@@ -1,0 +1,834 @@
+on_actions = {
+	on_new_term_election = {
+		random_events = {
+			100 = mexico.18 # 1940 Mexican election
+		}
+	}
+	
+	#Root is exile
+	#From is new host
+	#FromFrom is old host
+	on_host_changed_from_capitulation = {
+		effect = {
+			#Transfer exile leaders to new host
+			From.From = {
+				every_army_leader = {
+					limit = { is_exiled_leader_from = Root }
+					set_nationality = Root.From
+				}
+			}
+		}
+	}
+
+	#Root is exile
+	#From is old host
+	on_exile_government_reinstated = {
+		effect = {
+			From = {
+				every_army_leader = {
+					limit = { is_exiled_leader_from = Root }
+					set_nationality = Root
+				}
+			}
+			Root = {
+				every_army_leader = {
+					limit = { is_exiled_leader_from = Root }
+					remove_unit_leader_trait = exiled_leader
+					remove_exile_tag = yes
+				}
+			}
+		}
+	}
+
+	on_unit_leader_created = {
+		effect = {
+			if = {
+				limit = { is_exiled_leader = yes }
+				From.From = { save_event_target_as = exile_nation }
+				add_unit_leader_trait = exiled_leader
+				
+				add_random_trait = {
+					old_guard
+					brilliant_strategist
+					inflexible_strategist
+					war_hero
+					trait_cautious
+					trait_reckless
+					media_personality
+					harsh_leader
+					infantry_officer
+					cavalry_officer
+					armor_officer
+				}
+
+				add_random_trait = {
+					organizer
+					panzer_leader
+					cavalry_leader
+					trait_engineer
+					infantry_leader
+					naval_invader						
+					commando
+					skilled_staffer
+					trickster					
+				}
+
+				unit_leader_event = { id = mtg_exile_leader_added.1 }
+			}
+		}
+	}
+
+	#ROOT is winner #FROM gets annexed - This will also fire on_annex
+	on_civil_war_end = {
+		effect = {
+			#End of British Fascist Civil War
+			if = {
+				limit = {
+					original_tag = ENG
+					has_government = fascism
+					has_completed_focus = ENG_organize_the_blackshirts
+				}
+				set_country_flag = { flag = won_british_civil_war value = 1 days = 365 }
+				country_event = { id = mtg_britain.34 }
+			}
+			#End of British Communist Civil War
+			if = {
+				limit = {
+					original_tag = ENG
+					has_government = democratic
+					has_completed_focus = ENG_concessions_to_the_trade_unions
+				}
+				country_event = { id = mtg_britain.56 }
+			}
+			#End of Imperialist Loyalist civil war
+			if = {
+				limit = {
+					OR = {
+						original_tag = CAN
+						original_tag = SAF
+						original_tag = AST
+						original_tag = NZL
+					}
+					has_government = neutrality
+					ENG = { has_completed_focus = ENG_appeal_to_imperial_loyalists }
+					NOT = { is_subject_of = ENG }
+				}
+				ENG = { country_event = { id = mtg_britain.113 hours = 6 } }
+			}
+		}
+	}
+
+	#ROOT is winner #FROM gets annexed - This fires just before FROM gets annexed, meaning the country and everything it owns still exists. It will also fire on_annex and on_civil_war_end
+	on_civil_war_end_before_annexation = {
+		effect = {
+			#End of British Fascist Civil War - moving the fleet back to the Fascists because they won
+			if = {
+				limit = {
+					original_tag = ENG
+					has_government = fascism
+					has_completed_focus = ENG_organize_the_blackshirts
+				}
+				random_other_country = {
+					limit = {
+						original_tag = ENG
+						has_government = democratic
+					}
+					transfer_navy = { target = ENG }
+					every_unit_leader = {
+						limit = {
+							OR = {
+								has_id = 983
+								has_id = 984
+								has_id = 985
+								has_id = 986
+								has_id = 987
+								has_id = 988
+								has_id = 989
+								has_id = 990
+								has_id = 991
+								has_id = 992
+							}
+						}
+						set_nationality = ENG
+					}
+				}
+			}
+		}
+	}
+
+	#FROM is war target
+	on_declare_war = {
+		effect = {
+			# In case of HOL being declared war on and still having Shell-shocked Spectator of the Great War, remove the spirit
+			if = {
+				limit = {
+					FROM = {
+						original_tag = HOL
+						OR = {
+							has_idea = HOL_shell_shocked_spectator_1
+							has_idea = HOL_shell_shocked_spectator_2
+							has_idea = HOL_shell_shocked_spectator_3
+							has_idea = HOL_shell_shocked_spectator_4
+							has_idea = HOL_shell_shocked_spectator_5
+						}
+					}
+				}
+				FROM = {
+					hidden_effect = {
+						remove_ideas = HOL_shell_shocked_spectator_1
+						remove_ideas = HOL_shell_shocked_spectator_2
+						remove_ideas = HOL_shell_shocked_spectator_3
+						remove_ideas = HOL_shell_shocked_spectator_4
+						remove_ideas = HOL_shell_shocked_spectator_5
+					}
+				}
+			}
+			# In case of HOL being declared war on and still having Aloof Neutrality, remove the spirit
+			if = {
+				limit = {
+					FROM = {
+						original_tag = HOL
+						has_idea = HOL_aloof_neutrality
+					}
+				}
+				FROM = {
+					hidden_effect = {
+						remove_ideas = HOL_aloof_neutrality
+					}
+				}
+			}
+			# In case of HOL being declared war on and having taken the "Share intelligence" decision, they get a temporary buff to defense and attack
+			if = {
+				limit = {
+					tag = FRA
+					NOT = { is_in_faction_with = ENG }
+					FROM = { has_country_flag = secret_staff_talks_british_intelligence }
+				}
+				hidden_effect = {
+					FROM = { add_timed_idea = { idea = HOL_shared_intelligence_eng_fra days = 180 } }
+				}
+			}
+			if = {
+				limit = {
+					tag = GER
+					NOT = { is_in_faction_with = ENG }
+					FROM = { has_country_flag = secret_staff_talks_british_intelligence }
+				}
+				hidden_effect = {
+					FROM = { add_timed_idea = { idea = HOL_shared_intelligence_eng_ger days = 180 } }
+				}
+			}
+			if = {
+				limit = {
+					tag = ENG
+					NOT = { is_in_faction_with = FRA }
+					FROM = { has_country_flag = secret_staff_talks_french_intelligence }
+				}
+				hidden_effect = {
+					FROM = { add_timed_idea = { idea = HOL_shared_intelligence_fra_eng days = 180 } }
+				}
+			}
+			if = {
+				limit = {
+					tag = GER
+					NOT = { is_in_faction_with = FRA }
+					FROM = { has_country_flag = secret_staff_talks_french_intelligence }
+				}
+				hidden_effect = {
+					FROM = { add_timed_idea = { idea = HOL_shared_intelligence_fra_ger days = 180 } }
+				}
+			}
+			if = {
+				limit = {
+					tag = FRA
+					NOT = { is_in_faction_with = GER }
+					FROM = { has_country_flag = secret_staff_talks_german_intelligence }
+				}
+				hidden_effect = {
+					FROM = { add_timed_idea = { idea = HOL_shared_intelligence_ger_fra days = 180 } }
+				}
+			}
+			if = {
+				limit = {
+					tag = ENG
+					NOT = { is_in_faction_with = GER }
+					FROM = { has_country_flag = secret_staff_talks_german_intelligence }
+				}
+				hidden_effect = {
+					FROM = { add_timed_idea = { idea = HOL_shared_intelligence_ger_eng days = 180 } }
+				}
+			}
+			# In case of GER/ENG/FRA going to war they get a minor buff if they shared intelligence
+			if = {
+				limit = {
+					tag = FRA
+					NOT = { is_in_faction_with = HOL }
+					FROM = { has_country_flag = secret_staff_talks_dutch_intelligence }
+				}
+				hidden_effect = { FROM = { add_timed_idea = { idea = HOL_shared_intelligence_hol_fra days = 180 } } }
+			}
+			if = {
+				limit = {
+					FROM = { tag = FRA }
+					FROM = { NOT = { is_in_faction_with = HOL } }
+					has_country_flag = secret_staff_talks_french_intelligence
+				}
+				hidden_effect = { add_timed_idea = { idea = HOL_shared_intelligence_hol_fra days = 180 } }
+			}
+			if = {
+				limit = {
+					tag = ENG
+					NOT = { is_in_faction_with = HOL }
+					FROM = { has_country_flag = secret_staff_talks_dutch_intelligence }
+				}
+				hidden_effect = { FROM = { add_timed_idea = { idea = HOL_shared_intelligence_hol_eng days = 180 } } }
+			}
+			if = {
+				limit = {
+					FROM = { tag = ENG }
+					FROM = { NOT = { is_in_faction_with = HOL } }
+					has_country_flag = secret_staff_talks_french_intelligence
+				}
+				hidden_effect = { add_timed_idea = { idea = HOL_shared_intelligence_hol_eng days = 180 } }
+			}
+			if = {
+				limit = {
+					tag = GER
+					NOT = { is_in_faction_with = HOL }
+					FROM = { has_country_flag = secret_staff_talks_dutch_intelligence }
+				}
+				hidden_effect = { FROM = { add_timed_idea = { idea = HOL_shared_intelligence_hol_ger days = 180 } } }
+			}
+			if = {
+				limit = {
+					FROM = { tag = GER }
+					FROM = { NOT = { is_in_faction_with = HOL } }
+					has_country_flag = secret_staff_talks_french_intelligence
+				}
+				hidden_effect = { add_timed_idea = { idea = HOL_shared_intelligence_hol_ger days = 180 } }
+			}
+			# In case of HOL being declared war on and having taken the "draw up shared staff plan" decision, they get a temporary buff to core defense and max entrenchment
+			if = {
+				limit = {
+					OR = {
+						tag = FRA
+						tag = GER
+					}
+					NOT = { is_in_faction_with = ENG }
+					FROM = { has_country_flag = secret_staff_talks_british_staff_plan }
+				}
+				hidden_effect = { FROM = { add_timed_idea = { idea = HOL_staff_plan_eng days = 180 } } }
+			}
+			if = {
+				limit = {
+					OR = {
+						tag = ENG
+						tag = GER
+					}
+					NOT = { is_in_faction_with = FRA }
+					FROM = { has_country_flag = secret_staff_talks_french_staff_plan }
+				}
+				hidden_effect = { FROM = { add_timed_idea = { idea = HOL_staff_plan_fra days = 180 } } }
+			}
+			if = {
+				limit = {
+					OR = {
+						tag = FRA
+						tag = ENG
+					}
+					NOT = { is_in_faction_with = GER }
+					FROM = { has_country_flag = secret_staff_talks_german_staff_plan }
+				}
+				hidden_effect = { FROM = { add_timed_idea = { idea = HOL_staff_plan_ger days = 180 } } }
+			}
+		}
+	}
+
+	on_government_exiled = {
+		effect = {
+			if = {
+				limit = {
+					original_tag = HOL
+					has_country_flag = HOL_prepared_evacuation_of_gold_reserves_flag
+				}
+				country_event = { id = mtg_netherlands.63 days = 1 }
+			}
+		}
+	}
+
+	#ROOT = nation being puppeted, FROM = overlord
+	on_puppet = {
+		effect = {
+			if = {
+				limit = {
+					original_tag = SOV
+					has_government = communism
+					has_country_leader = { name = "Joseph Stalin" }
+					is_puppet_of = MEX
+					MEX = {
+						OR = {
+							has_country_leader = { ruling_only = yes name = "Hernán Laborde" }
+							has_country_leader = { ruling_only = yes name = "Leon Trotsky" }
+							has_country_leader = { ruling_only = yes name = "Valentín Campa" }
+						}
+					}
+				}
+				SOV = { #TODO william check if works as intended or recreate Trotsky independently, also remove Trotsky from Mexico? What about puppet relationship? Look for another Soviet Trotskyist?
+					country_event = soviet.28
+				}
+			}
+			if = {
+				limit = {
+					original_tag = MEX
+					has_government = communism
+					OR = {
+						has_country_leader = { ruling_only = yes name = "Hernán Laborde" }
+						has_country_leader = { ruling_only = yes name = "Leon Trotsky" }
+						has_country_leader = { ruling_only = yes name = "Valentín Campa" }
+					}					
+					is_puppet_of = SOV
+					MEX = {
+						has_country_leader = { name = "Joseph Stalin" } #change to subideology stalinism when supported
+					}
+				}
+				MEX = { 
+					create_country_leader = {
+						name = "Dionisio Encina"
+						desc = "POLITICS_DIONISIO_ENCINA_DESC"
+						picture = "GFX_portrait_mex_dionisio_encina"
+						expire = "1965.1.1"
+						ideology = stalinism
+						traits = {
+							staunch_stalinist
+						}
+					}				
+				}
+			}
+			if = {
+				limit = {
+					FROM = {
+						original_tag = ENG
+						NOT = { has_government = communism }
+					}
+					has_completed_focus = MEX_focus_nationalize_the_oil_fields
+				}
+				set_cosmetic_tag = ENG_MEX_dominion
+			}	
+		}
+	}
+
+	on_startup = {
+		effect = {
+			#Mexican oil concessions
+			MEX = {
+				give_resource_rights = { receiver = ENG state = 476 }
+				give_resource_rights = { receiver = ENG state = 477 }
+				give_resource_rights = { receiver = USA state = 479 }
+				give_resource_rights = { receiver = USA state = 480 }
+			}
+			# Game Rules - Decolonization
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = americas_colonization_status
+						option = AMERICAS_DECOLONIZED
+					}
+				}
+				ENG = {
+					release = BLZ
+					release = BAH
+					release = GYA
+					release = JAM
+					release = TRI
+					release = BAS
+				}
+				HOL = {
+					release = CRC
+					release = SUR
+				}
+				FRA = {
+					release = GDL
+					release = CAY
+				}
+				USA = {
+					release = PUE
+				}
+				PAN = {
+					transfer_state = 685
+				}
+				ENG = {
+					set_autonomy = { target = CAN autonomy_state = autonomy_free }
+				}
+				CAN = {
+					drop_cosmetic_tag = yes
+					transfer_state = 332
+					transfer_state = 331
+				}
+			}
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = africa_colonization_status
+						option = AFRICA_DECOLONIZED
+					}
+				}
+				FRA = {
+					release = MOR
+					release = ALG
+					release = TUN
+					release = DJI
+					release = MAD
+					release = GAB
+					release = RCG
+					release = CMR
+					release = CAR
+					release = CHA
+					release = DAH
+					release = TOG
+					release = IVO
+					release = VOL
+					release = MLI
+					release = GNA
+					release = SEN
+					release = NGR
+					release = MRT
+				}
+				ITA = {
+					release = LBA
+					release = ERI
+					release = SOM
+				}
+				SOM = {
+					transfer_state = 269
+				}
+				ENG = {
+					release = EGY
+					release = SUD
+					release = UGA
+					release = TZN
+					release = ZAM
+					release = MLW
+					release = KEN
+					release = ZIM
+					release = BOT
+					release = NGA
+					release = GHA
+					release = SIE
+					release = GAM
+				}
+				BEL = {
+					release = RWA
+					release = BRD
+					release = COG
+				}
+				SAF = {
+					release = NMB
+				}
+				POR = {
+					release = MZB
+					release = ANG
+					release = GNB
+				}
+				SPR = {
+					release = WES
+					release = EQG
+				}
+				ITA = {
+					white_peace = {
+						tag = ETH
+					}
+				}
+				MOR = {
+					transfer_state = 290
+					transfer_state = 783
+				}
+				ENG = {
+					set_autonomy = { target = SAF autonomy_state = autonomy_free }
+				}
+				SAF = {
+					retire_country_leader = yes
+				}
+			}
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = asia_colonization_status
+						option = ASIA_DECOLONIZED
+					}
+				}
+				ENG = {
+					release = FIJ
+					release = MLD
+					release = MAL
+					release = SRL
+					release = QAT
+					release = KUW
+					release = UAE
+					release = PAL
+					release = JOR
+				}
+				RAJ = {
+					release = BRM
+					release = BAN
+					release = PAK
+				}
+				AST = {
+					release = PNG
+				}
+				ENG = {
+					set_autonomy = { target = RAJ autonomy_state = autonomy_free }
+					set_autonomy = { target = AST autonomy_state = autonomy_free }
+					set_autonomy = { target = NZL autonomy_state = autonomy_free }
+				}
+				MAL = {
+					drop_cosmetic_tag = yes
+					retire_country_leader = yes
+				}
+				RAJ = {
+					drop_cosmetic_tag = yes
+					retire_country_leader = yes
+				}
+				HOL = {
+					set_autonomy = { target = INS autonomy_state = autonomy_free }
+				}
+				INS = {
+					drop_cosmetic_tag = yes
+					retire_country_leader = yes
+				}
+				USA = {
+					release = PHI
+				}
+				FRA = {
+					release = VIN
+					release = CAM
+					release = LAO
+					release = LEB
+					release = SYR
+				}
+				YEM = {
+					transfer_state = 659
+				}
+				RAJ = {
+					transfer_state = 321
+					transfer_state = 320
+				}
+				GXC = {
+					transfer_state = 728
+					transfer_state = 729
+					transfer_state = 326
+				}
+			}
+			# Game Rules - Fragmentation
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = eng_fragmentation_status
+						option = ENG_FRAGMENTED
+					}
+				}
+				ENG = {
+					release = SCO
+					release = WLS
+					release = NIR
+					release = MLT
+					release = CYP
+					set_cosmetic_tag = ENG_england
+				}
+			}
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = yug_fragmentation_status
+						option = YUG_FRAGMENTED
+					}
+				}
+				YUG = {
+					release = SLV
+					release = BOS
+					release = MAC
+					release = SER
+					release = CRO
+					release = MNT
+				}
+			}
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = sov_fragmentation_status
+						option = SOV_FRAGMENTED
+					}
+				}
+				SOV = {
+					release = UKR
+					release = BLR
+					release = GEO
+					release = AZR
+					release = ARM
+					release = UZB
+					release = TAJ
+					release = KYR
+					release = TMS
+					release = KAZ
+				}
+			}
+			if = {
+				limit = {
+					has_game_rule = {
+						rule = raj_fragmentation_status
+						option = RAJ_FRAGMENTED
+					}
+				}
+				RAJ = {
+					release = BAN
+					release = PAK
+					release = BRM
+				}
+			}
+		}
+	}
+
+	# ROOT is capitulated country, FROM is winner
+	on_capitulation = {
+		effect = {
+			if = { # Reducing the Crisisjaren idea to level 1 when capitulated (in case player didn't manage to finish the mainland industrial focuses), but still needs Liberation to remove it fully
+				limit = {
+					original_tag = HOL
+					has_idea = HOL_de_crisisjaren_4
+				}
+				swap_ideas = {
+					remove_idea = HOL_de_crisisjaren_4
+					add_idea = HOL_de_crisisjaren_1
+				}
+			}
+			if = {
+				limit = {
+					original_tag = HOL
+					has_idea = HOL_de_crisisjaren_3
+				}
+				swap_ideas = {
+					remove_idea = HOL_de_crisisjaren_3
+					add_idea = HOL_de_crisisjaren_1
+				}
+			}
+			if = {
+				limit = {
+					original_tag = HOL
+					has_idea = HOL_de_crisisjaren_2
+				}
+				swap_ideas = {
+					remove_idea = HOL_de_crisisjaren_2
+					add_idea = HOL_de_crisisjaren_1
+				}
+			}
+			if = { # Only possible if Abandon the Gold Standard hasn't been taken yet, this can be taken later so should be reduced to level 2 rather than 1
+				limit = {
+					original_tag = HOL
+					has_idea = HOL_de_crisisjaren_5
+				}
+				swap_ideas = {
+					remove_idea = HOL_de_crisisjaren_5
+					add_idea = HOL_de_crisisjaren_2
+				}
+			}
+			if = {
+				limit = {
+					tag = GER
+					FROM = {
+						tag = HOL
+						has_completed_focus = HOL_wilhelminism
+					}
+				}
+				HOL = { country_event = { id = mtg_netherlands.76 } }
+			}
+		}
+	}
+
+	#ROOT is winner #FROM is loser
+	on_peaceconference_ended = {
+		effect = {
+			if = {
+				limit = {
+					original_tag = GER
+					FROM = { original_tag = HOL }
+				}
+				remove_ideas = HOL_german_defectors_2
+			}
+		}
+	}
+
+	#ROOT is new controller #FROM is old controller #FROM.FROM is state ID
+	on_state_control_changed = {
+		effect = {
+			if = {
+				limit = {
+					original_tag = HOL
+					has_completed_focus = HOL_wilhelminism
+					FROM = {
+						original_tag = GER
+						has_government = fascism
+						has_civil_war = no
+					}
+					FROM.FROM = {
+						is_core_of = GER
+					}
+				}
+				FROM.FROM = { 
+					set_state_flag = HOL_german_states_kaiser
+				}
+				country_event = { id = mtg_netherlands.73 }
+			}
+		}
+	}
+
+	on_nuke_drop = {
+		effect = {			
+			if = {
+				limit = {
+					tag = USA
+					FROM = {
+						state = 16
+					}
+				}
+				set_country_flag = achievement_team_america
+			}
+			if = {
+				limit = {
+					FROM.FROM = { is_core_of = HOL }
+				}
+				FROM = {
+					set_country_flag = HOL_lost_starting_state
+				}
+			}
+		}
+	}
+
+	# FROM is the sinker, ROOT is the owner of the ship being sunk
+	on_sunk_pride = {
+		effect = {
+			if = {
+				limit = {
+					tag = ENG
+				}
+				FROM = { set_country_flag = achievements_pride_and_extreme_prejudice }
+			}
+		}
+	}
+
+	on_leave_faction = {
+		effect = {
+			if = {
+				limit = { 
+					original_tag = HOL
+					has_country_flag = HOL_joined_germany_flag
+				}
+				FROM = {
+					create_wargoal = {
+						type = take_state_focus
+						target = ROOT
+						generator = { 7 }
+					}
+				}
+			}
+		}
+	}
+}

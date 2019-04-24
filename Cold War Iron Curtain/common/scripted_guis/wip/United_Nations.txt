@@ -1,0 +1,153 @@
+scripted_gui = {
+	unsc_topbar = {
+		context_type = player_context
+		
+		window_name = "unsc_topbar_select"
+		
+		visible = {
+			OR = {
+				has_idea = UN_Security_Council_Member_Perm
+				has_idea = UN_Security_Council_Member_Temp_afr
+				has_idea = UN_Security_Council_Member_Temp_asia
+				has_idea = UN_Security_Council_Member_Temp_latam
+				has_idea = UN_Security_Council_Member_Temp_westeu
+				has_idea = UN_Security_Council_Member_Temp_eastern
+			}
+		}
+		effects = {
+			comecon_topbar_click = {
+				set_variable = { unsc_main_show = 1 } 
+			}	
+		}
+	}
+	unsc_menu = {
+		context_type = player_context
+		
+		window_name = "unsc_menu_select"
+		
+		visible = {
+			check_variable = { unsc_main_show = 1 }
+		}
+		effects = {
+			vote_yes_click = {
+				add_to_variable = {
+					var = global.vote_yes
+					value = 1
+				}				
+			}
+			vote_no_click = {
+				add_to_variable = {
+					var = global.vote_no
+					value = 1
+				}				
+			}
+			vote_abstain_click = {
+				add_to_variable = {
+					var = global.vote_abstain
+					value = 1
+				}					
+			}
+			vote_veto_click = {
+				add_to_variable = {
+					var = global.vote_veto
+					value = 1
+				}				
+			}
+		}
+		triggers = {
+			vote_yes_click = {
+			
+			}
+			vote_no_click_enabled = {
+			
+			}
+			vote_abstain_click_enabled = {
+			
+			}
+			vote_veto_click_enabled = {
+			
+			}
+		}
+	}
+	unsc_select_menu = {
+		context_type = selected_country_context
+		parent_window_token = selected_country_view_diplomacy
+		
+		window_name = "unsc_select_menu_counter"
+		visible = {
+			ROOT = { 
+				OR = {
+					has_idea = UN_Security_Council_Member_Perm
+					has_idea = UN_Security_Council_Member_Temp_afr
+					has_idea = UN_Security_Council_Member_Temp_asia
+					has_idea = UN_Security_Council_Member_Temp_latam
+					has_idea = UN_Security_Council_Member_Temp_westeu
+					has_idea = UN_Security_Council_Member_Temp_eastern
+				}
+			}
+		}
+		effects = {
+			unsc_select_click = {
+				ROOT = { set_variable = { unsc_tar_show = 1 } }
+			}
+		}
+	}
+	unsc_target_menu = {
+		context_type = player_context
+		
+		window_name = "unsc_target_menu"
+        
+		visible = {
+			check_variable = { unsc_tar_show = 1 }
+		}
+		
+		effects = {
+			humanitarian_click = {
+				set_global_flag = un_ongoing_voting
+				set_global_flag = un_voting_one
+				set_variable = { global.vote_target = THIS.id }
+				country_event = un.1
+			}		
+			propose_sanctions_click = {
+				set_variable = { global.vote_target = THIS.id }
+				set_global_flag = un_voting_two
+				country_event = un.1
+			}
+			send_peacekeepers_click = {
+				set_variable = { global.vote_target = THIS.id }
+				set_global_flag = un_voting_three
+				country_event = un.1
+			}
+			authorize_intervention_click = {
+				set_variable = { global.vote_target = THIS.id }
+				set_global_flag = un_voting_four
+				country_event = un.1
+			}
+		}
+		triggers = {
+			humanitarian_click_enabled = {
+				 NOT = { has_global_flag = un_ongoing_voting }
+				 NOT = { has_added_tension_amount > 2 }
+				 ic_ratio = {
+					tag = ROOT
+					ratio < 0.06
+				}				
+			}
+			propose_sanctions_click_enabled = {
+				has_added_tension_amount > 10		
+			}		
+			send_peacekeepers_click_enabled = {
+				has_added_tension_amount < 5	
+				has_defensive_war = yes
+				has_offensive_war = no
+				any_enemy_country  = {
+					has_added_tension_amount > 10
+				}
+			}
+			authorize_intervention_click_enabled = {
+				has_added_tension_amount > 20
+				has_offensive_war = yes
+			}
+		}
+	}
+}

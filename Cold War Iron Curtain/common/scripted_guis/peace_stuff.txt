@@ -1,0 +1,63 @@
+scripted_gui = {
+	peace_menu_topbar = {
+		context_type = player_context
+		
+		window_name = "peace_menu_topbar_select"
+		
+		visible = {
+			has_war = yes
+		}
+		effects = {
+			peace_menu_topbar_click = {
+				clear_array = warEnemies
+				every_enemy_country = {
+					PREV = { add_to_array = { warEnemies = PREV.id } }
+				}
+				set_variable = { peace_menu_show = 1 } 
+			}	
+		}
+	}
+
+	peace_menu_select = {
+	
+		context_type = player_context
+		
+		window_name = "peace_menu_select"
+		
+		visible = {
+			check_variable = { peace_menu_show = 1 }
+		}
+
+		dynamic_lists = {
+			peace_list = {
+				array = warEnemies
+				entry_container = peace_full_list
+			}
+		}	
+		properties = {
+			peace_list_icon = { image = "[?warEnemies^i.GetFlag]" }
+		}
+		effects = {
+			peace_list_icon_click = {
+				set_country_flag = in_negotiations
+				set_variable = { currentTarget = warEnemies^i }
+				white_peace = var:currentTarget
+				var:currentTarget = {
+					every_owned_state = {
+						limit = {
+							is_core_of = ROOT
+						}
+						ROOT = {
+							transfer_state = PREV
+						}
+					}
+				}
+				
+			}	
+		}
+	}
+}
+
+
+
+

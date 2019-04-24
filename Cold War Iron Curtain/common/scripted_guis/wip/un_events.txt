@@ -1,0 +1,297 @@
+add_namespace = un
+add_namespace = UN_intervention
+country_event = {
+	id = un.1
+	hidden = yes
+
+	is_triggered_only = yes
+
+
+	immediate = {
+		save_global_event_target_as = un_target
+		every_country = {
+			limit = {
+				OR = {
+					has_idea = UN_Security_Council_Member_Perm
+					has_idea = UN_Security_Council_Member_Temp_afr
+					has_idea = UN_Security_Council_Member_Temp_asia
+					has_idea = UN_Security_Council_Member_Temp_latam
+					has_idea = UN_Security_Council_Member_Temp_westeu
+					has_idea = UN_Security_Council_Member_Temp_eastern				}
+			}
+			if = {
+				limit = {
+					has_global_flag = un_voting_one
+				}
+				country_event = un.101
+			}
+			if = {
+				limit = {
+					has_global_flag = un_voting_two
+				}
+				country_event = un.102
+			}	
+			if = {
+				limit = {
+					has_global_flag = un_voting_three
+				}
+				country_event = un.103
+			}					
+			if = {
+				limit = {
+					has_global_flag = un_voting_four
+				}
+				country_event = un.104
+			}		
+		}
+	}
+}
+
+country_event = {
+	id = un.101
+	title = un.101.t
+	desc =  un.101.d
+
+	is_triggered_only = yes
+
+	option = {
+		title = "Vote Yes"
+		add_to_variable = {
+			var = global.vote_total
+			value = 1
+		}			
+	}
+	option = {
+		title = "Vote No"
+		subtract_from_variable = {
+			var = global.vote_total
+			value = 1
+		}			
+	}
+	option = {
+		title = "Abstain"
+	}
+	option = {
+		title = "Veto"
+		trigger = {
+			has_idea = UN_Security_Council_Member_Perm
+		}
+		set_global_flag = resolution_vetoed
+	}
+}
+country_event = {
+	id = un.102
+	title = un.102.t
+	desc =  un.102.d
+
+	is_triggered_only = yes
+
+	option = {
+		title = "Vote Yes"
+		add_to_variable = {
+			var = global.vote_total
+			value = 1
+		}			
+	}
+	option = {
+		title = "Vote No"
+		subtract_from_variable = {
+			var = global.vote_total
+			value = 1
+		}			
+	}
+	option = {
+		title = "Abstain"
+	}
+	option = {
+		title = "Veto"
+		trigger = {
+			has_idea = UN_Security_Council_Member_Perm
+		}
+		set_global_flag = resolution_vetoed
+	}
+}
+country_event = {
+	id = un.103
+	title = un.103.t
+	desc =  un.103.d
+
+	is_triggered_only = yes
+
+	option = {
+		title = "Vote Yes"
+		add_to_variable = {
+			var = global.vote_total
+			value = 1
+		}			
+	}
+	option = {
+		title = "Vote No"
+		subtract_from_variable = {
+			var = global.vote_total
+			value = 1
+		}			
+	}
+	option = {
+		title = "Abstain"
+	}
+	option = {
+		title = "Veto"
+		trigger = {
+			has_idea = UN_Security_Council_Member_Perm
+		}
+		set_global_flag = resolution_vetoed
+	}
+}
+country_event = {
+	id = un.104
+	title = un.104.t
+	desc =  un.104.d
+
+	is_triggered_only = yes
+
+	option = {
+		title = "Vote Yes"
+		add_to_variable = {
+			var = global.vote_total
+			value = 1
+		}			
+	}
+	option = {
+		title = "Vote No"
+		subtract_from_variable = {
+			var = global.vote_total
+			value = 1
+		}			
+	}
+	option = {
+		title = "Abstain"
+	}
+	option = {
+		title = "Veto"
+		trigger = {
+			has_idea = UN_Security_Council_Member_Perm
+		}
+		set_global_flag = resolution_vetoed
+	}
+}
+country_event = {
+	id = un.1000
+	hidden = yes
+
+	is_triggered_only = yes
+
+
+	immediate = {
+
+		if = {
+			limit = {
+				has_global_flag = un_voting_one	#Humanitarian Aid
+			}
+			global_event_target:un_target = {
+				news_event = un.8000
+				add_timed_idea = {
+					idea = un_aid
+					days = 1825
+				}
+			}
+		}
+		if = {
+			limit = {		
+				has_global_flag = un_voting_two	#Sanctions Passed
+			}
+			global_event_target:un_target = {	
+				UNI = {
+					add_opinion_modifier = {
+							target = PREV
+							modifier = UN_under_sanctions_trade
+						}
+				add_opinion_modifier = {
+							target = PREV
+							modifier = UN_under_sanctions
+						}
+				}
+				add_opinion_modifier = {
+						target = ROOT
+						modifier = UN_under_sanctions_trade
+				}
+				add_opinion_modifier = {
+						target = ROOT
+						modifier = UN_under_sanctions
+				}
+				every_country = {
+					limit = {
+						NOT = {
+							OR = {
+								tag = var:vote_target
+								has_relation_modifier = {
+									target = UNI
+									modifier = UN_under_sanctions
+								}
+							}
+						}
+						country_event = UN_sanctions.1
+					}
+				}
+			}			
+		}	
+		if = {
+			limit = {		
+				has_global_flag = un_voting_three	#Send Peacekeepers
+			}
+			set_global_flag = UN_PEACEKEEPERS
+			set_global_flag = UN_FACTION_FORMED
+			create_faction = "United Nations"	
+			add_to_faction = var:vote_target
+			add_ideas = UN_INTERVENTION
+			var:vote_target= {
+				add_ideas = UN_INTERVENTION
+			 }	
+		}					
+		if = {
+			limit = {
+				has_global_flag = un_voting_four	#Authorize Intervention
+			}
+			set_global_flag = UN_WAR
+			set_global_flag = UN_FACTION_FORMED
+			create_faction = "United Nations"
+			declare_war_on = {
+				target = var:vote_target
+				type = annex_everything
+			}
+			every_country = {
+				limit = {
+					NOT = {
+						OR = {
+							tag = var:vote_target
+							is_in_faction_with = var:vote_target
+						}
+					}
+					country_event = UN_intervention.1
+				}
+			}
+		}
+	}
+}
+country_event = {
+	id = UN_intervention.1
+	title = UN_intervention.1.t
+	desc =  UN_intervention.1.d
+
+	is_triggered_only = yes
+
+	option = {
+		title = "Join the War"
+		UNI = {
+			add_to_faction = ROOT
+		}
+		add_to_war = { 
+			targeted_alliance = UNI 
+			enemy = var:vote_target
+			hostility_reason = asked_to_join
+		}
+	}
+	option = {
+		title = "Decline to Intervene
+	}
+}

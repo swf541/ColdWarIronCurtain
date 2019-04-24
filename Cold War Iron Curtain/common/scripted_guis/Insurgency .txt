@@ -1,0 +1,200 @@
+scripted_gui = {
+	insurgency_panel = {
+	
+		context_type = selected_state_context
+		
+		window_name = "insurgency_panel_menu"
+		parent_window_token = selected_state_view
+		
+		visible = {
+			check_variable = { show_insurg_menu = 1 }
+		}
+			
+		effects = {
+		
+			exitbutton_insurgency_click = {
+				set_variable = { show_insurg_menu = 0 }
+			}
+
+			fund_insurgency_click = {
+				if = {
+					limit = {
+						NOT = {
+							has_state_flag = active_insurgency
+						}		
+					}
+					set_state_flag = active_insurgency
+
+					add_state_modifier = {
+						modifier = {
+							local_resources = -0.20
+							local_supplies = -0.30
+							local_intel_to_enemies = 0.25
+							local_factory_sabotage = 0.30
+							local_non_core_manpower = -0.30
+							attrition = 0.30
+							local_org_regain = -0.25
+						}
+					}
+				}
+				
+				ROOT = {
+					set_state_controller = created_guerillas_state
+					add_equipment_to_stockpile = {
+						type = infantry_equipment
+						amount = -1000
+					}
+				}
+			}
+			encourage_uprising_click = {
+				set_temp_variable = { ROOT.created_guerillas_state = THIS }
+				set_variable = { insur_target = THIS }
+				reset_insurgency_modifiers_effect = yes
+				ROOT = {
+					set_state_controller = created_guerillas_state
+					add_equipment_to_stockpile = {
+						type = infantry_equipment
+						amount = -5000
+					}	
+					
+					country_event = insurgency_effects.1 	#add_manpower = -2000
+					if = {
+						limit = {
+							has_country_flag = insurgency_revolution	
+						}
+						transfer_state = created_guerillas_state
+					}
+					if = {
+						limit = {
+							check_variable = { created_guerrillas_template = 0 }
+						}
+						set_variable = { ROOT.created_guerrillas_template = 1 }
+						division_template = {
+							name = "Guerrillas"
+							regiments = {
+								infantry = { x = 0 y = 0 }
+								infantry = { x = 0 y = 1 }
+								infantry = { x = 0 y = 2 }
+							}
+						}
+						set_division_template_lock = { division_template = Guerrillas is_locked = yes }
+					}
+					var:created_guerillas_state = {
+						create_unit = {
+							division = "name = \"Partisan\" division_template = \"Guerrillas\" start_experience_factor = 0.3" 
+							owner = ROOT
+						}
+						create_unit = {
+							division = "name = \"Partisan\" division_template = \"Guerrillas\" start_experience_factor = 0.3" 
+							owner = ROOT
+						}
+						create_unit = {
+							division = "name = \"Partisan\" division_template = \"Guerrillas\" start_experience_factor = 0.3" 
+							owner = ROOT
+						}
+					}
+				}				
+			}
+			raid_insurgent_bases_click = {
+				ROOT = { 
+					add_timed_idea = {
+						idea = cooldown_for_insurgent_attacks
+						days = 50
+					}
+				}	
+				set_variable = { insur_target = THIS }
+				country_event = insurgency_effects.2
+				subtract_from_variable = { insurgency_strength = 3 }
+			}
+			arial_bombardment_on_insurgent_bases_click = {
+				ROOT = { 
+					add_timed_idea = {
+						idea = cooldown_for_insurgent_attacks
+						days = 50
+					}
+				}
+				set_variable = { insur_target = THIS }
+				country_event = insurgency_effects.3 
+				subtract_from_variable = { insurgency_strength = 5 }
+			}
+		}	
+		triggers = {
+
+			raid_insurgent_bases_click_enabled = {
+				ROOT = {
+					NOT = {
+						has_idea = cooldown_for_insurgent_attacks
+					}
+					has_army_size = {
+						size > 5
+					}
+				}
+				has_state_flag = active_insurgency
+				is_fully_controlled_by = ROOT
+				is_owned_by = ROOT 
+			}
+			arial_bombardment_on_insurgent_bases_click_enabled = {
+				NOT = {
+					has_idea = cooldown_for_insurgent_attacks
+				}
+				has_state_flag = active_insurgency
+				is_fully_controlled_by = ROOT
+				is_owned_by = ROOT 
+				ROOT = {
+					OR = {
+						has_deployed_air_force_size = {
+							size > 20
+							type = strategic_bomber
+						} 
+						has_deployed_air_force_size = {
+							size > 20
+							type = tactical_bomber
+						} 
+					}
+				}
+			}
+			raid_insurgent_bases_visible = {
+				has_state_flag = active_insurgency
+				is_fully_controlled_by = ROOT
+				is_owned_by = ROOT 
+			}
+			arial_bombardment_on_insurgent_bases_visible = {
+				has_state_flag = active_insurgency
+				is_fully_controlled_by = ROOT
+				is_owned_by = ROOT 
+			}
+			fund_insurgency_visible = {
+				is_core_of = ROOT
+				
+				NOT = { has_state_flag = active_insurgency }
+				NOT = { is_fully_controlled_by = ROOT }
+				NOT = { is_owned_by = ROOT }	
+				ROOT = {
+					has_manpower = 1000
+					has_equipment  = {
+						type = infantry_equipment
+						amount = 1000
+					}					
+				}
+			}
+
+			encourage_uprising_visible = {
+				has_state_flag = active_insurgency
+				is_core_of = ROOT
+				NOT = { is_owned_by = ROOT }
+			}
+			encourage_uprising_click_enabled = {
+				any_country = {
+					controls_state = THIS
+					has_war_with = ROOT
+				}		
+				OR = {
+					check_variable = { var = insurgency_strength value = 150 compare = greater_than_or_equals }
+					ROOT = { 
+						has_country_flag = insurgency_revolution
+					}
+				}
+			}	
+		}
+	}
+}

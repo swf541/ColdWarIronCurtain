@@ -1,0 +1,621 @@
+governments_in_exile = {
+
+	request_reinstatement = {
+
+		icon = generic_independence
+
+		days_re_enable = 120 # Prevent event spam
+
+		cost = 10
+
+		available = {
+			all_owned_state = {
+				is_controlled_by = ROOT
+			}
+		}
+
+		visible = {
+			FROM = { is_hosting_exile = ROOT }
+			any_owned_state = {
+				is_controlled_by = ROOT
+			}
+		}
+
+		target_trigger = { FROM = { is_hosting_exile = ROOT } }
+		
+		complete_effect = {
+			FROM = {
+				country_event = { id = mtg_exile_government.2 }
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	grant_parliamentary_audience = {
+
+		icon = eng_install_government
+
+		available = {
+		    FROM = {
+		    	has_legitimacy < 95
+		    }
+			OR = {
+				political_power_daily > 0.25
+				has_political_power > 30
+			}
+		}
+
+		visible = {
+			FROM = { is_exiled_in = ROOT }
+		    FROM = {
+		    	has_legitimacy < 100
+		    }
+		}
+
+		target_trigger = { FROM = { is_exiled_in = ROOT } }
+		
+		modifier = {
+			political_power_cost = 0.25
+		}
+		
+		targeted_modifier = {
+			tag = FROM
+			targeted_legitimacy_daily = 0.2
+		}
+
+		days_remove = 120
+
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				OR = {
+					has_political_power < 50
+					political_power_daily < 0.3
+				}
+				factor = 0
+			}
+			modifier = {
+				factor = 0
+				FROM = {
+					has_legitimacy > 60
+				}
+			}
+		}
+	}
+
+	lobby_for_parliamentary_support = {
+
+		icon = eng_install_government
+
+		available = {
+			OR = {
+				political_power_daily > 0.25
+				has_political_power > 30
+			}
+		}
+
+		visible = {
+			FROM = { is_hosting_exile = ROOT }
+		    FROM = {
+		    	has_legitimacy < 100
+		    }
+		}
+
+		target_trigger = { FROM = { is_hosting_exile = ROOT } }
+		
+		modifier = {
+			political_power_cost = 0.25
+			legitimacy_daily = 0.2
+		}		
+
+		days_remove = 120
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	public_support_for_from = {
+
+		icon = eng_install_government
+
+		available = {
+			OR = {
+				political_power_daily > 0.25
+				has_political_power > 30
+			}
+		}
+
+		visible = {
+			is_major = yes
+			FROM = { is_in_faction_with = ROOT }
+		    FROM = {
+		    	has_legitimacy < 100
+		    }
+		}
+
+		target_trigger = {
+			has_capitulated = no
+			is_major = yes
+			FROM = { is_in_faction_with = ROOT }
+
+			any_other_country = {
+				is_in_faction_with = ROOT
+				is_faction_leader = yes
+				is_hosting_exile = FROM
+			}
+		}
+		
+		modifier = {
+			political_power_cost = 0.25
+		}
+
+		targeted_modifier = {
+			tag = FROM
+			targeted_legitimacy_daily = 0.2
+		}
+
+		days_remove = 120
+
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+	exile_recruitment_campaign = {
+
+		icon = eng_propaganda_campaigns
+
+		days_remove = 120
+
+		available = {
+			OR = {
+				political_power_daily > 1.0
+				has_political_power > 120
+			}
+		    FROM = {
+		    	has_legitimacy > 20
+		    }
+		}
+
+		visible = {
+			FROM = { is_hosting_exile = ROOT }
+		    FROM = {
+		    	has_legitimacy > 10
+		    }
+		}
+
+		target_trigger = { FROM = { is_hosting_exile = ROOT } }
+		
+		modifier = {
+			political_power_cost = 1.0
+			exile_manpower_factor = 0.5
+		}
+
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				has_political_power < 150
+				factor = 0
+			}
+		}
+	}
+
+	exile_extraction_campaign = {
+		
+		icon = oppression
+
+		cost = 0
+
+		days_remove = 60
+
+		custom_cost_trigger = {
+			command_power > 25
+		}
+
+		custom_cost_text = custom_cost_joint_training_exercise
+
+		available = {
+		    FROM = {
+		    	has_legitimacy > 40
+		    }
+		    FROM = {
+		    	any_war_score > 4
+		    }
+		}
+
+		visible = {
+			FROM = { is_exiled_in = ROOT }
+		    FROM = {
+		    	has_legitimacy > 30
+		    	any_war_score > 2
+		    }
+		}
+
+		target_trigger = { FROM = { is_exiled_in = ROOT } }
+		
+		targeted_modifier = {
+			tag = FROM
+			exile_manpower_factor = 0.5
+		}
+
+		complete_effect = {
+			hidden_effect = {
+				add_command_power = -25
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+
+			modifier = {
+				factor = 0 # Save for more immediately useful stuff
+				command_power < 50
+			}
+			modifier = {
+				factor = 100
+				command_power > 98 # Not doing you any good so spend it
+			}
+		}
+	}
+
+	purge_infiltrators = {
+
+		icon = generic_political_discourse
+
+		available = {
+		    FROM = {
+		    	has_legitimacy > 50
+		    }
+		    FROM = {
+		    	OR = {
+		    		fascism > 0.1
+		    		communism > 0.1
+		    	}
+		    }
+		}
+
+		visible = {
+			FROM = { is_exiled_in = ROOT }
+		    FROM = {
+		    	has_legitimacy > 40
+		    }
+		    FROM = {
+		    	OR = {
+		    		fascism > 0.05
+		    		communism > 0.05
+		    	}
+		    }
+		}
+
+		target_trigger = {
+			FROM = { is_exiled_in = ROOT }
+			FROM = {
+		    	has_legitimacy > 40
+		    }
+		    FROM = {
+		    	OR = {
+		    		fascism > 0.05
+		    		communism > 0.05
+		    	}
+		    }
+		}
+				
+		targeted_modifier = {
+			tag = FROM
+			targeted_legitimacy_daily = -1
+		}
+
+		remove_effect = {
+			add_political_power = 50
+		}
+
+		days_remove = 30
+
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+	expatriate_donations = {
+		
+		icon = ger_military_buildup
+
+		cost = 25
+
+		days_remove = 360
+
+		available = {
+		    FROM = {
+		    	has_legitimacy > 60
+		    }
+		    FROM = {
+		    	any_war_score > 9
+		    }
+		}
+
+		visible = {
+			FROM = { is_exiled_in = ROOT }
+		    FROM = {
+		    	has_legitimacy > 50
+		    	any_war_score > 5
+		    }
+		}
+
+		target_trigger = { FROM = { is_exiled_in = ROOT } }
+		
+		modifier = {
+			industrial_factory_donations = 1
+		}
+
+		targeted_modifier = {
+			tag = FROM
+			military_factory_donations = 1
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	request_control_of_navy = {
+		
+		icon = generic_naval
+
+		cost = 25
+		fire_only_once = yes
+
+		available = {
+		    FROM = {
+		    	has_legitimacy < 80
+		    }
+		}
+		visible = {
+			FROM = { is_exiled_in = ROOT }
+		}
+
+		target_trigger = {
+			FROM = {
+				is_exiled_in = ROOT
+				has_navy_size = {
+				    size > 0
+				}
+			}
+		}
+
+		complete_effect = {
+			effect_tooltip = {
+				FROM = {
+					transfer_navy = {
+						target = ROOT
+						is_government_in_exile = yes
+					}
+					add_legitimacy = 10
+				}
+			}
+			custom_effect_tooltip = HOL_request_equipment_tt_2
+			FROM = {
+				country_event = { id = mtg_exile_government.3 hours = 6 }
+			}
+		}
+
+		ai_will_do = {
+			factor = 10
+		}
+	}
+}
+
+category_exile_forces = {
+
+	weapons_for_the_resistance = {
+
+		icon = generic_ignite_civil_war
+
+		cost = 50
+		
+		available = {
+			hidden_trigger = {
+				FROM = {
+					set_temp_variable = { resistance_equipment_needed = num_owned_states }
+					subtract_from_temp_variable = { resistance_equipment_needed = num_owned_controlled_states }
+				}
+				multiply_temp_variable = { resistance_equipment_needed = 75 }
+			}
+		    has_equipment = { infantry_equipment > resistance_equipment_needed }
+		    FROM = {
+		    	has_legitimacy > 25
+		    }
+		}
+
+		visible = {
+		    FROM = {
+		    	has_legitimacy > 15
+		    }
+			FROM = {
+				is_exiled_in = ROOT
+			}
+			any_enemy_country = {
+				any_state = {
+					is_owned_by = FROM
+					is_controlled_by = PREV
+				}
+			}
+		}
+
+		target_trigger = {
+			FROM = { is_exiled_in = ROOT }
+		}
+		
+		days_remove = 120
+
+		complete_effect = {
+			hidden_effect = {
+				FROM = {
+					set_temp_variable = { resistance_equipment_needed = num_owned_states }
+					subtract_from_temp_variable = { resistance_equipment_needed = num_owned_controlled_states }
+				}
+				multiply_temp_variable = { resistance_equipment_needed = -75 }
+			}
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = resistance_equipment_needed
+			}
+			FROM = {
+				add_timed_idea = {
+					idea = idea_weapons_for_the_resistance
+					days = 120
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 0.1
+		}
+	}
+
+	unity_parade = {
+
+		icon = generic_nationalism
+
+		cost = 50
+
+		available = {
+		    FROM = {
+		    	has_legitimacy > 50
+		    }
+		    FROM = {
+		    	any_war_score > 2
+		    }
+		    has_war_support < 0.8
+		}
+
+		visible = {
+			FROM = { is_exiled_in = ROOT }
+		    FROM = {
+		    	has_legitimacy > 40
+		    }
+		}
+
+		target_trigger = { FROM = { is_exiled_in = ROOT } }
+				
+		targeted_modifier = {
+			tag = FROM
+			targeted_legitimacy_daily = -0.5
+		}
+
+		modifier = {
+			war_support_weekly = 0.01
+		}
+
+		days_remove = 45
+
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 0
+		    	has_war_support > 0.7
+			}
+			modifier = {
+				has_political_power < 100
+				factor = 0
+			}
+			modifier = {
+				has_war_support < 0.5
+				factor = 2
+			}
+			modifier = {
+				has_war_support < 0.3
+				factor = 10
+			}
+		}
+	}
+
+	joint_training_exercise = {
+
+		icon = eng_blackshirt_march
+
+		cost = 0
+
+		days_re_enable = 270
+
+		custom_cost_trigger = {
+			command_power > 25
+		}
+
+		custom_cost_text = custom_cost_joint_training_exercise
+
+		available = {
+		    FROM = {
+		    	has_legitimacy > 35
+		    }
+		    FROM = {
+		    	any_war_score > 9
+		    }
+		}
+
+		visible = {
+			FROM = { is_exiled_in = ROOT }
+		    FROM = {
+		    	has_legitimacy > 25
+		    }
+		}
+
+		target_trigger = { FROM = { is_exiled_in = ROOT } }
+		
+		complete_effect = {
+
+			army_experience = 25
+			air_experience = 50
+			navy_experience = 50
+
+			FROM = {
+				army_experience = 25
+				air_experience = 50
+				navy_experience = 50
+			}
+
+			hidden_effect = {
+				add_command_power = -25
+			}
+		}
+
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				OR = {
+					has_army_experience < 25
+					has_air_experience < 25
+					has_navy_experience < 25
+				}
+				factor = 2
+			}
+
+			modifier = {
+				factor = 0 # Save for more immediately useful stuff
+				command_power < 50
+			}
+			modifier = {
+				factor = 100
+				command_power > 98 # Not doing you any good so spend it
+			}
+			modifier = {
+				factor = 0.1 # Reached limit of an experience type
+				OR = {
+					has_army_experience > 475
+					has_air_experience > 450
+					has_navy_experience > 450
+				}
+			}
+			modifier = {
+				factor = 0 # Spend some of your damn experience!!
+				has_army_experience > 475
+				has_air_experience > 450
+				has_navy_experience > 450
+			}
+		}
+	}
+}
+

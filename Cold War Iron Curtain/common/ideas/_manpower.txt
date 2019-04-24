@@ -1,0 +1,355 @@
+ideas = {
+	nuclear_mobilization_laws = {
+		law = yes
+		disarmed_nation_nuke = {
+						
+			cost = 150
+			removal_cost = -1
+			level = 7
+			
+			available = {
+			}
+
+			modifier = {
+				nuclear_production_factor = -9999
+			}
+			default = yes
+			cancel_if_invalid = no
+			
+			picture = disarmed_nation_nuke
+		}	
+		armed_nation_nuke = {
+						
+			cost = 50
+			removal_cost = -1
+			level = 7
+			
+			available = {
+				threat > 0.9
+				has_tech = nukes
+			}
+
+			modifier = {
+			}
+			default = no
+			cancel_if_invalid = yes
+			ai_will_do = {
+   				factor = 1
+			}
+			
+			picture = armed_nation_nuke
+		}		
+	}
+
+		
+	mobilization_laws = { 
+		law = yes
+
+		disarmed_nation = {
+						
+			cost = 100
+			removal_cost = -1
+			level = 7
+			
+			available = {
+				#has_manpower_for_recruit_change_to = { value = 1.005 group = mobilization_laws }
+			}
+
+			modifier = {
+				conscription = 0.005
+			}
+			
+			cancel_if_invalid = no
+		}
+		
+		volunteer_only = {
+						
+			cost = 150
+			removal_cost = -1
+			level = 6
+			
+			available = {
+				#has_manpower_for_recruit_change_to =  { value = 1.015 group = mobilization_laws }
+				if = {
+					limit = {
+						original_tag = HUN
+						has_dlc = "Death or Dishonor"
+					}
+					NOT = { has_idea = HUN_treaty_of_triannon }
+				}
+				NOT = { has_idea = undisturbed_isolation }
+				NOT = { has_idea = isolation }
+			}
+
+			ai_will_do = {
+   				factor = 1
+
+   				modifier = {
+					factor = 60 # being disarmed is bad in a wargame yo
+					has_idea = disarmed_nation 
+				}
+			}
+
+			modifier = {
+				conscription = 0.01
+			}
+			
+			default = yes
+			
+			cancel_if_invalid = no
+		}
+		
+		limited_conscription = {
+					
+			cost = 200
+			removal_cost = -1
+			level = 5
+
+			available = {
+				#has_manpower_for_recruit_change_to =  { value = 1.025 group = mobilization_laws }
+				NOT = { has_idea = undisturbed_isolation }
+				NOT = { has_idea = isolation }
+			}
+
+			modifier = {
+				conscription = 0.02
+			}
+
+			ai_will_do = {
+   				factor = 1
+				modifier = {
+					#Prio if low on manpower
+					factor = 20
+					manpower_per_military_factory <  1000
+				}
+			}
+			
+			cancel_if_invalid = no
+		}
+		
+		extensive_conscription = {
+			
+			available = {
+				#has_manpower_for_recruit_change_to = { value = 1.05 group = mobilization_laws }
+				OR = {
+					has_government = fascism
+					has_government = communism
+					has_government = trotskyism
+					has_government = maoism
+					has_government = radical_shiaism
+					has_government = islamism
+					AND = {
+						has_war = yes
+						enemies_strength_ratio > 0.5
+						#any_enemy_country = {
+						#	strength_ratio = {
+						#		tag = ROOT 
+						#		ratio > 0.5
+						#	}
+						#}
+					}					
+				}
+			}
+
+			ai_will_do = {
+   				factor = 1
+				modifier = {
+					#Prio if low on manpower
+					factor = 20
+					manpower_per_military_factory <  800
+				}
+
+				modifier = { # china relies a lot on throwing bodies at the enemy
+					factor = 3
+
+					tag = CHI
+					has_manpower < 200000
+				}
+			}
+			
+			cost = 300
+			removal_cost = -1
+			level = 4
+			
+			modifier = {
+				conscription = 0.04
+				#industrial_capacity_factory = -0.1
+				#production_speed_buildings_factor = -0.1
+				training_time_factor = 0.1
+			}
+			
+			cancel_if_invalid = no
+		}
+		
+		service_by_requirement = {
+			
+			
+			available = {
+				#has_manpower_for_recruit_change_to =  { value = 1.1 group = mobilization_laws }
+				OR = {
+					has_government = radical_shiaism
+					AND = {
+						has_war = yes
+						enemies_strength_ratio > 0.6
+						#any_enemy_country = {
+						#	strength_ratio = {
+						#		tag = ROOT 
+						#		ratio > 0.6
+						#	}
+						#}
+					}
+				}
+			}
+
+			ai_will_do = {
+   				factor = 1
+				modifier = {
+					#Prio if low on manpower
+					factor = 20
+					manpower_per_military_factory <  700
+				}
+				modifier = {
+					#Lower chance if has decent amount
+					factor = 0.5
+					manpower_per_military_factory >  1000
+				}
+				modifier = {
+					#Block has plenty manpower
+					factor = 0
+					NOT = { tag = CHI }
+					manpower_per_military_factory >  3000
+				}
+
+				modifier = { # china relies a lot on throwing bodies at the enemy
+					factor = 3
+
+					tag = CHI
+					has_manpower < 200000
+				}
+			}
+			
+			cost = 400
+			removal_cost = -1
+			level = 3
+
+			modifier = {
+				conscription = 0.08
+				industrial_capacity_factory = -0.2
+				industrial_capacity_dockyard = -0.2
+				production_speed_buildings_factor = -0.2
+				training_time_factor = 0.3
+			}
+			
+			cancel_if_invalid = no
+		}
+		
+		all_adults_serve = {
+			
+			
+			available = {
+				#has_manpower_for_recruit_change_to =  { value = 1.2 group = mobilization_laws }
+				has_war = yes
+				enemies_strength_ratio > 0.75
+				#any_enemy_country = {
+				#	strength_ratio = {
+				#		tag = ROOT 
+				#		ratio > 0.75
+				#	}
+				#}
+
+			}
+
+			ai_will_do = {
+   				factor = 1
+				modifier = {
+					#Prio if low on manpower
+					factor = 20
+					manpower_per_military_factory <  600
+				}
+				modifier = {
+					#Lower chance if has decent amount
+					factor = 0.5
+					manpower_per_military_factory >  1000
+				}
+				modifier = {
+					#Block has plenty manpower
+					factor = 0
+					NOT = { tag = CHI }
+					manpower_per_military_factory >  5000
+				}
+
+				modifier = { # china relies a lot on throwing bodies at the enemy
+					factor = 3
+
+					tag = CHI
+					has_manpower < 200000
+				}
+			}
+		
+			cost = 500
+			removal_cost = -1
+			level = 2
+			
+			modifier = {
+				conscription = 0.12
+				industrial_capacity_factory = -0.5
+				industrial_capacity_dockyard = -0.5
+				production_speed_buildings_factor = -0.5
+				#XP from reinforcement penalty (small)
+				training_time_factor = 0.4
+			}
+			
+			cancel_if_invalid = no
+		}
+		
+		scraping_the_barrel = {
+			
+			
+			available = {
+				#has_manpower_for_recruit_change_to =  { value = 1.25 group = mobilization_laws }
+				has_war = yes
+				
+				enemies_strength_ratio > 1
+				#any_enemy_country = {
+				#	strength_ratio = {
+				#		tag = ROOT 
+				#		ratio > 1
+				#	}
+				#}
+			}
+
+			ai_will_do = {
+   				factor = 1
+				modifier = {
+					#Prio if low on manpower
+					factor = 20
+					manpower_per_military_factory <  500
+				}				
+				modifier = {
+					#Lower chance if has decent amount
+					factor = 0.5
+					manpower_per_military_factory >  1000
+				}
+				modifier = {
+					#Block has plenty manpower
+					factor = 0
+					manpower_per_military_factory >  5000
+				}
+			}
+
+			cost = 600
+			removal_cost = -1
+			level = 1
+
+			modifier = {
+				conscription = 0.6
+				industrial_capacity_factory = -0.6
+				industrial_capacity_dockyard = -0.6
+				production_speed_buildings_factor = -0.6
+				training_time_factor = 0.5
+			}
+			
+			cancel_if_invalid = no
+		}
+	}
+}

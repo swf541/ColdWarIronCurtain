@@ -1,0 +1,285 @@
+NATO_decisions = {
+
+	leave_NATO = {
+	
+		icon = generic_nato
+	
+		available = {
+			has_idea = nato_member 
+		}
+
+		visible = {
+			has_idea = nato_member 
+		}
+		
+		cost = 100
+
+		complete_effect = {
+			remove_ideas = nato_member
+			remove_from_tech_sharing_group = NATO_Tech_Share
+			every_other_country = {
+				limit = { has_idea = nato_member }
+				add_opinion_modifier = { target = ROOT modifier = left_alliance }
+			}
+			hidden_effect = {
+				news_event = { id = NATO.6 hours = 6 }
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+			modifier = {
+				add = 10
+				OR = {
+					NOT = { 
+						OR = {
+									has_government = conservative
+									has_government = socialist
+									has_government = democratic
+									has_government = centrist
+									has_government = liberal
+									has_government = Liberal_Conservatism
+									has_government = Christian_Democratic
+									has_government = Social_Liberalism
+									has_government = fascism	
+									has_government = Social_Democratic										
+						}
+					}
+					AND = {
+						USA = { has_idea = nato_member }
+						NOT = { tag = USA }
+						has_opinion = { target = USA value < -100 }
+					}
+				}
+			}
+		}
+	}
+	
+	become_NATO_aspirant = {
+	
+		icon = generic_nato
+		
+		available = {
+			NOT = { has_idea = nato_member }
+			hidden_trigger = {
+				NOT = { has_country_flag = NATO_Aspirant }
+			}
+		}
+		
+		visible = {
+			NOT = { has_idea = nato_member }
+			NOT = { has_country_flag = NATO_Aspirant }
+		}
+		
+		cost = 250
+		
+		complete_effect = {
+			every_other_country = { 
+				limit = { has_idea = nato_member }
+				country_event = NATO.7 
+			}
+			set_country_flag = NATO_Aspirant
+		}
+		
+		ai_will_do = {
+			factor = 0
+			modifier = {
+				add = 10
+				has_opinion = { target = USA value > 150 }
+			}
+		}
+	}
+	
+	finish_nato_membership_action_plan = {
+	
+		icon = generic_nato
+		
+		available = {
+			is_in_faction = no
+			OR = {
+				has_government = conservative
+				has_government = socialist
+				has_government = democratic
+				has_government = centrist
+				has_government = liberal
+				has_government = Liberal_Conservatism
+				has_government = Christian_Democratic
+				has_government = Social_Liberalism
+				has_government = fascism	
+				has_government = Social_Democratic										
+			}
+			has_added_tension_amount < 5
+		}
+		
+		visible = {
+			NOT = { has_idea = nato_member }
+			has_country_flag = NATO_Aspirant
+			NOT = { has_country_flag = NATO_Accession_Voting }
+		}
+		
+		cost = 150
+		
+		complete_effect = {
+			set_country_flag = NATO_Accession_Voting
+		}
+		
+		ai_will_do = {
+			factor = 10
+		}
+		
+	}
+	
+	ratify_country_accession = {
+	
+		icon = generic_nato
+		
+		target_trigger = {
+			FROM = { has_country_flag = NATO_Accession_Voting }
+		}
+		
+		available = {
+			has_idea = nato_member
+			hidden_trigger = {
+				NOT = { has_country_flag = NATO_Ratified_@FROM }
+			}
+		}
+		
+		visible = {
+			has_idea = nato_member
+			hidden_trigger = {
+				NOT = { has_country_flag = NATO_Ratified_@FROM }
+			}
+		}
+		
+		cost = 50
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = NATO_Ratified_@FROM
+			}
+		}
+		
+		ai_will_do = {
+			factor = 10
+			modifier = {
+				factor = 0
+				has_opinion = { target = FROM value < 50 }
+			}
+		}
+	}
+	
+	join_NATO = {
+	
+		icon = generic_nato
+		
+		visible = {
+			has_country_flag = NATO_Accession_Voting
+		}
+		
+		available = {
+			hidden_trigger = {
+				has_country_flag = NATO_Accession_Voting
+			}
+			custom_trigger_tooltip = {
+				tooltip = TT_ALL_nato_memberS_RATIFIED
+				NOT = {
+					any_other_country = {
+						has_idea = nato_member
+						NOT = { has_country_flag = NATO_Ratified_@ROOT }
+					}
+				}
+			}
+		}
+		
+		complete_effect = {
+			add_ideas = nato_member
+			add_to_tech_sharing_group = NATO_Tech_Share
+			hidden_effect = {
+				clr_country_flag = NATO_Accession_Voting
+				clr_country_flag = NATO_Aspirant
+				every_country = {
+					limit = { 
+						has_idea = nato_member
+					}
+					clr_country_flag = NATO_Ratified_@ROOT
+				}
+			}
+			hidden_effect = { news_event = { id = NATO.8 hours = 6 } }
+		}
+		
+		ai_will_do = {
+			factor = 10
+		}
+	
+	}
+	
+	#show_non_ratified_countries = {
+	#
+	#	icon = generic_nato
+	#	
+	#	visible = {
+	#		has_country_flag = NATO_Accession_Voting
+	#	}
+	#	
+	#	available = {
+	#		hidden_trigger = {
+	#			always = no
+	#		}
+	#	}
+	#	
+	#	complete_effect = {
+	#		NATO_show_non_ratified_countries = yes
+	#	}
+	#	
+	#}
+	#
+	call_nato_to_arms = {
+	
+		icon = generic_nato
+		
+		visible = {
+			OR = {
+				has_defensive_war = yes
+				has_war_with = PRC
+				has_war_with = SOV
+			}
+			has_idea = nato_member
+			NOT = { has_global_flag = NATO_called_to_arms }
+		}
+		
+		available = {
+			has_idea = nato_member
+			has_defensive_war = yes
+			custom_trigger_tooltip = {
+				tooltip = TT_ATTACKER_CONTROLS_OUR_STATES
+				any_enemy_country = {
+					has_offensive_war_with = ROOT
+					any_state = {
+						is_controlled_by = PREV
+						is_owned_by = ROOT
+					}
+				}
+			}
+		}
+		
+		fire_only_once = yes
+		
+		complete_effect = {
+			create_faction = NATO
+			set_global_flag = NATO_called_to_arms
+			set_country_flag = Leader_of_NATO
+			every_other_country = {
+				limit = {
+					has_idea = nato_member
+					NOT = { has_war_with = ROOT }		#Just in case someone starts a war between NATO countries
+				}
+				country_event = NATO.3
+			}
+		}
+		
+		ai_will_do = {
+			factor = 10
+		}
+
+	}
+}

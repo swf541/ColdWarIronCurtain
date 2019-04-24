@@ -1,0 +1,1306 @@
+#################################
+# TO DO LIST:
+#
+# - Finish Project Vanguard (satellite news event, Russians with first satellite, etc.) and Atlas (launching SCORE)
+#################################
+
+
+SPACE_RACE_USA = {
+
+	initiate_space_race_usa = {
+
+		icon = generic_research
+
+		allowed = {
+			original_tag = USA
+		}
+
+		available = {
+			date > 1955.1.1
+			NOT = { has_global_flag = space_race_started }
+
+		}
+
+		cost = 200
+
+		fire_only_once = yes
+
+		days_remove = 3
+
+		visible = {
+			original_tag = USA
+			date > 1955.1.1
+			NOT = { has_global_flag = space_race_started }
+		}
+
+		complete_effect = {
+			set_global_flag = space_race_started
+			news_event = { id = space_race.1 days = 1} 
+			set_country_flag = space_race_started_usa
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				date > 1955.1.1
+			}
+		}
+	}
+
+	form_NASA = {
+
+		icon = generic_research
+
+		allowed = {
+			original_tag = USA
+		}
+
+		available = {
+			date > 1958.7.1
+			NOT = { USA = { has_country_flag = USA_NASA } }
+		}
+
+		cost = 100
+
+		fire_only_once = yes
+
+		days_remove = 3
+
+		visible = {
+			original_tag = USA
+			date > 1958.7.1
+			NOT = { has_global_flag = space_race_started }
+		}
+
+		complete_effect = {
+			set_country_flag = USA_NASA
+			news_event = { id = space_race.1 days = 1} 
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				date > 1958.1.1
+			}
+		}
+	}
+
+	##############################################
+	##############################################
+	#  ATLAS ICBM MISSION FOR "SCORE" SATELLITE  #
+	##############################################
+	##############################################
+
+	the_atlas_program_government_funding = {
+
+		icon = generic_research
+		
+		visible = {
+			NOT = { has_global_flag = usa_atlas_program }
+		}
+
+		allowed = {
+			original_tag = USA
+			
+		}
+
+		available = {
+			USA = { has_country_flag = NASA_Atlas_research }
+		}
+
+		cost = 200
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 1440
+
+		remove_trigger = {
+			has_tech = icbm1
+		}
+
+		visible = {
+			original_tag = USA
+			USA = { has_country_flag = NASA_Atlas_research }
+			NOT = { has_global_flag = usa_atlas_program }
+		}
+
+		complete_effect = {
+			set_global_flag = usa_atlas_program
+			add_tech_bonus = {
+				name = "Atlas Program I"
+				uses = 5
+				bonus = 0.65
+				category = rocketry
+			}
+			news_event = space_race.2
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_atlas_level value = 5 }
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				date > 1954.5.14
+			}
+		}
+	}
+
+	atlas_project_progress = {
+
+		icon = generic_research
+
+
+		available = {
+			USA = { has_country_flag = not_selectable }
+		}
+
+		cost = 0
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 14
+
+		visible = {
+			OR = {
+				AND = {
+					original_tag = USA
+					has_global_flag = usa_atlas_program
+				}
+				USA = { has_country_flag = usa_atlas_program }
+			}
+		}
+
+		remove_effect = {
+		}
+
+		remove_trigger = {
+			USA = { has_country_flag = usa_SCORE_satellite }
+		}
+
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+	test_sm65A_atlas_missile1 = {
+
+		icon = generic_research
+
+
+
+		available = {
+			has_global_flag = usa_atlas_program
+			NOT = { has_global_flag = usa_sm65A_atlas_missile }
+		}
+
+		cost = 200
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 14
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_atlas_program
+			}
+		}
+
+		remove_effect = {
+			set_global_flag = usa_sm65A_atlas_missile
+			custom_effect_tooltip = atlas_missile_level_up
+			hidden_effect = {
+				country_event = space_race.3
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_tech = icbm1
+			}
+		}
+	}
+
+	test_sm65A_atlas_missile2 = {
+
+		icon = generic_research
+
+		available = {
+			has_global_flag = usa_sm65A_atlas_missile
+			NOT = { USA = { has_country_flag = usa_sm65A_atlas_missile_test2 }
+		}
+
+		cost = 200
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 10
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_sm65A_atlas_missile
+			}
+		}
+
+		remove_effect = {
+			set_country_flag = usa_sm65A_atlas_missile_test2
+			custom_effect_tooltip = atlas_missile_level_up
+			hidden_effect = {
+				country_event = space_race.5
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_global_flag = usa_sm65A_atlas_missile
+			}
+		}
+	}
+
+	test_sm65A_atlas_missile3 = {
+
+		icon = generic_research
+
+
+		available = {
+			OR = {
+				USA = { has_country_flag = atlas_sm65a_test2_failed_start }
+				USA = { has_country_flag = atlas_sm65a_test2_failed_air }
+			}
+			NOT = { USA = { has_country_flag = usa_sm65A_atlas_missile_test3 } 
+		}
+
+		cost = 200
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 14
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_atlas_program
+				OR = {
+					has_country_flag = atlas_sm65a_test2_failed_start
+					has_country_flag = atlas_sm65a_test2_failed_air
+				}
+			}
+		}
+
+		remove_effect = {
+			set_country_flag = usa_sm65A_atlas_missile_test3
+			custom_effect_tooltip = atlas_missile_level_up
+			hidden_effect = {
+				country_event = space_race.7
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				OR = {
+					has_country_flag = atlas_sm65a_test2_failed_start
+					has_country_flag = atlas_sm65a_test2_failed_air
+				}
+			}
+		}
+	}
+
+	continue_atlas_research = {
+
+		icon = generic_research
+
+		allowed = {
+			AND = {
+				original_tag = USA
+				check_variable = { var = USA_atlas_level value = 10 compare = greater_than_or_equals }
+				NOT = { check_variable = { var = USA_atlas_level value = 30 compare = greater_than_or_equals } }
+			}
+		}
+
+		available = {
+			check_variable = { var = USA_atlas_level value = 10 compare = greater_than_or_equals }
+		}
+
+		cost = 150
+
+		fire_only_once = no
+		selectable_mission = yes
+		days_re_enable = 31
+
+		days_remove = 25
+
+		visible = {
+			AND = {
+				original_tag = USA
+				check_variable = { var = USA_atlas_level value = 10 compare = greater_than_or_equals }
+				NOT = { check_variable = { var = USA_atlas_level value = 50 compare = greater_than_or_equals } }
+			}
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_atlas_level value = 10 }
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				check_variable = { var = USA_atlas_level value = 10 compare = greater_than_or_equals }
+			}
+		}
+	}
+
+	build_SCORE_satellite = {
+
+		icon = generic_research
+
+		allowed = {
+			AND = {
+				original_tag = USA
+				check_variable = { var = USA_atlas_level value = 10 compare = greater_than_or_equals }
+				NOT = { check_variable = { var = USA_atlas_level value = 50 compare = greater_than_or_equals } }
+				NOT = { USA = { has_country_flag = usa_atlas_score_built } }
+			}
+		}
+
+		available = {
+			check_variable = { var = USA_atlas_level value = 10 compare = greater_than_or_equals }
+		}
+
+		cost = 150
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 31
+
+		visible = {
+			AND = {
+				original_tag = USA
+				check_variable = { var = USA_atlas_level value = 10 compare = greater_than_or_equals }
+				NOT = { check_variable = { var = USA_atlas_level value = 50 compare = greater_than_or_equals } }
+			}
+		}
+
+		remove_effect = {
+			set_country_flag = usa_atlas_score_built
+			custom_effect_tooltip = "A Communication Satellite called 'SCORE'"
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				check_variable = { var = USA_atlas_level value = 10 compare = greater_than_or_equals }
+			}
+		}
+	}
+
+	assemble_sm65b_atlas = {
+
+		icon = generic_research
+
+		allowed = {
+			AND = {
+				original_tag = USA
+				check_variable = { var = USA_atlas_level value = 20 compare = greater_than_or_equals }
+				NOT = { check_variable = { var = USA_atlas_level value = 50 compare = greater_than_or_equals } }
+				NOT = { has_country_flag = usa_sm65B_atlas_missile }
+			}
+		}
+
+		available = {
+			check_variable = { var = USA_atlas_level value = 20 compare = greater_than_or_equals }
+		}
+
+		cost = 150
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 20
+
+		visible = {
+			AND = {
+				original_tag = USA
+				check_variable = { var = USA_atlas_level value = 20 compare = greater_than_or_equals }
+				NOT = { check_variable = { var = USA_atlas_level value = 50 compare = greater_than_or_equals } }
+			}
+		}
+
+		remove_effect = {
+			set_country_flag = usa_sm65B_atlas_missile
+			add_to_variable = { var = USA_atlas_level value = 10 }
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				check_variable = { var = USA_atlas_level value = 10 compare = greater_than_or_equals }
+			}
+		}
+	}
+
+	test_sm65b_atlas = {
+
+		icon = generic_research
+
+		allowed = {
+			AND = {
+				original_tag = USA
+				check_variable = { var = USA_atlas_level value = 20 compare = greater_than_or_equals }
+				USA = { has_country_flag = usa_sm65B_atlas_missile }
+				NOT = { USA = { has_country_flag = usa_sm65B_atlas_missile_tested } }
+			}
+		}
+
+		available = {
+			check_variable = { var = USA_atlas_level value = 20 compare = greater_than_or_equals }
+		}
+
+		cost = 150
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 4
+
+		visible = {
+			AND = {
+				original_tag = USA
+				check_variable = { var = USA_atlas_level value = 20 compare = greater_than_or_equals }
+				USA = { has_country_flag = usa_sm65B_atlas_missile }
+			}
+		}
+
+		remove_effect = {
+			custom_effect_tooltip = "A rocket capable of launching the SCORE satellite"
+			set_country_flag = usa_sm65B_atlas_missile_tested
+			country_event = { id = space_race.15 hours = 6 }
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				check_variable = { var = USA_atlas_level value = 10 compare = greater_than_or_equals }
+			}
+		}
+	}
+
+	launch_SCORE_satellite = {
+
+		icon = generic_research
+
+		allowed = {
+			AND = {
+				original_tag = USA
+				check_variable = { var = USA_atlas_level value = 20 compare = greater_than_or_equals }
+				USA = { has_country_flag = usa_sm65B_atlas_missile_tested }
+				NOT = { USA = { has_country_flag = usa_SCORE_satellite } }
+			}
+		}
+
+		available = {
+			check_variable = { var = USA_atlas_level value = 20 compare = greater_than_or_equals }
+		}
+
+		cost = 150
+
+		fire_only_once = yes
+		selectable_mission = no
+
+		days_remove = 7
+
+		visible = {
+			AND = {
+				original_tag = USA
+				check_variable = { var = USA_atlas_level value = 20 compare = greater_than_or_equals }
+				USA = { has_country_flag = usa_sm65B_atlas_missile_tested }
+			}
+		}
+
+		complete_effect = {
+			set_country_flag = usa_SCORE_satellite
+			add_to_variable = { var = USA_atlas_level value = 10 }
+			news_event = { id = space_race.14 }
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				check_variable = { var = USA_atlas_level value = 10 compare = greater_than_or_equals }
+			}
+		}
+	}
+
+	#############################################
+	#############################################
+	#			  PROJECT VANGUARD				#
+	#############################################
+	#############################################
+
+	project_vanguard = {
+
+		icon = generic_research
+
+
+		available = {
+			date > 1955.7.29
+		}
+
+		cost = 350
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 780
+
+		visible = {
+			original_tag = USA
+			date > 1955.7.29
+			NOT = { has_global_flag = usa_project_vanguard }
+		}
+
+		complete_effect = {
+			set_global_flag = usa_project_vanguard
+			add_tech_bonus = {
+				name = "Project Vanguard I"
+				uses = 2
+				bonus = 0.65
+				category = rocketry
+			}
+			news_event = space_race.10
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			country_event = space_race.11
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				date > 1955.7.29
+			}
+		}
+	}
+
+	vanguard_project_progress = {
+
+		icon = generic_research
+
+
+		available = {
+			USA = { has_country_flag = not_selectable }
+		}
+
+		cost = 0
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 14
+
+		visible = {
+			AND = {
+				original_tag = USA
+				date > 1955.7.29
+				NOT = { has_global_flag = usa_project_vanguard }
+			}
+		}
+
+		remove_effect = {
+		}
+
+		remove_trigger = {
+			USA = { has_country_flag = usa_project_vanguard_finished }
+		}
+
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+
+	project_vanguard_navy_proposal = {
+
+		icon = generic_research
+
+		available = {
+			USA = { has_country_flag = usa_project_vanguard_navy }
+		}
+
+		cost = 50
+
+		fire_only_once = yes
+		selectable_mission = no
+
+		days_remove = 7
+
+		visible = {
+			AND = {
+				original_tag = USA
+				USA = { has_country_flag = usa_project_vanguard_navy }
+				NOT = { has_global_flag = usa_project_vanguard_navy }
+			}
+		}
+
+		complete_effect = {
+			add_tech_bonus = {
+				name = "Project Vanguard II"
+				uses = 1
+				bonus = 0.65
+				category = rocketry
+			}
+			set_global_flag = usa_project_vanguard_navy
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_country_flag = usa_project_vanguard_navy
+			}
+		}
+	}
+
+	project_vanguard_navy_telemetry = {
+
+		icon = generic_research
+
+		available = {
+			has_global_flag = usa_project_vanguard_navy
+		}
+
+		cost = 100
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 14
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+
+		complete_effect = {
+			add_tech_bonus = {
+				name = "Project Vanguard Telemetry"
+				uses = 1
+				bonus = 0.5
+				category = electronics
+			}
+			set_country_flag = usa_project_vanguard_telemetry
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+	}
+
+	project_vanguard_navy_engine1 = {
+
+		icon = generic_research
+
+		available = {
+			has_global_flag = usa_project_vanguard_navy
+		}
+
+		cost = 75
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 14
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+
+		complete_effect = {
+		custom_effect_tooltip = "Provides the rocket with the Stage-1 Engine"
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			custom_effect_tooltip = "Provides the rocket with the Stage-1 Engine"
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+	}
+
+	project_vanguard_navy_engine2 = {
+
+		icon = generic_research
+
+		available = {
+			has_global_flag = usa_project_vanguard_navy
+		}
+
+		cost = 75
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 14
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+
+		complete_effect = {
+			custom_effect_tooltip = "Provides the rocket with the Stage-2 Engine"
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			custom_effect_tooltip = "Provides the rocket with the Stage-2 Engine"
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+	}
+
+	project_vanguard_navy_engine3 = {
+
+		icon = generic_research
+
+		available = {
+			has_global_flag = usa_project_vanguard_navy
+		}
+
+		cost = 75
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 14
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+
+		complete_effect = {
+			custom_effect_tooltip = "Provides the rocket with the Stage-3 Engine"
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			custom_effect_tooltip = "Provides the rocket with the Stage-3 Engine"
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+	}
+
+	project_vanguard_navy_rocket_test = {
+
+		icon = generic_research
+
+		available = {
+			has_global_flag = usa_project_vanguard_navy
+		}
+
+		cost = 50
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 7
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_navy
+				check_variable = { var = USA_vanguard_level value = 20 compare = greater_than_or_equals }
+			}
+		}
+
+		complete_effect = {
+
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			country_event = space_race.12
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+	}
+
+	project_vanguard_navy_rocket_more_research = {
+
+		icon = generic_research
+
+
+		available = {
+			has_global_flag = usa_project_vanguard_navy
+		}
+
+		cost = 75
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 28
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_navy
+				check_variable = { var = USA_vanguard_level value = 20 compare = greater_than_or_equals }
+				USA = { has_country_flag = usa_project_vanguard_rework_needed }
+			}
+		}
+
+		complete_effect = {
+
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 15 }
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+	}
+
+	project_vanguard_navy_rocket_test2 = {
+
+		icon = generic_research
+
+		available = {
+			has_global_flag = usa_project_vanguard_navy
+		}
+
+		cost = 50
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 7
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_navy
+				check_variable = { var = USA_vanguard_level value = 30 compare = greater_than_or_equals }
+				USA = { has_country_flag = usa_project_vanguard_rework_needed }
+			}
+		}
+
+		complete_effect = {
+
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			country_event = space_race.12
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+	}
+
+	project_vanguard_navy_launch_satellite = {
+
+		icon = generic_research
+
+
+		available = {
+			has_global_flag = usa_project_vanguard_navy
+		}
+
+		cost = 100
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 3
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_navy
+				check_variable = { var = USA_vanguard_level value = 30 compare = greater_than_or_equals }
+				USA = { has_country_flag = usa_project_vanguard_success }
+			}
+		}
+
+		complete_effect = {
+
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			news_event = { id = space_race.13 hours = 6 }
+			set_global_flag = usa_project_vanguard_satellite
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_global_flag = usa_project_vanguard_navy
+			}
+		}
+	}
+
+	project_vanguard_airforce_proposal = {
+
+		icon = generic_research
+
+		available = {
+			USA = { has_country_flag = usa_atlas_program }
+			NOT = { has_global_flag = usa_project_vanguard_navy }
+		}
+
+		cost = 200
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 31
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_country_flag = usa_atlas_program
+				has_global_flag = usa_project_vanguard
+				NOT = { has_global_flag = usa_project_vanguard_navy }
+				USA = { has_country_flag = usa_project_vanguard_airforce }
+			}
+		}
+
+		complete_effect = {
+			add_tech_bonus = {
+				name = "Atlas Project"
+				uses = 1
+				bonus = 0.65
+				category = icbm
+			}
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			add_to_variable = { var = USA_atlas_level value = 5 }
+			set_global_flag = usa_project_vanguard_airforce
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_country_flag = usa_project_vanguard_airforce
+			}
+		}
+	}
+
+	project_vanguard_airforce_modify_rocket = {
+
+		icon = generic_research
+
+		available = {
+			USA = { has_country_flag = usa_atlas_program }
+		}
+
+		cost = 200
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 31
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_airforce
+			}
+		}
+
+		complete_effect = {
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			add_to_variable = { var = USA_atlas_level value = 5 }
+			set_country_flag = usa_project_vanguard_airforce_rocket_modification
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_country_flag = usa_project_vanguard_airforce
+			}
+		}
+	}
+
+	project_vanguard_airforce_rocket_booster = {
+
+		icon = generic_research
+
+		available = {
+			USA = { has_country_flag = usa_atlas_program }
+			USA = { has_country_flag = usa_project_vanguard_airforce_rocket_modification }
+		}
+
+		cost = 150
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 24
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_airforce
+			}
+		}
+
+		complete_effect = {
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			add_to_variable = { var = USA_atlas_level value = 5 }
+			set_country_flag = usa_project_vanguard_airforce_rocket_modification
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_country_flag = usa_project_vanguard_airforce
+			}
+		}
+	}
+
+	project_vanguard_airforce_rocket_control = {
+
+		icon = generic_research
+
+		available = {
+			USA = { has_country_flag = usa_atlas_program }
+			USA = { has_country_flag = usa_project_vanguard_airforce_rocket_modification }
+		}
+
+		cost = 150
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 24
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_airforce
+			}
+		}
+
+		complete_effect = {
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			add_to_variable = { var = USA_atlas_level value = 5 }
+			set_country_flag = usa_project_vanguard_airforce_rocket_modification
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_country_flag = usa_project_vanguard_airforce
+			}
+		}
+	}
+
+	project_vanguard_airforce_use_sm65b = {
+
+		icon = generic_research
+
+		available = {
+			has_country_flag = usa_atlas_program
+			has_tech = icbm1
+			USA = { has_country_flag = usa_sm65B_atlas_missile_tested }
+		}
+
+		cost = 200
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_remove = 31
+
+		visible = {
+			AND = {
+				original_tag = USA
+				has_global_flag = usa_project_vanguard_airforce
+				USA = { has_country_flag = usa_sm65B_atlas_missile_tested }
+			}
+		}
+
+		complete_effect = {
+		}
+
+		remove_effect = {
+			add_to_variable = { var = USA_vanguard_level value = 5 }
+			add_to_variable = { var = USA_atlas_level value = 5 }
+			set_country_flag = usa_project_vanguard_airforce_rocket_ready
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_country_flag = usa_project_vanguard_airforce
+			}
+		}
+	}
+}
+
+
+
+
+
+
+
+
+############################################
+############################################
+############################################
+# SOVIET UNION #
+############################################
+############################################
+############################################
+
+
+
+
+
+
+
+
+SPACE_RACE_SOV = {
+
+	initiate_space_race_sov = {
+
+		icon = generic_research
+
+		allowed = {
+			original_tag = SOV
+		}
+
+		available = {
+			date > 1955.1.1
+			NOT = { has_global_flag = space_race_started }
+
+		}
+
+		cost = 200
+
+		fire_only_once = yes
+
+		days_remove = 3
+
+		visible = {
+			original_tag = SOV
+			date > 1955.1.1
+			NOT = { has_global_flag = space_race_started }
+		}
+
+		complete_effect = {
+			set_global_flag = space_race_started
+			news_event = { id = space_race.1 days = 1} 
+			set_country_flag = space_race_started_sov
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				date > 1955.3.1
+			}
+		}
+	}		
+}
