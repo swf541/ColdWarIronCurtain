@@ -1,0 +1,90 @@
+Files in this folder control the layout of the visual representation of
+equipment in the equipment designer window, along with the equipment module
+slots and modules as they would appear on the equipment.
+
+For any given equipment variant design, the appropriate top-level container
+window is found by searching for the following named windows, in the same order
+of priority as they are listed here:
+
+	"equipment_designer_" EQUIPMENT_TYPE "_" COUNTRY_TAG
+	"equipment_designer_" EQUIPMENT_ARCHETYPE "_" COUNTRY_TAG
+	"equipment_designer_" EQUIPMENT_TYPE
+	"equipment_designer_" EQUIPMENT_ARCHETYPE
+
+Within these equipment designer windows for a specific piece of equipment,
+there is an inner container window named "module_slots".  Each module slot
+that is possible for any equipment using this designer window should have
+its own container window inside here, using the same name as the module slot.
+
+Inside a module slot container window, further container windows should be
+listed, corresponding to the modules that can be installed in that module slot.
+Within them, you can include the iconType elements or any other elements
+appropriate for displaying the associated module on the equipment for that slot.
+
+When a particular module is installed in a slot, the proper module window is
+found by searcing for the following named windows, in the same order of priority
+as they are listed here:
+
+	MODULE_NAME
+	MODULE_GFX_NAME
+	MODULE_CATEGORY_NAME
+
+In addition to the main elements used to visually represent each possible
+module, highlight elements can be included which will be shown when attention
+is to be given to a specific module slot and its contents.  These follow the
+same naming scheme as the module, with "@hightlight" appended to the end.
+
+If no highlight is found for the module name, GFX name, or category name, then
+the container window simply named "@highlight" with nothing before the "@" will
+be used instead, if it is available.  This could be something as simple as a
+rectangle outline of approximately the correct size, and positioned at the
+module slot location.
+
+Here is an abbreviated example of the structure:
+
+	containerWindowType = {
+		name = "equipment_designer_ship_hull_heavy_1_USA" # name of equipment archetype or type, with optional country tag
+		# other window attributes...
+
+		# Primary image for the equipment
+		iconType = {
+			name = "equipment_image"
+			spriteType = "GFX_ED_heavy_hull"
+			position = { x=0 y=0 }
+		}
+
+		# Container window for all of the module slots
+		containerWindowType = {
+			name = "module_slots"
+			position = { x=0 y=0 }
+			size = { width=100% height=100% }
+
+			containerWindowType = {
+				name = "fixed_heavy_battery_slot" # Name of a slot
+				# other window attributes...
+
+				containerWindowType = {
+					name = "ship_heavy_battery_1" # Name of a module, its GFX name, or category name
+					# other window attributes...
+					
+					# Any number of GUI elements; names are up to the discretion of the content creator.
+				}
+
+				containerWindowType = {
+					name = "ship_heavy_battery@highlight" # Name of a module, its GFX name, or category name, plus the text "@highlight"
+					# other window attributes...
+					
+					# Any number of GUI elements; names are up to the discretion of the content creator.
+				}
+
+				containerWindowType = {
+					name = "@highlight" # Fallback highlight element when no other "@highlight" window matches
+					# other window attributes...
+					
+					# Any number of GUI elements; names are up to the discretion of the content creator.
+				}
+			}
+
+			# remaining module slots...
+		}
+	}
