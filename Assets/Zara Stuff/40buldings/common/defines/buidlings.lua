@@ -1,0 +1,2 @@
+NDefines.NBuildings.MAX_SHARED_SLOTS = 200
+NDefines.NBuildings.MAX_BUILDING_LEVELS = 50
