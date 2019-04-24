@@ -1,0 +1,831 @@
+﻿# Generic Events
+
+add_namespace = generic
+
+# WAR: Get Annexed or War, 50/50 chance
+country_event = {
+  id = generic.1
+	title = generic.1.t
+	desc = generic.1.d
+
+	is_triggered_only = yes
+
+	# Get Annexed
+	option = {
+		name = generic.1.a
+		FROM = { annex_country = { target = ROOT } }
+		ai_chance = {
+			factor = 50
+		}
+	}
+
+	# War
+	option = {
+		name = generic.1.b
+		FROM = { declare_war_on = { target = ROOT type = annex_everything } }
+		ai_chance = {
+		  factor = 50
+		}
+	}
+}
+
+# FACTION: Wanna join my faction?, 85/15 chance
+country_event = {
+  id = generic.2
+	title = generic.2.t
+	desc = generic.2.d
+
+	is_triggered_only = yes
+
+	# Join
+	option = {
+		name = generic.2.a
+		FROM = { 
+			add_to_faction = ROOT
+			country_event = { id = generic.3 hours = 6 }
+		}
+		ai_chance = {
+			factor = 85
+		}
+	}
+
+	# Nope
+	option = {
+		name = generic.2.b
+		FROM = { country_event = { id = generic.4 hours = 6 } }
+		ai_chance = {
+		  factor = 15
+		}
+	}
+}
+
+# FACTION: Yes, I want to join
+country_event = {
+  id = generic.3
+	title = generic.3.t
+	desc = generic.3.d
+
+	is_triggered_only = yes
+
+	# Nice
+	option = {
+		name = generic.3.a
+	}
+}
+
+# FACTION: No, I'm staying out
+country_event = {
+  id = generic.4
+	title = generic.4.t
+	desc = generic.4.d
+
+	is_triggered_only = yes
+
+	# That's sad
+	option = {
+		name = generic.4.a
+	}
+}
+
+# UNIFICATION: Wanna unite countries?, 50/50 chance
+country_event = {
+  id = generic.5
+	title = generic.5.t
+	desc = generic.5.d
+
+	is_triggered_only = yes
+
+	# Join
+	option = {
+		name = generic.5.a
+		FROM = { 
+			annex_country = { target = ROOT }
+			country_event = { id = generic.6 hours = 6 } 
+		}
+		ROOT = { every_owned_state = { add_core_of = FROM } }
+		ai_chance = {
+			factor = 50
+		}
+	}
+
+	# Nope
+	option = {
+		name = generic.5.b
+		FROM = { country_event = { id = generic.7 hours = 6 } }
+		ai_chance = {
+		  factor = 50
+		}
+	}
+}
+
+# UNIFICATION: Yes, let's unite
+country_event = {
+  id = generic.6
+	title = generic.6.t
+	desc = generic.6.d
+
+	is_triggered_only = yes
+
+	# Great
+	option = {
+		name = generic.6.a
+	}
+}
+
+# UNIFICATION: No thanks
+country_event = {
+  id = generic.7
+	title = generic.7.t
+	desc = generic.7.d
+
+	is_triggered_only = yes
+
+	# Great
+	option = {
+		name = generic.7.a
+	}
+}
+
+# FACTION: Can I join your faction?, 80/20 chance
+country_event = {
+  id = generic.8
+	title = generic.8.t
+	desc = generic.8.d
+
+	is_triggered_only = yes
+
+	# Yes
+	option = {
+		name = generic.8.a
+		ROOT = { add_to_faction = FROM }
+		FROM = { country_event = { id = generic.9 hours = 6 } }
+		ai_chance = {
+			factor = 80
+		}
+		if = {
+			limit = {
+				ROOT = { original_tag = USA }
+			}
+			FROM = { add_ideas = nato_member }
+		}
+	}
+
+	# No
+	option = {
+		name = generic.8.b
+		FROM = { country_event = { id = generic.10 hours = 6 } }
+		ai_chance = {
+		  factor = 20
+		}
+	}
+}
+
+# FACTION: Yes, you can
+country_event = {
+  id = generic.9
+	title = generic.9.t
+	desc = generic.9.d
+
+	is_triggered_only = yes
+
+	# Nice
+	option = {
+		name = generic.9.a
+	}
+}
+
+# FACTION: No, I don't want you
+country_event = {
+  id = generic.10
+	title = generic.10.t
+	desc = generic.10.d
+
+	is_triggered_only = yes
+
+	# That's sad
+	option = {
+		name = generic.10.a
+	}
+}
+
+
+###############################################
+###############################################
+# VANILLA GENERIC EVENTS HERE (generic.12 - generic.18)
+###############################################
+###############################################
+
+
+
+# Enemy attempting to destroy Suez
+country_event = {
+	id = generic.12
+	title = generic.12.t
+	desc = generic.12.d
+	
+	picture = GFX_report_event_merchant_ship_01
+
+	is_triggered_only = yes
+	
+	option = {
+		name = generic.12.a
+		custom_effect_tooltip = canals_tt
+	}	
+}
+
+# Enemy attempting to destroy Panama
+country_event = {
+	id = generic.13
+	title = generic.13.t
+	desc = generic.13.d
+	
+	picture = GFX_report_event_merchant_ship_01
+
+	is_triggered_only = yes
+	
+	option = {
+		name = generic.12.a
+		custom_effect_tooltip = canals_tt
+	}	
+}
+
+# Object to Attaches
+country_event = {
+	id = generic.14
+	title = generic.14.t
+	desc = generic.14.d
+	
+	picture = GFX_report_event_generic_read_write
+
+	is_triggered_only = yes
+	
+	# Agree - recall attache
+	option = {
+		name = generic.14.a
+		ai_chance = {
+			base = 80
+			modifier = {
+				factor = 1.5
+				has_opinion = { target = FROM value > 50 }
+			}
+			modifier = {
+				factor = 1.5
+				has_opinion = { target = FROM value > 75 }
+			}
+		}
+		random_other_country = {
+			limit = {
+				has_war_with = FROM
+				has_attache_from = ROOT
+			}
+			ROOT = { recall_attache = PREV }
+		}
+		FROM = {
+			country_event = { id = generic.15 days = 1 }
+		}
+		clr_country_flag = object_attache_going_on
+	}	
+
+	# Reject demands
+	option = {
+		name = generic.14.b
+		ai_chance = {
+			base = 20
+			modifier = {
+				factor = 2
+				has_opinion = { target = FROM value < 0 }
+			}
+			modifier = {
+				factor = 3
+				has_opinion = { target = FROM value < -20 }
+			}
+			modifier = {
+				factor = 3
+				has_opinion = { target = FROM value < -50 }
+			}
+		}
+		custom_effect_tooltip = attache_political_power_tt
+		if = {
+			limit = {
+				NOT = { strength_ratio = { tag = FROM ratio < 3 } }
+			}
+			if = {
+				limit = {
+					has_opinion = { target = FROM value > -25 }
+					NOT = { has_opinion = { target = FROM value > 0 } }
+				}
+				add_political_power = -5
+			}
+			if = {
+				limit = {
+					has_opinion = { target = FROM value > 0 }
+					NOT = { has_opinion = { target = FROM value > 50 } }
+	
+				}
+				add_political_power = -10
+			}
+			if = {
+				limit = { has_opinion = { target = FROM value > 50 } }
+				add_political_power = -15
+			}
+		}
+		if = {
+			limit = {
+				strength_ratio = { tag = FROM ratio < 3 }
+				NOT = { strength_ratio = { tag = FROM ratio < 2.5 } }
+			}
+			if = {
+				limit = {
+					has_opinion = { target = FROM value > -25 }
+					NOT = { has_opinion = { target = FROM value > 0 } }
+				}
+				add_political_power = -10
+			}
+			if = {
+				limit = {
+					has_opinion = { target = FROM value > 0 }
+					NOT = { has_opinion = { target = FROM value > 50 } }
+	
+				}
+				add_political_power = -20
+			}
+			if = {
+				limit = { has_opinion = { target = FROM value > 50 } }
+				add_political_power = -30
+			}
+		}
+		if = {
+			limit = {
+				strength_ratio = { tag = FROM ratio < 2.5 }
+				NOT = { strength_ratio = { tag = FROM ratio < 2 } }
+			}
+			if = {
+				limit = {
+					has_opinion = { target = FROM value > -25 }
+					NOT = { has_opinion = { target = FROM value > 0 } }
+				}
+				add_political_power = -15
+			}
+			if = {
+				limit = {
+					has_opinion = { target = FROM value > 0 }
+					NOT = { has_opinion = { target = FROM value > 50 } }
+	
+				}
+				add_political_power = -30
+			}
+			if = {
+				limit = { has_opinion = { target = FROM value > 50 } }
+				add_political_power = -45
+			}
+		}
+		if = {
+			limit = {
+				strength_ratio = { tag = FROM ratio < 2 }
+				NOT = { strength_ratio = { tag = FROM ratio < 1.5 } }
+			}
+			if = {
+				limit = {
+					has_opinion = { target = FROM value > -25 }
+					NOT = { has_opinion = { target = FROM value > 0 } }
+				}
+				add_political_power = -20
+			}
+			if = {
+				limit = {
+					has_opinion = { target = FROM value > 0 }
+					NOT = { has_opinion = { target = FROM value > 50 } }
+	
+				}
+				add_political_power = -40
+			}
+			if = {
+				limit = { has_opinion = { target = FROM value > 50 } }
+				add_political_power = -60
+			}
+		}
+		if = {
+			limit = {
+				strength_ratio = { tag = FROM ratio < 1.5 }
+			}
+			if = {
+				limit = {
+					has_opinion = { target = FROM value > -25 }
+					NOT = { has_opinion = { target = FROM value > 0 } }
+				}
+				add_political_power = -25
+			}
+			if = {
+				limit = {
+					has_opinion = { target = FROM value > 0 }
+					NOT = { has_opinion = { target = FROM value > 50 } }
+	
+				}
+				add_political_power = -50
+			}
+			if = {
+				limit = { has_opinion = { target = FROM value > 50 } }
+				add_political_power = -75
+			}
+		}
+		FROM = {
+			add_opinion_modifier = { target = ROOT modifier = rejected_demands }
+			country_event = { id = generic.16 days = 1 }
+		}
+		hidden_effect = {
+			set_country_flag = { flag = rejected_withdrawing_attache value = 1 days = 90 }
+			set_country_flag = { flag = rejected_withdrawing_attache@FROM value = 1 days = 365 }
+			clr_country_flag = object_attache_going_on
+		}
+		if = {
+			limit = {
+				FROM = { has_government = fascism }
+				NOT = { has_government = fascism }
+				fascism > 0.1
+				NOT = { fascism > 0.2 }
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_fascism_tt
+			add_stability = -0.025
+		}
+		if = {
+			limit = {
+				FROM = { has_government = fascism }
+				NOT = { has_government = fascism }
+				fascism > 0.2
+				NOT = { fascism > 0.3 }
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_fascism_tt
+			add_stability = -0.05
+		}
+		if = {
+			limit = {
+				FROM = { has_government = fascism }
+				NOT = { has_government = fascism }
+				fascism > 0.3
+				NOT = { fascism > 0.4 }
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_fascism_tt
+			add_stability = -0.075
+		}
+		if = {
+			limit = {
+				FROM = { has_government = fascism }
+				NOT = { has_government = fascism }
+				fascism > 0.4
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_fascism_tt
+			add_stability = -0.1
+		}
+		if = {
+			limit = {
+				FROM = { has_government = communism }
+				communism > 0.1
+				NOT = { communism > 0.2 }
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_communism_tt
+			add_stability = -0.025
+		}
+		if = {
+			limit = {
+				FROM = { has_government = communism }
+				NOT = { has_government = communism }
+				communism > 0.2
+				NOT = { communism > 0.3 }
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_communism_tt
+			add_stability = -0.05
+		}
+		if = {
+			limit = {
+				FROM = { has_government = communism }
+				NOT = { has_government = communism }
+				communism > 0.3
+				NOT = { communism > 0.4 }
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_communism_tt
+			add_stability = -0.075
+		}
+		if = {
+			limit = {
+				FROM = { has_government = communism }
+				NOT = { has_government = communism }
+				communism > 0.4
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_communism_tt
+			add_stability = -0.1
+		}
+		if = {
+			limit = {
+				FROM = { has_government = democratic }
+				NOT = { has_government = democratic }
+				democratic > 0.1
+				NOT = { democratic > 0.2 }
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_democratic_tt
+			add_stability = -0.025
+		}
+		if = {
+			limit = {
+				FROM = { has_government = democratic }
+				NOT = { has_government = democratic }
+				democratic > 0.2
+				NOT = { democratic > 0.3 }
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_democratic_tt
+			add_stability = -0.05
+		}
+		if = {
+			limit = {
+				FROM = { has_government = democratic }
+				NOT = { has_government = democratic }
+				democratic > 0.3
+				NOT = { democratic > 0.4 }
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_democratic_tt
+			add_stability = -0.075
+		}
+		if = {
+			limit = {
+				FROM = { has_government = democratic }
+				NOT = { has_government = democratic }
+				democratic > 0.4
+				strength_ratio = { tag = FROM ratio < 1.2 }
+			}
+			custom_effect_tooltip = attache_democratic_tt
+			add_stability = -0.1
+		}
+	}	
+}
+
+# Notification event that TAG withdrew attache
+country_event = {
+	id = generic.15
+	title = generic.15.t
+	desc = generic.15.d
+	
+	picture = GFX_report_event_generic_read_write
+
+	is_triggered_only = yes
+
+	option = {
+		name = excellent
+	}	
+}
+
+# Notification event that TAG refused to withdraw attache
+country_event = {
+	id = generic.16
+	title = generic.16.t
+	desc = generic.16.d
+	
+	picture = GFX_report_event_generic_read_write
+
+	is_triggered_only = yes
+
+	option = {
+		name = generic.16.a
+		effect_tooltip = {
+			add_opinion_modifier = { target = FROM modifier = rejected_demands }
+		}
+	}	
+}
+
+# Notification event that leader has gotten sick
+unit_leader_event = {
+	id = generic.17
+	title = generic.17.t
+	desc = generic.17.d
+	
+	picture = GFX_report_event_military_planning
+
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			FROM = {
+				set_unit_leader_flag = {
+					flag = recently_sick
+					value = 1
+					days = 180
+				}
+			}
+		}
+	}
+
+	option = {
+		name = unfortunate
+		effect_tooltip = {
+			FROM = {
+				add_timed_unit_leader_trait = {
+					trait = sick
+					days = 30
+				}
+			}
+		}
+	}	
+}
+
+# Notification event that leader has been wounded
+country_event = {
+	id = generic.18
+	title = generic.18.t
+	desc = generic.18.d
+	
+	picture = GFX_report_event_military_planning
+
+	is_triggered_only = yes
+
+	option = {
+		name = unfortunate
+		effect_tooltip = {
+			FROM = {
+				add_timed_unit_leader_trait = {
+					trait = wounded
+					days = 90
+				}
+			}
+		}
+	}	
+}
+
+###############################################
+###############################################
+# COLD WAR GENERIC EVENTS AGAIN (generic.19 - generic.x)
+###############################################
+###############################################
+
+# RELATION: LICENCE ALIGNMENT: from X, 90/10 chance
+country_event = {
+  id = generic.19
+	title = generic.19.t
+	desc = generic.19.d
+
+	is_triggered_only = yes
+
+	# Okay
+	option = {
+		name = generic.19.a
+		FROM = {
+			add_relation_modifier = {
+				target = ROOT
+				modifier = alignment_licenses
+			}
+			country_event = { id = generic.20 hours = 6 }
+		}
+		ROOT = {
+			add_relation_modifier = {
+				target = FROM
+				modifier = alignment_licenses
+			}
+		}
+	  	ai_chance = {
+			factor = 90
+			modifier = {
+				factor = 1
+				has_idea = Member_of_European_Defense_Community
+			}
+		}
+	}
+
+	# No
+	option = {
+		name = generic.19.b
+		country_event = { id = generic.21 hours = 6 }
+	  	ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 0
+				has_idea = Member_of_European_Defense_Community
+			}
+		}
+	}
+}
+
+# RELATION: LICENCE ALIGNTMENT: Country said yes
+country_event = {
+	id = generic.20
+	title = generic.20.t
+	desc = generic.20.d
+
+	is_triggered_only = yes
+
+	# Very good
+	option = {
+		name = generic.20.a
+	}	
+}
+
+# RELATION: LICENCE ALIGNTMENT: Country said no
+country_event = {
+	id = generic.21
+	title = generic.21.t
+	desc = generic.21.d
+
+	is_triggered_only = yes
+
+	# Aww
+	option = {
+		name = generic.21.a
+	}	
+}
+
+# NATO: Can I join NATO? 80/20 chance
+country_event = {
+	id = generic.22
+	title = generic.22.t
+	desc = generic.22.d
+
+	is_triggered_only = yes
+
+	# Yes
+	option = {
+		name = generic.22.a
+		FROM = {
+			country_event = { id = generic.23 hours = 6 }
+			add_ideas = nato_member
+		}
+		ai_chance = {
+			factor = 8
+		}
+	}	
+
+	# No
+	option = {
+		name = generic.22.a
+		FROM = {
+			country_event = { id = generic.24 hours = 6 }
+		}
+		ai_chance = {
+			factor = 2
+		}
+	}
+}
+
+# NATO: Country said yes
+country_event = {
+	id = generic.23
+	title = generic.23.t
+	desc = generic.23.d
+
+	is_triggered_only = yes
+
+	# Very good
+	option = {
+		name = generic.23.a
+	}	
+}
+
+# NATO: Country said no
+country_event = {
+	id = generic.24
+	title = generic.24.t
+	desc = generic.24.d
+
+	is_triggered_only = yes
+
+	# Aww
+	option = {
+		name = generic.24.a
+	}	
+}
+#100% Odds
+country_event = {
+  id = generic.30
+	title = generic.5.t
+	desc = generic.5.d
+
+	is_triggered_only = yes
+
+	# Join
+	option = {
+		name = generic.5.a
+		FROM = { 
+			annex_country = { target = ROOT }
+			country_event = { id = generic.6 hours = 6 } 
+		}
+		ROOT = { every_owned_state = { add_core_of = FROM } }
+		ai_chance = {
+			factor = 100
+		}
+	}
+
+	# Nope
+	option = {
+		name = generic.5.b
+		FROM = { country_event = { id = generic.7 hours = 6 } }
+		ai_chance = {
+		  factor = 0
+		}
+	}
+}

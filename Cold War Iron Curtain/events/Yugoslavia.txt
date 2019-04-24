@@ -1,0 +1,736 @@
+﻿#####################
+# Yugoslavia Events
+#####################
+
+add_namespace = yug
+
+
+#Titos Death Hidden Trigger
+country_event = {
+	id = yug.3
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		news_event = news.1024
+		set_country_flag = tito_dead
+	}
+
+}
+
+# Collective Presidency
+country_event = {
+	id = yug.4
+	title = yug.4.t
+	desc = yug.4.d
+
+	is_triggered_only = yes
+
+	option = { # Only those who can be trusted
+		name = yug.4.a
+		ai_chance = {
+			factor = 33
+		}
+	}
+
+	option = { # Hand-Pick the Members
+		name = yug.4.b
+		ai_chance = {
+			factor = 33
+		}
+		add_ideas = { YUG_corruption_scandals }
+		add_political_power = 250
+		hidden_effect = {
+			country_event = yug.5
+		}
+	}
+
+	option = { # Let the republics pick them
+		name = yug.4.c
+		ai_chance = {
+			factor = 34
+		}
+		add_ideas = { YUG_corruption_scandals }
+		add_political_power = 200
+		hidden_effect = {
+			country_event = yug.5
+		}
+	}
+}
+
+# Corruption Scandals
+country_event = {
+	id = yug.5
+	title = yug.5.t
+	desc = yug.5.d
+
+	is_triggered_only = yes
+
+	option = { # Investigate further
+		name = yug.5.a
+		ai_chance = {
+			factor = 5
+		}
+		remove_ideas = YUG_corruption_scandals
+		add_ideas = { YUG_arrested_ministers }
+	}
+
+	option = { # We can't risk it getting public
+		name = yug.5.b
+		ai_chance = {
+			factor = 5
+		}
+		hidden_effect = {
+			if = { limit = { NOT = { has_country_flag = corruption_scandals } } }
+			set_country_flag = corruption_scandals
+		}
+	}
+
+}
+
+# Corruption Scandals, hidden trigger for new event
+country_event = {
+	id = yug.6
+	hidden = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = yug.5
+	}
+
+	option = { }
+}
+
+# Tito's Successor
+country_event = {
+	id = yug.7
+	title = yug.7.t
+	desc = yug.7.d
+
+	is_triggered_only = yes
+
+	option = { # Appoint Vice President
+		name = yug.7.a
+		ai_chance = {
+			factor = 5
+		}
+		effect_tooltip = {
+			create_country_leader = {
+				name = "Lazar Koliševski"
+				picture = "Portrait_Yugoslavia_Lazar_Kolisevski.dds"
+				ideology = stalinism
+			}
+		}
+	}
+
+	option = { # Appoint Head of SR Croatia
+		name = yug.7.b
+		ai_chance = {
+			factor = 5
+		}
+		create_country_leader = {
+			name = "Ante Marković"
+			picture = "Portrait_Yugoslavia_Ante_Markovic.dds"
+			ideology = stalinism
+		}
+	}
+
+	option = { # Appoint Head of SR Serbia 
+		name = yug.7.c
+		ai_chance = {
+			factor = 5
+		}
+		create_country_leader = {
+			name = "Ivan Stambolić"
+			picture = "Portrait_Yugoslavia_Ivan_Stambolic.dds"
+			ideology = stalinism
+		}
+	}
+
+}
+
+# Purge the Gouvernment
+country_event = {
+	id = yug.8
+	title = yug.8.t
+	desc = yug.8.d
+
+	is_triggered_only = yes
+
+	option = { # Whatever is necessary
+		name = yug.8.a
+	}
+}
+
+# Suez Crisis
+country_event = {
+	id = yug.9
+	title = yug.9.t
+	desc = yug.9.d
+
+	is_triggered_only = yes
+
+	option = { # Support Egypt
+		name = yug.9.a
+		ai_chance = {
+			factor = 5
+		}
+		add_opinion_modifier = { target = ENG modifier = YUG_Suez_Crisis_hurting_opinion }
+		add_opinion_modifier = { target = EGY modifier = YUG_Suez_Crisis_improve_opinion }
+	}
+	option = { # Stay out
+		name = yug.9.b
+		ai_chance = {
+			factor = 5
+		}
+		add_opinion_modifier = { target = EGY modifier = YUG_Suez_Crisis_hurting_opinion }
+		add_opinion_modifier = { target = ENG modifier = YUG_Suez_Crisis_improve_opinion }
+	}
+}
+
+# The Afghan Question
+country_event = {
+	id = yug.10
+	title = yug.10.t
+	desc = yug.10.d
+
+	is_triggered_only = yes
+
+	option = { # Allow him to join
+		name = yug.10.a
+		ai_chance = {
+			factor = 5
+		}
+		YUG = { add_to_faction = AFG }
+	}
+	option = { # We cannot risk it
+		name = yug.10.b
+		ai_chance = {
+			factor = 5
+		}
+		add_opinion_modifier = { target = AFG modifier = YUG_Afghan_Question_hurting_opinion}
+	}
+}
+
+# Croatia Declares Independence
+country_event = {
+	id = yug.11
+	title = yug.11.t
+	desc = yug.11.d
+
+	is_triggered_only = yes
+
+	option = { # We cant let them leave
+		name = yug.11.a
+		set_politics = {
+							ruling_party = monarchism
+							elections_allowed = no
+						}
+					create_country_leader = {
+							name = "Peter II"
+							picture = "Peter_II.dds"
+							expire = "1988.5.5"
+							ideology = monarchy
+						}
+					set_cosmetic_tag = SERBIA
+					release = CRO
+					release = BOS
+					release = TRS
+					CRO = {
+							set_politics = {
+									ruling_party = fascism
+									elections_allowed = no
+								}
+							create_country_leader = {
+									name = "Andrija Artukov"
+									picture = "Artukov.dds"
+									expire = "1988.5.5"
+									ideology = neo_nazism
+								}
+						}
+						TRS = {
+								set_cosmetic_tag = TRS_YUG
+								create_country_leader = {
+									name = "Josip Broz Tito"
+									picture = "gfx/leaders/YUG/Tito.dds"
+									expire = "1988.5.5"
+									ideology = titoism
+								}
+								add_popularity = { ideology = trotskyism popularity = 0.5 }
+								set_party_name = { ideology = trotskyism long_name = "Vlada Jugoslovenske Spasenja" name = "VJS" }
+								set_politics = {
+									ruling_party = trotskyism
+									elections_allowed = no
+								}
+						}
+	}
+}
+
+# Serbia Declares Independence
+country_event = {
+	id = yug.12
+	title = yug.12.t
+	desc = yug.12.d
+
+	is_triggered_only = yes
+
+	option = { # We cant let them leave
+		name = yug.12.a
+		 kill_country_leader = yes
+		set_politics = {
+							ruling_party = fascism
+							elections_allowed = no
+						}
+					create_country_leader = {
+							name = "Andrija Artukov"
+							picture = "Artukov.dds"
+							expire = "1988.5.5"
+							ideology = neo_nazism
+						}
+					set_cosmetic_tag = CROATIA
+					release = SER
+					release = SRP
+					release = MAC
+					SER = {
+							set_politics = {
+									ruling_party = monarchism
+									elections_allowed = no
+								}
+							create_country_leader = {
+									name = "Peter II"
+									picture = "Peter_II.dds"
+									expire = "1988.5.5"
+									ideology = monarchy
+								}
+						}
+	}
+}
+
+# Radical Coup
+country_event = {
+	id = yug.13
+	title = yug.13.t
+	desc = yug.13.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.13.a
+		add_stability = -0.10
+	}
+}
+
+# The Bled Agreement
+country_event = {
+	id = yug.14
+	title = yug.14.t
+	desc = yug.14.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.14.a
+		add_political_power = 150
+	}
+}
+
+# Pressure Bulgaria
+country_event = {
+	id = yug.15
+	title = yug.15.t
+	desc = yug.15.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.15.a
+		BUL = { country_event = yug.16 }
+	}
+}
+
+# Yugoslavia Wants to Unite
+country_event = {
+	id = yug.16
+	title = yug.16.t
+	desc = yug.16.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.16.a
+		ai_chance = {
+			factor = 20
+				modifier = {
+					factor = 0
+					is_historical_focus_on = yes
+				}
+		}
+		YUG = { annex_country = { target = ROOT } }
+	}
+	option = { 
+		name = yug.16.b
+		ai_chance = {
+			factor = 80
+				modifier = {
+					factor = 100
+					is_historical_focus_on = yes
+				}
+		}
+		add_opinion_modifier = { target = ROOT modifier = YUG_not_uniting_opinion }
+		YUG = {  create_wargoal = { type = annex_everything target = ROOT } }
+	}
+}
+
+# Pressure Albania
+country_event = {
+	id = yug.17
+	title = yug.17.t
+	desc = yug.17.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.17.a
+		ALB = { country_event = yug.16 }
+	}
+}
+
+
+# Pressure Romania
+country_event = {
+	id = yug.18
+	title = yug.18.t
+	desc = yug.18.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.18.a
+		ROM = { country_event = yug.16 }
+	}
+}
+
+# Yugoslavia Wants to Unite
+country_event = {
+	id = yug.19
+	title = yug.19.t
+	desc = yug.19.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.19.a
+		ai_chance = {
+			factor = 40
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		YUG = { annex_country = { target = ROOT } }
+	}
+	option = { 
+		name = yug.19.b
+		ai_chance = {
+			factor = 60
+				modifier = {
+					factor = 100
+					is_historical_focus_on = yes
+				}
+		}
+		add_opinion_modifier = { target = ROOT modifier = YUG_not_uniting_opinion }
+	}
+}
+
+# Proclaim the Balkan Federation
+news_event = {
+	id = yug.20
+	title = yug.20.t
+	desc = yug.20.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.20.a
+	}
+}
+
+# A Romanian puppet
+country_event = {
+	id = yug.21
+	title = yug.21.t
+	desc = yug.21.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.21.a
+		create_wargoal = {
+			target = ROM
+			type = puppet_wargoal_focus
+		}
+	}
+}
+
+# Invite Greece
+country_event = {
+	id = yug.22
+	title = yug.22.t
+	desc = yug.22.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.22.a
+		GRE = { country_event = yug.19 }
+	}
+}
+
+# Destroy the Rebellion
+country_event = {
+	id = yug.23
+	title = yug.23.t
+	desc = yug.23.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.23.a
+		add_manpower = 25000
+	}
+}
+
+# Bandung Conference
+country_event = {
+	id = yug.24
+	title = yug.24.t
+	desc = yug.24.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.24.a
+		RAJ = { country_event = yug.25 }
+		INO = { country_event = yug.25 }
+		EGY = { country_event = yug.25 }
+	}
+}
+
+# Join Non-aligned Movement
+country_event = {
+	id = yug.25
+	title = yug.25.t
+	desc = yug.25.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.25.a
+		ai_chance = {
+			factor = 5
+		}
+		YUG = { add_to_faction = ROOT}
+	}
+	option = { 
+		name = yug.25.a
+		ai_chance = {
+			factor = 5
+		}
+	}
+}
+
+# North African Expantion
+country_event = {
+	id = yug.26
+	title = yug.26.t
+	desc = yug.26.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.26.a
+		TUN = { country_event = yug.25 }
+		LBA = { country_event = yug.25 }
+		MOR = { country_event = yug.25 }
+	}
+}
+
+# Middle East Expantion
+country_event = {
+	id = yug.27
+	title = yug.27.t
+	desc = yug.27.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.27.a
+		IRQ = { country_event = yug.25 }
+		SAU = { country_event = yug.25 }
+		JOR = { country_event = yug.25 }
+		SYR = { country_event = yug.25 }
+	}
+}
+
+# Middle East Expantion
+country_event = {
+	id = yug.28
+	title = yug.28.t
+	desc = yug.28.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = yug.28.a
+		CAM = { country_event = yug.25 }
+		BHU = { country_event = yug.25 }
+		NEP = { country_event = yug.25 }
+		MAL = { country_event = yug.25 }
+	}
+}
+
+#Elections
+country_event = {
+	id = yug.29
+	title = "Election Day"
+	desc = "Who will be the future leader?"
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Josip Broz Tito (SKJ)"
+
+		set_politics = {
+			ruling_party = trotskyism
+			elections_allowed = yes
+		}
+		add_popularity = { ideology = trotskyism popularity = 0.05 }
+		ai_chance = {
+			factor = 50
+		}
+	}
+	option = {
+		name = "Vladko Maček (HSS)"
+
+		set_politics = {
+			ruling_party = liberal
+			elections_allowed = yes
+		}
+		create_country_leader = {
+			name = "Juraj Krnjević"
+			picture = "Juraj.dds"
+			expire = "1988.12.14"
+			ideology = libertarianism
+		}
+		add_popularity = { ideology = liberal popularity = 0.1 }
+		ai_chance = {
+			factor = 20
+		}
+	}
+	option = {
+		name = "Milan Stojadinović (JRZ)"
+
+		set_politics = {
+			ruling_party = nationalism
+			elections_allowed = yes
+		}
+		create_country_leader = {
+			name = "Milan Stojadinović"
+			picture = "Milan.dds"
+			expire = "1962.3.26"
+			ideology = nationalist_ideology
+		}
+		add_popularity = { ideology = nationalism popularity = 0.2 }
+		ai_chance = {
+			factor = 33
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
+		}
+	}
+}
+
+#Communism
+country_event = {
+	id = yug.30
+	title = "Transformation To Communism"
+	desc = yug.30.d
+	
+	picture = GFX_report_event_tito_speech
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "A Surprise, To Be Sure"
+
+		set_politics = {
+			ruling_party = communism
+			elections_allowed = yes
+		}
+	}
+}
+
+country_event = {
+	id = yug.31
+	title = "No deal"
+	desc = yug.31.d
+
+	is_triggered_only = yes
+
+	option = { 
+		name = "Our disappointment is immeasurable"
+		ai_chance = {
+			factor = 80
+		}
+	}
+	option = { 
+		name = "Lets Fight Them"
+		ai_chance = {
+			factor = 20
+		}
+		 declare_war_on = { target = BUL type = annex_everything } 
+	}
+}
+
+news_event = {
+	id = yug.32
+	title = "[GetNewspaperHeader]Eleanor Roosevelt and Josip Tito Meet"
+	desc = yug.32.d
+	picture = roosevelt_tito
+	is_triggered_only = yes
+	
+	option = { 
+		name = "Well then"
+	}
+}
+
+country_event = {
+	id = yug.33
+	title = "Rebellion in Bosanska Krajina"
+	desc = yug.33.d
+	picture = GFX_report_event_cazin_rebellion
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { 
+		name = "Break Them Up"
+		country_event = { id = yug.34 days = 30 }
+	}
+}
+
+country_event = {
+	id = yug.34
+	title = "Aftermath of Cazin rebellion"
+	desc = yug.34.d
+	picture = GFX_report_event_cazin_rebellion
+	is_triggered_only = yes
+	
+	option = { 
+		name = "A clear message"
+		add_stability = -0.05
+		 add_war_support = -0.02
+		 add_political_power = -50
+	}
+}

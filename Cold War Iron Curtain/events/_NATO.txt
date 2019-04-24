@@ -1,0 +1,842 @@
+﻿add_namespace = nato
+# Egypt (France and Britain go to war)
+country_event = {
+	id = nato.1
+	title = nato.1.t
+	desc = nato.1.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = yes
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.1
+		every_country = {
+			limit = { has_offensive_war_with = ROOT }
+			country_event = nato.2
+		}
+	}
+}
+country_event = {
+	id = nato.2
+	title = nato.2.t
+	desc = nato.2.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = yes
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.1
+		every_country = {
+			limit = { has_idea = nato_member }
+			add_to_war = { targeted_alliance = ROOT enemy = FROM }	
+		}
+	}
+}
+
+# Taft: Leave NATO?
+country_event = {
+	id = nato.9
+	title = nato.9.t
+	desc = nato.9.d
+	picture = GFX_report_event_taft_leave_nato
+	
+	fire_only_once = yes
+	#Sent to USA
+	is_triggered_only = yes
+	option = {
+		#Disband NATO
+		ai_chance = {
+			base = 90
+		}
+		name = nato.9.a
+		#set_global_flag = nato_disbanded
+		ENG = {country_event = { id = nato.10 hours = 2} }
+	}
+	option = {
+		#Status Quo
+		ai_chance = {
+			base = 10
+		}
+		name = nato.9.b
+	}
+	
+}
+
+# America Leaves NATO
+country_event = {
+	id = nato.10
+	title = nato.10.t
+	desc = nato.10.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = yes
+	#Sent to England
+	is_triggered_only = yes
+	
+	immediate = {
+		news_event = nato.101 
+	#mark all former members
+	every_country = {
+		limit = { is_in_faction_with = USA }
+		set_country_flag = former_nato_member
+	}
+	USA = { clr_country_flag = former_nato_member }
+	#destroy faction
+	USA = {dismantle_faction = yes}	
+	remove_ideas = nato_member
+	}
+	
+	option = {
+		#Become the leader of NATO
+		ai_chance = {
+			base = 70
+		}
+		name = nato.10.a
+		every_country = {
+			limit = { 
+			NOT = { tag = ROOT }
+			has_country_flag = former_nato_member 
+			}
+			country_event =  nato.11
+		}
+		set_global_flag = english_nato
+	}
+	option = {
+		#Disband NATO
+		ai_chance = {
+			base = 30
+		}
+		name = nato.10.b
+		set_global_flag = nato_disbanded
+		FRA = {country_event = { id = nato.12 hours = 2} }
+	}
+}
+# US Leaves NATO
+news_event = {
+	id = nato.101
+	title = nato.101.t
+	desc = nato.101.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	
+	
+	option = {
+		name = nato.101.a
+	}
+}
+# America Leaves, still want to remain in?
+country_event = {
+	id = nato.11
+	title = nato.11.t
+	desc = nato.11.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = no
+	#Sent to Members
+	is_triggered_only = yes
+	
+	immediate = {
+		clr_country_flag = former_nato_member 
+	}
+	
+	option = {
+		#Yes
+		ai_chance = {
+			base = 90
+		}
+		name = nato.11.a
+		#news_event = {id = nato.111}
+	}
+	option = {
+		#No
+		ai_chance = {
+			base = 10
+		}
+		name = nato.11.b
+		remove_ideas = nato_member
+		news_event = nato.112
+	}
+}
+# Country Remains in NATO
+news_event = {
+	id = nato.111
+	title = nato.111.t
+	desc = nato.111.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	
+	
+	option = {
+		name = nato.111.a
+		trigger = {
+			NOT = {is_in_faction_with = SOV}
+		}
+	}
+	option = {
+		name = nato.111.b
+		trigger = {
+			is_in_faction_with = SOV
+		}
+	}
+}
+# Country Leaves NATO
+news_event = {
+	id = nato.112
+	title = nato.112.t
+	desc = nato.112.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	
+	
+	option = {
+		name = nato.112.a
+		trigger = {
+			NOT = {is_in_faction_with = SOV}
+		}
+	}
+	option = {
+		name = nato.112.b
+		trigger = {
+			is_in_faction_with = SOV
+		}
+	}
+}
+
+# NATO Disbands, form EDC?
+country_event = {
+	id = nato.12
+	title = nato.12.t
+	desc = nato.12.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = no
+	#Sent to France
+	is_triggered_only = yes
+	
+	immediate = {
+		#clr_country_flag = former_nato_member
+		set_global_flag = nato_disbanded
+	}
+	
+	option = {
+		#Yes
+		ai_chance = {
+			base = 90
+		}
+		name = nato.12.a
+		news_event = nato.121
+		#Form EDF
+		set_global_flag = edc_formed
+		create_faction = "European Defence Community"
+		#Invite every european NATO country
+		every_country = {
+			limit = {
+				NOT = { tag = ROOT }
+				OR = {
+					original_tag = GRE
+					original_tag = ENG
+					original_tag = FIN
+					original_tag = ITA
+					original_tag = IRE
+					original_tag = ICE
+					original_tag = YUG
+					original_tag = SPR
+					original_tag = POR
+					original_tag = TUR
+					original_tag = SOV
+					original_tag = UKR
+					original_tag = POL
+					original_tag = BLR
+					original_tag = LIT
+					original_tag = LAT
+					original_tag = EST
+					original_tag = SWE
+					original_tag = NOR
+					original_tag = GER
+					original_tag = DEN
+					original_tag = WGR
+					original_tag = DDR
+					original_tag = SWI
+					original_tag = AUS
+					original_tag = HUN
+					original_tag = SER
+					original_tag = BUL
+					original_tag = ALB
+					original_tag = ROM
+					original_tag = CRO
+					original_tag = SLO
+					original_tag = CZE
+					original_tag = SLV
+					original_tag = TRS
+					original_tag = MOL
+					original_tag = BEL
+					original_tag = HOL
+					original_tag = LUX
+					original_tag = SAR
+					original_tag = CYP
+					original_tag = FCB
+					original_tag = KOS
+					original_tag = MAC
+				}
+				NOT = {
+					is_in_faction_with = SOV
+				}
+				#has_country_flag = former_nato_member
+			}
+			country_event = { id = nato.13 hours = 1 }
+		}
+	}
+	option = {
+		#No
+		ai_chance = {
+			base = 10
+		}
+		name = nato.12.b
+		#NATO Disbanded event
+		#set_global_flag = nato_disbanded
+		news_event = { id = nato.122 hours = 2 }
+	}
+}
+# EDC Founded
+news_event = {
+	id = nato.121
+	title = nato.121.t
+	desc = nato.121.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.121.a
+	}
+}
+# NATO Disbanded
+news_event = {
+	id = nato.122
+	title = nato.122.t
+	desc = nato.122.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.122.a
+		trigger = {
+			NOT = {is_in_faction_with = SOV}
+		}
+	}
+	option = {
+		name = nato.122.b
+		trigger = {
+			is_in_faction_with = SOV
+		}
+	}
+}
+# NATO disbanded, want to join the EDC?
+country_event = {
+	id = nato.13
+	title = nato.13.t
+	desc = nato.13.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = no
+	#Sent to Members
+	is_triggered_only = yes
+	
+	immediate = {
+		#clr_country_flag = former_nato_member 
+	}
+	
+	option = {
+		ai_chance = {
+			base = 20
+			modifier = {
+					factor = 4
+					has_country_flag = former_nato_member
+				}
+			
+		}
+		#Yes
+		name = nato.13.a
+		FRA = {add_to_faction = ROOT}
+		save_event_target_as = edc_target
+		news_event = nato.131
+	}
+	option = {
+		ai_chance = {
+			base = 80
+			modifier = {
+					factor = 0.2
+					has_country_flag = former_nato_member
+				}
+		}
+		#No
+		name = nato.13.b
+		save_event_target_as = edc_target
+		#news_event = {id = nato.132}
+	}
+}
+# Country Joins EDC
+news_event = {
+	id = nato.131
+	title = nato.131.t
+	desc = nato.131.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	
+	
+	option = {
+		name = nato.131.a
+		trigger = {
+			NOT = {is_in_faction_with = SOV}
+		}
+	}
+	option = {
+		name = nato.131.b
+		trigger = {
+			is_in_faction_with = SOV
+		}
+	}
+}
+#has_global_flag = president_taft
+
+# NATO Disbanded and no EDC, Should We Reform It?
+country_event = {
+	id = nato.14
+	title = nato.14.t
+	desc = nato.14.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = yes
+	#Sent to US
+	is_triggered_only = yes
+	
+	option = {
+		#Become the leader of NATO
+		ai_chance = {
+			base = 70
+		}
+		name = nato.14.a
+		#every_country = {
+			#limit = { is_in_faction_with = ENG }
+			#set_country_flag = former_nato_member
+		#}
+		
+		add_ideas = nato_member 
+		every_country = {
+			limit = { 
+			NOT = { tag = ROOT }
+			has_country_flag = former_nato_member 
+			}
+			country_event = nato.15
+		}
+	}
+	option = {
+		#Disband NATO
+		ai_chance = {
+			base = 30
+		}
+		name = nato.14.b
+	}
+}
+
+# NATO Reforms
+news_event = {
+	id = nato.141
+	title = nato.141.t
+	desc = nato.141.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.141.a
+	}
+}
+
+# America Reforms, rejoin NATO?
+country_event = {
+	id = nato.15
+	title = nato.15.t
+	desc = nato.15.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = no
+	#Sent to Members
+	is_triggered_only = yes
+	
+	immediate = {
+		clr_country_flag = former_nato_member 
+	}
+	
+	option = {
+		#Yes
+		ai_chance = {
+			base = 90
+		}
+		name = nato.15.a
+		USA = {add_to_faction = ROOT}
+		add_ideas = nato_member
+		save_event_target_as = nato_target
+		news_event = nato.111
+	}
+	option = {
+		#No
+		ai_chance = {
+			base = 10
+		}
+		name = nato.15.b
+		#save_event_target_as = nato_target
+		#news_event = {id = nato.112}
+	}
+}
+
+
+
+# Country Joins NATO
+news_event = {
+	id = nato.151
+	title = nato.151.t
+	desc = nato.151.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.151.a
+		trigger = {
+			NOT = {is_in_faction_with = SOV}
+		}
+	}
+	option = {
+		name = nato.151.b
+		trigger = {
+			is_in_faction_with = SOV
+		}
+	}
+}
+# Country Leaves NATO
+news_event = {
+	id = nato.152
+	title = nato.152.t
+	desc = nato.152.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.152.a
+		trigger = {
+			NOT = {is_in_faction_with = SOV}
+		}
+	}
+	option = {
+		name = nato.152.b
+		trigger = {
+			is_in_faction_with = SOV
+		}
+	}
+}
+
+# NATO Disbanded and EDC exists, Should We Reform It?
+country_event = {
+	id = nato.16
+	title = nato.16.t
+	desc = nato.16.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = yes
+	#Sent to US
+	is_triggered_only = yes
+
+	option = {
+		#Become the leader of NATO
+		ai_chance = {
+			base = 95
+		}
+		name = nato.16.a
+		every_country = {
+			limit = { is_in_faction_with = FRA }
+			set_country_flag = former_nato_member
+		}
+		
+		create_faction = "NATO"
+		FRA = {dismantle_faction = yes}
+		add_to_faction = FRA
+		FRA = {clr_country_flag = former_nato_member}
+		every_country = {
+			limit = {
+			NOT = { tag = ROOT }
+			has_country_flag = former_nato_member 
+			}
+			country_event = nato.17 
+		}
+	}
+	option = {
+		#No
+		name = nato.16.b
+		ai_chance = {
+			base = 5
+		}
+	}
+}
+
+# EDC Reforms
+news_event = {
+	id = nato.161
+	title = nato.161.t
+	desc = nato.161.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.161.a
+	}
+}
+
+# America turns EDC into NATO, still want to remain/return?
+country_event = {
+	id = nato.17
+	title = nato.17.t
+	desc = nato.17.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = no
+	#Sent to Members
+	is_triggered_only = yes
+	
+	immediate = {
+		clr_country_flag = former_nato_member 
+	}
+	
+	option = {
+		#Yes
+		ai_chance = {
+			base = 80
+		}
+		name = nato.17.a
+		USA = {add_to_faction = ROOT}
+		save_event_target_as = nato_target
+		news_event = nato.171
+	}
+	option = {
+		#No
+		ai_chance = {
+			base = 20
+		}
+		name = nato.17.b
+		save_event_target_as = nato_target
+		#news_event = {id = nato.112}
+	}
+}
+
+# Country Joins NATO
+news_event = {
+	id = nato.171
+	title = nato.171.t
+	desc = nato.171.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.171.a
+		trigger = {
+			NOT = {is_in_faction_with = SOV}
+		}
+	}
+	option = {
+		name = nato.171.b
+		trigger = {
+			is_in_faction_with = SOV
+		}
+	}
+}
+# Country Leaves NATO
+news_event = {
+	id = nato.172
+	title = nato.172.t
+	desc = nato.172.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.172.a
+		trigger = {
+			NOT = {is_in_faction_with = SOV}
+		}
+	}
+	option = {
+		name = nato.172.b
+		trigger = {
+			is_in_faction_with = SOV
+		}
+	}
+}
+
+# England NATO, Should We Reform It?
+country_event = {
+	id = nato.18
+	title = nato.18.t
+	desc = nato.18.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = yes
+	#Sent to US
+	is_triggered_only = yes
+
+	option = {
+		#Become the leader of NATO
+		ai_chance = {
+			base = 95
+		}
+		name = nato.18.a
+		every_country = {
+			limit = { is_in_faction_with = ENG }
+			set_country_flag = former_nato_member
+			
+		}
+		
+		create_faction = "NATO"
+		ENG = {dismantle_faction = yes}
+		add_to_faction = ENG
+		ENG = {clr_country_flag = former_nato_member}
+		every_country = {
+			limit = {
+			NOT = { tag = ROOT }
+			has_country_flag = former_nato_member 
+			}
+			country_event = nato.19
+		}
+	}
+	option = {
+		#No
+		name = nato.18.b
+		ai_chance = {
+			base = 5
+		}
+	}
+}
+
+# ENGNATO Reforms
+news_event = {
+	id = nato.181
+	title = nato.181.t
+	desc = nato.181.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.181.a
+	}
+}
+
+# America Rejoins, still want to remain/return?
+country_event = {
+	id = nato.19
+	title = nato.19.t
+	desc = nato.19.d
+	picture = GFX_report_event_british_artillery
+	
+	fire_only_once = no
+	#Sent to Members
+	is_triggered_only = yes
+	
+	immediate = {
+		clr_country_flag = former_nato_member 
+	}
+	
+	option = {
+		#Yes
+		ai_chance = {
+			base = 95
+		}
+		name = nato.19.a
+		USA = {add_to_faction = ROOT}
+		save_event_target_as = nato_target
+		#news_event = {id = nato.111}
+	}
+	option = {
+		#No
+		ai_chance = {
+			base = 5
+		}
+		name = nato.19.b
+		save_event_target_as = nato_target
+		news_event = nato.192
+	}
+}
+# Country Joins NATO
+news_event = {
+	id = nato.191
+	title = nato.191.t
+	desc = nato.191.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.191.a
+		trigger = {
+			NOT = {is_in_faction_with = SOV}
+		}
+	}
+	option = {
+		name = nato.191.b
+		trigger = {
+			is_in_faction_with = SOV
+		}
+	}
+}
+# Country Leaves NATO
+news_event = {
+	id = nato.192
+	title = nato.192.t
+	desc = nato.192.d
+	picture = GFX_report_event_british_artillery
+	
+	major = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = nato.192.a
+		trigger = {
+			NOT = {is_in_faction_with = SOV}
+		}
+	}
+	option = {
+		name = nato.192.b
+		trigger = {
+			is_in_faction_with = SOV
+		}
+	}
+}

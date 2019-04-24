@@ -1,0 +1,256 @@
+﻿#####################
+# Trieste Events
+#####################
+
+add_namespace = ita
+add_namespace = yug
+add_namespace = tri
+
+# Yes / No Unification Trieste
+country_event = {
+	id = ita.1
+	title = ita.1.t
+	desc = ita.1.d
+
+	is_triggered_only = yes
+
+	option = {
+		name = ita.1.a
+		ai_chance = {
+			factor = 95
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 1
+			}
+		}
+		set_global_flag = ita_yes_trieste
+
+	}
+
+	option = {
+		ai_chance = {
+			factor = 5
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
+		}
+
+		name = ita.1.b
+		set_global_flag = ita_no_Trieste
+	}
+}
+
+# No Unification Trieste from Yugoslavia
+country_event = {
+	id = ita.2
+	title = ita.2.t
+	desc = ita.2.d
+
+	is_triggered_only = yes
+
+	option = { #Enforce Yugoslavia
+		name = ita.2.a
+		ai_chance = {
+			factor = 35
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
+		}
+		YUG = { country_event = yug.2 }
+	}
+
+	option = { #Back Down
+		name = ita.2.b
+		ai_chance = {
+			factor = 65
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 1
+			}
+		}
+		country_event = tri.6
+	}
+}
+
+# Yes / No Unification Trieste
+country_event = {
+	id = yug.1
+	title = yug.1.t
+	desc = yug.1.d
+
+	is_triggered_only = yes
+
+	option = {
+		name = yug.1.a
+		set_global_flag = yug_yes_trieste
+		ai_chance = {
+			factor = 85
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 1
+			}
+		}
+	}
+
+	option = {
+		name = yug.1.b
+		set_global_flag = yug_no_Trieste
+		ai_chance = {
+			factor = 15
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
+		}
+	}
+}
+
+# Unification Trieste: Enforcing from Italy
+country_event = {
+	id = yug.2
+	title = yug.2.t
+	desc = yug.2.d
+
+	is_triggered_only = yes
+
+	option = { #Invade Trieste
+		name = yug.2.a
+		ai_chance = {
+			factor = 75
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 1
+			}
+		}
+		set_global_flag = yug_not_back_down_trieste
+	}
+
+	option = { #Back down
+		name = yug.2.b
+		ai_chance = {
+			factor = 25
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
+		}
+		set_global_flag = yug_back_down_trieste
+	}
+}
+# The unification of Trieste, Question
+country_event = {
+	id = tri.1
+	hidden = yes
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		ITA = {
+			country_event = ita.1
+		}
+		YUG = {
+			country_event = yug.1
+		}
+		set_global_flag = tri_questions_over
+	}
+}
+
+# The unification of Triese, Unification
+country_event = {
+	id = tri.2
+	hidden = yes
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	immediate = {
+		ITA = {
+			transfer_state = 756
+		}
+		news_event = news.1018
+		set_global_flag = tri_Trieste_united
+	}
+}
+
+# The unification of Trieste, No Unification due to tension yet
+country_event = {
+	id = tri.3
+	hidden = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		ITA = { news_event = news.1019 }
+		YUG = { news_event = news.1019 }
+		set_global_flag = tri_Trieste_not_united
+		ITA = { country_event = ita.2 }
+		add_named_threat = { threat = 10 name = tri.3.tension }
+	}
+}
+
+# The unification of Trieste, Yugoslavia backs down
+country_event = {
+	id = tri.4
+	hidden = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		ITA = {
+			transfer_state = 152
+		}
+		news_event = news.1020
+		set_global_flag = tri_yug_back_down
+	}
+
+}
+
+# The unification of Trieste, Yugoslavia does not backs down
+country_event = {
+	id = tri.5
+	hidden = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		YUG = { 
+			declare_war_on = {
+				target = TRI
+				type = take_state
+				generator = { 756 }
+			}
+		}
+		ITA = {
+			declare_war_on = {
+				target = YUG
+				type = puppet_wargoal_focus
+			}
+		}
+		news_event = news.1021
+		set_global_flag = tri_war
+		add_named_threat = { threat = 25 name = tri.5.tension }
+	}
+}
+
+# The unification of Trieste, Italy backs down
+country_event = {
+	id = tri.6
+	hidden = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_global_flag = ita_back_down_triste_1 }
+	}
+
+	immediate = {
+		YUG = {
+			transfer_state = 756
+		}
+		news_event = news.1022
+		set_global_flag = ita_back_down_triste_1
+	}
+}

@@ -1,0 +1,155 @@
+﻿###########################
+# Exile leader events
+###########################
+
+add_namespace = mtg_exile_leader_added
+add_namespace = mtg_exile_government
+
+#unit leader offers his service
+unit_leader_event = {
+	id = mtg_exile_leader_added.1
+	title = mtg_exile_leader_added.1.t
+	desc = mtg_exile_leader_added.1.desc
+
+	is_triggered_only = yes
+	
+	option = {
+		name = mtg_exile_leader_added.1.a
+		ai_chance = {
+			factor = 1
+		}		
+	}
+}
+
+# Government in Exile requests permission from host to return home via decision
+
+country_event = {
+	id = mtg_exile_government.2
+	title = mtg_exile_government.2.title
+	desc = mtg_exile_government.2.desc
+	
+	picture = GFX_report_event_canadian_soldiers
+	
+	is_triggered_only = yes
+
+	option = {
+		name = mtg_exile_government.2.a
+
+		FROM = {
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = our_liberators
+			}
+		}
+		end_exile = FROM
+	}
+
+	option = {
+		name = mtg_exile_government.2.b
+
+		FROM = {
+			add_legitimacy = -10
+		}
+	}
+}
+
+# Host nation requesting navy from GiE
+country_event = {
+	id = mtg_exile_government.3
+	title = mtg_exile_government.3.title
+	desc = mtg_exile_government.3.desc
+	
+	picture = GFX_report_event_destroyers
+	
+	is_triggered_only = yes
+
+	# Yes we will
+	option = {
+		name = mtg_exile_government.3.a
+		ai_chance = { factor = 1 }
+		transfer_navy = {
+			target = FROM
+			is_government_in_exile = yes
+		}
+		add_legitimacy = 10
+		FROM = {
+			country_event = { id = mtg_exile_government.4 hours = 6 }
+		}
+	}
+
+	# No ty
+	option = {
+		name = mtg_exile_government.3.b
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_navy_size = {
+				    size > 75
+				}
+			}
+		}
+		FROM = {
+			country_event = { id = mtg_exile_government.5 hours = 6 }
+		}
+	}
+}
+
+# Notification event for host nation that GiE transfers navy
+country_event = {
+	id = mtg_exile_government.4
+	title = mtg_exile_government.4.title
+	desc = mtg_exile_government.4.desc
+	
+	picture = GFX_report_event_destroyers
+	
+	is_triggered_only = yes
+
+	# Good
+	option = {
+		name = excellent
+		effect_tooltip = {
+			FROM = {
+				transfer_navy = {
+					target = ROOT
+				}
+				add_legitimacy = 10
+			}
+		}
+	}
+}
+
+# Notification event for host nation that GiE will not transfer navy
+country_event = {
+	id = mtg_exile_government.5
+	title = mtg_exile_government.5.title
+	desc = mtg_exile_government.5.desc
+	
+	picture = GFX_report_event_destroyers
+	
+	is_triggered_only = yes
+
+	# Good
+	option = {
+		name = mtg_exile_government.5.a
+	}
+}
+
+# generic events
+add_namespace = mtg_generic
+
+# Notification event of changing ideology
+country_event = {
+	id = mtg_generic.1
+	title = mtg_generic.1.title
+	desc = mtg_generic.1.desc
+	
+	picture = GFX_report_event_generic_parliament
+	
+	is_triggered_only = yes
+
+	# Good
+	option = {
+		name = mtg_generic.1.a
+	}
+}
