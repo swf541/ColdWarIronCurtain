@@ -17,7 +17,7 @@ NDefines.NAir.STRATEGIC_BOMBER_NUKE_AIR_SUPERIORITY = 0.0 -- How much air superi
 
 NDefines.NBuildings.AIRBASE_CAPACITY_MULT = 40 -- Each level of airbase building multiplied by this, gives capacity (max operational value). Value is int. 1 for each airplane.
 NDefines.NBuildings.ANTI_AIR_SUPERIORITY_MULT = 100.0 -- How much air superiority reduction to the enemy does our AA guns? Normally each building level = -1 reduction. With this multiplier.
-NDefines.NBuildings.INFRASTRUCTURE_RESOURCE_BONUS= 0.2
+NDefines.NBuildings.INFRASTRUCTURE_RESOURCE_BONUS= 0.0
 NDefines.NBuildings.MAX_BUILDING_LEVELS = 200
 NDefines.NBuildings.MAX_SHARED_SLOTS = 40
 NDefines.NBuildings.RADAR_RANGE_MAX = 220 -- Range is interpolated between building levels 1-15.
@@ -101,3 +101,4 @@ NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_COST_FACTOR = 0.0-- Desire to boost rela
 NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_PP_FACTOR = 0.0	-- Desire to boost relations adds total PP multiplied by this
 
 NDefines.NProduction.MAX_EQUIPMENT_RESOURCES_NEED = 4
+NDefines.NProduction.INFRA_MAX_CONSTRUCTION_COST_EFFECT = 1.4
