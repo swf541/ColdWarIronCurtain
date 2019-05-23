@@ -1,0 +1,115 @@
+	scripted_influence_option_buttons = {
+		context_type = selected_country_context
+		parent_window_token = selected_country_view_diplomacy
+		
+		window_name = "influence_option_buttons"
+		
+		visible = {
+		  always = yes
+		}
+		
+		properties = {
+			opt_influence_action_button = {
+				image = "[select_influence_action_button]"
+			}
+			opt_aid_button = {
+				image = "[select_aid_button]"
+			}
+			opt_aid_military_button = {
+				image = "[select_aid_military_button]"
+			}
+			opt_target_other_button = {
+				image = "[select_target_other_button]"
+			}
+			opt_manipulate_politics_button = {
+				image = "[select_manipulate_politics_button]"
+			}
+			opt_coup_button = {
+				image = "[select_coup_button]"
+			}
+			opt_economic_exploitation_button = {
+				image = "[select_economic_exploitation_button]"
+			}
+			opt_make_puppet_button = {
+				image = "[select_make_puppet_button]"
+			}
+		}
+		
+		triggers = {
+		
+			opt_influence_action_button_click_enabled = {
+				ROOT = { has_political_power > 100 }
+			}
+			
+			#hide for yourself
+			opt_influence_action_button_visible = {
+				NOT = {
+					TAG = ROOT
+				}
+			}
+			opt_aid_button_visible = {
+				NOT = {
+					TAG = ROOT
+				}
+			}
+			opt_aid_military_button_visible = {
+				NOT = {
+					TAG = ROOT
+				}
+			}
+			opt_target_other_button_visible = {
+				NOT = {
+					TAG = ROOT
+				}
+			}
+			opt_manipulate_politics_button_visible = {
+				NOT = {
+					TAG = ROOT
+				}
+			}
+			opt_coup_button_visible = {
+				NOT = {
+					TAG = ROOT
+				}
+			}
+			opt_economic_exploitation_button_visible = {
+				NOT = {
+					TAG = ROOT
+				}
+			}
+			opt_make_puppet_button_visible = {
+				NOT = {
+					TAG = ROOT
+				}
+			}
+		}
+		
+		effects = {
+		
+			opt_influence_action_button_click = {
+			
+				ROOT = { add_political_power = -100 }
+				
+				set_temp_variable = { influence_gain = ROOT.influence_multiplier } #from global rank idea
+				multiply_temp_variable = { influence_gain = 10 } #base gain
+				for_loop_effect = {
+					end = influence_array^num
+					value = v
+					if = {
+						limit = {
+							check_variable = { influence_array^v = ROOT }
+						}
+						add_to_variable = { influence_array_val^v = influence_gain }
+						set_country_flag = found
+					}
+				}
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+						add_to_array = { influence_array = ROOT.id }
+						add_to_array = { influence_array_val = influence_gain }
+				}
+				clr_country_flag = found
+				recalculate_influence = yes
+			}
+		}
+	}
