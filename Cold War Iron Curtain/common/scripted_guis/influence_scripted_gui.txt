@@ -1,4 +1,19 @@
 scripted_gui = {
+
+
+	domestic_influence_diplo = {
+		context_type = selected_country_context
+		parent_window_token = selected_country_view_diplomacy
+		
+		window_name = "fpp_influence_diplo"
+		
+		visible = {
+		  always = yes
+		}
+		
+		effects = { }
+	}
+
 	domestic_influence_diplo = {
 		context_type = selected_country_context
 		parent_window_token = selected_country_view_diplomacy
@@ -6,75 +21,11 @@ scripted_gui = {
 		window_name = "domestic_influence_diplo"
 		
 		visible = {
-			always = yes
+		  always = yes
 		}
 		
-		effects = { 
-			establish_influencer_click = {	
-				if = {
-					limit = {
-						check_variable = { influencer1 = 0 } 
-						NOT = {
-							   OR = {
-									check_variable = { influencer1 = ROOT.temp_check } 
-									check_variable = { influencer2 = ROOT.temp_check } 
-									check_variable = { influencer3 = ROOT.temp_check } 
-									check_variable = { influencer4 = ROOT.temp_check } 
-									check_variable = { influencer5 = ROOT.temp_check } 
-									check_variable = { influencer6 = ROOT.temp_check } 
-									check_variable = { influencer7 = ROOT.temp_check } 
-							   }
-						}
-					}
-					set_variable = { influencer1 = ROOT.temp_check }
-					set_variable = { var = influencer1_amount value = 250 }
-					recalculate_influence = yes	
-					break = yes
-				}
-				if = {
-					limit = {
-						check_variable = { influencer2 = 0 } 
-						NOT = {
-							   OR = {
-									check_variable = { influencer1 = ROOT.temp_check } 
-									check_variable = { influencer2 = ROOT.temp_check } 
-									check_variable = { influencer3 = ROOT.temp_check } 
-									check_variable = { influencer4 = ROOT.temp_check } 
-									check_variable = { influencer5 = ROOT.temp_check } 
-									check_variable = { influencer6 = ROOT.temp_check } 
-									check_variable = { influencer7 = ROOT.temp_check } 
-							   }
-						}
-					}
-					set_variable = { influencer2 = ROOT.temp_check }
-					set_variable = { var = influencer2_amount value = 250 }
-					recalculate_influence = yes	
-					break = yes
-				}
-				if = {
-					limit = {
-						check_variable = { influencer3 = 0 } 
-						NOT = {
-							   OR = {
-									check_variable = { influencer1 = ROOT.temp_check } 
-									check_variable = { influencer2 = ROOT.temp_check } 
-									check_variable = { influencer3 = ROOT.temp_check } 
-									check_variable = { influencer4 = ROOT.temp_check } 
-									check_variable = { influencer5 = ROOT.temp_check } 
-									check_variable = { influencer6 = ROOT.temp_check } 
-									check_variable = { influencer7 = ROOT.temp_check } 
-							   }
-						}
-					}
-					set_variable = { var = influencer3 value = ROOT.temp_check }
-					set_variable = { var = influencer3_amount value = 1500 }
-					recalculate_influence = yes	
-					break = yes
-				}
-			}
-		}
+		effects = { }
 	}
-
 	position_1_diplo = {
 		context_type = selected_country_context
 		parent_window_token = selected_country_view_diplomacy
@@ -82,7 +33,7 @@ scripted_gui = {
 		window_name = "position_1_diplo"
 		
 		visible = {
-			always = yes
+		  always = yes
 		}
 		
 		effects = { }
@@ -94,7 +45,7 @@ scripted_gui = {
 		window_name = "position_2_diplo"
 		
 		visible = {
-			always = yes
+		  always = yes
 		}
 		
 		effects = { }
@@ -106,7 +57,7 @@ scripted_gui = {
 		window_name = "position_3_diplo"
 		
 		visible = {
-			always = yes
+		  always = yes
 		}
 		
 		effects = { }
@@ -118,7 +69,7 @@ scripted_gui = {
 		window_name = "position_4_diplo"
 		
 		visible = {
-			always = yes
+		  always = yes
 		}
 		
 		effects = { }
@@ -130,7 +81,7 @@ scripted_gui = {
 		window_name = "position_5_diplo"
 		
 		visible = {
-			always = yes
+		  always = yes
 		}
 		
 		effects = { }
@@ -142,7 +93,7 @@ scripted_gui = {
 		window_name = "position_6_diplo"
 		
 		visible = {
-			always = yes
+		  always = yes
 		}
 		
 		effects = { }
@@ -154,443 +105,226 @@ scripted_gui = {
 		window_name = "position_7_diplo"
 		
 		visible = {
-			always = yes
+		  always = yes
 		}
 		
 		effects = { }
 	}
-	
-	domestic_influence_diplo_menu = {
+
+	scripted_influence_option_buttons = {
 		context_type = selected_country_context
 		parent_window_token = selected_country_view_diplomacy
 		
-		window_name = "domestic_influence_diplo_menu"
+		window_name = "influence_option_buttons"
 		
 		visible = {
-		   OR = {
-				check_variable = { influencer1 = ROOT } 
-				check_variable = { influencer2 = ROOT } 
-				check_variable = { influencer3 = ROOT } 
-				check_variable = { influencer4 = ROOT } 
-				check_variable = { influencer5 = ROOT } 
-				check_variable = { influencer6 = ROOT } 
-				check_variable = { influencer7 = ROOT } 
-		   }
+		  always = yes
+		}
+		
+		
+		triggers = {
+			opt_make_puppet_button_click_enabled = {
+				AND = {
+					check_variable = { influence_array^0 = ROOT }
+					check_variable = { influence_array_calc^0 > 0.9 }
+					has_political_power = 500
+					is_subject = no
+					NOT = { has_war = yes }
+					meta_trigger = {
+						text = {
+							ic_ratio = {
+								tag = [CHECKTAG]
+								ratio < 1
+							}
+						}
+						CHECKTAG = "[?var:ROOT.temp_check]"
+					}				
+				}
+			}
+		
+			opt_aid_button_click_enabled = {
+				is_influencer = yes
+				ic_ratio = {
+					tag = ROOT
+					ratio > 0.5
+				}
+			}
+			opt_influence_action_button_enabled = {
+				OR = {
+					is_influencer = yes
+					check_variable = { ROOT.fppDomesticSet > fppDomesticDoubled }		
+				}
+				check_variable = { ROOT.foriegnPowerProjection > 1 }
+				ROOT = { has_political_power > 100 }
+			}
+			opt_economic_exploitation_button_enabled = {
+				
+				AND = {
+					check_variable = { influence_array^0 = ROOT }
+					check_variable = { influence_array_calc^0 > 0.65 }
+					NOT = { is_puppet_of = ROOT }
+					has_political_power > 200
+				}
+				#not twice
+				NOT = {
+					meta_trigger = {
+						text = {
+							has_idea = [CHECKTAG]_exploit_idea
+						}
+						CHECKTAG = "[?var:influence_array^0.GetTag]"
+					}
+				}
+			}
+			opt_trade_agreement_button_enabled = {
+				
+				AND = {
+					check_variable = { influence_array^0 = ROOT }
+					check_variable = { influence_array_calc^0 > 0.50 }
+					NOT = { is_puppet_of = ROOT }
+					has_political_power > 100
+				}
+				#not twice
+				NOT = {
+					meta_trigger = {
+						text = {
+							has_idea = trade_treaty_[ROOTTAG]
+						}
+						CHECKTAG = "[?var:influence_array^0.GetTag]"
+					}
+				}
+			}
 		}
 		
 		effects = {
+		
+			opt_influence_action_button_click = {
 
-			#Positive Actions
-			economic_investments_click = {		
-				add_timed_idea = {
-					idea = foriegn_economic_investments
-					days = 900
-				}
-				ROOT = { 
-					add_political_power = -100
-					add_to_variable = { foriegnPowerProjection = -3 }
-				}
-				fifty_point_influence_gain = yes
 				
-				recalculate_influence = yes
-				
-			}
-			defense_treaty_click = {	
-				
-				ROOT = {
-					give_guarantee = PREV
-					add_to_variable = { foriegnPowerProjection = -10 }
-				}
-				if = {
-					limit = {
-						check_variable = { influencer1 = ROOT }
-					}
-					add_ideas = influencer1_defense_treaty
-				}
-				if = {
-					limit = {
-						check_variable = { influencer2 = ROOT }
-					}
-					add_ideas = influencer2_defense_treaty
-				}
-				if = {
-					limit = {
-						check_variable = { influencer3 = ROOT }
-					}
-					add_ideas = influencer3_defense_treaty
-					
-				}
-				if = {
-					limit = {
-						check_variable = { influencer4 = ROOT }
-					}
-					add_ideas = influencer4_defense_treaty
-					
-				}
-				if = {
-					limit = {
-						check_variable = { influencer5 = ROOT }
-					}
-					add_ideas = influencer5_defense_treaty
-				}
-				if = {
-					limit = {
-						check_variable = { influencer6 = ROOT }
-					}
-					add_ideas = influencer6_defense_treaty
-				}
-				if = {
-					limit = {
-						check_variable = { influencer7 = ROOT }
-					}
-					add_ideas = influencer7_defense_treaty
-				}	
-				give_military_access = ROOT
-				ROOT = { add_political_power = -500 }
-				hundred_point_influence_cost = yes
-				recalculate_influence = yes				
-			}
-			civil_war_intevention_click = {	
-				
-				random_country = { 
-					limit = {
-						has_civil_war = yes
-						original_tag = PREV
-						NOT = { tag = PREV }
-					}
-					set_variable = { war_target = THIS.id }
-				}	
-				add_to_war = { 
-					targeted_alliance = ROOT 
-					enemy = var:war_target 
-					hostility_reason = asked_to_join
-				}
-				ROOT = {
-					add_threat = 5
-					add_to_variable = { foriegnPowerProjection = -25 }
-				}
-				give_military_access = ROOT
-				ROOT = { add_political_power = -750 }
-				clear_variable = war_target
-				three_hundred_point_influence_gain = yes
-				recalculate_influence = yes				
-			}
-
-			trade_agreement_click = {
-				
-				sign_trade_agreement_inv = yes
-				sign_trade_agreement = yes	
-				if = {
-					limit = {
-						check_variable = { influencer1 = ROOT }
-					}
-					add_ideas = influencer1_trade_deal
-				}
-				if = {
-					limit = {
-						check_variable = { influencer2 = ROOT }
-					}
-					add_ideas = influencer2_trade_deal
-				}
-				if = {
-					limit = {
-						check_variable = { influencer3 = ROOT }
-					}
-					add_ideas = influencer3_trade_deal
-					
-				}
-				if = {
-					limit = {
-						check_variable = { influencer4 = ROOT }
-					}
-					add_ideas = influencer4_trade_deal
-					
-				}
-				if = {
-					limit = {
-						check_variable = { influencer5 = ROOT }
-					}
-					add_ideas = influencer5_trade_deal
-				}
-				if = {
-					limit = {
-						check_variable = { influencer6 = ROOT }
-					}
-					add_ideas = influencer6_trade_deal
-				}
-				if = {
-					limit = {
-						check_variable = { influencer7 = ROOT }
-					}
-					add_ideas = influencer7_trade_deal
-				}			
-
-				ROOT = { 
-					add_political_power = -500
-					add_to_variable = { foriegnPowerProjection = -10 }
-				}
-				three_hundred_point_influence_gain = yes
-				recalculate_influence = yes				
-			}
-			#Negative Actions
-			political_influence_click = {
-				
-				influence_nation = yes
-				ROOT = { 
-					add_political_power = -200
-					add_to_variable = { foriegnPowerProjection = -25 }
-				}
-				recalculate_influence = yes				
-			}
-			attempt_political_coup_click = {
-				
-				add_to_variable = { foriegnPowerProjection = -75 }
-				random_list = {
-					60 = {		#Success
-						successul_coup_effect = yes
-						influence_nation_coup = yes
-						#news_event = coup.1
-					}
-					10 = {		#Failure
-						coup_influence_change_failure = yes
-						#news_event = coup.2
-					}
-					30 = {		#Civil War
-						
-						influence_nation_coup_civil_war = yes
-						coup_influence_change_failure = yes
-						#news_event = coup.3
-						random_country = {
-							limit = {
-								NOT = { tag = ROOT }
-								original_tag = ROOT
-							}
-							set_variable = { var = domestic_influence_amount value = 500 }
-							set_variable = { var = influencer1 value = FROM.id }
-							set_variable = { var = influencer1_amount value = 2500 }	
-							recalculate_influence = yes
+				ROOT = { add_political_power = -100 }
+				add_to_variable = { ROOT.foriegnPowerProjection = -1 }
+				set_temp_variable = { influence_gain = 10 } #from global rank idea
+				for_loop_effect = {
+					end = influence_array^num
+					value = v
+					if = {
+						limit = {
+							check_variable = { influence_array^v = ROOT }
 						}
+						add_to_variable = { influence_array_val^v = influence_gain }
+						set_country_flag = found
 					}
-				}				
+				}
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+						add_to_array = { influence_array = ROOT.id }
+						add_to_array = { influence_array_val = influence_gain }
+				}
+				clr_country_flag = found
+				recalculate_influence = yes
+			}
+			opt_aid_military_button_click = {
+			}
+			opt_target_other_button_click = {
+				add_political_power = -100
+				diplomatic_relation = {
+					country = ROOT
+					relation = military_access
+					active = yes
+				}
+				diplomatic_relation = {
+					country = ROOT
+					relation = docking_rights
+					active = yes
+				}
+			}
+			opt_manipulate_politics_button_click = {
+			}
+			opt_coup_button_click = {
+			}
+			opt_economic_exploitation_button_click = {
 				
-				influence_nation_coup_civil_war = yes
-				coup_influence_change_failure = yes
-				news_event = coup.3
-
-				random_country = {
-					limit = {
-						NOT = { tag = PREV }
-						original_tag = PREV
+				meta_effect = {
+					text = {
+						add_ideas = [ROOTTAG]_exploit_idea
 					}
-					set_variable = { var = domestic_influence_amount value = 500 }
-					set_variable = { var = influencer1 value = ROOT.id }
-					set_variable = { var = influencer1_amount value = 2500 }	
-					recalculate_influence = yes
+					ROOTTAG = "[?var:influence_array^0.GetTag]"
+				}
+				
+				set_temp_variable = { influence_reduce = influence_array_val^0 }
+				multiply_temp_variable = { influence_reduce = 0.1 }
+				for_loop_effect = {
+					end = influence_array^num
+					value = v
+					if = {
+						limit = {
+							check_variable = { influence_array^v = ROOT }
+						}
+						subtract_from_variable = { influence_array_val^v = influence_reduce }
+					}
+				}
+				recalculate_influence = yes
+				add_stability = -0.10
+				add_political_power = -250
+				#opinions
+				add_opinion_modifier = {
+					target = ROOT
+					modifier = exploiter
+				}
+				every_neighbor_country = {
+					add_opinion_modifier = {
+						target = ROOT
+						modifier = exploiter_neighbor
+					}
 				}
 			}
-		}
-		triggers = {
-			economic_investments_click_enabled = {
-				NOT = { has_idea = foriegn_economic_investments }
+			opt_make_puppet_button_click = {
+				for_loop_effect = {
+					end = influence_array^num
+					value = v
+					
+					meta_effect = {
+						text = {
+							remove_ideas = [THISTAG]_exploit_idea
+						}
+						THISTAG = "[?var:influence_array^v.GetTag]"
+					}
+				}
+				set_country_flag = influence_puppet
+				add_stability = -0.25
+				add_political_power = -500
 				ROOT = {
-					check_variable = { foriegnPowerProjection > 2 }
-					has_political_power > 99
+					set_autonomy = {
+						target = PREV
+						autonomy_state = autonomy_associated_state
+						freedom_level = 0.5
+					}
+					add_threat = {
+						threat = 10
+					}
+				}
+				every_neighbor_country = {
+					add_opinion_modifier = {
+						target = ROOT
+						modifier = condemn_aggression
+					}
 				}
 			}
-			defense_treaty_click_enabled = {
-				not_signed_defense_treaty = yes
-				ROOT = {
-					check_variable = { foriegnPowerProjection > 9 }
-					has_political_power > 499
+			opt_trade_agreement_button_click = {
+				set_temp_variable = { target = THIS.id }
+				for_loop_effect = {
+					end = influence_array^num
+					value = v
+					meta_effect = {
+						text = {
+							add_ideas = trade_treaty_[ROOTTAG]
+							ROOT = { add_ideas = trade_treaty_[CURRENTTAG] }
+						}
+						ROOTTAG = "[?var:influence_array^0.GetTag]"
+						CURRENTTAG = "[?var:target]"
+					}
 				}
-				OR = {
-					AND = {
-						check_variable = { influencer1 = ROOT.temp_check }
-						check_variable = { influencer1_amount_calc > 0.49 }
-					}
-					AND = {
-						check_variable = { influencer2 = ROOT.temp_check }
-						check_variable = { influencer2_amount_calc > 0.49 }
-					}
-					AND = {
-						check_variable = { influencer3 = ROOT.temp_check }
-						check_variable = { influencer3_amount_calc > 0.49 }
-						
-					}
-					AND = {
-						check_variable = { influencer4 = ROOT.temp_check }
-						check_variable = { influencer4_amount_calc > 0.49 }
-						
-					}
-					AND = {
-						check_variable = { influencer5 = ROOT.temp_check }
-						check_variable = { influencer5_amount_calc > 0.49 }
-					}
-					AND = {
-						check_variable = { influencer6 = ROOT.temp_check }
-						check_variable = { influencer6_amount_calc > 0.49 }
-					}
-					AND = {
-						check_variable = { influencer7 = ROOT.temp_check }
-						check_variable = { influencer7_amount_calc > 0.49 }
-					}			
-				}
-			}
-			civil_war_intevention_click_enabled = {
-				always = no
-				#not_intervened_already = no
-				has_civil_war = yes
-				check_variable = { ROOT.oriegnPowerProjection > 24 }
-				OR = {
-					AND = {
-						check_variable = { influencer1 = ROOT.temp_check }
-						check_variable = { influencer1_amount_calc > 0.49 }
-					}
-					AND = {
-						check_variable = { influencer2 = ROOT.temp_check }
-						check_variable = { influencer2_amount_calc > 0.49 }
-					}
-					AND = {
-						check_variable = { influencer3 = ROOT.temp_check }
-						check_variable = { influencer3_amount_calc > 0.49 }
-						
-					}
-					AND = {
-						check_variable = { influencer4 = ROOT.temp_check }
-						check_variable = { influencer4_amount_calc > 0.49 }
-						
-					}
-					AND = {
-						check_variable = { influencer5 = ROOT.temp_check }
-						check_variable = { influencer5_amount_calc > 0.49 }
-					}
-					AND = {
-						check_variable = { influencer6 = ROOT.temp_check }
-						check_variable = { influencer6_amount_calc > 0.49 }
-					}
-					AND = {
-						check_variable = { influencer7 = ROOT.temp_check }
-						check_variable = { influencer7_amount_calc > 0.49 }
-					}			
-				}
-			}
-			trade_agreement_click_enabled = {
-				not_signed_trade_deal = yes
-				ROOT = {
-					check_variable = { foriegnPowerProjection > 9 }
-					has_political_power > 499
-				}
-				OR = {
-					AND = {
-						check_variable = { influencer1 = ROOT.temp_check }
-						check_variable = { influencer1_amount_calc > 0.33 }
-					}
-					AND = {
-						check_variable = { influencer2 = ROOT.temp_check }
-						check_variable = { influencer2_amount_calc > 0.33 }
-					}
-					AND = {
-						check_variable = { influencer3 = ROOT.temp_check }
-						check_variable = { influencer3_amount_calc > 0.33 }
-						
-					}
-					AND = {
-						check_variable = { influencer4 = ROOT.temp_check }
-						check_variable = { influencer4_amount_calc > 0.33 }
-						
-					}
-					AND = {
-						check_variable = { influencer5 = ROOT.temp_check }
-						check_variable = { influencer5_amount_calc > 0.33 }
-					}
-					AND = {
-						check_variable = { influencer6 = ROOT.temp_check }
-						check_variable = { influencer6_amount_calc > 0.33 }
-					}
-					AND = {
-						check_variable = { influencer7 = ROOT.temp_check }
-						check_variable = { influencer7_amount_calc > 0.33 }
-					}			
-				}
-
-			}
-			political_influence_click_enabled = {
-				ROOT = {
-					check_variable = { foriegnPowerProjection > 24 }
-					has_political_power > 499
-				}
-				OR = {
-					AND = {
-						check_variable = { influencer1 = ROOT.temp_check }
-						check_variable = { influencer1_amount_calc > 0.33 }
-					}
-					AND = {
-						check_variable = { influencer2 = ROOT.temp_check }
-						check_variable = { influencer2_amount_calc > 0.33 }
-					}
-					AND = {
-						check_variable = { influencer3 = ROOT.temp_check }
-						check_variable = { influencer3_amount_calc > 0.33 }
-						
-					}
-					AND = {
-						check_variable = { influencer4 = ROOT.temp_check }
-						check_variable = { influencer4_amount_calc > 0.33 }
-						
-					}
-					AND = {
-						check_variable = { influencer5 = ROOT.temp_check }
-						check_variable = { influencer5_amount_calc > 0.33 }
-					}
-					AND = {
-						check_variable = { influencer6 = ROOT.temp_check }
-						check_variable = { influencer6_amount_calc > 0.33 }
-					}
-					AND = {
-						check_variable = { influencer7 = ROOT.temp_check }
-						check_variable = { influencer7_amount_calc > 0.33 }
-					}			
-				}
-			}
-			attempt_political_coup_click_enabled = {
-				ROOT = {
-					check_variable = { foriegnPowerProjection > 74 }
-					has_political_power > 749
-				}
-				OR = {
-					AND = {
-						check_variable = { influencer1 = ROOT.temp_check }
-						check_variable = { influencer1_amount_calc > 0.5 }
-					}
-					AND = {
-						check_variable = { influencer2 = ROOT.temp_check }
-						check_variable = { influencer2_amount_calc > 0.5 }
-					}
-					AND = {
-						check_variable = { influencer3 = ROOT.temp_check }
-						check_variable = { influencer3_amount_calc > 0.5 }
-						
-					}
-					AND = {
-						check_variable = { influencer4 = ROOT.temp_check }
-						check_variable = { influencer4_amount_calc > 0.5 }
-						
-					}
-					AND = {
-						check_variable = { influencer5 = ROOT.temp_check }
-						check_variable = { influencer5_amount_calc > 0.5 }
-					}
-					AND = {
-						check_variable = { influencer6 = ROOT.temp_check }
-						check_variable = { influencer6_amount_calc > 0.5 }
-					}
-					AND = {
-						check_variable = { influencer7 = ROOT.temp_check }
-						check_variable = { influencer7_amount_calc > 0.5 }
-					}			
-				}
+				add_political_power = -100
 			}
 		}
 	}
 }
-

@@ -1,127 +1,104 @@
 #Written by Killerrabbit and SWF541
+#for not oversizing the array for having both 2000 and 2017 values
+init_influence = {
+	clear_array = influence_array_val
+	clear_array = influence_array_calc
+	clear_array = influence_array
+}
+
+startup_influence = {
+	sort_influence = yes #the rest is on_startup
+}
+
+recalculate_influence = {
+	sort_influence = yes
+	#calculate_influence_percentage = yes
+}
+
+sort_influence = {
+	resize_temp_array = { 
+		array = influence_array_val_temp #values
+		size = influence_array_val^num
+	}
+	resize_temp_array = { 
+		array = influence_array_temp #tags
+		size = influence_array_val^num
+	}
+	for_loop_effect = {
+		end = influence_array_val^num
+		value = v
+		find_highest_in_array = {
+			array = influence_array_val 
+			value = max
+			index = max_index
+		}
+		set_temp_variable = { influence_array_val_temp^v = max } #sets biggest at the earliest available position
+		set_temp_variable = { influence_array_temp^v = influence_array^max_index } #sets biggest TAG at the earliest available position
+		set_variable = { influence_array_val^max_index = -1 } #removes it from selection
+	}
+	clear_array = influence_array_val
+	clear_array = influence_array_calc
+	clear_array = influence_array
+	set_variable = { influence_total = 0 }
+	#restores destroyed arrays in the above process
+	for_each_loop = {
+		array = influence_array_val_temp
+		add_to_array = { influence_array_val = v  }
+		add_to_array = { influence_array_calc = v }
+		add_to_variable = { influence_total = v }
+	}
+	for_each_loop = {
+		array = influence_array_temp
+		add_to_array = { influence_array = v  }
+	}
+	clear_temp_array = influence_array_val_temp
+	clear_temp_array = influence_array_temp
+	set_variable = { domestic_influence_amount_calc = domestic_influence_amount }
+	add_to_variable = { influence_total = domestic_influence_amount_calc }
+	
+	for_each_loop = {
+		array = influence_array_calc
+		round_variable = influence_array_calc^i
+		divide_variable = { influence_array_calc^i = influence_total }
+		clamp_variable = { var = influence_array_calc^i min = 0 max = 1 }
+		clamp_variable = { var = influence_array_val^i min = 0 max = influence_total }
+	}
+	
+	round_variable = domestic_influence_amount_calc
+	divide_variable = { domestic_influence_amount_calc = influence_total }
+	clamp_variable = { var = domestic_influence_amount_calc min = 0 max = 1 }
+	clamp_variable = { var = domestic_influence_amount min = 0 max = influence_total }
+}
 
 #Script to run after any change to influence
 monthly_power_projection_gain = {
 	set_variable = { foriegnPowerProjectionMonth = num_of_factories }
 	add_to_variable = { foriegnPowerProjectionMonth = num_subjects }
 	add_to_variable = { foriegnPowerProjectionMonth = num_owned_controlled_states }
-	add_to_variable = { foriegnPowerProjectionMonth = num_subjects }
 
 	divide_variable = { foriegnPowerProjectionMonth = 100 }
 	add_to_variable = { foriegnPowerProjection = foriegnPowerProjectionMonth }
 	
 }
-recalculate_influence = {
-	influence_refresh = yes
-	set_variable = { found_num_vars = 0 } #always have this
-	if = { limit = { NOT = { check_variable = { found_num_vars = total_influencers } } }
-		add_to_variable = { found_num_vars = 1 }
-		find_largest_influence = yes #returns the largest not found yet 1
-	}	
-	if = { limit = { NOT = { check_variable = { found_num_vars = total_influencers } } }
-		add_to_variable = { found_num_vars = 1 }
-		find_largest_influence = yes #returns the largest not found yet	2
-	}	
-	if = { limit = { NOT = { check_variable = { found_num_vars = total_influencers } } }
-		add_to_variable = { found_num_vars = 1 }
-		find_largest_influence = yes #returns the largest not found yet	3
-	}
-	if = { limit = { NOT = { check_variable = { found_num_vars = total_influencers } } }
-		add_to_variable = { found_num_vars = 1 }
-		find_largest_influence = yes #returns the largest not found yet	4
-	}
-	if = { limit = { NOT = { check_variable = { found_num_vars = total_influencers } } }
-		add_to_variable = { found_num_vars = 1 }
-		find_largest_influence = yes #returns the largest not found yet	5
-	}
-	if = { limit = { NOT = { check_variable = { found_num_vars = total_influencers } } }
-		add_to_variable = { found_num_vars = 1 }
-		find_largest_influence = yes #returns the largest not found yet	6
-	}
-	if = { limit = { NOT = { check_variable = { found_num_vars = total_influencers } } }
-		add_to_variable = { found_num_vars = 1 }
-		find_largest_influence = yes #returns the largest not found yet	7
-	}
+
+monthly_set_fpp = {
+	clear_variable = fppDomestic
+	clear_variable = fppDomesticDoubled
+	clear_variable = fppDomesticSet
+	
+	set_variable = { fppDomestic = num_of_factories }
+	add_to_variable = { fppDomestic = num_subjects }
+	add_to_variable = { fppDomestic = num_owned_controlled_states }
+	add_to_variable = { fppDomestic = num_of_nukes }
+	add_to_variable = { fppDomestic = num_divisions }
+
+	set_variable = { fppDomesticSet = fppDomestic }
+	multiply_variable = { fppDomestic = 2 }
+	set_variable = { fppDomesticDoubled = fppDomestic }
+	
 }
 
-influence_refresh = {
 
-	#Set Variables for Calc Variant
-	if = { limit = { has_variable = influencer1 }
-		set_variable = { influencer1_amount_calc = influencer1_amount }
-	}
-	if = { limit = { has_variable = influencer2 }
-	set_variable = { influencer2_amount_calc = influencer2_amount }
-	}
-	if = { limit = { has_variable = influencer3 }
-	set_variable = { influencer3_amount_calc = influencer3_amount }
-	}
-	if = { limit = { has_variable = influencer4 }
-	set_variable = { influencer4_amount_calc = influencer4_amount }
-	}
-	if = { limit = { has_variable = influencer5 }
-	set_variable = { influencer5_amount_calc = influencer5_amount }
-	}
-	if = { limit = { has_variable = influencer6 }
-	set_variable = { influencer6_amount_calc = influencer6_amount }
-	}
-	if = { limit = { has_variable = influencer7 }
-	set_variable = { influencer7_amount_calc = influencer7_amount }
-	}
-	set_variable = { domestic_influence_amount_calc = domestic_influence_amount }
-	set_variable = { influence_total = 0 } 
-	
-	
-	#Influence Total Addition Begins
-	add_to_variable = { influence_total = influencer1_amount_calc }
-	add_to_variable = { influence_total = influencer2_amount_calc }
-	add_to_variable = { influence_total = influencer3_amount_calc }
-	add_to_variable = { influence_total = influencer4_amount_calc }
-	add_to_variable = { influence_total = influencer5_amount_calc }
-	add_to_variable = { influence_total = influencer6_amount_calc }
-	add_to_variable = { influence_total = influencer7_amount_calc }
-	add_to_variable = { influence_total = domestic_influence_amount_calc }
-	#Total Established
-	
-	#Begin Division
-	set_variable = { total_influencers = 0 }
-	if = {
-		limit = { check_variable = { influencer1_amount_calc > 0.5 } }
-		divide_variable = { influencer1_amount_calc = influence_total }
-		add_to_variable = { total_influencers = 1 }
-	}
-	if = {
-		limit = { check_variable = { influencer2_amount_calc > 0.5 } }
-		divide_variable = { influencer2_amount_calc = influence_total }
-		add_to_variable = { total_influencers = 1 }
-	}
-	if = {
-		limit = { check_variable = { influencer3_amount_calc > 0.5 } }
-		divide_variable = { influencer3_amount_calc = influence_total }
-		add_to_variable = { total_influencers = 1 }
-	}
-	if = {
-		limit = { check_variable = { influencer4_amount_calc > 0.5 } }
-		divide_variable = { influencer4_amount_calc = influence_total }
-		add_to_variable = { total_influencers = 1 }
-	}
-	if = {
-		limit = { check_variable = { influencer5_amount_calc > 0.5 } }
-		divide_variable = { influencer5_amount_calc = influence_total }
-		add_to_variable = { total_influencers = 1 }
-	}
-	if = {
-		limit = { check_variable = { influencer6_amount_calc > 0.5 } }
-		divide_variable = { influencer6_amount_calc = influence_total }
-		add_to_variable = { total_influencers = 1 }
-	}
-	if = {
-		limit = { check_variable = { influencer7_amount_calc > 0.5 } }
-		divide_variable = { influencer7_amount_calc = influence_total }
-		add_to_variable = { total_influencers = 1 }
-	}
-	divide_variable = { domestic_influence_amount_calc = influence_total }
-}
 fifty_point_influence_gain = {
 	if = {
 		limit = {
