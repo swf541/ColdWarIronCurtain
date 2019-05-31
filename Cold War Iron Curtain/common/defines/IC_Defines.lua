@@ -30,7 +30,6 @@ NDefines.NCountry.NAVY_SCORE_MULTIPLIER = 25.0 -- Based on number of navies.
 NDefines.NCountry.AIR_SCORE_MULTIPLIER = 0.01 -- Based on number of planes (which is typically a lot).
 NDefines.NCountry.INDUSTRY_SCORE_MULTIPLIER = 1.0 -- Based on number of factories.
 NDefines.NCountry.PROVINCE_SCORE_MULTIPLIER = 0.1 -- Based on number of controlled provinces.
-NDefines.NCountry.POLITICAL_POWER_CAP = 10000.0					-- Max amount of political power country should have
 NDefines.NCountry.STATE_VALUE_NON_CORE_STATE_FRACTION = 1
 
 
@@ -53,8 +52,6 @@ NDefines.NDiplomacy.TENSION_STATE_VALUE = 5 -- Tension value gained by annexing 
 NDefines.NDiplomacy.TENSION_TIME_SCALE_MIN = 0.0 -- Timed tension scale won't decrease under this value
 NDefines.NDiplomacy.TENSION_TIME_SCALE_MONTHLY_FACTOR = 0.00 -- Timed tension scale will be modified by this amount starting with TENSION_TIME_SCALE_START_DATE
 NDefines.NDiplomacy.TENSION_TIME_SCALE_START_DATE = "1999.1.1.12" -- Starting at this date the tension values will be scaled down (will be equal to 1 before that)
-NDefines.NDiplomacy.TRADE_NEUTRAL_OPINION_FACTOR = 0.50 -- If Both fear and trust are 0 this is the neutral factor for trade
-NDefines.NDiplomacy.TRADE_OPINION_FACTOR_FACTOR = 100.0 -- How much the factor should effect the possible trade amount. Setting TRADE_NEUTRAL_OPINION_FACTOR to 1.0 and TRADE_OPINION_FACTOR_FACTOR to 0 means opinion does nothing in regards to trade.
 NDefines.NDiplomacy.VOLUNTEERS_DIVISIONS_REQUIRED = 1 -- This many divisons are required for the country to be able to send volunteers.
 NDefines.NDiplomacy.VOLUNTEERS_PER_COUNTRY_ARMY = 0.10 -- Each army unit owned by the source country contributes this amount of volunteers to the limit.
 NDefines.NDiplomacy.VOLUNTEERS_PER_TARGET_PROVINCE = 0.10 -- Each province owned by the target country contributes this amount of volunteers to the limit.
@@ -77,7 +74,6 @@ NDefines.NMilitary.BASE_DIVISION_SUPPORT_SLOT_COST = 1 	--Base cost to unlock a 
 
 NDefines.NNavy.CARRIER_STACK_PENALTY = 8 -- The most efficient is 4 carriers in combat. 5+ brings the penalty to the amount of wings in battle.
 NDefines.NNavy.CARRIER_STACK_PENALTY_EFFECT = 0.1 -- Each carrier above the optimal amount decreases the amount of airplanes being able to takeoff by such %.
-NDefines.NNavy.DETECTION_SUBS_CHANCE_BALANCE = 30.0 -- Same as above but for sub detection. It should be very hard to detect just the subs.
 NDefines.NNavy.SUBMARINE_HIDE_TIMEOUT = 4 -- Amount of in-game-hours that takes the submarine (with position unrevealed) to hide.
 NDefines.NNavy.SUBMARINE_REVEAL_BASE_CHANCE = 0.002 -- Base chance for submarine detection. It's modified by the difference of a spootter's submarines detection vs submarine visibility. Use this variable for game balancing.
 NDefines.NNavy.SUBMARINE_REVEALED_TIMEOUT = 8 -- Amount of in-game-hours that makes the submarine visible if it is on the defender side.
@@ -96,7 +92,6 @@ NDefines.NGame.LAG_DAYS_FOR_PAUSE = 50
 
 NDefines.NAI.DIPLOMACY_SCARED_MINOR_EXTRA_RELUCTANCE = -50 -- extra reluctance to join stuff as scared minor
 NDefines.NAI.DIPLOMACY_BOOST_PARTY_COST_FACTOR = 0.0	-- Desire to boost party popularity subtracts the daily cost multiplied by this
-NDefines.NAI.DIPLOMACY_STAGE_COUP_COST_FACTOR = 100.0	-- Desire to stage a coup subtracts the cost multiplied by this
 NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_COST_FACTOR = 0.0-- Desire to boost relations subtracts the cost multiplied by this
 NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_PP_FACTOR = 0.0	-- Desire to boost relations adds total PP multiplied by this
 
