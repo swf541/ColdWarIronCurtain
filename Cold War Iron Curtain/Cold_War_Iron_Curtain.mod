@@ -7,7 +7,7 @@ tags={
 	"Historical"
 	"Map"
 }
-supported_version="1.6.x"
+supported_version="1.7.0"
 replace_path = "events"
 replace_path = "history/units"
 replace_path = "common/on_actions"
