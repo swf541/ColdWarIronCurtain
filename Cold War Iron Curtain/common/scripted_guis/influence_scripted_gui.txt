@@ -128,7 +128,7 @@ scripted_gui = {
 					check_variable = { influence_array^0 = ROOT }
 					check_variable = { influence_array_calc^0 > 0.9 }
 					check_variable = { ROOT.foriegnPowerProjection > 10 }
-					ROOT = { has_political_power = 500 }
+					ROOT = { has_political_power > 499 }
 					is_subject = no
 					NOT = { has_war = yes }
 					meta_trigger = {
@@ -142,22 +142,23 @@ scripted_gui = {
 					}				
 				}
 			}
-		
-			opt_aid_military_button_click_enabled = {
+			opt_target_other_button_enabled = {
+				is_influencer = yes
+				check_variable = { ROOT.foriegnPowerProjection > 4 }				
+				NOT = { gives_military_access_to = ROOT }
+				ROOT = { has_political_power > 99 }
+			}
+			opt_aid_military_button_enabled = {
 				is_influencer = yes
 				check_variable = { ROOT.foriegnPowerProjection > 1 }
-				ic_ratio = {
-					tag = ROOT
-					ratio > 0.5
-				}
+				ROOT = { has_political_power > 99 }
+				NOT = { has_idea = foriegn_military_aid }
 			}
-			opt_influence_action_button_enabled = {
-				OR = {
-					is_influencer = yes
-					check_variable = { ROOT.fppDomesticSet > fppDomesticDoubled }		
-				}
+			opt_coup_button_enabled = {
+				is_influencer = yes
 				check_variable = { ROOT.foriegnPowerProjection > 1 }
-				ROOT = { has_political_power > 100 }
+				ROOT = { has_political_power > 99 }
+				NOT = { has_idea = foriegn_economic_growth }
 			}
 			opt_economic_exploitation_button_enabled = {
 				check_variable = { ROOT.foriegnPowerProjection > 5 }
@@ -165,7 +166,7 @@ scripted_gui = {
 					check_variable = { influence_array^0 = ROOT }
 					check_variable = { influence_array_calc^0 > 0.65 }
 					NOT = { is_puppet_of = ROOT }
-					has_political_power > 200
+					ROOT = { has_political_power > 249 }
 				}
 				#not twice
 				NOT = {
@@ -177,13 +178,22 @@ scripted_gui = {
 					}
 				}
 			}
+			opt_manipulate_politics_button_enabled = {
+				check_variable = { ROOT.foriegnPowerProjection > 1 }
+				AND = {
+					check_variable = { influence_array^0 = ROOT }
+					check_variable = { influence_array_calc^0 > 0.50 }
+					NOT = { is_puppet_of = ROOT }
+					ROOT = { has_political_power > 99 }
+				}
+			}
 			opt_trade_agreement_button_enabled = {
 				check_variable = { ROOT.foriegnPowerProjection > 3 }
 				AND = {
 					check_variable = { influence_array^0 = ROOT }
 					check_variable = { influence_array_calc^0 > 0.50 }
 					NOT = { is_puppet_of = ROOT }
-					has_political_power > 100
+					ROOT = { has_political_power > 99 }
 				}
 				#not twice
 				NOT = {
@@ -192,6 +202,33 @@ scripted_gui = {
 							has_idea = trade_treaty_[ROOTTAG]
 						}
 						CHECKTAG = "[?var:influence_array^0.GetTag]"
+					}
+				}
+			}
+			opt_influence_action_button_enabled = {
+				NOT = { tag = ROOT }
+				ROOT = { has_political_power > 99 }
+				check_variable = { ROOT.foriegnPowerProjection > 0 }
+				OR = {
+					OR = {
+						check_variable = { influence_array^0 = ROOT }
+						check_variable = { influence_array^1 = ROOT }
+						check_variable = { influence_array^2 = ROOT }
+						check_variable = { influence_array^3 = ROOT }
+						check_variable = { influence_array^4 = ROOT }
+						check_variable = { influence_array^5 = ROOT }
+						check_variable = { influence_array^6 = ROOT }
+						check_variable = { influence_array^7 = ROOT }					
+					}
+					OR = {
+						AND = { NOT = { has_variable = influence_array^0 } check_variable = { ROOT.gdp  > gdp  }
+						AND = { NOT = { has_variable = influence_array^1 } check_variable = { ROOT.gdp  > gdp  }
+						AND = { NOT = { has_variable = influence_array^2 } check_variable = { ROOT.gdp  > gdp  }
+						AND = { NOT = { has_variable = influence_array^3 } check_variable = { ROOT.gdp  > gdp  }
+						AND = { NOT = { has_variable = influence_array^4 } check_variable = { ROOT.gdp  > gdp  }
+						AND = { NOT = { has_variable = influence_array^5 } check_variable = { ROOT.gdp  > gdp  }
+						AND = { NOT = { has_variable = influence_array^6 } check_variable = { ROOT.gdp  > gdp  }
+						AND = { NOT = { has_variable = influence_array^7 } check_variable = { ROOT.gdp  > gdp  }
 					}
 				}
 			}
@@ -227,6 +264,30 @@ scripted_gui = {
 				recalculate_influence = yes
 			}
 			opt_aid_military_button_click = {
+				add_to_variable = { ROOT.foriegnPowerProjection = -1 }
+				add_timed_idea = {
+					idea = foriegn_military_aid
+					days = 365
+				}
+				set_temp_variable = { influence_gain = 50 } #from global rank idea
+				for_loop_effect = {
+					end = influence_array^num
+					value = v
+					if = {
+						limit = {
+							check_variable = { influence_array^v = ROOT }
+						}
+						add_to_variable = { influence_array_val^v = influence_gain }
+						set_country_flag = found
+					}
+				}
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+						add_to_array = { influence_array = ROOT.id }
+						add_to_array = { influence_array_val = influence_gain }
+				}
+				recalculate_influence = yes
+				ROOT = { add_political_power = -100 }
 			}
 			opt_target_other_button_click = {
 				add_to_variable = { ROOT.foriegnPowerProjection = -5 }
@@ -263,9 +324,52 @@ scripted_gui = {
 			}
 			opt_manipulate_politics_button_click = {
 				add_to_variable = { ROOT.foriegnPowerProjection = -2 }
+				if = { limit = { has_government = conservative } add_popularity = { ideology = conservative popularity = 0.02 } }
+				if = { limit = { has_government = Liberal_Conservatism } add_popularity = { ideology = Liberal_Conservatism popularity = 0.02 } }
+				if = { limit = { has_government = Christian_Democratic } add_popularity = { ideology = Christian_Democratic popularity = 0.02 } }
+				if = { limit = { has_government = socialist } add_popularity = { ideology = socialist popularity = 0.02 } }
+				if = { limit = { has_government = Social_Democratic } add_popularity = { ideology = Social_Democratic popularity = 0.02 } }
+				if = { limit = { has_government = Social_Liberalism } add_popularity = { ideology = Social_Liberalism popularity = 0.02 } }
+				if = { limit = { has_government = democratic } add_popularity = { ideology = democratic popularity = 0.02 } }
+				if = { limit = { has_government = centrist } add_popularity = { ideology = centrist popularity = 0.02 } }
+				if = { limit = { has_government = liberal } add_popularity = { ideology = liberal popularity = 0.02 } }
+				if = { limit = { has_government = communism } add_popularity = { ideology = communism popularity = 0.02 } }
+				if = { limit = { has_government = trotskyism } add_popularity = { ideology = trotskyism popularity = 0.02 } }
+				if = { limit = { has_government = maoism } add_popularity = { ideology = maoism popularity = 0.02 } }
+				if = { limit = { has_government = fascism } add_popularity = { ideology = fascism popularity = 0.02 } }
+				if = { limit = { has_government = nationalism } add_popularity = { ideology = nationalism popularity = 0.02 } }
+				if = { limit = { has_government = monarchism } add_popularity = { ideology = monarchism popularity = 0.02 } }
+				if = { limit = { has_government = neutrality } add_popularity = { ideology = neutrality popularity = 0.02 } }
+				if = { limit = { has_government = islamism } add_popularity = { ideology = islamism popularity = 0.02 } }
+				if = { limit = { has_government = radical_shiaism } add_popularity = { ideology = radical_shiaism popularity = 0.02 } }
+				if = { limit = { has_government = Salafism } add_popularity = { ideology = Salafism popularity = 0.02 } }
+				ROOT = { add_political_power = -100 }
 			}
 			opt_coup_button_click = {		#Economic Aid
 				add_to_variable = { ROOT.foriegnPowerProjection = -1 }
+				add_timed_idea = {
+					idea = foriegn_economic_growth
+					days = 365
+				}
+				set_temp_variable = { influence_gain = 50 } #from global rank idea
+				for_loop_effect = {
+					end = influence_array^num
+					value = v
+					if = {
+						limit = {
+							check_variable = { influence_array^v = ROOT }
+						}
+						add_to_variable = { influence_array_val^v = influence_gain }
+						set_country_flag = found
+					}
+				}
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+						add_to_array = { influence_array = ROOT.id }
+						add_to_array = { influence_array_val = influence_gain }
+				}
+				recalculate_influence = yes
+				ROOT = { add_political_power = -100 }
 			}
 			opt_economic_exploitation_button_click = {
 				add_to_variable = { ROOT.foriegnPowerProjection = -5 }
