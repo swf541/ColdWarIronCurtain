@@ -1,5 +1,6 @@
 gdpCalc = {
     every_country = {
+		set_variable = { gdp = 0  } 
         set_variable = { cgBase = modifier@consumer_goods_factor  } 
         set_variable = { peBase = modifier@production_factory_max_efficiency_factor } 
         add_to_variable = { peBase = 1 } 
@@ -11,4 +12,370 @@ gdpCalc = {
         set_variable = { gdp = totCiv  } 
 
     }
+}
+#############################################
+### D&T's scripted effects for resources ####
+#############################################
+
+update_onmap_resources = {
+	#Input: prev_resource_count, building types and their resource production
+	#Output: prev_resource_count (Total count of resources modified in the state), added/subtracted state resources
+	#State Scope
+	#Takes the output from buildings and updates on-map resources
+	clear_array = resource_count
+	for_loop_effect = {
+		end = 8
+		add_to_array = { resource_count = 0 }
+	}
+	#Note: Indexes indicate building type which is defined after this
+	#When adding a new building, KEEP ALL ADD_TO_ARRAYS, they are important to keep everything in order
+	
+	#Example Building (Let's say an oil power plant)
+	#It produces 4 Electricity but consumes 1 Oil
+	add_to_array = { 1_production = -1 } #Oil
+	add_to_array = { 2_production = 0 } #Aluminum
+	add_to_array = { 3_production = 0 } #Rubber
+	add_to_array = { 4_production = 0 } #Tungsten
+	add_to_array = { 5_production = -1 } #Steel
+	add_to_array = { 6_production = 0 } #Chromium
+	add_to_array = { 7_production = -1 } #Electricity
+	add_to_array = { number_of_buildings = building_level@industrial_complex } #Change BUILDING to code name of the building
+	
+	#Tech/National Spirit modifiers to this building
+	if = {
+		limit = {
+			has_tech = management_IX
+		}
+		add_to_variable = { 5_production^0 = 0.1 } 
+	}
+	if = {
+		limit = {
+			has_tech = plastics_III
+		}
+		add_to_variable = { 5_production^0 = 0.1 } 
+	}	
+	if = {
+		limit = {
+			has_tech = plastics_V
+		}
+		add_to_variable = { 5_production^0 = 0.1 } 
+	}	
+	if = {
+		limit = {
+			has_tech = ecoenergy_I
+		}
+		add_to_variable = { 7_production^0 = 0.1 } 
+	}
+	if = {
+		limit = {
+			has_tech = ecoenergy_II
+		}
+		add_to_variable = { 7_production^0 = 0.1 } 
+	}	
+	if = {
+		limit = {
+			has_tech = ecoenergy_V
+		}
+		add_to_variable = { 7_production^0 = 0.1 } 
+	}	
+	if = {
+		limit = {
+			has_tech = electriccars
+		}
+		add_to_variable = { 1_production^0 = 0.35 } 
+		add_to_variable = { 7_production^0 = -0.25 }  
+	}	
+	
+	#Dockyards
+	add_to_array = { 1_production = 0 }
+	add_to_array = { 2_production = 0 }
+	add_to_array = { 3_production = 0 }
+	add_to_array = { 4_production = 0 }
+	add_to_array = { 5_production = 0 }
+	add_to_array = { 6_production = 0 }
+	add_to_array = { 7_production = 1 }
+	add_to_array = { number_of_buildings = building_level@dockyard }
+
+	if = {
+		limit = {
+			has_tech = ecoenergy_III
+		}
+		add_to_variable = { 7_production^1 = -0.1 }  
+	}		
+	if = {
+		limit = {
+			has_tech = ecoenergy_V
+		}
+		add_to_variable = { 7_production^1 = -0.1 }  
+	}		
+	if = {
+		limit = {
+			has_tech = ecoenergy_VI
+		}
+		add_to_variable = { 7_production^1 = -0.1 }  
+	}		
+
+
+
+	#fossil_fuel_powerplant
+	add_to_array = { 1_production = -1 }
+	add_to_array = { 2_production = 0 }
+	add_to_array = { 3_production = 0 }
+	add_to_array = { 4_production = 0 }
+	add_to_array = { 5_production = 0 }
+	add_to_array = { 6_production = 0 }
+	add_to_array = { 7_production = 5 }
+	add_to_array = { number_of_buildings = building_level@fossil_fuel_powerplant }
+
+	if = {
+		limit = {
+			has_tech = gas_I
+		}
+		add_to_variable = { 7_production^2 = 1 }  
+	}
+	if = {
+		limit = {
+			has_tech = gas_II
+		}
+		add_to_variable = { 7_production^2 = 1 }  
+	}
+	if = {
+		limit = {
+			has_tech = gas_III
+		}
+		add_to_variable = { 7_production^2 = 1 }  
+	}	
+	if = {
+		limit = {
+			has_tech = software_VI
+		}
+		add_to_variable = { 7_production^2 = 1 }  
+	}	
+
+	#Building 4
+	add_to_array = { 1_production = 0 }
+	add_to_array = { 2_production = 0 }
+	add_to_array = { 3_production = 0 }
+	add_to_array = { 4_production = 0 }
+	add_to_array = { 5_production = 0 }
+	add_to_array = { 6_production = 0 }
+	add_to_array = { 7_production = 0 }
+	add_to_array = { number_of_buildings = building_level@BUILDING }
+	#To add more, just copy/paste
+
+	#Gets the controller of the state
+	controller = {
+		set_variable = { PREV.state_controller = THIS }
+	}
+	for_each_loop = {
+		array = 1_production
+		index = i
+		for_loop_effect = {
+			start = 1
+			end = 7 #Number of resources
+			value = v
+			meta_effect = {
+				text = {
+					set_variable = { resource_count^v = [RESOURCE_NO]_production^i }
+				}
+				RESOURCE_NO = "[?v|0]"
+			}
+			multiply_variable = {  resource_count^v = number_of_buildings^i }
+			set_temp_variable = { local_resources_factor_temp = state_controller.modifier@local_resources_factor }
+			add_to_temp_variable = { local_resources_factor_temp = 1 }
+			divide_variable = { resource_count^v = local_resources_factor_temp }
+		}
+	}
+	
+	#DO NOT TOUCH ANYTHING AFTER THIS (Unless you've changed the name of a resource or added a new resource)
+	if = {
+		limit = {
+			OR = {
+				check_variable = { prev_resource_count^1 > 0 }
+				check_variable = { resource_count^1 > 0 }
+			}
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = oil
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?prev_resource_count^1|0]"
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = oil
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?resource_count^1|0]"
+		}
+	}
+	if = {
+		limit = {
+			OR = {
+				check_variable = { prev_resource_count^2 > 0 }
+				check_variable = { resource_count^2 > 0 }
+			}
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = aluminium
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?prev_resource_count^2|0]"
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = aluminium
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?resource_count^2|0]"
+		}
+	}
+	if = {
+		limit = {
+			OR = {
+				check_variable = { prev_resource_count^3 > 0 }
+				check_variable = { resource_count^3 > 0 }
+			}
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = rubber
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?prev_resource_count^3|0]"
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = rubber
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?resource_count^3|0]"
+		}
+	}
+	if = {
+		limit = {
+			OR = {
+				check_variable = { prev_resource_count^4 > 0 }
+				check_variable = { resource_count^4 > 0 }
+			}
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = tungsten
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?prev_resource_count^4|0]"
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = tungsten
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?resource_count^4|0]"
+		}
+	}
+	if = {
+		limit = {
+			OR = {
+				check_variable = { prev_resource_count^5 > 0 }
+				check_variable = { resource_count^5 > 0 }
+			}
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = steel
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?prev_resource_count^5|0]"
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = steel
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?resource_count^5|0]"
+		}
+	}
+	if = {
+		limit = {
+			OR = {
+				check_variable = { prev_resource_count^6 > 0 }
+				check_variable = { resource_count^6 > 0 }
+			}
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = chromium
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?prev_resource_count^6|0]"
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = chromium
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?resource_count^6|0]"
+		}
+	}
+	if = {
+		limit = {
+			OR = {
+				check_variable = { prev_resource_count^7 > 0 }
+				check_variable = { resource_count^7 > 0 }
+			}
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = electricity
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?prev_resource_count^7|0]"
+		}
+		meta_effect = {
+			text = {
+				add_resource = {
+					type = electicity
+					amount = [AMNT]
+				}
+			}
+			AMNT = "[?resource_count^7|0]"
+		}
+	}
+
+	clear_array = prev_resource_count
+	for_loop_effect = {
+		end = 8
+		value = v
+		add_to_array = { prev_resource_count = resource_count^v }
+		multiply_variable = { prev_resource_count^v = -1 }
+	}
 }
