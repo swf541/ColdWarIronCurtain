@@ -1,3 +1,49 @@
+petrochemicals_logistic_center = {
+
+#####COMPUTER DATA RESTARTS#####
+	multiply_variable = { oil_consumption_total_desired = -1 }
+	meta_effect = {
+		text = {
+			modify_building_resources = {
+				building = national_logistical_supercomputer
+				resource = oil
+				amount = [AMNT]
+			}
+		}
+		AMNT = "[?oil_consumption_total_desired]"
+	}
+	set_variable = { fossil_fuel_plant_quantity = 0 }
+	set_variable = { oil_consumption_total_desired = 0 }
+	set_variable = { fossil_fuel_oil_consumption = 0 }
+
+#####BUILDING COUNT#####
+	every_owned_state = {
+		add_to_variable = { PREV.fossil_fuel_plant_quantity = building_level@fossil_fuel_powerplant }
+	}
+	
+#####FOSSIL FUEL POWERPLANT CONSUMPTION CALCULATION#####
+	add_to_variable = { fossil_fuel_oil_consumption = -1 }
+	
+#####DESIRED TOTAL FOSSIL FUEL POWER PLANT CONSUMPTION#####
+	set_variable = { ff_oil_con_export = fossil_fuel_oil_consumption }
+	multiply_variable = { ff_oil_con_export = fossil_fuel_plant_quantity }
+	
+#####TOTAL DESIRED CONSUMPTION#####
+	add_to_variable = { oil_consumption_total_desired = ff_oil_con_export }
+	
+#####SET NATIONAL CONSUMPTION#####
+	
+	meta_effect = {
+		text = {
+			modify_building_resources = {
+				building = national_logistical_supercomputer
+				resource = oil
+				amount = [AMNT]
+			}
+		}
+		AMNT = "[?oil_consumption_total_desired]"
+	}
+}
 fossil_fuel_pulse = {
 
 		multiply_variable = { fossil_fuel_oil_consumption = -1 }  
@@ -9,7 +55,7 @@ fossil_fuel_pulse = {
 				}
 			}
 			AMNT = "[?fossil_fuel_oil_consumption]"
-		}	
+		}
 
 		multiply_variable = { fossil_fuel_elec_prod = -1 }  
 		meta_effect = {
