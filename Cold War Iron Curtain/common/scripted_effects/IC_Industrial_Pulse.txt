@@ -154,55 +154,142 @@ oil_subtract2 = {
 		}
 	}
 }
-resource_modifier_set = {
-			set_variable = { resourceEfficienyNational = modifier@local_resources_factor }
-			every_owned_state = {
-				set_variable = { resourceEfficienyState = modifier@local_resources }
-				add_variable = { resourceEfficienyState = PREV.modifier@local_resources_factor }
-				set_variable = { resourceEfficienyModify = resourceEfficienyState }
-				multiply_variable = { resourceEfficienyState = -1 }
-				meta_effect = {
-					text = {
-						add_state_modifier = {
-							modifier = {
-								local_resources = [RESOURCEADJ]
-							}
-						}
+resource_modifier_set_startup = {
+	set_variable = { resourceEfficienyNational = modifier@local_resources_factor }
+	every_owned_state = {
+		set_variable = { resourceEfficienyState = modifier@local_resources }
+		add_to_variable = { resourceEfficienyState = PREV.modifier@local_resources_factor }
+		set_variable = { resourceEfficienyModify = resourceEfficienyState }
+		add_to_variable = { resourceEfficienyModify = 1 }
+		multiply_variable = { resourceEfficienyState = -1 }
+		meta_effect = {
+			text = {
+				add_state_modifier = {
+					modifier = {
+						local_resources = [RESOURCEADJ]
 					}
-					RESOURCEADJ = resourceEfficienyState
 				}
 			}
+			RESOURCEADJ = resourceEfficienyState
+		}
+	}
 }
-oil_consumption_set = {
+resource_modifier_calc = {
+	set_variable = { resourceEfficienyNational = modifier@local_resources_factor }
+	every_owned_state = {
+		add_to_variable = { resourceEfficienyState = modifier@local_resources }
+		add_to_variable = { resourceEfficienyState = PREV.modifier@local_resources_factor }
+		set_variable = { resourceEfficienyModify = resourceEfficienyState }
+		add_to_variable = { resourceEfficienyModify = 1 }
+		multiply_variable = { resourceEfficienyState = -1 }
+		meta_effect = {
+			text = {
+				add_state_modifier = {
+					modifier = {
+						local_resources = [RESOURCEADJ]
+					}
+				}
+			}
+			RESOURCEADJ = resourceEfficienyState
+		}
+	}
+}
+oil_consumption_set = {	#Fire in Decision Pulse
+	resource_modifier_calc = yes
 	hidden_effect = {
 		every_owned_state = {
 			set_variable = { oilAmmount = oilAmmountback }
 			oil_add = yes
 			oil_calc = yes	
-			set_variable = { fossil_fuel_plant_quantity = building_level@fossil_fuel_powerplant }						
-			subtract_from_variable = { oilAmmount = fossil_fuel_plant_quantity }
+			
+			multiply_variable = { oilAmmount = resourceEfficienyModify }
+			
+			set_variable = { fossil_fuel_plant_quantity = building_level@fossil_fuel_powerplant }	
+			
+			set_variable = { industrial_complex_quantity = building_level@industrial_complex }			
+			set_variable = { industrial_complex_quantity_adjustment = 1 }
+			if = {
+				limit = {
+					controller = {
+						has_tech = plastics_V
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = -0.1 } 
+			}	
+			
+			if = {
+				limit = {
+					controller = {
+						has_tech = electriccars
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = -0.35 } 
+			}			
+			
+			multiply_variable = { industrial_complex_quantity_adjustment = industrial_complex_quantity }
+			
+			set_variable = { oilAdjustment = industrial_complex_quantity_adjustment } 
+
+			add_to_variable = { oilAdjustment = fossil_fuel_plant_quantity } 
+			
+			
+			subtract_from_variable = { oilAmmount = oilAdjustment }
+			round_variable = oilAmmount
+			
 			if = { 
 				limit = {
 					check_variable = { oilAmmount < 0 }
 				}
-				set_variable = { oilAmmountback = fossil_fuel_plant_quantity }	#When more maluses added we will change this to a combination of all maluses under oilConsumptionReversion
+				set_variable = { oilAmmountback = oilAdjustment }	#When more maluses added we will change this to a combination of all maluses under oilConsumptionReversion
 			}
 			oil_add = yes
 			oil_subtract = yes
 		}
 	}
 }
-oil_consumption_original = {
+oil_consumption_original = {	#Fire on Startup
+	resource_modifier_set_startup = yes
 	hidden_effect = {
 		every_owned_state = {
 			oil_calc = yes				
-			set_variable = { fossil_fuel_plant_quantity = building_level@fossil_fuel_powerplant }			
-			subtract_from_variable = { oilAmmount = fossil_fuel_plant_quantity }
+			multiply_variable = { oilAmmount = resourceEfficienyModify }
+			
+			set_variable = { fossil_fuel_plant_quantity = building_level@fossil_fuel_powerplant }	
+			
+			set_variable = { industrial_complex_quantity = building_level@industrial_complex }			
+			set_variable = { industrial_complex_quantity_adjustment = 1 }
+			if = {
+				limit = {
+					controller = {
+						has_tech = plastics_V
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = -0.1 } 
+			}	
+			
+			if = {
+				limit = {
+					controller = {
+						has_tech = electriccars
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = -0.35 } 
+			}			
+			
+			multiply_variable = { industrial_complex_quantity_adjustment = industrial_complex_quantity }
+			
+			set_variable = { oilAdjustment = industrial_complex_quantity_adjustment } 
+
+			add_to_variable = { oilAdjustment = fossil_fuel_plant_quantity } 
+			
+			
+			subtract_from_variable = { oilAmmount = oilAdjustment }
+			round_variable = oilAmmount
 			if = { 
 				limit = {
 					check_variable = { oilAmmount < 0 }
 				}
-				set_variable = { oilAmmountback = fossil_fuel_plant_quantity } #When more maluses added we will change this to a combination of all maluses under oilConsumptionReversion
+				set_variable = { oilAmmountback = oilAdjustment } #When more maluses added we will change this to a combination of all maluses under oilConsumptionReversion
 			}
 			oil_add = yes
 			oil_subtract = yes
