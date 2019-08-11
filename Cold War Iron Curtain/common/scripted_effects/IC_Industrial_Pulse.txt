@@ -1,4 +1,214 @@
-
+oil_calc = {
+	if = {
+		limit = {
+			 has_resources_amount = {
+				resource = oil
+				amount > 0
+			}
+		}
+		add_resource = {
+			type = oil
+			amount = -1
+		}
+		add_to_variable = { oilAmmount = 1 }
+		if = {
+			limit = {
+				 has_resources_amount = {
+					resource = oil
+					amount > 0
+				}
+			}
+			oil_calc2 = yes
+		}
+	}
+}
+oil_calc2 = {
+	if = {
+		limit = {
+			 has_resources_amount = {
+				resource = oil
+				amount > 0
+			}
+		}
+		add_resource = {
+			type = oil
+			amount = -1
+		}
+		add_to_variable = { oilAmmount = 1 }
+		if = {
+			limit = {
+				 has_resources_amount = {
+					resource = oil
+					amount > 0
+				}
+			}
+			oil_calc = yes
+		}
+	}
+}
+oil_calc3 = {
+	if = {
+		limit = {
+			check_variable = { oilAmmountBackUp > 0 }
+		}
+		add_resource = {
+			type = oil
+			amount = 1
+		}
+		add_to_variable = { oilAmmountBackUp = -1 }
+		if = {
+			limit = {
+				check_variable = { oilAmmountBackUp > 0 }
+			}
+			oil_calc4 = yes
+		}
+	}
+}
+oil_calc4 = {
+	if = {
+		limit = {
+			check_variable = { oilAmmountBackUp > 0 }
+		}
+		add_resource = {
+			type = oil
+			amount = 1
+		}
+		add_to_variable = { oilAmmountBackUp = -1 }
+		if = {
+			limit = {
+				check_variable = { oilAmmountBackUp > 0 }
+			}
+			oil_calc3 = yes
+		}
+	}
+}
+oil_add = {
+	if = {
+		limit = {
+			 check_variable = { oilAmmount > 0 }
+		}
+		add_resource = {
+			type = oil
+			amount = 1
+		}
+		add_to_variable = { oilAmmount = -1 }
+		if = {
+			limit = {
+				check_variable = { oilAmmount > 0 }
+			}
+			oil_add2 = yes
+		}
+	}
+}
+oil_add2 = {
+	if = {
+		limit = {
+			 check_variable = { oilAmmount > 0 }
+		}
+		add_resource = {
+			type = oil
+			amount = 1
+		}
+		add_to_variable = { oilAmmount = -1 }
+		if = {
+			limit = {
+				check_variable = { oilAmmount > 0 }
+			}
+			oil_add = yes
+		}
+	}
+}
+oil_subtract = {
+	if = {
+		limit = {
+			 check_variable = { oilAmmount < 0 }
+		}
+		add_resource = {
+			type = oil
+			amount = -1
+		}
+		add_to_variable = { oilAmmount = 1 }
+		if = {
+			limit = {
+				check_variable = { oilAmmount < 0 }
+			}
+			oil_subtract2 = yes
+		}
+	}
+}
+oil_subtract2 = {
+	if = {
+		limit = {
+			 check_variable = { oilAmmount < 0 }
+		}
+		add_resource = {
+			type = oil
+			amount = -1
+		}
+		add_to_variable = { oilAmmount = 1 }
+		if = {
+			limit = {
+				check_variable = { oilAmmount < 0 }
+			}
+			oil_subtract = yes
+		}
+	}
+}
+resource_modifier_set = {
+			set_variable = { resourceEfficienyNational = modifier@local_resources_factor }
+			every_owned_state = {
+				set_variable = { resourceEfficienyState = modifier@local_resources }
+				add_variable = { resourceEfficienyState = PREV.modifier@local_resources_factor }
+				set_variable = { resourceEfficienyModify = resourceEfficienyState }
+				multiply_variable = { resourceEfficienyState = -1 }
+				meta_effect = {
+					text = {
+						add_state_modifier = {
+							modifier = {
+								local_resources = [RESOURCEADJ]
+							}
+						}
+					}
+					RESOURCEADJ = resourceEfficienyState
+				}
+			}
+}
+oil_consumption_set = {
+	hidden_effect = {
+		every_owned_state = {
+			set_variable = { oilAmmount = oilAmmountback }
+			oil_add = yes
+			oil_calc = yes	
+			set_variable = { fossil_fuel_plant_quantity = building_level@fossil_fuel_powerplant }						
+			subtract_from_variable = { oilAmmount = fossil_fuel_plant_quantity }
+			if = { 
+				limit = {
+					check_variable = { oilAmmount < 0 }
+				}
+				set_variable = { oilAmmountback = fossil_fuel_plant_quantity }	#When more maluses added we will change this to a combination of all maluses under oilConsumptionReversion
+			}
+			oil_add = yes
+			oil_subtract = yes
+		}
+	}
+}
+oil_consumption_original = {
+	hidden_effect = {
+		every_owned_state = {
+			oil_calc = yes				
+			set_variable = { fossil_fuel_plant_quantity = building_level@fossil_fuel_powerplant }			
+			subtract_from_variable = { oilAmmount = fossil_fuel_plant_quantity }
+			if = { 
+				limit = {
+					check_variable = { oilAmmount < 0 }
+				}
+				set_variable = { oilAmmountback = fossil_fuel_plant_quantity } #When more maluses added we will change this to a combination of all maluses under oilConsumptionReversion
+			}
+			oil_add = yes
+			oil_subtract = yes
+		}
+	}
+}
 industrial_pulse = {	
 
 	multiply_variable = { oil_consumption = -1 }  
