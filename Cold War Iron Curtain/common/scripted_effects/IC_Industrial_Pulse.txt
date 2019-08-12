@@ -154,56 +154,49 @@ oil_subtract2 = {
 		}
 	}
 }
+
 resource_modifier_set_startup = {
-	set_variable = { resourceEfficienyNational = modifier@local_resources_factor }
-	every_owned_state = {
-		set_variable = { resourceEfficienyState = modifier@local_resources }
-		add_to_variable = { resourceEfficienyState = PREV.modifier@local_resources_factor }
-		set_variable = { resourceEfficienyModify = resourceEfficienyState }
-		add_to_variable = { resourceEfficienyModify = 1 }
-		multiply_variable = { resourceEfficienyState = -1 }
-		meta_effect = {
-			text = {
-				add_state_modifier = {
-					modifier = {
-						local_resources = [RESOURCEADJ]
-					}
-				}
-			}
-			RESOURCEADJ = resourceEfficienyState
-		}
-	}
+	set_variable = { state_infrastructure_quantity = building_level@state_infrastructure }
+	if = { limit = { check_variable = { state_infrastructure_quantity = 0 } }	set_variable = { resourceEfficienyInfra = 0 } }
+	if = { limit = { check_variable = { state_infrastructure_quantity = 1 } }	set_variable = { resourceEfficienyInfra = 0.07 } } 
+	if = { limit = { check_variable = { state_infrastructure_quantity = 2 } }	set_variable = { resourceEfficienyInfra = 0.14 } } 
+	if = { limit = { check_variable = { state_infrastructure_quantity = 3 } }	set_variable = { resourceEfficienyInfra = 0.21 } } 
+	if = { limit = { check_variable = { state_infrastructure_quantity = 4 } }	set_variable = { resourceEfficienyInfra = 0.28 } } 
+	if = { limit = { check_variable = { state_infrastructure_quantity = 5 } }	set_variable = { resourceEfficienyInfra = 0.35 } } 
+	if = { limit = { check_variable = { state_infrastructure_quantity = 6 } }	set_variable = { resourceEfficienyInfra = 0.42 } } 
+	if = { limit = { check_variable = { state_infrastructure_quantity = 7 } }	set_variable = { resourceEfficienyInfra = 0.49 } } 
+	if = { limit = { check_variable = { state_infrastructure_quantity = 8 } }	set_variable = { resourceEfficienyInfra = 0.56 } } 
+	if = { limit = { check_variable = { state_infrastructure_quantity = 9 } }	set_variable = { resourceEfficienyInfra = 0.63 } } 
+	add_to_variable = { resourceEfficienyInfra = 1 }
+	 
 }
-resource_modifier_calc = {
-	set_variable = { resourceEfficienyNational = modifier@local_resources_factor }
-	every_owned_state = {
-		add_to_variable = { resourceEfficienyState = modifier@local_resources }
-		add_to_variable = { resourceEfficienyState = PREV.modifier@local_resources_factor }
-		set_variable = { resourceEfficienyModify = resourceEfficienyState }
-		add_to_variable = { resourceEfficienyModify = 1 }
-		multiply_variable = { resourceEfficienyState = -1 }
-		meta_effect = {
-			text = {
-				add_state_modifier = {
-					modifier = {
-						local_resources = [RESOURCEADJ]
-					}
-				}
-			}
-			RESOURCEADJ = resourceEfficienyState
-		}
-	}
-}
+
 oil_consumption_set = {	#Fire in Decision Pulse
-	resource_modifier_calc = yes
+	
 	hidden_effect = {
 		every_owned_state = {
-			set_variable = { oilAmmount = oilAmmountback }
-			oil_add = yes
-			oil_calc = yes	
+			resource_modifier_set_startup = yes
+			oil_calc = yes
+
+			set_variable = { oilCheck = oilAmmount }
+
+			subtract_from_variable = { oilAmmount = baseOil }
+			add_to_variable = { oilAmmount = oilAmmountback } 
+			set_variable = { baseOil = oilAmmount }	
+
+			if = {
+				limit = {
+					check_variable = { oilCheck > 0 }
+				}
+				multiply_variable = { oilAmmount = resourceEfficienyInfra }
+			}			
 			
-			multiply_variable = { oilAmmount = resourceEfficienyModify }
-			
+			round_variable = oilAmmount
+			subtract_from_variable = { baseOil = oilAmmount }
+			multiply_variable = { baseOil = -1 }
+
+			#Same
+			set_variable = { oilBaseEffCheck = oilAmmount }	
 			set_variable = { fossil_fuel_plant_quantity = building_level@fossil_fuel_powerplant }	
 			
 			set_variable = { industrial_complex_quantity = building_level@industrial_complex }			
@@ -243,12 +236,19 @@ oil_consumption_set = {	#Fire in Decision Pulse
 		}
 	}
 }
+
 oil_consumption_original = {	#Fire on Startup
-	resource_modifier_set_startup = yes
+	
 	hidden_effect = {
+		
 		every_owned_state = {
+			resource_modifier_set_startup = yes
 			oil_calc = yes				
-			multiply_variable = { oilAmmount = resourceEfficienyModify }
+			set_variable = { baseOil = oilAmmount }	
+			multiply_variable = { oilAmmount = resourceEfficienyInfra }
+			round_variable = oilAmmount
+			subtract_from_variable = { baseOil = oilAmmount }
+			multiply_variable = { baseOil = -1 }
 			
 			set_variable = { oilBaseEffCheck = oilAmmount }	
 			
