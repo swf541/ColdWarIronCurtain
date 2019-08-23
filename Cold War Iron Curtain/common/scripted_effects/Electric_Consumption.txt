@@ -1,0 +1,277 @@
+electricity_calc = {
+	if = {
+		limit = {
+			 has_resources_amount = {
+				resource = electricity
+				amount > 0
+			}
+		}
+		add_resource = {
+			type = electricity
+			amount = -1
+		}
+		add_to_variable = { electricityAmmount = 1 }
+		if = {
+			limit = {
+				 has_resources_amount = {
+					resource = electricity
+					amount > 0
+				}
+			}
+			electricity_calc2 = yes
+		}
+	}
+}
+electricity_calc2 = {
+	if = {
+		limit = {
+			 has_resources_amount = {
+				resource = electricity
+				amount > 0
+			}
+		}
+		add_resource = {
+			type = electricity
+			amount = -1
+		}
+		add_to_variable = { electricityAmmount = 1 }
+		if = {
+			limit = {
+				 has_resources_amount = {
+					resource = electricity
+					amount > 0
+				}
+			}
+			electricity_calc = yes
+		}
+	}
+}
+electricity_calc3 = {
+	if = {
+		limit = {
+			check_variable = { electricityAmmountBackUp > 0 }
+		}
+		add_resource = {
+			type = electricity
+			amount = 1
+		}
+		add_to_variable = { electricityAmmountBackUp = -1 }
+		if = {
+			limit = {
+				check_variable = { electricityAmmountBackUp > 0 }
+			}
+			electricity_calc4 = yes
+		}
+	}
+}
+electricity_calc4 = {
+	if = {
+		limit = {
+			check_variable = { electricityAmmountBackUp > 0 }
+		}
+		add_resource = {
+			type = electricity
+			amount = 1
+		}
+		add_to_variable = { electricityAmmountBackUp = -1 }
+		if = {
+			limit = {
+				check_variable = { electricityAmmountBackUp > 0 }
+			}
+			electricity_calc3 = yes
+		}
+	}
+}
+electricity_add = {
+	if = {
+		limit = {
+			 check_variable = { electricityAmmount > 0 }
+		}
+		add_resource = {
+			type = electricity
+			amount = 1
+		}
+		add_to_variable = { electricityAmmount = -1 }
+		if = {
+			limit = {
+				check_variable = { electricityAmmount > 0 }
+			}
+			electricity_add2 = yes
+		}
+	}
+}
+electricity_add2 = {
+	if = {
+		limit = {
+			 check_variable = { electricityAmmount > 0 }
+		}
+		add_resource = {
+			type = electricity
+			amount = 1
+		}
+		add_to_variable = { electricityAmmount = -1 }
+		if = {
+			limit = {
+				check_variable = { electricityAmmount > 0 }
+			}
+			electricity_add = yes
+		}
+	}
+}
+electricity_subtract = {
+	if = {
+		limit = {
+			 check_variable = { electricityAmmount < 0 }
+		}
+		add_resource = {
+			type = electricity
+			amount = -1
+		}
+		add_to_variable = { electricityAmmount = 1 }
+		if = {
+			limit = {
+				check_variable = { electricityAmmount < 0 }
+			}
+			electricity_subtract2 = yes
+		}
+	}
+}
+electricity_subtract2 = {
+	if = {
+		limit = {
+			 check_variable = { electricityAmmount < 0 }
+		}
+		add_resource = {
+			type = electricity
+			amount = -1
+		}
+		add_to_variable = { electricityAmmount = 1 }
+		if = {
+			limit = {
+				check_variable = { electricityAmmount < 0 }
+			}
+			electricity_subtract = yes
+		}
+	}
+}
+
+
+
+electricity_consumption_set = {	#Fire in Decision Pulse
+	
+	hidden_effect = {
+		every_owned_state = {
+			resource_modifier_set_startup = yes
+			electricity_calc = yes
+
+			set_variable = { electricityCheck = electricityAmmount }
+
+			subtract_from_variable = { electricityAmmount = baseelectricity }
+			add_to_variable = { electricityAmmount = electricityAmmountback } 
+			set_variable = { baseelectricity = electricityAmmount }	
+
+			if = {
+				limit = {
+					check_variable = { electricityCheck > 0 }
+				}
+				multiply_variable = { electricityAmmount = resourceEfficiencyInfra }
+			}			
+			
+			round_variable = electricityAmmount
+			subtract_from_variable = { baseelectricity = electricityAmmount }
+			multiply_variable = { baseelectricity = -1 }
+
+			#Same
+			set_variable = { electricityBaseEffCheck = electricityAmmount }
+			
+			set_variable = { dockyard_quantity = building_level@dockyard }	
+			set_variable = { dockyard_quantity_adjustment = 1 }
+			
+			set_variable = { industrial_complex_quantity = building_level@industrial_complex }			
+			set_variable = { industrial_complex_quantity_adjustment = 1 }
+
+			set_variable = { office_park_quantity = building_level@office_park }			
+			set_variable = { office_park_quantity_adjustment = 1 }			
+			
+			set_variable = { nuclear_reactor_quantity = building_level@nuclear_reactor }			
+			set_variable = { nuclear_reactor_quantity_adjustment = 2 }			
+			
+			if = {
+				limit = {
+					controller = {
+						has_tech = ecoenergy_I
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = -0.1 } 
+				add_to_variable = { office_park_quantity_adjustment = -0.1 } 
+			}	
+			if = {
+				limit = {
+					controller = {
+						has_tech = ecoenergy_II
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = -0.1 } 
+				add_to_variable = { office_park_quantity_adjustment = -0.1 } 
+			}	
+			if = {
+				limit = {
+					controller = {
+						has_tech = ecoenergy_III
+					}
+				}
+				add_to_variable = { dockyard_quantity_adjustment = -0.1 } 
+			}	
+			if = {
+				limit = {
+					controller = {
+						has_tech = ecoenergy_V
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = -0.1 } 
+				add_to_variable = { office_park_quantity_adjustment = -0.1 } 
+				add_to_variable = { dockyard_quantity_adjustment = -0.1 } 
+			}	
+			if = {
+				limit = {
+					controller = {
+						has_tech = ecoenergy_VI
+					}
+				}
+				add_to_variable = { dockyard_quantity_adjustment = -0.1 } 
+			}				
+			if = {
+				limit = {
+					controller = {
+						has_tech = electriccars
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = 0.25 } 
+				add_to_variable = { office_park_quantity_adjustment = 0.25 } 
+			}			
+			multiply_variable = { nuclear_reactor_quantity_adjustment = nuclear_reactor_quantity }
+			
+			multiply_variable = { dockyard_quantity_adjustment = dockyard_quantity }
+			
+			multiply_variable = { industrial_complex_quantity_adjustment = industrial_complex_quantity }
+			
+			multiply_variable = { office_park_quantity_adjustment = office_park_quantity }
+			
+			add_to_variable = { industrial_complex_quantity_adjustment = office_park_quantity_adjustment }
+			add_to_variable = { industrial_complex_quantity_adjustment = nuclear_reactor_quantity_adjustment }
+			add_to_variable = { industrial_complex_quantity_adjustment = dockyard_quantity_adjustment }
+			
+			set_variable = { electricityAdjustment = industrial_complex_quantity_adjustment } 
+
+			round_variable = electricityAdjustment
+			
+			subtract_from_variable = { electricityAmmount = electricityAdjustment }
+			round_variable = electricityAmmount
+			
+			set_variable = { electricityAmmountback = electricityAdjustment }	#When more maluses added we will change this to a combination of all maluses under electricityConsumptionReversion
+
+			electricity_add = yes
+			electricity_subtract = yes
+		}
+	}
+}

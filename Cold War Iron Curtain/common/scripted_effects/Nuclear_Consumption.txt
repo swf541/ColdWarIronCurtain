@@ -1,0 +1,212 @@
+chromium_calc = {
+	if = {
+		limit = {
+			 has_resources_amount = {
+				resource = chromium
+				amount > 0
+			}
+		}
+		add_resource = {
+			type = chromium
+			amount = -1
+		}
+		add_to_variable = { chromiumAmmount = 1 }
+		if = {
+			limit = {
+				 has_resources_amount = {
+					resource = chromium
+					amount > 0
+				}
+			}
+			chromium_calc2 = yes
+		}
+	}
+}
+chromium_calc2 = {
+	if = {
+		limit = {
+			 has_resources_amount = {
+				resource = chromium
+				amount > 0
+			}
+		}
+		add_resource = {
+			type = chromium
+			amount = -1
+		}
+		add_to_variable = { chromiumAmmount = 1 }
+		if = {
+			limit = {
+				 has_resources_amount = {
+					resource = chromium
+					amount > 0
+				}
+			}
+			chromium_calc = yes
+		}
+	}
+}
+chromium_calc3 = {
+	if = {
+		limit = {
+			check_variable = { chromiumAmmountBackUp > 0 }
+		}
+		add_resource = {
+			type = chromium
+			amount = 1
+		}
+		add_to_variable = { chromiumAmmountBackUp = -1 }
+		if = {
+			limit = {
+				check_variable = { chromiumAmmountBackUp > 0 }
+			}
+			chromium_calc4 = yes
+		}
+	}
+}
+chromium_calc4 = {
+	if = {
+		limit = {
+			check_variable = { chromiumAmmountBackUp > 0 }
+		}
+		add_resource = {
+			type = chromium
+			amount = 1
+		}
+		add_to_variable = { chromiumAmmountBackUp = -1 }
+		if = {
+			limit = {
+				check_variable = { chromiumAmmountBackUp > 0 }
+			}
+			chromium_calc3 = yes
+		}
+	}
+}
+chromium_add = {
+	if = {
+		limit = {
+			 check_variable = { chromiumAmmount > 0 }
+		}
+		add_resource = {
+			type = chromium
+			amount = 1
+		}
+		add_to_variable = { chromiumAmmount = -1 }
+		if = {
+			limit = {
+				check_variable = { chromiumAmmount > 0 }
+			}
+			chromium_add2 = yes
+		}
+	}
+}
+chromium_add2 = {
+	if = {
+		limit = {
+			 check_variable = { chromiumAmmount > 0 }
+		}
+		add_resource = {
+			type = chromium
+			amount = 1
+		}
+		add_to_variable = { chromiumAmmount = -1 }
+		if = {
+			limit = {
+				check_variable = { chromiumAmmount > 0 }
+			}
+			chromium_add = yes
+		}
+	}
+}
+chromium_subtract = {
+	if = {
+		limit = {
+			 check_variable = { chromiumAmmount < 0 }
+		}
+		add_resource = {
+			type = chromium
+			amount = -1
+		}
+		add_to_variable = { chromiumAmmount = 1 }
+		if = {
+			limit = {
+				check_variable = { chromiumAmmount < 0 }
+			}
+			chromium_subtract2 = yes
+		}
+	}
+}
+chromium_subtract2 = {
+	if = {
+		limit = {
+			 check_variable = { chromiumAmmount < 0 }
+		}
+		add_resource = {
+			type = chromium
+			amount = -1
+		}
+		add_to_variable = { chromiumAmmount = 1 }
+		if = {
+			limit = {
+				check_variable = { chromiumAmmount < 0 }
+			}
+			chromium_subtract = yes
+		}
+	}
+}
+
+
+
+chromium_consumption_set = {	#Fire in Decision Pulse
+	
+	hidden_effect = {
+		every_owned_state = {
+			resource_modifier_set_startup = yes
+			chromium_calc = yes
+
+			set_variable = { chromiumCheck = chromiumAmmount }
+
+			subtract_from_variable = { chromiumAmmount = basechromium }
+			add_to_variable = { chromiumAmmount = chromiumAmmountback } 
+			set_variable = { basechromium = chromiumAmmount }	
+
+			if = {
+				limit = {
+					check_variable = { chromiumCheck > 0 }
+				}
+				multiply_variable = { chromiumAmmount = resourceEfficiencyInfra }
+			}			
+			
+			round_variable = chromiumAmmount
+			subtract_from_variable = { basechromium = chromiumAmmount }
+			multiply_variable = { basechromium = -1 }
+
+			#Same
+			set_variable = { chromiumBaseEffCheck = chromiumAmmount }	
+			
+			set_variable = { nuclear_powerplant_quantity = building_level@nuclear_powerplant }			
+			set_variable = { nuclear_powerplant_quantity_adjustment = 1 }
+			
+			set_variable = { nuclear_reactor_quantity = building_level@nuclear_reactor }			
+			set_variable = { nuclear_reactor_quantity_adjustment = 2 }
+
+			
+			multiply_variable = { nuclear_reactor_quantity_adjustment = nuclear_reactor_quantity }
+			multiply_variable = { nuclear_powerplant_quantity_adjustment = nuclear_powerplant_quantity }
+			
+			add_to_variable = { nuclear_powerplant_quantity_adjustment = nuclear_reactor_quantity_adjustment }
+						
+			set_variable = { chromiumAdjustment = nuclear_powerplant_quantity_adjustment } 
+
+			round_variable = chromiumAdjustment
+			
+			subtract_from_variable = { chromiumAmmount = chromiumAdjustment }
+			round_variable = chromiumAmmount
+			
+			set_variable = { chromiumAmmountback = chromiumAdjustment }	#When more maluses added we will change this to a combination of all maluses under chromiumConsumptionReversion
+
+			chromium_add = yes
+			chromium_subtract = yes
+		}
+	}
+}
