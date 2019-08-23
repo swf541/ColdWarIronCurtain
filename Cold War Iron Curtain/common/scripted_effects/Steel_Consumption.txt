@@ -1,0 +1,224 @@
+steel_calc = {
+	if = {
+		limit = {
+			 has_resources_amount = {
+				resource = steel
+				amount > 0
+			}
+		}
+		add_resource = {
+			type = steel
+			amount = -1
+		}
+		add_to_variable = { steelAmmount = 1 }
+		if = {
+			limit = {
+				 has_resources_amount = {
+					resource = steel
+					amount > 0
+				}
+			}
+			steel_calc2 = yes
+		}
+	}
+}
+steel_calc2 = {
+	if = {
+		limit = {
+			 has_resources_amount = {
+				resource = steel
+				amount > 0
+			}
+		}
+		add_resource = {
+			type = steel
+			amount = -1
+		}
+		add_to_variable = { steelAmmount = 1 }
+		if = {
+			limit = {
+				 has_resources_amount = {
+					resource = steel
+					amount > 0
+				}
+			}
+			steel_calc = yes
+		}
+	}
+}
+steel_calc3 = {
+	if = {
+		limit = {
+			check_variable = { steelAmmountBackUp > 0 }
+		}
+		add_resource = {
+			type = steel
+			amount = 1
+		}
+		add_to_variable = { steelAmmountBackUp = -1 }
+		if = {
+			limit = {
+				check_variable = { steelAmmountBackUp > 0 }
+			}
+			steel_calc4 = yes
+		}
+	}
+}
+steel_calc4 = {
+	if = {
+		limit = {
+			check_variable = { steelAmmountBackUp > 0 }
+		}
+		add_resource = {
+			type = steel
+			amount = 1
+		}
+		add_to_variable = { steelAmmountBackUp = -1 }
+		if = {
+			limit = {
+				check_variable = { steelAmmountBackUp > 0 }
+			}
+			steel_calc3 = yes
+		}
+	}
+}
+steel_add = {
+	if = {
+		limit = {
+			 check_variable = { steelAmmount > 0 }
+		}
+		add_resource = {
+			type = steel
+			amount = 1
+		}
+		add_to_variable = { steelAmmount = -1 }
+		if = {
+			limit = {
+				check_variable = { steelAmmount > 0 }
+			}
+			steel_add2 = yes
+		}
+	}
+}
+steel_add2 = {
+	if = {
+		limit = {
+			 check_variable = { steelAmmount > 0 }
+		}
+		add_resource = {
+			type = steel
+			amount = 1
+		}
+		add_to_variable = { steelAmmount = -1 }
+		if = {
+			limit = {
+				check_variable = { steelAmmount > 0 }
+			}
+			steel_add = yes
+		}
+	}
+}
+steel_subtract = {
+	if = {
+		limit = {
+			 check_variable = { steelAmmount < 0 }
+		}
+		add_resource = {
+			type = steel
+			amount = -1
+		}
+		add_to_variable = { steelAmmount = 1 }
+		if = {
+			limit = {
+				check_variable = { steelAmmount < 0 }
+			}
+			steel_subtract2 = yes
+		}
+	}
+}
+steel_subtract2 = {
+	if = {
+		limit = {
+			 check_variable = { steelAmmount < 0 }
+		}
+		add_resource = {
+			type = steel
+			amount = -1
+		}
+		add_to_variable = { steelAmmount = 1 }
+		if = {
+			limit = {
+				check_variable = { steelAmmount < 0 }
+			}
+			steel_subtract = yes
+		}
+	}
+}
+
+
+
+steel_consumption_set = {	#Fire in Decision Pulse
+	
+	hidden_effect = {
+		every_owned_state = {
+			resource_modifier_set_startup = yes
+			steel_calc = yes
+
+			set_variable = { steelCheck = steelAmmount }
+
+			subtract_from_variable = { steelAmmount = basesteel }
+			add_to_variable = { steelAmmount = steelAmmountback } 
+			set_variable = { basesteel = steelAmmount }	
+
+			if = {
+				limit = {
+					check_variable = { steelCheck > 0 }
+				}
+				multiply_variable = { steelAmmount = resourceEfficienyInfra }
+			}			
+			
+			round_variable = steelAmmount
+			subtract_from_variable = { basesteel = steelAmmount }
+			multiply_variable = { basesteel = -1 }
+
+			#Same
+			set_variable = { steelBaseEffCheck = steelAmmount }	
+			
+			set_variable = { industrial_complex_quantity = building_level@industrial_complex }			
+			set_variable = { industrial_complex_quantity_adjustment = 1 }
+
+			
+			if = {
+				limit = {
+					controller = {
+						has_tech = management_IX
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = -0.1 } 
+			}	
+			
+			if = {
+				limit = {
+					controller = {
+						has_tech = plastics_III
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = -0.1 } 
+			}			
+			
+			multiply_variable = { industrial_complex_quantity_adjustment = industrial_complex_quantity }
+						
+			set_variable = { steelAdjustment = industrial_complex_quantity_adjustment } 
+
+			round_variable = steelAdjustment
+			
+			subtract_from_variable = { steelAmmount = steelAdjustment }
+			round_variable = steelAmmount
+			
+			set_variable = { steelAmmountback = steelAdjustment }	#When more maluses added we will change this to a combination of all maluses under steelConsumptionReversion
+
+			steel_add = yes
+			steel_subtract = yes
+		}
+	}
+}
