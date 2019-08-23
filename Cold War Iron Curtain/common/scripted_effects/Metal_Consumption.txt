@@ -222,3 +222,57 @@ aluminium_consumption_set = {	#Fire in Decision Pulse
 		}
 	}
 }
+aluminium_consumption_original = {	#Fire on Startup
+	
+	hidden_effect = {
+		
+		every_owned_state = {
+			resource_modifier_set_startup = yes
+			aluminium_calc = yes				
+			set_variable = { basealuminium = aluminiumAmmount }	
+			multiply_variable = { aluminiumAmmount = resourceEfficiencyInfra }
+			round_variable = aluminiumAmmount
+			subtract_from_variable = { basealuminium = aluminiumAmmount }
+			multiply_variable = { basealuminium = -1 }
+			
+			#Same
+			set_variable = { aluminiumBaseEffCheck = aluminiumAmmount }	
+			
+			set_variable = { office_park_quantity = building_level@office_park }			
+			set_variable = { office_park_quantity_adjustment = 1 }
+
+			
+			if = {
+				limit = {
+					controller = {
+						has_tech = management_IX
+					}
+				}
+				add_to_variable = { office_park_quantity_adjustment = -0.1 } 
+			}	
+			
+			if = {
+				limit = {
+					controller = {
+						has_tech = plastics_IV
+					}
+				}
+				add_to_variable = { office_park_quantity_adjustment = -0.1 } 
+			}			
+			
+			multiply_variable = { office_park_quantity_adjustment = office_park_quantity }
+						
+			set_variable = { aluminiumAdjustment = office_park_quantity_adjustment } 
+
+			round_variable = aluminiumAdjustment
+			
+			subtract_from_variable = { aluminiumAmmount = aluminiumAdjustment }
+			round_variable = aluminiumAmmount
+			
+			set_variable = { aluminiumAmmountback = aluminiumAdjustment }	#When more maluses added we will change this to a combination of all maluses under aluminiumConsumptionReversion
+
+			aluminium_add = yes
+			aluminium_subtract = yes
+		}
+	}
+}
