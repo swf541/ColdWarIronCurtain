@@ -222,3 +222,57 @@ steel_consumption_set = {	#Fire in Decision Pulse
 		}
 	}
 }
+steel_consumption_original = {	#Fire on Startup
+	
+	hidden_effect = {
+		
+		every_owned_state = {
+			resource_modifier_set_startup = yes
+			steel_calc = yes				
+			set_variable = { basesteel = steelAmmount }	
+			multiply_variable = { steelAmmount = resourceEfficiencyInfra }
+			round_variable = steelAmmount
+			subtract_from_variable = { basesteel = steelAmmount }
+			multiply_variable = { basesteel = -1 }
+			
+			#Same
+			set_variable = { steelBaseEffCheck = steelAmmount }	
+			
+			set_variable = { industrial_complex_quantity = building_level@industrial_complex }			
+			set_variable = { industrial_complex_quantity_adjustment = 1 }
+
+			
+			if = {
+				limit = {
+					controller = {
+						has_tech = management_IX
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = -0.1 } 
+			}	
+			
+			if = {
+				limit = {
+					controller = {
+						has_tech = plastics_III
+					}
+				}
+				add_to_variable = { industrial_complex_quantity_adjustment = -0.1 } 
+			}			
+			
+			multiply_variable = { industrial_complex_quantity_adjustment = industrial_complex_quantity }
+						
+			set_variable = { steelAdjustment = industrial_complex_quantity_adjustment } 
+
+			round_variable = steelAdjustment
+			
+			subtract_from_variable = { steelAmmount = steelAdjustment }
+			round_variable = steelAmmount
+			
+			set_variable = { steelAmmountback = steelAdjustment }	#When more maluses added we will change this to a combination of all maluses under steelConsumptionReversion
+
+			steel_add = yes
+			steel_subtract = yes
+		}
+	}
+}
