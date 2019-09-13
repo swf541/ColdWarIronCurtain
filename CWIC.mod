@@ -1,5 +1,5 @@
 ﻿name="Cold War Iron Curtain - A Time For Choosing"
-path="mod/Cold War Iron Curtain"
+path="mod/ColdWarIronCurtain/Cold War Iron Curtain"
 tags={
 	"Gameplay"
 	"Military"
