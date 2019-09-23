@@ -86,6 +86,7 @@ NDefines.NNavy.SUBMARINE_REVEAL_BASE_CHANCE = 0.002 -- Base chance for submarine
 NDefines.NNavy.SUBMARINE_REVEALED_TIMEOUT = 8 -- Amount of in-game-hours that makes the submarine visible if it is on the defender side.
 NDefines.NNavy.SHORE_BOMBARDMENT_CAP = 0.15 -- Maximum shore bombardment
 NDefines.NNavy.NAVAL_INVASION_PREPARE_HOURS = 72 -- base hours needed to prepare an invasion
+NDefines.NNavy.SEA_AIR_COMBAT_MAX_WINGS_ON_STACK = 75 -- max planes that can enter naval combat
 
 NDefines.NTechnology.BASE_RESEARCH_POINTS_SAVED = 50.0 -- Base amount of research points a country can save per slot.
 NDefines.NTechnology.BASE_YEAR_AHEAD_PENALTY_FACTOR = 4 -- Base year ahead penalty
