@@ -104,6 +104,8 @@ NDefines.NAI.DIPLOMACY_SCARED_MINOR_EXTRA_RELUCTANCE = -50 -- extra reluctance t
 NDefines.NAI.DIPLOMACY_BOOST_PARTY_COST_FACTOR = 0.0	-- Desire to boost party popularity subtracts the daily cost multiplied by this
 NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_COST_FACTOR = 0.0-- Desire to boost relations subtracts the cost multiplied by this
 NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_PP_FACTOR = 0.0	-- Desire to boost relations adds total PP multiplied by this
+NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 9999999
+NDefines.NAI.DIVISION_CREATE_MIN_XP = 9999999
 
 NDefines.NProduction.MAX_EQUIPMENT_RESOURCES_NEED = 4
 NDefines.NProduction.INFRA_MAX_CONSTRUCTION_COST_EFFECT = 1.4
