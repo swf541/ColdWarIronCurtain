@@ -86,6 +86,7 @@ NDefines.NNavy.SUBMARINE_REVEAL_BASE_CHANCE = 0.002 -- Base chance for submarine
 NDefines.NNavy.SUBMARINE_REVEALED_TIMEOUT = 8 -- Amount of in-game-hours that makes the submarine visible if it is on the defender side.
 NDefines.NNavy.SHORE_BOMBARDMENT_CAP = 0.15 -- Maximum shore bombardment
 NDefines.NNavy.NAVAL_INVASION_PREPARE_HOURS = 72 -- base hours needed to prepare an invasion
+NDefines.NNavy.SEA_AIR_COMBAT_MAX_WINGS_ON_STACK = 75 -- max planes that can enter naval combat
 
 NDefines.NTechnology.BASE_RESEARCH_POINTS_SAVED = 50.0 -- Base amount of research points a country can save per slot.
 NDefines.NTechnology.BASE_YEAR_AHEAD_PENALTY_FACTOR = 4 -- Base year ahead penalty
@@ -103,6 +104,8 @@ NDefines.NAI.DIPLOMACY_SCARED_MINOR_EXTRA_RELUCTANCE = -50 -- extra reluctance t
 NDefines.NAI.DIPLOMACY_BOOST_PARTY_COST_FACTOR = 0.0	-- Desire to boost party popularity subtracts the daily cost multiplied by this
 NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_COST_FACTOR = 0.0-- Desire to boost relations subtracts the cost multiplied by this
 NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_PP_FACTOR = 0.0	-- Desire to boost relations adds total PP multiplied by this
+NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 9999999
+NDefines.NAI.DIVISION_CREATE_MIN_XP = 9999999
 
 NDefines.NProduction.MAX_EQUIPMENT_RESOURCES_NEED = 4
 NDefines.NProduction.INFRA_MAX_CONSTRUCTION_COST_EFFECT = 1.4
