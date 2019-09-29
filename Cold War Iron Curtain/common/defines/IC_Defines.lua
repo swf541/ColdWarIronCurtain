@@ -89,8 +89,9 @@ NDefines.NNavy.NAVAL_INVASION_PREPARE_HOURS = 72 -- base hours needed to prepare
 NDefines.NNavy.SEA_AIR_COMBAT_MAX_WINGS_ON_STACK = 75 -- max planes that can enter naval combat
 
 NDefines.NTechnology.BASE_RESEARCH_POINTS_SAVED = 50.0 -- Base amount of research points a country can save per slot.
-NDefines.NTechnology.BASE_YEAR_AHEAD_PENALTY_FACTOR = 4 -- Base year ahead penalty
+NDefines.NTechnology.BASE_YEAR_AHEAD_PENALTY_FACTOR = 2 -- Base year ahead penalty
 NDefines.NTechnology.MAX_TECH_SHARING_BONUS = 0.15 -- Max technology sharing bonus that can be applied instantly
+NDefines.NTechnology.BASE_TECH_COST = 100 -- Multiplied by tech cost, then years ahead penalty
 
 NDefines.NTrade.RELATION_TRADE_FACTOR = 5 -- Trade factor is modified by Opinion value times this
 
@@ -106,6 +107,7 @@ NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_COST_FACTOR = 0.0-- Desire to boost rela
 NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_PP_FACTOR = 0.0	-- Desire to boost relations adds total PP multiplied by this
 NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 9999999
 NDefines.NAI.DIVISION_CREATE_MIN_XP = 9999999
+NDefines.NAI.RESEARCH_AHEAD_OF_TIME_FACTOR = 9999999
 
 NDefines.NProduction.MAX_EQUIPMENT_RESOURCES_NEED = 4
 NDefines.NProduction.INFRA_MAX_CONSTRUCTION_COST_EFFECT = 1.4
