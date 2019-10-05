@@ -39,6 +39,7 @@ NDefines.NCountry.INDUSTRY_SCORE_MULTIPLIER = 1.0 -- Based on number of factorie
 NDefines.NCountry.PROVINCE_SCORE_MULTIPLIER = 0.1 -- Based on number of controlled provinces.
 NDefines.NCountry.STATE_VALUE_NON_CORE_STATE_FRACTION = 1
 NDefines.NCountry.POPULATION_YEARLY_GROWTH_BASE = 0.008
+NDefines.NCountry.MIN_COUP_SUCCESS_STABILITY = -2 -- NO COUPS ALLOWED!!!!
 
 NDefines.NDiplomacy.BASE_PEACE_TAKE_UNCONTROLLED_STATE_FACTOR = 10.0 -- Base factor for taking state you do not control in %
 NDefines.NDiplomacy.CIVIL_WAR_INVOLVEMENT_MIN_TENSION = 0.0 -- base value of world tension to involve other sides to the civil war
