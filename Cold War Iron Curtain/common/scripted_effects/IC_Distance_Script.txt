@@ -1,16 +1,29 @@
-every_state = {
-    limit = {
-        #Is owned by an enemy country
-        any_country = {
-            controls_state = PREV
-            has_war_with = ROOT
-        }
-        ROOT = {
-            any_owned_state = {
-                air_base > 0
-                check_variable = { THIS.distance_to@PREV < 400}    #MAP_SCALE_PIXEL_TO_KM = 7.114
-            }
-        }
-    }
-    add_to_array = { ROOT.WarCrimeTargetList = THIS.id }
+distance_calculator = {
+	clear_array = WarCrimeTargetList
+	every_state = {
+		limit = {
+			#Is owned by an enemy country
+			any_country = {
+				controls_state = PREV
+				has_war_with = ROOT
+			}
+			ROOT = {
+				any_owned_state = {
+					air_base > 0
+					check_variable = { THIS.distance_to@PREV.PREV < 75}    #MAP_SCALE_PIXEL_TO_KM = 7.114
+				}
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					is_in_array = {
+					   array = ROOT.WarCrimeTargetList
+					   value = THIS.id
+					}				
+				}
+			}
+			add_to_array = { ROOT.WarCrimeTargetList = THIS.id }
+		}
+	}
 }
