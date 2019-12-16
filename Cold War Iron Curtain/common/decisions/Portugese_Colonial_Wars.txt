@@ -1,7 +1,379 @@
 Guinea_Bissau_War_of_Independence_category = {
+	Increase_PAIGC_Funding = {
+				
+		visible = {
+			country_exists  = GNB
+			OR = {
+				tag = SOV
+				tag = PRC
+				tag = GNA
+				tag = SEN
+				tag = YUG
+			}
+			NOT = { has_country_flag = GNB_Established_State }
+		}
+		available = {
+			country_exists  = GNB
+			OR = {
+				tag = SOV
+				tag = PRC
+				tag = GNA
+				tag = SEN
+				tag = YUG
+			}
+			NOT = { has_country_flag = GNB_Established_State }
+		}
+		complete_effect = {
+			add_to_variable = { paigc_funding = 1 }
+			custom_effect_tooltip = insurgency_funding_inc_tt
+		}
+	}
+	Decrease_PAIGC_Funding = {
+				
+		visible = {
+			country_exists  = GNB
+			OR = {
+				tag = SOV
+				tag = PRC
+				tag = GNA
+				tag = SEN
+				tag = YUG
+			}
+			NOT = { has_country_flag = GNB_Established_State }
+		}
+		available = {
+			check_variable = { paigc_funding > 0 }
+			country_exists  = GNB
+			OR = {
+				tag = SOV
+				tag = PRC
+				tag = GNA
+				tag = YUG
+				tag = SEN
+			}
+			NOT = { has_country_flag = GNB_Established_State }
+		}
+		days_re_enable = 60
+		complete_effect = {
+			add_to_variable = { paigc_funding = -1 }
+			custom_effect_tooltip = insurgency_funding_dec_tt
+		}
+	}	
+	
+	
+	Expel_PAIGC_Camps = {
+				
+		visible = {
+			country_exists  = GNB
+			OR = {
+				AND = {
+					tag = GNA
+					774 = {
+						has_state_flag = PAIGC_Camp
+					}
+				}
+				AND = {
+					tag = SEN
+					272 = {
+						has_state_flag = PAIGC_Camp
+					}
+				}
+			}
+			NOT = { has_country_flag = GNB_Established_State }
+		}
+		available = {
+			country_exists  = GNB
+			OR = {
+				AND = {
+					tag = GNA
+					774 = {
+						has_state_flag = PAIGC_Camp
+					}
+				}
+				AND = {
+					tag = SEN
+					272 = {
+						has_state_flag = PAIGC_Camp
+					}
+				}
+			}
+			NOT = { has_country_flag = GNB_Established_State }
+		}
+		days_re_enable = 60
+		complete_effect = {
+			if = {
+				limit = {
+					tag = GNA
+				}
+				774 = {
+					set_variable = { PAIGC_Camp_level = 0 }
+					clr_state_flag = PAIGC_Camp
+				}
+				country_event = gbn_colonial_war.700
+			}
+			if = {
+				limit = {
+					tag = SEN
+				}
+				272 = {
+					set_variable = { PAIGC_Camp_level = 0 }
+					clr_state_flag = PAIGC_Camp
+				}
+				country_event = gbn_colonial_war.701
+			}
+			custom_effect_tooltip = expel_militant_bases_tt
+		}
+	}	
+	
+	Raid_PAIGC_Camps_in_Guinea = {
+		visible = {
+			tag = POR
+		}
+		available = {
+			tag = POR
+			country_exists = GNB
+			has_border_war = no
+			GNA = {
+				774 = {
+					has_state_flag = PAIGC_Camp
+					check_variable = { PAIGC_Camp_level > 0 }
+				}			
+			}
+		}
 
+		days_re_enable = 120
+
+		complete_effect = {
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 296
+					num_provinces = 3
+					on_win = gbn_colonial_war.500
+					on_lose = gbn_colonial_war.501
+					on_cancel = gbn_colonial_war.4
+				}
+							
+				defender = {
+					state = 774
+					num_provinces = 3
+					on_win = gbn_colonial_war.501
+					on_lose = gbn_colonial_war.500
+					on_cancel = gbn_colonial_war.4
+				}
+			}			
+		}
+
+		ai_will_do = {
+			factor = 0.10
+		}
+	}
+	
+	Raid_PAIGC_Camps_in_Senegal = {
+		visible = {
+			tag = POR
+		}
+
+		available = {
+			tag = POR
+			country_exists = GNB
+			has_border_war = no
+			SEN = {
+				272 = {
+					has_state_flag = PAIGC_Camp
+					check_variable = { PAIGC_Camp_level > 0 }
+				}			
+			}
+		}
+
+		days_re_enable = 120
+
+		complete_effect = {
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 296
+					num_provinces = 3
+					on_win = gbn_colonial_war.600
+					on_lose = gbn_colonial_war.601
+					on_cancel = gbn_colonial_war.4
+				}
+							
+				defender = {
+					state = 272
+					num_provinces = 3
+					on_win = gbn_colonial_war.601
+					on_lose = gbn_colonial_war.600
+					on_cancel = gbn_colonial_war.4
+				}
+			}			
+		}
+
+		ai_will_do = {
+			factor = 0.10
+		}
+	}
+		
+	Expand_Training_Camps_in_Guinea = {
+				
+		visible = {
+			tag = GNB
+			774 = {
+				has_state_flag = PAIGC_Camp
+			}
+			NOT = { has_country_flag = GNB_Established_State }
+		}
+		available = {
+			tag = GNB
+			774 = {
+				has_state_flag = PAIGC_Camp
+			}
+			NOT = { has_country_flag = GNB_Established_State }
+			has_army_experience > 20
+			has_manpower > 5000
+		}
+		days_re_enable = 90
+		complete_effect = {
+			army_experience = -20
+			add_manpower = -5000
+			GNA = {
+				774 = {
+					add_to_variable = { PAIGC_Camp_level = 1 }
+				}
+			}
+			custom_effect_tooltip = increase_camp_level_one_tt
+		}
+	}	
+	
+	Expand_Training_Camps_in_Senegal = {
+				
+		visible = {
+			tag = GNB
+			272 = {
+				has_state_flag = PAIGC_Camp
+			}
+			NOT = { has_country_flag = GNB_Established_State }
+		}
+		available = {
+			tag = GNB
+			272 = {
+				has_state_flag = PAIGC_Camp
+			}
+			NOT = { has_country_flag = GNB_Established_State }
+			has_army_experience > 20
+			has_manpower > 5000
+		}
+		days_re_enable = 90
+		complete_effect = {
+			army_experience = -20
+			add_manpower = -5000
+			SEN = {
+				272 = {
+					add_to_variable = { PAIGC_Camp_level = 1 }
+				}
+			}
+			custom_effect_tooltip = increase_camp_level_one_tt
+		}
+	}	
+
+	PAIGC_External_Support = {
+		
+		allowed = {
+		  tag = GNB
+		}
+		
+		visible = {
+			always = yes
+			tag = GNB
+			NOT = { has_country_flag = GNB_Established_State }
+		}
+		available = {
+			always = no
+		}
+		
+		activation = {
+			always = yes
+			tag = GNB
+			NOT = { has_country_flag = GNB_Established_State }
+		}
+
+		#is_good = yes
+
+		selectable_mission = yes
+		days_mission_timeout = 30
+		
+
+		
+		timeout_effect = {
+			hidden_effect = {
+				set_variable = { paigc_camp_level_calc = 0 }
+				every_state = { add_to_variable = { GNB.paigc_camp_level_calc = PAIGC_Camp_level } }
+				set_temp_variable = { manpower_gain = paigc_camp_level_calc }
+				multiply_temp_variable = { manpower_gain = 100 }
+
+				set_temp_variable = { army_xp_gain = paigc_camp_level_calc }
+				multiply_temp_variable = { army_xp_gain = 5 }
+				
+				set_variable = { global_paigc_funding = 0 }
+				add_to_variable = { global_paigc_funding = SOV.paigc_funding }
+				add_to_variable = { global_paigc_funding = GNA.paigc_funding }		
+				add_to_variable = { global_paigc_funding = SEN.paigc_funding }
+				add_to_variable = { global_paigc_funding = PRC.paigc_funding }		
+				add_to_variable = { global_paigc_funding = YUG.paigc_funding }				
+
+				set_temp_variable = { inf_equp_gain = global_paigc_funding }
+				multiply_temp_variable = { inf_equp_gain = 10 }	
+
+				set_temp_variable = { artillery_gain = global_paigc_funding }
+				multiply_temp_variable = { artillery_gain = 5 }	
+				
+				set_temp_variable = { anti_air_gain = global_paigc_funding }
+				multiply_temp_variable = { anti_air_gain = 2 }	
+			}
+			
+			army_experience = var:army_xp_gain
+			add_manpower = var:manpower_gain
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = infantry_equipment
+						amount = [AMNT]
+						producer = SOV
+					}
+				}
+				AMNT = "inf_equp_gain"
+			}
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = artillery_equipment
+						amount = [AMNT]
+						producer = SOV
+					}
+				}
+				AMNT = "artillery_gain"
+			}			
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = auto_cannon_equipment
+						amount = [AMNT]
+						producer = SOV
+					}
+				}
+				AMNT = "anti_air_gain"
+			}
+			activate_mission = PAIGC_External_Support
+			
+		}
+	}
    Raid_Northern_Bases = {
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GNB
@@ -24,8 +396,8 @@ Guinea_Bissau_War_of_Independence_category = {
 				defender = {
 					state = 1282
 					num_provinces = 3
-					on_win = gbn_colonial_war.101
-					on_lose = gbn_colonial_war.100
+					on_win = gbn_colonial_war.102
+					on_lose = gbn_colonial_war.103
 					on_cancel = gbn_colonial_war.4
 				}
 			}			
@@ -36,7 +408,9 @@ Guinea_Bissau_War_of_Independence_category = {
 		}
 	}
    Raid_Southern_Bases = {
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GNB
@@ -59,8 +433,8 @@ Guinea_Bissau_War_of_Independence_category = {
 				defender = {
 					state = 1284
 					num_provinces = 3
-					on_win = gbn_colonial_war.101
-					on_lose = gbn_colonial_war.100
+					on_win = gbn_colonial_war.102
+					on_lose = gbn_colonial_war.103
 					on_cancel = gbn_colonial_war.4
 				}
 			}			
@@ -71,7 +445,9 @@ Guinea_Bissau_War_of_Independence_category = {
 		}
 	}
    Attack_Bissau_from_the_North = {
-
+		visible = {
+			tag = GNB
+		}
 		available = {
 			tag = GNB
 			country_exists = GNB
@@ -86,16 +462,16 @@ Guinea_Bissau_War_of_Independence_category = {
 				attacker = {
 					state = 1282
 					num_provinces = 3
-					on_win = gbn_colonial_war.100
-					on_lose = gbn_colonial_war.101
+					on_win = gbn_colonial_war.102
+					on_lose = gbn_colonial_war.103
 					on_cancel = gbn_colonial_war.4
 				}
 							
 				defender = {
 					state = 296
 					num_provinces = 3
-					on_win = gbn_colonial_war.101
-					on_lose = gbn_colonial_war.100
+					on_win = gbn_colonial_war.100
+					on_lose = gbn_colonial_war.101
 					on_cancel = gbn_colonial_war.4
 				}
 			}			
@@ -106,7 +482,9 @@ Guinea_Bissau_War_of_Independence_category = {
 		}
 	}
    Attack_Bissau_from_the_South = {
-
+		visible = {
+			tag = GNB
+		}
 		available = {
 			tag = GNB
 			country_exists = GNB
@@ -119,18 +497,18 @@ Guinea_Bissau_War_of_Independence_category = {
 			start_border_war = {
 				change_state_after_war = no
 				attacker = {
-					state = 1284
+					state = 1282
 					num_provinces = 3
-					on_win = gbn_colonial_war.100
-					on_lose = gbn_colonial_war.101
+					on_win = gbn_colonial_war.102
+					on_lose = gbn_colonial_war.103
 					on_cancel = gbn_colonial_war.4
 				}
 							
 				defender = {
 					state = 296
 					num_provinces = 3
-					on_win = gbn_colonial_war.101
-					on_lose = gbn_colonial_war.100
+					on_win = gbn_colonial_war.100
+					on_lose = gbn_colonial_war.101
 					on_cancel = gbn_colonial_war.4
 				}
 			}			
@@ -144,7 +522,9 @@ Guinea_Bissau_War_of_Independence_category = {
 	
 	#https://pt.m.wikipedia.org/wiki/Opera%C3%A7%C3%A3o_Tridente
     Operation_Trident = {
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GNB
@@ -163,7 +543,9 @@ Guinea_Bissau_War_of_Independence_category = {
 	}
 	#Operation Griffin	April 1966 Paratrooper Ambush
     Operation_Griffin = {
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GNB
@@ -173,7 +555,7 @@ Guinea_Bissau_War_of_Independence_category = {
 		fire_only_once = yes
 
 		complete_effect = {
-			country_event = gbn_colonial_war.610	
+			country_event = gbn_colonial_war.680	
 		}
 
 		ai_will_do = {
@@ -181,7 +563,9 @@ Guinea_Bissau_War_of_Independence_category = {
 		}
 	}  
 	Operation_Cyclone_II = {	#Helicoptor Assault on PAIGC
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GNB
@@ -199,7 +583,9 @@ Guinea_Bissau_War_of_Independence_category = {
 		}
 	}	
 	Operation_Vulcano = {	
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GNB
@@ -217,7 +603,9 @@ Guinea_Bissau_War_of_Independence_category = {
 		}
 	}	
 	Operation_Little_Cat = {	
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GNB
@@ -235,7 +623,9 @@ Guinea_Bissau_War_of_Independence_category = {
 		}
 	}		
 	Initiate_the_Buba_Attack = {	
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GNB
@@ -254,7 +644,9 @@ Guinea_Bissau_War_of_Independence_category = {
 	}	
 	
 	Operation_Jove = {	
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GNB
@@ -272,7 +664,9 @@ Guinea_Bissau_War_of_Independence_category = {
 		}
 	}		
 	Royal_Amethyst_Operation = {	
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GNB
@@ -282,7 +676,7 @@ Guinea_Bissau_War_of_Independence_category = {
 		fire_only_once = yes
 
 		complete_effect = {
-			country_event = gbn_colonial_war.660	
+			country_event = gbn_colonial_war.670	
 		}
 
 		ai_will_do = {
@@ -290,7 +684,9 @@ Guinea_Bissau_War_of_Independence_category = {
 		}
 	}		
    Operation_Green_Sea = {
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GUI
@@ -302,9 +698,24 @@ Guinea_Bissau_War_of_Independence_category = {
 		fire_only_once = yes
 
 		complete_effect = {
-			GUI = {
-				country_event = gbn_colonial_war.400
-			}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 296
+					num_provinces = 3
+					on_win = gbn_colonial_war.400
+					on_lose = gbn_colonial_war.401
+					on_cancel = gbn_colonial_war.4
+				}
+							
+				defender = {
+					state = 774
+					num_provinces = 3
+					on_win = gbn_colonial_war.401
+					on_lose = gbn_colonial_war.402
+					on_cancel = gbn_colonial_war.4
+				}
+			}			
 		}
 
 		ai_will_do = {
@@ -312,7 +723,9 @@ Guinea_Bissau_War_of_Independence_category = {
 		}
 	}
    Exile_PAIGC = {
-
+		visible = {
+			tag = POR
+		}
 		available = {
 			tag = POR
 			country_exists = GNB
@@ -330,7 +743,7 @@ Guinea_Bissau_War_of_Independence_category = {
 			annex_country = {
 				target = GNB
 			}
-			news_event = gbn_colonial_war.300
+			country_event = gbn_colonial_war.300
 		}
 
 		ai_will_do = {
@@ -338,7 +751,9 @@ Guinea_Bissau_War_of_Independence_category = {
 		}
 	}
    The_Liberation_of_Guinea_Bissau = {
-
+		visible = {
+			tag = GNB
+		}
 	   available = {
 			tag = GNB
 			country_exists = POR
@@ -354,7 +769,7 @@ Guinea_Bissau_War_of_Independence_category = {
 		complete_effect = {
 			clr_global_flag = Portugese_Colonial_War_GNB
 			transfer_state = 296
-			news_event = gbn_colonial_war.301
+			country_event = gbn_colonial_war.301
 		}
 
 
