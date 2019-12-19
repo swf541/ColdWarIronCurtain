@@ -709,6 +709,14 @@ Food_Need_Pulse = {
 		}
 		set_variable = { food_consumption = -2 }
 	}
+	set_variable = { FoodCheck = food_consumption }
+	multiply_variable = { FoodCheck = -1 }
+	
+	set_variable = { FoodTot = resource_produced@rubber }
+	add_to_variable = { FoodTot = resource_imported@rubber }
+	subtract_from_variable = { FoodTot = resource_exported@rubber }
+	subtract_from_variable = { FoodTot = resource_consumed@rubber }
+	
 	
 	meta_effect = {
 		text = {
@@ -719,4 +727,40 @@ Food_Need_Pulse = {
 		}
 		AMNT = "[?food_consumption]"
 	}	
+}
+Food_Level_Verification = { 
+	set_variable = { PriceCheck = FoodCheck }
+	multiply_variable = { PriceCheck = 0.30 }
+	round_variable = PriceCheck
+
+	set_variable = { StarvationCheck = FoodCheck }
+	multiply_variable = { StarvationCheck = -0.5 }
+	round_variable = StarvationCheck
+
+	if = {
+		limit = {
+			check_variable = { FoodTot < PriceCheck }
+			check_variable = { FoodTot > 0 }
+		}
+		add_ideas = famine
+		remove_ideas = famine2
+		remove_ideas = famine3
+	}
+	if = {
+		limit = {
+			check_variable = { FoodTot < 0 }
+			check_variable = { FoodTot > StarvationCheck }
+		}
+		remove_ideas = famine
+		add_ideas = famine2
+		remove_ideas = famine3
+	}
+	if = {
+		limit = {
+			check_variable = { FoodTot < StarvationCheck }
+		}
+		remove_ideas = famine
+		add_ideas = famine2
+		add_ideas = famine3	
+		}
 }
