@@ -1,10 +1,14 @@
 income_effect = {
+	corruption_idea_calc = yes
 	miitary_expenditure = yes
 	welfare_expenditure = yes
 	cpi_expenditure = yes
 	edu_expenditure = yes
 	health_expenditure = yes
 	public_expenditure = yes
+	
+	set_variable = { CorruptPolicyExcess = CorruptionLevel }
+	multiply_variable = { CorruptPolicyExcess = 0.2 }
 	
 	every_owned_state = {
 		add_to_variable = { ROOT.industrial_complex_total = building_level@industrial_complex }  
@@ -120,7 +124,7 @@ income_effect = {
 		multiply_variable = { industrial_complex_total = 1.05 }
 	}
 	add_to_variable = { IncomeTotal = industrial_complex_total }
-	
+	set_variable = { IND_DISPLAY = industrial_complex_total }
 	#agri_industrial_complex
 	if = {
 		limit = {
@@ -166,7 +170,7 @@ income_effect = {
 		multiply_variable = { farm_total = 1.15 }
 	}
 	add_to_variable = { IncomeTotal = farm_total }
-	
+	set_variable = { FARM_DISPLAY = farm_total }
 	#dockyard
 	if = {
 		limit = {
@@ -265,6 +269,7 @@ income_effect = {
 		multiply_variable = { dockyard_total = 1.05 }
 	}
 	add_to_variable = { IncomeTotal = dockyard_total }
+	set_variable = { DOCK_TOTAL = dockyard_total }
 
 	#synthetic_refinery +15%	
 	if = {
@@ -422,6 +427,7 @@ income_effect = {
 		multiply_variable = { office_park_total = 1.15 }
 	}
 	add_to_variable = { IncomeTotal = office_park_total }
+	set_variable { OP_Display = office_park_total }
 	
 	set_variable = { resource_income = 0 }
 	set_variable = { oil_exports = resource_exported@oil } 
@@ -445,6 +451,16 @@ income_effect = {
 	add_to_variable = { resource_income = chromium_exports }
 	
 	add_to_variable = { IncomeTotal = resource_income }
+	
+	set_variable = { display_income = IncomeTotal }
+	
+	set_variable = { CorruptIncomeLoss = CorruptionLevel }
+	multiply_variable = { CorruptIncomeLoss = 0.5 }
+	
+	set_variable = { CorruptLoss = IncomeTotal }
+	multiply_variable = { CorruptLoss = CorruptIncomeLoss }
+	
+	subtract_from_variable = { IncomeTotal = CorruptLoss }
 	
 	set_variable = { resource_cost = 0 }
 	set_variable = { oil_imports = resource_imported@oil } 
@@ -491,6 +507,12 @@ income_effect = {
 	subtract_from_variable = {
 		currentDebt = debtPayment
 	}
+	set_variable = { refinery_total = 0 }
+	
+	add_to_variable = { refinery_total = tungsten_factory_total }
+	add_to_variable = { refinery_total = steel_works_total }
+	add_to_variable = { refinery_total = oil_refinery_total }
+
 
 	set_variable = { IncomeCheck = IncomeTotal }	
 	set_variable = { IncomeTotal = 0 }
@@ -606,6 +628,11 @@ miitary_expenditure = {
 		}
 		multiply_variable = { mil_expend = 1.6 }
 	}
+	set_variable = { mil_expend_cor_penalty = mil_expend }
+	multiply_variable = { mil_expend_cor_penalty = CorruptPolicyExcess }
+	
+	add_to_variable = { mil_expend = mil_expend_cor_penalty }
+	set_variable = { mil_expend_display = mil_expend }
 }	
 welfare_expenditure = {
 	set_variable = { welfare_cost = 0 }
@@ -643,6 +670,11 @@ welfare_expenditure = {
 		}
 		multiply_variable = { welfare_cost = 1.5 }
 	}
+	set_variable = { welfare_cost_cor_penalty = welfare_cost }
+	multiply_variable = { welfare_cost_cor_penalty = CorruptPolicyExcess }
+	
+	add_to_variable = { welfare_cost = welfare_cost_cor_penalty }
+	set_variable = { welfare_cost_display = welfare_cost }
 }
 cpi_expenditure = {
 	set_variable = { cpi_cost = 0 }
@@ -686,6 +718,12 @@ cpi_expenditure = {
 		}
 		multiply_variable = { cpi_cost = 1.5 }
 	}
+	
+	set_variable = { cpi_cost_cor_penalty = cpi_cost }
+	multiply_variable = { cpi_cost_cor_penalty = CorruptPolicyExcess }
+	
+	add_to_variable = { cpi_cost = cpi_cost_cor_penalty }
+	set_variable = { cpi_cost_display = cpi_cost }
 }
 edu_expenditure = {
 	set_variable = { edu_cost = 0 }
@@ -723,7 +761,11 @@ edu_expenditure = {
 		}
 		multiply_variable = { edu_cost = 1.25 }
 	}
-
+	set_variable = { edu_cost_cor_penalty = edu_cost }
+	multiply_variable = { edu_cost_cor_penalty = CorruptPolicyExcess }
+	
+	add_to_variable = { edu_cost = edu_cost_cor_penalty }
+	set_variable = { edu_cost_display = edu_cost }
 }
 health_expenditure = {
 	set_variable = { health_cost = 0 }
@@ -767,6 +809,11 @@ health_expenditure = {
 		}
 		multiply_variable = { health_cost = 1.25 }
 	}
+	set_variable = { health_cost_cor_penalty = health_cost }
+	multiply_variable = { health_cost_cor_penalty = CorruptPolicyExcess }
+		
+	add_to_variable = { health_cost = health_cost_cor_penalty }
+	set_variable = { health_cost_display = health_cost }
 }
 public_expenditure = {
 	set_variable = { pub_cost = 0 }
@@ -798,7 +845,11 @@ public_expenditure = {
 		}
 		multiply_variable = { pub_cost = 0.60 }
 	}
-
+	set_variable = { pub_cost_cor_penalty = pub_cost }
+	multiply_variable = { pub_cost_cor_penalty = CorruptPolicyExcess }
+		
+	add_to_variable = { pub_cost = pub_cost_cor_penalty }
+	set_variable = { health_cost_display = health_cost }
 }
 gdp_calculation = {
 
@@ -1237,4 +1288,7 @@ gdp_calculation = {
 	set_variable = { ROOT.tungsten_factory_totalGDP = 0 }
 	set_variable = { ROOT.office_park_totalGDP = 0 }
 }
+
+
+
 
