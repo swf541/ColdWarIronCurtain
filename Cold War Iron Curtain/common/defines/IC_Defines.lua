@@ -41,6 +41,10 @@ NDefines.NCountry.STATE_VALUE_NON_CORE_STATE_FRACTION = 1
 NDefines.NCountry.POPULATION_YEARLY_GROWTH_BASE = 0.008
 NDefines.NCountry.MIN_COUP_SUCCESS_STABILITY = -2 -- NO COUPS ALLOWED!!!!
 
+NDefines.NCountry.AIR_VOLUNTEER_PLANES_LIMIT = 0.5	-- Ratio for volunteer planes available for sending in relation to sender air force
+NDefines.NCountry.AIR_VOLUNTEER_BASES_CAPACITY_LIMIT = 0.75	-- Ratio for volunteer planes available for sending in relation to receiver air base capacity
+
+
 NDefines.NDiplomacy.BASE_PEACE_TAKE_UNCONTROLLED_STATE_FACTOR = 10.0 -- Base factor for taking state you do not control in %
 NDefines.NDiplomacy.CIVIL_WAR_INVOLVEMENT_MIN_TENSION = 0.0 -- base value of world tension to involve other sides to the civil war
 NDefines.NDiplomacy.IDEOLOGY_JOIN_FACTION_MIN_LEVEL = 0 -- ideology limit required to join faction
