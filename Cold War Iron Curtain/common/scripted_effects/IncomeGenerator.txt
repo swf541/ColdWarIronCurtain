@@ -509,19 +509,99 @@ income_effect = {
 	
 	
 	add_to_variable = { currentMoney = IncomeTotal }
+	set_variable = { IncomeCheck = IncomeTotal }	
+	
+	set_variable = { currentDebtPayments = 0 }
+	for_each_loop = {
+	  array = debtPaymentArray
+	  index = i
+
+	  subtract_from_variable = { debtTotalsArray^i = debtPaymentArray^i } 
+	  subtract_from_variable = { currentMoney = debtPaymentArray^i }
+	  subtract_from_variable = { currentDebt = debtPaymentArray^i }
+	  add_to_variable = { currentDebtPayments = debtPaymentArray^i }
+	  if = {
+		limit = {
+			NOT = {
+				check_variable = {
+					debtOwnerArray^i = THIS.ID
+				}
+			}
+		}
+		debtOwnerArray^i = {
+			add_to_variable = {
+				currentMoney = debtPaymentArray^i
+			}
+		}
+	  }
+	  #if = {
+		#limit = {
+		#	debtsTotalsArray^i = 0
+		#}
+		#remove_from_array = { debtTotalsArray = i }
+		#remove_from_array = { debtPaymentArray = i }
+		#remove_from_array = { debtOwnerArray = i }
+	  #}
+	}
+
 	if = {
 		limit = {
-			check_variable = { currentDebt > 1 }
+			check_variable = { currentMoney < 0 }
+		}	
+		set_variable = {
+			pulse_deficit = currentMoney
 		}
-		clear_variable = currentDebt
-		clear_variable = debtPayment
+		multiply_variable = {
+			pulse_deficit = -1
+		}
+		add_to_variable = { 
+			currentMoney = pulse_deficit 
+		}
+
+		multiply_variable = {	#Interest
+			pulse_deficit = 1.05
+		}
+		add_to_array = {
+			array = debtOwnerArray
+			value = THIS.id
+		}
+		add_to_array = {
+			array = debtTotalsArray
+			value = pulse_deficit
+		}
+
+		add_to_variable = { 
+			currentDebt = pulse_deficit
+		}
+		divide_variable = {
+			pulse_deficit = 120
+		}
+		add_to_variable = { 
+			debtPayment = pulse_deficit
+		}		
+		add_to_array = {
+			array = debtPaymentArray
+			value = debtPayment
+		}
+		add_to_array = {
+			array = debtPaymentArray
+			value = debtPayment
+		}
+
 	}
-	subtract_from_variable = {
-		currentMoney = debtPayment
+	set_variable = {
+		austerityCheck = grossdomesticproduct
 	}
-	subtract_from_variable = {
-		currentDebt = debtPayment
+	multiply_variable = {
+		austerityCheck = 0.55
 	}
+	set_variable = {
+		defaultCheck = grossdomesticproduct
+	}
+	multiply_variable = {
+		defaultCheck = 1.25
+	}
+	
 	set_variable = { refinery_total = 0 }
 	
 	add_to_variable = { refinery_total = tungsten_factory_total }
@@ -529,7 +609,7 @@ income_effect = {
 	add_to_variable = { refinery_total = oil_refinery_total }
 
 
-	set_variable = { IncomeCheck = IncomeTotal }	
+	
 	set_variable = { IncomeTotal = 0 }
 	set_variable = { ROOT.industrial_complex_total = 0 }  
 	set_variable = { ROOT.farm_total = 0 }
@@ -838,25 +918,25 @@ public_expenditure = {
 	multiply_variable = { ROOT.pub_cost = 0.001 }
 	if = {
 		limit = {
-			has_idea = policy_healthcare_temp_0
+			has_idea = policy_services_temp_0
 		}
 		multiply_variable = { pub_cost = 0 }
 	}
 	if = {
 		limit = {
-			has_idea = policy_healthcare_temp_1
+			has_idea = policy_services_temp_1
 		}
 		multiply_variable = { pub_cost = 0.2 }
 	}
 	if = {
 		limit = {
-			has_idea = policy_healthcare_temp_2
+			has_idea = policy_services_temp_2
 		}
 		multiply_variable = { pub_cost = 0.4 }
 	}
 	if = {
 		limit = {
-			has_idea = policy_healthcare_temp_3
+			has_idea = policy_services_temp_3
 		}
 		multiply_variable = { pub_cost = 0.60 }
 	}
@@ -864,7 +944,7 @@ public_expenditure = {
 	multiply_variable = { pub_cost_cor_penalty = CorruptPolicyExcess }
 		
 	add_to_variable = { pub_cost = pub_cost_cor_penalty }
-	set_variable = { health_cost_display = health_cost }
+	set_variable = { pub_cost_display = pub_cost }
 }
 gdp_calculation = {
 
@@ -1308,7 +1388,7 @@ tax_rate = {
 	every_owned_state = {
 		add_to_variable = { ROOT.tax_base = state_population_k }
 	}
-	multiply_variable = { ROOT.tax_base = 0.01 }
+	multiply_variable = { ROOT.tax_base = 0.001 }
 	if = {
 		limit = {
 			has_idea = 	Light_Taxation
