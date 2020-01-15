@@ -1,0 +1,3461 @@
+imf_decisions = {
+	IMF_Pulse_Decision = {		
+		visible = {
+		
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+		}
+		available = {
+			always = yes
+		}
+		
+		activation = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0.14 }
+		}
+
+		is_bad = yes
+		
+		cancel_trigger = {
+			check_variable = { influence_array_calc^IMF_POSITION < 0.14 }
+		}
+
+		selectable_mission = yes
+		days_mission_timeout = 180
+		
+		fixed_random_seed = no
+		
+		timeout_effect = { 
+				if = {
+					limit = {
+						OR = { 
+							check_variable = { influence_array_calc^IMF_POSITION < 0.50 }
+							has_country_flag = IMF_SAP_ENACTED
+						}
+					}
+					hidden_effect = {
+						imf_pulse_effect = yes
+					}
+					country_event = IMF.1	#IMF Reccomendations
+				}
+				if = {
+					limit = {
+						check_variable = { influence_array_calc^IMF_POSITION > 0.49 }
+						NOT = { has_country_flag = IMF_SAP_ENACTED }
+					}
+					set_country_flag = IMF_SAP_ENACTED
+					country_event = IMF.2	#SAP
+				}
+
+			activate_mission = IMF_Pulse_Decision
+			
+		}
+	}
+
+	Cut_Enviromental_Regulations = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = gen_materialist_2
+			}
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = gen_materialist_2
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -50 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -50 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			if = {
+				limit = {
+					has_idea = gen_environmentalist_2
+				}   
+				add_ideas = gen_environmentalist_1
+			}
+			else_if = {
+				limit = {
+					has_idea = gen_environmentalist_1
+				}   
+				add_ideas = gen_balanced_outlook_1
+			}			
+			else_if = {
+				limit = {
+					has_idea = gen_balanced_outlook_1
+				}   
+				add_ideas = gen_balanced_outlook_2
+			}
+			else_if = {
+				limit = {
+					has_idea = gen_balanced_outlook_2
+				}
+				add_ideas = gen_materialist_1
+			}
+			else = {
+				add_ideas = gen_materialist_2
+			}			
+		}
+	}
+	Promote_Women_in_the_Workforce = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = Positive_Action
+			}
+			NOT = {
+				has_idea = Equality
+			}
+
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = Equality
+			}
+			NOT = {
+				has_idea = Positive_Action
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -50 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -50 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			if = {
+				limit = {
+					has_idea = Patriarchy
+				}   
+				remove_ideas = Patriarchy
+				add_ideas = Cognitive_Patriarchy
+			}
+			else_if = {
+				limit = {
+					has_idea = Cognitive_Patriarchy
+				}   
+				remove_ideas = Cognitive_Patriarchy
+				add_ideas = Traditional
+
+			}
+			else_if = {
+				limit = {
+					has_idea = Traditional
+				}
+				remove_ideas = Traditional
+				add_ideas = Womens_Rights_Policy
+
+			}
+			else = {
+				remove_ideas = Womens_Rights_Policy
+				add_ideas = Equality
+
+			}			
+		}
+	}
+
+	Increase_Exports = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = IMF_increase_exports
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 1625
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -50 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -50 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			
+			add_timed_idea = {
+				idea = IMF_increase_exports
+				days = 1625
+			}
+		}
+	}
+	
+	Turn_a_Blind_Eye_to_Unsavory_Business_Practices = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -50 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -50 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			
+			custom_effect_tooltip = Corruption_Increase_5
+			add_to_variable = { CorruptionLevel = 5 }
+			corruption_idea_calc = yes
+		}
+	}
+	
+	
+	Currency_Devaluation = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+			NOT = {
+				has_idea = Currency_Devaluation
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -50 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -50 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			
+			add_timed_idea = {
+				idea = Currency_Devaluation
+				days = 365
+			}
+		}
+	}
+	Privitization_Campaign = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = Privitization
+			}
+
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = Privitization
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 1625
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -200 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -200 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			
+			add_timed_idea = {
+				idea = Privitization
+				days = 1625
+			}
+		}
+	}
+
+	# 
+	Embrace_Free_Trade = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = free_trade
+			}
+
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = free_trade
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -50 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -50 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			
+			add_ideas = free_trade
+		}
+	}
+	Weaken_Union_Protections = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = gen_pro_employer_2
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			if = {
+				limit = {
+					OR = {
+						has_idea = socialist_state_unions
+						has_idea = gen_workers_councils
+					}
+				}   
+				add_ideas = gen_pro_union_2
+			}
+			if = {
+				limit = {
+					has_idea = gen_pro_union_2
+				}   
+				add_ideas = gen_pro_union_1
+			}
+			else_if = {
+				limit = {
+					has_idea = gen_pro_union_1
+				}   
+				add_ideas = gen_balanced_outlook_1
+			}			
+			else_if = {
+				limit = {
+					has_idea = gen_balanced_outlook_1
+				}   
+				add_ideas = gen_balanced_workers_2
+			}
+			else_if = {
+				limit = {
+					has_idea = gen_balanced_workers_2
+				}
+				add_ideas = gen_pro_employer_1
+			}
+			else = {
+				add_ideas = gen_pro_employer_2
+			}			
+		}
+	}
+	Reduce_Bureacracy = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = policy_services_temp_0
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -50 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -50 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			if = {
+				limit = {
+					has_idea = policy_services_temp_3
+				}   
+				add_ideas = policy_services_temp_2
+				remove_ideas = policy_services_temp_3
+			}			
+			else_if = {
+				limit = {
+					has_idea = policy_services_temp_2
+				}   
+				add_ideas = policy_services_temp_1
+				remove_ideas = policy_services_temp_2
+			}
+
+			else = {
+				remove_ideas = policy_services_temp_1
+				add_ideas = policy_services_temp_0
+			}			
+		}
+	}
+	
+	Reduce_Education_Budget = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = policy_education_temp_0
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			if = {
+				limit = {
+					has_idea = policy_education_temp_4
+				}   
+				add_ideas = policy_education_temp_3
+				remove_ideas = policy_education_temp_4
+			}			
+			else_if = {
+				limit = {
+					has_idea = policy_education_temp_3
+				}   
+				add_ideas = policy_education_temp_2
+				remove_ideas = policy_education_temp_3
+			}
+			else_if = {
+				limit = {
+					has_idea = policy_education_temp_2
+				}   
+				add_ideas = policy_education_temp_1
+				remove_ideas = policy_education_temp_2
+			}
+			else = {
+				remove_ideas = policy_education_temp_1
+				add_ideas = policy_education_temp_0
+			}			
+		}
+	}	
+	Cut_Healthcare_Benefits = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = policy_education_temp_0
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			if = {
+				limit = {
+					has_idea = policy_healthcare_temp_5
+				}   
+				add_ideas = policy_healthcare_temp_4
+				remove_ideas = policy_healthcare_temp_5
+			}			
+			else_if = {
+				limit = {
+					has_idea = policy_healthcare_temp_4
+				}   
+				add_ideas = policy_healthcare_temp_3
+				remove_ideas = policy_healthcare_temp_4
+			}
+			else_if = {
+				limit = {
+					has_idea = policy_healthcare_temp_3
+				}   
+				add_ideas = policy_healthcare_temp_2
+				remove_ideas = policy_healthcare_temp_3
+			}
+			else_if = {
+				limit = {
+					has_idea = policy_healthcare_temp_2
+				}   
+				add_ideas = policy_healthcare_temp_1
+				remove_ideas = policy_healthcare_temp_2
+			}
+			else = {
+				remove_ideas = policy_healthcare_temp_1
+				add_ideas = policy_healthcare_temp_0
+			}			
+		}
+	}		
+	Rollback_the_Welfare_State = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = policy_welfare_temp_0
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			if = {
+				limit = {
+					has_idea = policy_welfare_temp_5
+				}   
+				add_ideas = policy_welfare_temp_4
+				remove_ideas = policy_welfare_temp_5
+			}			
+			else_if = {
+				limit = {
+					has_idea = policy_welfare_temp_4
+				}   
+				add_ideas = policy_welfare_temp_3
+				remove_ideas = policy_welfare_temp_4
+			}
+			else_if = {
+				limit = {
+					has_idea = policy_welfare_temp_3
+				}   
+				add_ideas = policy_welfare_temp_2
+				remove_ideas = policy_welfare_temp_3
+			}
+			else_if = {
+				limit = {
+					has_idea = policy_welfare_temp_2
+				}   
+				add_ideas = policy_welfare_temp_1
+				remove_ideas = policy_welfare_temp_2
+			}
+			else = {
+				remove_ideas = policy_welfare_temp_1
+				add_ideas = policy_welfare_temp_0
+			}			
+		}
+	}		
+
+	Foster_Positive_Business_Climate = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = Austrian_Taxation
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			if = {
+				limit = {
+					has_idea = Marxist_Taxation
+				}   
+				add_ideas = Heavy_Taxation
+				remove_ideas = Marxist_Taxation
+			}			
+			else_if = {
+				limit = {
+					has_idea = Heavy_Taxation
+				}   
+				add_ideas = Progressive_Taxation
+				remove_ideas = Heavy_Taxation
+			}
+			else_if = {
+				limit = {
+					has_idea = Progressive_Taxation
+				}   
+				add_ideas = Moderate_Taxation
+				remove_ideas = Progressive_Taxation
+			}
+			else_if = {
+				limit = {
+					has_idea = Moderate_Taxation
+				}   
+				add_ideas = Light_Taxation
+				remove_ideas = Moderate_Taxation
+			}
+			else = {
+				remove_ideas = Light_Taxation
+				add_ideas = Austrian_Taxation
+			}			
+		}
+	}	
+	Weaken_Worker_Safety_Regulations = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = weaken_safety_regulations
+			}
+
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = weaken_safety_regulations
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -75 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -75 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			if = {
+				limit = {
+					has_idea = safety_regulations
+				}
+				remove_ideas = safety_regulations
+			}
+			else = {
+				add_timed_idea = {
+					idea = weaken_safety_regulations
+					days = 1625
+				}
+			}
+		}
+	}
+
+	Relax_Working_Hours_Limits = {
+
+		icon = generic_industry
+
+		visible = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = free_trade
+			}
+
+		}
+		available = {
+			check_variable = { influence_array_calc^IMF_POSITION > 0 }
+			NOT = { 
+				has_idea = increase_working_hours
+			}
+			NOT = {
+				has_idea = IMF_Recent_Change
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = IMF_Recent_Change
+				days = 50
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = -100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = -100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			add_timed_idea = {
+				idea = increase_working_hours
+				days = 1095
+			}
+		}
+	}
+	
+	
+
+	Seek_5_Million_from_the_International_Monetary_Fund = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			is_subject = no
+		}
+
+		fire_only_once = no
+		days_re_enable = 0
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = 25 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = 25 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 5
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.015
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = GER.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 36
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_25_Million_from_the_International_Monetary_Fund = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			is_subject = no
+		}
+
+		fire_only_once = no
+		days_re_enable = 0
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 25
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.015
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = GER.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 36
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_100_Million_from_the_International_Monetary_Fund = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			is_subject = no
+		}
+
+		fire_only_once = no
+		days_re_enable = 0
+
+
+		cost = 0
+
+		complete_effect = {
+
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = 250 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = 250 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 100
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.01
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = GER.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 36
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+}
+economy_decisions = {
+ 	Seek_5_Million_from_the_Americans = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = USA
+			NOT = { original_tag = USA }
+			is_subject = no
+			NOT = { has_government = communism }
+			NOT = { has_government = maoism }
+			USA = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = USA }
+					}
+					add_to_variable = { influence_array_val^v = 5 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = USA.id }
+					add_to_array = { influence_array_val = 5 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 5
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = USA.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_25_Million_from_the_Americans = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = USA
+			NOT = { original_tag = USA }
+			is_subject = no
+			NOT = { has_government = communism }
+			NOT = { has_government = maoism }
+
+			USA = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = USA }
+					}
+					add_to_variable = { influence_array_val^v = 25 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = USA.id }
+					add_to_array = { influence_array_val = 25 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 25
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = USA.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_100_Million_from_the_Americans = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = USA
+			NOT = { original_tag = USA }
+			is_subject = no
+			NOT = { has_government = communism }
+			NOT = { has_government = maoism }
+
+			USA = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = USA }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = USA.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 100
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = USA.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	
+ 	Seek_5_Million_from_the_Russians = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = SOV
+			NOT = { original_tag = SOV }
+			is_subject = no
+			SOV = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = SOV }
+					}
+					add_to_variable = { influence_array_val^v = 5 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = SOV.idinfluence_array = SOV.id }
+					add_to_array = { influence_array_val = 5 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 5
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = SOV.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_25_Million_from_the_Russians = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = SOV
+			NOT = { original_tag = SOV }
+			is_subject = no
+			SOV = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = SOV }
+					}
+					add_to_variable = { influence_array_val^v = 25 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = SOV.id }
+					add_to_array = { influence_array_val = 25 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 25
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = SOV.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_100_Million_from_the_Russians = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = SOV
+			NOT = { original_tag = SOV }
+			is_subject = no
+			SOV = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = SOV }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = SOV.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 100
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = SOV.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	
+ 	Seek_5_Million_from_the_British = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = ENG
+			NOT = { original_tag = ENG }
+			is_subject = no
+			ENG = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = ENG }
+					}
+					add_to_variable = { influence_array_val^v = 5 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = ENG.idinfluence_array = ENG.id }
+					add_to_array = { influence_array_val = 5 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 5
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = ENG.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_25_Million_from_the_British = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = ENG
+			NOT = { original_tag = ENG }
+			is_subject = no
+			ENG = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = ENG }
+					}
+					add_to_variable = { influence_array_val^v = 25 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = ENG.id }
+					add_to_array = { influence_array_val = 25 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 25
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = ENG.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_100_Million_from_the_British = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = ENG
+			NOT = { original_tag = ENG }
+			is_subject = no
+			ENG = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = ENG }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = ENG.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 100
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = ENG.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+	
+ 	Seek_5_Million_from_the_Germans = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = WGR
+			NOT = { original_tag = WGR }
+			is_subject = no
+			WGR = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = WGR }
+					}
+					add_to_variable = { influence_array_val^v = 5 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = WGR.idinfluence_array = WGR.id }
+					add_to_array = { influence_array_val = 5 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 5
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = WGR.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_25_Million_from_the_Germans = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = WGR
+			NOT = { original_tag = WGR }
+			is_subject = no
+			WGR = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = WGR }
+					}
+					add_to_variable = { influence_array_val^v = 25 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = WGR.id }
+					add_to_array = { influence_array_val = 25 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 25
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = WGR.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_100_Million_from_the_Germans = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = WGR
+			NOT = { original_tag = WGR }
+			is_subject = no
+			WGR = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = WGR }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = WGR.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 100
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = WGR.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+	
+ 	Seek_5_Million_from_the_French = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = FRA
+			NOT = { original_tag = FRA }
+			is_subject = no
+			FRA = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = FRA }
+					}
+					add_to_variable = { influence_array_val^v = 5 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = FRA.idinfluence_array = FRA.id }
+					add_to_array = { influence_array_val = 5 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 5
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = FRA.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_25_Million_from_the_French = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = FRA
+			NOT = { original_tag = FRA }
+			is_subject = no
+			FRA = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = FRA }
+					}
+					add_to_variable = { influence_array_val^v = 25 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = FRA.id }
+					add_to_array = { influence_array_val = 25 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 25
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = FRA.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_100_Million_from_the_French = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = FRA
+			NOT = { original_tag = FRA }
+			is_subject = no
+			FRA = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = FRA }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = FRA.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 100
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = FRA.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+	
+	#The TAZARA Railway (PRC Decision)
+	
+
+
+ 	Request_Chinese_Technical_Advisors = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = PRC
+			NOT = { original_tag = PRC }
+			is_subject = no
+			check_variable = { grossdomesticproduct > 35 }
+			OR = {
+				has_government = socialist
+				has_government = maoism
+				has_government = communism
+				has_government = nationalism
+				has_government = trotskyism 
+				has_government = fascism
+			}
+			PRC = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 3650
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = PRC_technical_advisors
+				days = 3650
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = PRC }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = PRC.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+		}
+	}
+
+
+ 	Request_Chinese_Educational_Support = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = PRC
+			NOT = { original_tag = PRC }
+			is_subject = no
+			OR = {
+				has_idea = policy_education_temp_0
+				has_idea = policy_education_temp_1
+			}
+			OR = {
+				has_government = socialist
+				has_government = maoism
+				has_government = communism
+				has_government = nationalism
+				has_government = trotskyism 
+				has_government = fascism
+			}
+			PRC = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 3650
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = PRC_Educational_Advisors
+				days = 3650
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = PRC }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = PRC.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+		}
+	}
+
+
+ 	Request_Chinese_Medical_Assistance = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = PRC
+			NOT = { original_tag = PRC }
+			is_subject = no
+			OR = {
+				has_idea = policy_healthcare_temp_0
+				has_idea = policy_healthcare_temp_1
+			}
+			OR = {
+				has_government = socialist
+				has_government = maoism
+				has_government = communism
+				has_government = nationalism
+				has_government = trotskyism 
+				has_government = fascism
+			}
+			PRC = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 3650
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = PRC_Health_Advisors
+				days = 3650
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = PRC }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = PRC.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+		}
+	}
+
+
+
+ 	Request_Chinese_Military_Advisors = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = PRC
+			NOT = { original_tag = PRC }
+			is_subject = no
+
+			OR = {
+				has_government = socialist
+				has_government = maoism
+				has_government = communism
+				has_government = nationalism
+				has_government = trotskyism 
+				has_government = fascism
+			}
+			PRC = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 3650
+
+
+		cost = 0
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = chinese_advisors
+				days = 3650
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = PRC }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = PRC.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+		}
+	}
+
+ 	Seek_5_Million_from_the_Chinese = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = PRC
+			NOT = { original_tag = PRC }
+			is_subject = no
+			OR = {
+				has_government = socialist
+				has_government = maoism
+				has_government = communism
+				has_government = nationalism
+				has_government = trotskyism 
+				has_government = fascism
+			}
+			PRC = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = PRC }
+					}
+					add_to_variable = { influence_array_val^v = 5 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = PRC.id }
+					add_to_array = { influence_array_val = 5 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 5
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = PRC.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_25_Million_from_the_Chinese = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = PRC
+			NOT = { original_tag = PRC }
+			is_subject = no
+			OR = {
+				has_government = socialist
+				has_government = maoism
+				has_government = communism
+				has_government = nationalism
+				has_government = trotskyism 
+				has_government = fascism
+			}
+			PRC = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = PRC }
+					}
+					add_to_variable = { influence_array_val^v = 25 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = PRC.id }
+					add_to_array = { influence_array_val = 25 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 25
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = PRC.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Seek_100_Million_from_the_Chinese = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = PRC
+			NOT = { original_tag = PRC }
+			is_subject = no
+			OR = {
+				has_government = socialist
+				has_government = maoism
+				has_government = communism
+				has_government = nationalism
+				has_government = trotskyism 
+				has_government = fascism
+			}
+			PRC = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 365
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = PRC }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = PRC.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			set_variable = {
+				pulse_deficit = 100
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.03
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = PRC.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 60
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+	Seek_Chinese_Financial_Aid = {
+
+		icon = generic_industry
+
+		visible = {
+			is_subject = no
+		}
+		available = {
+			country_exists = PRC
+			NOT = { original_tag = PRC }
+			is_subject = no
+			OR = {
+				has_government = socialist
+				has_government = maoism
+				has_government = communism
+				has_government = nationalism
+				has_government = trotskyism 
+				has_government = fascism
+			}
+			PRC = {
+				has_opinion = {
+					target = ROOT
+					value = 25
+				}
+			}
+		}
+
+		fire_only_once = no
+		days_re_enable = 1095
+
+
+		cost = 0
+
+		complete_effect = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = PRC }
+					}
+					add_to_variable = { influence_array_val^v = 25 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = PRC.id }
+					add_to_array = { influence_array_val = 25 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+
+			add_to_variable = { 
+				currentMoney = 25 
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}	
+	
+	
+	##Weaken Child Labor Laws
+	ic_Financial = {
+		
+		allowed = {
+		  always = yes
+		}
+		
+		visible = {
+			always = yes
+		}
+		available = {
+			always = no
+		}
+		
+
+
+		activation = {
+			always = yes
+		}
+
+		#is_good = yes
+
+		selectable_mission = yes
+		days_mission_timeout = 30
+		
+
+		
+		timeout_effect = {
+			hidden_effect = {
+				income_effect = yes
+				country_event = resource.1
+				activate_mission = ic_Financial
+				if = {
+					limit = {
+						has_country_flag = latam_authoritarian
+					}
+					authoriatiran_gfx_display_latam = yes
+					latam_authoritarian_ideas_update = yes
+				}
+				every_owned_state = {
+					limit = {
+						has_state_flag = napalm_attacked
+					}
+					add_to_variable = { napalm_total = -1 }
+					if = {
+						limit = {
+							check_variable = { napalm_total < 1 }
+						}
+						clr_state_flag = napalm_attacked
+						set_variable = { napalm_total = 0 }
+						remove_province_modifier = {
+							static_modifiers = { napalm }
+							province = {
+								all_provinces = yes 
+							}
+						}						
+					}
+				}
+				every_owned_state = {
+					limit = {
+						has_state_flag = agent_orange_attacked
+					}
+					add_to_variable = { agent_orange_total = -1 }
+					if = {
+						limit = {
+							check_variable = { napalm_total < 1 }
+						}
+						clr_state_flag = agent_orange_attacked
+						set_variable = { agent_orange_total = 0 }
+						remove_province_modifier = {
+							static_modifiers = { agent_orange2 }
+							province = {
+								all_provinces = yes 
+							}
+						}						
+					}
+				}
+				every_owned_state = {
+					limit = {
+						has_state_flag = mustard_gas_attacked
+					}
+					add_to_variable = { mustard_gas_total = -1 }
+					if = {
+						limit = {
+							check_variable = { mustard_gas_total < 1 }
+						}
+						clr_state_flag = mustard_gas_attacked
+						set_variable = { mustard_gas_total = 0 }
+						remove_province_modifier = {
+							static_modifiers = { mustard_gas }
+							province = {
+								all_provinces = yes 
+							}
+						}						
+					}
+				}
+				every_owned_state = {
+					limit = {
+						has_state_flag = white_phosphorus_attacked
+					}
+					add_to_variable = { white_phosphorus_total = -1 }
+					if = {
+						limit = {
+							check_variable = { white_phosphorus_total < 1 }
+						}
+						clr_state_flag = white_phosphorus_attacked
+						set_variable = { white_phosphorus_total = 0 }
+						remove_province_modifier = {
+							static_modifiers = { white_phosphorus }
+							province = {
+								all_provinces = yes 
+							}
+						}						
+					}
+				}
+				every_owned_state = {
+					limit = {
+						has_state_flag = sarin_attacked
+					}
+					add_to_variable = { sarin_total = -1 }
+					if = {
+						limit = {
+							check_variable = { sarin_total < 1 }
+						}
+						clr_state_flag = sarin_attacked
+						set_variable = { sarin_total = 0 }
+						remove_province_modifier = {
+							static_modifiers = { sarin }
+							province = {
+								all_provinces = yes 
+							}
+						}						
+					}
+				}
+				every_owned_state = {
+					limit = {
+						has_state_flag = vx_attacked
+					}
+					add_to_variable = { vx_total = -1 }
+					if = {
+						limit = {
+							check_variable = { vx_total < 1 }
+						}
+						clr_state_flag = vx_attacked
+						set_variable = { vx_total = 0 }
+						remove_province_modifier = {
+							static_modifiers = { vx }
+							province = {
+								all_provinces = yes 
+							}
+						}						
+					}
+				}
+			}
+		}
+
+
+		complete_effect = {
+			hidden_effect = {
+				every_country = {
+					income_effect = yes
+				}
+			}
+		}
+		
+		ai_will_do = {
+			factor = 100
+		}
+	}
+	dismantle_maginot = {
+
+		icon = generic_construction
+
+		allowed = {
+			NOT = { OR = { tag = GER tag = FRA } }
+		}
+
+		cost = 50
+		fire_only_once = yes
+
+		days_remove = 200
+
+		available = {
+			controls_state = 28
+		}
+
+		visible = {
+			any_state = {
+				is_owned_by = FRA
+				is_controlled_by = ROOT
+			}
+			NOT = { is_in_faction_with = FRA }
+		}
+
+		modifier = {
+			civilian_factory_use = 5
+		}
+
+		complete_effect = {
+			28 = {
+				set_building_level = {
+					type = bunker
+					level = 2
+					province = {
+						all_provinces = yes
+						level > 2
+					}
+				}
+			}
+		}
+	}		
+}

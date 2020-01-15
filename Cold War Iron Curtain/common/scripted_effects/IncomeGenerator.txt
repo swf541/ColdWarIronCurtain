@@ -520,6 +520,7 @@ income_effect = {
 	  subtract_from_variable = { currentMoney = debtPaymentArray^i }
 	  subtract_from_variable = { currentDebt = debtPaymentArray^i }
 	  add_to_variable = { currentDebtPayments = debtPaymentArray^i }
+
 	  if = {
 		limit = {
 			NOT = {
@@ -527,12 +528,48 @@ income_effect = {
 					debtOwnerArray^i = THIS.ID
 				}
 			}
+			NOT = {
+				check_variable = {
+					debtOwnerArray^i = GER.ID
+				}
+			}
 		}
-		debtOwnerArray^i = {
+		 var:debtOwnerArray^i = {
 			add_to_variable = {
 				currentMoney = debtPaymentArray^i
 			}
 		}
+	  }
+	  if = {
+		limit = {
+			check_variable = {
+				debtOwnerArray^i = GER.ID
+			}
+		}
+		 var:debtOwnerArray^i = {
+			add_to_variable = {
+				currentMoney = debtPaymentArray^i
+			}
+			set_temp_variable = { temp_debt_pay = debtPaymentArray^i }
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					subtract_from_variable = { influence_array_val^v = temp_debt_pay }
+				}
+			}
+		}
+	  }
+	  if = {
+		limit = {
+			check_variable = {
+				debtOwnerArray^i = THIS.ID
+			}
+		}
+		subtract_from_variable = { domesticTotalDebt = debtPaymentArray^i } 
 	  }
 	  #if = {
 		#limit = {
@@ -544,48 +581,176 @@ income_effect = {
 	  #}
 	}
 
+	set_variable = { domesticTotalDebtK = domesticTotalDebt }
+	divide_variable = { domesticTotalDebtK = 1000 }
+	set_variable = { gdpDomesticDebtLimit = 0.40 }
+	if = {
+		limit = { 
+			check_variable = {
+				grossdomesticproduct > 1
+			}
+		}
+		add_to_variable = {
+			gdpDomesticDebtLimit = 0.10
+		}
+	}
+	if = {
+		limit = { 
+			check_variable = {
+				grossdomesticproduct > 5
+			}
+		}
+		add_to_variable = {
+			gdpDomesticDebtLimit = 0.10
+		}
+	}
+	if = {
+		limit = { 
+			check_variable = {
+				grossdomesticproduct > 10
+			}
+		}
+		add_to_variable = {
+			gdpDomesticDebtLimit = 0.10
+		}
+	}
+	if = {
+		limit = { 
+			check_variable = {
+				grossdomesticproduct > 100
+			}
+		}
+		add_to_variable = {
+			gdpDomesticDebtLimit = 0.10
+		}
+	}
+	if = {
+		limit = { 
+			check_variable = {
+				grossdomesticproduct > 1000
+			}
+		}
+		add_to_variable = {
+			gdpDomesticDebtLimit = 0.10
+		}
+	}
 	if = {
 		limit = {
 			check_variable = { currentMoney < 0 }
 		}	
-		set_variable = {
-			pulse_deficit = currentMoney
-		}
-		multiply_variable = {
-			pulse_deficit = -1
-		}
-		add_to_variable = { 
-			currentMoney = pulse_deficit 
-		}
+		if = {
+			limit = {
+				OR = {
+					check_variable = { domesticTotalDebtK < gdpDomesticDebtLimit }
+					check_variable = { domesticTotalDebtK = gdpDomesticDebtLimit }
+				}
+			}
+			set_variable = {
+				pulse_deficit = currentMoney
+			}
+			multiply_variable = {
+				pulse_deficit = -1
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
 
-		multiply_variable = {	#Interest
-			pulse_deficit = 1.05
-		}
-		add_to_array = {
-			array = debtOwnerArray
-			value = THIS.id
-		}
-		add_to_array = {
-			array = debtTotalsArray
-			value = pulse_deficit
-		}
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.05
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = THIS.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
 
-		add_to_variable = { 
-			currentDebt = pulse_deficit
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			add_to_variable = { 
+				domesticTotalDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 120
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
 		}
-		divide_variable = {
-			pulse_deficit = 120
-		}
-		add_to_variable = { 
-			debtPayment = pulse_deficit
-		}		
-		add_to_array = {
-			array = debtPaymentArray
-			value = debtPayment
-		}
-		add_to_array = {
-			array = debtPaymentArray
-			value = debtPayment
+		if = {
+			limit = {
+				check_variable = { domesticTotalDebtK > gdpDomesticDebtLimit }
+			}
+			set_variable = {
+				pulse_deficit = currentMoney
+			}
+			multiply_variable = {
+				pulse_deficit = -1
+			}
+			add_to_variable = { 
+				currentMoney = pulse_deficit 
+			}
+
+			multiply_variable = {	#Interest
+				pulse_deficit = 1.025
+			}
+			add_to_array = {
+				array = debtOwnerArray
+				value = GER.id
+			}
+			add_to_array = {
+				array = debtTotalsArray
+				value = pulse_deficit
+			}
+
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = GER }
+					}
+					add_to_variable = { influence_array_val^v = pulse_deficit }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = GER.id }
+					add_to_array = { influence_array_val = pulse_deficit }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+				
+			
+			add_to_variable = { 
+				currentDebt = pulse_deficit
+			}
+			divide_variable = {
+				pulse_deficit = 36
+			}
+			add_to_variable = { 
+				debtPayment = pulse_deficit
+			}		
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
+			add_to_array = {
+				array = debtPaymentArray
+				value = debtPayment
+			}
 		}
 
 	}
