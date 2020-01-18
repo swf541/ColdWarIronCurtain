@@ -68,6 +68,8 @@ NDefines.NDiplomacy.VOLUNTEERS_DIVISIONS_REQUIRED = 1 -- This many divisons are 
 NDefines.NDiplomacy.VOLUNTEERS_PER_COUNTRY_ARMY = 0.10 -- Each army unit owned by the source country contributes this amount of volunteers to the limit.
 NDefines.NDiplomacy.VOLUNTEERS_PER_TARGET_PROVINCE = 0.10 -- Each province owned by the target country contributes this amount of volunteers to the limit.
 
+NDefines.NDiplomacy.VOLUNTEERS_TRANSFER_SPEED = 7
+
 NDefines.NGame.END_DATE = "2050.5.23.12"
 NDefines.NGame.START_DATE = "1945.5.23.12"
 
