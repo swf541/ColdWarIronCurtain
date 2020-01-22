@@ -1,0 +1,59 @@
+﻿irrigation_setup = {
+#basic 			0
+#lakes 			2
+#river 			4
+#riverlarge 	6
+#freshwatersea 	8
+	#12.5% Bonus Per Level
+	every_state = {
+		if = {
+			limit = {
+				has_state_flag = freshwatersea
+			}
+			set_variable = { max_irrigation = 8 }
+			set_state_flag = irrigation_enabled
+			every_neighbor_state = {
+				limit = {
+					NOT = {
+						has_state_flag = freshwatersea
+					}
+					set_state_flag = irrigation_enabled
+					set_variable = { max_irrigation = 4 }
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_state_flag = riverlarge
+			}
+			set_variable = { max_irrigation = 6 }
+			set_state_flag = irrigation_enabled
+			every_neighbor_state = {
+				limit = {
+					NOT = { has_state_flag = freshwatersea }
+					NOT = { has_state_flag = riverlarge }
+					NOT = { has_state_flag = irrigation_enabled }
+				}
+				set_state_flag = irrigation_enabled
+				set_variable = { max_irrigation = 3 }
+			}
+		}
+
+		else_if = {
+			limit = {
+				has_state_flag = river
+			}
+			add_to_variable = { max_irrigation = 2 }
+			set_state_flag = irrigation_enabled
+		}
+		else_if = {
+			limit = {
+				has_state_flag = lakes
+			}
+			add_to_variable = { max_irrigation = 2 }
+			set_state_flag = irrigation_enabled
+		}
+		else = {
+		}
+	}
+}

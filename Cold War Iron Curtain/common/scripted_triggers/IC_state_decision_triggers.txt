@@ -1,0 +1,60 @@
+sd_complete_check_conditions = {	
+	if = {
+		limit = {
+			check_variable = { v = 1 }	##Increase Development Level
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { v = 2 }	##Increase Irrigation Level
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { v = 3 }
+		}
+		has_state_flag = resource_exploit_cooldown 
+		check_variable = { exploiter_id = ROOT.id }
+	}
+	else = {
+		always = no
+	}
+}
+
+sd_available_conditions = {
+
+	if = {
+		limit = {
+			check_variable = { v = 1 }
+		}
+
+	}
+	else_if = {
+		limit = {
+			check_variable = { v = 2 }
+
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { v = 3 }
+		}
+		NOT = { has_state_flag = resource_exploit_cooldown }
+		NOT = { check_variable = { exploiter_id = ROOT.id } }
+		owner = {
+			controls_state = PREV
+			owner = { NOT = { tag = ROOT } }
+		}
+		OR = {
+			owner = { is_subject_of = ROOT }
+			AND = {
+				owner = { check_variable = { influence_array_val^0 = ROOT.id } }
+				owner = { check_variable = { influence_array_calc^0 = 0.65.id } }
+			}
+		}
+	}
+	else = {
+		always = no
+	}
+}
+
