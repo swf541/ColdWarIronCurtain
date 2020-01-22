@@ -566,19 +566,26 @@ income_effect = {
 	  if = {
 		limit = {
 			check_variable = {
-				debtOwnerArray^i = THIS.ID
+				var:debtOwnerArray^i = THIS.ID
 			}
 		}
 		subtract_from_variable = { domesticTotalDebt = debtPaymentArray^i } 
 	  }
-	  #if = {
-		#limit = {
-		#	debtsTotalsArray^i = 0
-		#}
-		#remove_from_array = { debtTotalsArray = i }
-		#remove_from_array = { debtPaymentArray = i }
-		#remove_from_array = { debtOwnerArray = i }
-	  #}
+	  if = {
+		limit = {
+			OR = {
+				check_variable = {
+					var:debtOwnerArray^i = 0
+				}
+				check_variable = {
+					var:debtOwnerArray^i < 1
+				}				
+			}
+		}
+		remove_from_array = { debtTotalsArray = i }
+		remove_from_array = { debtPaymentArray = i }
+		remove_from_array = { debtOwnerArray = i }
+	  }
 	}
 
 	set_variable = { domesticTotalDebtK = domesticTotalDebt }
