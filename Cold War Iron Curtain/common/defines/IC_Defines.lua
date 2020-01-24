@@ -22,7 +22,7 @@ NDefines.NAir.NAVAL_STRIKE_DAMAGE_TO_STR = 2 -- Balancing value to convert damag
 NDefines.NAir.MISSION_COMMAND_POWER_COSTS = {  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
 NDefines.NAir.CAS_NIGHT_ATTACK_FACTOR = 0.5 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
 
-NDefines.NBuildings.AIRBASE_CAPACITY_MULT = 40 -- Each level of airbase building multiplied by this, gives capacity (max operational value). Value is int. 1 for each airplane.
+NDefines.NBuildings.AIRBASE_CAPACITY_MULT = 50 -- Each level of airbase building multiplied by this, gives capacity (max operational value). Value is int. 1 for each airplane.
 NDefines.NBuildings.ANTI_AIR_SUPERIORITY_MULT = 100.0 -- How much air superiority reduction to the enemy does our AA guns? Normally each building level = -1 reduction. With this multiplier.
 NDefines.NBuildings.INFRASTRUCTURE_RESOURCE_BONUS= 0.0
 NDefines.NBuildings.MAX_BUILDING_LEVELS = 200
