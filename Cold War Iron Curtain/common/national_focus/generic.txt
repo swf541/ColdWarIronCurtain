@@ -35,14 +35,11 @@ focus_tree = {
 		}
 		x = 59
 		y = 3
-			
 		completion_reward = {
 			add_ideas = thicc_intel_network
 			remove_ideas = intel_network
 		}
-
-	}	
-#####
+	}
 	focus = {
 		id = military_naval_expansion
 		icon = GFX_focus_generic_navy_battleship2
@@ -53,41 +50,63 @@ focus_tree = {
 		}
 		x = 57
 		y = 6
-			
-			available = {
-					any_state = {
-							is_coastal = yes
-							is_controlled_by = ROOT
-						}
+		available = {
+			AND = {
+				any_state = {
+					is_coastal = yes
+					is_controlled_by = ROOT
 				}
-			available = {
+				NOT = {
+					has_idea = infrastructure_boost_general
+					has_idea = civilian_boost_general
+					has_idea = military_boost_general
+					has_idea = navy_boost_general
+				}
+			}
+		}
+		completion_reward = {
+			add_timed_idea = {
+				idea = navy_boost_general
+				days = 180
+			}
+			navy_experience = 25
+			if = {
+				limit = {
 					NOT = {
-							has_idea = infrastructure_boost_general
-							has_idea = civilian_boost_general
-							has_idea = military_boost_general
-							has_idea = navy_boost_general
+						any_owned_state = {
+							free_building_slots = {
+								building = dockyard
+								size > 2
+								include_locked = yes
+							}
 						}
+					}
+					any_owned_state = {
+						is_coastal = yes
+					}
+					owner = {
+						num_of_military_factories > 10
+					}
 				}
-			complete_tooltip = {
-					navy_experience = 25
+				random_owned_controlled_state = {
+					limit = {
+						is_coastal = yes
+						free_building_slots = {
+							building = dockyard
+							size > 1
+							include_locked = yes
+						}
+					}
 					add_extra_state_shared_building_slots = 2
 					add_building_construction = {
-							type = dockyard
-							level = 2
-							instant_build = yes
-						}
+						type = dockyard
+						level = 2
+						instant_build = yes
+					}
 				}
-			completion_reward = {
-					add_timed_idea = {
-							idea = navy_boost_general
-							days = 180
-						}
-					navy_experience = 25
-					add_offsite_building = { type = dockyard level = 3 }
-				}
-
-	}	
-	####
+			}
+		}
+	}
 	focus = {
 		id = interior_minister
 		icon = GFX_Freedom
@@ -163,11 +182,9 @@ focus_tree = {
 		}
 		x = 57
 		y = 2
-			
-			completion_reward = {
-					add_ideas = internal_audits
-				}
-
+		completion_reward = {
+			add_ideas = internal_audits
+		}
 	}
 	focus = {
 		id = interior_internal_2
@@ -179,16 +196,10 @@ focus_tree = {
 		}
 		x = 57
 		y = 3
-			
-			completion_reward = {
-					add_stability = 0.10
-				}
-
+		completion_reward = {
+			add_stability = 0.05
+		}
 	}
-
-	
-	#####
-	
 	focus = {
 		id = civilian_industrialize
 		icon = GFX_focus_generic_industry_3
@@ -199,75 +210,35 @@ focus_tree = {
 		}
 		x = 45
 		y = 6
-			
-			ai_will_do = {
-					factor = 2
+		available = {
+			NOT = {
+				has_idea = infrastructure_boost_general
+				has_idea = civilian_boost_general
+				has_idea = military_boost_general
+				has_idea = navy_boost_general
+			}
+		}
+		completion_reward = {
+			add_timed_idea = {
+				idea = civilian_boost_general
+				days = 180
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = industrial_complex
+						size > 0
+						include_locked = yes
+					}
 				}
-			available = {
-					NOT = {
-							has_idea = infrastructure_boost_general
-							has_idea = civilian_boost_general
-							has_idea = military_boost_general
-							has_idea = navy_boost_general
-						}
-				}
-			bypass = {
-					custom_trigger_tooltip = {
-							tooltip = construction_effort_tt
-							all_owned_state = {
-									free_building_slots = {
-											building = industrial_complex
-											size < 1
-											include_locked = yes
-										}
-								}
-						}
-				}
-			complete_tooltip = {
-					add_extra_state_shared_building_slots = 1
-					add_building_construction = {
-							type = industrial_complex
-							level = 1
-							instant_build = yes
-						}
-				}
-			completion_reward = {
-					add_timed_idea = {
-							idea = civilian_boost_general
-							days = 180
-						}
-					random_owned_controlled_state = {
-							limit = {
-									free_building_slots = {
-											building = industrial_complex
-											size > 0
-											include_locked = yes
-										}
-									OR = {
-											is_in_home_area = yes
-											NOT = {
-													owner = {
-															any_owned_state = {
-																	free_building_slots = {
-																			building = industrial_complex
-																			size > 0
-																			include_locked = yes
-																		}
-																	is_in_home_area = yes
-																}
-														}
-												}
-										}
-								}
-							add_extra_state_shared_building_slots = 1
-							add_building_construction = {
-									type = industrial_complex
-									level = 1
-									instant_build = yes
-								}
-						}
-				}
-
+			}
+			add_extra_state_shared_building_slots = 1
+			add_building_construction = {
+				type = industrial_complex
+				level = 1
+				instant_build = yes
+			}
+		}
 	}
 	focus = {
 		id = education_minister
@@ -432,9 +403,6 @@ focus_tree = {
 		}
 		x = 51
 		y = 5
-		ai_will_do = {
-			factor = 2
-		}
 		available = {
 			NOT = {
 				has_idea = infrastructure_boost_general
@@ -451,21 +419,23 @@ focus_tree = {
 			random_owned_controlled_state = {
 				limit = {
 					free_building_slots = {
-						building = industrial_complex
+						building = office_park
 						size > 0
 						include_locked = yes
+					}
+					owner = {
+						num_of_factories > 10
 					}
 				}
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
-					type = industrial_complex
+					type = office_park
 					level = 1
 					instant_build = yes
 				}
 			}
 		}
-	}	
-	###########
+	}
 	focus = {
 		id = military_revise_plans
 		icon = GFX_focus_generic_little_entente
@@ -834,14 +804,6 @@ focus_tree = {
 				has_idea = navy_boost_general
 			}
 		}
-		complete_tooltip = {
-			add_extra_state_shared_building_slots = 1
-			add_building_construction = {
-				type = arms_factory
-				level = 1
-				instant_build = yes
-			}
-		}
 		completion_reward = {
 			add_timed_idea = {
 				idea = military_boost_general
@@ -854,6 +816,9 @@ focus_tree = {
 						size > 0
 						include_locked = yes
 					}
+					owner = {
+						num_of_military_factories > 10
+					}
 				}
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
@@ -864,7 +829,6 @@ focus_tree = {
 			}
 		}
 	}
-	################
 	focus = {
 		id = infrastructure_revise_planning
 		icon = GFX_canal
@@ -1074,6 +1038,9 @@ focus_tree = {
 						building = arms_factory
 						size > 0
 						include_locked = yes
+					}
+					owner = {
+						num_of_military_factories > 10
 					}
 				}
 				add_extra_state_shared_building_slots = 1
@@ -2745,7 +2712,7 @@ focus_tree = {
 			add_popularity = {
 				ideology = socialist
 				popularity = 0.02
-			}	
+			}
 				}
 
 	}
@@ -3440,15 +3407,14 @@ focus_tree = {
 		}
 		x = 47
 		y = 3
-			
-			completion_reward = {
-							remove_ideas = activate_capitalism
-							add_ideas = capitalism_intensifies
+		completion_reward = {
+			remove_ideas = activate_capitalism
+			add_ideas = capitalism_intensifies
 			add_popularity = {
 				ideology = liberal
 				popularity = 0.03
 			}
-				}
+		}
 
 	}
 	focus = {
@@ -3463,65 +3429,41 @@ focus_tree = {
 		}
 		x = 45
 		y = 5
-			
-			ai_will_do = {
-					factor = 2
+		available = {
+			NOT = {
+				has_idea = infrastructure_boost_general
+				has_idea = civilian_boost_general
+				has_idea = military_boost_general
+				has_idea = navy_boost_general
+			}
+		}
+		completion_reward = {
+			add_timed_idea = {
+				idea = civilian_boost_general
+				days = 180
+			}
+			if = {
+				limit = {
+					owner = {
+						num_of_factories > 10
+					}
 				}
-			bypass = {
-					custom_trigger_tooltip = {
-							tooltip = construction_effort_tt
-							all_owned_state = {
-									free_building_slots = {
-											building = industrial_complex
-											size < 2
-											include_locked = yes
-										}
-								}
+				random_owned_controlled_state = {
+					limit = {
+						free_building_slots = {
+							building = industrial_complex
+							size > 0
+							include_locked = yes
 						}
+					}
 				}
-			complete_tooltip = {
-					add_extra_state_shared_building_slots = 2
-					add_building_construction = {
-							type = industrial_complex
-							level = 1
-							instant_build = yes
-						}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = industrial_complex
+					level = 1
+					instant_build = yes
 				}
-			completion_reward = {
-					random_owned_controlled_state = {
-							limit = {
-									free_building_slots = {
-											building = industrial_complex
-											size > 0
-											include_locked = yes
-										}
-									OR = {
-											is_in_home_area = yes
-											NOT = {
-													owner = {
-															any_owned_state = {
-																	free_building_slots = {
-																			building = industrial_complex
-																			size > 0
-																			include_locked = yes
-																		}
-																	is_in_home_area = yes
-																}
-														}
-												}
-										}
-								}
-							add_extra_state_shared_building_slots = 2
-							add_building_construction = {
-									type = industrial_complex
-									level = 1
-									instant_build = yes
-								}
-						}
-				}
-
+			}
+		}
 	}
-
-
-
 }
