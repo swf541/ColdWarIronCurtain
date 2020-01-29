@@ -273,7 +273,7 @@ focus_tree = {
 			add_ideas = national_militia
 		}
 	}
-	focus = { #NEEDS POLICE REWORK IN FUTURE #NOT DONE
+	focus = { #NEEDS POLICE REWORK IN FUTURE
 		id = gen70_cooperative_counterterrorism
 		icon = GFX_gender_equality
 		cost = 8.00
@@ -285,7 +285,10 @@ focus_tree = {
 		}
 		x = 7
 		y = 2
-
+		completion_reward = {
+			add_political_power = 100
+			add_ideas = counterterrorism_force
+		}
 	}
 	focus = {
 		id = gen70_militia_urban
@@ -395,7 +398,7 @@ focus_tree = {
 		y = 4
 		completion_reward = {
 			army_experience = 10
-			war_support_factor = 0.05
+			add_war_support = 0.05
 			add_tech_bonus = {
 				bonus = 0.5
 				uses = 1
@@ -498,10 +501,10 @@ focus_tree = {
 			remove_ideas = civil_defense_bureau
 		}
 	}
-	focus = { #NOT DONE
+	focus = {
 		id = gen70_militia_brigade
 		icon = GFX_black_military
-		cost = 10.00
+		cost = 30.00
 		prerequisite = {
 			focus = gen70_nat_militia
 		}
@@ -510,7 +513,72 @@ focus_tree = {
 		}
 		x = 15
 		y = 2
-
+		completion_reward = {
+			load_oob = "levy_militia_negative_one"
+			army_experience = 50
+			if = {
+				limit = {
+					owner = {
+						num_of_military_factories < 10
+					}
+				}
+				create_unit = {
+					division = "name = \"1st Militia Brigade\" division_template = \"National Militia Brigade\" start_experience_factor = 0 start_equipment_factor = 1"
+					owner = ROOT
+				}
+			}
+			if = {
+				limit = {
+					owner = {
+						AND = {
+							num_of_military_factories > 9
+							num_of_military_factories < 20
+						}
+					}
+				}
+				create_unit = {
+					division = "name = \"1st Militia Brigade\" division_template = \"National Militia Brigade\" start_experience_factor = 0 start_equipment_factor = 1"
+					owner = ROOT
+				}
+				create_unit = {
+					division = "name = \"2nd Militia Brigade\" division_template = \"National Militia Brigade\" start_experience_factor = 0 start_equipment_factor = 1"
+					owner = ROOT
+				}
+			}
+			if = {
+				limit = {
+					owner = {
+						AND = {
+							num_of_military_factories > 19
+							num_of_military_factories < 30
+						}
+					}
+				}
+				create_unit = {
+					division = "name = \"1st Militia Organization\" division_template = \"National Militia Division\" start_experience_factor = 0 start_equipment_factor = 1"
+					owner = ROOT
+				}
+			}
+			if = {
+				limit = {
+					owner = {
+						num_of_military_factories > 29
+					}
+				}
+				create_unit = {
+					division = "name = \"1st Militia Organization\" division_template = \"National Militia Division\" start_experience_factor = 0 start_equipment_factor = 1"
+					owner = ROOT
+				}
+				create_unit = {
+					division = "name = \"5th Militia Brigade\" division_template = \"National Militia Brigade\" start_experience_factor = 0 start_equipment_factor = 1"
+					owner = ROOT
+				}
+				create_unit = {
+					division = "name = \"6th Militia Brigade\" division_template = \"National Militia Brigade\" start_experience_factor = 0 start_equipment_factor = 1"
+					owner = ROOT
+				}
+			}
+		}
 	}
 	focus = {
 		id = gen70_network_centric
@@ -1479,7 +1547,7 @@ focus_tree = {
 			}
 		}
 	}
-	focus = { #NOT DONE
+	focus = {
 		id = gen70_infrastructure_revise_planning
 		icon = GFX_goal_unknown
 		cost = 10.00
@@ -1490,9 +1558,70 @@ focus_tree = {
 		}
 		x = 28
 		y = 6
-
+		available = {
+			NOT = {
+				has_idea = infrastructure_boost_general
+				has_idea = civilian_boost_general
+				has_idea = military_boost_general
+				has_idea = navy_boost_general
+			}
+		}
+		completion_reward = {
+			add_timed_idea = {
+				idea = infrastructure_boost_general
+				days = 180
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = infrastructure
+						size > 0
+					}
+					owner = {
+						num_of_factories > 10
+					}
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = infrastructure
+						size > 0
+					}
+					owner = {
+						num_of_factories > 10
+					}
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = infrastructure
+						size > 1
+					}
+					owner = {
+						num_of_factories > 10
+					}
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 2
+					instant_build = yes
+				}
+			}
+		}
 	}
-	focus = { #NOT DONE
+	focus = {
 		id = gen70_civilian_urban_services
 		icon = GFX_goal_unknown
 		cost = 10.00
@@ -1501,9 +1630,104 @@ focus_tree = {
 		}
 		x = 36
 		y = 7
-
+		available = {
+			NOT = {
+				has_idea = infrastructure_boost_general
+				has_idea = civilian_boost_general
+				has_idea = military_boost_general
+				has_idea = navy_boost_general
+			}
+		}
+		completion_reward = {
+			add_timed_idea = {
+				idea = civilian_boost_general
+				days = 180
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = office_park
+						size > 0
+						include_locked = yes
+					}
+					owner = {
+						num_of_factories > 10
+					}
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = office_park
+					level = 1
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = water_infrastructure
+						size > 0
+					}
+					owner = {
+						num_of_factories > 10
+					}
+				}
+				add_building_construction = {
+					type = water_infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = water_infrastructure
+						size > 1
+					}
+					owner = {
+						num_of_factories > 20
+					}
+				}
+				add_building_construction = {
+					type = water_infrastructure
+					level = 2
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = water_infrastructure
+						size > 1
+					}
+					owner = {
+						num_of_factories > 30
+					}
+				}
+				add_building_construction = {
+					type = water_infrastructure
+					level = 2
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = water_infrastructure
+						size > 1
+					}
+					owner = {
+						num_of_factories > 40
+					}
+				}
+				add_building_construction = {
+					type = water_infrastructure
+					level = 2
+					instant_build = yes
+				}
+			}
+		}
 	}
-	focus = { #NOT DONE
+	focus = {
 		id = gen70_infrastructure_interstate
 		icon = GFX_goal_unknown
 		cost = 10.00
@@ -1514,9 +1738,67 @@ focus_tree = {
 		}
 		x = 24
 		y = 6
-
+		available = {
+			NOT = {
+				has_idea = infrastructure_boost_general
+				has_idea = civilian_boost_general
+				has_idea = military_boost_general
+				has_idea = navy_boost_general
+			}
+		}
+		completion_reward = {
+			add_timed_idea = {
+				idea = infrastructure_boost_general
+				days = 180
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = state_infrastructure
+						size > 0
+					}
+				}
+				add_building_construction = {
+					type = state_infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = state_infrastructure
+						size > 0
+					}
+					owner = {
+						num_of_factories > 10
+					}
+				}
+				add_building_construction = {
+					type = state_infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = state_infrastructure
+						size > 1
+					}
+					owner = {
+						num_of_factories > 10
+					}
+				}
+				add_building_construction = {
+					type = state_infrastructure
+					level = 2
+					instant_build = yes
+				}
+			}
+		}
 	}
-	focus = { #NOT DONE
+	focus = {
 		id = gen70_infrastructure_railway
 		icon = GFX_goal_unknown
 		cost = 10.00
@@ -1525,9 +1807,51 @@ focus_tree = {
 		}
 		x = 24
 		y = 7
-
+		available = {
+			NOT = {
+				has_idea = infrastructure_boost_general
+				has_idea = civilian_boost_general
+				has_idea = military_boost_general
+				has_idea = navy_boost_general
+			}
+		}
+		completion_reward = {
+			add_timed_idea = {
+				idea = infrastructure_boost_general
+				days = 180
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = state_infrastructure
+						size > 0
+					}
+				}
+				add_building_construction = {
+					type = state_infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = state_infrastructure
+						size > 1
+					}
+					owner = {
+						num_of_factories > 10
+					}
+				}
+				add_building_construction = {
+					type = state_infrastructure
+					level = 2
+					instant_build = yes
+				}
+			}
+		}
 	}
-	focus = { #NOT DONE
+	focus = {
 		id = gen70_mil_naval_bases
 		icon = GFX_goal_unknown
 		cost = 10.00
@@ -1539,7 +1863,112 @@ focus_tree = {
 		}
 		x = 30
 		y = 10
-
+		available = {
+			any_state = {
+				is_coastal = yes
+				is_controlled_by = ROOT
+			}
+		}
+		completion_reward = {
+			navy_experience = 25
+			if = {
+				limit = {
+					any_owned_state = {
+						is_coastal = yes
+					}
+				}
+				random_owned_controlled_state = {
+					limit = {
+						is_coastal = yes
+						free_building_slots = {
+							building = naval_base
+							size > 1
+							include_locked = yes
+						}
+						owner = {
+							num_of_military_factories > 10
+						}
+					}
+					add_building_construction = {
+						type = naval_base
+						level = 2
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state = {
+					limit = {
+						is_coastal = yes
+						free_building_slots = {
+							building = naval_base
+							size > 1
+							include_locked = yes
+						}
+						owner = {
+							num_of_military_factories > 20
+						}
+					}
+					add_building_construction = {
+						type = naval_base
+						level = 2
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state = {
+					limit = {
+						is_coastal = yes
+						free_building_slots = {
+							building = naval_base
+							size > 2
+							include_locked = yes
+						}
+						owner = {
+							num_of_military_factories > 30
+						}
+					}
+					add_building_construction = {
+						type = naval_base
+						level = 3
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state = {
+					limit = {
+						is_coastal = yes
+						free_building_slots = {
+							building = naval_base
+							size > 3
+							include_locked = yes
+						}
+						owner = {
+							num_of_military_factories > 40
+						}
+					}
+					add_building_construction = {
+						type = naval_base
+						level = 4
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state = {
+					limit = {
+						is_coastal = yes
+						free_building_slots = {
+							building = naval_base
+							size > 4
+							include_locked = yes
+						}
+						owner = {
+							num_of_military_factories > 50
+						}
+					}
+					add_building_construction = {
+						type = naval_base
+						level = 5
+						instant_build = yes
+					}
+				}
+			}
+		}
 	}
 	focus = {
 		id = gen70_agrarian_growth
@@ -1586,7 +2015,7 @@ focus_tree = {
 			remove_ideas = commercial_philosophy_artisan_export
 		}
 	}
-	focus = { #NOT DONE
+	focus = {
 		id = gen70_civilian_rust_belt
 		icon = GFX_goal_unknown
 		cost = 10.00
@@ -1597,7 +2026,42 @@ focus_tree = {
 		}
 		x = 32
 		y = 6
-
+		available = {
+			NOT = {
+				has_idea = infrastructure_boost_general
+				has_idea = civilian_boost_general
+				has_idea = military_boost_general
+				has_idea = navy_boost_general
+			}
+		}
+		completion_reward = {
+			add_timed_idea = {
+				idea = civilian_boost_general
+				days = 180
+			}
+			if = {
+				limit = {
+					owner = {
+						num_of_factories > 10
+					}
+				}
+				random_owned_controlled_state = {
+					limit = {
+						free_building_slots = {
+							building = industrial_complex
+							size > 0
+							include_locked = yes
+						}
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = industrial_complex
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+		}
 	}
 	focus = {
 		id = gen70_civilian_industrialize
@@ -1608,9 +2072,39 @@ focus_tree = {
 		}
 		x = 32
 		y = 7
-		
+		available = {
+			NOT = {
+				has_idea = infrastructure_boost_general
+				has_idea = civilian_boost_general
+				has_idea = military_boost_general
+				has_idea = navy_boost_general
+			}
+		}
+		completion_reward = {
+			add_timed_idea = {
+				idea = civilian_boost_general
+				days = 180
+			}
+			random_owned_controlled_state = {
+				if = {
+					limit = {
+						free_building_slots = {
+							building = industrial_complex
+							size > 0
+							include_locked = yes
+						}
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = industrial_complex
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+		}
 	}
-	focus = { #NOT DONE
+	focus = {
 		id = gen70_military_naval_expansion
 		icon = GFX_goal_unknown
 		cost = 10.00
@@ -1619,7 +2113,50 @@ focus_tree = {
 		}
 		x = 28
 		y = 9
-
+		available = {
+			AND = {
+				any_state = {
+					is_coastal = yes
+					is_controlled_by = ROOT
+				}
+				NOT = {
+					has_idea = infrastructure_boost_general
+					has_idea = civilian_boost_general
+					has_idea = military_boost_general
+					has_idea = navy_boost_general
+				}
+			}
+		}
+		completion_reward = {
+			add_timed_idea = {
+				idea = navy_boost_general
+				days = 180
+			}
+			navy_experience = 25
+			if = {
+				limit = {
+					owner = {
+						num_of_military_factories > 10
+					}
+				}
+				random_owned_controlled_state = {
+					limit = {
+						is_coastal = yes
+						free_building_slots = {
+							building = dockyard
+							size > 1
+							include_locked = yes
+						}
+					}
+					add_extra_state_shared_building_slots = 2
+					add_building_construction = {
+						type = dockyard
+						level = 2
+						instant_build = yes
+					}
+				}
+			}
+		}
 	}
 	focus = {
 		id = gen70_civilian_urban_renewal
@@ -1648,14 +2185,17 @@ focus_tree = {
 			random_owned_controlled_state = {
 				limit = {
 					free_building_slots = {
-						building = industrial_complex
+						building = office_park
 						size > 0
 						include_locked = yes
+					}
+					owner = {
+						num_of_factories > 10
 					}
 				}
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
-					type = industrial_complex
+					type = office_park
 					level = 1
 					instant_build = yes
 				}
@@ -1690,6 +2230,9 @@ focus_tree = {
 						building = arms_factory
 						size > 0
 						include_locked = yes
+					}
+					owner = {
+						num_of_military_factories > 10
 					}
 				}
 				add_extra_state_shared_building_slots = 1
@@ -1730,6 +2273,9 @@ focus_tree = {
 						size > 0
 						include_locked = yes
 					}
+					owner = {
+						num_of_military_factories > 10
+					}
 				}
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
@@ -1757,14 +2303,6 @@ focus_tree = {
 				has_idea = navy_boost_general
 			}
 		}
-		complete_tooltip = {
-			add_extra_state_shared_building_slots = 1
-			add_building_construction = {
-				type = arms_factory
-				level = 1
-				instant_build = yes
-			}
-		}
 		completion_reward = {
 			add_timed_idea = {
 				idea = military_boost_general
@@ -1776,6 +2314,9 @@ focus_tree = {
 						building = arms_factory
 						size > 0
 						include_locked = yes
+					}
+					owner = {
+						num_of_military_factories > 10
 					}
 				}
 				add_extra_state_shared_building_slots = 1
