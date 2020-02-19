@@ -7,7 +7,7 @@ tags={
 	"Historical"
 	"Map"
 }
-version="1.8.*"
+version="1.9.*"
 replace_path = "events"
 replace_path = "common/decisions"
 replace_path = "common/national_focus"
@@ -27,4 +27,5 @@ replace_path = "common/scripted_diplomatic_actions"
 replace_path = "history/states"
 replace_path = "history/countries"
 replace_path = "common/ai_focuses" 
+replace_path = "common/ai_strategy_plans"
 
