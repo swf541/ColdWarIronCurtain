@@ -69,11 +69,6 @@ weather_arctic_water = { # on Region
 	naval_retreat_speed = -0.05
 	positioning = -0.2
 }
-weather_unpredictable_storms = { # on Region 
-	navy_casualty_on_sink = 0.4
-	positioning = 0.1
-	naval_accidents_chance = 0.05
-}
 
 weather_mud = { # on Province
 	attrition = 0.7
@@ -118,6 +113,12 @@ flooded = { # on Province
 	dig_in_speed_factor = 0.2
 }
 
+unplanned_offensive = { # on Province
+	army_speed_factor = -0.75
+	army_attack_factor = -0.9
+	local_org_regain = -0.5
+}
+
 night = { # On province. Multiplied by amount of darkness.
 	naval_hit_chance = -0.25
 	carrier_traffic = -1.0
@@ -125,48 +126,43 @@ night = { # On province. Multiplied by amount of darkness.
 	naval_retreat_speed = 0.1
 }
 
-occupation_policy_1 = { # Gentlest
-	#resistance_tick = -0.6
-	local_resources = -0.3
-	local_manpower = -0.7
-	local_factories = -0.6
-}
-occupation_policy_2 = { # Gentle
-	#resistance_tick = -0.4
-	local_resources = -0.2
-	local_manpower = -0.8
-	local_factories = -0.4
-	occupation_cost = 0.01
-}
-occupation_policy_3 = { # Harsh
-	#resistance_tick = -0.2
-	local_resources = -0.1
-	local_manpower = -0.9
-	local_factories = -0.2
-	occupation_cost = 0.02
-}
-occupation_policy_4 = { # Harshest
-	##resistance_tick = 0.0
-	#local_resources = 0.0
-	local_manpower = -1.0
-	#local_factories = 0.0
-	occupation_cost = 0.04
-}
-
 # The following is multiplied by local resistance strength.
+resistance_effect_base = {
+	# todo - spy defense
+}
+
 resistance_effect = {
-	local_supplies = -0.5
-	local_intel_to_enemies = 1
-	local_factory_sabotage = 0.75
-	attrition = 0.25
+	#local_supplies = -0.5
+	#local_intel_to_enemies = 10
+	#local_factory_sabotage = 0.75
+	#attrition = 0.25
 }
 
-# On States
+# For compliance base + effect * compliance_level will be applied as a modifier.
+compliance_effect_base = {
+	#local_factories = -0.75
+	#local_manpower = -0.75
+	#local_resources = -0.75
+}
+
+compliance_effect = {
+	local_factories = 0.65
+	local_non_core_manpower = 0.18
+	local_resources = 0.60
+}
+
+# On States that are owned by a non-core country
 non_core = {
-	local_building_slots_factor = -0.01
 }
 
-
+# On States that are controlled by a non-core country
+non_core_controller = {
+	local_building_slots_factor = -0.5
+	
+	local_factories = -0.75
+	#local_manpower = -0.75
+	local_resources = -0.65
+}
 
 lacking_consumer_goods = {
 }
@@ -225,6 +221,18 @@ YUG_western_license = {
 
 }
 
+FRA_coordinate_rearmament = {
+	valid_relation_trigger = {
+		FROM = {
+			is_in_faction_with = ROOT
+		}
+	}
+	license_purchase_cost = 0
+	ai_license_acceptance = 100 #more to AI acceptance value.
+	license_production_speed = 0.25
+	license_tech_difference_speed = 0.25
+}
+
 HUN_stubborn_fools = {
 	valid_relation_trigger = {
 		FROM = {
@@ -267,8 +275,8 @@ stability_good_modifier = {
 
 # applies when stability < 50%
 stability_bad_modifier = {
-	industrial_capacity_factory = -0.30
-	industrial_capacity_dockyard = -0.30
+	industrial_capacity_factory = -0.50
+	industrial_capacity_dockyard = -0.50
 	political_power_factor = -0.2
 }
 
@@ -296,7 +304,7 @@ attache_sent = {
 
 diff_very_easy_player = {
 	production_factory_max_efficiency_factor = 0.3
-	research_speed_factor = 0.1
+	research_speed_factor = 0.15
 	political_power_factor = 0.5
 	production_lack_of_resource_penalty_factor = -0.8
 	army_fuel_consumption_factor = -0.5
@@ -306,7 +314,7 @@ diff_very_easy_player = {
 
 diff_easy_player = {
 	production_factory_max_efficiency_factor = 0.2
-	research_speed_factor = 0.05
+	research_speed_factor = 0.07
 	political_power_factor = 0.25
 	production_lack_of_resource_penalty_factor = -0.3
 	army_fuel_consumption_factor = -0.25
@@ -319,13 +327,13 @@ diff_normal_player = {
 
 diff_hard_player = {
 	production_factory_max_efficiency_factor = -0.2
-	research_speed_factor = -0.10
+	research_speed_factor = -0.15
 	political_power_factor = -0.1
 }
 
 diff_very_hard_player = {
 	production_factory_max_efficiency_factor = -0.3
-	research_speed_factor = -0.2
+	research_speed_factor = -0.30
 	political_power_factor = -0.15
 }
 
@@ -384,6 +392,7 @@ diff_strong_ai_generic = {
 	experience_gain_air_factor = 0.25
 	experience_gain_army_factor = 0.25
 	experience_gain_navy_factor = 0.25
+	air_mission_xp_gain_factor = 0.25
 	experience_gain_army_unit_factor = 0.10
 	experience_gain_navy_unit_factor = 0.10
 }
@@ -394,7 +403,15 @@ naval_mines_effect = {
 	naval_invasion_penalty = 0.5
 }
 
-air_wing_experience_bad = {
+air_wing_experience_bonus_max = {
+	air_attack_factor = 0.2
+	#air_defence_factor = 0.2
+	air_agility_factor = 0.3
+	air_night_penalty = -0.2
+	#air_weather_penalty = -0.3
+}
+
+air_wing_experience_malus_min = {
 	air_attack_factor = -0.15
 	#air_defence_factor = -0.15
 	air_agility_factor = -0.15
@@ -402,12 +419,22 @@ air_wing_experience_bad = {
 	#air_weather_penalty = 0.15
 }
 
-air_wing_experience = {
-	air_attack_factor = 0.2
-	#air_defence_factor = 0.2
-	air_agility_factor = 0.3
-	air_night_penalty = -0.2
-	#air_weather_penalty = -0.3
+ship_experience_bonus_max = {
+    naval_damage_factor = 0.3
+    naval_defense_factor = 0.2
+}
+
+ship_experience_malus_min = {
+    naval_damage_factor = -0.1
+    naval_defense_factor = -0.1
+}
+
+carrier_experience_bonus_max = {
+	fighter_sortie_efficiency = 0.2
+}
+
+carrier_experience_malus_min = {
+	fighter_sortie_efficiency = -0.1
 }
 
 pride_of_the_fleet = {
@@ -428,24 +455,6 @@ pride_of_the_fleet_sunk_temporary = {
 water_modifier_shark_infested = {
 	navy_casualty_on_sink = 0.6
 }
-water_modifier_shipping_channel = {
-	navy_casualty_on_sink = -0.6
-}
-water_modifier_dense_thermal_layers = {
-	navy_casualty_on_sink = -0.01
-}
-water_modifier_arctic_waters = { # on Region 
-	navy_casualty_on_sink = 0.2
-	naval_attrition = 0.1
-	naval_retreat_speed = -0.05
-	positioning = -0.2
-}
-water_modifier_posadist_dolphin_infestation = {
-	navy_casualty_on_sink = -0.01
-}
-water_modifier_whale_infestation = {
-	navy_casualty_on_sink = -0.01
-}
 
 screening_bonus = { 
   naval_retreat_speed = 0.2 
@@ -456,117 +465,15 @@ capital_screening_bonus = {
   naval_retreat_speed = 0.2
   sortie_efficiency = 0.1
 }
-a_cold_volcano = {
 
-}
-Victoria_Falls = {
-
-}
-Mount_Everest = {
-
-}
-Niagra_Falls = {
-
-}
-Khone_Phapheng_Falls = {
-
-}
-iguazu_falls = {
-
-}
-Kilimanjaro = {
-
-}
-insurgency_tier1 = { # on Province
-	army_speed_factor = -0.20
-	dig_in_speed_factor = -0.2
-	attrition = 0.15
-}
-insurgency_tier2 = { # on Province
-	army_speed_factor = -0.35
-	dig_in_speed_factor = -0.35
-	attrition = 0.3
-}
-insurgency_tier3 = { # on Province
-	army_speed_factor = -0.50
-	dig_in_speed_factor = -0.5
-	attrition = 0.45
-}
-radiation = { # on Province
-	army_speed_factor = -0.50
-	dig_in_speed_factor = -0.5
-	attrition = 0.45
-}
-napalm = { # on Province	Also Infrastructure Damage
-	local_org_regain = -0.05
-	attrition = 0.25
-	army_defence_factor = -0.20
-}
-mustard_gas = { # on Province
-	local_org_regain = -0.05
-	attrition = 0.01
-	army_defence_factor = -0.10
-}
-white_phosphorus = { # on Province
-	air_bombing_targetting = 0.25
-	attrition = 0.025
-	army_defence_factor = 0.05
-}
-agent_orange2 = { # on Province/ Only on Tropical States
-	army_speed_factor = 0.15
-	army_attack_factor = 0.2
-	attrition = 0.05
-}
-sarin = { # on Province
-	army_speed_factor = -0.4
-	attrition = 0.4
-	army_defence_factor = -0.3
-}
-vx = { # on Province
-	army_speed_factor = -0.65
-	attrition = 0.65
-	local_supplies = -0.65
-	local_org_regain = -0.50
-}
-
-#LaR Compliance
-FRA_host_the_german_exiles = {
-	valid_relation_trigger = {
-		ROOT = {
-			has_government = communism
-		}
-	}
-	compliance_gain = 0.25
-}
-FRA_reorganized_departments = {
-	valid_relation_trigger = {
-		ROOT = {
-			has_government = neutrality
-		}
-	}
-	compliance_gain = 0.25
-}
-GER_rescued_mussolini = {
-	valid_relation_trigger = {
-		ROOT = {
-			has_government = fascism
-		}
-	}
-	compliance_gain = 0.5
-}
-FRA_carry_the_revolution_south = {
-	valid_relation_trigger = {
-		ROOT = {
-			has_government = communism
-		}
-	}
-	compliance_gain = 0.4
-}
 country_is_at_peace = {
 	decryption_power_factor = -0.5
 }
+
 country_is_at_war = {
+
 }
+
 # targeted modifiers that will apply when you have fully decrypted a country's cipher
 passive_decryption_modifier = {
 	air_detection = 0.05
@@ -576,6 +483,7 @@ passive_decryption_modifier = {
 	navy_intel_decryption_bonus = 10
 	airforce_intel_decryption_bonus = 10
 }
+
 # targeted modifiers that will apply when you have activated your active decryption bonuses against a country
 active_decryption_modifier = {
 	# attack_bonus_against = 0.15
@@ -589,95 +497,77 @@ active_decryption_modifier = {
 	navy_intel_decryption_bonus = 50
 	airforce_intel_decryption_bonus = 50
 }
+
 # modifiers applied to allied divisions entering the intel network
 intel_network_state_level_bonus = {
 	amphibious_invasion_defence = 1
 	planning_speed = 0.5
 }
+
 # modifiers applied to enemy divisions in an intel network
 intel_network_state_level_penalty = {
 	max_planning = -1
 	max_dig_in = -1
 }
+
 # modifiers enabled by the creation of the intelligence agency
 created_intelligence_agency = {
 	operative_slot = 1
 	new_operative_slot_bonus = 3
 }
+
 # Modifiers enabled at state level when an operative is assigned to the root out resistance mission
 root_out_resistance_mission_modifier = {
 	resistance_target = -0.1
 }
+
 # modifiers active when an operative has the nationality of the nation it is performing a mission in.
 operative_nationality_mission = {
 	intel_network_gain_factor = 0.3
 	own_operative_detection_chance_factor = -0.1
 }
+
 # modifiers active when an operative has the nationalty of the operation's target
 operative_nationality_operation = {
 	# NOTE: all modifiers used here need to be pre-defined in modifier_definitions if dynamic
 	operation_outcome = 0.1
 	operation_cost = -0.1
 }
-unplanned_offensive = { # on Province
-	army_speed_factor = -0.75
-	army_attack_factor = -0.9
-	local_org_regain = -0.5
-}
-# The following is multiplied by local resistance strength.
-resistance_effect_base = {
-	# todo - spy defense
-}
-resistance_effect = {
-	#local_supplies = -0.5
-	#local_intel_to_enemies = 10
-	#local_factory_sabotage = 0.75
-	#attrition = 0.25
-}
-# For compliance base + effect * compliance_level will be applied as a modifier.
-compliance_effect_base = {
-	#local_factories = -0.75
-	#local_manpower = -0.75
-	#local_resources = -0.75
-}
-compliance_effect = {
-	local_factories = 0.65
-	local_non_core_manpower = 0.18
-	local_resources = 0.60
-}
-# On States that are owned by a non-core country
-non_core = {
-}
-# On States that are controlled by a non-core country
-non_core_controller = {
-	local_building_slots_factor = -0.5
-	
-	local_factories = -0.75
-	#local_manpower = -0.75
-	local_resources = -0.65
-}
-FRA_coordinate_rearmament = {
+
+#LaR Compliance
+
+FRA_host_the_german_exiles = {
 	valid_relation_trigger = {
-		FROM = {
-			is_in_faction_with = ROOT
+		ROOT = {
+			has_government = communism
 		}
 	}
-	license_purchase_cost = 0
-	ai_license_acceptance = 100 #more to AI acceptance value.
-	license_production_speed = 0.25
-	license_tech_difference_speed = 0.25
+	compliance_gain = 0.25
 }
-	ship_experience_bonus_max = {
-    naval_damage_factor = 0.3
-    naval_defense_factor = 0.2
+
+FRA_reorganized_departments = {
+	valid_relation_trigger = {
+		ROOT = {
+			has_government = neutrality
+		}
+	}
+	compliance_gain = 0.25
 }
-ship_experience_malus_min = {
-    naval_damage_factor = -0.1
-    naval_defense_factor = -0.1
+
+GER_rescued_mussolini = {
+	valid_relation_trigger = {
+		ROOT = {
+			has_government = fascism
+		}
+	}
+	compliance_gain = 0.5
 }
-carrier_experience_bonus_max = {
-	fighter_sortie_efficiency = 0.2
-}
-carrier_experience_malus_min = {
-	fighter_sortie_efficiency = -0.1
+
+FRA_carry_the_revolution_south = {
+	valid_relation_trigger = {
+		ROOT = {
+			has_government = communism
+		}
+	}
+	compliance_gain = 0.4
 }
