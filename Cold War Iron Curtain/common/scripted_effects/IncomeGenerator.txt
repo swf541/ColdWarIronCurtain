@@ -284,7 +284,7 @@ income_effect = {
 	add_to_variable = { IncomeTotal = dockyard_total }
 	set_variable = { DOCK_TOTAL = dockyard_total }
 	#synthetic_refinery +15%
-	multiply_variable = { oil_refinery_total = 0.9 } #DIVIDER
+	multiply_variable = { oil_refinery_total = 1.8 } #DIVIDER
 	set_variable = { oil_refinery_tech = 1 }
 	if = {
 		limit = {
@@ -326,7 +326,7 @@ income_effect = {
 	add_to_variable = { IncomeTotal = oil_refinery_total }
 	
 	#steel_factory +15%			steel_works_total
-	multiply_variable = { steel_works_total = 0.9 } #DIVIDER
+	multiply_variable = { steel_works_total = 1.8 } #DIVIDER
 	set_variable = { steel_works_tech = 1 }
 	if = {
 		limit = {
@@ -368,7 +368,7 @@ income_effect = {
 	add_to_variable = { IncomeTotal = steel_works_total }
 
 	#tungsten_factory +15%		tungsten_factory_total
-	multiply_variable = { tungsten_factory_total = 0.9 } #DIVIDER
+	multiply_variable = { tungsten_factory_total = 1.8 } #DIVIDER
 	set_variable = { tungsten_factory_tech = 1 }
 	if = {
 		limit = {
@@ -538,11 +538,19 @@ income_effect = {
 	for_each_loop = {
 	  array = debtPaymentArray
 	  index = i
-
-	  subtract_from_variable = { debtTotalsArray^i = debtPaymentArray^i } 
-	  subtract_from_variable = { currentMoney = debtPaymentArray^i }
-	  subtract_from_variable = { currentDebt = debtPaymentArray^i }
-	  add_to_variable = { currentDebtPayments = debtPaymentArray^i }
+	 if = {
+		limit = {
+			check_variable = {
+				var = debtTotalsArray^i
+				value = 0
+				compare = more_than
+			}
+		}
+		  subtract_from_variable = { debtTotalsArray^i = debtPaymentArray^i } 
+		  subtract_from_variable = { currentMoney = debtPaymentArray^i }
+		  subtract_from_variable = { currentDebt = debtPaymentArray^i }
+		  add_to_variable = { currentDebtPayments = debtPaymentArray^i }
+		}
 
 	  if = {
 		limit = {
@@ -594,28 +602,17 @@ income_effect = {
 		}
 		subtract_from_variable = { domesticTotalDebt = debtPaymentArray^i } 
 	  }
-	  if = {
+	 if = {
 		limit = {
 			check_variable = {
 				var = debtTotalsArray^i
 				value = 0
-				compare = less_than_or_equals
+				compare = lesser_than_or_equals
 			}
-			
 		}
-		remove_from_array = {
-			array = debtTotalsArray
-			index = i
+		set_variable = { debtTotalsArray^i = 0 }
+		set_variable = { debtPaymentArray^i = 0 }
 		}
-		remove_from_array = {
-			array = debtPaymentArray
-			index = i
-		}
-		remove_from_array = {
-			array = debtOwnerArray
-			index = i
-		}
-	  }
 	}
 
 	set_variable = { domesticTotalDebtK = domesticTotalDebt }
