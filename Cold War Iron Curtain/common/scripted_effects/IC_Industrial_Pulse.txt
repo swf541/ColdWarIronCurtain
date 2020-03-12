@@ -1,295 +1,122 @@
-oil_calc = {
-	set_variable = { oilAmmount = resource@oil }
-	set_variable = { oilAmmountNeg = oilAmmount }
-	multiply_variable = { oilAmmountNeg = -1 }
-	meta_effect = {
-		text = {
-			add_resource = {
-				type = oil
-				amount = [AMNT]
-			}
-		}
-		AMNT = "[?oilAmmountNeg]"
-	}	
-}
-
-oil_calc3 = {
-	meta_effect = {
-		text = {
-			add_resource = {
-				type = oil
-				amount = [AMNT]
-			}
-		}
-		AMNT = "[?oilAmmountback]"
-	}	
-	set_variable = { oilAmmountback = 0 }
-}
-oil_add = {
-	meta_effect = {
-		text = {
-			add_resource = {
-				type = oil
-				amount = [AMNT]
-			}
-		}
-		AMNT = "[?oilAmmount]"
-	}	
-	set_variable = { oilAmmount = 0 }
-}
-
-
-oil_consumption_set = {	#Fire in Decision Pulse
-	
-	hidden_effect = {
-		every_owned_state = {
-			resource_modifier_set_startup = yes
-			oil_calc = yes
-
-			set_variable = { oilCheck = oilAmmount }
-
-			subtract_from_variable = { oilAmmount = baseOil }
-			add_to_variable = { oilAmmount = oilAmmountback } 
-			set_variable = { baseOil = oilAmmount }	
-
-			if = {
-				limit = {
-					check_variable = { oilCheck > 0 }
-				}
-				multiply_variable = { oilAmmount = resourceEfficiencyInfra }
-				multiply_variable = { oilAmmount = oilEfficiencyGain }
-			}			
-			
-			round_variable = oilAmmount
-			subtract_from_variable = { baseOil = oilAmmount }
-			multiply_variable = { baseOil = -1 }
-
-			#Same
-			set_variable = { oilBaseEffCheck = oilAmmount }	
-			set_variable = { fossil_fuel_plant_quantity = building_level@fossil_fuel_powerplant }	
-			
-			set_variable = { industrial_complex_quantity = building_level@industrial_complex }			
-			set_variable = { industrial_complex_quantity_adjustment = 1 }
-
-			set_variable = { office_park_quantity = building_level@office_park }			
-			set_variable = { office_park_quantity_adjustment = 1 }			
-			
-			if = {
-				limit = {
-					controller = {
-						has_tech = plastics_V
-					}
-				}
-				add_to_variable = { industrial_complex_quantity_adjustment = -0.1 } 
-				add_to_variable = { office_park_quantity_adjustment = -0.1 } 
-			}	
-			
-			if = {
-				limit = {
-					controller = {
-						has_tech = electriccars
-					}
-				}
-				add_to_variable = { industrial_complex_quantity_adjustment = -0.35 } 
-				add_to_variable = { office_park_quantity_adjustment = -0.35 } 
-			}			
-			
-			multiply_variable = { industrial_complex_quantity_adjustment = industrial_complex_quantity }
-			
-			multiply_variable = { office_park_quantity_adjustment = office_park_quantity }
-			
-			add_to_variable = { industrial_complex_quantity_adjustment = office_park_quantity_adjustment }
-			
-			set_variable = { oilAdjustment = industrial_complex_quantity_adjustment } 
-
-			add_to_variable = { oilAdjustment = fossil_fuel_plant_quantity } 
-			round_variable = oilAdjustment
-			
-			subtract_from_variable = { oilAmmount = oilAdjustment }
-			round_variable = oilAmmount
-			
-			set_variable = { oilAmmountback = oilAdjustment }	#When more maluses added we will change this to a combination of all maluses under oilConsumptionReversion
-
-			oil_add = yes
-		}
-	}
-}
-
-oil_consumption_original = {	#Fire on Startup
-	
-	hidden_effect = {
-		
-		every_owned_state = {
-			resource_modifier_set_startup = yes
-			oil_calc = yes				
-			set_variable = { baseOil = oilAmmount }	
-			multiply_variable = { oilAmmount = resourceEfficiencyInfra }
-			round_variable = oilAmmount
-			subtract_from_variable = { baseOil = oilAmmount }
-			multiply_variable = { baseOil = -1 }
-			
-			set_variable = { oilBaseEffCheck = oilAmmount }	
-			
-			set_variable = { fossil_fuel_plant_quantity = building_level@fossil_fuel_powerplant }	
-			
-			set_variable = { industrial_complex_quantity = building_level@industrial_complex }			
-			set_variable = { industrial_complex_quantity_adjustment = 1 }
-			
-			set_variable = { office_park_quantity = building_level@office_park }			
-			set_variable = { office_park_quantity_adjustment = 1 }			
-			
-			if = {
-				limit = {
-					controller = {
-						has_tech = plastics_V
-					}
-				}
-				add_to_variable = { industrial_complex_quantity_adjustment = -0.1 } 
-				add_to_variable = { office_park_quantity_adjustment = -0.1 } 
-			}	
-			
-			if = {
-				limit = {
-					controller = {
-						has_tech = electriccars
-					}
-				}
-				add_to_variable = { industrial_complex_quantity_adjustment = -0.35 } 
-				add_to_variable = { office_park_quantity_adjustment = -0.35 } 
-			}					
-			
-			multiply_variable = { industrial_complex_quantity_adjustment = industrial_complex_quantity }
-			
-			multiply_variable = { office_park_quantity_adjustment = office_park_quantity }
-			
-			add_to_variable = { industrial_complex_quantity_adjustment = office_park_quantity_adjustment }
-			
-			set_variable = { oilAdjustment = industrial_complex_quantity_adjustment } 
-
-			add_to_variable = { oilAdjustment = fossil_fuel_plant_quantity } 
-			round_variable = oilAdjustment
-			
-			subtract_from_variable = { oilAmmount = oilAdjustment }
-			round_variable = oilAmmount
-			
-			set_variable = { oilAmmountback = oilAdjustment }	#When more maluses added we will change this to a combination of all maluses under oilConsumptionReversion
-
-			oil_add = yes
-		}
-	}
-}
 industrial_pulse = {	
 	
-	set_variable = { oil_consumption = -1 }
-	set_variable = { steel_consumption = -1 }
-	set_variable = { electric_consumption = -1 }
+	set_variable = { oil_consumption = 1 }
+	set_variable = { steel_consumption = 1 }
+	set_variable = { electricity_consumption = 1 }
+	set_variable = { dockyard_consumption = 1 }
 	
+	set_variable = { fossil_fuel_plant_quantity = 0 }
+	set_variable = { industrial_complex_quantity = 0 }
+	set_variable = { office_park_quantity = 0 }
+	set_variable = { dockyard_quantity = 0 }
+	
+	every_owned_state = {
+		add_to_variable = { PREV.fossil_fuel_plant_quantity = non_damaged_building_level@fossil_fuel_powerplant }	
+		add_to_variable = { PREV.industrial_complex_quantity = non_damaged_building_level@industrial_complex }			
+		add_to_variable = { PREV.office_park_quantity = non_damaged_building_level@office_park }	
+		add_to_variable = { PREV.dockyard_quantity = non_damaged_building_level@dockyard }	
+	}
+
 		
 	#Tech/National Spirit modifiers to this building
+	#Dockyard Specific
 	if = {
 		limit = {
-			controller = {
-				has_tech = management_IX
-			}
+			has_tech = ecoenergy_III
 		}
-
-		add_to_variable = { steel_consumption = 0.1 } 
-	}
-	if = {
-		limit = {
-			controller = {
-				has_tech = plastics_III
-			}
-		}
-		add_to_variable = { steel_consumption = 0.1 } 
-	}	
-	if = {
-		limit = {
-			controller = {
-				has_tech = plastics_V
-			}
-		}
-		add_to_variable = { steel_consumption = 0.1 } 
-	}	
-	if = {
-		limit = {
-			controller = {
-				has_tech = ecoenergy_I
-			}
-		}
-		add_to_variable = { electric_consumption = 0.1 } 
-	}
-	if = {
-		limit = {
-			controller = {
-				has_tech = ecoenergy_II
-			}
-		}
-		add_to_variable = { electric_consumption = 0.1 } 
-	}	
-	if = {
-		limit = {
-			controller = {
-				has_tech = ecoenergy_V
-			}
-		}
-		add_to_variable = { electric_consumption = 0.1 } 
-	}	
-	if = {
-		limit = {
-			controller = {
-				has_tech = electriccars
-			}
-		}
-		add_to_variable = { oil_consumption = 0.35 } 
-		add_to_variable = { electric_consumption = -0.25 }  
-	}
-	
-	multiply_variable = { oil_consumption =	building_level@industrial_complex }
-	multiply_variable = { electric_consumption = building_level@industrial_complex }
-	multiply_variable = { steel_consumption = building_level@industrial_complex }
-	
-	add_to_variable = { ROOT.oil_consumption = oil_consumption }
-	
-	add_to_variable = { ROOT.electric_consumption = electric_consumption }
-	
-	add_to_variable = { ROOT.steel_consumption = steel_consumption }
-}
-
-dockyard_pulse = {
-
-	multiply_variable = { dockyard_consumption = -1 }  
-
-	
-	set_variable = { dockyard_consumption = -1 }
-
-	if = {
-		limit = {
-			controller = {
-				has_tech = ecoenergy_III
-			}
-		}
-		add_to_variable = { dockyard_consumption = 0.1 }  
+		add_to_variable = { dockyard_consumption = -0.1 }  
 	}		
 	if = {
 		limit = {
-			controller = {
-				has_tech = ecoenergy_V
-			}
+			has_tech = ecoenergy_V
 		}
-		add_to_variable = { dockyard_consumption = 0.1 }  
+		add_to_variable = { dockyard_consumption = -0.1 }  
 	}		
 	if = {
 		limit = {
-			controller = {
-				has_tech = ecoenergy_VI
-			}
+			has_tech = ecoenergy_VI
 		}
-		add_to_variable = { dockyard_consumption = 0.1 }  
-	}		
-	multiply_variable = { dockyard_consumption = building_level@dockyard }
+		add_to_variable = { dockyard_consumption = -0.1 }  
+	}	
+
+	#Stop Dockyard Specific
+	if = {
+		limit = {
+			has_tech = management_IX
+		}
+
+		add_to_variable = { steel_consumption = -0.1 } 
+	}
+	if = {
+		limit = {
+			has_tech = plastics_III
+		}
+		add_to_variable = { steel_consumption = -0.1 } 
+	}	
+	if = {
+		limit = {
+			has_tech = plastics_V
+		}
+		add_to_variable = { steel_consumption = -0.1 } 
+	}	
+	if = {
+		limit = {
+			has_tech = ecoenergy_I
+		}
+		add_to_variable = { electricity_consumption = -0.1 } 
+	}
+	if = {
+		limit = {
+			has_tech = ecoenergy_II
+		}
+		add_to_variable = { electricity_consumption = -0.1 } 
+	}	
+	if = {
+		limit = {
+			has_tech = ecoenergy_V
+		}
+		add_to_variable = { electricity_consumption = -0.1 } 
+	}	
+	if = {
+		limit = {
+			has_tech = electriccars
+		}
+		add_to_variable = { oil_consumption = -0.35 } 
+		add_to_variable = { electricity_consumption = -0.25 }  
+	}
 	
-	add_to_variable = { ROOT.electric_consumption = dockyard_consumption }
+	set_variable = { fossil_fuel_plant_oil_consumption = fossil_fuel_plant_quantity }
+	multiply_variable = { fossil_fuel_plant_oil_consumption = oil_consumption }
 
+	set_variable = { industrial_complex_oil_consumption = industrial_complex_quantity }
+	set_variable = { industrial_complex_electricity_consumption = industrial_complex_quantity }
+	set_variable = { industrial_complex_steel_consumption = industrial_complex_quantity }
 
+	multiply_variable = { industrial_complex_oil_consumption = oil_consumption }
+	multiply_variable = { industrial_complex_electricity_consumption = electricity_consumption }
+	multiply_variable = { industrial_complex_steel_consumption = steel_consumption }
+	
+	multiply_variable = { dockyard_consumption = dockyard_quantity }
+	
+	
+	#Actual Tabulated Consumption
+	set_variable = { oil_consumption = 0 }
+	set_variable = { electricity_consumption = 0 }
+	set_variable = { steel_consumption = 0 }
+	
+	add_to_variable = { oil_consumption = industrial_complex_oil_consumption }
+	add_to_variable = { electricity_consumption = industrial_complex_electricity_consumption }
+	add_to_variable = { steel_consumption = industrial_complex_steel_consumption }
+	add_to_variable = { oil_consumption = fossil_fuel_plant_oil_consumption }
+	add_to_variable = { electricity_consumption = dockyard_consumption }
+	
+	#multiply_variable = { oil_consumption = -1 }
+	#multiply_variable = { steel_consumption = -1 }
+	#multiply_variable = { electricity_consumption = -1 }
+	
+	
+	round_variable = oil_consumption
+	round_variable = electricity_consumption
+	round_variable = steel_consumption
+	
 }
