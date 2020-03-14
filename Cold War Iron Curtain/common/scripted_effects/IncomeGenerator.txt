@@ -1,5 +1,16 @@
 #5.1184.1121.761.2528.5594.77ea90bca89780c73238eb646bea8f1f#
 income_effect = {
+	if = {
+		limit = {
+			NOT = { 
+				has_variable = mil_subsidy_id
+			}
+			set_variable = { mil_subsidy_id = GER.id }
+		}
+	}
+	set_variable = { grossdomesticproduct_influence_limit = grossdomesticproduct }
+	multiply_variable = { grossdomesticproduct_influence_limit = 2 }
+	
 	corruption_idea_calc = yes
 	miitary_expenditure = yes
 	welfare_expenditure = yes
@@ -530,6 +541,8 @@ income_effect = {
 	subtract_from_variable = { IncomeTotal = health_cost }	
 	subtract_from_variable = { IncomeTotal = pub_cost }	
 	
+	set_variable = { SubsidiyCheck = IncomeTotal }
+	multiply_variable = { SubsidiyCheck = 0.25 }
 	
 	add_to_variable = { currentMoney = IncomeTotal }
 	set_variable = { IncomeCheck = IncomeTotal }	
@@ -721,6 +734,7 @@ income_effect = {
 				array = debtPaymentArray
 				value = debtPayment
 			}
+			add_to_variable = { currentDebtPayments = debtPayment }
 		}
 		if = {
 			limit = {
@@ -785,6 +799,8 @@ income_effect = {
 				array = debtPaymentArray
 				value = debtPayment
 			}
+			
+			add_to_variable = { currentDebtPayments = debtPayment }
 		}
 
 	}
@@ -930,6 +946,39 @@ miitary_expenditure = {
 		multiply_variable = { mil_expend = 3.5 }
 	}
 	multiply_variable = { mil_expend = 0.5 } #COST DIVIDER
+	set_variable = { mil_expend_subsidy = mil_expend }
+	multiply_variable = { mil_expend_subsidy = 0.25 }
+	every_country = {
+		limit = {
+			ROOT = {
+				is_in_array = {
+					array = military_subsidies
+					value = PREV
+				}
+			}
+		}
+		meta_effect = {
+			text = {
+				add_to_variable = { mil_expend = [ROOTTAG].mil_expend_subsidy }
+			
+			}
+			ROOTTAG = "[?var:mil_subsidy_id.GetTag]"
+		}	
+		subtract_from_variable = { mil_expend = mil_expend_subsidy }
+		for_loop_effect = {
+			end = influence_array^num
+			value = v
+			if = {
+				limit = {
+					check_variable = { influence_array^v = mil_subsidy_id }
+				}
+				add_to_variable = { influence_array_val^v = mil_expend_subsidy }
+				set_country_flag = found
+			}
+		}
+		recalculate_influence = yes	
+	}
+	
 	set_variable = { mil_expend_cor_penalty = mil_expend }
 	multiply_variable = { mil_expend_cor_penalty = CorruptPolicyExcess }
 	
