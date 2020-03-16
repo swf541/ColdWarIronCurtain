@@ -1,5 +1,7 @@
-#5.1184.1121.761.2528.5594.77ea90bca89780c73238eb646bea8f1f#
 income_effect = {
+	set_variable = { grossdomesticproduct_influence_limit = grossdomesticproduct }
+	multiply_variable = { grossdomesticproduct_influence_limit = 2 }
+	
 	corruption_idea_calc = yes
 	miitary_expenditure = yes
 	welfare_expenditure = yes
@@ -530,6 +532,8 @@ income_effect = {
 	subtract_from_variable = { IncomeTotal = health_cost }	
 	subtract_from_variable = { IncomeTotal = pub_cost }	
 	
+	set_variable = { SubsidiyCheck = IncomeTotal }
+	multiply_variable = { SubsidiyCheck = 0.25 }
 	
 	add_to_variable = { currentMoney = IncomeTotal }
 	set_variable = { IncomeCheck = IncomeTotal }	
@@ -538,80 +542,76 @@ income_effect = {
 	for_each_loop = {
 	  array = debtPaymentArray
 	  index = i
-	 if = {
-		limit = {
-			check_variable = {
-				var = debtTotalsArray^i
-				value = 0
-				compare = more_than
+		 if = {
+			limit = {
+				check_variable = { debtTotalsArray^i > 0 }
 			}
-		}
-		  subtract_from_variable = { debtTotalsArray^i = debtPaymentArray^i } 
-		  subtract_from_variable = { currentMoney = debtPaymentArray^i }
-		  subtract_from_variable = { currentDebt = debtPaymentArray^i }
-		  add_to_variable = { currentDebtPayments = debtPaymentArray^i }
-		}
+			  subtract_from_variable = { debtTotalsArray^i = debtPaymentArray^i } 
+			  subtract_from_variable = { currentMoney = debtPaymentArray^i }
+			  subtract_from_variable = { currentDebt = debtPaymentArray^i }
+			  add_to_variable = { currentDebtPayments = debtPaymentArray^i }
+			}
 
-	  if = {
-		limit = {
-			NOT = {
-				check_variable = {
-					debtOwnerArray^i = THIS.ID
+		  if = {
+			limit = {
+				NOT = {
+					check_variable = {
+						debtOwnerArray^i = THIS.ID
+					}
+				}
+				NOT = {
+					check_variable = {
+						debtOwnerArray^i = GER.ID
+					}
 				}
 			}
-			NOT = {
+			 var:debtOwnerArray^i = {
+				add_to_variable = {
+					currentMoney = debtPaymentArray^i
+				}
+			}
+		  }
+		  if = {
+			limit = {
 				check_variable = {
 					debtOwnerArray^i = GER.ID
 				}
 			}
-		}
-		 var:debtOwnerArray^i = {
-			add_to_variable = {
-				currentMoney = debtPaymentArray^i
-			}
-		}
-	  }
-	  if = {
-		limit = {
-			check_variable = {
-				debtOwnerArray^i = GER.ID
-			}
-		}
-		 var:debtOwnerArray^i = {
-			add_to_variable = {
-				currentMoney = debtPaymentArray^i
-			}
-			set_temp_variable = { temp_debt_pay = debtPaymentArray^i }
-			for_loop_effect = {
-				end = influence_array^num
-				value = v
-				if = {
-					limit = {
-						check_variable = { influence_array^v = GER }
+			 var:debtOwnerArray^i = {
+				add_to_variable = {
+					currentMoney = debtPaymentArray^i
+				}
+				set_temp_variable = { temp_debt_pay = debtPaymentArray^i }
+				for_loop_effect = {
+					end = influence_array^num
+					value = v
+					if = {
+						limit = {
+							check_variable = { influence_array^v = GER }
+						}
+						subtract_from_variable = { influence_array_val^v = temp_debt_pay }
 					}
-					subtract_from_variable = { influence_array_val^v = temp_debt_pay }
 				}
 			}
-		}
-	  }
-	  if = {
-		limit = {
-			check_variable = {
-				debtOwnerArray^i = THIS.ID
+		  }
+		  if = {
+			limit = {
+				check_variable = {
+					debtOwnerArray^i = THIS.ID
+				}
 			}
-		}
-		subtract_from_variable = { domesticTotalDebt = debtPaymentArray^i } 
-	  }
-	 if = {
-		limit = {
-			check_variable = {
-				var = debtTotalsArray^i
-				value = 0
-				compare = lesser_than_or_equals
+			subtract_from_variable = { domesticTotalDebt = debtPaymentArray^i } 
+		  }
+		 if = {
+			limit = {
+				OR = {
+					check_variable = { debtTotalsArray^i = 0 }
+					check_variable = { debtTotalsArray^i < 0 }			
+				}
 			}
-		}
-		set_variable = { debtTotalsArray^i = 0 }
-		set_variable = { debtPaymentArray^i = 0 }
+			set_variable = { debtTotalsArray^i = 0 }
+			set_variable = { debtPaymentArray^i = 0 }
+			set_variable = { debtOwnerArray = 0 }
 		}
 	}
 
@@ -721,6 +721,7 @@ income_effect = {
 				array = debtPaymentArray
 				value = debtPayment
 			}
+			add_to_variable = { currentDebtPayments = debtPayment }
 		}
 		if = {
 			limit = {
@@ -785,6 +786,8 @@ income_effect = {
 				array = debtPaymentArray
 				value = debtPayment
 			}
+			
+			add_to_variable = { currentDebtPayments = debtPayment }
 		}
 
 	}
@@ -817,7 +820,7 @@ income_effect = {
 	set_variable = { ROOT.steel_works_total = 0 }
 	set_variable = { ROOT.tungsten_factory_total = 0 }
 	set_variable = { ROOT.office_park_total = 0 }
-}
+	}
 
 miitary_expenditure = {
 	add_to_variable = { IncomeCheck = mil_expend }
@@ -930,13 +933,47 @@ miitary_expenditure = {
 		multiply_variable = { mil_expend = 3.5 }
 	}
 	multiply_variable = { mil_expend = 0.5 } #COST DIVIDER
+	set_variable = { mil_expend_subsidy = mil_expend }
+	multiply_variable = { mil_expend_subsidy = 0.25 }
+	set_variable = { mil_expend_subsidy_tot = 0 }
+	every_country = {
+		limit = {
+			ROOT = {
+				is_in_array = {
+					array = military_subsidies
+					value = PREV
+				}
+			}
+		}
+		meta_effect = {
+			text = {
+				add_to_variable = { mil_expend_subsidy_tot = [ROOTTAG].mil_expend_subsidy }
+			
+			}
+			ROOTTAG = "[?var:mil_subsidy_id.GetTag]"
+		}	
+		subtract_from_variable = { mil_expend = mil_expend_subsidy }
+		for_loop_effect = {
+			end = influence_array^num
+			value = v
+			if = {
+				limit = {
+					check_variable = { influence_array^v = mil_subsidy_id }
+				}
+				add_to_variable = { influence_array_val^v = mil_expend_subsidy }
+				set_country_flag = found
+			}
+		}
+		recalculate_influence = yes	
+	}
+	add_to_variable = { mil_expend = mil_expend_subsidy_tot }
 	set_variable = { mil_expend_cor_penalty = mil_expend }
 	multiply_variable = { mil_expend_cor_penalty = CorruptPolicyExcess }
 	
 	add_to_variable = { mil_expend = mil_expend_cor_penalty }
 	set_variable = { mil_expend_display = mil_expend }
 	subtract_from_variable = { IncomeCheck = mil_expend }
-}
+	}
 welfare_expenditure = {
 	add_to_variable = { IncomeCheck = welfare_cost }
 	set_variable = { welfare_cost = 0 }
