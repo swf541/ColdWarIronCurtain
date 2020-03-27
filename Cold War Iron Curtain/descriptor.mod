@@ -29,4 +29,3 @@ replace_path = "history/states"
 replace_path = "history/countries"
 replace_path = "common/ai_focuses" 
 replace_path = "common/ai_strategy_plans" 
-
