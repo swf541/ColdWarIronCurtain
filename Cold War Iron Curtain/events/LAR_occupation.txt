@@ -1,0 +1,327 @@
+﻿
+add_namespace = occupied_countries
+
+#instantiate a collabration government
+country_event = {
+	id = occupied_countries.1
+	title = occupied_countries.1.title
+	desc = occupied_countries.1.desc
+	
+	# todo lar
+	picture = GFX_report_event_canadian_soldiers
+	
+	is_triggered_only = yes
+
+	option = {
+		name = occupied_countries.1.a
+
+		if = {
+			limit = {
+				has_core_occupation_modifier = {
+					occupied_country_tag = FROM.FROM
+					modifier = compliance_80
+				}
+				NOT = {
+					any_country_with_original_tag = { #copy of is_available_to_collaboration_government but from from scope because of events
+						original_tag_to_check = FROM.FROM
+						is_puppet_of = PREV # if already created one do not create another
+						has_autonomy_state = autonomy_collaboration_government
+					}
+				}
+			}
+			set_temp_variable = { country_to_initiate = FROM.FROM }
+			instantiate_collaboration_government = yes
+		}
+		
+		ai_chance = {
+			base = 0
+		}
+	}
+
+	option = {
+		name = occupied_countries.1.b
+		# do nothing
+		
+		ai_chance = {
+			base = 100
+		}
+	}
+}
+
+
+# create uprising
+country_event = {
+	id = occupied_countries.2
+	
+	is_triggered_only = yes
+	
+	hidden = yes
+	
+	immediate = {
+		FROM = {
+			if = {
+				limit = {
+					has_core_occupation_modifier = {
+						occupied_country_tag = FROM
+						modifier = resistance_90
+					}
+				}
+				
+				set_temp_variable = { occupier_country = THIS }
+				set_temp_variable = { occupied_country = FROM }
+				set_temp_variable = { new_occupied_country = FROM }
+				
+				if = { #warsaw achievement
+					limit = {
+						var:occupied_country = { original_tag = POL }
+					}
+					set_global_flag = warsaw_liberated_self_flag
+				}
+				
+				
+				set_temp_variable = { civil_war_country_picked = 0 }
+				if = {
+					## pick an existing civil war country
+					limit = {
+						FROM = {
+							tag = PREV
+						}
+					}
+					
+					random_country_with_original_tag = {
+						original_tag_to_check = var:occupier_country
+						
+						limit = {
+							NOT = { tag = var:occupier_country }
+							has_war_with = var:occupier_country
+						}
+						
+						set_temp_variable = { civil_war_country_picked = 1 }
+						set_temp_variable = { new_occupied_country = this }
+					}
+				}
+				
+				if = {
+					## create a new country if necesarry
+					limit = {
+						check_variable = { civil_war_country_picked = 0 } 
+						FROM = {
+							#if resistance country exists and not at war with occupier (whitepaced/subjected etc) create a country instead
+							exists = yes
+							NOT = { has_war_with = occupier_country }
+						}
+					}
+					create_dynamic_country = {
+						original_tag = FROM
+						copy_tag = FROM
+						
+						set_temp_variable = { new_occupied_country = THIS }
+					}
+				}
+				
+				
+				# change ideology if necessary
+				if = {
+					limit = { 
+						var:occupied_country = {
+							#only change ideology if we are not creating a new country and old country is not existing
+							OR = {
+								exists = no
+								NOT = { tag = new_occupied_country }
+							}
+						}
+					}
+					
+					# booleans that will be allowed to change ideology
+					set_temp_variable = { allowed_party_neutrality = 1 }
+					set_temp_variable = { allowed_party_democratic = 1 }
+					set_temp_variable = { allowed_party_fascism = 1 }
+					set_temp_variable = { allowed_party_communism = 1 }
+					
+					# do not change ideology of occupier country
+					var:occupier_country = {
+						remove_from_allowed_party = yes
+					}
+					
+					if = {
+						# if occupied country exists and different than new country
+						# it is white peaced & subject of occupier. ignore its ideology as well
+						limit = { NOT = { check_variable = { new_occupied_country = occupied_country } } }
+						var:occupied_country = {
+							remove_from_allowed_party = yes
+						}
+					}
+					
+					# change government if necesarry
+					var:new_occupied_country = {
+						if = {
+							# check if our current ideology is OK
+							limit = { 
+								OR = {
+									AND = {
+										has_government = democratic
+										check_variable = { allowed_party_democratic = 0 }
+									}
+									AND = {
+										has_government = fascism
+										check_variable = { allowed_party_fascism = 0 }
+									}
+									AND = {
+										has_government = communism
+										check_variable = { allowed_party_communism = 0 }
+									}
+									AND = { 
+										has_government = neutrality
+										check_variable = { allowed_party_neutrality = 0 }
+									}
+								}
+							}
+							
+							random_list = {
+								allowed_party_democratic = {
+									set_popularities = {
+										democratic = 100
+									}
+									set_politics = { ruling_party = democratic elections_allowed = yes }
+								}
+								allowed_party_fascism = {
+									set_popularities = {
+										fascism = 100
+									}
+									set_politics = { ruling_party = fascism elections_allowed = no }
+								}
+								allowed_party_communism = {
+									set_popularities = {
+										communism = 100
+									}
+									set_politics = { ruling_party = communism elections_allowed = no }
+								}
+								allowed_party_neutrality = {
+									set_popularities = {
+										neutrality = 100
+									}
+									set_politics = { ruling_party = neutrality elections_allowed = no }
+								}
+							}
+						}
+					}
+				}
+				
+				# create resistance template for armies to spawn
+				var:new_occupied_country = {
+					if = {
+						limit = { NOT = { has_country_flag = created_civil_war_template } }
+						set_country_flag = created_civil_war_template
+							
+						division_template = {
+							name = "Resistance"
+							is_locked = yes
+							regiments = {
+								infantry = { x = 0 y = 0 }
+								infantry = { x = 0 y = 1 }
+					
+								infantry = { x = 1 y = 0 }
+								infantry = { x = 1 y = 1 }
+								
+								infantry = { x = 2 y = 0 }
+								infantry = { x = 2 y = 1 }
+							}
+						}
+					}
+				}
+				
+				
+				clear_temp_array = checked_neighbours
+				every_controlled_state = {
+					limit = { 
+						occupied_country_tag = occupied_country 
+						impassable = no
+					}
+					
+					# move our armies to back home
+					teleport_armies = {
+						limit = { 
+							OR = {
+								is_ally_with = occupier_country
+								has_military_access_to = occupier_country
+							}
+						}
+						to_state_array = owned_controlled_states
+					}
+					
+					# transfer state
+					if = {
+						limit = { has_resistance = yes }
+						set_resistance = 0
+					}
+					var:new_occupied_country = {
+						transfer_state = PREV
+					}
+					
+					if = {
+						limit = { 
+							var:occupier_country = {
+								check_variable = { resistance_already_inited@var:occupied_country = 0 } 
+							}
+						}
+						
+						# create resistance units, number is relative to size of industry
+						set_temp_variable = { num_units_to_create = building_level@arms_factory }
+						add_to_temp_variable = { num_units_to_create = building_level@industrial_complex } 
+						divide_temp_variable = { num_units_to_create = 3 }
+						add_to_temp_variable = { num_units_to_create = 2 }
+						round_temp_variable = num_units_to_create
+						clamp_temp_variable = { var = num_units_to_create min = 2 max = 6 }
+						for_loop_effect = {
+							end = num_units_to_create
+							
+							create_unit = {
+								division = "division_template = \"Resistance\" start_experience_factor = 1 start_equipment_factor = 1"
+								owner = new_occupied_country
+							}
+						}
+					}
+					
+					# also check neighbouring core states of the occupier that are not captured yet
+					# move our armies so they are not surrounded/create pockets
+					every_neighbor_state = {
+						limit = {
+							is_owned_and_controlled_by = occupied_country
+							is_core_of = occupied_country
+							not = { is_in_array = { checked_neighbours = this } }
+						}
+						add_to_temp_array = { checked_neighbours = this }
+						
+						teleport_armies = {
+							limit = { 
+								OR = {
+									is_ally_with = occupier_country
+									has_military_access_to = occupier_country
+								}
+							}
+							to_state_array = owned_controlled_states
+						}
+						
+						set_state_province_controller = {
+							controller = occupied_country
+							limit = {
+								is_ally_with = occupier_country
+							}
+						}
+					}
+				}
+			
+				# create war if necesarry
+				if = {
+					limit = { NOT = { has_war_with = new_occupied_country } }
+					declare_war_on = { target = new_occupied_country type = annex_everything }
+				}
+				
+				var:occupier_country = {
+					set_variable = { resistance_already_inited@var:occupied_country = 1 } 
+				}
+			
+			}
+		}
+	}
+}
