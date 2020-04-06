@@ -1,0 +1,328 @@
+#
+no_garrison = {
+	icon = 1
+	default_law = yes
+	sound_effect = "Martial_Law_Interface_No_Garrison"
+	
+	state_modifier = {
+		resistance_target = 0.4
+		no_compliance_gain = 1
+		required_garrison_factor = -1
+	}
+	
+	suppressed_state_modifier = {
+		required_garrison_factor = -1
+		resistance_target = 0.4
+	}
+	
+	ai_will_do = {
+		base = 0
+		# if losing, get manpower & equipment back
+		modifier = {
+			FROM = {
+				surrender_progress > 0.3
+			}
+			add = 500
+		}
+	}
+}
+
+autonomous_occupation = {
+	icon = 2
+	sound_effect = "Martial_Law_Interface_Autonomous_Occupation_Unique_DEM"
+	
+	visible = {
+		NOT = {
+			OR = {
+				has_government = radical_shiaism
+				has_government = salafism
+				has_government = neutrality
+				has_government = nationalism
+				has_government = fascism
+				has_government = maoism
+				has_government = communism
+				has_government = trotskyism
+			}
+		}
+	}
+	
+	state_modifier = {
+		compliance_gain 				= 0.02
+		required_garrison_factor 		= -0.6	
+		resistance_damage_to_garrison 	= -0.25	
+	}
+	
+	ai_will_do = {
+		base = 200
+		
+		modifier = {
+			set_temp_variable = { resistance_limit = 30 }
+			if = {
+				limit = { occupation_law = martial_law_occupation }
+				set_temp_variable = { resistance_limit = 35 }
+			}
+			resistance < autonomous_occupation # if we are under base resistance try to build compliance instead
+			add = 500
+		}
+	}
+}
+
+foreign_civilian_oversight = {
+	icon = 3
+	sound_effect = "Martial_Law_Interface_Foreign_Cvilian_Oversight"
+	
+	state_modifier = {
+		resistance_target 				= -0.10
+		resistance_damage_to_garrison 	= -0.25	
+		compliance_gain 				= 0.02
+	}
+	starting_law = yes
+
+	ai_will_do = {
+		base = 120
+		modifier = {
+			check_variable  = { resistance_target_without_law > 0.29 } 						
+			add = 100
+		}
+	}
+}
+
+
+local_police_force_garrison = {
+	icon = 11
+	sound_effect = "Martial_Law_Interface_Local_Police_Force_Garrison"
+	
+	state_modifier = {
+		resistance_target 				= -0.20
+		resistance_damage_to_garrison	= -0.5
+	}
+	
+	
+	ai_will_do = {
+		base = 100
+		modifier = {
+			check_variable  = { resistance_target_without_law > 0.44 } 						
+			add = 200
+		}
+		
+	
+		modifier = {
+			check_variable  = { resistance_target_without_law > 0.44 }
+
+			set_temp_variable = { requirement_limit = 0.35 }
+			if = {
+				limit = { occupation_law = local_police_force_garrison }
+				set_temp_variable = { requirement_limit = 0.55 }
+			}
+			check_variable = { garrison_min_support_ratio < requirement_limit }
+			
+			add = 350
+		}
+	}
+}
+
+secret_police_oversight = {
+	icon = 4
+	sound_effect = "Martial_Law_Interface_Secret_Police_Oversight"
+	
+	visible = {
+		NOT = {
+			OR = {
+				has_government = liberal
+			}
+		}
+	}
+	
+	state_modifier = {
+		resistance_target 				= -0.30
+		compliance_gain 				= -0.04
+		required_garrison_factor 		= 0.3	
+		resistance_damage_to_garrison 	= -0.15	
+		enemy_operative_detection_chance_over_occupied_tag = 1 # offset detection chance by +1%
+		enemy_intel_network_gain_factor_over_occupied_tag = -0.25 # -25% scaled by the number of occupied states and the ratio of the network covering those occupied states
+		# todo + spy defense
+	}
+}
+
+liberate_workers_occupation = {
+	icon = 5
+	sound_effect = "Martial_Law_Interface_Liberate_Workers_Occupation_Unique_COM"
+	
+	visible = {
+		OR = {
+			has_government = communism
+			has_government = trotskyism
+			has_government = maoism
+			has_government = socialism
+		}
+	}
+	
+	state_modifier = {
+		resistance_target 				= -0.15
+		compliance_gain 				= -0.025
+		required_garrison_factor 		= -0.25
+		resistance_damage_to_garrison 	= 0.25
+	}
+	
+	ai_will_do = {
+		base = 200
+	}
+}
+
+military_governor_occupation = {
+	icon = 6
+	sound_effect = "Martial_Law_Interface_Military_Governor_Occupation"
+	
+	visible = {
+		NOT = {
+			OR = {
+				has_government = liberal
+			}
+		}
+	}
+	
+	state_modifier = {
+		resistance_target 			= -0.4
+		compliance_gain 			= 0.025
+		required_garrison_factor 	= 0.7
+	}
+	ai_will_do = {
+		base = 0
+		modifier = {
+			check_variable  = { resistance_target_without_law > 0.55} 						
+			add = 400
+		}
+	}
+}
+
+martial_law_occupation = {
+	icon = 7
+	sound_effect = "Martial_Law_Interface_Martial_Law_Occupation_Default"
+	
+	visible = {
+		NOT = {
+			OR = {
+				has_government = liberal
+			}
+		}
+	}
+	
+	state_modifier = {
+		resistance_target 				= -0.50		
+		required_garrison_factor 		= 1.2
+		#resistance_damage_to_garrison 	= 0.0
+	}
+	
+	ai_will_do = {
+		base = 0
+	
+		modifier = {
+			check_variable = { resistance_target_without_law > 0.69} 
+
+			set_temp_variable = { resistance_limit = 40 }
+			set_temp_variable = { requirement_limit = 0.8 }
+			if = {
+				limit = { occupation_law = martial_law_occupation }
+				set_temp_variable = { resistance_limit = 35 }
+				set_temp_variable = { requirement_limit = 0.6 }
+			}
+			check_variable = { garrison_min_support_ratio > requirement_limit }
+			resistance > resistance_limit
+			
+			add = 500
+		}
+	}
+}
+
+forced_labor_occupation = {
+	icon = 8
+	sound_effect = "Martial_Law_Interface_Forced_Labor_Occupation"
+	
+	visible = {
+		OR = {
+			has_government = radical_shiaism
+			has_government = salafism
+			has_government = fascism
+		}
+	}
+	
+	state_modifier = {
+		resistance_target 					= -0.40
+		compliance_gain 					= -0.08
+		resistance_damage_to_garrison 		= 0.3
+		required_garrison_factor 			= 1.5
+		repair_speed_infrastructure_factor 	= 0.25
+		
+		custom_modifier_tooltip = "resource_sabotage_decrease_tooltip"
+	}
+	
+	ai_will_do = {
+		base = 0
+	}
+}
+
+harsh_quotas_occupation = {
+	icon = 9
+	sound_effect = "Martial_Law_Interface_Harsh_Quotas_Occupation"
+	
+	visible = {
+		OR = {
+			has_government = radical_shiaism
+			has_government = salafism
+			has_government = fascism
+		}
+	}
+	
+	state_modifier = {
+		resistance_target 				= -0.40
+		compliance_gain 				= -0.08
+		required_garrison_factor 		= 2
+		resistance_damage_to_garrison 	= 0.50
+
+		repair_speed_arms_factory_factor = 0.25
+		repair_speed_industrial_complex_factor = 0.25
+		
+		custom_modifier_tooltip = "factory_sabotage_decrease_tooltip"
+	}
+	
+	ai_will_do = {
+		# enabled if has damaged factories
+		# gets higher score if more are damaged
+		base = 0
+		
+		modifier = {
+			set_temp_variable = { num_damaged = damaged_building_level@arms_factory }
+			add_to_temp_variable = { num_damaged = damaged_building_level@industrial_complex }
+		
+			check_variable = { num_damaged > 0 }
+			clamp_temp_variable = { var = num_damaged max = 4 }
+			multiply_temp_variable = { num_damaged = 50 }
+			add_to_temp_variable = { num_damaged = 150 }
+			
+			add = num_damaged
+		}
+	}
+}
+
+brutally_oppressive_occupation = {
+	icon = 10
+	sound_effect = "Martial_Law_Interface_Brutally_Oppressive_Occupation_Unique_FAS"
+	
+	visible = {
+		has_government = radical_shiaism
+		has_government = salafism
+		has_government = fascism
+	}
+	
+	state_modifier = {		
+		resistance_target 				= -0.75
+		compliance_gain 				= -0.11
+		required_garrison_factor 		= 2.0
+		resistance_damage_to_garrison 	= 1.0
+		resistance_decay 				= 1.0
+	}
+	
+	ai_will_do = {
+		base = 0
+	}
+}
