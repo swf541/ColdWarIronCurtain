@@ -1,0 +1,89 @@
+#~~ Used in decision of activating/not activating a crypto
+
+# checked daily when a country cracks crypto of another country
+# game has some hard coded checks to decide if it should enable or not but it will also use these
+
+# scope is target country
+# from scope is the ai country that is checking if it should activate its bonuses or not
+
+# you will have access to following temp variables here. these will not be calculated if we are not enemy
+# activation_score: hard coded score calculated by ai
+# activation_threshold: hard coded activation threshold calculated by ai
+
+# is checked when ai decides not to activate its bonuses. you can override this decision and activate by returning true here
+should_activate_active_crypto_bonuses = {
+	always = no
+}
+
+
+# called if the ai decides activating bonuses. you can override that decision by returning true here.
+should_not_activate_active_crypto_bonuses = {
+	always = no
+}
+
+#--------------------------------------------------------
+
+
+#~~ Used for checking if resistance should be enabled in a certain state
+
+# this triggers are called when state controller/owner is changed
+# it is also called daily if there is an active resistance and used if we should disable it or not
+
+# should return true if a state should have resistance
+# scope = state
+# from = occupier
+# from from = occupied (always original tag)
+# can be specialized for states by using should_initiate_resistance_STATEID1_STATEID2 = { }
+# those will override default should_initiate_resistance
+should_initiate_resistance = {
+	impassable = no
+	OR = {
+		check_variable = { core_countries^num > 0 } # have no cores
+
+		AND = {
+			FROM = {
+				original_tag = VIE
+			}
+			has_global_flag = Vietnam_War 
+			NOT = { has_state_flag = NLF_Crushed }
+		}
+	}
+	OR = {
+		NOT = { is_core_of = FROM  } # never for our cores
+		AND = {
+			is_core_of = VIE
+			FROM = { original_tag = VIE }
+		}
+	}
+}
+
+#should_initiate_resistance_5 = {
+#	# for Germany, this state always has resistance
+#	if = {
+#		limit = { FROM = { tag = GER } }
+#		always = yes
+#	}
+#	else_if = {
+#		should_initiate_resistance = yes
+#	}
+#}
+#
+#should_initiate_resistance_60_65_54 = {
+#	# for facsist Germany, these state always has resistance
+#	# since there are no other cores, the resistor will be Germany
+#	if = {
+#		limit = { 
+#			FROM = { 
+#				tag = GER 
+#				has_government = fascism
+#			}
+#		}
+#		always = yes
+#	}
+#	else_if = {
+#		should_initiate_resistance = yes
+#	}
+#}
+
+# ~~
+
