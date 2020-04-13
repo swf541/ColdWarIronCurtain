@@ -1,5 +1,48 @@
 distance_calculator = {
 	clear_array = WarCrimeTargetList
+	clear_array = wmd_enemy_array
+	set_variable = { warhead_cost = 0 }
+	ROOT = {
+		every_enemy_country = {
+			add_to_array = { ROOT.wmd_enemy_array = THIS.id }
+		}
+	}
+	if = {
+		limit = {
+
+			has_tech = icbm5		
+		}
+		set_variable = { ICBM_Distance = 13000 }
+	}
+	else_if = {
+		limit = {
+
+			has_tech = icbm4				
+		}	
+		set_variable = { ICBM_Distance = 12000 }
+	}
+	else_if = {
+		limit = {
+
+			has_tech = icbm3				
+		}
+		set_variable = { ICBM_Distance = 10000 }
+	}
+	else_if = {
+		limit = {
+			has_tech = icbm2				
+		}	
+		set_variable = { ICBM_Distance = 9000 }
+	}
+	else_if = {
+		limit = {
+			has_tech = icbm1			
+		}	
+		set_variable = { ICBM_Distance = 8000 }
+	}
+	else = {
+		set_variable = { ICBM_Distance = 0 }
+	}
 	every_state = {
 		limit = {
 			#Is owned by an enemy country
@@ -11,14 +54,14 @@ distance_calculator = {
 				ROOT = {
 					any_owned_state = {
 						air_base > 0
-						check_variable = { THIS.distance_to@PREV.PREV < 75}    #MAP_SCALE_PIXEL_TO_KM = 7.114
+						check_variable = { THIS.distance_to@PREV.PREV < ROOT.ICBM_Distance}    #MAP_SCALE_PIXEL_TO_KM = 7.114
 					}
 				}
 				every_country = {
 					limit = { is_subject_of = ROOT }
 					any_owned_state = {
 						air_base > 0
-						check_variable = { THIS.distance_to@PREV.PREV < 75}    #MAP_SCALE_PIXEL_TO_KM = 7.114
+						check_variable = { THIS.distance_to@PREV.PREV < ROOT.ICBM_Distance}    #MAP_SCALE_PIXEL_TO_KM = 7.114
 					}
 				}
 			}
@@ -31,8 +74,22 @@ distance_calculator = {
 					   value = THIS.id
 					}				
 				}
+				OR = {
+					is_capital = yes
+					state_population_k = 1000
+				}
 			}
 			add_to_array = { ROOT.WarCrimeTargetList = THIS.id }
+			add_to_variable = { ROOT.warhead_cost = 1 }
+			set_variable = { state_pop_total = state_population_k }
+			if = {
+				limit = {
+					check_variable = { state_pop_total > 1000 }
+				}
+				divide_variable = { state_pop_total = 1000 }
+				round_variable = state_pop_total
+				add_to_variable = { ROOT.warhead_cost = 1 }
+			}
 		}
 	}
 }
