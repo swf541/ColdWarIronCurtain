@@ -12,6 +12,7 @@ income_effect = {
 	public_expenditure = yes
 	tax_rate = yes
 	edict_expenditure = yes
+	domestic_bond_calc = yes
 	
 	
 	set_variable = { CorruptPolicyExcess = CorruptionLevel }
@@ -1635,6 +1636,53 @@ tax_rate = {
 	add_to_variable = { IncomeCheck = tax_base }
 }
 edict_expenditure = {
+}
+domestic_bond_calc = {
+	if = { #Failsafe to prevent crash
+		limit = {
+			check_variable = { available_liquidity < 1 }
+		}
+		set_variable = { available_liquidity = 1 }
+	}
+	
+	set_variable = { outcrowding_limit = 1 } #Limit on max domestic loans
+	every_owned_state = {
+		add_to_variable = { ROOT.outcrowding_limit = building_level@office_park }
+	}
+	
+	multiply_variable = { outcrowding_limit = 10 } #Billions per office park
+	
+	set_variable = { outcrowding_temp_var = outcrowding_limit }
+	
+	#REPLENISHMENT RATES FOR OUTCROWDING LIMITS#
+	if = {
+		limit = {
+			check_variable = { outcrowding_limit < 100 }
+		}
+		multiply_variable = { outcrowding_temp_var = 0.05 } #Percent to restore difference per month
+	}
+	if = {
+		limit = {
+			AND = {
+				check_variable = { outcrowding_limit < 500 }
+				check_variable = { outcrowding_limit > 100 }
+			}
+		}
+		multiply_variable = { outcrowding_temp_var = 0.035 } #Percent to restore difference per month
+	}
+	if = {
+		limit = {
+			check_variable = { outcrowding_limit > 500 }
+		}
+		multiply_variable = { outcrowding_temp_var = 0.02 } #Percent to restore difference per month
+	}
+	#REPLENISHMENT SCRIPT#
+	if = {
+		limit = {
+			check_variable = { available_liquidity < outcrowding_limit } #Liquidity less than limit
+		}
+		add_to_variable = { available_liquidity = outcrowsing_temp_var } #Replenish available liquidity
+	}
 }
 
 
