@@ -50,16 +50,20 @@ ideas = {
 			cost = 100
 			removal_cost = -1
 			level = 7
-			
-			available = {
-				#has_manpower_for_recruit_change_to = { value = 1.005 group = mobilization_laws }
-			}
 
 			modifier = {
 				conscription = 0.005
+				training_time_factor = -0.2
+				industrial_capacity_factory = 0.1
+				industrial_capacity_dockyard = 0.1
+				production_speed_buildings_factor = 01
 			}
 			
 			cancel_if_invalid = no
+			
+			ai_will_do = {
+   				factor = 0
+			}
 		}
 		
 		volunteer_only = {
@@ -67,17 +71,20 @@ ideas = {
 			cost = 150
 			removal_cost = -1
 			level = 6
-			
-			available = {
-				#has_manpower_for_recruit_change_to = { value = 1.015 group = mobilization_laws }
-			}
 
 			ai_will_do = {
    				factor = 1
 
    				modifier = {
-					factor = 60 # being disarmed is bad in a wargame yo
+					factor = 60
 					has_idea = disarmed_nation 
+				}
+				modifier = {
+					factor = 100
+					AND = {
+						manpower_per_military_factory > 8000
+						has_idea = limited_conscription
+					}
 				}
 			}
 
@@ -91,25 +98,31 @@ ideas = {
 		}
 		
 		limited_conscription = {
-					
+			
 			cost = 200
 			removal_cost = -1
 			level = 5
 
-			available = {
-				#has_manpower_for_recruit_change_to = { value = 1.025 group = mobilization_laws }
-			}
-
 			modifier = {
 				conscription = 0.02
+				training_time_factor = 0.2
 			}
 
 			ai_will_do = {
    				factor = 1
 				modifier = {
-					#Prio if low on manpower
 					factor = 20
-					manpower_per_military_factory <  1000
+					AND = {
+						manpower_per_military_factory < 1200
+						has_idea = volunteer_only
+					}
+				}
+				modifier = {
+					factor = 20
+					AND = {
+						manpower_per_military_factory > 8000
+						has_idea = extensive_conscription
+					}
 				}
 			}
 			
@@ -118,21 +131,21 @@ ideas = {
 		
 		extensive_conscription = {
 			
-
-
 			ai_will_do = {
    				factor = 1
 				modifier = {
-					#Prio if low on manpower
-					factor = 20
-					manpower_per_military_factory <  800
+					factor = 25
+					AND = {
+						manpower_per_military_factory < 1200
+						has_idea = limited_conscription
+					}
 				}
-
-				modifier = { # china relies a lot on throwing bodies at the enemy
-					factor = 3
-
-					tag = CHI
-					has_manpower < 200000
+				modifier = {
+					factor = 25
+					AND = {
+						manpower_per_military_factory > 8000
+						has_idea = service_by_requirement
+					}
 				}
 			}
 			
@@ -142,9 +155,7 @@ ideas = {
 			
 			modifier = {
 				conscription = 0.04
-				#industrial_capacity_factory = -0.1
-				#production_speed_buildings_factor = -0.1
-				training_time_factor = 0.1
+				training_time_factor = 0.4
 			}
 			
 			cancel_if_invalid = no
@@ -156,27 +167,18 @@ ideas = {
 			ai_will_do = {
    				factor = 1
 				modifier = {
-					#Prio if low on manpower
-					factor = 20
-					manpower_per_military_factory <  700
+					factor = 30
+					AND = {
+						manpower_per_military_factory < 1200
+						has_idea = extensive_conscription
+					}
 				}
 				modifier = {
-					#Lower chance if has decent amount
-					factor = 0.5
-					manpower_per_military_factory >  1000
-				}
-				modifier = {
-					#Block has plenty manpower
-					factor = 0
-					NOT = { tag = CHI }
-					manpower_per_military_factory >  3000
-				}
-
-				modifier = { # china relies a lot on throwing bodies at the enemy
-					factor = 3
-
-					tag = CHI
-					has_manpower < 200000
+					factor = 30
+					AND = {
+						manpower_per_military_factory > 8000
+						has_idea = all_adults_serve
+					}
 				}
 			}
 			
@@ -189,41 +191,29 @@ ideas = {
 				industrial_capacity_factory = -0.2
 				industrial_capacity_dockyard = -0.2
 				production_speed_buildings_factor = -0.2
-				training_time_factor = 0.3
+				training_time_factor = 0.6
 			}
 			
 			cancel_if_invalid = no
 		}
 		
 		all_adults_serve = {
-			
-			
-
 
 			ai_will_do = {
    				factor = 1
 				modifier = {
-					#Prio if low on manpower
-					factor = 20
-					manpower_per_military_factory <  600
+					factor = 35
+					AND = {
+						manpower_per_military_factory < 1200
+						has_idea = service_by_requirement
+					}
 				}
 				modifier = {
-					#Lower chance if has decent amount
-					factor = 0.5
-					manpower_per_military_factory >  1000
-				}
-				modifier = {
-					#Block has plenty manpower
-					factor = 0
-					NOT = { tag = CHI }
-					manpower_per_military_factory >  5000
-				}
-
-				modifier = { # china relies a lot on throwing bodies at the enemy
-					factor = 3
-
-					tag = CHI
-					has_manpower < 200000
+					factor = 35
+					AND = {
+						manpower_per_military_factory > 8000
+						has_idea = scraping_the_barrel
+					}
 				}
 			}
 		
@@ -233,42 +223,25 @@ ideas = {
 			
 			modifier = {
 				conscription = 0.12
-				industrial_capacity_factory = -0.5
-				industrial_capacity_dockyard = -0.5
-				production_speed_buildings_factor = -0.5
-				#XP from reinforcement penalty (small)
-				training_time_factor = 0.4
+				industrial_capacity_factory = -0.4
+				industrial_capacity_dockyard = -0.4
+				production_speed_buildings_factor = -0.4
+				training_time_factor = 0.8
 			}
 			
 			cancel_if_invalid = no
 		}
 		
 		scraping_the_barrel = {
-			
-			
-			available = {
-				has_war = yes
-				
-				enemies_strength_ratio > 1
-	
-			}
 
 			ai_will_do = {
    				factor = 1
 				modifier = {
-					#Prio if low on manpower
-					factor = 20
-					manpower_per_military_factory <  500
-				}				
-				modifier = {
-					#Lower chance if has decent amount
-					factor = 0.5
-					manpower_per_military_factory >  1000
-				}
-				modifier = {
-					#Block has plenty manpower
-					factor = 0
-					manpower_per_military_factory >  5000
+					factor = 40
+					AND = {
+						manpower_per_military_factory < 1200
+						has_idea = all_adults_serve
+					}
 				}
 			}
 
@@ -278,10 +251,10 @@ ideas = {
 
 			modifier = {
 				conscription = 0.2
-				industrial_capacity_factory = -0.6
-				industrial_capacity_dockyard = -0.6
-				production_speed_buildings_factor = -0.6
-				training_time_factor = 0.5
+				industrial_capacity_factory = -0.5
+				industrial_capacity_dockyard = -0.5
+				production_speed_buildings_factor = -0.5
+				training_time_factor = 1
 			}
 			
 			cancel_if_invalid = no
