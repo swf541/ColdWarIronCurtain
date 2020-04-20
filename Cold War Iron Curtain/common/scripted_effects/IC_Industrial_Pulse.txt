@@ -701,19 +701,28 @@ industrial_pulse = {
 	#Food Comparison
 	add_to_variable = { foodCheck = food_bonus }
 	add_to_variable = { foodCheck = resource_imported@rubber }
+	set_variable = { food_penalty = 0 }
 	if = {
-		limit = { check_variable = { foodCheck < food_consumption } }
-		set_variable = { food_penalty = -0.05 }
+		limit = {
+			check_variable = { foodCheck < food_consumption } 
+		}
+		set_variable = { food_penalty = -1 }
 		set_variable = { foodCheckComp = foodCheck }
-		set_variable = { foodConsumptionComp = food_consumption  }
-		divide_variable = { foodConsumptionComp = foodCheckComp }
+		set_variable = { foodConsumptionComp = food_consumption }
+		
+		subtract_from_variable = { foodConsumptionComp = foodCheckComp }
+		divide_variable = { foodConsumptionComp = food_consumption }
+		
 		multiply_variable = { foodConsumptionComp = 0.5 }
-		add_to_variable = { food_penalty = foodConsumptionComp }
+		multiply_variable = { food_penalty = foodConsumptionComp }
 		
-		set_variable = { food_penalty_production = production_factory_max_efficiency_factor }
+		set_variable = { food_penalty_production = modifier@production_factory_max_efficiency_factor }
 		multiply_variable = { food_penalty_production = food_penalty }
+		multiply_variable = { food_penalty_production = -1 }
 		
-		set_variable = { food_penalty_construction = production_factory_max_efficiency_factor }
-		multiply_variable = { food_penalty_construction = production_speed_buildings_factor }
+		set_variable = { food_penalty_construction = modifier@production_speed_buildings_factor }
+		multiply_variable = { food_penalty_construction = food_penalty }
+		multiply_variable = { food_penalty_construction = -1 }
+		
 	}
 }
