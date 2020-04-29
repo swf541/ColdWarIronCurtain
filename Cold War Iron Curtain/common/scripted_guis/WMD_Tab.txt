@@ -230,6 +230,14 @@ scripted_gui = {
         context_type = player_context
         window_name = "wmd_bottom_portion"
 		parent_window_name = WMD_tab
+		triggers = {
+			wmd_button_launch_click_enabled = {
+				has_equipment = {
+					icbm_equipment > var:warhead_cost
+				}
+			}
+			
+		}
 		effects = {
 			tier1_click = { 
 				add_political_power = 100
@@ -251,7 +259,27 @@ scripted_gui = {
 				clr_country_flag = WMD_STRIKE_LEVEL_2
 				clr_country_flag = WMD_STRIKE_LEVEL_1
 			}
-
+			wmd_button_launch_click = { 
+				for_each_loop = {
+					array = WarCrimeTargetList
+					launch_nuke = {
+						state = var:WarCrimeTargetList^i
+						use_nuke = yes
+					}
+					#ADD DAMAGE MULTIPLIER HERE
+				}
+				set_variable = { icbm_cost = warhead_cost }
+				multiply_variable = { icbm_cost = -1 }
+				meta_effect = {
+					text = {
+						add_equipment_to_stockpile = {
+							type = icbm_equipment
+							amount = [AMNT]
+						}
+					}
+					AMNT = "icbm_cost"
+				}
+			}
 		}
     }
 }
