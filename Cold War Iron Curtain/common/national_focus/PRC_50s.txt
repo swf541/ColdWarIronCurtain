@@ -49,10 +49,16 @@ focus_tree = {
 			completion_reward = {
 					news_event = news.1005
 					drop_cosmetic_tag = yes
+
+					add_political_power = 350
+
 					hidden_effect = {
+						add_ideas = illegal_opposition_3
+						
 						add_war_support = -0.35
 						add_stability = 0.25
 						add_ideas = Xinjiang_Seperatists
+						add_ideas = party_supremacy_1
 					}
 				}
 
@@ -2119,10 +2125,8 @@ focus_tree = {
 		x = 41
 		y = 1
 		completion_reward = { 
-			add_timed_idea = {
-				idea = political_crackdown
-				days = 750
-			}
+			remove_ideas = illegal_opposition_3
+			add_ideas = illegal_opposition_2
 		}
 	}
 	focus = {
@@ -2136,12 +2140,24 @@ focus_tree = {
 		x = 38
 		y = 2
 		completion_reward = {
-			add_popularity = {
-				ideology = socialist
-				popularity = 0.075
+			if = {
+				limit = {
+					has_idea = illegal_opposition_2
+					}
+				remove_ideas = illegal_opposition_2
+
+				add_ideas = illegal_opposition_1
+
+			else_if = {
+				limit = { 
+					
+					has_idea = illegal_opposition_1 
+					}
+
+				remove_ideas = illegal_opposition_1
+				
+				}
 			}
-			add_political_power = 150
-			add_stability = 0.02
 		}
 	}
 	focus = {
@@ -2155,12 +2171,11 @@ focus_tree = {
 		x = 41
 		y = 2
 		completion_reward = { 
-			add_timed_idea = {
-				idea = leftwing_deathsquads
-				days = 750
+			remove_ideas = party_supremacy_1
+			add_ideas = party_supremacy_2
+			add_ideas = laogai_1
 			}
-		}
-	}	
+		}	
 	focus = {
 		id = PRC_Hold_Trials_Against_Hostile_Elements
 		icon = GFX_reign_of_terror
@@ -2172,9 +2187,28 @@ focus_tree = {
 		x = 44
 		y = 2
 		completion_reward = {
-			add_ideas = one_party_state
+			if = {
+				limit = {
+					has_idea = illegal_opposition_2
+					}
+
+				remove_ideas = illegal_opposition_2
+
+				add_ideas = illegal_opposition_1
+
+			else_if = {
+				limit = { 
+					has_idea = illegal_opposition_1 
+					}
+
+				remove_ideas = illegal_opposition_1
+
+
+				}
+			}		
 		}	
 	}
+
 	focus = {
 		id = PRC_Purge_The_Administration
 		icon = GFX_DeathTracks2
@@ -2195,8 +2229,10 @@ focus_tree = {
 		x = 40
 		y = 3
 			completion_reward = {
-					add_stability = -0.05
-					add_political_power = 150
+					remove_ideas = laogai_1
+					add_ideas = laogai_2
+					remove_ideas = party_supremacy_2
+					add_ideas = party_supremacy_3
 				}
 
 	}
@@ -2211,7 +2247,8 @@ focus_tree = {
 		x = 40
 		y = 4
 			completion_reward = {
-				add_stability = 0.05
+				remove_ideas = party_supremacy_3
+				add_ideas = party_supremacy_4
 				}
 
 	}
@@ -2235,15 +2272,13 @@ focus_tree = {
 		x = 42
 		y = 3
 			completion_reward = {
-					add_political_power = 150
-					add_popularity = {
-							ideology = nationalism
-							popularity = 0.02
-						}
-					add_popularity = {
-							ideology = socialist
-							popularity = 0.05
-						}
+					hidden_effect = {
+
+					}
+					remove_ideas = party_supremacy_2
+					add_ideas = party_supremacy_1
+					remove_ideas = administration_integration_3
+					add_ideas = administration_integration_2
 				}
 
 	}
@@ -2258,8 +2293,8 @@ focus_tree = {
 		x = 42
 		y = 4
 			completion_reward = {
-					add_political_power = 200
-					add_stability = 0.01
+				remove_ideas = administration_integration_2
+				add_ideas = administration_integration_1
 						}
 
 	}
@@ -2341,7 +2376,23 @@ focus_tree = {
 		x = 45
 		y = 6
 		completion_reward = {
-			add_ideas = repression
+			if = {
+				limit = {
+					has_idea = party_supremacy_1
+				}
+					remove_ideas = party_supremacy_1
+					add_ideas = party_supremacy_2
+
+				else_if = {
+
+				limit = {
+					has_idea = party_supremacy_4
+				}
+
+					remove_ideas = party_supremacy_4
+					add_ideas = party_supremacy_5
+				}
+			}
 		}
 	}
 	focus = {
@@ -2355,14 +2406,30 @@ focus_tree = {
 		x = 43
 		y = 7
 			completion_reward = {
-					add_ideas = state_media
-					add_popularity = {
-							ideology = maoism
-							popularity = 0.10
-						}
-				}
 
+				custom_effect_tooltip = daily_PRC_TT
+			
+			hidden_effect = {
+			if = {
+				limit = {
+					has_idea = party_supremacy_2
+				}
+					remove_ideas = party_supremacy_2
+					add_ideas = party_supremacy_3
+
+				else_if = {
+					
+				limit = {
+					has_idea = party_supremacy_5
+				}
+					remove_ideas = party_supremacy_5
+					add_ideas = party_supremacy_6
+				}
+			}
+			}
+		}
 	}
+
 	focus = {
 		id = PRC_Ministry_of_Propaganda
 		icon = GFX_Nationalize_the_Press
@@ -2383,7 +2450,13 @@ focus_tree = {
 		icon = GFX_Communist_Repression_2
 		search_filters = {IC_FILTER}
 		cost = 5.00
+		available = {
+			NOT = {
+			has_stability < 0.5
+			}
+		}
 		prerequisite = {
+			
 			focus = PRC_Ministry_of_Propaganda
 		}
 		prerequisite = {
@@ -2392,40 +2465,130 @@ focus_tree = {
 		x = 45
 		y = 8
 			completion_reward = {
-					add_ideas = revolutionary_fervor
+
+				custom_effect_tooltip = PRC_campaign_TT
+					
+				hidden_effect = {
+					add_stability = -0.1
+					if = {
+				limit = {
+					has_idea = party_supremacy_6
+				}
+					remove_ideas = party_supremacy_6
+					add_ideas = party_supremacy_7
+
+				else_if = {
+
+					limit = {
+
+					has_idea = party_supremacy_3
 				}
 
+					remove_ideas = party_supremacy_3
+					add_ideas = party_supremacy_4
+					}
+				}
+			}
+		}
 	}
 	focus = {
 		id = PRC_Three_Anti_Campaign
 		icon = GFX_Camp_Rafidah
 		search_filters = {IC_FILTER}
 		cost = 5.00
+		available = {
+			NOT = {
+			has_stability < 0.6
+			has_political_power < 300
+			}
+		}
 		prerequisite = {
 			focus = PRC_Launch_the_Mass_Campaigns
 		}
 		x = 45
 		y = 9
 			completion_reward = {
+				
+				custom_effect_tooltip = PRC_campaign_TT 
+
+				hidden_effect = {
 					news_event = PRC_Focus.5
-					add_political_power = 100
-					add_stability = -0.05
+					add_political_power = -300
+					add_stability = -0.15
+					add_ideas = intra_party_opposition_1
 				}
 
+				if = {
+					limit = {
+						has_idea = party_supremacy_7
+					}
+					remove_ideas = party_supremacy_7
+					add_ideas =party_supremacy_8
+
+				else_if = {
+					limit = {
+						has_idea = party_supremacy_4
+					}
+					remove_ideas = party_supremacy_4
+					add_ideas = party_supremacy_5
+				}
+			}
+		}
 	}
 	focus = {
 		id = PRC_Fight_Corruption
 		icon = GFX_Stamp_out_Corruption
 		search_filters = {IC_FILTER}
 		cost = 5.00
+		available = {
+			if = {
+				limit = {
+				has_idea = administration_integration_3
+				}
+				has_political_power = 75
+				else_if = {
+					limit = {
+						has_idea = administration_integration_2
+					}
+					has_political_power = 50
+				}
+			}
+		}
 		prerequisite = {
+			
 			focus = PRC_Three_Anti_Campaign
 		}
 		x = 42
 		y = 10
 		completion_reward = {
+
+			if = {
+				limit = {
+					has_idea = administration_integration_1
+				}
+				remove_ideas = administration_integration_1
+			
+			else_if = {
+				limit = { 
+					has_idea = administration_integration_3
+				}
+				remove_ideas = administration_integration_3
+				add_ideas = administration_integration_2
+				add_political_power = -75
+				}
+			else_if = {
+				limit = {
+					has_idea = administration_integration_2
+				}
+				remove_ideas = administration_integration_2
+				add_ideas = administration_integration_1
+				add_political_power = -50
+			}
+
 			remove_ideas = SOV_government_corruption_endemic
-			add_ideas = SOV_government_corruption		
+
+			add_ideas = SOV_government_corruption	
+			}
 		}
 	}
 	focus = {
@@ -2450,13 +2613,67 @@ focus_tree = {
 		icon = GFX_DeathTracks
 		search_filters = {IC_FILTER}
 		cost = 5.00
+		available = {
+		if = {
+				limit = {
+					has_idea = administration_integration_2
+			}
+			has_political_power > 50
+			
+			else_if = {
+				limit = {
+					has_idea = administration_integration_3
+				}
+			has_political_power > 75
+				}
+			}
+		}
 		prerequisite = {
 			focus = PRC_Three_Anti_Campaign
+			
 		}
 		x = 48
 		y = 10
 		completion_reward = {
-			add_ideas = gulag_politic
+			if = {
+				limit = {
+					has_idea = laogai_1
+				}
+				remove_ideas = laogai_1
+				add_ideas = laogai_2
+
+			else_if = {
+				limit = {
+					has_idea = laogai_2
+				}
+				remove_ideas = laogai_2
+				add_ideas = laogai_3
+				}
+			}
+
+			if = {
+				limit = {
+					has_idea = administration_integration_1
+				}
+				remove_ideas = administration_integration_1
+			
+			else_if = {
+				limit = { 
+					has_idea = administration_integration_3
+				}
+				remove_ideas = administration_integration_3
+				add_ideas = administration_integration_2
+				add_political_power = -75
+				}
+			else_if = {
+				limit {
+					has_idea = administration_integration_2
+				}
+				remove_ideas = administration_integration_2
+				add_ideas = administration_integration_1
+				add_political_power = -50
+				}
+			}
 		}
 	}
 	focus = {
@@ -2464,6 +2681,11 @@ focus_tree = {
 		icon = GFX_Prison_Camps
 		search_filters = {IC_FILTER}
 		cost = 5.00
+		available = {
+		NOT = {
+			has_stability < 0.7
+			}
+		}
 		prerequisite = {
 			focus = PRC_Wreck_The_Bureacracy
 		}
@@ -2476,11 +2698,38 @@ focus_tree = {
 		x = 45
 		y = 11
 			completion_reward = {
-					news_event = PRC_Focus.6
-					remove_ideas = SOV_government_corruption
-					add_political_power = 150
-				}
 
+					custom_effect_tooltip = PRC_campaign_TT
+
+					hidden_effect = {
+					remove_ideas = intra_party_opposition_1
+					add_ideas = intra_party_opposition_2
+
+					add_stability = -0.2
+
+					news_event = PRC_Focus.6
+
+					remove_ideas = SOV_government_corruption
+
+					add_political_power = 150
+
+					if = {
+					limit = {
+						has_idea = party_supremacy_8
+					}
+					remove_ideas = party_supremacy_8
+					add_ideas =party_supremacy_9
+
+				else_if = {
+					limit = {
+						has_idea = party_supremacy_5
+					}
+					remove_ideas = party_supremacy_5
+					add_ideas = party_supremacy_6
+					}
+				}
+			}
+		}
 	}
 	focus = {
 		id = PRC_Encourage_Denunciations
@@ -2493,7 +2742,10 @@ focus_tree = {
 		x = 43
 		y = 12
 		completion_reward = {
-			add_ideas = workers_culture
+			remove_ideas = intra_party_opposition_2
+			add_ideas = intra_party_opposition_1
+
+			add_political_power = 150		
 		}
 	}
 	focus = {
@@ -2511,6 +2763,7 @@ focus_tree = {
 				ideology = maoism
 				popularity = 0.05
 			}
+			add_ideas = extra_spies
 			add_stability = 0.05
 		}
 	}
@@ -4324,6 +4577,9 @@ focus_tree = {
 		icon = GFX_focus_Hundred_Flowers
 		search_filters = {IC_FILTER}
 		cost = 5.00
+		available = {
+			has_stability > 0.8
+		}
 		prerequisite = {
 			focus = PRC_Remodel_the_Intellectuals
 		}
@@ -4336,9 +4592,18 @@ focus_tree = {
 		x = 41
 		y = 13
 			completion_reward = {
+					
 					news_event = PRC_Focus.4
-					add_ideas = hundred_flowers_campaign
+
+					custom_effect_tooltip = hundred_TT
+
+					hidden_effect = {
+						add_ideas = hundred_flowers_campaign
+						add_stability = -0.25
+					remove_ideas = intra_party_opposition_1
+					add_ideas = intra_party_opposition_10
 				}
+			}
 
 	}
 	focus = {
@@ -4349,16 +4614,49 @@ focus_tree = {
 		prerequisite = {
 			focus = PRC_Coping_With_Increased_Hostility_Towards_the_CPC
 		}
+		available = {
+			has_political_power > 400
+		}
 		mutually_exclusive = {
 			focus = PRC_Reconsider_the_Legitimacy_of_the_Regime
 		}
 		x = 46
 		y = 17
 			completion_reward = {
-					news_event = PRC_Focus.2
-				}
+				news_event = PRC_Focus.2
 
+				add_political_power = -400
+				
+				custom_effect_tooltip = rectification_TT
+
+
+				hidden_effect {
+
+					add_ideas = illegal_opposition_3
+
+					remove_ideas = intra_party_opposition_10
+					add_ideas = intra_party_opposition_9
+
+					if = {
+						limit = {
+							has_idea = party_supremacy_6
+						}
+							remove_ideas = party_supremacy_6
+							add_ideas = party_supremacy_5
+			
+					else_if = {
+						limit = {
+							has_idea = party_supremacy_3
+						}
+
+					remove_ideas = party_supremacy_3
+
+					add_ideas = party_supremacy_2
+				}
+			}		
+		}
 	}
+}
 	focus = {
 		id = PRC_Reconsider_the_Legitimacy_of_the_Regime
 		icon = GFX_Communist_Discourse  
@@ -4389,7 +4687,12 @@ focus_tree = {
 		x = 46
 		y = 18
 			completion_reward = {
-					add_ideas = total_loyalty
+					custom_effect_tooltip = rectification_TT
+
+					hidden_effect = {
+						remove_ideas = intra_party_opposition_9
+						add_ideas = intra_party_opposition_8
+					}
 				}
 
 	}
@@ -4407,8 +4710,8 @@ focus_tree = {
 		x = 44
 		y = 21
 			completion_reward = {
-					remove_ideas = repression
-					add_ideas = severe_repression
+					remove_ideas = intra_party_opposition_7
+					add_ideas = intra_party_opposition_6
 				}
 
 	}
@@ -4477,8 +4780,29 @@ focus_tree = {
 		x = 46
 		y = 22
 			completion_reward = {
+				custom_effect_tooltip = hundred_end_TT
+				
+				hidden_effect = {
+					if = {
+						limit = {
+						has_idea = party_supremacy_3
+						}
+	
+					remove_ideas = party_supremacy_3
+					add_ideas = party_supremacy_5
+
+					else_if = {
+						limit = {
+							has_idea = party_supremacy_6
+						}
+						remove_ideas = party_supremacy_6
+						add_ideas = party_supremacy_5
+					}
+				}
+				
 				remove_ideas = hundred_flowers_campaign
 			}
+		}
 
 	}
 	focus = {
@@ -4492,9 +4816,17 @@ focus_tree = {
 		x = 46
 		y = 23
 			completion_reward = {
-					country_event = PRC_Focus.28
-					add_stability = 0.05
-					add_political_power = 150
+
+					custom_effect_tooltip = lushan_TT
+					
+
+					hidden_effect = {
+						country_event = PRC_Focus.28
+						add_stability = 0.15
+						add_political_power = 150
+						remove_ideas = intra_party_opposition_6
+						add_ideas = intra_party_opposition_4
+					}
 				}
 
 	}
@@ -4606,12 +4938,32 @@ focus_tree = {
 		x = 41
 		y = 14
 		completion_reward = {
+
+			custom_effect_tooltip = warning_hundred_TT
+
+			hidden_effect = {
+
+			if = {
+				limit = {
+					has_idea = party_supremacy_6
+				}
+				remove_ideas = party_supremacy_6
+				add_ideas = party_supremacy_5
+			
+			else_if = {
+				limit = {
+				has_idea = party_supremacy_9
+			}
+			remove_ideas = party_supremacy_9
+			add_ideas = party_supremacy_8
+			}
+
 			add_political_power = 100
-			add_popularity = {
-				ideology = maoism
-				popularity = -0.05
+			
+			add_stability = -0.05
 			}
 		}
+	}
 	}
 	focus = {
 		id = PRC_Coping_With_Increased_Hostility_Towards_the_CPC
@@ -4630,14 +4982,29 @@ focus_tree = {
 		x = 41
 		y = 16
 		completion_reward = {
-			add_political_power = 150
-			add_stability = -0.03
-			add_popularity = {
-				ideology = maoism
-				popularity = -0.03
+			custom_effect_tooltip = van_halen_fair_warning_TT
+
+			hidden_effect = {
+				add_stability = -0.05
+
+				if = {
+				limit = {
+					has_idea = party_supremacy_4
+				}
+				remove_ideas = party_supremacy_4
+				add_ideas = party_supremacy_3
+			
+				else_if = {
+					limit = {
+						has_idea = party_supremacy_7
+					}
+					remove_ideas = party_supremacy_7
+					add_ideas = party_supremacy_6
+				}
 			}
 		}
 	}
+}
 	focus = {
 		id = PRC_Pressure_Cadres_For_Criticizing
 		icon = GFX_focus_internal_dissent
@@ -4649,10 +5016,12 @@ focus_tree = {
 		x = 44
 		y = 15
 		completion_reward = {
-			add_ideas = political_commissars_focus
-			add_popularity = {
-				ideology = maoism
-				popularity = -0.03
+			custom_effect_tooltip = warning_hundred_TT
+
+			hidden_effect = {
+				add_stability = -0.1
+
+				add_political_power = 150
 			}
 		}
 	}
@@ -4667,10 +5036,12 @@ focus_tree = {
 		x = 41
 		y = 15
 		completion_reward = {
-			remove_ideas = repression
-			add_popularity = {
-				ideology = maoism
-				popularity = -0.03
+			custom_effect_tooltip = warning_hundred_TT
+
+			hidden_effect = {
+				add_stability = -0.1
+
+				add_political_power = 150
 			}
 		}
 	}
@@ -4685,10 +5056,29 @@ focus_tree = {
 		x = 38
 		y = 15
 		completion_reward = {
-			add_ideas = art_and_liberalization
-			add_popularity = {
-				ideology = maoism
-				popularity = -0.03
+			custom_effect_tooltip = warning_hundred_TT
+
+			
+			hidden_effect = {
+				add_stability = -0.1
+				
+				if = {
+				limit = {
+					has_idea = party_supremacy_5
+				}
+				remove_ideas = party_supremacy_5
+				add_ideas = party_supremacy_4
+			
+			else_if = {
+				limit = {
+				has_idea = party_supremacy_8
+			}
+			remove_ideas = party_supremacy_8
+			add_ideas = party_supremacy_7
+			}
+
+				add_political_power = 150
+				}
 			}
 		}
 	}
@@ -4775,6 +5165,14 @@ focus_tree = {
 		y = 19
 		completion_reward = {
 			add_political_power = 150
+
+			custom_effect_tooltip = rectification_TT
+
+			hidden_effect = {
+				remove_ideas = intra_party_opposition_8
+				add_ideas = intra_party_opposition_7
+			}
+
 		}
 	}
 	focus = {
@@ -4788,11 +5186,15 @@ focus_tree = {
 		x = 42
 		y = 20
 		completion_reward = {
-			add_timed_idea = {
-				idea = death_squads
-				days = 750
+
+			custom_effect_tooltip = rectification_TT
+
+			hidden_effect = {
+				news_event = PRC_Focus.7
+				remove_ideas = intra_party_opposition_7
+				add_ideas = intra_party_opposition_6
 			}
-			news_event = PRC_Focus.7
+			
 		}
 	}
 	focus = {
@@ -4806,14 +5208,30 @@ focus_tree = {
 		x = 46
 		y = 20
 		completion_reward = {
-			add_political_power = 150
-			add_popularity = {
-				ideology = maoism
-				popularity = 0.03
+
+			custom_effect_tooltip = rectification_TT
+
+			hidden_effect = {
+				news_event = PRC_Focus.8
+
+			if = {
+				limit = {
+					has_idea = party_supremacy_2
+				}
+				remove_ideas = party_supremacy_2
+				add_ideas = party_supremacy_3
+
+				else_if = {
+					limit = {
+						has_idea = party_supremacy_5
+					}
+					remove_ideas = party_supremacy_5
+					add_ideas = party_supremacy_6
+				}
 			}
-			news_event = PRC_Focus.8
-		}
+		}		
 	}
+}
 	focus = {
 		id = PRC_Public_Criticism_of_the_Enemies_of_the_Regime
 		icon = GFX_microphone
@@ -4825,7 +5243,13 @@ focus_tree = {
 		x = 49
 		y = 19
 		completion_reward = {
-			remove_ideas = art_and_liberalization
+
+			custom_effect_tooltip = rectification_TT
+
+			hidden_effect = {
+				remove_ideas = illegal_opposition_3
+				add_ideas = illegal_opposition_2
+			}
 		}
 	}
 	focus = {
@@ -4839,8 +5263,15 @@ focus_tree = {
 		x = 49
 		y = 20
 		completion_reward = {
-			add_ideas = repress_minorities
-			news_event = PRC_Focus.3
+
+			custom_effect_tooltip = rectification_TT
+
+			hidden_effect = {
+				news_event = PRC_Focus.3
+				remove_ideas = illegal_opposition_2
+				add_ideas = illegal_opposition_1
+			}
+			
 		}
 	}
 	focus = {
@@ -4854,8 +5285,12 @@ focus_tree = {
 		x = 47
 		y = 21
 		completion_reward = {
-			add_ideas = state_atheism
-			add_stability = -0.01
+
+			custom_effect_tooltip = rectification_TT
+
+			hidden_effect = {
+				remove_ideas = illegal_opposition_1
+			}
 		}
 	}
 	focus = {
@@ -4869,7 +5304,10 @@ focus_tree = {
 		x = 50
 		y = 21
 		completion_reward = {
-			add_ideas = martial_law
+
+			custom_effect_tooltip = rectification_TT
+
+			add_stability = 0.05
 		}
 	}
 }
