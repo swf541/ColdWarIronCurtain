@@ -74,6 +74,7 @@ NDefines.NGame.END_DATE = "2050.5.23.12"
 NDefines.NGame.START_DATE = "1945.5.23.12"
 
 NDefines.NMilitary.MAX_DIVISION_SUPPORT_WIDTH = 2 -- Max width of support in division designer.
+NDefines.NMilitary.MAX_DIVISION_SUPPORT_HEIGHT = 5 -- Max width of support in division designer.
 NDefines.NMilitary.MAX_ARMY_EXPERIENCE = 9999999;
 NDefines.NMilitary.MAX_NAVY_EXPERIENCE = 9999999;
 NDefines.NMilitary.MAX_AIR_EXPERIENCE = 9999999;
