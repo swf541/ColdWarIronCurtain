@@ -1,0 +1,71 @@
+
+#TEMPLATE# To use, simply copy this file and use replace all to replace the following tags then put in mercenary_calc_global
+	[COMPANY NAME] #All lower case no spaces
+	[TYPE] #Militia, Light, Mobile, Pro
+	[TYPE NUMBER] #1 = Militia, 2 = Light, 3 = Mobile, 4 = Pro
+#PUT IN mercenary_company_establishment in IncomeGenerator.txt#
+	if = {
+		limit = {
+			NOT = { has_global_flag = [COMPANY NAME]_established }
+			has_global_flag = [COMPANY NAME]_enabled
+		}
+		set_variable = { global.[COMPANY NAME]_manpower_limit = global.Merc[TYPE]Manpower }
+		multiply_variable = { global.[COMPANY NAME]_manpower_limit = [# of Divisions Total] }
+		set_variable = { global.[COMPANY NAME]_manpower = global.[COMPANY NAME]_manpower_limit }
+		set_variable = { global.[COMPANY NAME]_division_[NAME] = [# of Divisions] } #Make as many as you want and 1 OOB for each Division template#
+		set_variable = { global.[COMPANY NAME]_profit = 0 }
+		set_variable = { global.[COMPANY NAME]_type = [TYPE NUMBER] } #1 - militia, 2 - light, 3 - mobile, 4 - pro
+		set_global_flag = [COMPANY NAME]_established
+	}
+#PUT IN mercenary_calc_global in IncomeGenerator.txt#
+	if = {
+		limit = {
+			check_variable = { global.[COMPANY NAME]_manpower < global.[COMPANY NAME]_manpower_limit } #Manpower is less than limit
+			has_global_flag = [COMPANY NAME]_enabled
+		}
+		set_variable = { manpower_replenish = global.[COMPANY NAME]_manpower_limit }
+		multiply_variable = { manpower_replenish = global.MercManpowerReplenish }
+		add_to_variable = { global.[COMPANY NAME]_manpower = manpower_replenish } #Replenish available liquidity
+		divide_variable = { manpower_replenish = 1000 }
+		mutliply_variable = { manpower_replenish = global.Merc[TYPE]ManpowerPrice }
+		mutliply_variable = { manpower_replenish = 0.5 }
+		subtract_from_variable = { global.[COMPANY NAME]_profit = manpower_replenish }
+		set_variable = { manpower_replenish = 0 }
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	set_temp_variable = { num_battalions_with_type@mercenary_militia = merc_militia_desired }
+	set_temp_variable = { num_battalions_with_type@mercenary_light = merc_light_desired }
+	set_temp_variable = { num_battalions_with_type@mercenary_mobile = merc_mobile_desired }
+	set_temp_variable = { num_battalions_with_type@mercenary_pro = merc_pro_desired }
+	multiply_temp_variable = { merc_militia_desired = 2000 }
+	multiply_temp_variable = { merc_light_desired = 1500 }
+	multiply_temp_variable = { merc_mobile_desired = 1000 }
+	multiply_temp_variable = { merc_pro_desired = 500 }
+	#limit = less manpower than desired then fire a seperate calc to replenish
+	#limit = less equipment than desired x 2 then fire a equipment purchse in this script to buy it
+	#use arrays or something
+	#if = { #PUT IN A SEPERATE SCRIPT#
+	#	limit = {
+	#		is_in_array = { [COMPANY NAME]_clients }
+	#		check_variable = { num_equipment@mercenary_manpower <  }
+	#	}
+	#		mercenary
+	#}
