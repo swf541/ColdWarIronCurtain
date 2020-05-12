@@ -1,0 +1,2019 @@
+biafra_war_categorty = {
+	#Establish the Republic of Benin
+	Secure_Our_Independence_BFR = {
+		
+		
+		visible = {
+			tag = BFR
+		}
+		available = {
+			always = no
+
+		}
+
+		activation = {
+			has_war_with = NGA
+			tag = BFR
+		}
+
+		selectable_mission = no
+		days_mission_timeout = 1825 
+		fire_only_once = yes
+		
+
+		
+		timeout_effect = {
+			white_peace = NGA
+			#if = { limit = { country_exists = BEN } BEN = { white_peace = NGA } }
+			news_event = Biafra_War.4
+		}
+
+		complete_effect = {
+
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+}
+Angolan_War_Decisions_categorty = {
+	Operation_Savannah_DOC = {
+		
+		
+		visible = {
+			tag = SAF
+		}
+		available = {
+			always = no
+
+		}
+
+		activation = {
+			always = no
+		}
+
+		selectable_mission = no
+		days_mission_timeout = 90 
+		fire_only_once = yes
+
+		timeout_effect = {
+			if = {
+				limit = {
+					OR = { 
+						controls_state = 540
+						FNL = { controls_state = 540 }
+					}
+				}	
+				transfer_state = 902
+				set_autonomy = { target = FNL autonomy_state = autonomy_free }
+				FNL = {
+					transfer_state = 979
+					transfer_state = 540
+					transfer_state = 1316
+					transfer_state = 1039
+					transfer_state = 1034
+					transfer_state = 1138
+					news_event = { id = Angola_Civil_War.10 days = 10 }
+				}
+				UNT = {
+					annex_country = { target = ANG transfer_troops = no }	
+				}
+				news_event = Angola_Civil_War.4	
+				news_event = { id = Angola_Civil_War.9 days = 1 }
+				
+				set_global_flag = PARTITION_ANGOLA
+			}
+			else = {
+				news_event = Angola_Civil_War.3
+				
+				set_global_flag = OP_SAVANNAH_FAIL_DOC
+				white_peace = ANG
+
+			}
+		}
+	}
+	Operation_Savannah_SAF = {
+		
+		
+		visible = {
+			tag = SAF
+		}
+		available = {
+			always = no
+
+		}
+
+		activation = {
+			always = no
+		}
+
+		selectable_mission = no
+		days_mission_timeout = 100
+		fire_only_once = yes
+
+		timeout_effect = {
+			if = {
+				limit = {
+					controls_state = 540
+				}
+				UNT = {
+					annex_country = { target = FNL transfer_troops = yes }	
+					annex_country = { target = ANG transfer_troops = no }	
+				}
+				news_event = Angola_Civil_War.6	
+				set_global_flag = UNITA_ANGOLA
+				news_event = { id = Angola_Civil_War.11 days = 1 }
+			}
+			else = {
+				news_event = Angola_Civil_War.7
+				set_global_flag = OP_SAVANNAH_FAIL
+				white_peace = ANG
+			}
+		}
+	}
+
+	The_Carnation_Revolution = {
+		
+		
+		visible = {
+			tag = POR
+		}
+		available = {
+			always = no
+
+		}
+
+		activation = {
+			has_country_flag = Angolan_Bush_War
+			tag = POR
+		}
+
+		selectable_mission = no
+		days_mission_timeout = 4862 
+		fire_only_once = yes
+		
+
+		
+		timeout_effect = {
+			if = {
+				limit = {
+					check_variable = { POR.victory_points < GNB.victory_points }
+					OR = {
+						check_variable = { POR.victory_points < FNL.ANGOLA_VICTORY_POINTS }
+						check_variable = { POR.victory_points < UNT.ANGOLA_VICTORY_POINTS }
+						check_variable = { POR.victory_points < ANG.ANGOLA_VICTORY_POINTS }
+					}
+				}
+				GBN = {
+					transfer_state = 296
+					country_event = gbn_colonial_war.301
+				}
+				ANG = {
+					transfer_state = 1313
+					transfer_state = 1314
+					transfer_state = 1317
+					transfer_state = 13389
+					transfer_state = 1138
+					transfer_state = 1316
+					transfer_state = 8248
+				}
+				UNT = {
+					transfer_state = 1311
+					transfer_state = 1315
+				}
+				release = MZB
+				white_peace = MZB
+				news_event = CARNATION_REV.1
+				set_country_flag = CARNATION_REV_SUCCESS
+				set_politics = {
+					ruling_party = neutrality
+					election_frequency = 48
+					elections_allowed = no
+				}
+				create_country_leader = {
+					name = "António de Spínola"
+					picture = "Antonio_de_Spinola.dds"
+					ideology = military_junta
+				}
+				news_event = { id = Angola_Civil_War.0 days = 1 }
+				news_event = { id = Angola_Civil_War.1 days = 2 }
+				news_event = { id = Angola_Civil_War.5 days = 3 }
+				DOC = { activate_mission = Operation_Savannah_DOC }
+				SAF = { activate_mission = Operation_Savannah_SAF }
+				SAF = {
+					declare_war_on = {
+						target = ANG
+						type = annex_everything
+					}	
+				}
+				DOC = {
+					puppet = FNL
+					declare_war_on = {
+						target = ANG
+						type = annex_everything
+					}					
+				}
+			}
+
+			else = {
+				set_country_flag = CARNATION_FAILED
+				news_event = CARNATION_REV.2
+			}
+		}
+
+		complete_effect = {
+
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Infilitrate_UNITA = {
+
+		icon = generic_civil_support
+		visible = {
+			country_exists = UNT
+			POR = { has_country_flag = Angolan_Bush_War }
+			OR = {
+				NOT = { POR = { has_country_flag = CARNATION_REV_SUCCESS } }
+				NOT = { tag = POR }
+			}
+		}
+		allowed = {
+			OR = {
+				tag = ANG
+				#tag = UNT
+				tag = POR	
+				tag = FNL
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		days_re_enable = 25
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+			if = {
+				limit = { tag = FNL }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_FNL.21
+					}
+					40 = {
+						country_event = ANGOLA_FNL.22
+					}
+				}
+			}
+			if = {
+				limit = { tag = ANG }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_ANG.21
+					}
+					40 = {
+						country_event = ANGOLA_ANG.22
+					}
+				}
+			}
+			if = {
+				limit = { tag = POR }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_POR.21
+					}
+					40 = {
+						country_event = ANGOLA_POR.22
+					}
+				}
+			}
+		}
+	}
+
+	Infilitrate_The_MPLA = {
+
+		icon = generic_civil_support
+		visible = {
+			country_exists = ANG
+			POR = { has_country_flag = Angolan_Bush_War }
+			OR = {
+				NOT = { POR = { has_country_flag = CARNATION_REV_SUCCESS } }
+				NOT = { tag = POR }
+			}
+		}
+		allowed = {
+			OR = {
+				#tag = ANG
+				tag = UNT
+				tag = POR	
+				tag = FNL
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		days_re_enable = 25
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+			if = {
+				limit = { tag = FNL }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_FNL.11
+					}
+					40 = {
+						country_event = ANGOLA_FNL.12
+					}
+				}
+			}
+			if = {
+				limit = { tag = UNT }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_UNT.11
+					}
+					40 = {
+						country_event = ANGOLA_UNT.12
+					}
+				}
+			}
+			if = {
+				limit = { tag = POR }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_POR.1
+					}
+					40 = {
+						country_event = ANGOLA_POR.2
+					}
+				}
+			}
+		}
+	}
+
+	Infilitrate_The_POR = {
+
+		icon = generic_civil_support
+		visible = {
+			country_exists = POR
+			POR = { has_country_flag = Angolan_Bush_War }
+			OR = {
+				NOT = { POR = { has_country_flag = CARNATION_REV_SUCCESS } }
+				NOT = { tag = POR }
+			}
+		}
+		allowed = {
+			OR = {
+				tag = ANG
+				tag = UNT
+				#tag = POR	
+				tag = FNL
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		days_re_enable = 25
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+			if = {
+				limit = { tag = FNL }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_FNL.1
+					}
+					40 = {
+						country_event = ANGOLA_FNL.2
+					}
+				}
+			}
+			if = {
+				limit = { tag = UNT }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_UNT.1
+					}
+					40 = {
+						country_event = ANGOLA_UNT.2
+					}
+				}
+			}
+			if = {
+				limit = { tag = ANG }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_ANG.1
+					}
+					40 = {
+						country_event = ANGOLA_ANG.2
+					}
+				}
+			}
+		}
+	}
+
+	Infilitrate_The_FNL = {
+
+		icon = generic_civil_support
+		visible = {
+			country_exists = FNL
+			POR = { has_country_flag = Angolan_Bush_War }
+			OR = {
+				NOT = { POR = { has_country_flag = CARNATION_REV_SUCCESS } }
+				NOT = { tag = POR }
+			}
+			NOT = { has_global_flag = KONGO_RESTORED }
+		}
+		allowed = {
+			OR = {
+				tag = ANG
+				tag = UNT
+				tag = POR	
+				#tag = FNL
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		days_re_enable = 25
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+			if = {
+				limit = { tag = POR }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_POR.11
+					}
+					40 = {
+						country_event = ANGOLA_POR.12
+					}
+				}
+			}
+			if = {
+				limit = { tag = UNT }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_UNT.21
+					}
+					40 = {
+						country_event = ANGOLA_UNT.22
+					}
+				}
+			}
+			if = {
+				limit = { tag = ANG }
+				random_list = {
+					60 = {
+						country_event = ANGOLA_ANG.11
+					}
+					40 = {
+						country_event = ANGOLA_ANG.12
+					}
+				}
+			}
+		}
+	}
+	Raid_The_FNLA = {
+
+		icon = generic_civil_support
+		visible = {
+			POR = { has_country_flag = Angolan_Bush_War }
+			OR = {
+				NOT = { has_country_flag = CARNATION_REV_SUCCESS } 
+				NOT = { tag = POR }
+			}
+			is_neighbor_of = FNL
+			NOT = { has_global_flag = KONGO_RESTORED }
+		}
+		allowed = {
+			OR = {
+				tag = UNT
+				tag = POR	
+				tag = ANG
+			}
+		}
+		available = {
+			has_border_war = no
+	
+		}
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		days_re_enable = 25
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+
+			random_owned_state = {
+				limit = {
+					any_neighbor_state = {
+						is_owned_by = FNL
+					}
+				}
+				set_variable = { ROOT.attacker_state = THIS.id }
+				random_neighbor_state = {
+					limit = { is_owned_by = FNL }
+					set_variable = { ROOT.defender_state = THIS.id }
+				}
+			}
+			if = {
+				limit = { tag = UNT }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_UNT.23
+						on_lose = ANGOLA_UNT.24
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_FNL.23
+						on_lose = ANGOLA_FNL.24
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+			if = {
+				limit = { tag = ANG }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_ANG.13
+						on_lose = ANGOLA_ANG.14
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_FNL.13
+						on_lose = ANGOLA_FNL.14
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+			if = {
+				limit = { tag = POR }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_POR.13
+						on_lose = ANGOLA_POR.14
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_FNL.3
+						on_lose = ANGOLA_FNL.4
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+		}
+	}
+	Raid_UNITA = {
+
+		icon = generic_civil_support
+		visible = {
+			POR = { has_country_flag = Angolan_Bush_War }
+			NOT = { POR = { has_country_flag = CARNATION_REV_SUCCESS } }
+			is_neighbor_of = POR
+		}
+		allowed = {
+			OR = {
+				tag = POR
+				tag = ANG	
+				tag = FNL
+			}
+		}
+		available = {
+			has_border_war = no
+	
+		}
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		days_re_enable = 25
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+
+			random_owned_state = {
+				limit = {
+					any_neighbor_state = {
+						is_owned_by = POR
+					}
+				}
+				set_variable = { ROOT.attacker_state = THIS.id }
+				random_neighbor_state = {
+					limit = { is_owned_by = POR }
+					set_variable = { ROOT.defender_state = THIS.id }
+				}
+			}
+			if = {
+				limit = { tag = UNT }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_POR.23
+						on_lose = ANGOLA_POR.24
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_UNT.3
+						on_lose = ANGOLA_UNT.4
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+			if = {
+				limit = { tag = ANG }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_ANG.23
+						on_lose = ANGOLA_ANG.24
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_UNT.13
+						on_lose = ANGOLA_UNT.14
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+			if = {
+				limit = { tag = FNL }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_FNL.23
+						on_lose = ANGOLA_FNL.24
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_UNT.23
+						on_lose = ANGOLA_UNT.24
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+		}
+	}
+
+	Raid_The_Portugese_Angola = {
+
+		icon = generic_civil_support
+		visible = {
+			POR = { has_country_flag = Angolan_Bush_War }
+			NOT = { POR = { has_country_flag = CARNATION_REV_SUCCESS } }
+			is_neighbor_of = POR
+		}
+		allowed = {
+			OR = {
+				tag = UNT
+				tag = ANG	
+				tag = FNL
+			}
+		}
+		available = {
+			has_border_war = no
+	
+		}
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		days_re_enable = 25
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+
+			random_owned_state = {
+				limit = {
+					any_neighbor_state = {
+						is_owned_by = POR
+					}
+				}
+				set_variable = { ROOT.attacker_state = THIS.id }
+				random_neighbor_state = {
+					limit = { is_owned_by = POR }
+					set_variable = { ROOT.defender_state = THIS.id }
+				}
+			}
+			if = {
+				limit = { tag = UNT }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_UNT.3
+						on_lose = ANGOLA_UNT.4
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_POR.23
+						on_lose = ANGOLA_POR.24
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+			if = {
+				limit = { tag = ANG }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_ANG.3
+						on_lose = ANGOLA_ANG.4
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_POR.3
+						on_lose = ANGOLA_POR.4
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+			if = {
+				limit = { tag = FNL }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_FNL.3
+						on_lose = ANGOLA_FNL.4
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_POR.13
+						on_lose = ANGOLA_POR.14
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+		}
+	}
+
+	Raid_The_MPLA = {
+
+		icon = generic_civil_support
+		visible = {
+			POR = { has_country_flag = Angolan_Bush_War }
+			OR = {
+				NOT = { has_country_flag = CARNATION_REV_SUCCESS } 
+				NOT = { tag = POR }
+			}	
+			is_neighbor_of = ANG
+		}
+		allowed = {
+			OR = {
+				tag = SAF
+				tag = UNT
+				tag = POR	
+				tag = FNL
+			}
+		}
+		available = {
+			has_border_war = no
+	
+		}
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		days_re_enable = 25
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+			
+
+			random_owned_state = {
+				limit = {
+					any_neighbor_state = {
+						is_owned_by = ANG
+					}
+				}
+				set_variable = { ROOT.attacker_state = THIS.id }
+				random_neighbor_state = {
+					limit = { is_owned_by = ANG }
+					set_variable = { ROOT.defender_state = THIS.id }
+				}
+			}
+			if = {
+				limit = { tag = UNT }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_UNT.13
+						on_lose = ANGOLA_UNT.14
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_ANG.23
+						on_lose = ANGOLA_ANG.24
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+			if = {
+				limit = { tag = FNL }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_FNL.13
+						on_lose = ANGOLA_FNL.14
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_ANG.13
+						on_lose = ANGOLA_ANG.14
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+			if = {
+				limit = { tag = POR }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_POR.3
+						on_lose = ANGOLA_POR.4
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_ANG.3
+						on_lose = ANGOLA_ANG.4
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+			if = {
+				limit = { tag = SAF }
+				start_border_war = {
+					change_state_after_war = no
+					attacker = {
+						state = var:attacker_state
+						num_provinces = 4
+						on_win = ANGOLA_SAF.1
+						on_lose = ANGOLA_SAF.2
+						on_cancel = Indochina_War.4
+					}
+								
+					defender = {
+						state = var:defender_state
+						num_provinces = 4
+						on_win = ANGOLA_ANG.3
+						on_lose = ANGOLA_ANG.4
+						on_cancel = Indochina_War.4
+					}
+				}
+			}
+		}
+	}
+	Bomb_The_MPLA = {
+
+		icon = generic_civil_support
+		visible = {
+			country_exists = ANG
+			POR = { has_country_flag = Angolan_Bush_War }
+			OR = {
+				NOT = { POR = { has_country_flag = CARNATION_REV_SUCCESS } }
+				NOT = { tag = POR }
+			}
+		}
+		allowed = {
+			OR = {
+				tag = SAF
+				#tag = ANG
+				tag = FNL
+				tag = UNT
+				tag = POR	
+			}
+		}
+		available = {
+			has_deployed_air_force_size = {
+				size > 10
+				type = cas
+			}
+		}
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+			if = {
+				limit = { tag = POR }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_POR.5
+					}
+					25 = {
+						country_event = ANGOLA_POR.6
+					}
+				}
+			}
+			if = {
+				limit = { tag = SAF }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_SAF.3
+					}
+					25 = {
+						country_event = ANGOLA_SAF.4
+					}
+				}
+			}
+			if = {
+				limit = { tag = FNL }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_FNL.15
+					}
+					25 = {
+						country_event = ANGOLA_FNL.16
+					}
+				}
+			}
+			if = {
+				limit = { tag = UNT }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_UNT.15
+					}
+					25 = {
+						country_event = ANGOLA_UNT.16
+					}
+				}
+			}
+		}
+	}
+	Bomb_The_FNL = {
+
+		icon = generic_civil_support
+		visible = {
+			country_exists = FNL
+			POR = { has_country_flag = Angolan_Bush_War }
+			OR = {
+				NOT = { POR = { has_country_flag = CARNATION_REV_SUCCESS } }
+				NOT = { tag = POR }
+			}
+			NOT = { has_global_flag = KONGO_RESTORED }
+		}
+		allowed = {
+			OR = {
+				tag = ANG
+				#tag = FNL
+				tag = UNT
+				tag = POR	
+			}
+		}
+		available = {
+			has_deployed_air_force_size = {
+				size > 10
+				type = cas
+			}
+		}
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+			if = {
+				limit = { tag = POR }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_POR.15
+					}
+					25 = {
+						country_event = ANGOLA_POR.16
+					}
+				}
+			}
+
+			if = {
+				limit = { tag = ANG }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_ANG.15
+					}
+					25 = {
+						country_event = ANGOLA_ANG.16
+					}
+				}
+			}
+			if = {
+				limit = { tag = UNT }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_UNT.25
+					}
+					25 = {
+						country_event = ANGOLA_UNT.26
+					}
+				}
+			}
+		}
+	}
+	Bomb_The_UNT = {
+
+		icon = generic_civil_support
+		visible = {
+			country_exists = UNT
+			POR = { has_country_flag = Angolan_Bush_War }
+			OR = {
+				NOT = { POR = { has_country_flag = CARNATION_REV_SUCCESS } }
+				NOT = { tag = POR }
+			}
+		}
+		allowed = {
+			OR = {
+				tag = ANG
+				tag = FNL
+				#tag = UNT
+				tag = POR	
+			}
+		}
+		available = {
+			has_deployed_air_force_size = {
+				size > 10
+				type = cas
+			}
+		}
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+			if = {
+				limit = { tag = POR }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_POR.25
+					}
+					25 = {
+						country_event = ANGOLA_POR.26
+					}
+				}
+			}
+
+			if = {
+				limit = { tag = ANG }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_ANG.25
+					}
+					25 = {
+						country_event = ANGOLA_ANG.26
+					}
+				}
+			}
+			if = {
+				limit = { tag = FNL }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_FNL.25
+					}
+					25 = {
+						country_event = ANGOLA_FNL.26
+					}
+				}
+			}
+		}
+	}
+	Bomb_The_POR = {
+
+		icon = generic_civil_support
+		visible = {
+			country_exists = POR
+			POR = { has_country_flag = Angolan_Bush_War }
+			OR = {
+				NOT = { POR = { has_country_flag = CARNATION_REV_SUCCESS } }
+				NOT = { tag = POR }
+			}
+		}
+		allowed = {
+			OR = {
+				tag = ANG
+				tag = FNL
+				tag = UNT
+				#tag = POR	
+			}
+		}
+		available = {
+			has_deployed_air_force_size = {
+				size > 10
+				type = cas
+			}
+		}
+		ai_will_do = {
+			factor = 1
+		}
+		fire_only_once = no
+		
+		
+		fixed_random_seed = no
+		
+		cost = 0
+		
+		complete_effect = {
+			if = {
+				limit = { tag = UNT }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_UNT.5
+					}
+					25 = {
+						country_event = ANGOLA_UNT.6
+					}
+				}
+			}
+
+			if = {
+				limit = { tag = ANG }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_ANG.5
+					}
+					25 = {
+						country_event = ANGOLA_ANG.6
+					}
+				}
+			}
+			if = {
+				limit = { tag = FNL }
+				random_list = {
+					75 = {
+						country_event = ANGOLA_FNL.5
+					}
+					25 = {
+						country_event = ANGOLA_FNL.6
+					}
+				}
+			}
+		}
+	}
+	Expand_Training_Camps_in_Zaire = {
+				
+		visible = {
+			tag = FNL
+			NOT = { has_global_flag = KONGO_RESTORED }
+		}
+		available = {
+			has_army_experience > 20
+			has_manpower > 5000
+		}
+		days_re_enable = 90
+		complete_effect = {
+			army_experience = -20
+			add_manpower = -5000
+			ZAM = {
+				295 = {
+					add_to_variable = { FNLA_Camp_Level = 1 }
+				}
+			}
+			custom_effect_tooltip = increase_camp_level_one_tt
+		}
+	}
+	Expand_Training_Camps_in_Zambia = {
+				
+		visible = {
+			OR = {
+				AND = {
+					tag = UNT
+					246 = {
+						has_state_flag = UNITA_Camp
+					}
+				}
+				AND = {
+					tag = ANG
+					246 = {
+						has_state_flag = MPLA_Camp
+					}
+				}
+			}
+
+		}
+		available = {
+			has_army_experience > 20
+			has_manpower > 5000
+		}
+		days_re_enable = 90
+		complete_effect = {
+			army_experience = -20
+			add_manpower = -5000
+			if = {
+				limit = { tag = ANG }
+				ZAM = {
+					246 = {
+						add_to_variable = { MPLA_Camp_Level = 1 }
+					}
+				}
+			}
+			if = {
+				limit = { tag = UNT }
+				ZAM = {
+					246 = {
+						add_to_variable = { UNITA_Camp_Level = 1 }
+					}
+				}
+			}
+			custom_effect_tooltip = increase_camp_level_one_tt
+		}
+	}
+	Expel_UNITA_Camps = {
+				
+		visible = {
+			country_exists = UNT
+			246 = {
+				has_state_flag = UNITA_Camp
+			}
+			tag = ZAM
+		}
+
+		days_re_enable = 60
+		complete_effect = {
+			246 = {
+				set_variable = { UNITA_Camp_Level = 0 }
+				clr_state_flag = UNITA_Camp
+			}
+			news_event = Angola_Expulsion.1
+			custom_effect_tooltip = expel_militant_bases_tt
+		}
+	}
+	Expel_MPLA_Camps = {
+				
+		visible = {
+			country_exists = ANG
+			246 = {
+				has_state_flag = MPLA_Camp
+			}
+			tag = ZAM
+		}
+
+		days_re_enable = 60
+		complete_effect = {
+			246 = {
+				set_variable = { MPLA_Camp_Level = 0 }
+				clr_state_flag = MPLA_Camp
+			}
+			news_event = Angola_Expulsion.2
+			custom_effect_tooltip = expel_militant_bases_tt
+		}
+	}
+	Expel_FNLA_Camps = {
+				
+		visible = {
+			country_exists = FNL
+			NOT = { has_global_flag = KONGO_RESTORED }
+			295 = {
+				has_state_flag = UNITA_Camp
+			}
+			tag = ZAM
+		}
+
+		days_re_enable = 60
+		complete_effect = {
+			295 = {
+				set_variable = { FNLA_Camp_Level = 0 }
+				clr_state_flag = FNLA_Camp
+			}
+			news_event = Angola_Expulsion.3
+			custom_effect_tooltip = expel_militant_bases_tt
+		}
+	}
+	Increase_MPLA_Funding = {
+				
+		visible = {
+			NOT = { has_global_flag = ANGOLAN_WAR_END }
+			NOT = { tag = POR }
+			NOT = { tag = ANG }
+			NOT = { tag = FNL }
+			NOT = { tag = UNT }	
+			OR = {
+				has_government = communism
+				has_government = trotskyism
+			}
+		}
+		complete_effect = {
+			add_to_variable = { mpla_funding = 1 }
+			custom_effect_tooltip = insurgency_funding_inc_tt
+		}
+	}
+	Decrease_MPLA_Funding = {
+				
+		visible = {
+			NOT = { has_global_flag = ANGOLAN_WAR_END }
+			country_exists = ANG
+			NOT = { tag = POR }
+			NOT = { tag = ANG }
+			NOT = { tag = FNL }
+			NOT = { tag = UNT }	
+			OR = {
+				has_government = communism
+				has_government = trotskyism
+			}
+		}
+
+		days_re_enable = 60
+		complete_effect = {
+			add_to_variable = { mpla_funding = -1 }
+			custom_effect_tooltip = insurgency_funding_dec_tt
+		}
+	}
+
+	MPLA_External_Support = {
+		
+		allowed = {
+		  tag = ANG
+		}
+		
+		visible = {
+			
+			tag = ANG
+			
+		}
+		available = {
+			always = no
+		}
+		
+		activation = {
+			
+			tag = ANG
+			
+		}
+
+		selectable_mission = yes
+		days_mission_timeout = 30
+		
+		timeout_effect = {
+			hidden_effect = {
+				set_variable = { mpla_camp_level_calc = 0 }
+				246 = { add_to_variable = { ANG.mpla_camp_level_calc = MPLA_Camp_Level } }
+				set_temp_variable = { manpower_gain = mpla_camp_level_calc }
+				multiply_temp_variable = { manpower_gain = 100 }
+
+				set_temp_variable = { army_xp_gain = mpla_camp_level_calc }
+				multiply_temp_variable = { army_xp_gain = 5 }
+			}
+			army_experience = var:army_xp_gain
+			add_manpower = var:manpower_gain
+			hidden_effect = {				
+				set_variable = { global_mpla_funding = 0 }
+				every_country = {
+					add_to_variable = { ANG.global_mpla_funding = mpla_funding }
+				}
+
+				set_temp_variable = { inf_equp_gain = global_mpla_funding }
+				multiply_temp_variable = { inf_equp_gain = 10 }
+
+				set_temp_variable = { artillery_gain = global_mpla_funding }
+				multiply_temp_variable = { artillery_gain = 5 }
+				
+				set_temp_variable = { anti_air_gain = global_mpla_funding }
+				multiply_temp_variable = { anti_air_gain = 2 }
+			}
+			
+			army_experience = var:army_xp_gain
+			add_manpower = var:manpower_gain
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = infantry_equipment
+						amount = [AMNT]
+						producer = SOV
+					}
+				}
+				AMNT = "inf_equp_gain"
+			}
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = artillery_equipment
+						amount = [AMNT]
+						producer = SOV
+					}
+				}
+				AMNT = "artillery_gain"
+			}
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = auto_cannon_equipment
+						amount = [AMNT]
+						producer = SOV
+					}
+				}
+				AMNT = "anti_air_gain"
+			}
+			activate_mission = MPLA_External_Support
+			
+		}
+	}
+	Increase_UNITA_Funding = {
+				
+		visible = {
+			NOT = { has_global_flag = ANGOLAN_WAR_END }
+			NOT = { tag = POR }
+			NOT = { tag = ANG }
+			NOT = { tag = FNL }
+			NOT = { tag = UNT }	
+			country_exists = UNT
+			NOT = {
+				OR = {
+					has_government = communism
+					has_government = trotskyism
+				}
+			}
+		}
+		complete_effect = {
+			add_to_variable = { unita_funding = 1 }
+			custom_effect_tooltip = insurgency_funding_inc_tt
+		}
+	}
+	Decrease_UNITA_Funding = {
+				
+		visible = {
+			NOT = { has_global_flag = ANGOLAN_WAR_END }
+			country_exists = UNT
+			NOT = { tag = POR }
+			NOT = { tag = ANG }
+			NOT = { tag = FNL }
+			NOT = { tag = UNT }	
+			NOT = {
+				OR = {
+					has_government = communism
+					has_government = trotskyism
+				}
+			}
+		}
+
+		days_re_enable = 60
+		complete_effect = {
+			add_to_variable = { unita_funding = -1 }
+			custom_effect_tooltip = insurgency_funding_dec_tt
+		}
+	}
+
+	UNITA_External_Support = {
+		
+		allowed = {
+		  tag = UNT
+		}
+		
+		visible = {
+			
+			tag = UNT
+		}
+		available = {
+			always = no
+		}
+		
+		activation = {
+			
+			tag = UNT
+			
+		}
+
+		selectable_mission = yes
+		days_mission_timeout = 30
+		
+		timeout_effect = {
+			hidden_effect = {
+				set_variable = { unita_camp_level_calc = 0 }
+				246 = { add_to_variable = { UNT.unita_camp_level_calc = UNITA_Camp_Level } }
+				set_temp_variable = { manpower_gain = unita_camp_level_calc }
+				multiply_temp_variable = { manpower_gain = 100 }
+
+				set_temp_variable = { army_xp_gain = unita_camp_level_calc }
+				multiply_temp_variable = { army_xp_gain = 5 }
+			}
+			army_experience = var:army_xp_gain
+			add_manpower = var:manpower_gain
+			hidden_effect = {				
+				set_variable = { global_unita_funding = 0 }
+				every_country = {
+					add_to_variable = { UNT.global_unita_funding = unita_funding }
+				}
+
+				set_temp_variable = { inf_equp_gain = global_unita_funding }
+				multiply_temp_variable = { inf_equp_gain = 10 }
+
+				set_temp_variable = { artillery_gain = global_unita_funding }
+				multiply_temp_variable = { artillery_gain = 5 }
+				
+				set_temp_variable = { anti_air_gain = global_unita_funding }
+				multiply_temp_variable = { anti_air_gain = 2 }
+			}
+			
+			army_experience = var:army_xp_gain
+			add_manpower = var:manpower_gain
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = infantry_equipment
+						amount = [AMNT]
+						producer = USA
+					}
+				}
+				AMNT = "inf_equp_gain"
+			}
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = artillery_equipment
+						amount = [AMNT]
+						producer = USA
+					}
+				}
+				AMNT = "artillery_gain"
+			}
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = auto_cannon_equipment
+						amount = [AMNT]
+						producer = USA
+					}
+				}
+				AMNT = "anti_air_gain"
+			}
+			activate_mission = UNITA_External_Support
+			
+		}
+	}
+
+	Increase_FNLA_Funding = {
+				
+		visible = {
+			NOT = { has_global_flag = ANGOLAN_WAR_END }
+			NOT = { tag = POR }
+			NOT = { tag = ANG }
+			NOT = { tag = FNL }
+			NOT = { tag = UNT }	
+			country_exists = FNL
+			NOT = {
+				OR = {
+					has_government = communism
+					has_government = trotskyism
+				}
+			}
+		}
+		complete_effect = {
+			add_to_variable = { fnla_funding = 1 }
+			custom_effect_tooltip = insurgency_funding_inc_tt
+		}
+	} 
+	Kick_out_Portugal_from_Angola = {
+				
+		visible = {
+			POR = {
+				owns_state = 902
+			}
+			OR = {
+				tag = UNT
+				tag = FLN
+				tag = UNT
+			}
+		}
+		available = {
+			check_variable = { ROOT.victory_points < UNT.ANGOLA_VICTORY_POINTS }
+			check_variable = { ROOT.victory_points > 2500 }
+
+		}
+		
+		fire_only_once = yes
+		complete_effect = {
+				ANG = {
+					transfer_state = 1313
+					transfer_state = 1314
+					transfer_state = 1317
+					transfer_state = 13389
+					transfer_state = 1138
+					transfer_state = 1316
+					transfer_state = 8248
+				}
+				UNT = {
+					transfer_state = 1311
+					transfer_state = 1315
+				}
+				news_event = CARNATION_REV.0
+				news_event = { id = Angola_Civil_War.0 days = 1 }
+				news_event = { id = Angola_Civil_War.1 days = 2 }
+				news_event = { id = Angola_Civil_War.5 days = 3 }
+				DOC = { activate_mission = Operation_Savannah_DOC }
+				SAF = { activate_mission = Operation_Savannah_SAF }
+				SAF = {
+					declare_war_on = {
+						target = ANG
+						type = annex_everything
+					}	
+				}
+				DOC = {
+					puppet = FNL
+					declare_war_on = {
+						target = ANG
+						type = annex_everything
+					}					
+				}
+		}
+	}	
+	Crush_the_FNLA = {
+				
+		visible = {
+			country_exists = FNL
+			OR = {
+				tag = UNT 
+				tag = ANG
+			}
+			is_neighbor_of = FNL
+		}
+		available = {
+			check_variable = { ROOT.victory_points > FNL.ANGOLA_VICTORY_POINTS }
+			check_variable = { ROOT.victory_points > 1500 }
+			NOT = {
+				POR = {
+					owns_state = 902
+				}
+			}
+		}
+		
+		fire_only_once = yes
+		complete_effect = {
+			news_event = { id = Angola_Civil_War.12 days = 1 }
+			ANG = { annex_country = { target = FNL transfer_troops = no } }
+		}
+	}
+
+	Seize_Control_of_Angola = {
+				
+		visible = {
+			country_exists = ANG
+			tag = UNT 
+
+		}
+		available = {
+			check_variable = { UNT.victory_points > ANG.ANGOLA_VICTORY_POINTS }
+			check_variable = { UNT.victory_points > 5000 }
+			NOT = {
+				POR = {
+					owns_state = 902
+				}
+			}
+		}
+		
+		fire_only_once = yes
+		complete_effect = {
+			annex_country = { target = ANG transfer_troops = no }	
+			news_event = Angola_Civil_War.11
+		}
+	}
+	Restore_the_Kingdom_of_the_Kongo = {
+				
+		visible = {
+			OR = {
+				country_exists = UNT 
+				country_exists = ANG
+			}
+			tag =  FNL
+
+		}
+		available = {
+			check_variable = { ANG.victory_points > UNT.ANGOLA_VICTORY_POINTS }
+			check_variable = { ANG.victory_points > 5000 }
+			NOT = {
+				POR = {
+					owns_state = 902
+				}
+			}
+		}
+		
+		fire_only_once = yes
+		complete_effect = {
+			transfer_state = 979
+			transfer_state = 540
+			transfer_state = 1316
+			transfer_state = 1039
+			transfer_state = 1034
+			transfer_state = 1138
+			set_global_flag = KONGO_RESTORED
+			news_event = Angola_Civil_War.10
+		}
+	}
+	Eliminate_UNITA_MPLA = {
+				
+		visible = {
+			country_exists = UNT 
+			tag =  ANG
+
+		}
+		available = {
+			check_variable = { ANG.victory_points > UNT.ANGOLA_VICTORY_POINTS }
+			check_variable = { ANG.victory_points > 5000 }
+			NOT = {
+				POR = {
+					owns_state = 902
+				}
+			}
+		}
+		
+		fire_only_once = yes
+		complete_effect = {
+			annex_country = { target = UNT transfer_troops = no }	
+			news_event = Angola_Civil_War.13
+		}
+	}
+	Eliminate_the_MPLA = {
+				
+		visible = {
+			country_exists = ANG
+			tag = POR 
+		}
+		available = {
+			check_variable = { POR.victory_points > ANG.ANGOLA_VICTORY_POINTS }
+			check_variable = { POR.victory_points > 2000 }
+			has_country_flag = CARNATION_FAILED
+
+		}
+		
+		fire_only_once = yes
+		complete_effect = {
+			annex_country = { target = ANG transfer_troops = no }	
+			news_event = Portugal_Victory_Angola.1
+		}
+	}
+	Eliminate_the_FNLA = {
+				
+		visible = {
+			country_exists = FNL
+			tag = POR 
+		}
+		available = {
+			check_variable = { POR.victory_points > FNL.ANGOLA_VICTORY_POINTS }
+			check_variable = { POR.victory_points > 2000 }
+			has_country_flag = CARNATION_FAILED
+
+		}
+		
+		fire_only_once = yes
+		complete_effect = {
+			annex_country = { target = FNL transfer_troops = no }	
+			news_event = Portugal_Victory_Angola.2
+		}
+	}
+	Eliminate_UNITA = {
+				
+		visible = {
+			country_exists = UNT
+			tag = POR 
+		}
+		available = {
+			check_variable = { POR.victory_points > UNT.ANGOLA_VICTORY_POINTS }
+			check_variable = { POR.victory_points > 2000 }
+			has_country_flag = CARNATION_FAILED
+
+		}
+		
+		fire_only_once = yes
+		complete_effect = {
+			annex_country = { target = UNT transfer_troops = no }	
+			news_event = Portugal_Victory_Angola.3
+		}
+	}	
+	
+
+
+	Decrease_FNLA_Funding = {
+				
+		visible = {
+			NOT = { has_global_flag = ANGOLAN_WAR_END }
+			country_exists = FNL
+			NOT = { tag = POR }
+			NOT = { tag = ANG }
+			NOT = { tag = FNL }
+			NOT = { tag = UNT }	
+			NOT = {
+				OR = {
+					has_government = communism
+					has_government = trotskyism
+				}
+			}
+		}
+
+		days_re_enable = 60
+		complete_effect = {
+			add_to_variable = { fnla_funding = -1 }
+			custom_effect_tooltip = insurgency_funding_dec_tt
+		}
+	}
+
+	FNLA_External_Support = {
+		
+		allowed = {
+		  tag = FNL
+		}
+		
+		visible = {
+			
+			tag = FNL
+		}
+		available = {
+			always = no
+		}
+		
+		activation = {
+			
+			tag = FNL
+			
+		}
+
+		selectable_mission = yes
+		days_mission_timeout = 30
+		
+		timeout_effect = {
+			hidden_effect = {
+				set_variable = { fnla_camp_level_calc = 0 }
+				295 = { add_to_variable = { FNL.fnla_camp_level_calc = FNLA_Camp_Level } }
+				set_temp_variable = { manpower_gain = fnla_camp_level_calc }
+				multiply_temp_variable = { manpower_gain = 100 }
+
+				set_temp_variable = { army_xp_gain = fnla_camp_level_calc }
+				multiply_temp_variable = { army_xp_gain = 5 }
+			}
+			army_experience = var:army_xp_gain
+			add_manpower = var:manpower_gain
+			hidden_effect = {				
+				set_variable = { global_fnla_funding = 0 }
+				every_country = {
+					add_to_variable = { FNL.global_fnla_funding = fnla_funding }
+				}
+
+				set_temp_variable = { inf_equp_gain = global_fnla_funding }
+				multiply_temp_variable = { inf_equp_gain = 10 }
+
+				set_temp_variable = { artillery_gain = global_fnla_funding }
+				multiply_temp_variable = { artillery_gain = 5 }
+				
+				set_temp_variable = { anti_air_gain = global_fnla_funding }
+				multiply_temp_variable = { anti_air_gain = 2 }
+			}
+			
+			army_experience = var:army_xp_gain
+			add_manpower = var:manpower_gain
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = infantry_equipment
+						amount = [AMNT]
+						producer = USA
+					}
+				}
+				AMNT = "inf_equp_gain"
+			}
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = artillery_equipment
+						amount = [AMNT]
+						producer = USA
+					}
+				}
+				AMNT = "artillery_gain"
+			}
+			
+			meta_effect = {
+				text = {
+					add_equipment_to_stockpile = {
+						type = auto_cannon_equipment
+						amount = [AMNT]
+						producer = USA
+					}
+				}
+				AMNT = "anti_air_gain"
+			}
+			activate_mission = FNLA_External_Support
+			
+		}
+	}
+
+
+
+}
