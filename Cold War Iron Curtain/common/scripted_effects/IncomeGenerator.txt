@@ -777,6 +777,7 @@ income_effect = {
 	add_to_variable = { refinery_total = oil_refinery_total }
 
 
+	ai_economic_planning = yes
 	
 	set_variable = { IncomeTotal = 0 }
 	set_variable = { ROOT.industrial_complex_total = 0 }  
@@ -1906,7 +1907,111 @@ flag_building_macro = {
 }
 
 
-
+ai_economic_planning = {
+	if = { limit = { is_ai = yes } emergency_policy_replanning = yes }
+	
+	set_variable = { ai_fossil_fuel_powerplant_target = ROOT.industrial_complex_total }
+	multiply_variable = { ai_fossil_fuel_powerplant_target = 1.2 }
+	add_to_variable = { ai_fossil_fuel_powerplant_target = ROOT.dockyard_total }
+	add_to_variable = { ai_fossil_fuel_powerplant_target = ROOT.office_park_total }
+	multiply_variable = { ai_fossil_fuel_powerplant_target = global.ai_power_ratio }
+	
+	set_variable = { ai_fossil_fuel_powerplant_target_reduced = ai_fossil_fuel_powerplant_target }
+	set_temp_variable = { alpha = 1 }
+	subtract_from_temp_variable = { alpha = global.ai_renewable_ratio }
+	subtract_from_temp_variable = { alpha = global.ai_nuclear_ratio }
+	multiply_variable = { ai_fossil_fuel_powerplant_target_reduced = alpha }
+	set_variable = { ai_renewable_powerplant_target = ai_fossil_fuel_powerplant_target }
+	set_variable = { ai_nuclear_powerplant_target = ai_fossil_fuel_powerplant_target }
+	multiply_variable = { ai_renewable_powerplant_target = global.ai_renewable_ratio }
+	multiply_variable = { ai_nuclear_powerplant_target = global.ai_nuclear_ratio }
+	
+	
+	set_variable = { ai_office_park_target = ROOT.industrial_complex_total }
+	multiply_variable = { ai_office_park_target = global.ai_office_ratio }
+	
+	set_variable = { ai_agri_industrial_complex_target = ROOT.farm_total }
+	set_temp_variable = { beta = ROOT.num_of_civilian_factories_available_for_projects }
+	add_to_variable = { beta = 1 }
+	divide_temp_variable = { beta = 7 } #one half max factories per construction project rounded down
+	multiply_temp_variable = { beta = global.ai_agri_investment }
+	multiply_variable = { ai_agri_industrial_complex_target = beta }
+	
+	round_variable = ai_fossil_fuel_powerplant_target
+	round_variable = ai_fossil_fuel_powerplant_target_reduced
+	round_variable = ai_renewable_powerplant_target
+	round_variable = ai_nuclear_powerplant_target
+	round_variable = ai_office_park_target
+	round_variable = ai_agri_industrial_complex_target
+	
+	set_temp_variable = { gamma = 1.5 }
+	multiply_temp_variable = { gamma = global.ai_water_point }
+	set_temp_variable = { delta = 2.5 }
+	multiply_temp_variable = { delta = global.ai_water_point }
+	if = {
+		limit = { num_of_civilian_factories_available_for_projects > global.ai_water_point }
+		any_owned_state = {
+			limit = {
+				AND = {
+					agri_industrial_complex > 0
+					
+					free_building_slots = {
+						building = water_infrastructure
+						size > 0
+						include_locked = no
+					}
+				}
+			}
+			add_building_construction = {
+				type = water_infrastructure
+				level = 1
+				instant_build = no #ADDS TO QUEUE
+			}
+		}
+	}
+	if = {
+		limit = { num_of_civilian_factories_available_for_projects > gamma }
+		any_owned_state = {
+			limit = {
+				AND = {
+					agri_industrial_complex > 0
+					
+					free_building_slots = {
+						building = water_infrastructure
+						size > 0
+						include_locked = no
+					}
+				}
+			}
+			add_building_construction = {
+				type = water_infrastructure
+				level = 1
+				instant_build = no #ADDS TO QUEUE
+			}
+		}
+	}
+	if = {
+		limit = { num_of_civilian_factories_available_for_projects > delta }
+		any_owned_state = {
+			limit = {
+				AND = {
+					agri_industrial_complex > 0
+					
+					free_building_slots = {
+						building = water_infrastructure
+						size > 0
+						include_locked = no
+					}
+				}
+			}
+			add_building_construction = {
+				type = water_infrastructure
+				level = 1
+				instant_build = no #ADDS TO QUEUE
+			}
+		}
+	}
+}
 
 
 
