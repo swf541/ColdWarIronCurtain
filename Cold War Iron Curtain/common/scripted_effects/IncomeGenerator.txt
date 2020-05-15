@@ -1907,15 +1907,15 @@ flag_building_macro = {
 }
 
 
-ai_economic_planning = {	#SCRIPT ADDS BUILDINGS TO CONSTRUCTION QUEUE FOR AI; CALCS FOR AI STRATS
-	if = { limit = { is_ai = yes } emergency_policy_replanning = yes }
-	
-	set_variable = { ai_fossil_fuel_powerplant_target = ROOT.industrial_complex_total }		#SETS VARIABLE TO NUM OF INDUSTRIAL FACTORIES
-	multiply_variable = { ai_fossil_fuel_powerplant_target = 1.2 }							#ADJUSTS IT UP 20%
-	add_to_variable = { ai_fossil_fuel_powerplant_target = ROOT.dockyard_total }			#DOCKYARD TOTAL ADDED
-	add_to_variable = { ai_fossil_fuel_powerplant_target = ROOT.office_park_total }			#OFFICE PARK TOTAL ADDED
-	multiply_variable = { ai_fossil_fuel_powerplant_target = global.ai_power_ratio }		#DEFINED RATIO IN 00_ON_ACTIONS FOR POWER PLANTS TO AFOREMENTIONED BUILDINGS
-	
+ai_economic_planning = {	#Caulcates building targets for the AI Strategies in default.txt
+	if = { limit = { is_ai = yes } emergency_policy_replanning = yes } #AI Reduces Policies if Overbudget
+	#ai_fossil_fuel_powerplant_target is total economic buildings x the ai_power_Ratio global define
+	set_variable = { ai_fossil_fuel_powerplant_target = ROOT.industrial_complex_total }
+	multiply_variable = { ai_fossil_fuel_powerplant_target = 1.2 }
+	add_to_variable = { ai_fossil_fuel_powerplant_target = ROOT.dockyard_total }
+	add_to_variable = { ai_fossil_fuel_powerplant_target = ROOT.office_park_total }
+	multiply_variable = { ai_fossil_fuel_powerplant_target = global.ai_power_ratio }
+	#Calculations for the large economy power plant building targets
 	set_variable = { ai_fossil_fuel_powerplant_target_reduced = ai_fossil_fuel_powerplant_target }
 	set_temp_variable = { alpha = 1 }
 	subtract_from_temp_variable = { alpha = global.ai_renewable_ratio }
@@ -1926,10 +1926,11 @@ ai_economic_planning = {	#SCRIPT ADDS BUILDINGS TO CONSTRUCTION QUEUE FOR AI; CA
 	multiply_variable = { ai_renewable_powerplant_target = global.ai_renewable_ratio }
 	multiply_variable = { ai_nuclear_powerplant_target = global.ai_nuclear_ratio }
 	
-	
+	#office target = factories x global define ratio
 	set_variable = { ai_office_park_target = ROOT.industrial_complex_total }
 	multiply_variable = { ai_office_park_target = global.ai_office_ratio }
 	
+	#AI will spend the ai_agri_investment on factories on agri-industry until they reach a positive food balance
 	set_variable = { ai_agri_industrial_complex_target = ROOT.farm_total }
 	set_temp_variable = { beta = ROOT.num_of_civilian_factories_available_for_projects }
 	add_to_variable = { beta = 1 }
@@ -1944,9 +1945,10 @@ ai_economic_planning = {	#SCRIPT ADDS BUILDINGS TO CONSTRUCTION QUEUE FOR AI; CA
 	round_variable = ai_office_park_target
 	round_variable = ai_agri_industrial_complex_target
 	
-	set_temp_variable = { gamma = 1.5 }
+	#At the ai_water_point variable's number of factories that can construct in the country, the AI will start to build water infrastructure
+	set_temp_variable = { gamma = 1.5 } #Will build 2 per month at gamma x the ai_water_point
 	multiply_temp_variable = { gamma = global.ai_water_point }
-	set_temp_variable = { delta = 2.5 }
+	set_temp_variable = { delta = 2.5 } #Will build 3 per month at delta x the ai_water_point
 	multiply_temp_variable = { delta = global.ai_water_point }
 	if = {
 		limit = { 
