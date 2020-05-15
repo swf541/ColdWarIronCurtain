@@ -559,6 +559,14 @@ ai_unit_production_limiter = {
 		id = armor_heavy
 		value = -420
 	}
+	ai_strategy = {
+		type = air_factory_balance
+		value = 50
+	}
+	ai_strategy = {
+		type = dockyard_to_military_factory_ratio
+		value = 50
+	}
 }
 
 save_admiral_pp_for_later = {
@@ -653,11 +661,11 @@ default_garrison_production = {
 
 build_intelligence_agency = {
 	enable = {
-		num_of_civilian_factories > 24
+		num_of_civilian_factories_available_for_projects > 24
 	}
 	abort = {
 		OR = {
-			num_of_civilian_factories < 25
+			num_of_civilian_factories_available_for_projects < 25
 		}
 	}
 
@@ -669,11 +677,17 @@ build_intelligence_agency = {
 }
 build_intelligence_agency2 = {
 	enable = {
-		num_of_civilian_factories > 49
+		OR = {
+			num_of_civilian_factories_available_for_projects > 49
+			AND = {
+				num_of_civilian_factories_available_for_projects > 24
+				agency_upgrade_number < 5
+			}
+		}
 	}
 	abort = {
 		OR = {
-			num_of_civilian_factories < 50
+			num_of_civilian_factories_available_for_projects < 50
 		}
 	}
 
@@ -685,11 +699,17 @@ build_intelligence_agency2 = {
 }
 build_intelligence_agency3 = {
 	enable = {
-		num_of_civilian_factories > 74
+		OR = {
+			num_of_civilian_factories_available_for_projects > 74
+			AND = {
+				num_of_civilian_factories_available_for_projects > 49
+				agency_upgrade_number < 15
+			}
+		}
 	}
 	abort = {
 		OR = {
-			num_of_civilian_factories < 75
+			num_of_civilian_factories_available_for_projects < 75
 		}
 	}
 
@@ -739,5 +759,67 @@ put_garrisons_on_high_prio = {
 	ai_strategy = {
 		type = garrison_reinforcement_priority
 		value = 100 # positive is high prio, negative is low prio
+	}
+}
+
+stellar_peacetime_economics = { #Peacetime Economy Ratios
+	enable = {
+		has_war = no
+	}
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = added_military_to_civilian_factory_ratio
+		value = -50
+	}
+	ai_strategy = {
+		type = dockyard_to_military_factory_ratio
+		value = 15
+	}
+}
+stellar_building_targets = { #Building Targets for Custom Buildings
+	enable = { num_of_civilian_factories > 9 }
+	ai_strategy = {
+		type = building_target
+		id = office_park
+		value = ai_office_park_target
+	}
+	ai_strategy = {
+		type = building_target
+		id = agri_industrial_complex
+		value = ai_agri_industrial_complex_target
+	}
+}
+stellar_small_economy_power = { #Small AI-Controlled Economies' Powerplant Construction Targets
+	enable = {
+		NOT = { num_of_civilian_factories > global.ai_renewable_point }
+	}
+	abort = { num_of_civilian_factories > global.ai_renewable_point }
+	ai_strategy = {
+		type = building_target
+		id = fossil_fuel_powerplant
+		value = ai_fossil_fuel_powerplant_target
+	}
+}
+stellar_large_economy_power = { #Large AI-Controlled Economies' Powerplant Construction Targets
+	enable = {
+		num_of_civilian_factories > global.ai_renewable_point
+		NOT = { num_of_civilian_factories < global.ai_renewable_point }
+	}
+	abort = { num_of_civilian_factories > global.ai_renewable_point }
+	ai_strategy = {
+		type = building_target
+		id = fossil_fuel_powerplant
+		value = ai_fossil_fuel_powerplant_target_reduced
+	}
+	ai_strategy = {
+		type = building_target
+		id = renewable_powerplant
+		value = ai_renewable_powerplant_target
+	}
+	ai_strategy = {
+		type = building_target
+		id = nuclear_powerplant
+		value = ai_nuclear_powerplant_target
 	}
 }
