@@ -2,6 +2,7 @@ NDefines_Graphics.NGraphics.VICTORY_POINT_MAP_ICON_AFTER = {0, 10} -- After this
 
 NDefines_Graphics.NFrontend.CAMERA_MAX_HEIGHT = 3500.0
 NDefines_Graphics.NFrontend.CAMERA_MIN_HEIGHT = 35.0
+NDefines_Graphics.NGraphics.MINIMUM_PROVINCE_SIZE_IN_PIXELS = 3
 
 NDefines_Graphics.NMapIcons.STATES_PRIORITY_VICTORY_POINTS = 4
 
