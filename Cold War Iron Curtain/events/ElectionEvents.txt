@@ -1,12 +1,512 @@
 
 add_namespace = election
 
-country_event = {
+country_event = { #COALITION CALCULATOR
 	id = election.1
-	title = election.1.t
-	desc = election.1.d
-	picture = GFX_report_event_election
 	hidden = yes
 	is_triggered_only = yes
+	immediate = {
+		# FORM COALITIONS #
+		set_variable = { coalition_right = 0 } #centrist
+		set_variable = { coalition_left = 0 } #democratic
+		set_variable = { coalition_far_right = 0 } #communism
+		set_variable = { coalition_far_left = 0 } #neutrality
+		
+		
+		#IF ALL PARTIES IN A COALITION HAVE LESS THAN 25% POPULARITY, A COALITION WILL BE USED#
+		if = {
+			limit = {
+				AND = {
+					check_variable = { party_popularity@conservative < .25 }
+					check_variable = { party_popularity@Liberal_Conservatism < .25 }
+					check_variable = { party_popularity@Christian_Democratic < .25 }
+					check_variable = { party_popularity@islamism < .25 }
+					check_variable = { party_popularity@centrist < .25 }
+					check_variable = { party_popularity@liberal < .25 }
+				}
+			}
+			add_to_variable = { coalition_right = party_popularity@conservative }
+			add_to_variable = { coalition_right = party_popularity@Liberal_Conservatism }
+			add_to_variable = { coalition_right = party_popularity@Christian_Democratic }
+			add_to_variable = { coalition_right = party_popularity@islamism }
+			add_to_variable = { coalition_right = party_popularity@centrist }
+			add_to_variable = { coalition_right = party_popularity@liberal }
+		}
+		if = {
+			limit = {
+				AND = {
+					check_variable = { party_popularity@Social_Liberalism < .25 }
+					check_variable = { party_popularity@democratic < .25 }
+					check_variable = { party_popularity@socialist < .25 }
+					check_variable = { party_popularity@Social_Democratic < .25 }
+				}
+			}
+			add_to_variable = { coalition_left = party_popularity@Social_Liberalism }
+			add_to_variable = { coalition_left = party_popularity@democratic }
+			add_to_variable = { coalition_left = party_popularity@socialist }
+			add_to_variable = { coalition_left = party_popularity@Social_Democratic }
+		}
+		if = {
+			limit = {
+				AND = {
+					check_variable = { party_popularity@communism < .25 }
+					check_variable = { party_popularity@trotskyism < .25 }
+					check_variable = { party_popularity@maoism < .25 }
+					check_variable = { party_popularity@socialist < .25 } #SOCIALIST OPTION SATISFIES THE LEFT
+				}
+			}
+			add_to_variable = { coalition_far_left = party_popularity@communism }
+			add_to_variable = { coalition_far_left = party_popularity@trotskyism }
+			add_to_variable = { coalition_far_left = party_popularity@maoism }
+		}
+		if = {
+			limit = {
+				AND = {
+					check_variable = { party_popularity@fascism < .25 }
+					check_variable = { party_popularity@nationalism < .25 }
+					check_variable = { party_popularity@monarchism < .25 }
+					check_variable = { party_popularity@neutrality < .25 }
+				}
+			}
+			add_to_variable = { coalition_far_right = party_popularity@fascism }
+			add_to_variable = { coalition_far_right = party_popularity@nationalism }
+			add_to_variable = { coalition_far_right = party_popularity@monarchism }
+			add_to_variable = { coalition_far_right = party_popularity@neutrality }
+		}
+		
+		#IF A COALITION'S POPULARITY DOES NOT ADD UP TO 25% THEN IT CANNOT RUN!#
+		if = {
+			limit = { check_variable = { coalition_right < .24 } }
+			clear_variable = coalition_right
+		}
+		if = {
+			limit = { check_variable = { coalition_left < .24 } }
+			clear_variable = coalition_left
+		}
+		if = {
+			limit = { check_variable = { coalition_far_right < .24 } }
+			clear_variable = coalition_far_right
+		}
+		if = {
+			limit = { check_variable = { coalition_far_left < .24 } }
+			clear_variable = coalition_far_left
+		}
+		
+		#START THE ELECTIONS
+		country_event = election.2
+	}
+}
+country_event = {
+	id = election.2
+	title = election.2.t
+	desc = election.2.d
+	picture = GFX_report_event_election
+	is_triggered_only = yes
 	
+	
+	immediate = {
+		add_stability = 0.03
+	}
+	
+	# check_variable = { party > .24 } #Only parties over 25% popularity can run
+	# add_popularity = { ideology = radical_furryism popularity = 0.05 } #Winner gains popularity
+	#ai_chance = {
+	#	base = party #AI is more likely to choose options with more popularity
+	#}
+	
+	
+	
+	option = { #coalition_right
+		name = election.2.coalition_right
+		trigger = {
+			check_variable = { coalition_right > .24 }
+		}
+		set_politics = {
+			ruling_party = centrist
+			elections_allowed = yes
+		}
+		add_popularity = { ideology = conservative popularity = 0.0125 }
+		add_popularity = { ideology = Liberal_Conservatism popularity = 0.0125 }
+		add_popularity = { ideology = centrist popularity = 0.0125 }
+		add_popularity = { ideology = liberal popularity = 0.0125 }
+		ai_chance = {
+			base = coalition_right
+		}
+	}
+	option = { #coalition_left
+		name = election.2.coalition_left
+		trigger = {
+			check_variable = { coalition_left > .24 }
+		}
+		set_politics = {
+			ruling_party = democratic
+			elections_allowed = yes
+		}
+		add_popularity = { ideology = Social_Liberalism popularity = 0.0125 }
+		add_popularity = { ideology = democratic popularity = 0.0125 }
+		add_popularity = { ideology = socialist popularity = 0.0125 }
+		add_popularity = { ideology = Social_Democratic popularity = 0.0125 }
+		ai_chance = {
+			base = coalition_left
+		}
+	}
+	option = { #coalition_far_right
+		name = election.2.coalition_far_right
+		trigger = {
+			check_variable = { coalition_far_right > .24 }
+		}
+		set_politics = {
+			ruling_party = neutrality
+			elections_allowed = yes
+		}
+		add_popularity = { ideology = fascism popularity = 0.0125 }
+		add_popularity = { ideology = nationalism popularity = 0.0125 }
+		add_popularity = { ideology = monarchism popularity = 0.0125 }
+		add_popularity = { ideology = neutrality popularity = 0.0125 }
+		ai_chance = {
+			base = coalition_far_right
+		}
+	}
+	option = { #coalition_far_left
+		name = election.2.coalition_far_left
+		trigger = {
+			check_variable = { coalition_far_left > .24 }
+		}
+		set_politics = {
+			ruling_party = communism
+			elections_allowed = yes
+		}
+		add_popularity = { ideology = communism popularity = 0.0125 }
+		add_popularity = { ideology = trotskyism popularity = 0.0125 }
+		add_popularity = { ideology = maoism popularity = 0.0125 }
+		add_popularity = { ideology = socialist popularity = 0.0125 }
+		ai_chance = {
+			base = coalition_far_left
+		}
+	}
+	
+	#INDEPENDENT VIABLE PARTIES#
+	option = { #conservative
+		name = election.2.conservative
+		trigger = {
+			check_variable = { party_popularity@conservative > .24 }
+		}
+		set_politics = {
+			ruling_party = conservative
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = conservative
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@conservative
+		}
+	}
+	option = { #Liberal_Conservatism
+		name = election.2.Liberal_Conservatism
+		trigger = {
+			check_variable = { party_popularity@Liberal_Conservatism > .24 }
+		}
+		set_politics = {
+			ruling_party = Liberal_Conservatism
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = Liberal_Conservatism
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@Liberal_Conservatism
+		}
+	}
+	option = { #Christian_Democratic
+		name = election.2.Christian_Democratic
+		trigger = {
+			check_variable = { party_popularity@Christian_Democratic > .24 }
+		}
+		set_politics = {
+			ruling_party = Christian_Democratic
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = Christian_Democratic
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@Christian_Democratic
+		}
+	}
+	option = { #socialist
+		name = election.2.socialist
+		trigger = {
+			check_variable = { party_popularity@socialist > .24 }
+		}
+		set_politics = {
+			ruling_party = socialist
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = socialist
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@socialist
+		}
+	}
+	option = { #Social_Democratic
+		name = election.2.Social_Democratic
+		trigger = {
+			check_variable = { party_popularity@Social_Democratic > .24 }
+		}
+		set_politics = {
+			ruling_party = Social_Democratic
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = Social_Democratic
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@Social_Democratic
+		}
+	}
+	option = { #Social_Liberalism
+		name = election.2.Social_Liberalism
+		trigger = {
+			check_variable = { party_popularity@Social_Liberalism > .24 }
+		}
+		set_politics = {
+			ruling_party = Social_Liberalism
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = Social_Liberalism
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@Social_Liberalism
+		}
+	}
+	option = { #democratic
+		name = election.2.democratic
+		trigger = {
+			check_variable = { party_popularity@democratic > .24 }
+		}
+		set_politics = {
+			ruling_party = democratic
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = democratic
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@democratic
+		}
+	}
+	option = { #centrist
+		name = election.2.centrist
+		trigger = {
+			check_variable = { party_popularity@centrist > .24 }
+		}
+		set_politics = {
+			ruling_party = centrist
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = centrist
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@centrist
+		}
+	}
+	option = { #liberal
+		name = election.2.liberal
+		trigger = {
+			check_variable = { party_popularity@liberal > .24 }
+		}
+		set_politics = {
+			ruling_party = liberal
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = liberal
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@liberal
+		}
+	}
+	option = { #communism
+		name = election.2.communism
+		trigger = {
+			check_variable = { party_popularity@communism > .24 }
+		}
+		set_politics = {
+			ruling_party = communism
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = communism
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@communism
+		}
+	}
+	option = { #trotskyism
+		name = election.2.trotskyism
+		trigger = {
+			check_variable = { party_popularity@trotskyism > .24 }
+		}
+		set_politics = {
+			ruling_party = trotskyism
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = trotskyism
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@trotskyism
+		}
+	}
+	option = { #maoism
+		name = election.2.maoism
+		trigger = {
+			check_variable = { party_popularity@maoism > .24 }
+		}
+		set_politics = {
+			ruling_party = maoism
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = maoism
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@maoism
+		}
+	}
+	option = { #fascism
+		name = election.2.fascism
+		trigger = {
+			check_variable = { party_popularity@fascism > .24 }
+		}
+		set_politics = {
+			ruling_party = fascism
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = fascism
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@fascism
+		}
+	}
+	option = { #nationalism
+		name = election.2.nationalism
+		trigger = {
+			check_variable = { party_popularity@nationalism > .24 }
+		}
+		set_politics = {
+			ruling_party = nationalism
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = nationalism
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@nationalism
+		}
+	}
+	option = { #monarchism
+		name = election.2.monarchism
+		trigger = {
+			check_variable = { party_popularity@monarchism > .24 }
+		}
+		set_politics = {
+			ruling_party = monarchism
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = monarchism
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@monarchism
+		}
+	}
+	option = { #neutrality
+		name = election.2.neutrality
+		trigger = {
+			check_variable = { party_popularity@neutrality > .24 }
+		}
+		set_politics = {
+			ruling_party = neutrality
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = neutrality
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@neutrality
+		}
+	}
+	option = { #islamism
+		name = election.2.islamism
+		trigger = {
+			check_variable = { party_popularity@islamism > .24 }
+		}
+		set_politics = {
+			ruling_party = islamism
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = islamism
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@islamism
+		}
+	}
+	option = { #radical_shiaism
+		name = election.2.radical_shiaism
+		trigger = {
+			check_variable = { party_popularity@radical_shiaism > .24 }
+		}
+		set_politics = {
+			ruling_party = radical_shiaism
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = radical_shiaism
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@radical_shiaism
+		}
+	}
+	option = { #Salafism
+		name = election.2.Salafism
+		trigger = {
+			check_variable = { party_popularity@Salafism > .24 }
+		}
+		set_politics = {
+			ruling_party = Salafism
+			elections_allowed = yes
+		}
+		add_popularity = {
+			ideology = Salafism
+			popularity = 0.05
+		}
+		ai_chance = {
+			base = party_popularity@Salafism
+		}
+	}
 }
