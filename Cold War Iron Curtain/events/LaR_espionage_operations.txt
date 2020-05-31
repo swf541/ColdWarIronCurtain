@@ -1,0 +1,69 @@
+﻿
+add_namespace = lar_fake_intel_units
+
+
+# delete old intel units created by script
+country_event = {
+	id = lar_fake_intel_units.1
+	title = lar_fake_intel_units.1.t
+	desc = lar_fake_intel_units.1.d
+	
+	picture = GFX_report_event_generic_factory
+
+	is_triggered_only = yes
+
+	hidden = yes
+
+	immediate = {
+		
+		# delete old intel units
+		# fake_intel_ids_to_delete contains the id of each unit
+		# num_days_for_fake_intel_id@id contains the num hours that it is created
+		
+		clear_temp_array = ids_to_remove
+		
+		for_each_loop = {
+			array = fake_intel_ids_to_delete
+			
+			set_temp_variable = { passed_days = global.num_days }
+			subtract_from_temp_variable = { passed_days = num_days_for_fake_intel_id@var:v }
+			
+			if = {
+				limit = { check_variable = { passed_days > 85 } }
+				add_to_temp_array = { ids_to_remove = v }
+				delete_unit = {
+					id = v
+				}
+			}
+		}
+		
+		for_each_loop = {
+			array = ids_to_remove
+			
+			remove_from_array = { fake_intel_ids_to_delete = v }
+			clear_variable = num_days_for_fake_intel_id@var:v
+		}
+	}
+	
+	option = {
+		name = excellent
+	}
+}
+
+add_namespace = lar_collab_gov
+
+
+# collab government event
+country_event = {
+	id = lar_collab_gov.1
+	title = lar_collab_gov.1.t
+	desc = lar_collab_gov.1.d
+	
+	picture = GFX_report_event_german_troops
+
+	is_triggered_only = yes
+	
+	option = {
+		name = traitors
+	}
+}
