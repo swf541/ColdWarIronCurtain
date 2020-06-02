@@ -1,0 +1,823 @@
+add_namespace = thetroubles 
+country_event = {
+	id = thetroubles.0 # IRA meets
+	title = "IRA High Command"
+	desc = thetroubles.0.d 
+	major = no 
+	
+	is_triggered_only = yes 
+	
+	hidden = yes
+	immediate = {
+		name = "Tiocfaidh ar la"
+		activate_mission = Irish_Republican_Army
+		IF = { has_token = token_informers
+				activate_mission = anti_informer
+		}
+		IF = { has_idea = internment 
+				add_to_variable = { IRA = 2 }
+		}
+		IF = {
+			NOT = {
+				has_operation_token = {
+					tag = ROOT 
+					token = token_informers
+				}
+				activate_mission = IRA_attack
+			}
+		}
+		IF = {
+			check_variable = { IRA < 5 }
+			country_event = thetroubles.43
+		}
+	}
+}
+country_event = {
+	id = thetroubles.11
+	title = "Safehouse Raid Botched"
+	desc = troublesfailedraid.d
+	major = no
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "Damned Fenians!"
+		add_to_variable = { IRA = 1 }
+		add_war_support = -.01
+	}
+}
+country_event = {
+	id = thetroubles.12
+	title = "Successful Safehouse raid"
+	desc = troubleswinraid.desc
+	major = no
+	
+	is_triggered_only = yes 
+	
+	option = {
+		name = "Fine job, Lads!"
+		add_to_variable = { IRA = -3 }
+	}
+}
+news_event = {
+	id = thetroubles.1
+	title = "[GetNewspaperHeader]The Battle of the Bogside"
+	desc = thetroubles.1.d
+	picture = GFX_bogside
+	
+	major = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		date > 1969.8.12
+	}
+	
+	option = {
+		name = "We must preserve order in Ireland."
+		trigger = {
+			TAG = ENG
+		}
+		hidden_effect = {
+			ENG = {	
+				country_event = thetroubles.2
+			}
+		}
+	}
+	
+	option = {
+		name = "More troubles ahead for the Emerald Isle."
+		trigger = {
+			NOT = { TAG = ENG }
+				AND = {
+					has_opinion = {
+					target = ENG
+						value > 0
+					}
+				}
+		}
+	}
+	
+	option = {
+		name = "Up the Ra!"
+		trigger = {
+		NOT = { TAG = ENG }
+			AND {
+				has_opinion = {
+					target = ENG
+						value < 0
+				}
+			}
+		}	
+	}
+}
+
+country_event = {
+	id = thetroubles.2
+	title = "Troubles in Ireland"
+	desc = thetroubles.2.d
+	major = no
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "We'll get them, sooner or later!"
+				set_country_idea = the_troubles 
+		set_variable = {
+			var = IRA
+			value = 60
+		}
+		add_ideas = the_troubles
+		119 = {
+			set_state_flag = IRA_presence
+			set_state_flag = insurg_lvl2
+			add_province_modifier = {
+				static_modifiers = { insurgency_tier2 }
+				province = {
+					all_provinces = yes
+				}
+			}
+		}
+		activate_mission = Irish_Republican_Army
+	}
+}
+
+country_event = {
+	id = thetroubles.3
+	title = "Bombing in Belfast"
+	desc = thetroubles.3.d
+	major = no 
+	
+	is_triggered_only = yes 
+	trigger = {
+		date > 1971.12.3
+	}
+	option = {
+		name = "Such senseless murder.."
+		add_war_support = -.05
+		119 = {
+			add_manpower = -15
+		}
+		news_event = thetroubles.4
+	}
+}
+
+news_event = {
+	id = thetroubles.4
+	title = "[GetNewspaperHeader] McGurk's Bar Bombing"
+	desc = thetroubles.4.d
+	major = no
+	
+	is_triggered_only = yes 
+	
+	option = {
+		name = thetroubles.4.a
+		trigger = {
+			TAG = ENG
+		}
+	}
+	option = {
+		name = "Ulster truly is troubled."
+		trigger = {
+			NOT = {
+				TAG = ENG
+			}
+		}
+	}
+}
+
+country_event = {
+	id = thetroubles.5 
+	title = "Incident in Londonderry"
+	desc = thetroubles.5.d
+	major = no 
+	
+	is_triggered_only = yes 
+	trigger = {
+		date > 1972.1.30
+	}
+	option = {
+		name = "Tell them to stop shooting! Stop!"
+		add_war_support = -.05
+		IRE = {
+			add_opinion_modifier = { target = ENG modifier = IRE_Bloody_Sunday }
+		}
+		119 = {
+			add_manpower = -13
+		}
+		news_event = thetroubles.6 
+	}
+}
+
+news_event = {
+	id = thetroubles.6
+	title = "[GetNewspaperHeader]Bloody Sunday"
+	desc = thetroubles.6.d
+	picture = GFX_bloodysunday
+	major = yes
+	
+	is_triggered_only
+	
+	option = {
+		name = "Bloody oafs!"
+		trigger = {
+			TAG = ENG
+		}
+	}
+	option = {
+		name = "English murderers!"
+		trigger = {
+			TAG = IRE
+				OR = {
+					NOT = { TAG = ENG }
+						AND {
+							has_opinion = {
+								target = ENG
+								value < 0
+							}
+						}
+				}
+		}
+	}
+	option = {
+		name = "Inexcusable."
+		trigger = {
+			has_opinion = {
+					target = ENG
+					value > 0
+				}
+			NOT = { TAG = ENG }
+				OR = {
+					TAG = IRE
+				}
+		}
+	}
+}
+
+country_event = {
+	id = thetroubles.13
+	title = "IRA sniping campaign"
+	desc = thetroubles.13.d
+	major = no
+	picture = GFX_thetroubles_13
+	
+	is_triggered_only = yes 
+	
+	option = {
+		name = "Terrorist cowards!"
+		add_war_support = -.05
+		add_manpower = -5 
+		add_to_variable = { IRA = 2 }
+	}
+}
+
+country_event = {
+	id = thetroubles.14
+	title = "Failed IRA ambush"
+	desc = thetroubles.14.d
+	major = no
+	
+	is_triggered_only = yes 
+	
+	option = {
+		name = "They got what they deserved."
+		add_to_variable = { IRA = -2 }
+	}
+}
+
+country_event = {
+	id = thetroubles.15
+	title = "IRA Bombing"
+	desc = thetroubles.15.d
+	major = no 
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "Absolutely ruthless."
+		add_war_support = -.03
+		119 = {
+			add_manpower = -5
+			add_war_support = -.03
+		}
+	}
+}
+
+country_event = {
+	id = thetroubles.16
+	title = "Bombing plot foiled"
+	desc = thetroubles.16.d
+	major = no 
+	
+	is_triggered_only = yes 
+	
+	option = {
+		name = "Can't even make a bomb right..."
+		add_war_support = .01
+		add_to_variable = { IRA = -2 }
+	}
+}
+
+country_event = {
+	id = thetroubles.17
+	title = "Informers executed"
+	desc = thetroubles.17.d
+	major = no 
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "Damn it!"
+		clr_country_flag = informers_flag
+	}
+}
+
+country_event = {
+	id = thetroubles.18 
+	title = "A Day of Tragedy"
+	desc = thetroubles.18.d
+	major = no 
+	
+	is_triggered_only = yes 
+	trigger = {
+		date > 1979.8.27
+	}
+	option = {
+		name = "God rest their souls."
+		add_war_support = -.1
+		add_manpower = -18
+		add_to_variable = { IRA = 5 }
+	}
+}
+
+country_event = {
+	id = thetroubles.19
+	title = "Death of Bobby Sands"
+	desc = thetroubles.19.d
+	major = no
+	
+	is_triggered_only = yes
+	trigger	= {
+		date > 1981.5.5
+	}
+	option = {
+		name = "Not my fault he wouldn't eat!"
+		add_war_support = -.05
+		add_to_variable = { IRA = 5 }
+		news_event = thetroubles.20
+	}
+}
+
+news_event = {
+	id = thetroubles.20
+	title = "[GetNewspaperHeader] Death of Bobby Sands"
+	desc = thetroubles.20.d
+	major = no
+	
+	is_triggered_only = yes
+	option = {
+		name = "So what? He was a terrorist."
+		trigger = {
+			TAG = ENG
+		}
+	}
+	option = {
+		name = "A powerful statement."
+		trigger = {
+			NOT = {
+				TAG = ENG
+			}
+		}
+	}
+	option = {
+		name = "Read the roll of honor!"
+		NOT = { TAG = ENG }
+			AND {
+				has_opinion = {
+					target = ENG
+					value < 0
+				}
+			}
+	}
+}
+
+country_event = {
+	id = thetroubles.21
+	title = "Bombing at Brighton"
+	desc = thetroubles.21.d
+	major = no 
+	
+	is_triggered_only = yes
+	trigger = {
+		date > 1984.10.11
+		has_country_leader = {
+			name = "Margret Thatcher"
+			ruling_only = yes
+		}
+	}
+	option = {
+		name = "Is Thatcher alright?!"
+		random_list = {
+			50 = { country_event = thetroubles.22 
+					modifier = {
+						is_historical_focus_on = yes
+						factor = 0
+					}
+			}
+			50 = { country_event = thetroubles.23 
+					modifier = {
+						is_historical_focus_on = yes
+						factor = .5
+					}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = thetroubles.22
+	title = "Thatcher found dead."
+	desc = thetroubles.22.d
+	major = no 
+	
+	is_triggered_only = yes 
+	
+	option = {
+		add_war_support = -.1 
+		add_to_variable = { IRA = 8 }
+		name = "Rest in peace, Iron Lady."
+		kill_country_leader = yes 
+		news_event = thetroubles.24 
+	}
+}
+
+country_event = {
+	id = thetroubles.23 
+	title = "Thatcher found alive."
+	desc = thetroubles.23.d
+	major = no 
+	
+	is_triggered_only = yes 
+	
+	option = {
+		add_war_support = .1
+		name = "She truly is the Iron Lady!"
+	}
+}
+
+news_event = {
+	id = thetroubles.24
+	title = thetroubles.24.t
+	desc = thetroubles.24.d
+	major = no 
+	
+	is_triggered_only = yes
+
+	option = {
+		name = "Rest in Peace, iron lady."
+		trigger = {
+			TAG = ENG
+			OR = {
+				has_opinion = {
+						TAG = ENG 
+						target = ENG
+						value > 0
+						}
+				}
+			}
+		}
+	option = {
+		name = "Rust in hell!"
+		trigger = {
+			NOT = {
+				TAG = ENG
+			}
+			has_opinion = {
+					TAG = ENG 
+						target = ENG
+						value < 0
+				}
+				
+		}
+	}
+}
+
+country_event = {
+	id = thetroubles.30
+	title = "Bombing in Birmingham"
+	desc = thetroubles.30.d
+	major = no
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "Not even England is safe.."
+		add_idea = IRA_eng_bomb
+		add_war_support = -0.05
+		128 = {
+			add_manpower = -100 
+		}
+	}
+}
+
+country_event = {
+	id = thetroubles.40
+	title "The IRA terms"
+	desc = thetroubles.40.d
+	major = no
+	
+	is_triggered_only = yes 
+	
+	option = {
+		name = "We have no choice."
+		trigger = {
+			check_variable = { 
+				variable = IRA
+				value = 80 
+				compare = greater_than }
+			AND = {
+				check_variable = { 
+					variable = war_support
+					value = 20 
+					compare = less_than }
+			}
+		}
+		clr_country_flag = irish_troubles_flag
+		119 = {
+			remove_state_flag = IRA_presence
+			remove_state_flag = insurg_lvl2
+		}
+		IRE = {
+			transfer_state = 119
+		}
+		news_event = thetroubles.52
+	}
+	option = {
+		name = "This is a charade."
+		trigger = {
+			has_war_support > 20
+			check_variable = { 
+				variable = IRA
+				value = 5 
+				compare = greater_than }
+				check_variable = { 
+				variable = IRA
+				value = 80  
+				compare = less_than }
+				AND = {	
+					check_variable = { 
+						variable = war_support
+						value = 20 
+						compare = greater_than }
+				}
+		}
+	}
+	option = {
+		name = "Make a counter-offer."
+		check_variable = { 
+				variable = IRA
+				value = 30 
+				compare = less_than }
+			AND = {
+				check_variable = { 
+						variable = war_support
+						value = 20   
+						compare = greater_than }
+			}			
+		country_event = thetroubles.41
+	}
+}
+
+country_event = {
+	id = thetroubles.41
+	title = "Our counter-offer"
+	desc = thetroubles.41.d
+	major = no 
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = thetroubles.41.a #Good Friday
+		country_event = thetroubles.42
+		check_variable = { 
+				variable = IRA
+				value = 50 
+				compare = less_than }
+		check_variable = { 
+				variable = IRA
+				value = 40 
+				compare = greater_than }
+	}
+	option = {
+		name = thetroubles.41.b #independent ulster
+		country_event = thetroubles.44
+		check_variable = { 
+				variable = IRA
+				value = 40 
+				compare = less_than }
+		check_variable = { 
+				variable = IRA
+				value = 5 
+				compare = greater_than }
+	}
+}
+
+country_event = {
+	id = thetroubles.42
+	title = "The IRA accept the agreement."
+	desc = thetroubles.42.d 
+	major = no 
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "Thank god."
+		add_stability = 0.1
+		remove_idea = the_troubles
+		119 = {
+			set_demilitarized_zone = yes 
+		}
+	}
+}
+
+country_event = {
+	id = thetroubles.43 
+	title = "The end of the IRA campaign."
+	desc = thetroubles.43.d
+	major = no
+	
+	is_triggered_only = yes 
+	
+	option = {
+		name = "And don't come back!"
+		remove_idea = the_troubles
+		news_event = thetroubles.53 
+	}
+}
+
+country_event = {
+	id = thetroubles.44 
+	title = "The IRA accept."
+	desc = thetroubles.44.d 
+	major = no
+	
+	is_triggered_only = yes 
+	
+	option = {
+		name = "A necessary compromise."
+		release = NIR
+		remove_idea = the_troubles
+	}
+}
+
+country_event = {
+	id = thetroubles.45
+	title = "Our new state."
+	desc = thetroubles.45.d
+	major = no 
+	
+	is_triggered_only = yes 
+	trigger = {
+		TAG = NIR
+		is_puppet = no 
+	}
+	option = {
+		name = "Quis Separabit!"
+			set_political_party = centrist
+			create_country_leader = {
+				name = "Roderick O'Connor"
+				desc = rod_oconnor_desc
+				picture = GFX_rod_oconnor
+				expire = 2000.1.23
+			}
+	}
+}
+
+news_event = {
+	id = thetroubles.51
+	title = "The End of The Troubles"
+	desc = thetroubles.51.d
+	major = yes 
+	
+	is_triggered_only = yes 
+	
+	option = {
+		trigger = {
+			TAG = ENG
+					OR = {
+						has_opinion = {
+							target = ENG
+								value > 0
+						}
+					}
+		}
+		name = "Finally, peace in Ireland."
+	}
+	option = {
+		trigger = {
+			has_opinion = {
+				target = ENG 
+				value < 0 	
+			}
+		}
+		name = "Our Time will Come."
+	}
+}
+
+country_event = {
+	id = thetroubles.50 
+	title = "Driven from Ireland"
+	desc = thetroubles.50.d
+	major = no
+	
+	is_triggered_only = yes 
+	
+	option = {
+		name = "We have no choice."
+		IRE = {
+			transfer_state = 119
+		}
+		news_event = thetroubles.52
+	}
+}
+
+news_event = {
+	id = thetroubles.52
+	title = "[GetNewspaperHeader] The IRA Victorious"
+	desc = thetroubles.52.d
+	major = yes
+	
+	is_triggered_only = yes 
+	
+	option = {
+		name = "Your problem now."
+		trigger = {
+			TAG = ENG 
+		}
+	}
+	option = {
+		name = "What about the Orangemen?"
+		trigger = {
+			TAG = IRE 
+		}
+	}
+	option = {
+		name = "Another blow to the Empire."
+		trigger = {
+			NOT = {
+				TAG = ENG
+				OR = {
+					TAG = IRE 
+				}
+			}
+		}
+	}
+	option = {
+		name = "Tiocfaidh ár lá!"
+		trigger = {
+		NOT = { TAG = ENG }
+			AND {
+				has_opinion = {
+					target = ENG
+						value < 0
+				}
+			}
+		}	
+	}
+}
+
+news_event = {
+	id = thetroubles.53
+	title = "[GetNewspaperHeader] IRA ceases operations in Ulster"
+	desc = thetroubles.53.d
+	major = yes 
+	
+	is_triggered_only = yes 
+	
+	option = {
+		name = "Victory over Terrorism!"
+		trigger = {
+			TAG = ENG 
+		}
+	}
+	
+	option = {
+		name = "Finally, peace in Ulster."
+		trigger = {
+			has_opinion = {
+				target = ENG 
+				value > 0 	
+			}
+		}
+	}
+	
+	option = {
+		name = "We'll get 'em next time."
+		trigger = {
+			has_opinion = {
+				target = ENG 
+				value < 0 	
+			}
+		}
+	}
+}
