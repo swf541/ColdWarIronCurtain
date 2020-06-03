@@ -54,6 +54,8 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 		add_to_variable = { ROOT.renewable_powerplant_total = building_level@renewable_powerplant }
 		add_to_variable = { ROOT.nuclear_powerplant_total = building_level@nuclear_powerplant }
 		
+		add_to_variable = { ROOT.tourism_infrastructure_total = tourism_infrastructure }
+		
 		add_to_variable = { ROOT.office_park_total = building_level@office_park }	#+2
 		if = {
 			limit = { check_variable = { upgrade_progress > 99 } }
@@ -416,9 +418,23 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	add_to_variable = { IncomeTotal = office_park_total }
 	set_variable { OP_Display = office_park_total }
 	
+	#Tourism Infrastructure#
+	multiply_variable = { tourism_infrastructure_total = 1 }
+	multiply_variable = { tourism_infrastructure_total = global.GlobalCredit } #DIVIDER
+	set_variable = { tourism_infrastructure_tech = 1 } #No techs for tourism so always 1
+	
+	add_to_variable = { tourism_infrastructure_tech = commerce_credit_factor_difference } #Tourism affected by commerce
+	
+	multiply_variable = { tourism_infrastructure_total = tourism_infrastructure_tech }
+	multiply_variable = { tourism_infrastructure_total = stability } #Stability affects tourism
+	add_to_variable = { IncomeTotal = tourism_infrastructure_total }
+	set_variable { TI_Display = tourism_infrastructure_total }
+	
+	#Overall Multipliers#
 	set_variable = { industrial_complex_per = 0.9 }
 	set_variable = { farm_per = 0.9 }
 	set_variable = { dockyard_per = 0.9 }
+	set_variable = { tourism_infrastructure_per = 0.9 } #Each tourist infrastructure unit is equal to 1/3 of a office park but each tourist infrastructure flag building may be worth more than 1 tourist infrastructure
 	set_variable = { oil_refinery_per = 1.8 }
 	set_variable = { steel_works_per = 1.8 }
 	set_variable = { tungsten_factory_per = 1.8 }
