@@ -19,7 +19,7 @@ NDefines.NAir.COMBAT_STACK_LIMIT = 1 -- The biggest allowed dogfight combination
 NDefines.NAir.COMBAT_MULTIPLANE_CAP = 2  -- How many planes can shoot at each plane on other side
 NDefines.NAir.COMBAT_DAMAGE_SCALE = 0.05 -- Higher value means more shot down planes
 NDefines.NAir.NAVAL_STRIKE_DAMAGE_TO_STR = 2 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
-NDefines.NAir.MISSION_COMMAND_POWER_COSTS = {  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+NDefines.NAir.MISSION_COMMAND_POWER_COSTS = {  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
 NDefines.NAir.CAS_NIGHT_ATTACK_FACTOR = 0.5 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
 
 NDefines.NBuildings.AIRBASE_CAPACITY_MULT = 50 -- Each level of airbase building multiplied by this, gives capacity (max operational value). Value is int. 1 for each airplane.
