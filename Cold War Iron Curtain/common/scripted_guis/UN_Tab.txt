@@ -19,6 +19,34 @@ scripted_gui = {
 					set_variable = { show_un = show }
 				}			
 			}
+			submit_proposal_button_click = {
+				UNS = {
+					activate_mission = UN_Vote
+					set_country_flag = Current_UN_Vote
+				}		
+				set_variable = { UNS.un_nation_target = root.un_nation_target }
+				set_variable = { UNS.un_action_set = root.un_action_set }
+				set_variable = { UNS.un_state_target = root.un_state_target }
+				every_country = {
+					limit = {
+						is_ai = yes
+						#NOT = { has_idea = unrecognized_state }
+						#NOT = { has_idea = semi_recognized_state }
+					}
+					UN_ai_vote_sorting = yes
+				}
+			}
+		}
+		triggers = {
+			submit_proposal_button_click_enabled = {
+				UNS = {
+					NOT = { has_country_flag = Current_UN_Vote }
+				}
+				OR = {
+					check_variable = { root.un_nation_target > 0 }
+					check_variable = { root.un_state_target > 0 }
+				}
+			}
 		}
     }
 	country_un_action_list = {
@@ -27,13 +55,14 @@ scripted_gui = {
 		parent_window_name = UN_tab
         dynamic_lists = {
             un_action_listing_grid = {
-                array = ROOT.un_option_list
+                array = UNS.un_option_list
                 change_scope = yes
 				entry_container = un_action_target_list_entry
             }
         }
 		effects = {
 			un_action_target_entry_button_click = { 
+				clear_array = ROOT.un_option_country_list
 				if = {
 					limit = {
 						check_variable = { root.un_option_list^i = 0 }
@@ -295,10 +324,7 @@ scripted_gui = {
 							NOT = { tag = USA }
 							NOT = { tag = ENG }
 							NOT = { tag = ROOT }
-							OR = {
-								is_researching_technology = atomic_weapons
-								has_tech = atomic_weapons
-							}
+							has_tech = atomic_weapons
 
 						}
 						add_to_array = { ROOT.un_option_country_list = THIS.id }
@@ -368,9 +394,9 @@ scripted_gui = {
  				if = {
 					limit = {
 						check_variable = { root.un_option_list^i = 12 }
-						has_war = yes 
+						has_defensive_war = yes 
 						OR = {
-							has_defensive_war = yes
+							has_civil_war = yes
 							alliance_strength_ratio < 0.75
 						}
 						check_variable = { badboy < 15 }
@@ -467,6 +493,11 @@ scripted_gui = {
 				entry_container = un_action_country_target_entry
             }
         }
+		effects = {
+			un_action_country_target_entry_button_click = { 
+				set_variable = { root.un_nation_target = THIS.id }
+			}
+		}
     }
 	country_un_state_list = {
        context_type = player_context
