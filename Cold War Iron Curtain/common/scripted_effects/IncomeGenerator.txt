@@ -45,7 +45,7 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	tax_rate = yes
 	domestic_bond_calc = yes
 	mercenary_calc = yes
-	
+	social_indices = yes
 	
 	set_variable = { CorruptPolicyExcess = CorruptionLevel }
 	multiply_variable = { CorruptPolicyExcess = 0.2 }
@@ -2706,7 +2706,73 @@ full_upgrade_estimate_regen = { #country scope
 	}
 	tax_rate = yes
 }
-
+social_indices = {
+	
+	#racial-related issues ebbed by equal rights and affirmative action#
+	if = { #Equal rights makes people work it out
+		limit = {
+			AND = {
+				has_idea = policy_minorities_temp_3
+				check_variable = { segregationValue < 0 }
+			}
+		}
+		add_to_variable = { segregationValue = 0.0002 }
+	}
+	else_if = { #Affirmative action tackles it
+		limit = {
+			AND = {
+				has_idea = policy_minorities_temp_3a
+				check_variable = { segregationValue < 0 }
+			}
+		}
+		add_to_variable = { segregationValue = 0.0005 }
+	}
+	else_if = { #Systemic opposition makes it worse
+		limit = {
+			AND = {
+				has_idea = policy_minorities_temp_1
+				check_variable = { segregationValue > -0.10 }
+			}
+		}
+		add_to_variable = { segregationValue = -0.0005 }
+	}
+	else_if = { #Systemic oppression makes it worse
+		limit = {
+			AND = {
+				has_idea = policy_minorities_temp_0
+				check_variable = { segregationValue > -0.10 }
+			}
+		}
+		add_to_variable = { segregationValue = -0.001 }
+	}
+	
+	if = {
+		limit = {
+			AND = {
+				NOT = {
+					has_dynamic_modifier = {
+						modifier = segregation_dynamic_modifier
+						scope = ROOT
+					}
+				}
+				check_variable = { segregationValue < -0.05 }
+			}
+		}
+		add_dynamic_modifier = { modifier = segregation_dynamic_modifier }
+	}
+	else_if = {
+		limit = {
+			AND = {
+				has_dynamic_modifier = {
+					modifier = segregation_dynamic_modifier
+					scope = ROOT
+				}
+				check_variable = { segregationValue > -0.001 }
+			}
+		}
+		remove_dynamic_modifier = { modifier = segregation_dynamic_modifier }
+	}
+}
 
 
 
