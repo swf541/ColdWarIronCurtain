@@ -1,0 +1,1582 @@
+state_on_startup_initialization = {
+
+	#HDI Cleanup#
+	if = {
+		limit = {
+			has_state_flag = HDI8
+		}
+		clr_state_flag = HDI7
+		clr_state_flag = HDI6
+		clr_state_flag = HDI5
+		clr_state_flag = HDI4
+		clr_state_flag = HDI3
+		clr_state_flag = HDI2
+		clr_state_flag = HDI1
+		clr_state_flag = HDI0
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI7
+		}
+		clr_state_flag = HDI6
+		clr_state_flag = HDI5
+		clr_state_flag = HDI4
+		clr_state_flag = HDI3
+		clr_state_flag = HDI2
+		clr_state_flag = HDI1
+		clr_state_flag = HDI0
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI6
+		}
+		clr_state_flag = HDI5
+		clr_state_flag = HDI4
+		clr_state_flag = HDI3
+		clr_state_flag = HDI2
+		clr_state_flag = HDI1
+		clr_state_flag = HDI0
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI5
+		}
+		clr_state_flag = HDI4
+		clr_state_flag = HDI3
+		clr_state_flag = HDI2
+		clr_state_flag = HDI1
+		clr_state_flag = HDI0
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI4
+		}
+		clr_state_flag = HDI3
+		clr_state_flag = HDI2
+		clr_state_flag = HDI1
+		clr_state_flag = HDI0
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI3
+		}
+		clr_state_flag = HDI2
+		clr_state_flag = HDI1
+		clr_state_flag = HDI0
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI2
+		}
+		clr_state_flag = HDI1
+		clr_state_flag = HDI0
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI1
+		}
+		clr_state_flag = HDI0
+	}
+	else = {
+		set_state_flag = HDI0
+	}
+	
+	
+	set_variable = { ReligionTotal = 0 }
+		#Christian#
+		add_to_variable = { ReligionTotal = ReligionChristianityCatholic  }
+		add_to_variable = { ReligionTotal = ReligionChristianityProtestant  }
+		add_to_variable = { ReligionTotal = ReligionChristianityOrthodox  }
+		add_to_variable = { ReligionTotal = ReligionChristianityOriental  }
+		#Judaic#
+		add_to_variable = { ReligionTotal = ReligionJudaism  }
+		#Islamic#
+		add_to_variable = { ReligionTotal = ReligionIslamSunni  }
+		add_to_variable = { ReligionTotal = ReligionIslamShia  }
+		add_to_variable = { ReligionTotal = ReligionIslamIbadi  }
+		#Buddhism#
+		add_to_variable = { ReligionTotal = ReligionBuddhismVajrayana  }
+		add_to_variable = { ReligionTotal = ReligionBuddhismMahayana  }
+		add_to_variable = { ReligionTotal = ReligionBuddhismThereveda  }
+		#Eastern#
+		add_to_variable = { ReligionTotal = ReligionShinto  }
+		add_to_variable = { ReligionTotal = ReligionTraditionalEastern  }
+		add_to_variable = { ReligionTotal = ReligionConfucian  }
+		#Indo-Iranian#
+		add_to_variable = { ReligionTotal = ReligionHindu  }
+		add_to_variable = { ReligionTotal = ReligionSikh  }
+		add_to_variable = { ReligionTotal = ReligionJain  }
+		add_to_variable = { ReligionTotal = ReligionTraditionalIranian  }
+		#Irreligious#
+		add_to_variable = { ReligionTotal = ReligionIrreligious }
+		add_to_variable = { ReligionTotal = ReligionAtheist  }
+		#Minor/Esoteric#
+		add_to_variable = { ReligionTotal = ReligionSpiritual  }
+		add_to_variable = { ReligionTotal = ReligionStatist  }
+		add_to_variable = { ReligionTotal = ReligionCultistSafe  }
+		add_to_variable = { ReligionTotal = ReligionCultistFatal  }
+		add_to_variable = { ReligionTotal = ReligionFurry  }
+		add_to_variable = { ReligionTotal = ReligionOther  }
+		
+	if = { #Anti divide by 0
+		limit = {
+			check_variable = { ReligionTotal = 0 }
+		}
+		add_to_variable = { ReligionIrreligious = 1 }
+		add_to_variable = { ReligionTotal = 1 }
+	}
+	
+	set_temp_variable = { POP_k = state_population_k } #POP_k is the state population in thousands
+	if = { #Anti divide by 0
+		limit = {
+			check_variable = { POP_k = 0 }
+		}
+		add_to_temp_variable = { POP_k = 1 }
+	}
+	
+	set_temp_variable = { ReligionValueRatio = ReligionTotal }
+	divide_temp_variable = { ReligionValueRatio = POP_k } #Total religious value divided by population. Less than 1 if values are lower, more than 1 if values are higher
+	
+	#All values are equalized to the population value so they add up to state_population_k, also important for religious drift 
+		#Christian#
+		divide_variable = { ReligionChristianityCatholic = ReligionValueRatio }
+		divide_variable = { ReligionChristianityProtestant = ReligionValueRatio }
+		divide_variable = { ReligionChristianityOrthodox = ReligionValueRatio }
+		divide_variable = { ReligionChristianityOriental = ReligionValueRatio }
+		#Judaic#
+		divide_variable = { ReligionJudaism = ReligionValueRatio }
+		#Islamic#
+		divide_variable = { ReligionIslamSunni = ReligionValueRatio }
+		divide_variable = { ReligionIslamShia = ReligionValueRatio }
+		divide_variable = { ReligionIslamIbadi = ReligionValueRatio }
+		#Buddhism#
+		divide_variable = { ReligionBuddhismVajrayana = ReligionValueRatio }
+		divide_variable = { ReligionBuddhismMahayana = ReligionValueRatio }
+		divide_variable = { ReligionBuddhismThereveda = ReligionValueRatio }
+		#Eastern#
+		divide_variable = { ReligionShinto = ReligionValueRatio }
+		divide_variable = { ReligionTraditionalEastern = ReligionValueRatio }
+		divide_variable = { ReligionConfucian = ReligionValueRatio }
+		#Indo-Iranian#
+		divide_variable = { ReligionHindu = ReligionValueRatio }
+		divide_variable = { ReligionSikh = ReligionValueRatio }
+		divide_variable = { ReligionJain = ReligionValueRatio }
+		divide_variable = { ReligionTraditionalIranian = ReligionValueRatio }
+		#Irreligious#
+		divide_variable = { ReligionIrreligious = ReligionValueRatio }
+		divide_variable = { ReligionAtheist = ReligionValueRatio }
+		#Minor/Esoteric#
+		divide_variable = { ReligionSpiritual = ReligionValueRatio }
+		divide_variable = { ReligionStatist = ReligionValueRatio }
+		divide_variable = { ReligionCultistSafe = ReligionValueRatio }
+		divide_variable = { ReligionCultistFatal = ReligionValueRatio }
+		divide_variable = { ReligionFurry = ReligionValueRatio }
+		divide_variable = { ReligionOther = ReligionValueRatio }
+	
+		#Christian#
+		add_to_variable = { ROOT.ReligionChristianityCatholicTotal = ReligionChristianityCatholic }
+		add_to_variable = { ROOT.ReligionChristianityProtestantTotal = ReligionChristianityProtestant }
+		add_to_variable = { ROOT.ReligionChristianityOrthodoxTotal = ReligionChristianityOrthodox }
+		add_to_variable = { ROOT.ReligionChristianityOrientalTotal = ReligionChristianityOriental }
+		#Judaic#
+		add_to_variable = { ROOT.ReligionJudaismTotal = ReligionJudaism }
+		#Islamic#
+		add_to_variable = { ROOT.ReligionIslamSunniTotal = ReligionIslamSunni }
+		add_to_variable = { ROOT.ReligionIslamShiaTotal = ReligionIslamShia }
+		add_to_variable = { ROOT.ReligionIslamIbadiTotal = ReligionIslamIbadi }
+		#Buddhism#
+		add_to_variable = { ROOT.ReligionBuddhismVajrayanaTotal = ReligionBuddhismVajrayana }
+		add_to_variable = { ROOT.ReligionBuddhismMahayanaTotal = ReligionBuddhismMahayana }
+		add_to_variable = { ROOT.ReligionBuddhismTherevedaTotal = ReligionBuddhismThereveda }
+		#Eastern#
+		add_to_variable = { ROOT.ReligionShintoTotal =  ReligionShinto }
+		add_to_variable = { ROOT.ReligionTraditionalEasternTotal = ReligionTraditionalEastern }
+		add_to_variable = { ROOT.ReligionConfucianTotal = ReligionConfucian }
+		#Indo-Iranian#
+		add_to_variable = { ROOT.ReligionHinduTotal = ReligionHindu }
+		add_to_variable = { ROOT.ReligionSikhTotal = ReligionSikh }
+		add_to_variable = { ROOT.ReligionJainTotal = ReligionJain }
+		add_to_variable = { ROOT.ReligionTraditionalIranianTotal = ReligionTraditionalIranian }
+		#Irreligious#
+		add_to_variable = { ROOT.ReligionIrreligiousTotal = ReligionIrreligious }
+		add_to_variable = { ROOT.ReligionAtheistTotal = ReligionAtheist }
+		#Minor/Esoteric#
+		add_to_variable = { ROOT.ReligionSpiritualTotal = ReligionSpiritual }
+		add_to_variable = { ROOT.ReligionStatistTotal = ReligionStatist }
+		add_to_variable = { ROOT.ReligionCultistSafeTotal = ReligionCultistSafe }
+		add_to_variable = { ROOT.ReligionCultistFatalTotal = ReligionCultistFatal }
+		add_to_variable = { ROOT.ReligionFurryTotal = ReligionFurry }
+		add_to_variable = { ROOT.ReligionOtherTotal = ReligionOther }
+}
+
+initialize_1949_setup = {
+	if = {
+		limit = {
+			has_state_flag = HDI0
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI1
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI2
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI3
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI4
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI5
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI6
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI7
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI8
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+}
+
+initialize_1960_setup = {
+	if = {
+		limit = {
+			has_state_flag = HDI0
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI1
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI2
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI3
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI4
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI5
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI6
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_2
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI7
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_2
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI8
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_2
+	}
+}
+
+initialize_1973_setup = {
+	if = {
+		limit = {
+			has_state_flag = HDI0
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI1
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI2
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI3
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI4
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI5
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI6
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_2
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI7
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_2
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI8
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_2
+	}
+}
+
+initialize_1980_setup = {
+	if = {
+		limit = {
+			has_state_flag = HDI0
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI1
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI2
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI3
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI4
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI5
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_2
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI6
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_2
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI7
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_3
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI8
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_3
+	}
+}
+
+initialize_1991_setup = {
+	if = {
+		limit = {
+			has_state_flag = HDI0
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI1
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI2
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI3
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_2
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI4
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_2
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI5
+		}
+		set_state_flag = grid_level_3
+		set_state_flag = telecoms_level_3
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI6
+		}
+		set_state_flag = grid_level_3
+		set_state_flag = telecoms_level_3
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI7
+		}
+		set_state_flag = grid_level_3
+		set_state_flag = telecoms_level_3
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI8
+		}
+		set_state_flag = grid_level_3
+		set_state_flag = telecoms_level_3
+	}
+}
+
+initialize_2000_setup = {
+	if = {
+		limit = {
+			has_state_flag = HDI0
+		}
+		
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI1
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI2
+		}
+		set_state_flag = grid_level_1
+		set_state_flag = telecoms_level_1
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI3
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_2
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI4
+		}
+		set_state_flag = grid_level_2
+		set_state_flag = telecoms_level_2
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI5
+		}
+		set_state_flag = grid_level_3
+		set_state_flag = telecoms_level_3
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI6
+		}
+		set_state_flag = grid_level_3
+		set_state_flag = telecoms_level_4
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI7
+		}
+		set_state_flag = grid_level_3
+		set_state_flag = telecoms_level_4
+	}
+	else_if = {
+		limit = {
+			has_state_flag = HDI8
+		}
+		set_state_flag = grid_level_3
+		set_state_flag = telecoms_level_4
+	}
+}
+
+major_religion_placeholder = {
+	if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionChristianityCatholicTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionChristianityOthodoxTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionChristianityCatholicTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionChristianityCatholicTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionChristianityCatholicTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionChristianityCatholicTotal > ReligionShintoTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionChristianityCatholicTotal > ReligionHinduTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionSikhTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionJainTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionChristianityCatholicTotal > ReligionIrreligious }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionChristianityCatholicTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionStatistTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionFurryTotal }
+			check_variable = { ReligionChristianityCatholicTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_ChristianityCatholic
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionChristianityProtestantTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionChristianityProtestantTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionChristianityProtestantTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionChristianityProtestantTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionChristianityProtestantTotal > ReligionShintoTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionChristianityProtestantTotal > ReligionHinduTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionSikhTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionJainTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionChristianityProtestantTotal > ReligionIrreligious }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionChristianityProtestantTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionStatistTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionFurryTotal }
+			check_variable = { ReligionChristianityProtestantTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_ChristianityProtestant
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionShintoTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionHinduTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionSikhTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionJainTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionIrreligious }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionStatistTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionFurryTotal }
+			check_variable = { ReligionChristianityOrthodoxTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_ChristianityOrthodox
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionChristianityOrientalTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionChristianityOrthodoxTotal }
+			#Judaic#
+			check_variable = { ReligionChristianityOrientalTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionChristianityOrientalTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionChristianityOrientalTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionChristianityOrientalTotal > ReligionShintoTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionChristianityOrientalTotal > ReligionHinduTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionSikhTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionJainTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionChristianityOrientalTotal > ReligionIrreligious }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionChristianityOrientalTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionStatistTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionFurryTotal }
+			check_variable = { ReligionChristianityOrientalTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_ChristianityOriental
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionJudaismTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionJudaismTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionJudaismTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionJudaismTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			#Islamic#
+			check_variable = { ReligionJudaismTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionJudaismTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionJudaismTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionJudaismTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionJudaismTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionJudaismTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionJudaismTotal > ReligionShintoTotal }
+			check_variable = { ReligionJudaismTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionJudaismTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionJudaismTotal > ReligionHinduTotal }
+			check_variable = { ReligionJudaismTotal > ReligionSikhTotal }
+			check_variable = { ReligionJudaismTotal > ReligionJainTotal }
+			check_variable = { ReligionJudaismTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionJudaismTotal > ReligionIrreligious }
+			check_variable = { ReligionJudaismTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionJudaismTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionJudaismTotal > ReligionStatistTotal }
+			check_variable = { ReligionJudaismTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionJudaismTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionJudaismTotal > ReligionFurryTotal }
+			check_variable = { ReligionJudaismTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_Judaism
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionIslamSunniTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionIslamSunniTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionIslamSunniTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionIslamSunniTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionIslamSunniTotal > ReligionShintoTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionIslamSunniTotal > ReligionHinduTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionSikhTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionJainTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionIslamSunniTotal > ReligionIrreligious }
+			check_variable = { ReligionIslamSunniTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionIslamSunniTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionStatistTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionFurryTotal }
+			check_variable = { ReligionIslamSunniTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_IslamSunni
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionIslamShiaTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionIslamShiaTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionIslamShiaTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionIslamShiaTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionIslamShiaTotal > ReligionShintoTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionIslamShiaTotal > ReligionHinduTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionSikhTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionJainTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionIslamShiaTotal > ReligionIrreligious }
+			check_variable = { ReligionIslamShiaTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionIslamShiaTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionStatistTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionFurryTotal }
+			check_variable = { ReligionIslamShiaTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_IslamShia
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionIslamIbadiTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionIslamIbadiTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionIslamIbadiTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionIslamShiaTotal }
+			#Buddhism#
+			check_variable = { ReligionIslamIbadiTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionIslamIbadiTotal > ReligionShintoTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionIslamIbadiTotal > ReligionHinduTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionSikhTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionJainTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionIslamIbadiTotal > ReligionIrreligious }
+			check_variable = { ReligionIslamIbadiTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionIslamIbadiTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionStatistTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionFurryTotal }
+			check_variable = { ReligionIslamIbadiTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_IslamIbadi
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionShintoTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionHinduTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionSikhTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionJainTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionIrreligious }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionStatistTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionFurryTotal }
+			check_variable = { ReligionBuddhismVajrayanaTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_BuddhismVajrayana
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionShintoTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionHinduTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionSikhTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionJainTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionIrreligious }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionStatistTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionFurryTotal }
+			check_variable = { ReligionBuddhismMahayanaTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_BuddhismMahayana
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionBuddhismMahayanaTotal }
+			#Eastern#
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionShintoTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionHinduTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionSikhTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionJainTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionIrreligious }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionStatistTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionFurryTotal }
+			check_variable = { ReligionBuddhismTherevedaTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_BuddhismThereveda
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionShintoTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionShintoTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionShintoTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionShintoTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionShintoTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionShintoTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionShintoTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionShintoTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionShintoTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionShintoTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionShintoTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionShintoTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionShintoTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionShintoTotal > ReligionHinduTotal }
+			check_variable = { ReligionShintoTotal > ReligionSikhTotal }
+			check_variable = { ReligionShintoTotal > ReligionJainTotal }
+			check_variable = { ReligionShintoTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionShintoTotal > ReligionIrreligious }
+			check_variable = { ReligionShintoTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionShintoTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionShintoTotal > ReligionStatistTotal }
+			check_variable = { ReligionShintoTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionShintoTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionShintoTotal > ReligionFurryTotal }
+			check_variable = { ReligionShintoTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_Shinto
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionTraditionalEasternTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionTraditionalEasternTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionTraditionalEasternTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionTraditionalEasternTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionTraditionalEasternTotal > ReligionShintoTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionTraditionalEasternTotal > ReligionHinduTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionSikhTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionJainTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionTraditionalEasternTotal > ReligionIrreligious }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionTraditionalEasternTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionStatistTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionFurryTotal }
+			check_variable = { ReligionTraditionalEasternTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_TraditionalEastern
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionConfucianTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionConfucianTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionConfucianTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionConfucianTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionConfucianTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionConfucianTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionConfucianTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionConfucianTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionConfucianTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionConfucianTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionConfucianTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionConfucianTotal > ReligionShintoTotal }
+			check_variable = { ReligionConfucianTotal > ReligionTraditionalEasternTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionConfucianTotal > ReligionHinduTotal }
+			check_variable = { ReligionConfucianTotal > ReligionSikhTotal }
+			check_variable = { ReligionConfucianTotal > ReligionJainTotal }
+			check_variable = { ReligionConfucianTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionConfucianTotal > ReligionIrreligious }
+			check_variable = { ReligionConfucianTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionConfucianTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionConfucianTotal > ReligionStatistTotal }
+			check_variable = { ReligionConfucianTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionConfucianTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionConfucianTotal > ReligionFurryTotal }
+			check_variable = { ReligionConfucianTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_Confucian
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionHinduTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionHinduTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionHinduTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionHinduTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionHinduTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionHinduTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionHinduTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionHinduTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionHinduTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionHinduTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionHinduTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionHinduTotal > ReligionShintoTotal }
+			check_variable = { ReligionHinduTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionHinduTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionHinduTotal > ReligionSikhTotal }
+			check_variable = { ReligionHinduTotal > ReligionJainTotal }
+			check_variable = { ReligionHinduTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionHinduTotal > ReligionIrreligious }
+			check_variable = { ReligionHinduTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionHinduTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionHinduTotal > ReligionStatistTotal }
+			check_variable = { ReligionHinduTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionHinduTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionHinduTotal > ReligionFurryTotal }
+			check_variable = { ReligionHinduTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_Hindu
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionSikhTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionSikhTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionSikhTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionSikhTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionSikhTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionSikhTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionSikhTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionSikhTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionSikhTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionSikhTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionSikhTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionSikhTotal > ReligionShintoTotal }
+			check_variable = { ReligionSikhTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionSikhTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionSikhTotal > ReligionHinduTotal }
+			check_variable = { ReligionSikhTotal > ReligionJainTotal }
+			check_variable = { ReligionSikhTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionSikhTotal > ReligionIrreligious }
+			check_variable = { ReligionSikhTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionSikhTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionSikhTotal > ReligionStatistTotal }
+			check_variable = { ReligionSikhTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionSikhTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionSikhTotal > ReligionFurryTotal }
+			check_variable = { ReligionSikhTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_Sikh
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionJainTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionJainTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionJainTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionJainTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionJainTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionJainTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionJainTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionJainTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionJainTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionJainTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionJainTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionJainTotal > ReligionShintoTotal }
+			check_variable = { ReligionJainTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionJainTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionJainTotal > ReligionHinduTotal }
+			check_variable = { ReligionJainTotal > ReligionSikhTotal }
+			check_variable = { ReligionJainTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionJainTotal > ReligionIrreligious }
+			check_variable = { ReligionJainTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionJainTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionJainTotal > ReligionStatistTotal }
+			check_variable = { ReligionJainTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionJainTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionJainTotal > ReligionFurryTotal }
+			check_variable = { ReligionJainTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_Jain
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionTraditionalIranianTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionTraditionalIranianTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionTraditionalIranianTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionTraditionalIranianTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionTraditionalIranianTotal > ReligionShintoTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionTraditionalIranianTotal > ReligionHinduTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionSikhTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionJainTotal }
+			#Irreligious#
+			check_variable = { ReligionTraditionalIranianTotal > ReligionIrreligious }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionTraditionalIranianTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionStatistTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionFurryTotal }
+			check_variable = { ReligionTraditionalIranianTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_TraditionalIranian
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionIrreligiousTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionIrreligiousTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionIrreligiousTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionIrreligiousTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionIrreligiousTotal > ReligionShintoTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionIrreligiousTotal > ReligionHinduTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionSikhTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionJainTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionIrreligiousTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionIrreligiousTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionStatistTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionFurryTotal }
+			check_variable = { ReligionIrreligiousTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_Irreligious
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionAtheistTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionAtheistTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionAtheistTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionAtheistTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionAtheistTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionAtheistTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionAtheistTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionAtheistTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionAtheistTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionAtheistTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionAtheistTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionAtheistTotal > ReligionShintoTotal }
+			check_variable = { ReligionAtheistTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionAtheistTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionAtheistTotal > ReligionHinduTotal }
+			check_variable = { ReligionAtheistTotal > ReligionSikhTotal }
+			check_variable = { ReligionAtheistTotal > ReligionJainTotal }
+			check_variable = { ReligionAtheistTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionAtheistTotal > ReligionIrreligious }
+			#Minor/Esoteric#
+			check_variable = { ReligionAtheistTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionAtheistTotal > ReligionStatistTotal }
+			check_variable = { ReligionAtheistTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionAtheistTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionAtheistTotal > ReligionFurryTotal }
+			check_variable = { ReligionAtheistTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_Atheist
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionSpiritualTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionSpiritualTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionSpiritualTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionSpiritualTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionSpiritualTotal > ReligionShintoTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionSpiritualTotal > ReligionHinduTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionSikhTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionJainTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionSpiritualTotal > ReligionIrreligious }
+			check_variable = { ReligionSpiritualTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionSpiritualTotal > ReligionStatistTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionFurryTotal }
+			check_variable = { ReligionSpiritualTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_Spiritual
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionStatistTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionStatistTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionStatistTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionStatistTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionStatistTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionStatistTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionStatistTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionStatistTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionStatistTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionStatistTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionStatistTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionStatistTotal > ReligionShintoTotal }
+			check_variable = { ReligionStatistTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionStatistTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionStatistTotal > ReligionHinduTotal }
+			check_variable = { ReligionStatistTotal > ReligionSikhTotal }
+			check_variable = { ReligionStatistTotal > ReligionJainTotal }
+			check_variable = { ReligionStatistTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionStatistTotal > ReligionIrreligious }
+			check_variable = { ReligionStatistTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionStatistTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionStatistTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionStatistTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionStatistTotal > ReligionFurryTotal }
+			check_variable = { ReligionStatistTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_Statist
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionCultistSafeTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionCultistSafeTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionCultistSafeTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionCultistSafeTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionCultistSafeTotal > ReligionShintoTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionCultistSafeTotal > ReligionHinduTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionSikhTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionJainTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionCultistSafeTotal > ReligionIrreligious }
+			check_variable = { ReligionCultistSafeTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionCultistSafeTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionStatistTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionFurryTotal }
+			check_variable = { ReligionCultistSafeTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_CultistSafe
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionCultistFatalTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionCultistFatalTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionCultistFatalTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionCultistFatalTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionCultistFatalTotal > ReligionShintoTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionCultistFatalTotal > ReligionHinduTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionSikhTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionJainTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionCultistFatalTotal > ReligionIrreligious }
+			check_variable = { ReligionCultistFatalTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionCultistFatalTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionStatistTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionFurryTotal }
+			check_variable = { ReligionCultistFatalTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_CultistFatal
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionFurryTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionFurryTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionFurryTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionFurryTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionFurryTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionFurryTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionFurryTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionFurryTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionFurryTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionFurryTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionFurryTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionFurryTotal > ReligionShintoTotal }
+			check_variable = { ReligionFurryTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionFurryTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionFurryTotal > ReligionHinduTotal }
+			check_variable = { ReligionFurryTotal > ReligionSikhTotal }
+			check_variable = { ReligionFurryTotal > ReligionJainTotal }
+			check_variable = { ReligionFurryTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionFurryTotal > ReligionIrreligious }
+			check_variable = { ReligionFurryTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionFurryTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionFurryTotal > ReligionStatistTotal }
+			check_variable = { ReligionFurryTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionFurryTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionFurryTotal > ReligionOtherTotal }
+		}
+		set_country_flag = PR_Furry
+	}
+	else_if = {
+		limit = {
+			#Christian#
+			check_variable = { ReligionOtherTotal > ReligionChristianityCatholicTotal }
+			check_variable = { ReligionOtherTotal > ReligionChristianityProtestantTotal }
+			check_variable = { ReligionOtherTotal > ReligionChristianityOrthodoxTotal }
+			check_variable = { ReligionOtherTotal > ReligionChristianityOrientalTotal }
+			#Judaic#
+			check_variable = { ReligionOtherTotal > ReligionJudaismTotal }
+			#Islamic#
+			check_variable = { ReligionOtherTotal > ReligionIslamSunniTotal }
+			check_variable = { ReligionOtherTotal > ReligionIslamShiaTotal }
+			check_variable = { ReligionOtherTotal > ReligionIslamIbadiTotal }
+			#Buddhism#
+			check_variable = { ReligionOtherTotal > ReligionBuddhismVajrayanaTotal }
+			check_variable = { ReligionOtherTotal > ReligionBuddhismMahayanaTotal }
+			check_variable = { ReligionOtherTotal > ReligionBuddhismTherevedaTotal }
+			#Eastern#
+			check_variable = { ReligionOtherTotal > ReligionShintoTotal }
+			check_variable = { ReligionOtherTotal > ReligionTraditionalEasternTotal }
+			check_variable = { ReligionOtherTotal > ReligionConfucianTotal }
+			#Indo-Iranian#
+			check_variable = { ReligionOtherTotal > ReligionHinduTotal }
+			check_variable = { ReligionOtherTotal > ReligionSikhTotal }
+			check_variable = { ReligionOtherTotal > ReligionJainTotal }
+			check_variable = { ReligionOtherTotal > ReligionTraditionalIranianTotal }
+			#Irreligious#
+			check_variable = { ReligionOtherTotal > ReligionIrreligious }
+			check_variable = { ReligionOtherTotal > ReligionAtheistTotal }
+			#Minor/Esoteric#
+			check_variable = { ReligionOtherTotal > ReligionSpiritualTotal }
+			check_variable = { ReligionOtherTotal > ReligionStatistTotal }
+			check_variable = { ReligionOtherTotal > ReligionCultistSafeTotal }
+			check_variable = { ReligionOtherTotal > ReligionCultistFatalTotal }
+			check_variable = { ReligionOtherTotal > ReligionFurryTotal }
+		}
+		set_country_flag = PR_Other
+	}
+	else = {
+		set_country_flag = PR_Other
+	}
+}
