@@ -19,7 +19,8 @@ NDefines.NAir.COMBAT_STACK_LIMIT = 1 -- The biggest allowed dogfight combination
 NDefines.NAir.COMBAT_MULTIPLANE_CAP = 2  -- How many planes can shoot at each plane on other side
 NDefines.NAir.COMBAT_DAMAGE_SCALE = 0.05 -- Higher value means more shot down planes
 NDefines.NAir.NAVAL_STRIKE_DAMAGE_TO_STR = 2 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
-NDefines.NAir.MISSION_COMMAND_POWER_COSTS = {  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+NDefines.NAir.MISSION_COMMAND_POWER_COSTS = {  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+NDefines.NAir.MISSION_FUEL_COSTS = {  1.0, 0.5, 0.2, 1.3, 1.3, 20.0, 3.0, 1.0, 1.3, 2.0, 0.5, 2.0, 2.0, 1.0 }
 NDefines.NAir.CAS_NIGHT_ATTACK_FACTOR = 0.5 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
 
 NDefines.NBuildings.AIRBASE_CAPACITY_MULT = 50 -- Each level of airbase building multiplied by this, gives capacity (max operational value). Value is int. 1 for each airplane.
@@ -114,7 +115,8 @@ NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_COST_FACTOR = 0.0-- Desire to boost rela
 NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_PP_FACTOR = 0.0	-- Desire to boost relations adds total PP multiplied by this
 NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 9999999
 NDefines.NAI.DIVISION_CREATE_MIN_XP = 9999999
-NDefines.NAI.MAX_AHEAD_RESEARCH_PENALTY = 1
+NDefines.NAI.VARIANT_UPGRADE_MIN_XP = 9999999
+NDefines.NAI.MAX_AHEAD_RESEARCH_PENALTY = 0
 NDefines.NAI.RESEARCH_AHEAD_OF_TIME_FACTOR = 9999999
 
 NDefines.NProduction.MAX_EQUIPMENT_RESOURCES_NEED = 4
@@ -134,9 +136,10 @@ NDefines.NAI.NUM_SILOS_PER_CIVILIAN_FACTORIES = 0.2
 
 NDefines.NOperatives.AGENCY_CREATION_DAYS = 200
 NDefines.NOperatives.AGENCY_UPGRADE_DAYS = 100
-NDefines.NOperatives.AGENCY_OPERATIVE_RECRUITMENT_TIME = 120
+NDefines.NOperatives.AGENCY_OPERATIVE_RECRUITMENT_TIME = 90
 NDefines.NOperatives.AGENCY_CREATION_FACTORIES = 15
-NDefines.NOperatives.AGENCY_UPGRADE_PER_OPERATIVE_SLOT = 10
+NDefines.NOperatives.AGENCY_UPGRADE_PER_OPERATIVE_SLOT = 24 -- lol that's all of them
+NDefines.NOperatives.MAX_RECRUITED_OPERATIVES = 25
 
 NDefines.NMilitary.LAND_COMBAT_STR_DAMAGE_MODIFIER = 0.025
 NDefines.NMilitary.LAND_COMBAT_ORG_DAMAGE_MODIFIER = 0.025

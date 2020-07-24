@@ -1063,6 +1063,20 @@ focus_tree = {
 		}
 		x = 24
 		y = 2
+		
+		completion_reward = {
+		      if = {
+				limit = { not = { has_dlc = "Man the Guns" } }
+				ISR = {	load_oob = "ISR_purchase_destroyers" }
+				}
+				
+			  else = {
+				ISR = {	load_oob = "ISR_purchase_destroyers_mtg" }
+				 } 
+			
+			
+			
+		}
 
 	}
 	focus = {
@@ -1099,7 +1113,7 @@ focus_tree = {
 		y = 21
 		completion_reward = {
 				add_opinion_modifier = {
-				target = JOR
+				target = EGY
 				modifier = large_increase
 			}
 		}
@@ -1114,6 +1128,19 @@ focus_tree = {
 		}
 		x = 28
 		y = 2
+		completion_reward = {
+		      if = {
+				limit = { not = { has_dlc = "Man the Guns" } }
+				ISR = {	load_oob = "ISR_purchase_submarines" }
+				}
+				
+			  else = {
+				ISR = {	load_oob = "ISR_purchase_submarines_mtg" }
+				 } 
+			
+			
+			
+		}
 
 	}
 	focus = {
@@ -1294,6 +1321,8 @@ focus_tree = {
 		y = 6
 			completion_reward = {
 					country_event = israel.8
+					add_stability = 0.05
+					add_political_power = 25
 				}
 	}
 	focus = {
@@ -3101,11 +3130,11 @@ focus_tree = {
 					add_political_power = 100
 					ISR = {
 							add_opinion_modifier = {
-									target = SOV
+									target = USA
 									modifier = small_increase
 								}
 						}
-					SOV = {
+					USA = {
 							add_opinion_modifier = {
 									target = ISR
 									modifier = small_increase
@@ -3804,6 +3833,423 @@ focus_tree = {
 			add_political_power = 100
 				}
 			}
+	##############
+
+	focus = {
+		id = ISR_address_hareidisecular_tensions
+		icon = GFX_israel_country
+		search_filters = { IC_FILTER } 
+		cost = 10
+		x = 51
+		y = 0
+		
+		available = {
+			has_country_flag = Election1955
+		}
+
+		completion_reward = {
+			add_stability = -.02
+			add_political_power = 15
+			custom_effect_tooltip = isr.tooltip.1
+			
+		}
+	}	
+	focus = {
+		id = ISR_side_with_the_hareidim
+		icon = GFX_ElectHapoelHaMizrachi
+		search_filters = {IC_FILTER}
+		cost = 10.00
+		prerequisite = {
+			focus = ISR_address_hareidisecular_tensions
+		}
+		x = 57
+		y = 1
+		available = {
+			always = no
+		}
+			bypass = {
+			OR = {
+					has_country_flag = Herut1955
+					has_country_flag = Religious1955
+					}
+					}
+	}
+	focus = {
+		id = ISR_side_with_the_hilonim
+		icon = GFX_mapam
+		search_filters = {IC_FILTER}
+		cost = 10.00
+		prerequisite = {
+			focus = ISR_address_hareidisecular_tensions
+		}
+		x = 45
+		y = 1
+		available = {
+			always = no
+		}
+			bypass = {
+			OR = {
+					has_country_flag = Mapam1955
+					has_country_flag = Genzionist1955
+					has_country_flag = Herut1955
+					}
+					}
+	}
+	focus = {
+		id = ISR_stay_neutral
+		icon = GFX_mapai
+		search_filters = {IC_FILTER}
+		cost = 10.00
+		prerequisite = {
+			focus = ISR_address_hareidisecular_tensions
+		}
+		x = 51
+		y = 1
+		available = {
+			always = no
+		}
+			bypass = {
+			OR = {
+					has_country_flag = Mapai1955
+					has_country_flag = Genzionist1955
+					has_country_flag = Mapam1955
+					has_country_flag = Herut1955
+
+					}
+					}
+	}
+	focus = {
+		id = ISR_support_the_hareidim_in_the_knesset
+		icon = GFX_herut
+		search_filters = { IC_FILTER }
+		cost = 10	
+		
+		
+		prerequisite = { 
+			focus = ISR_side_with_the_hareidim 
+			}
+		
+	    x = 57
+		y = 2
+		
+		completion_reward = {
+			add_political_power = 25
+			add_ideas = hareidi_support_1
+			custom_effect_tooltip = isr.tooltip.2
+
+		}
+	}
+	focus = {
+		id = ISR_enforce_religious_laws
+		icon = GFX_goal_generic_propaganda
+		x = 58
+		y = 3
+		cost = 10
+		available_if_capitulated = yes
+		prerequisite = {
+		 focus = ISR_support_the_hareidim_in_the_knesset 
+		 }
+		search_filters = { IC_FILTER } 
+		
+		completion_reward = {
+			swap_ideas = {
+			remove_idea = hareidi_support_1
+			add_idea = hareidi_support_2
+			custom_effect_tooltip = isr.tooltip.3
+			}
+		}
+	}
+	focus = {
+		id = ISR_make_yom_kippur_a_national_holiday
+		icon = GFX_goal_generic_neutrality_focus
+		x = 57
+		y = 4
+		cost = 10
+		prerequisite = { focus = ISR_enforce_religious_laws 
+		}
+		search_filters = { IC_FILTER } 
+		
+		completion_reward = {
+			swap_ideas = {
+			remove_idea = hareidi_support_2
+			add_idea = hareidi_support_3
+			custom_effect_tooltip = isr.tooltip.3
+			}
+		}
+	}
+	focus = {
+		id = ISR_suppress_hiloni_strikes
+		icon = GFX_goal_demand_sudetenland
+		x = 56
+		y = 5
+		cost = 10
+		prerequisite = { 
+		focus = ISR_make_yom_kippur_a_national_holiday 
+		}
+		mutually_exclusive = { focus = ISR_accept_hiloni_strikes }
+		search_filters = { IC_FILTER } 
+
+		complete_tooltip = {
+			
+		}
+		completion_reward = {	
+			custom_effect_tooltip = isr.tooltip.4
+			
+			remove_ideas = hareidi_support_3
+			add_timed_idea = { idea = hareidi_support_4 days = 380 }
+			
+			add_timed_idea = { idea = hiloni_strikes days = 180 }	
+		}
+	}
+	focus = {
+		id = ISR_accept_hiloni_strikes
+		icon = GFX_SP_focus_trade_unions
+		x = 58
+		y = 5
+		cost = 10
+		
+		prerequisite = {
+		 focus = ISR_make_yom_kippur_a_national_holiday
+			 }
+		mutually_exclusive = { focus = ISR_suppress_hiloni_strikes }
+
+		search_filters = { IC_FILTER } 
+		completion_reward = {
+			
+			custom_effect_tooltip = isr.tooltip.12	
+			swap_ideas = {
+			remove_idea = hareidi_support_3
+			add_idea = hareidi_compromise
+			}
+		}
+	}
+	focus = {
+		id = ISR_support_the_hilonim_in_the_knesset
+		icon = GFX_ISR_Communist_Party
+		x = 45
+		y = 2
+		cost = 10
+		
+		prerequisite = { 
+		focus = ISR_side_with_the_hilonim
+		}
+		
+		search_filters = { IC_FILTER } 
+		
+		completion_reward = {
+			add_political_power = 75
+			add_ideas = hiloni_support_1
+			custom_effect_tooltip = isr.tooltip.5
+			 
+		}
+		
+	}
+	focus = {
+		id = ISR_revoke_traditional_jewish_laws
+		icon = GFX_goal_generic_intelligence_exchange
+		x = 44
+		y = 3
+		cost = 10
+		
+		prerequisite = {
+	    focus = ISR_support_the_hilonim_in_the_knesset 
+	    }
+		search_filters = { IC_FILTER } 
+		
+		completion_reward = {
+			swap_ideas = {
+			remove_idea = hiloni_support_1
+			add_idea = hiloni_support_2
+			custom_effect_tooltip = isr.tooltip.6
+			}
+		}
+	}
+	focus = {
+		id = ISR_force_hareidim_into_the_national_service
+		icon = GFX_goal_generic_forceful_treaty
+		x = 45
+		y = 4
+		cost = 10
+		
+		prerequisite = {
+	     focus = ISR_revoke_traditional_jewish_laws 
+	    }
+		search_filters = { IC_FILTER } 
+
+		completion_reward = {
+			swap_ideas = {
+			remove_idea = hiloni_support_2
+			add_idea = hiloni_support_3
+			custom_effect_tooltip = isr.tooltip.6
+			}
+		}
+	}
+	focus = {
+		id = ISR_crack_down_on_hareidi_protests
+		icon = GFX_goal_generic_war_with_comintern
+		x = 46
+		y = 5
+		cost = 10
+		
+		prerequisite = {
+		 focus = ISR_force_hareidim_into_the_national_service 
+			 }
+		mutually_exclusive = { focus = ISR_accept_hareidi_protests }
+
+		search_filters = { IC_FILTER } 
+		completion_reward = {
+			
+			custom_effect_tooltip = isr.tooltip.7
+			
+			remove_ideas = hiloni_support_3
+			add_timed_idea = { idea = hiloni_support_4 days = 380 }
+			
+			add_timed_idea = { idea = hareidi_protests days = 180 }	
+		}
+	}
+	
+	focus = {
+		id = ISR_accept_hareidi_protests
+		icon = GFX_SP_focus_trade_unions
+		x = 44
+		y = 5
+		cost = 10
+		
+		prerequisite = {
+		 focus = ISR_force_hareidim_into_the_national_service 
+			 }
+		mutually_exclusive = { focus = ISR_crack_down_on_hareidi_protests }
+
+		search_filters = { IC_FILTER } 
+		completion_reward = {
+			
+			custom_effect_tooltip = isr.tooltip.11
+			swap_ideas = {
+			remove_idea = hiloni_support_3
+			add_idea = hiloni_compromise	
+			}
+		}
+	}
+	focus = {
+		id = ISR_try_to_compromise
+		icon = GFX_zionism
+		x = 51
+		y = 2
+		cost = 10
+		
+		prerequisite = { 
+		focus = ISR_stay_neutral
+		}
+		
+		search_filters = { IC_FILTER } 
+	
+		completion_reward = {
+			add_stability = -.05
+			add_political_power = -25
+			 add_ideas = isr_compromise_1
+			 custom_effect_tooltip = isr.tooltip.8
+			
+		}
+	}
+	focus = {
+		id = ISR_tread_the_middle_ground
+		icon = GFX_goal_support_democracy
+		x = 51
+		y = 3
+		cost = 10
+		
+		prerequisite = { 
+		focus = ISR_try_to_compromise 
+		}
+		search_filters = { IC_FILTER } 
+		
+		completion_reward = {
+			swap_ideas = {
+			remove_idea = isr_compromise_1
+			add_idea = isr_compromise_2
+			}
+			custom_effect_tooltip = isr.tooltip.9
+			
+		}
+	}
+	focus = {
+		id = ISR_organize_talks_between_faction_leaders
+		icon = GFX_focus_smiling_buddha
+		x = 51
+		y = 4
+		cost = 10
+		
+		prerequisite = { 
+		focus = ISR_tread_the_middle_ground 
+		}
+		search_filters = { IC_FILTER } 
+		
+		
+		completion_reward = {
+		custom_effect_tooltip = isr.tooltip.10
+		
+			country_event= israel.religiousdebate 	
+		}
+	}
+
+	focus = {
+		id = ISR_the_talks_are_a_success
+		icon = GFX_focus_renounce_the_treaty_of_trianon
+		x = 49
+		y = 5
+		cost = 5
+		available = {
+		OR = {
+		AND = { has_country_flag = compromise_issue_3 has_country_flag = compromise_issue_2 }
+		AND = { has_country_flag = compromise_issue_1  has_country_flag = compromise_issue_3 }
+		AND = { has_country_flag = compromise_issue_1  has_country_flag = compromise_issue_2 }	
+		}
+		}
+		prerequisite = { 
+		focus = ISR_organize_talks_between_faction_leaders 
+		}
+		mutually_exclusive = { 
+		focus = ISR_the_talks_are_a_failure 
+		}
+		search_filters = { IC_FILTER } 
+		
+		completion_reward = {
+			remove_ideas = isr_compromise_2
+			add_timed_idea = { idea = isr_compromise_success days = 365 }
+		}
+	}
+	
+	focus = {
+		id = ISR_the_talks_are_a_failure
+		icon = GFX_goal_generic_occupy_states_ongoing_war
+		x = 53
+		y = 5
+		cost = 5
+		available = {
+		OR = {
+		NOT = { has_country_flag = compromise_issue_3 has_country_flag = compromise_issue_2 }
+		NOT = { has_country_flag = compromise_issue_1  has_country_flag = compromise_issue_3 }
+		NOT = { has_country_flag = compromise_issue_1  has_country_flag = compromise_issue_2 }	
+		}
+		}
+		
+		prerequisite = { 
+		focus = ISR_organize_talks_between_faction_leaders 
+		}
+		mutually_exclusive = { 
+		focus = ISR_the_talks_are_a_success }
+		search_filters = { IC_FILTER } 
+		
+		completion_reward = {
+			remove_ideas = isr_compromise_2
+			add_timed_idea = { idea = isr_compromise_fail days = 365 }
+		}
+	}
+
+
+
+
+
 		}
 	}
 }	
