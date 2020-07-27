@@ -1,0 +1,176 @@
+# Scripted GUI Pie Chart example by Yard1
+# Feel free to use in your mods, but give credits to Yard1 (both in code, with comments; and on your download page)
+
+# this creates a pie chart of popularities - can be easily adapted to show anything that adds up to 100%
+create_pie_chart = {
+	clear_array = pie_chart
+	resize_array = {
+		array = pie_chart
+		value = 1 # 1 is value for neutrality frame, so we don't have to make a loop for it
+		size = 100 # 100 pieces, each percent is one piece
+	}
+	set_temp_variable = { industrial_pop = IND_DISPLAY }
+	add_to_temp_variable = { industrial_pop = refinery_total }
+	add_to_temp_variable = { industrial_pop = DOCK_TOTAL }	
+
+	set_variable = {industry_gui_total = industrial_pop }
+
+	divide_temp_variable = {industrial_pop = display_income }
+	multiply_temp_variable = { industrial_pop = 100 }
+	round_temp_variable = industrial_pop
+
+	set_temp_variable = { agricultural_pop = FARM_DISPLAY }
+	divide_temp_variable = {agricultural_pop = display_income }
+	multiply_temp_variable = { agricultural_pop = 100 }
+	round_temp_variable = agricultural_pop 
+	set_variable = { ROOT.last_idx = industrial_pop }
+	add_to_temp_variable = { agricultural_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = agricultural_pop
+		set_variable = { pie_chart^v = 2 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+
+	set_temp_variable = { tax_pop = tax_display }
+	divide_temp_variable = {tax_pop = display_income }
+	multiply_temp_variable = { tax_pop = 100 }
+	round_temp_variable = tax_pop
+	add_to_temp_variable = { tax_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = tax_pop
+		set_variable = { pie_chart^v = 3 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+
+	set_temp_variable = { services_pop = OP_Display }
+	add_to_temp_variable = { services_pop = tourism_infrastructure_total }
+	add_to_temp_variable = { services_pop = resource_income }
+	set_variable = {services_gui_total = services_pop }
+	divide_temp_variable = {services_pop = display_income }
+	multiply_temp_variable = { services_pop = 100 }
+	round_temp_variable = services_pop 
+	add_to_temp_variable = { services_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = services_pop
+		set_variable = { pie_chart^v = 4 }
+	}
+
+	clear_variable = ROOT.last_idx
+	add_to_variable = { pie_chart_dirty = 1 }
+
+
+	##military chart
+
+
+	clear_array = 2pie_chart
+	resize_array = {
+		array = 2pie_chart
+		value = 1 # 1 is value for neutrality frame, so we don't have to make a loop for it
+		size = 100 # 100 pieces, each percent is one piece
+	}
+	set_temp_variable = { army_pop = mil_gui_total }
+	divide_temp_variable = {army_pop = mil_expend }
+	multiply_temp_variable = { army_pop = 100 }
+	round_temp_variable = army_pop
+
+	set_temp_variable = { navy_pop = navy_expend }
+	divide_temp_variable = {navy_pop = mil_expend }
+	multiply_temp_variable = { navy_pop = 100 }
+	round_temp_variable = navy_pop 
+	set_variable = { ROOT.last_idx = army_pop }
+	add_to_temp_variable = { navy_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = navy_pop
+		set_variable = { 2pie_chart^v = 2 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+
+	set_temp_variable = { airforce_pop = af_expend }
+	divide_temp_variable = {airforce_pop = mil_expend }
+	multiply_temp_variable = { airforce_pop = 100 }
+	round_temp_variable = airforce_pop
+	add_to_temp_variable = { airforce_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = airforce_pop
+		set_variable = { 2pie_chart^v = 3 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+
+	set_temp_variable = { sf_pop = 0.0 }
+	divide_temp_variable = {sf_pop = mil_expend }
+	multiply_temp_variable = { sf_pop = 100 }
+	round_temp_variable = sf_pop 
+	add_to_temp_variable = { sf_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = sf_pop
+		set_variable = { 2pie_chart^v = 4 }
+	}
+
+	clear_variable = ROOT.last_idx
+	add_to_variable = { 2pie_chart_dirty = 1 }
+
+	##expenditure pie chart
+	
+	clear_array = 3pie_chart
+	resize_array = {
+		array = 3pie_chart
+		value = 1 # 1 is value for neutrality frame, so we don't have to make a loop for it
+		size = 100 # 100 pieces, each percent is one piece
+	}
+	set_temp_variable = { military_expenditure = mil_expend }
+	divide_temp_variable = {military_expenditure = global.totalexp }
+	multiply_temp_variable = { military_expenditure = 100 }
+	round_temp_variable = military_expenditure
+
+	set_temp_variable = { police_expenditure = cpi_cost }
+	divide_temp_variable = {police_expenditure = global.totalexp }
+	multiply_temp_variable = { police_expenditure = 100 }
+	round_temp_variable = police_expenditure 
+	set_variable = { ROOT.last_idx = military_expenditure }
+	add_to_temp_variable = { police_expenditure = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = police_expenditure
+		set_variable = { 3pie_chart^v = 2 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+
+	set_temp_variable = { edu_expenditure = edu_cost }
+	divide_temp_variable = {edu_expenditure = global.totalexp }
+	multiply_temp_variable = { edu_expenditure = 100 }
+	round_temp_variable = edu_expenditure
+	add_to_temp_variable = { edu_expenditure = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = edu_expenditure
+		set_variable = { 3pie_chart^v = 3 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+
+	set_temp_variable = { public_expenditure = pub_cost }
+	add_to_temp_variable = { public_expenditure = welfare_cost }
+	add_to_temp_variable = { public_expenditure = health_cost }
+	set_variable = {public_gui_total = public_expenditure }
+	divide_temp_variable = {public_expenditure = global.totalexp }
+	multiply_temp_variable = { public_expenditure = 100 }
+	round_temp_variable = public_expenditure 
+	add_to_temp_variable = { public_expenditure = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = public_expenditure
+		set_variable = { 3pie_chart^v = 4 }
+	}
+
+	clear_variable = ROOT.last_idx
+	add_to_variable = { 3pie_chart_dirty = 1 }
+
+
+
+
+}
