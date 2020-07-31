@@ -1,0 +1,1 @@
+Two example scripts for a monthly  and yearly implementation, more documentation within the scripts themselves.
