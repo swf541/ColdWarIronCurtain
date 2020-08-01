@@ -1,0 +1,76 @@
+##GDP calcs	
+	set_variable = { grossdomesticproduct = IncometotalGDP }
+	set_variable = { grossdomesticproduct_fake = grossdomesticproduct }
+	divide_variable = { grossdomesticproduct_fake = 250 } #Fake display multiplier
+	
+
+##monthly counter
+		add_to_variable = {checkdone = 0}   ##counts months since start
+		
+		
+##yearly counter
+		
+		add_to_variable = {multiplier_check = 0}
+		
+		if = { 
+				limit = { check_variable = {multiplier_check = 0 }
+						 }
+					set_variable = {graph_mult = -100}				## multiplier for graph display
+					add_to_variable = {multiplier_check = 1}
+		
+				}
+				
+		set_variable = {yearlycheck = checkdone }
+		set_variable = {yearlymodulo = yearlycheck}		
+		
+		modulo_variable = {yearlymodulo = 12}			##checks if a year is complete
+		
+		if = { 
+				limit = { 
+						AND={	check_variable = { yearlymodulo = 0 }
+								check_variable = { checkdone < 179 } 			##number of months
+						     }
+						}
+					add_to_variable = {yearlycounter = 1}						##every 12 months, a year completes
+					calculate_gdp_growth = yes
+					create_gdp_graph = yes										##chart generated every year
+			  }
+			  
+			  
+		##runinit for initial start
+		
+		add_to_variable = {initrun = 0}									##first run
+		
+		if = {
+				limit = { check_variable = {initrun = 0 }
+						 }
+						 
+				set_variable = {yearlycounter = 1}
+				create_gdp_graph = yes
+				set_variable = {yearlycounter = 1}
+				
+				add_to_variable = { initrun = 1}
+				add_to_variable = {gdp_growth_curr = 0 } ##reset init GDP growth counter
+				scale_y_axis = yes						 ##set graph scale y-axis
+				
+				x_axis_scale_init = yes						 ##x-axis scale init
+			}
+			  
+			  
+		##graph shift after 15 years (graph full/15 year version)
+		
+		if = {
+				limit = { check_variable = { yearlymodulo = 0 }
+						  check_variable = {checkdone>179}
+						 }
+					graph_shift = yes								##shift graph to left, remove first year data
+					calculate_gdp_growth = yes
+					graph_append = yes								##insert new data from the right	
+					
+					x_axis_scale_shift = yes
+					x_axis_scale_append = yes
+					}
+
+			
+	
+		add_to_variable = {checkdone = 1} 				##counts ingame months

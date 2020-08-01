@@ -182,7 +182,13 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	
 	add_to_variable = { IncomeTotal = industrial_complex_total }
 	set_variable = { IND_DISPLAY = industrial_complex_total }
-	#agri_industrial_complex
+	
+	set_variable = { milfactory_count = num_of_military_factories  }
+
+	
+	
+	
+#agri_industrial_complex
 	multiply_variable = { farm_total = global.GlobalCredit } #DIVIDER
 	set_variable = { farm_tech = 1 }
 	if = {
@@ -478,6 +484,8 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	multiply_variable = { steel_works_tech = inc_productivity }
 	multiply_variable = { steel_works_total = steel_works_tech }
 	add_to_variable = { IncomeTotal = steel_works_total }
+	
+	set_variable { steel_display = steel_works_total }
 
 	#tungsten_factory +15%		tungsten_factory_total
 	multiply_variable = { tungsten_factory_total = 1.8 } #DIVIDER
@@ -992,8 +1000,15 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	add_to_variable = { refinery_total = tungsten_factory_total }
 	add_to_variable = { refinery_total = steel_works_total }
 	add_to_variable = { refinery_total = oil_refinery_total }
-
-
+	
+	set_variable = { oilincome = 0 }
+	set_variable = { steelincome = 0 }
+	set_variable = { tungstenincome = 0 }
+	
+	add_to_variable = { oilincome = oil_refinery_total }
+	add_to_variable = { steelincome = steel_works_total }
+	add_to_variable = { tungstenincome = tungsten_factory_total }
+	
 	ai_economic_planning = yes
 	
 	set_variable = { IncomeTotal = 0 }
@@ -1008,6 +1023,9 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 
 military_expenditure = {
 	add_to_variable = { IncomeCheck = mil_expend }
+	
+## ARMY COSTS
+	
 	set_variable = { battalion_tier_1 = num_battalions_with_type@direct_fire_gun }
 	add_to_variable = { battalion_tier_1 = num_battalions_with_type@militia }
 
@@ -1081,8 +1099,108 @@ military_expenditure = {
 	add_to_variable = { mil_expend = battalion_tier_3 }
 	add_to_variable = { mil_expend = battalion_tier_4 }
 	add_to_variable = { mil_expend = battalion_tier_5 }
+	
+	set_variable { mil_test = 0 }
+	add_to_variable { mil_test = mil_expend}
+	
+	##navy costs--------------
+		
+##navy tier 1	
+	set_variable = { navy_tier_1 = num_ships_with_type@screen_hull_light }
+	add_to_variable = { navy_tier_1 = num_ships_with_type@screen_hull_medium }
+	add_to_variable = { navy_tier_1 = num_ships_with_type@sub_hull_small_single }
+	
+
+	multiply_variable = { navy_tier_1 = 0.3 }
+
+##navy tier 2
+	set_variable = { navy_tier_2 = num_ships_with_type@screen_hull_heavy }
+	add_to_variable = { navy_tier_2 = num_ships_with_type@battle_hull_light }
+	add_to_variable = { navy_tier_2 = num_ships_with_type@sub_hull_large_single }
+	add_to_variable = { navy_tier_2 = num_ships_with_type@carrier_hull_light }
+
+	multiply_variable = { navy_tier_2 = 0.5 }
+
+##navy tier 3
+	set_variable = { navy_tier_3 = num_ships_with_type@battle_hull_medium }
+	add_to_variable = { navy_tier_3 = num_ships_with_type@sub_hull_large_double }
+	add_to_variable = { navy_tier_3 = num_ships_with_type@carrier_hull }
+
+	multiply_variable = { navy_tier_3 = 0.6 }
+	
+##navy tier 4
+	set_variable = { navy_tier_4 = num_ships_with_type@battle_hull_heavy }
+	add_to_variable = { navy_tier_4 = num_ships_with_type@carrier_hull_super }
+	
+	multiply_variable = { navy_tier_4 = 1 }
+		
+##navy total	
+	set_variable = { navy_expend = 0 }
+	add_to_variable = { navy_expend = navy_tier_1 }
+	add_to_variable = { navy_expend = navy_tier_2 }
+	add_to_variable = { navy_expend = navy_tier_3 }
+	add_to_variable = { navy_expend = navy_tier_4 }
 
 
+	##airforce costs---------
+	
+##airforce tier 1	
+	set_variable = { af_tier_1 = num_deployed_planes_with_type@cas_uav}
+	add_to_variable = { af_tier_1 = num_deployed_planes_with_type@naval_uav }
+	add_to_variable = { af_tier_1 = num_deployed_planes_with_type@transport_plane }
+	add_to_variable = { af_tier_1 = num_deployed_planes_with_type@suicide_craft }
+	add_to_variable = { af_tier_1 = num_deployed_planes_with_type@rocket_interceptor }
+	add_to_variable = { af_tier_1 = num_deployed_planes_with_type@scout_plane }	
+
+	multiply_variable = { af_tier_1 = 0.03 }
+
+##airforce tier 2
+	set_variable = { af_tier_2 = num_deployed_planes_with_type@fighter }
+	add_to_variable = { af_tier_2 = num_deployed_planes_with_type@cas }
+	add_to_variable = { af_tier_2 = num_deployed_planes_with_type@nav_bomber }
+	add_to_variable = { af_tier_2 = num_deployed_planes_with_type@jet_light }
+	add_to_variable = { af_tier_2 = num_deployed_planes_with_type@cv_cas }
+	add_to_variable = { af_tier_2 = num_deployed_planes_with_type@cv_fighter }
+	add_to_variable = { af_tier_2 = num_deployed_planes_with_type@jump_jet }
+	add_to_variable = { af_tier_2 = num_deployed_planes_with_type@naval_helicopter }
+
+	multiply_variable = { af_tier_2 = 0.05 }
+		
+##airforce tier 3
+	set_variable = { af_tier_3 = num_deployed_planes_with_type@tac_bomber	}
+	add_to_variable = { af_tier_3 = num_deployed_planes_with_type@heavy_fighter }
+	add_to_variable = { af_tier_3 = num_deployed_planes_with_type@heavy_fighter_highmach }
+	add_to_variable = { af_tier_3 = num_deployed_planes_with_type@slbm }
+	add_to_variable = { af_tier_3 = num_deployed_planes_with_type@srbm }
+	add_to_variable = { af_tier_3 = num_deployed_planes_with_type@cruisemissile }
+	add_to_variable = { af_tier_3 = num_deployed_planes_with_type@coastalmissile }
+	add_to_variable = { af_tier_3 = num_deployed_planes_with_type@guided_missile }
+
+	multiply_variable = { af_tier_3 = 0.08 }
+	
+##airforce tier 4
+	set_variable = { af_tier_4 = num_deployed_planes_with_type@nuclearstratbomber }
+	add_to_variable = { af_tier_4 = num_deployed_planes_with_type@mach2stratbomber }
+	add_to_variable = { af_tier_4 = num_deployed_planes_with_type@stealth_tactical_bomber }
+	add_to_variable = { af_tier_4 = num_deployed_planes_with_type@mach3stratbomber }
+	add_to_variable = { af_tier_4 = num_deployed_planes_with_type@icbm }
+	add_to_variable = { af_tier_4 = num_deployed_planes_with_type@irbm }
+	
+	multiply_variable = { af_tier_4 = 0.1 }
+		
+##airforce total	
+	set_variable = { af_expend = 0 }
+	add_to_variable = { af_expend = af_tier_1 }
+	add_to_variable = { af_expend = af_tier_2 }
+	add_to_variable = { af_expend = af_tier_3 }
+	add_to_variable = { af_expend = af_tier_4 }
+	
+	set_variable = {total_planes = 0}
+	add_to_variable = { total_planes = num_deployed_planes  }
+	multiply_variable = {total_planes = 0.01}
+	set_variable = {af_expend = 0 }
+	set_variable = {af_expend = total_planes }
+	
 	if = {
 		limit = {
 			has_idea = policy_military_temp_1
@@ -1107,18 +1225,56 @@ military_expenditure = {
 		}
 		multiply_variable = { mil_expend = 2.2 }
 	}
+	
+##calc for corruption/subsidies
+
 	set_variable = { mil_expend_display = mil_expend }
+	set_variable = { navy_expend_display = navy_expend }
+	set_variable = { af_expend_display = navy_expend }
+	
+	##
+	
 	multiply_variable = { mil_expend_display = military_edict_debit_factor }
+	multiply_variable = { navy_expend_display = military_edict_debit_factor }
+	multiply_variable = { af_expend_display = military_edict_debit_factor }
+
+	##
 	
 	add_to_variable = { mil_expend = military_edict_debit_gain }
 	multiply_variable = { mil_expend = military_edict_debit_factor }
 	
+	add_to_variable = { navy_expend = military_edict_debit_gain }
+	multiply_variable = { navy_expend = military_edict_debit_factor }
+	
+	add_to_variable = { af_expend = military_edict_debit_gain }
+	multiply_variable = { af_expend = military_edict_debit_factor }
+	
+	##
+	
 	multiply_variable = { mil_expend = global.GlobalDebit } #COST DIVIDER
 	multiply_variable = { mil_expend_display = global.GlobalDebit } #COST DIVIDER
+	
+	multiply_variable = { navy_expend = global.GlobalDebit } #COST DIVIDER
+	multiply_variable = { navy_expend_display = global.GlobalDebit } #COST DIVIDER
+	
+	multiply_variable = { af_expend = global.GlobalDebit } #COST DIVIDER
+	multiply_variable = { af_expend_display = global.GlobalDebit } #COST DIVIDER
+	
+	##
 	
 	set_variable = { mil_expend_subsidy = mil_expend }
 	multiply_variable = { mil_expend_subsidy = 0.25 }
 	set_variable = { mil_expend_subsidy_tot = 0 }
+	
+	set_variable = { navy_expend_subsidy = navy_expend }
+	multiply_variable = { navy_expend_subsidy = 0.25 }
+	set_variable = { navy_expend_subsidy_tot = 0 }
+	
+	set_variable = { af_expend_subsidy = af_expend }
+	multiply_variable = { af_expend_subsidy = 0.25 }
+	set_variable = { af_expend_subsidy_tot = 0 }
+	
+	
 	every_country = {
 		limit = {
 			is_in_array = {
@@ -1129,11 +1285,16 @@ military_expenditure = {
 		meta_effect = {
 			text = {
 				add_to_variable = { mil_expend_subsidy_tot = [ROOTTAG].mil_expend_subsidy }
+				add_to_variable = { navy_expend_subsidy_tot = [ROOTTAG].mil_expend_subsidy }
+				add_to_variable = { af_expend_subsidy_tot = [ROOTTAG].mil_expend_subsidy }
 			
 			}
 			ROOTTAG = "[?var:mil_subsidy_id.GetTag]"
 		}	
 		subtract_from_variable = { mil_expend = mil_expend_subsidy }
+		subtract_from_variable = { navy_expend = mil_expend_subsidy }
+		subtract_from_variable = { af_expend = mil_expend_subsidy }
+		
 		for_loop_effect = {
 			end = influence_array^num
 			value = v
@@ -1147,14 +1308,48 @@ military_expenditure = {
 		}
 		recalculate_influence = yes	
 	}
+	
+	##
+	
 	add_to_variable = { mil_expend = mil_expend_subsidy_tot }
 	set_variable = { mil_expend_cor_penalty = mil_expend }
 	multiply_variable = { mil_expend_cor_penalty = CorruptPolicyExcess }
 	
 	add_to_variable = { mil_expend = mil_expend_cor_penalty }
 	add_to_variable = { mil_cost_display = mil_cost_cor_penalty }
+	
+	#
+	add_to_variable = { navy_expend = navy_expend_subsidy_tot }
+	set_variable = { navy_expend_cor_penalty = navy_expend }
+	multiply_variable = { navy_expend_cor_penalty = CorruptPolicyExcess }
+	
+	add_to_variable = { navy_expend = navy_expend_cor_penalty }
+	add_to_variable = { navy = navy_cost_cor_penalty }
+	
+	#
+	add_to_variable = { af_expend = af_expend_subsidy_tot }
+	set_variable = { af_expend_cor_penalty = af_expend }
+	multiply_variable = { af_expend_cor_penalty = CorruptPolicyExcess }
+	
+	add_to_variable = { af_expend = af_expend_cor_penalty }
+	add_to_variable = { af_cost_display = af_cost_cor_penalty }
+	
+	#
+	set_variable = { mil_gui_total = 0}
+	set_variable = { navy_gui_total = 0}
+	set_variable = { af_gui_total = 0}
+	
+	add_to_variable = { mil_gui_total = mil_expend }	
+	add_to_variable = { navy_gui_total = navy_expend }
+	add_to_variable = { af_gui_total = af_expend }
+	
+	#addition
+	add_to_variable = { mil_expend = navy_expend }
+	add_to_variable = { mil_expend = af_expend }	
+		
 	subtract_from_variable = { IncomeCheck = mil_expend }
 	}
+	
 welfare_expenditure = {
 	add_to_variable = { IncomeCheck = welfare_cost }
 	set_variable = { welfare_cost = 0 }
@@ -1598,6 +1793,14 @@ gdp_calculation = {
 		add_to_variable = { ROOT.office_park_totalGDP = building_level@office_park }	#+2
 	}
 	
+	set_variable = {farmnumber = farm_totalGDP}
+	
+	set_variable = {refinerynumber = oil_refinery_totalGDP}
+	add_to_variable = {refinerynumber = steel_works_totalGDP}
+	add_to_variable = {refinerynumber = tungsten_factory_totalGDP}
+	
+	set_variable = { officeparknumber = office_park_totalGDP }
+	
 	#industrial_complex Modifiers
 	set_variable = { industrial_complex_tech = 1 }
 	add_to_variable = { industrial_complex_tech = industry_credit_factor_difference }
@@ -1897,6 +2100,8 @@ gdp_calculation = {
 	add_to_variable = { steel_works_tech = refinery_credit_factor_difference }
 	multiply_variable = { steel_works_tech = inc_productivity }
 	multiply_variable = { steel_works_totalGDP = steel_works_tech }
+	
+		
 	add_to_variable = { IncometotalGDP = steel_works_totalGDP }
 
 	#tungsten_factory +15%		tungsten_factory_totalGDP
@@ -2007,12 +2212,104 @@ gdp_calculation = {
 	multiply_variable = { office_park_totalGDP = office_park_tech }
 	add_to_variable = { IncometotalGDP = office_park_totalGDP }
 	
+	set_variable = { civindvalue = industrial_complex_totalGDP }
+	divide_variable = { civindvalue = 250 }	
+
+	set_variable = { ofpvalue = office_park_totalGDP }
+	divide_variable = { ofpvalue = 250 }
+		
+	set_variable = { dockvalue = dockyard_totalGDP }
+	divide_variable = { dockvalue = 250 }
 	
+	set_variable = { farmvalue = farm_totalGDP }
+	divide_variable = { farmvalue = 250 }
 	
+	set_variable = { refineryvalue = oil_refinery_totalGDP }
+	add_to_variable = {refineryvalue = steel_works_totalGDP }
+	add_to_variable = {refineryvalue = tungsten_factory_totalGDP }
+	divide_variable ={ refineryvalue = 250 }
+	
+##GDP calcs	
 	set_variable = { grossdomesticproduct = IncometotalGDP }
 	set_variable = { grossdomesticproduct_fake = grossdomesticproduct }
 	divide_variable = { grossdomesticproduct_fake = 250 } #Fake display multiplier
 	
+
+##monthly counter
+		add_to_variable = {checkdone = 0}   ##counts months since start
+		
+		
+##yearly counter
+		
+		add_to_variable = {multiplier_check = 0}
+		
+		if = { 
+				limit = { check_variable = {multiplier_check = 0 }
+						 }
+					set_variable = {graph_mult = -100}				## multiplier for graph display
+					add_to_variable = {multiplier_check = 1}
+		
+				}
+				
+		set_variable = {yearlycheck = checkdone }
+		set_variable = {yearlymodulo = yearlycheck}		
+		
+		modulo_variable = {yearlymodulo = 12}			##checks if a year is complete
+		
+		if = { 
+				limit = { 
+						AND={	check_variable = { yearlymodulo = 0 }
+								check_variable = { checkdone < 179 } 			##number of months
+						     }
+						}
+					add_to_variable = {yearlycounter = 1}						##every 12 months, a year completes
+					calculate_gdp_growth = yes
+					create_gdp_graph = yes										##chart generated every year
+			  }
+			  
+			  
+		##runinit for initial start
+		
+		add_to_variable = {initrun = 0}									##first run
+		
+		if = {
+				limit = { check_variable = {initrun = 0 }
+						 }
+						 
+				set_variable = {yearlycounter = 1}
+				create_gdp_graph = yes
+				set_variable = {yearlycounter = 1}
+				
+				add_to_variable = { initrun = 1}
+				add_to_variable = {gdp_growth_curr = 0 } ##reset init GDP growth counter
+				scale_y_axis = yes						 ##set graph scale y-axis
+				
+				x_axis_scale_init = yes						 ##x-axis scale init
+			}
+			  
+			  
+		##graph shift after 15 years (graph full/15 year version)
+		
+		if = {
+				limit = { check_variable = { yearlymodulo = 0 }
+						  check_variable = {checkdone>179}
+						 }
+					graph_shift = yes								##shift graph to left, remove first year data
+					calculate_gdp_growth = yes
+					graph_append = yes								##insert new data from the right	
+					
+					x_axis_scale_shift = yes
+					x_axis_scale_append = yes
+					}
+
+			
+	
+		add_to_variable = {checkdone = 1} 				##counts ingame months
+	
+	
+	
+	
+##final variable clear	
 	set_variable = { IncometotalGDP = 0 }
 	set_variable = { ROOT.industrial_complex_totalGDP = 0 }  
 	set_variable = { ROOT.farm_totalGDP = 0 }
@@ -2131,6 +2428,14 @@ tax_rate = {
 	set_variable = { automated_population_tax = automated_population_census }
 	multiply_variable = { automated_population_tax = global.AutomatedTaxCredit }
 	add_to_variable = { tax_base = automated_population_tax }
+	
+	#total population
+	set_variable = { popTOTAL = 0 }
+	add_to_variable = { popTOTAL = preindustrial_population_census }
+	add_to_variable = { popTOTAL = industrial_population_census }
+	add_to_variable = { popTOTAL = developed_population_census }
+	add_to_variable = { popTOTAL = modern_population_census }
+	add_to_variable = { popTOTAL = automated_population_census }
 	
 	#multiply_variable = { ROOT.tax_base = 0.002 }
 	if = {
