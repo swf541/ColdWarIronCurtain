@@ -1,0 +1,1370 @@
+scripted_gui = {
+
+
+	view_arab_league = {
+
+		context_type = player_context
+		window_name = "view_arab_league_container"
+
+		visible = {
+			is_ai = no
+            has_country_flag = arab_league_member
+			
+		}
+
+		effects = {
+			view_arab_league_button_click = {
+				if = {
+					limit = { has_variable = show_arab_league_main }
+					add_to_variable = {main_screen = 0 }					
+					clear_variable = show_arab_league_main
+				}
+				else = {
+										
+					set_variable = {root.arab_league_action_set = -1 }				#set res selection to default
+					set_variable = {root.arab_league_influence_action_set = -1 } 	#set inf selection to default
+					set_variable = { show_arab_league_main = 1 }
+					add_to_variable = {main_screen = 0 }
+					
+				}
+
+				every_country = {
+					limit = {
+						OR = {
+							has_country_flag = arab_league_member
+							
+						}
+					}
+					add_to_array = { QAT.arab_league_total_member_list = THIS.id }
+					
+				}
+								
+			}
+		}
+	} # view arab league end
+
+	
+
+
+    arab_league_main = {
+		
+		window_name = "arab_league_main_container"
+		dirty = refresh_arab_league
+		
+		visible = {
+			check_variable = { show_arab_league_main > 0 }
+			is_ai = no
+            has_country_flag = arab_league_member
+			is_puppet = no
+			is_subject = no	
+		}
+		
+		ai_enabled = {
+			always = no
+		}
+
+        effects = {
+			exit_arab_league_button_click = {
+									set_variable = { show_arab_league_main = 0 }
+									
+											}
+
+			file_menu_button_click = {
+										
+										if = {
+												limit ={check_variable = {show_file_menu = 1}
+														}
+														set_variable = {show_file_menu = 0}
+										}
+										else = {
+												set_variable = { show_file_menu = 1 }
+												}
+			}							
+        }
+
+        properties = {
+			egypt = {
+				image = "[EGY_icon]"
+			}
+
+			algeria = {
+					image = "[ALG_icon]"
+			}
+
+			iraq = {
+					image = "[IRQ_icon]"
+			}
+
+			jordan = {
+					image = "[JOR_icon]"
+			}
+
+			libya = {
+					image = "[LBY_icon]"
+			}
+
+			tunisia = {
+					image = "[TUN_icon]"
+			}
+
+			morocco = {
+					image = "[MOR_icon]"
+			}
+
+			syria = {
+					image = "[SYR_icon]"
+			}
+
+			lebanon = {
+					image = "[LEB_icon]"
+			}
+
+			kuwait = {
+					image = "[KUW_icon]"
+			}
+
+			yemen = {
+					image = "[YEM_icon]"
+			}
+
+			oman = {
+					image = "[OMA_icon]"
+			}
+
+			qatar = {
+					image = "[QAT_icon]"
+			}
+
+			uae = {
+					image = "[UAE_icon]"
+			}
+
+			saudi = {
+					image = "[SAU_icon]"
+			}
+
+			
+
+        }
+
+
+    } #arab league end
+
+	
+
+	arab_league_tab_menu = {
+
+		context_type = player_context
+		parent_window_name = "arab_league_main_container"
+		window_name = "arab_league_tab"
+		
+		effects = {
+			exitbutton_arab_league_click = {
+				ROOT = {
+					set_temp_variable = { show = 1 }
+					subtract_from_temp_variable = { show = show_un }
+					set_variable = { show_un = show }
+				}			
+			}
+
+			arab_league_submit_proposal_button_click = {
+				
+
+				if= {
+						limit = {
+							check_variable = {resolution_confirmed = 0 }
+						}
+							#set map mode to voting
+							set_variable = {main_screen = 1 }
+							
+							#trigger voting decisions
+							QAT = {
+								activate_mission = ARAB_LEAGUE_Vote
+								activate_mission = ARAB_LEAGUE_Vote_Cleanuo
+								set_country_flag = Current_ARAB_LEAGUE_Vote
+							}
+							
+							set_variable = { QAT.arab_league_nation_target = root.arab_league_nation_target }
+							set_variable = { QAT.arab_league_action_set = root.arab_league_action_set }
+							set_variable = { QAT.arab_league_state_target = root.arab_league_state_target }
+							
+							var:root.arab_league_nation_target = {
+								save_global_event_target_as = arab_league_nation_global_target
+							}
+							
+							var:root.arab_league_state_target = {
+								save_global_event_target_as = arab_league_state_global_target
+							}				    
+
+							root.arab_league_state_target = {
+								owner = {
+									set_variable = { QAT.arab_league_state_target_owner = THIS.id }
+								}
+							}
+							
+							var:QAT.arab_league_state_target_owner = {
+								save_global_event_target_as = arab_league_state_owner_global_target
+							}		
+							
+							every_country = {
+								limit = {
+									is_ai = yes
+									OR = {
+										has_country_flag = arab_league_member	
+										has_country_flag = arab_league_founding_member
+									}
+								}
+								ARAB_LEAGUE_ai_vote_sorting = yes
+							}
+
+						add_to_variable = {refresh_arab_league= 1 }
+						set_variable = {resolution_confirmed = 1 }
+					}
+			}
+		}
+		triggers = {
+			submit_proposal_button_click_enabled = {
+				QAT = {
+					NOT = { has_country_flag = Current_ARAB_LEAGUE_Vote }
+				}
+				OR = {
+					check_variable = { root.arab_league_nation_target > 0 }
+					check_variable = { root.arab_league_state_target > 0 }
+				}
+			}
+		}
+    }
+
+	
+
+	#relations
+	country_arab_league_relations_list = {
+        context_type = player_context
+        window_name = "arab_league_relations_list_menu"
+		parent_window_name = "arab_league_main_container"
+		
+        dynamic_lists = {
+            arab_league_relations_listing_grid = {
+                array =  QAT.arab_league_relations_list
+                change_scope = yes
+				entry_container = arab_league_relations_list_entry
+            }
+        }
+	}
+
+
+	##influence action list main container
+
+	country_arab_league_influence_influence_action_list = {
+        context_type = player_context
+        window_name = "arab_league_influence_action_target_list_menu"
+		parent_window_name = "arab_league_main_container"
+		
+        dynamic_lists = {
+            arab_league_influence_action_listing_grid = {
+                array =  QAT.arab_league_influence_option_list
+                change_scope = yes
+				entry_container = arab_league_influence_action_target_list_entry
+            }
+        }
+		effects = {
+			
+			#influence button click 
+			arab_league_submit_influence_proposal_button_click = {
+				
+
+				if= {
+						limit = {
+							check_variable = { influence_confirmed = 0 }
+							check_variable = { influence_chosen = 1 }
+						}	
+							set_variable = {has_randomised = 0 }
+
+							#set map mode to voting
+							set_variable = {main_screen = 1 }
+							
+							#trigger voting decisions
+							QAT = {
+								activate_mission = ARAB_LEAGUE_influence_calc
+								
+							}
+							
+							#target nation set
+							set_variable = { QAT.arab_league_nation_influence_target = root.arab_league_nation_influence_target }
+							set_variable = { QAT.arab_league_influence_action_set = root.arab_league_influence_action_set }
+							set_variable = { QAT.arab_league_state_influence_target = root.arab_league_state_influence_target }
+							
+							
+
+							#action 1-16 effects
+
+							if = {
+								limit = {
+									check_variable = { QAT.arab_league_influence_action_set = 0 }
+								}
+								var:root.arab_league_nation_influence_target = {
+												subtract_from_variable = {randomised_acceptance = 10}
+								}
+							}
+
+							if = {
+								limit = {
+									check_variable = { QAT.arab_league_influence_action_set = 1 }
+								}
+								var:root.arab_league_nation_influence_target = {
+												add_to_variable = {randomised_acceptance = 10}
+								}
+							}
+
+							if = {
+								limit = {
+									check_variable = { QAT.arab_league_influence_action_set = 2 }
+								}
+								var:root.arab_league_nation_influence_target = {
+												add_to_variable = {randomised_acceptance = 10}
+								}
+							}
+
+							##reset array
+							ARAB_LEAGUE_array_reset = yes
+
+							every_country = {
+								limit = {
+									is_ai = yes
+									OR = {
+										has_country_flag = arab_league_member	
+										has_country_flag = arab_league_founding_member
+									}
+								}
+								ARAB_LEAGUE_ai_influence_vote = yes
+							}
+
+						add_to_variable = {refresh_arab_league= 1 }
+						set_variable = {influence_confirmed = 1 }
+
+						set_variable = {influence_countdown=1 }
+					}
+			}
+			
+			arab_league_influence_action_target_entry_button_click = { 
+				
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 0 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 0 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 1 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 1 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 2 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 2 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 3 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 3 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 4 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 4 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 5 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 5 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 6 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 6 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 7 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 7 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 8 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 8 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 9 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 9 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 10 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 10 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 11 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 11 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 12 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 12 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 13 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 13 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 14 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 14 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 15 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 15 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_influence_option_list^i = 16 }
+					}
+					set_variable = { root.arab_league_influence_action_set = 16 }
+					set_variable = { root.influence_chosen = 1 }
+				}
+				
+				
+			}
+		}
+    }
+	
+	#country list main container
+	influence_list = {
+       context_type = player_context
+        window_name = "influence_target_window"
+		parent_window_name = "arab_league_main_container"
+		visible = {
+			NOT = { check_variable = { root.arab_league_action_set = 9 } }
+		}
+        
+		effects = {
+			iraq_button_click = { 
+				set_variable = { root.arab_league_nation_influence_target  = IRQ.id }
+			}
+
+			saudi_button_click = { 
+				set_variable = { root.arab_league_nation_influence_target = SAU.id }
+			}
+
+			egypt_button_click = { 
+				set_variable = { root.arab_league_nation_influence_target = EGY.id }
+			}
+
+			jordan_button_click = { 
+				set_variable = { root.arab_league_nation_influence_target = JOR.id }
+			}
+
+			syria_button_click = { 
+				set_variable = { root.arab_league_nation_influence_target = SYR.id }
+			}
+
+			lebanon_button_click = { 
+				set_variable = { root.arab_league_nation_influence_target = LEB.id }
+			}
+
+			qatar_button_click = { 
+				set_variable = { root.arab_league_nation_influence_target = QAT.id }
+			}
+
+			morocco_button_click = { 
+				if = {
+						limit = {
+							MOR = {
+									has_country_flag = arab_league_member
+									}
+						}
+						set_variable = { root.arab_league_nation_influence_target = MOR.id }
+				}
+			}
+
+			algeria_button_click = { 
+				if = {
+						limit = {
+							ALG = {
+									has_country_flag = arab_league_member
+									}
+						}
+						set_variable = { root.arab_league_nation_influence_target = ALG.id }
+				}
+			}
+
+			tunisia_button_click = { 
+				if = {
+						limit = {
+							TUN = {
+									has_country_flag = arab_league_member
+									}
+						}
+						set_variable = { root.arab_league_nation_influence_target = TUN.id }
+				}
+			}
+
+			libya_button_click = { 
+				if = {
+						limit = {
+							LBA = {
+									has_country_flag = arab_league_member
+									}
+						}
+						set_variable = { root.arab_league_nation_influence_target = LBA.id }
+				}
+			}
+
+			oman_button_click = { 
+				if = {
+						limit = {
+							OMA = {
+									has_country_flag = arab_league_member
+									}
+						}
+						set_variable = { root.arab_league_nation_influence_target = OMA.id }
+				}
+			}
+
+			yemen_button_click = { 
+				if = {
+						limit = {
+							YEM = {
+									has_country_flag = arab_league_member
+									}
+						}
+						set_variable = { root.arab_league_nation_influence_target = YEM.id }
+				}
+			}
+
+			kuwait_button_click = { 
+				if = {
+						limit = {
+							KUW = {
+									has_country_flag = arab_league_member
+									}
+						}
+						set_variable = { root.arab_league_nation_influence_target = KUW.id }
+				}
+			}
+
+			uae_button_click = { 
+				if = {
+						limit = {
+							UAE = {
+									has_country_flag = arab_league_member
+									}
+						}
+						set_variable = { root.arab_league_nation_influence_target = UAE.id }
+				}
+			}
+
+			bahrain_button_click = { 
+				if = {
+						limit = {
+							BHR = {
+									has_country_flag = arab_league_member
+									}
+						}
+						set_variable = { root.arab_league_nation_influence_target = BHR.id }
+				}
+			}
+
+
+		}
+    }
+
+
+	##action list scripted gui
+	country_arab_league_action_list = {
+        context_type = player_context
+        window_name = "arab_league_action_target_list_menu"
+		parent_window_name = "arab_league_main_container"
+        dynamic_lists = {
+            arab_league_action_listing_grid = {
+                array =  QAT.arab_league_option_list
+                change_scope = yes
+				entry_container = arab_league_action_target_list_entry
+            }
+        }
+		effects = {
+			arab_league_action_target_entry_button_click = { 
+				clear_array = ROOT.arab_league_option_country_list
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 0 }
+					}
+					set_variable = { root.arab_league_action_set = 0 }
+					clear_array = ROOT.arab_league_option_country_list
+					every_country = {
+						limit = {
+							check_variable = { badboy > 14 }
+							OR = {
+								has_idea = gulag_politic
+								has_idea = repression
+								has_idea = gulag_politic_expanded
+								has_idea = rightwing_deathsquads
+								has_idea = leftwing_deathsquads
+								has_idea = cocacolawing_deathsquads
+								has_idea = martial_law_perm
+								has_idea = opposition_banned
+								has_idea = policy_voting_temp_0
+								has_idea = policy_religion_temp_0
+								has_idea = policy_religion_temp_0a
+								has_idea = policy_media_temp_0
+								has_idea = policy_women_temp_0
+								has_idea = policy_minorities_temp_0
+								check_variable = { apartheidValue > 0 }
+								check_variable = { segregationValue < 0 }
+							}
+						}
+						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
+					}
+				}
+				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 1 }
+					}
+					set_variable = { root.arab_league_action_set = 1 }
+					clear_array = ROOT.arab_league_option_country_list
+					every_country = {
+						limit = {
+							NOT = { tag = ROOT }
+							OR = {
+								AND = {
+									tag = HOL
+									OR = {
+										any_owned_state = {
+											is_on_continent = africa		
+										}
+										any_owned_state = {
+											is_on_continent = asia		
+										}										
+										any_country = {
+											is_subject_of = HOL
+											OR = {
+												any_owned_state = {
+													is_on_continent = africa		
+												}
+												any_owned_state = {
+													is_on_continent = asia		
+												}													
+											}
+										}
+									}
+								}
+								AND = {
+									tag = ENG
+									OR = {
+										any_owned_state = {
+											is_on_continent = africa		
+										}
+										any_owned_state = {
+											is_on_continent = asia		
+										}										
+										any_country = {
+											is_subject_of = ENG
+											OR = {
+												any_owned_state = {
+													is_on_continent = africa		
+												}
+												any_owned_state = {
+													is_on_continent = asia		
+												}													
+											}
+										}
+									}
+								}
+								AND = {
+									tag = POR
+									OR = {
+										any_owned_state = {
+											is_on_continent = africa		
+										}
+										any_owned_state = {
+											is_on_continent = asia		
+										}										
+										any_country = {
+											is_subject_of = POR
+											OR = {
+												any_owned_state = {
+													is_on_continent = africa		
+												}
+												any_owned_state = {
+													is_on_continent = asia		
+												}													
+											}
+										}
+									}
+								}
+								AND = {
+									tag = FRA
+									OR = {
+										any_owned_state = {
+											is_on_continent = africa		
+										}
+										any_owned_state = {
+											is_on_continent = asia		
+										}										
+										any_country = {
+											is_subject_of = FRA
+											OR = {
+												any_owned_state = {
+													is_on_continent = africa		
+												}
+												any_owned_state = {
+													is_on_continent = asia		
+												}													
+											}
+										}
+									}
+								}
+								AND = {
+									tag = SPR
+									OR = {
+										any_owned_state = {
+											is_on_continent = africa		
+										}
+										any_owned_state = {
+											is_on_continent = asia		
+										}										
+										any_country = {
+											is_subject_of = SPR
+											OR = {
+												any_owned_state = {
+													is_on_continent = africa		
+												}
+												any_owned_state = {
+													is_on_continent = asia		
+												}													
+											}
+										}
+									}
+								}
+								AND = {
+									tag = BEL
+									OR = {
+										any_owned_state = {
+											is_on_continent = africa		
+										}
+										any_owned_state = {
+											is_on_continent = asia		
+										}										
+										any_country = {
+											is_subject_of = BEL
+											OR = {
+												any_owned_state = {
+													is_on_continent = africa		
+												}
+												any_owned_state = {
+													is_on_continent = asia		
+												}													
+											}
+										}
+									}
+								}
+							}
+						}
+						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
+					}
+				}
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 2 }
+					}
+					set_variable = { root.arab_league_action_set = 2 }
+					clear_array = ROOT.arab_league_option_country_list
+					every_country = {
+						limit = {
+							check_variable = { badboy > 24 }
+							NOT = { tag = ROOT }
+						}
+						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
+					}
+				}
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 3 }
+					}
+					set_variable = { root.arab_league_action_set = 3 }
+					clear_array = ROOT.arab_league_option_country_list
+					every_country = {
+						limit = {
+							check_variable = { badboy > 34 }
+							NOT = { tag = ROOT }
+						}
+						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
+					}
+				}
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 4 }
+					}
+					set_variable = { root.arab_league_action_set = 4 }
+					clear_array = ROOT.arab_league_option_country_list
+					every_country = {
+						limit = {
+							check_variable = { badboy > 39 }
+							NOT = { tag = ROOT }
+						}
+						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
+					}
+				}
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 5 }
+					}
+					set_variable = { root.arab_league_action_set = 5 }
+					clear_array = ROOT.arab_league_option_country_list
+					every_country = {
+						limit = {
+							check_variable = { badboy > 49 }
+							NOT = { tag = ROOT }
+						}
+						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
+					}
+				}
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 6 }
+					}
+					set_variable = { root.arab_league_action_set = 6 }
+					clear_array = ROOT.arab_league_option_country_list
+					every_country = {
+						limit = {
+							check_variable = { badboy > 44 }
+							NOT = { tag = ROOT }
+						}
+						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
+					}
+				}
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 7 }
+					}
+					set_variable = { root.arab_league_action_set = 7 }
+					clear_array = ROOT.arab_league_option_country_list
+					every_country = {
+						limit = {
+							NOT = { tag = SOV }
+							NOT = { tag = FRA }
+							NOT = { tag = USA }
+							NOT = { tag = ENG }
+							NOT = { tag = ROOT }
+							has_tech = atomic_weapons
+
+						}
+						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
+					}
+				}
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 8 }
+					}
+					set_variable = { root.arab_league_action_set = 8 }
+					clear_array = ROOT.arab_league_option_country_list
+					every_country = {
+						limit = {
+							NOT = { tag = SOV }
+							NOT = { tag = FRA }
+							NOT = { tag = USA }
+							NOT = { tag = ENG }
+							NOT = { tag = ROOT }
+							OR = {
+								is_researching_technology = NBC_research
+								has_tech = NBC_research
+							}
+
+						}
+						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
+					}
+				}
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 9 }
+					}
+					set_variable = { root.arab_league_action_set = 9 }
+					clear_array = ROOT.arab_league_option_state_list
+					every_state = {
+						limit = {
+							is_core_of = ROOT
+							NOT = { owner = { tag = ROOT } }
+						}
+						add_to_array = { ROOT.arab_league_option_state_list = THIS.id }
+						set_variable = { ROOT.arab_league_nation_target = ROOT.id }
+					}
+				}	
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 10 }
+						has_war = no 
+						check_variable = { badboy < 10 }
+						any_owned_state = {
+							has_resistance = yes
+						}
+					}
+					set_variable = { root.arab_league_action_set = 10 }
+					clear_array = ROOT.arab_league_option_country_list
+				}		
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 11 }
+						has_war = yes 
+						OR = {
+							has_civil_war = yes
+							alliance_strength_ratio < 1
+						}
+						check_variable = { badboy < 20 }
+					}
+					set_variable = { root.arab_league_action_set = 11 }
+					clear_array = ROOT.arab_league_option_country_list
+				}	
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 12 }
+						has_defensive_war = yes 
+						OR = {
+							has_civil_war = yes
+							alliance_strength_ratio < 0.75
+						}
+						check_variable = { badboy < 15 }
+					}
+					set_variable = { root.arab_league_action_set = 12 }
+					clear_array = ROOT.arab_league_option_country_list
+				}	
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 13 }
+					}
+					set_variable = { root.arab_league_action_set = 13 }
+					clear_array = ROOT.arab_league_option_country_list
+					every_country = {
+						limit = {
+							check_variable = { badboy > 20 }
+							NOT = { tag = ROOT }
+							has_offensive_war = yes
+							alliance_strength_ratio < 1
+						}
+						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
+					}
+				}
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 14 }
+						check_variable = { badboy > 30 }
+						has_idea = UN_Trade_Sanctions
+					}
+					set_variable = { root.arab_league_action_set = 14 }
+					clear_array = ROOT.arab_league_option_country_list
+				}		
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 15 }
+						check_variable = { badboy > 30 }
+						has_idea = UN_Weapon_Trade_Ban
+					}
+					set_variable = { root.arab_league_action_set = 15 }
+					clear_array = ROOT.arab_league_option_country_list
+				}
+ 				if = {
+					limit = {
+						check_variable = { QAT.arab_league_option_list^i = 16 }
+					}
+					set_variable = { root.arab_league_action_set = 16 }
+					clear_array = ROOT.arab_league_option_country_list
+					set_variable = { root.tag_list = 0 }
+					for_each_loop = {
+						array = global.countries
+						if = {
+							limit = {
+								NOT = { country_exists = v }
+								NOT = { check_variable = { v = COG.id } }
+								NOT = { check_variable = { v = FCB.id } }
+								NOT = { check_variable = { v = KMP.id } }
+								NOT = { check_variable = { v = GER.id } }
+								NOT = { check_variable = { v = CAP.id } }
+								NOT = { check_variable = { v = CUM.id } }
+								NOT = { check_variable = { v = MAO.id } }
+								NOT = { check_variable = { v = IND.id } }
+								NOT = { check_variable = { v = LAO.id } }
+								NOT = { check_variable = { v = UNT.id } }
+								NOT = { check_variable = { v = CSA.id } }
+								NOT = { check_variable = { v = YAN.id } }
+								NOT = { check_variable = { v = TAL.id } }
+								NOT = { check_variable = { v = SEE.id } }
+								NOT = { check_variable = { v = LOP.id } }
+								NOT = { check_variable = { v = AGN.id } }
+								NOT = { is_in_array = { ROOT.arab_league_option_country_list = v } }
+								any_state = {
+									is_core_of = v
+								}
+							}
+							add_to_variable = { root.tag_list = 1 }
+							add_to_array = { ROOT.arab_league_option_country_list = v }
+						}
+					}	
+				}		
+			}
+		}
+    }
+
+	#country list main container
+	country_arab_league_country_list = {
+       context_type = player_context
+        window_name = "arab_league_action_country_menu"
+		parent_window_name = "arab_league_main_container"
+		visible = {
+			NOT = { check_variable = { root.arab_league_action_set = 9 } }
+		}
+        dynamic_lists = {
+            arab_league_action_country_listing_grid = {
+                array = ROOT.arab_league_option_country_list
+                change_scope = yes
+				entry_container = arab_league_action_country_target_entry
+            }
+        }
+		effects = {
+			arab_league_action_country_target_entry_button_click = { 
+				set_variable = { root.arab_league_nation_target = THIS.id }
+			}
+		}
+    }
+
+	#state list main container / replaces country when relevant resolution selected
+	country_arab_league_state_list = {
+       context_type = player_context
+        window_name = "arab_league_action_state_menu"
+		parent_window_name = "arab_league_main_container"
+		visible = {
+			check_variable = { root.arab_league_action_set = 9 }
+		}
+        dynamic_lists = {
+            arab_league_action_state_listing_grid = {
+                array = ROOT.arab_league_option_state_list
+                change_scope = yes
+				entry_container = arab_league_action_state_target_entry
+            }
+        }
+		effects = {
+			arab_league_action_state_target_entry_button_click = { 
+				set_variable = { root.arab_league_state_target = THIS.id }
+			}
+		}
+    }
+
+	#yes vote list container
+	arab_league_yes_vote_list_gui = {
+       context_type = player_context
+        window_name = "arab_league_yes_vote_list"
+		parent_window_name = "arab_league_main_container"
+        dynamic_lists = {
+            arab_league_yes_vote_list_grid = {
+                array = QAT.arab_league_vote_yes_list
+                change_scope = yes
+				entry_container = arab_league_yes_vote_list_entry
+            }
+        }
+		effects = {
+			yes_vote_button_click = {
+				set_country_flag = ARAB_LEAGUE_YES_ONGOING
+				clear_array = QAT.arab_league_vote_yes_list
+				add_to_variable = { arab_league_yes_count = 1 }
+				every_country = {
+					limit = {
+						has_country_flag = ARAB_LEAGUE_YES_ONGOING
+					}
+					add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+				}
+				if = {
+					limit = { has_country_flag = ARAB_LEAGUE_VETO_ONGOING }
+					clr_country_flag = ARAB_LEAGUE_VETO_ONGOING
+					clear_array = QAT.arab_league_vote_veto_list
+					
+					add_to_variable = { QAT.arab_league_veto_count = -1 }
+					every_country = {
+						limit = {
+							has_country_flag = ARAB_LEAGUE_VETO_ONGOING
+						}
+						add_to_array = { QAT.arab_league_vote_veto_list = THIS.id }
+					}
+				}
+				if = {
+					limit = { has_country_flag = ARAB_LEAGUE_NO_ONGOING }
+					add_to_variable = { arab_league_no_count = -1 }
+					clr_country_flag = ARAB_LEAGUE_NO_ONGOING
+					clear_array = QAT.arab_league_vote_no_list
+					every_country = {
+						limit = {
+							has_country_flag = ARAB_LEAGUE_NO_ONGOING
+						}
+						add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+					}
+				}
+				if = {
+					limit = { has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING }
+					add_to_variable = { arab_league_abstain_count = -1 }
+					clr_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING
+					clear_array = QAT.arab_league_vote_abstain_list
+					every_country = {
+						limit = {
+							has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING
+						}
+						add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+					}
+				}
+
+				add_to_variable = {refresh_arab_league= 1 }
+			}
+		}
+		triggers = {
+			yes_vote_button_click_enabled = {
+				NOT = { has_country_flag = ARAB_LEAGUE_YES_ONGOING }
+				QAT = { has_country_flag = Current_ARAB_LEAGUE_Vote }
+			}
+		}
+    } 
+
+	#no vote list container
+	arab_league_no_vote_list_gui = {
+       context_type = player_context
+        window_name = "arab_league_no_vote_list"
+		parent_window_name = "arab_league_main_container"
+        dynamic_lists = {
+            arab_league_no_vote_list_grid = {
+                array = QAT.arab_league_vote_no_list
+                change_scope = yes
+				entry_container = arab_league_no_vote_list_entry
+            }
+        }
+		effects = {
+			no_vote_button_click = {
+				add_to_variable = { arab_league_no_count = 1 }
+				set_country_flag = ARAB_LEAGUE_NO_ONGOING
+				clear_array = QAT.arab_league_vote_no_list
+				every_country = {
+					limit = {
+						has_country_flag = ARAB_LEAGUE_NO_ONGOING
+					}
+					add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+				}
+				if = {
+					limit = { has_country_flag = ARAB_LEAGUE_VETO_ONGOING }
+					clr_country_flag = ARAB_LEAGUE_VETO_ONGOING
+					clear_array = QAT.arab_league_vote_veto_list
+					
+					add_to_variable = { QAT.arab_league_veto_count = -1 }
+					every_country = {
+						limit = {
+							has_country_flag = ARAB_LEAGUE_VETO_ONGOING
+						}
+						add_to_array = { QAT.arab_league_vote_veto_list = THIS.id }
+					}
+				}
+				if = {
+					limit = { has_country_flag = ARAB_LEAGUE_YES_ONGOING }
+					clr_country_flag = ARAB_LEAGUE_YES_ONGOING
+					clear_array = QAT.arab_league_vote_yes_list
+					add_to_variable = { arab_league_yes_count = -1 }
+					every_country = {
+						limit = {
+							has_country_flag = ARAB_LEAGUE_YES_ONGOING
+						}
+						add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+					}
+				}
+				if = {
+					limit = { has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING }
+					add_to_variable = { arab_league_abstain_count = -1 }
+					clr_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING
+					clear_array = QAT.arab_league_vote_abstain_list
+					every_country = {
+						limit = {
+							has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING
+						}
+						add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+					}
+				}
+
+				add_to_variable = {refresh_arab_league= 1 }
+			}
+		}
+		triggers = {
+			no_vote_button_click_enabled = {
+				NOT = { has_country_flag = ARAB_LEAGUE_NO_ONGOING }
+				QAT = { has_country_flag = Current_ARAB_LEAGUE_Vote }
+			}
+		}
+    }
+
+	#abstain vote list container
+	arab_league_abstain_vote_list_gui = {
+       context_type = player_context
+        window_name = "arab_league_abstain_vote_list"
+		parent_window_name = "arab_league_main_container"
+        dynamic_lists = {
+            arab_league_abstain_vote_list_grid = {
+                array = QAT.arab_league_vote_abstain_list
+                change_scope = yes
+				entry_container = arab_league_abstain_vote_list_entry
+            }
+        }
+		effects = {
+			abstain_vote_button_click = {
+				add_to_variable = { arab_league_abstain_count = 1 }
+				set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING
+				clear_array = QAT.arab_league_vote_abstain_list
+				every_country = {
+					limit = {
+						has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING
+					}
+					add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+				}
+				if = {
+					limit = { has_country_flag = ARAB_LEAGUE_VETO_ONGOING }
+					clr_country_flag = ARAB_LEAGUE_VETO_ONGOING
+					clear_array = QAT.arab_league_vote_veto_list
+					
+					add_to_variable = { QAT.arab_league_veto_count = -1 }
+					every_country = {
+						limit = {
+							has_country_flag = ARAB_LEAGUE_VETO_ONGOING
+						}
+						add_to_array = { QAT.arab_league_vote_veto_list = THIS.id }
+					}
+				}
+				if = {
+					limit = { has_country_flag = ARAB_LEAGUE_YES_ONGOING }
+					clr_country_flag = ARAB_LEAGUE_YES_ONGOING
+					clear_array = QAT.arab_league_vote_yes_list
+					add_to_variable = { arab_league_yes_count = -1 }
+					every_country = {
+						limit = {
+							has_country_flag = ARAB_LEAGUE_YES_ONGOING
+						}
+						add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+					}
+				}
+				if = {
+					limit = { has_country_flag = ARAB_LEAGUE_NO_ONGOING }
+					add_to_variable = { arab_league_no_count = -1 }
+					clr_country_flag = ARAB_LEAGUE_NO_ONGOING
+					clear_array = QAT.arab_league_vote_no_list
+					every_country = {
+						limit = {
+							has_country_flag = ARAB_LEAGUE_NO_ONGOING
+						}
+						add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+					}
+				}
+
+				add_to_variable = {refresh_arab_league= 1 }
+			}
+		}
+		triggers = {
+			abstain_vote_button_click_enabled = {
+				NOT = { has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING }
+				QAT = { has_country_flag = Current_ARAB_LEAGUE_Vote }
+			}
+		}
+    }
+	
+	#member list container
+	arab_league_member_list_gui = {
+       context_type = player_context
+        window_name = "arab_league_member_list"
+		parent_window_name = "arab_league_main_container"
+        dynamic_lists = {
+            arab_league_member_list_grid = {
+                array = QAT.arab_league_total_member_list
+                change_scope = yes
+				entry_container = arab_league_member_list_entry
+            }
+        }
+    }
+
+	arab_league_file_menu = {
+		parent_window_name = "arab_league_main_container"
+		window_name = "file_menu"
+		dirty = file_menu_refresh
+		
+		visible = {
+				check_variable = { show_file_menu = 1 }
+		}
+		
+		ai_enabled = {
+			always = no
+		}
+
+        effects = {
+					file_menu_button_easter_click = {
+													set_temp_variable = { s = show_mine_sweeper }
+													set_variable = { show_mine_sweeper = 1 }
+													subtract_from_variable = { show_mine_sweeper = s }
+													
+													set_temp_variable = { first_run = 1 }
+													reset_mines = yes
+													}
+
+					file_menu_button_exit_click = {
+													set_variable = { show_arab_league_main = 0 }
+													}
+        }
+	}
+
+}
