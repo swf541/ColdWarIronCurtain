@@ -1,0 +1,410 @@
+reset_mines = {
+    set_variable = { face_frame = 1 }
+    clear_array = mine_grid
+    clear_array = mine_state
+    
+    set_variable = { found = 10 }
+    update_found_text = yes
+    
+    set_variable = { timer = 0 }
+    update_timer_text = yes
+    
+    set_variable = { started = 0 }
+    
+    for_loop_effect = {
+        end = 64
+        
+        add_to_array = { 
+            array = mine_grid
+            value = 0
+        }
+    
+        add_to_array = { 
+            array = mine_state
+            value = 0
+        }
+    }
+    
+    set_temp_variable = { rm = 0 }
+    
+    
+    if = {
+        limit = { check_variable = { first_run = 1 } }
+        
+
+        set_variable = { mine_grid^10 = -1 }
+        set_variable = { mine_grid^11 = -1 }
+        set_variable = { mine_grid^12 = -1 }
+        set_variable = { mine_grid^30 = -1 }
+        set_variable = { mine_grid^40 = -1 }
+        set_variable = { mine_grid^2 = -1 }
+        set_variable = { mine_grid^24 = -1 }
+        set_variable = { mine_grid^26 = -1 }
+        set_variable = { mine_grid^32 = -1 }
+        set_variable = { mine_grid^37 = -1 }
+    }
+    else = {
+        
+        while_loop_effect = {
+            limit = { check_variable = { rm < 10 } }
+            set_temp_variable = { ii = random }
+            multiply_temp_variable = { ii = 64 }
+            round_temp_variable = ii
+            clamp_temp_variable = { var = ii min = 0 max = 63 }
+            
+            if = {
+                limit = { check_variable = { mine_grid^ii = 0 } }
+                set_variable = { mine_grid^ii = -1 }
+                add_to_temp_variable = { rm = 1 }
+            }
+        }
+        
+    }
+    
+    
+    
+    clear_array = bg_frame
+    
+    for_loop_effect = {
+        end = 64
+        
+        if = {
+            limit = { check_variable = { mine_grid^v = -1 } }
+            
+            set_temp_variable = { x = v }
+            divide_temp_variable = { x = 8 }
+            add_to_temp_variable = { x = -0.5 }
+            round_temp_variable = x
+            
+            set_temp_variable = { y = x }
+            multiply_temp_variable = { y = -8 }
+            add_to_temp_variable = { y = v }
+            
+            
+            if = {
+                limit = { check_variable = { x > 0 } }
+                
+                set_temp_variable = { vv = v }
+                add_to_temp_variable = { vv = -8 }
+                add_to_number = yes
+            }
+            
+            if = {
+                limit = { check_variable = { x < 7 } }
+                
+                set_temp_variable = { vv = v }
+                add_to_temp_variable = { vv = 8 }
+                add_to_number = yes
+            }
+            
+            if = {
+                limit = { check_variable = { y > 0 } }
+                
+                set_temp_variable = { vv = v }
+                add_to_temp_variable = { vv = -1 }
+                add_to_number = yes
+            }
+            
+            if = {
+                limit = { check_variable = { y < 7 } }
+                
+                set_temp_variable = { vv = v }
+                add_to_temp_variable = { vv = 1 }
+                add_to_number = yes
+            }
+            
+            
+            if = {
+                limit = { 
+                    check_variable = { x > 0 }
+                    check_variable = { y > 0 } 
+                }
+                
+                set_temp_variable = { vv = v }
+                add_to_temp_variable = { vv = -9 }
+                add_to_number = yes
+            }
+            
+            if = {
+                limit = { 
+                    check_variable = { x > 0 }
+                    check_variable = { y < 7 } 
+                }
+                
+                set_temp_variable = { vv = v }
+                add_to_temp_variable = { vv = -7 }
+                add_to_number = yes
+            }
+            
+            
+            if = {
+                limit = { 
+                    check_variable = { x < 7 }
+                    check_variable = { y > 0 } 
+                }
+                
+                set_temp_variable = { vv = v }
+                add_to_temp_variable = { vv = 7 }
+                add_to_number = yes
+            }
+            
+            if = {
+                limit = { 
+                    check_variable = { x < 7 }
+                    check_variable = { y < 7 } 
+                }
+                
+                set_temp_variable = { vv = v }
+                add_to_temp_variable = { vv = 9 }
+                add_to_number = yes
+            }
+        }
+    }
+    for_loop_effect = {
+        end = 64
+        
+        if = {
+            limit = { check_variable = { mine_grid^v = -1 } }
+        
+            add_to_array = { 
+                array = bg_frame
+                value = 10
+            }
+        }
+        else = {
+            set_temp_variable = { zz = 1 }
+            add_to_temp_variable = { zz = mine_grid^v }
+            add_to_array = { 
+                array = bg_frame
+                value = zz
+            }
+        }
+    }
+}
+
+add_to_number = {
+    if = {
+        limit = {
+            check_variable = { vv > -1 }
+            check_variable = { vv < 64 }
+            check_variable = { mine_grid^vv > -1 }
+        }
+        add_to_variable = { mine_grid^vv = 1 }
+    }
+}
+
+open_cell = {
+    set_variable = { started = 1 }
+    if = {
+        limit = { check_variable = { mine_state^i < 3 } }
+    
+        set_variable = { mine_state^i = 3 }
+        
+        if = {
+            limit = { check_variable = { mine_grid^i = -1 } }
+            end_game = yes
+            set_variable = { bg_frame^i = 11 }
+            set_variable = { face_frame = 5 }
+        }
+    }
+    
+    if = {
+        limit = { check_variable = { mine_grid^i = 0 } }
+    
+    
+        add_to_temp_array = {
+            array = qu
+            value = i
+        }
+        
+        while_loop_effect = {
+            limit = { check_variable = { qu^num > 0 } }
+        
+            set_temp_variable = { x = qu^0 }
+            divide_temp_variable = { x = 8 }
+            add_to_temp_variable = { x = -0.5 }
+            round_temp_variable = x
+            
+            set_temp_variable = { y = x }
+            multiply_temp_variable = { y = -8 }
+            add_to_temp_variable = { y = qu^0 }
+            
+            
+            if = {
+                limit = { check_variable = { x > 0 } }
+                
+                set_temp_variable = { vv = qu^0 }
+                add_to_temp_variable = { vv = -8 }
+                open_if_safe = yes
+            }
+            
+            if = {
+                limit = { check_variable = { x < 7 } }
+                
+                set_temp_variable = { vv = qu^0 }
+                add_to_temp_variable = { vv = 8 }
+                open_if_safe = yes
+            }
+            
+            if = {
+                limit = { check_variable = { y > 0 } }
+                
+                set_temp_variable = { vv = qu^0 }
+                add_to_temp_variable = { vv = -1 }
+                open_if_safe = yes
+            }
+            
+            if = {
+                limit = { check_variable = { y < 7 } }
+                
+                set_temp_variable = { vv = qu^0 }
+                add_to_temp_variable = { vv = 1 }
+                open_if_safe = yes
+            }
+            
+            
+            if = {
+                limit = { 
+                    check_variable = { x > 0 }
+                    check_variable = { y > 0 } 
+                }
+                
+                set_temp_variable = { vv = qu^0 }
+                add_to_temp_variable = { vv = -9 }
+                open_if_safe = yes
+            }
+            
+            if = {
+                limit = { 
+                    check_variable = { x > 0 }
+                    check_variable = { y < 7 } 
+                }
+                
+                set_temp_variable = { vv = qu^0 }
+                add_to_temp_variable = { vv = -7 }
+                open_if_safe = yes
+            }
+            
+            
+            if = {
+                limit = { 
+                    check_variable = { x < 7 }
+                    check_variable = { y > 0 } 
+                }
+                
+                set_temp_variable = { vv = qu^0 }
+                add_to_temp_variable = { vv = 7 }
+                open_if_safe = yes
+            }
+            
+            if = {
+                limit = { 
+                    check_variable = { x < 7 }
+                    check_variable = { y < 7 } 
+                }
+                
+                set_temp_variable = { vv = qu^0 }
+                add_to_temp_variable = { vv = 9 }
+                open_if_safe = yes
+            }
+            
+        
+            remove_from_temp_array = {
+                array = qu
+                index = 0
+            }
+        }
+    }
+}
+
+
+open_if_safe = {
+    if = {
+        limit = {
+            check_variable = { mine_state^vv < 3 }
+            check_variable = { mine_grid^vv > -1 }
+        }
+        
+        
+        if = {
+            limit = {
+                check_variable = { mine_state^vv < 3 }
+            }
+            set_variable = { mine_state^vv = 3 }
+        }
+        
+        if = {
+            limit = {
+                check_variable = { mine_grid^vv = 0 }
+            }
+            
+            add_to_temp_array = {
+                array = qu
+                value = vv
+            }
+        }
+    }
+}
+
+end_game = {
+
+    set_variable = { started = 0 }
+    for_loop_effect = {
+        end = 64
+        
+        if = {
+            limit = { 
+                check_variable = { mine_state^v = 2 } 
+                check_variable = { mine_grid^v > -1 } 
+            }
+            
+            set_variable = { bg_frame^v = 12 }
+        }
+        
+        set_variable = { mine_state^v = 3 }
+    }
+}
+
+flag_cell = {
+    set_variable = { mine_state^i = 2 }
+    subtract_from_variable = { found = 1 }
+    update_found_text = yes
+}
+update_found_text = {
+    
+    set_temp_variable = { x10 = found }
+    divide_temp_variable = { x10 = 10 }
+    add_to_temp_variable = { x10 = -0.49 }
+    round_temp_variable = x10
+    
+
+    set_temp_variable = { x1 = x10 }
+    multiply_temp_variable = { x1 = -10 }
+    add_to_temp_variable = { x1 = found }
+    
+    set_variable = { found_1_frame = x1 }
+    add_to_variable = { found_1_frame = 1 }
+    set_variable = { found_10_frame = x10 }
+    add_to_variable = { found_10_frame = 1 }
+}
+
+update_timer_text = {
+    set_temp_variable = { x10 = timer }
+    divide_temp_variable = { x10 = 10 }
+    add_to_temp_variable = { x10 = -0.49 }
+    round_temp_variable = x10
+    
+
+    set_temp_variable = { x1 = x10 }
+    multiply_temp_variable = { x1 = -10 }
+    add_to_temp_variable = { x1 = timer }
+    
+    set_variable = { timer_1_frame = x1 }
+    add_to_variable = { timer_1_frame = 1 }
+    set_variable = { timer_10_frame = x10 }
+    add_to_variable = { timer_10_frame = 1 }
+}
+
+question_cell = {
+
+}
