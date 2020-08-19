@@ -121,7 +121,7 @@ NDefines.NAI.RESEARCH_AHEAD_OF_TIME_FACTOR = 9999999
 
 NDefines.NProduction.MAX_EQUIPMENT_RESOURCES_NEED = 4
 NDefines.NProduction.MAX_CIV_FACTORIES_PER_LINE = 10
-NDefines.NProduction.BASE_FACTORY_SPEED_NAV = 1.2 -- Double construction time for ships, vanilla 25
+NDefines.NProduction.BASE_FACTORY_SPEED_NAV = 2.5 -- Double construction time for ships, vanilla 25
 NDefines.NProduction.INFRA_MAX_CONSTRUCTION_COST_EFFECT = 0.7
 NDefines.NProduction.EQUIPMENT_MODULE_ADD_XP_COST = 2.0
 NDefines.NProduction.EQUIPMENT_MODULE_REPLACE_XP_COST = 2.0

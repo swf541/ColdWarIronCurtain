@@ -142,116 +142,901 @@ arab_league_monthly_infamy_calc = {
         add_to_variable = {
             badboy = 0.05
         }
-    }
-        
+    }        
 
-    subract_from_variable = {
+    subtract_from_variable = {
         badboy = -0.25
     }
 }
 
 ARAB_LEAGUE_ai_vote_sorting = {
+	
+	##################################################
+	## international voting
+	
+	if = {
+        limit = {  
+            OR = {
+                
+                check_variable = { QAT.arab_league_action_set = 1 }
+                
+                check_variable = { QAT.arab_league_action_set = 4 }
+				
+				#####rework below decisions soon
+                check_variable = { QAT.arab_league_action_set = 5 }
+                check_variable = { QAT.arab_league_action_set = 6 }
+                                                             
+               }
+        }
+		
+		
+      	##no vote
+		if = {
+			limit = {
+				OR = {
+					tag = QAT.arab_league_nation_target
+					
+					var:QAT.arab_league_nation_target = {
+						is_subject_of = ROOT
+					}
+					
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value > 30
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+				}
+			}
+			add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+			add_to_variable = { QAT.arab_league_no_count = 1 }
+			set_country_flag = ARAB_LEAGUE_NO_ONGOING
+			
+			randomize_variable = {
+									  var = randomised_acceptance
+									  distribution = uniform
+									  min = 10
+									  max = 29
+			}
+		}
+		
+		##yes vote
+		else_if = {
+			limit = {
+				OR = {
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value < 0
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+					has_war_with = QAT.arab_league_nation_target
+				}
 
+				
+			}
+			add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+			add_to_variable = { QAT.arab_league_yes_count = 1 }
+			set_country_flag = ARAB_LEAGUE_YES_ONGOING
+			
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 70
+					  max = 90
+			}
+			
+		}
+		
+		##abstain vote
+		else = {
+			add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+			add_to_variable = { QAT.arab_league_abstain_count = 1 }  
+			set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING   
+
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 40
+					  max = 60
+			}
+			
+		}
+		
+    }
+	
+	##################################################
+	## international voting / align with superpower
+	
 	if = {
         limit = {  
             OR = {
                 check_variable = { QAT.arab_league_action_set = 0 }
-                check_variable = { QAT.arab_league_action_set = 1 }
+                
+                                             
+               }
+        }
+		
+		
+      	##no vote
+		if = {
+			limit = {
+				OR = {
+					tag = QAT.arab_league_nation_target
+					
+					var:QAT.arab_league_nation_target = {
+						is_subject_of = ROOT
+					}
+					
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value < 10
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+				}
+			}
+			add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+			add_to_variable = { QAT.arab_league_no_count = 1 }
+			set_country_flag = ARAB_LEAGUE_NO_ONGOING
+			
+			randomize_variable = {
+									  var = randomised_acceptance
+									  distribution = uniform
+									  min = 10
+									  max = 29
+			}
+		}
+		
+		##yes vote
+		else_if = {
+			limit = {
+				OR = {
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value > 40
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+					has_war_with = QAT.arab_league_nation_target
+				}
+
+				
+			}
+			add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+			add_to_variable = { QAT.arab_league_yes_count = 1 }
+			set_country_flag = ARAB_LEAGUE_YES_ONGOING
+			
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 70
+					  max = 90
+			}
+			
+		}
+		
+		##abstain vote
+		else = {
+			add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+			add_to_variable = { QAT.arab_league_abstain_count = 1 }  
+			set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING   
+
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 40
+					  max = 60
+			}
+			
+		}
+		
+    }
+	
+	
+	##################################################
+	## international voting  / contain foreign influence
+	
+	if = {
+        limit = {  
+            OR = {
+                
                 check_variable = { QAT.arab_league_action_set = 2 }
+                
+                                             
+               }
+        }
+		
+		
+      	##no vote
+		if = {
+			limit = {
+				OR = {
+					tag = QAT.arab_league_nation_target
+					
+					var:QAT.arab_league_nation_target = {
+						is_subject_of = ROOT
+					}
+					
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value < 10
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+				}
+			}
+			add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+			add_to_variable = { QAT.arab_league_no_count = 1 }
+			set_country_flag = ARAB_LEAGUE_NO_ONGOING
+			
+			randomize_variable = {
+									  var = randomised_acceptance
+									  distribution = uniform
+									  min = 10
+									  max = 29
+			}
+		}
+		
+		##yes vote
+		else_if = {
+			limit = {
+				OR = {
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value > 30
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+					has_war_with = QAT.arab_league_nation_target
+				}
+
+				
+			}
+			add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+			add_to_variable = { QAT.arab_league_yes_count = 1 }
+			set_country_flag = ARAB_LEAGUE_YES_ONGOING
+			
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 70
+					  max = 90
+			}
+			
+		}
+		
+		##abstain vote
+		else = {
+			add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+			add_to_variable = { QAT.arab_league_abstain_count = 1 }  
+			set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING   
+
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 40
+					  max = 60
+			}
+			
+		}
+		
+    }
+	
+	
+	##################################################
+	## international voting  / ban foreign diplomats
+	
+	if = {
+        limit = {  
+            OR = {
+                
                 check_variable = { QAT.arab_league_action_set = 3 }
-                check_variable = { QAT.arab_league_action_set = 4 }
-                check_variable = { QAT.arab_league_action_set = 5 }
-                check_variable = { QAT.arab_league_action_set = 6 }
+                
+                                             
+               }
+        }
+		
+		
+      	##no vote
+		if = {
+			limit = {
+				OR = {
+					tag = QAT.arab_league_nation_target
+					
+					var:QAT.arab_league_nation_target = {
+						is_subject_of = ROOT
+					}
+					
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value < 20
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+				}
+			}
+			add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+			add_to_variable = { QAT.arab_league_no_count = 1 }
+			set_country_flag = ARAB_LEAGUE_NO_ONGOING
+			
+			randomize_variable = {
+									  var = randomised_acceptance
+									  distribution = uniform
+									  min = 10
+									  max = 29
+			}
+		}
+		
+		##yes vote
+		else_if = {
+			limit = {
+				OR = {
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value > 50
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+					has_war_with = QAT.arab_league_nation_target
+				}
+
+				
+			}
+			add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+			add_to_variable = { QAT.arab_league_yes_count = 1 }
+			set_country_flag = ARAB_LEAGUE_YES_ONGOING
+			
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 70
+					  max = 90
+			}
+			
+		}
+		
+		##abstain vote
+		else = {
+			add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+			add_to_variable = { QAT.arab_league_abstain_count = 1 }  
+			set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING   
+
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 40
+					  max = 60
+			}
+			
+		}
+		
+    }
+	
+	
+	##################################################
+	## international voting  /  enact oil embargo
+	
+	if = {
+        limit = {  
+            OR = {
+                
                 check_variable = { QAT.arab_league_action_set = 7 }
+                                             
+               }
+        }
+		
+		
+      	##no vote
+		if = {
+			limit = {
+				OR = {
+					tag = QAT.arab_league_nation_target
+					
+					var:QAT.arab_league_nation_target = {
+						is_subject_of = ROOT
+					}
+					
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value > -20
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+				}
+			}
+			add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+			add_to_variable = { QAT.arab_league_no_count = 1 }
+			set_country_flag = ARAB_LEAGUE_NO_ONGOING
+			
+			randomize_variable = {
+									  var = randomised_acceptance
+									  distribution = uniform
+									  min = 10
+									  max = 29
+			}
+		}
+		
+		##yes vote
+		else_if = {
+			limit = {
+				OR = {
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value < -30
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+					has_war_with = QAT.arab_league_nation_target
+				}
+
+				
+			}
+			add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+			add_to_variable = { QAT.arab_league_yes_count = 1 }
+			set_country_flag = ARAB_LEAGUE_YES_ONGOING
+			
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 70
+					  max = 90
+			}
+			
+		}
+		
+		##abstain vote
+		else = {
+			add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+			add_to_variable = { QAT.arab_league_abstain_count = 1 }  
+			set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING   
+
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 40
+					  max = 60
+			}
+			
+		}
+		
+    }
+	
+	######################################
+	## inter-league actions
+	
+	if = {
+        limit = {  
+            OR = {
+                
                 check_variable = { QAT.arab_league_action_set = 8 }
 				check_variable = { QAT.arab_league_action_set = 9 }
                 check_variable = { QAT.arab_league_action_set = 10 }
-				check_variable = { QAT.arab_league_action_set = 11 }
+				
                 check_variable = { QAT.arab_league_action_set = 12 }
                 check_variable = { QAT.arab_league_action_set = 13 }
                 check_variable = { QAT.arab_league_action_set = 14 }
                 check_variable = { QAT.arab_league_action_set = 15 }
+                                                
+               }
+        }
+		
+		
+      	##no vote
+		if = {
+			limit = {
+				OR = {
+					
+					
+					var:QAT.arab_league_nation_target = {
+						is_subject_of = ROOT
+					}
+					
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value < 10
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+				}
+			}
+			add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+			add_to_variable = { QAT.arab_league_no_count = 1 }
+			set_country_flag = ARAB_LEAGUE_NO_ONGOING
+			
+			randomize_variable = {
+									  var = randomised_acceptance
+									  distribution = uniform
+									  min = 10
+									  max = 29
+			}
+		}
+		
+		##yes vote
+		else_if = {
+			limit = {
+				OR = {
+					
+					tag = QAT.arab_league_nation_target
+					
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value > 60
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+					has_war_with = QAT.arab_league_nation_target
+				}
+
+				
+			}
+			add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+			add_to_variable = { QAT.arab_league_yes_count = 1 }
+			set_country_flag = ARAB_LEAGUE_YES_ONGOING
+			
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 70
+					  max = 90
+			}
+			
+		}
+		
+		##abstain vote
+		else = {
+			add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+			add_to_variable = { QAT.arab_league_abstain_count = 1 }  
+			set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING   
+
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 40
+					  max = 60
+			}
+			
+		}
+		
+    }
+	
+	######################################
+	## INTERVENTION
+	
+	if = {
+        limit = {  
+            OR = {
+                
+                
+				check_variable = { QAT.arab_league_action_set = 11 }
+                
+                                                
+               }
+        }
+		
+		
+      	##no vote
+		if = {
+			limit = {
+				OR = {
+					
+					
+					var:QAT.arab_league_nation_target = {
+						is_subject_of = ROOT
+					}
+					
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value < 0
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+				}
+			}
+			add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+			add_to_variable = { QAT.arab_league_no_count = 1 }
+			set_country_flag = ARAB_LEAGUE_NO_ONGOING
+			
+			randomize_variable = {
+									  var = randomised_acceptance
+									  distribution = uniform
+									  min = 10
+									  max = 29
+			}
+		}
+		
+		##yes vote
+		else_if = {
+			limit = {
+				OR = {
+					tag = QAT.arab_league_nation_target
+					
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value > 20
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+					has_war_with = QAT.arab_league_nation_target
+				}
+
+				
+			}
+			add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+			add_to_variable = { QAT.arab_league_yes_count = 1 }
+			set_country_flag = ARAB_LEAGUE_YES_ONGOING
+			
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 70
+					  max = 90
+			}
+			
+		}
+		
+		##abstain vote
+		else = {
+			add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+			add_to_variable = { QAT.arab_league_abstain_count = 1 }  
+			set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING   
+
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 40
+					  max = 60
+			}
+			
+		}
+		
+    }
+	
+	
+	######################################
+	## inter-league actions
+	
+	if = {
+        limit = {  
+            OR = {
+                
                 check_variable = { QAT.arab_league_action_set = 16 }
+				check_variable = { QAT.arab_league_action_set = 17 }
+                check_variable = { QAT.arab_league_action_set = 18 }
+          
                                 
                }
-            }
-            
-            if = {
-                limit = {
-                    OR = {
-                        tag = QAT.arab_league_nation_target
-                        var:QAT.arab_league_nation_target = {
-                            is_subject_of = ROOT
-                        }
-                        
-						meta_trigger = {
-							text = {
-								has_opinion = {
-									target = [CHECKTAG]
-									value > 30
-								}
-							}
-							CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
-						}
-                    }
-                }
-                add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
-                add_to_variable = { QAT.arab_league_no_count = 1 }
-                set_country_flag = ARAB_LEAGUE_NO_ONGOING
-				
-				randomize_variable = {
-										  var = randomised_acceptance
-										  distribution = uniform
-										  min = 10
-										  max = 29
-				}
-            }
-			
-            else_if = {
-                limit = {
-                    OR = {
-						meta_trigger = {
-							text = {
-								has_opinion = {
-									target = [CHECKTAG]
-									value < 0
-								}
-							}
-							CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
-						}
-                        has_war_with = QAT.arab_league_nation_target
-                    }
-
-                    
-                }
-                add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
-                add_to_variable = { QAT.arab_league_yes_count = 1 }
-                set_country_flag = ARAB_LEAGUE_YES_ONGOING
-				
-				randomize_variable = {
-										  var = randomised_acceptance
-										  distribution = uniform
-										  min = 70
-										  max = 90
-				}
-				
-            }
-			
-            else = {
-                add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
-                add_to_variable = { QAT.arab_league_abstain_count = 1 }  
-                set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING   
-
-				randomize_variable = {
-										  var = randomised_acceptance
-										  distribution = uniform
-										  min = 40
-										  max = 60
-				}
-				
-            }
         }
+		
+		
+      	##no vote
+		if = {
+			limit = {
+				OR = {
+					tag = QAT.arab_league_nation_target
+					
+					var:QAT.arab_league_nation_target = {
+						is_subject_of = ROOT
+					}
+					
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value < 50
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+				}
+			}
+			add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+			add_to_variable = { QAT.arab_league_no_count = 1 }
+			set_country_flag = ARAB_LEAGUE_NO_ONGOING
+			
+			randomize_variable = {
+									  var = randomised_acceptance
+									  distribution = uniform
+									  min = 10
+									  max = 29
+			}
+		}
+		
+		##yes vote
+		else_if = {
+			limit = {
+				OR = {
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value > 70
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+					has_war_with = QAT.arab_league_nation_target
+				}
+
+				
+			}
+			add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+			add_to_variable = { QAT.arab_league_yes_count = 1 }
+			set_country_flag = ARAB_LEAGUE_YES_ONGOING
+			
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 70
+					  max = 90
+			}
+			
+		}
+		
+		##abstain vote
+		else = {
+			add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+			add_to_variable = { QAT.arab_league_abstain_count = 1 }  
+			set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING   
+
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 40
+					  max = 60
+			}
+			
+		}
+		
+    }
 	
+	######################################
+	## unification calculations
+	if = {
+        limit = {  
+            OR = {
+                
+                check_variable = { QAT.arab_league_action_set = 19 }
+				check_variable = { QAT.arab_league_action_set = 20 }
+				check_variable = { QAT.arab_league_action_set = 21 }
+				check_variable = { QAT.arab_league_action_set = 22 }
+				check_variable = { QAT.arab_league_action_set = 23 }
+				check_variable = { QAT.arab_league_action_set = 24 }
+				check_variable = { QAT.arab_league_action_set = 25 }
+				check_variable = { QAT.arab_league_action_set = 26 }
+				check_variable = { QAT.arab_league_action_set = 27 }
+				check_variable = { QAT.arab_league_action_set = 28 }
+                                
+               }
+        }
+		
+		
+      	##no vote
+		if = {
+			limit = {
+				OR = {
+					tag = QAT.arab_league_nation_target
+					
+					var:QAT.arab_league_nation_target = {
+						is_subject_of = ROOT
+					}
+					
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value < 60
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+				}
+			}
+			add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+			add_to_variable = { QAT.arab_league_no_count = 1 }
+			set_country_flag = ARAB_LEAGUE_NO_ONGOING
+			
+			randomize_variable = {
+									  var = randomised_acceptance
+									  distribution = uniform
+									  min = 10
+									  max = 29
+			}
+		}
+		
+		##yes vote
+		else_if = {
+			limit = {
+				OR = {
+					meta_trigger = {
+						text = {
+							has_opinion = {
+								target = [CHECKTAG]
+								value > 90
+							}
+						}
+						CHECKTAG = "[?var:QAT.arab_league_nation_target.GetTag]"
+					}
+					has_war_with = QAT.arab_league_nation_target
+				}
+
+				
+			}
+			add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+			add_to_variable = { QAT.arab_league_yes_count = 1 }
+			set_country_flag = ARAB_LEAGUE_YES_ONGOING
+			
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 70
+					  max = 90
+			}
+			
+		}
+		
+		##abstain vote
+		else = {
+			add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+			add_to_variable = { QAT.arab_league_abstain_count = 1 }  
+			set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING   
+
+			randomize_variable = {
+					  var = randomised_acceptance
+					  distribution = uniform
+					  min = 40
+					  max = 60
+			}
+			
+		}
+		
+    }
+
+
+##
+#end voting	
 }
 
 ARAB_LEAGUE_array_reset = {
@@ -260,6 +1045,22 @@ ARAB_LEAGUE_array_reset = {
 			clear_array = QAT.arab_league_vote_no_list
 			clear_array = QAT.arab_league_vote_veto_list
 			clear_array = QAT.arab_league_vote_yes_list
+			
+			set_variable = { QAT.arab_league_veto_count = 0 }
+			set_variable = { QAT.arab_league_yes_count = 0 }
+			set_variable = { QAT.arab_league_no_count = 0 }
+			set_variable = { QAT.arab_league_abstain_count = 0 }
+			
+			every_country = {
+							limit = {
+									has_country_flag = arab_league_member
+							}
+							clr_country_flag = ARAB_LEAGUE_YES_ONGOING
+							clr_country_flag = ARAB_LEAGUE_VETO_ONGOING
+							clr_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING
+							clr_country_flag = ARAB_LEAGUE_NO_ONGOING
+						
+			}
 
 }
 
@@ -269,9 +1070,9 @@ ARAB_LEAGUE_ai_influence_vote = {
 									limit = {
 											check_variable = {randomised_acceptance < 33}
 											}
-									    add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
-										add_to_variable = { QAT.arab_league_no_count = 1 }
-										set_country_flag = ARAB_LEAGUE_NO_ONGOING
+											add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+											add_to_variable = { QAT.arab_league_no_count = 1 }
+											set_country_flag = ARAB_LEAGUE_NO_ONGOING
 							
 							}
 							
@@ -279,10 +1080,10 @@ ARAB_LEAGUE_ai_influence_vote = {
 									limit = {
 											check_variable = {randomised_acceptance > 66}
 											}
-									     add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
-										 add_to_variable = { QAT.arab_league_yes_count = 1 }
-										 set_country_flag = ARAB_LEAGUE_YES_ONGOING
-							
+											add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+											add_to_variable = { QAT.arab_league_yes_count = 1 }
+											set_country_flag = ARAB_LEAGUE_YES_ONGOING
+													
 							}
 							
 							else={
@@ -290,7 +1091,7 @@ ARAB_LEAGUE_ai_influence_vote = {
 									add_to_variable = { QAT.arab_league_abstain_count = 1 }  
 									set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING   
 							
-								}
+							}
 
 
 }
