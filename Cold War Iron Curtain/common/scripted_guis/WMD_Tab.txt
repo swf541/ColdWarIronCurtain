@@ -10,12 +10,33 @@ scripted_gui = {
 			check_variable = { show_wmd = 1 }
 		}	
 		effects = {
+
 			exitbutton_wmd_click = {
 				ROOT = {
 					set_temp_variable = { show = 1 }
 					subtract_from_temp_variable = { show = show_wmd }
 					set_variable = { show_wmd = show }
 				}			
+			}
+
+			show_nuclear_powers_click = {
+				ROOT = {
+					
+					if = {
+						limit = {
+							check_variable = { right_display = 1 } 
+						}					
+						set_variable = { right_display = 2 }
+					}
+					else_if = {
+						limit = {
+							check_variable = { right_display = 2 }
+						}
+						set_variable = { right_display = 1 }
+					}
+				}	
+
+				add_to_variable = { refresh_wmd_menu = 1}		
 			}
 
 			defconbuttonraise_click = {
@@ -237,12 +258,15 @@ scripted_gui = {
 				image = "[key_hanging_status]"
 			}
 
-
 			wmd_key_in_hole={
 				image = "[key_turn_status]"
 			}
 
-			
+			show_nuclear_powers = {
+				image = "[nuclear_powers_button]"
+			}
+
+						
 		}
 
 
@@ -276,31 +300,58 @@ scripted_gui = {
 
 					set_variable = { missile_selected = 0 }
 
-				}
+					set_variable = { right_display = 1 }
+
+					clear_array = ROOT.nuclear_power_custom_array
+					
+					every_country = {
+						limit = {
+							OR = {
+								has_idea = defcon_system_5
+								has_idea = defcon_system_4
+								has_idea = defcon_system_3
+								has_idea = defcon_system_2
+								has_idea = defcon_system_1
+							}
+							
+						}
+
+						add_to_array = { ROOT.nuclear_power_custom_array = THIS.id }
+					}
+
+				}		
+				
+
 				wmd_stockpile_loc = yes
 				nuclear_power_array = yes
 
 			}	
 		}
 	}
-	wmd_nuclear_powers_list = {
-        context_type = player_context
-        window_name = "wmd_list"
-		parent_window_name = WMD_tab
-        dynamic_lists = {
-            nuclear_power_listing_grid = {
-                array = global.nuclear_power_array
-                change_scope = yes
-				entry_container = nuclear_power_listing_entry
-            }
-        }
-    }
+
+	#wmd_nuclear_powers_list = {
+    #    context_type = player_context
+    #    window_name = "wmd_list"
+	#	parent_window_name = WMD_tab
+    #     dynamic_lists = {
+    #        nuclear_power_listing_grid = {
+    #            array = ROOT.nuclear_power_custom_array
+    #            change_scope = yes
+	#			entry_container = nuclear_power_listing_entry
+    #        }
+    #    }
+    #}
 
 	
 	wmd_state_strike_list = {
         context_type = player_context
         window_name = "wmd_state_list"
 		parent_window_name = WMD_tab
+
+		visible = {			
+			check_variable = { right_display = 1 }
+		}	
+
         dynamic_lists = {
             wmd_state_listing_grid = {
                 array = ROOT.WarCrimeTargetList
@@ -309,6 +360,50 @@ scripted_gui = {
             }
         }
     }
+
+	######################################
+	# nuclear powers list
+
+	wmd_nuclear_powers_list = {
+        context_type = player_context
+        window_name = "wmd_nuclear_powers_list"
+		parent_window_name = WMD_tab
+
+		visible = {			
+			check_variable = { right_display = 2 }
+		}	
+
+        dynamic_lists = {
+            wmd_nuclear_powers_listing_grid = {
+                array = ROOT.nuclear_power_custom_array
+                change_scope = yes
+				entry_container = wmd_nuclear_powers_listing_entry
+            }
+        }
+
+		properties = {
+			flag = {
+				image = "[This.GetFlag]"
+			}
+		}
+    }
+
+	
+
+	###################################
+
+	# WMD STOCKPILE LIST
+
+	wmd_stockpile_list = {
+		context_type = player_context
+        window_name = "wmd_mid_portion"
+		parent_window_name = WMD_tab
+
+		visible = {			
+			check_variable = { right_display = 1 }
+		}	
+
+	}
 	
 	wmd_war_strike_list = {
         context_type = player_context
