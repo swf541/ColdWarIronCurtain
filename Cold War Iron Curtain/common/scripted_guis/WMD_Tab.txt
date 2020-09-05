@@ -3,18 +3,40 @@ scripted_gui = {
 	WMD_tab_menu = {
 
 		context_type = player_context
+		dirty = refresh_wmd_menu
 
 		window_name = "WMD_tab"
 		visible = {
 			check_variable = { show_wmd = 1 }
 		}	
 		effects = {
+
 			exitbutton_wmd_click = {
 				ROOT = {
 					set_temp_variable = { show = 1 }
 					subtract_from_temp_variable = { show = show_wmd }
 					set_variable = { show_wmd = show }
 				}			
+			}
+
+			show_nuclear_powers_click = {
+				ROOT = {
+					
+					if = {
+						limit = {
+							check_variable = { right_display = 1 } 
+						}					
+						set_variable = { right_display = 2 }
+					}
+					else_if = {
+						limit = {
+							check_variable = { right_display = 2 }
+						}
+						set_variable = { right_display = 1 }
+					}
+				}	
+
+				add_to_variable = { refresh_wmd_menu = 1}		
 			}
 
 			defconbuttonraise_click = {
@@ -49,11 +71,21 @@ scripted_gui = {
 				else = {
 				
 				}	
-				add_timed_idea = {
-					idea = DEFCON_COOLDOWN
-					days = 2
-				}			
+				#add_timed_idea = {
+				#	idea = DEFCON_COOLDOWN
+				#	days = 2
+				#}	
+
+				set_variable = { DEFCON_cooldown = 1}
+				add_to_variable = { refresh_wmd_menu = 1}
+
+				THIS = {
+					activate_mission = WMD_defcon_cooldown
+								
+				}
+
 			}
+			
 			defconbuttonlower_click = {
 				if = {
 					limit = { 
@@ -86,17 +118,28 @@ scripted_gui = {
 				else = {
 				
 				}
-				add_timed_idea = {
-					idea = DEFCON_COOLDOWN
-					days = 2
-				}			
+				#add_timed_idea = {
+				#	idea = DEFCON_COOLDOWN
+				#	days = 2
+				#}	
+
+				set_variable = { DEFCON_cooldown = 1}
+				add_to_variable = { refresh_wmd_menu = 1}	
+
+				THIS = {
+					activate_mission = WMD_defcon_cooldown
+								
+				}
+
 			}
+
 			denuclearize_click = {
 				set_temp_variable = { NukesRemoval = NukeTotal }
 				multiply_temp_variable = { NukesRemoval = -1 }
 				
 				add_nuclear_bombs = var:NukesRemoval
 			}
+
 			denuclearize1_click = {
 				set_temp_variable = { MustardGasRemoval = MustardGasTotal }
 				multiply_temp_variable = { MustardGasRemoval = -1 }
@@ -159,15 +202,74 @@ scripted_gui = {
 			denuclearize2_click = {
 			
 			}
+
+			hanging_key1_click = {
+				if = {
+					limit = {
+						check_variable = { key_hanging_selected = 0}
+					}
+					set_variable = { key_hanging_selected = 1 }
+					set_variable = { key_turned = 1 }
+				}
+				else = {
+					set_variable = { key_hanging_selected = 0 }
+					set_variable = { key_turned = 0 }
+				}
+
+				add_to_variable = {refresh_wmd_menu = 1}
+
+			}
+
+			wmd_key_in_hole1_click = {
+
+				if = {
+					limit = {
+						check_variable = { key_turned = 1 }
+					}
+					set_variable = { key_turned = 2 }
+					set_variable = { ack_selected = 1 }
+				}
+				else = {
+
+					set_variable = { key_turned = 1 }
+					set_variable = { ack_selected = 0 }
+
+				}
+
+				add_to_variable = {refresh_wmd_menu = 1}
+
+
+			}
+
 		}
+
 		triggers = {
 			defconbuttonraise_click_enabled = {
-				NOT = { has_idea = DEFCON_COOLDOWN }
+				NOT = { check_variable = { DEFCON_cooldown = 1 } }
 			}
 			defconbuttonlower_click_enabled = {
-				NOT = { has_idea = DEFCON_COOLDOWN }
+				NOT = { check_variable = { DEFCON_cooldown = 1 } }
 			}
 		}
+
+		properties = {
+
+			hanging_key={
+				image = "[key_hanging_status]"
+			}
+
+			wmd_key_in_hole={
+				image = "[key_turn_status]"
+			}
+
+			show_nuclear_powers = {
+				image = "[nuclear_powers_button]"
+			}
+
+						
+		}
+
+
 	}
 	wmd_topbar_button = {
 
@@ -181,30 +283,75 @@ scripted_gui = {
 					set_temp_variable = { show = 1 }
 					subtract_from_temp_variable = { show = show_wmd }
 					set_variable = { show_wmd = show }
-				}
+
+					set_variable = { tier_1_selected = 0 }
+					set_variable = { tier_2_selected = 0 }
+					set_variable = { tier_3_selected = 0 }
+
+					set_variable = { target_selected = 0 }
+
+					#set_variable = { show_super_event_korea_nuke = 1 }
+
+					set_variable = { key_hanging_selected = 0 }
+
+					set_variable = { key_turned = 0}
+					
+					set_variable = { ack_selected = 0 }
+
+					set_variable = { missile_selected = 0 }
+
+					set_variable = { right_display = 1 }
+
+					clear_array = ROOT.nuclear_power_custom_array
+					
+					every_country = {
+						limit = {
+							OR = {
+								has_idea = defcon_system_5
+								has_idea = defcon_system_4
+								has_idea = defcon_system_3
+								has_idea = defcon_system_2
+								has_idea = defcon_system_1
+							}
+							
+						}
+
+						add_to_array = { ROOT.nuclear_power_custom_array = THIS.id }
+					}
+
+				}		
+				
+
 				wmd_stockpile_loc = yes
 				nuclear_power_array = yes
+
 			}	
 		}
 	}
-	wmd_nuclear_powers_list = {
-        context_type = player_context
-        window_name = "wmd_list"
-		parent_window_name = WMD_tab
-        dynamic_lists = {
-            nuclear_power_listing_grid = {
-                array = global.nuclear_power_array
-                change_scope = yes
-				entry_container = nuclear_power_listing_entry
-            }
-        }
-    }
+
+	#wmd_nuclear_powers_list = {
+    #    context_type = player_context
+    #    window_name = "wmd_list"
+	#	parent_window_name = WMD_tab
+    #     dynamic_lists = {
+    #        nuclear_power_listing_grid = {
+    #            array = ROOT.nuclear_power_custom_array
+    #            change_scope = yes
+	#			entry_container = nuclear_power_listing_entry
+    #        }
+    #    }
+    #}
 
 	
 	wmd_state_strike_list = {
         context_type = player_context
         window_name = "wmd_state_list"
 		parent_window_name = WMD_tab
+
+		visible = {			
+			check_variable = { right_display = 1 }
+		}	
+
         dynamic_lists = {
             wmd_state_listing_grid = {
                 array = ROOT.WarCrimeTargetList
@@ -214,6 +361,50 @@ scripted_gui = {
         }
     }
 
+	######################################
+	# nuclear powers list
+
+	wmd_nuclear_powers_list = {
+        context_type = player_context
+        window_name = "wmd_nuclear_powers_list"
+		parent_window_name = WMD_tab
+
+		visible = {			
+			check_variable = { right_display = 2 }
+		}	
+
+        dynamic_lists = {
+            wmd_nuclear_powers_listing_grid = {
+                array = ROOT.nuclear_power_custom_array
+                change_scope = yes
+				entry_container = wmd_nuclear_powers_listing_entry
+            }
+        }
+
+		properties = {
+			flag = {
+				image = "[This.GetFlag]"
+			}
+		}
+    }
+
+	
+
+	###################################
+
+	# WMD STOCKPILE LIST
+
+	wmd_stockpile_list = {
+		context_type = player_context
+        window_name = "wmd_mid_portion"
+		parent_window_name = WMD_tab
+
+		visible = {			
+			check_variable = { right_display = 1 }
+		}	
+
+	}
+	
 	wmd_war_strike_list = {
         context_type = player_context
         window_name = "wmd_war_list"
@@ -226,19 +417,184 @@ scripted_gui = {
             }
         }
 		effects = {
-			enemy_box_unchecked_click = { 
-				set_variable = { THIS.checkmark = 0 }
-			}
+
+			###################
+			## enable button
 			enemy_box_checked_click = { 
 				set_variable = { THIS.checkmark = 1 }
+				
+
+				if = {
+					limit = {
+						OR = {
+							
+							check_variable = { ROOT.tier_1_selected = 1 }
+						}
+					}
+
+					###Very important below
+					clear_array = ROOT.WarCrimeTargetList
+					clear_array = ROOT.wmd_enemy_array
+					
+					ROOT= {
+						distance_calculator_tier_1 = yes
+					}
+
+				}
+				else_if = {
+					limit = {
+						check_variable = { ROOT.tier_2_selected = 1 }
+					}
+					###Very important below
+					clear_array = ROOT.WarCrimeTargetList
+					clear_array = ROOT.wmd_enemy_array
+					
+					ROOT= {
+						distance_calculator_tier_2 = yes
+					}
+
+				}
+				else = {
+					###Very important below
+					clear_array = ROOT.WarCrimeTargetList
+					clear_array = ROOT.wmd_enemy_array
+					
+					ROOT= {
+						distance_calculator = yes
+					}
+
+				}
+
+				## check for missiles and nukes
+				if = {
+					limit = {
+						
+						ROOT = {
+
+							has_equipment = {
+								icbm_equipment > var:warhead_cost
+							}
+
+							check_variable = { num_of_nukes>nuke_cost }
+
+						}
+
+					}
+
+					set_variable = { ROOT.missile_selected = 1}
+
+				}
+				else = {
+					set_variable = { ROOT.missile_selected = 0}
+				}
+				####################
+
+				#distance_calculator = yes
+				#clear_array = ROOT.WarCrimeTargetList
+
+				add_to_variable = { ROOT.refresh_wmd_menu = 1}
+				add_to_variable = { ROOT.nations_selected = 1 }
+
 			}
+
+			###################
+			## disable button
+			enemy_box_unchecked_click = { 
+				set_variable = { THIS.checkmark = 0 }
+								
+				if = {
+					limit = {
+						OR = {
+							
+							check_variable = { ROOT.tier_1_selected = 1 }
+						}
+					}
+
+					###Very important below
+					clear_array = ROOT.WarCrimeTargetList
+					clear_array = ROOT.wmd_enemy_array
+					set_variable = { ROOT.warhead_cost = 0 }
+					set_variable = { ROOT.nuke_cost = 0 }
+					
+					ROOT= {
+						distance_calculator_tier_1 = yes
+					}
+
+				}
+				else_if = {
+					limit = {
+						check_variable = { ROOT.tier_2_selected = 1 }
+					}
+					###Very important below
+					clear_array = ROOT.WarCrimeTargetList
+					clear_array = ROOT.wmd_enemy_array
+					set_variable = { ROOT.warhead_cost = 0 }
+					
+					ROOT= {
+						distance_calculator_tier_2 = yes
+					}
+
+				}
+				else = {
+					###Very important below
+					clear_array = ROOT.WarCrimeTargetList
+					clear_array = ROOT.wmd_enemy_array
+					set_variable = { ROOT.warhead_cost = 0 }
+					
+					ROOT= {
+					distance_calculator = yes
+					}
+				}
+
+				## check for missiles and nukes
+				if = {
+					limit = {
+
+						ROOT = {
+
+							has_equipment = {
+								icbm_equipment > var:warhead_cost
+							}
+
+							check_variable = { num_of_nukes>nuke_cost }
+
+						}
+
+					}
+
+					set_variable = { ROOT.missile_selected = 1}
+
+				}
+				else = {
+					set_variable = { ROOT.missile_selected = 0}
+				}
+				####################
+
+				#distance_calculator = yes
+				#clear_array = ROOT.WarCrimeTargetList
+
+				add_to_variable = { ROOT.refresh_wmd_menu = 1}
+				subtract_from_variable = { ROOT.nations_selected = 1 }
+
+			}
+			
 		}
 		triggers = {
 			enemy_box_checked_visible = {
 				check_variable = { THIS.checkmark = 0 }
 			}
+
+			enemy_box_checked_click_enabled = {
+				check_variable = { ROOT.target_selected = 1 }
+				
+			}
+
 			enemy_box_unchecked_visible = {
 				check_variable = { THIS.checkmark = 1 }
+			}
+
+			enemy_box_unchecked_click_enabled = {
+				check_variable = { ROOT.target_selected = 1 }
 			}
 		}
     }
@@ -246,37 +602,226 @@ scripted_gui = {
         context_type = player_context
         window_name = "wmd_bottom_portion"
 		parent_window_name = WMD_tab
+
 		triggers = {
 			wmd_button_launch_click_enabled = {
+				
 				has_equipment = {
 					icbm_equipment > var:warhead_cost
 				}
+
 				num_of_nukes > var:nuke_cost
+
+				check_variable = { ROOT.nations_selected > 0 }
+
+				check_variable = { missile_selected = 1 }
+				check_variable = { target_selected = 1 }
+				check_variable = { ack_selected = 1 }
+
+				OR = {
+					check_variable = { tier_1_selected = 1 }
+					check_variable = { tier_2_selected = 1 }
+					check_variable = { tier_3_selected = 1 }
+				}
 			}
 			
 		}
+
+
+		properties = {
+
+			tier1={
+				image = "[tier_1_icon]"
+			}
+
+			tier2={
+				image = "[tier_2_icon]"
+			}
+
+			tier3={
+				image = "[tier_3_icon]"
+			}
+
+			target_icon={
+				image = "[target_status]"
+			}
+
+			missile_icon={
+				image = "[missile_status]"
+			}
+
+			ack_icon={
+				image = "[ack_status]"
+			}
+
+
+		}
+
 		effects = {
 			tier1_click = { 
 				distance_calculator_tier_1 = yes
+
+				## check for missiles and nukes
+				if = {
+					limit = {
+						OR = {
+
+							check_variable = { IcbmTotal > 0 }
+							check_variable = { IRBMTotal > 0 }
+							check_variable = { SLBMTotal > 0 }
+							
+						}
+
+						check_variable = { NukeTotal > 0 }
+					}
+
+					set_variable = { missile_selected = 1}
+
+				}
+				else = {
+					set_variable = { missile_selected = 0}
+				}
+
+				###############################################
+
+				if = {
+					limit = {
+						check_variable = { tier_1_selected = 0 }
+					}
+
+					set_variable = { tier_1_selected = 1 }
+					set_variable = { tier_2_selected = 0 }
+					set_variable = { tier_3_selected = 0 }
+
+					set_variable = { target_selected = 1}
+
+				}
+				else_if = {
+					limit = {
+						check_variable = { tier_1_selected = 1 }
+					}
+
+					set_variable = { tier_1_selected = 0 }
+
+					set_variable = { target_selected = 0}
+					set_variable = { missile_selected = 0}
+					
+				}
+				
+				####################
+
 				set_country_flag = WMD_STRIKE_LEVEL_1
 				clr_country_flag = WMD_STRIKE_LEVEL_2
 				clr_country_flag = WMD_STRIKE_LEVEL_3
+
+				add_to_variable = {refresh_wmd_menu = 1}
+
 			}
 			tier2_click = { 
 				distance_calculator_tier_2 = yes
+
+				## check for missiles and nukes
+				if = {
+					limit = {
+						OR = {
+
+							check_variable = { IcbmTotal > 0 }
+							check_variable = { IRBMTotal > 0 }
+							check_variable = { SLBMTotal > 0 }
+							
+						}
+
+						check_variable = { NukeTotal > 0 }
+					}
+
+					set_variable = { missile_selected = 1}
+
+				}
+
+				###############################################
+
+				if = {
+					limit = {
+						check_variable = { tier_2_selected = 0 }
+					}
+
+					set_variable = { tier_1_selected = 0 }
+					set_variable = { tier_2_selected = 1 }
+					set_variable = { tier_3_selected = 0 }
+
+					set_variable = { target_selected = 1 }
+
+				}
+				else_if = {
+					limit = {
+						check_variable = { tier_2_selected = 1 }
+					}
+
+					set_variable = { tier_2_selected = 0 }
+
+					set_variable = { target_selected = 0 }
+
+					set_variable = { missile_selected = 0 }
+					
+				}
+
+				
+				else = {
+					set_variable = { missile_selected = 0 }
+				}
+				####################
+
+
 				set_country_flag = WMD_STRIKE_LEVEL_2
 				clr_country_flag = WMD_STRIKE_LEVEL_1
 				clr_country_flag = WMD_STRIKE_LEVEL_3
 
+				add_to_variable = {refresh_wmd_menu = 1}
+
 			}
 			tier3_click = { 
+
 				distance_calculator = yes
+
+				
+
+				if = {
+					limit = {
+						check_variable = { tier_3_selected = 0 }
+					}
+
+					set_variable = { tier_1_selected = 0 }
+					set_variable = { tier_2_selected = 0 }
+					set_variable = { tier_3_selected = 1 }
+
+					set_variable = { target_selected = 1 }
+
+				}
+				else_if = {
+					limit = {
+						check_variable = { tier_3_selected = 1 }
+					}
+
+					set_variable = { tier_3_selected = 0 }
+
+					set_variable = { target_selected = 0 }
+
+					set_variable = { missile_selected = 0 }
+					
+				}
+
+				###############################################
+
 				set_country_flag = WMD_STRIKE_LEVEL_3
 				clr_country_flag = WMD_STRIKE_LEVEL_2
 				clr_country_flag = WMD_STRIKE_LEVEL_1
+				
+				add_to_variable = {refresh_wmd_menu = 1}
+				
 			}
 
 			wmd_button_launch_click = { 
+
 				for_each_loop = {
 					array = WarCrimeTargetList
 					launch_nuke = {
@@ -292,8 +837,10 @@ scripted_gui = {
 					}
 					set_variable = { warhead_damage_local = 0 }
 				}
+
 				set_variable = { icbm_cost = warhead_cost }
 				multiply_variable = { icbm_cost = -1 }
+
 				meta_effect = {
 					text = {
 						add_equipment_to_stockpile = {
@@ -303,6 +850,368 @@ scripted_gui = {
 					}
 					AMNT = "icbm_cost"
 				}
+
+				###################################################
+				# MAD
+
+				#USA triggered MAD
+				if = {
+					limit = {
+						ROOT = {
+
+							
+								
+									check_variable = { THIS.id = USA.id }
+									check_variable = { tier_3_selected = 1 }
+								
+
+									OR = {
+
+										SOV = {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										POL = {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										CZE = {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										HUN = {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										ALB = {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										ROM = {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										BUL= {
+											check_variable = { THIS.checkmark = 1 }
+										}
+									}
+								
+								#SOV = {
+								#	check_variable = { THIS.checkmark = 1 }
+								#}
+							
+						}
+					}
+
+					#add_to_variable = { VTC.usa_global_thermonuclearwar = 1 }
+
+					################################################
+					# draw striking array/ NATO
+
+					clear_array = SOV.COUNTERATTACK
+
+					#SOV = {
+
+						every_state = {
+							limit = {
+								#Is owned by an enemy country
+
+								any_country = {
+									controls_state = PREV
+									has_war_with = SOV
+									
+									
+								}
+								
+							}
+
+							if = {
+								limit = {
+									NOT = {
+										is_in_array = {
+										array = SOV.COUNTERATTACK
+										value = THIS.id
+										}
+									}
+									OR = {
+										is_capital = yes
+										state_population_k > 4000
+										#controller = {
+										#	divisions_in_state = {
+										#		size > 4
+										#		state = PREV
+										#	}
+										#}
+
+										#nuclear_reactor > 0
+									}
+								}
+								add_to_array = { SOV.COUNTERATTACK = THIS.id }
+
+								add_to_variable = { SOV.COUNTERATTACK_warhead_cost = 1 }
+
+								set_variable = { state_pop_total = state_population_k }
+								if = {
+									limit = {
+										check_variable = { state_pop_total > 1000 }
+									}
+									divide_variable = { state_pop_total = 1000 }
+									round_variable = state_pop_total
+									add_to_variable = { SOV.COUNTERATTACK_warhead_cost = state_pop_total }
+									
+									
+								}
+							}
+						}
+					
+					#}
+
+					#event
+					every_country = {
+						#limit = {
+						#	is_ai = no
+						#	
+						#}
+						
+						if = {
+							limit = {
+								tag = SOV
+							}
+							country_event = WMD.2
+							news_event = WMD.31
+						}
+						else = {
+							news_event = WMD.31
+						}
+
+					}
+
+					if = {
+						limit = {
+							SOV = {
+								is_ai = yes
+							}
+						}
+
+						SOV = {
+							activate_mission = WMD_USA_MAD
+						}
+
+						#every_country = {
+						#	limit = {
+						#		is_ai = no
+						#	}
+
+							#news_event = UN_RESOLUTION.1
+
+						#}
+
+					}
+					
+				}
+
+				
+
+				#event
+				#if = {
+				#	limit = {
+				#		check_variable = { VTC.usa_global_thermonuclearwar = 1 }
+				#	}
+					
+				#}
+
+				#SOV triggered MAD
+				if = {
+					limit = {
+						ROOT = {
+						
+									check_variable = { THIS.id = SOV.id }
+									check_variable = { tier_3_selected = 1 }
+								
+
+									OR = {
+
+										USA= {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										WGR= {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										DEN = {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										ENG = {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										HOL = {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										BEL = {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										FRA = {
+											check_variable = { THIS.checkmark = 1 }
+										}
+
+										ITA= {
+											check_variable = { THIS.checkmark = 1 }
+										}
+									}
+								
+								#SOV = {
+								#	check_variable = { THIS.checkmark = 1 }
+								#}
+							
+						}
+					}
+
+					#add_to_variable = { VTC.sov_global_thermonuclearwar = 1 }
+
+					################################################
+					# draw striking array/ USSR
+
+					clear_array = USA.COUNTERATTACK
+
+					#USA = {
+
+						every_state = {
+							limit = {
+								#Is owned by an enemy country
+
+								any_country = {
+									controls_state = PREV
+									has_war_with = USA
+									
+									
+								}
+								
+							}
+
+							if = {
+								limit = {
+									NOT = {
+										is_in_array = {
+										array = USA.COUNTERATTACK
+										value = THIS.id
+										}
+									}
+									OR = {
+										is_capital = yes
+										state_population_k > 4000
+										
+										#controller = {
+										#	divisions_in_state = {
+										#		size > 4
+										#		state = PREV
+										#	}
+										#}
+
+										#nuclear_reactor > 0
+									}
+								}
+								add_to_array = { USA.COUNTERATTACK = THIS.id }
+
+								add_to_variable = { USA.COUNTERATTACK_warhead_cost = 1 }
+
+								set_variable = { state_pop_total = state_population_k }
+								if = {
+									limit = {
+										check_variable = { state_pop_total > 1000 }
+									}
+									divide_variable = { state_pop_total = 1000 }
+									round_variable = state_pop_total
+									add_to_variable = { USA.COUNTERATTACK_warhead_cost = state_pop_total }
+									
+									
+								}
+							}
+						}
+					
+					#}
+
+					#event
+					every_country = {
+						#limit = {
+						#	is_ai = no
+						#}
+						if = {
+							limit = {
+								tag = USA
+							}
+							country_event = WMD.1
+							news_event = WMD.3
+						}
+						else = {
+							news_event = WMD.3
+						}
+
+					}
+
+					if = {
+						limit = {
+							USA = {
+								is_ai = yes
+							}
+						}
+
+						USA = {
+							activate_mission = WMD_SOV_MAD
+						}
+
+						#every_country = {
+						#	limit = {
+						#		is_ai = no
+						#	}
+						#
+						#	#news_event = UN_RESOLUTION.1
+						#
+						#}
+
+					}
+					
+				}
+
+				
+
+				#event
+				#if = {
+				#	limit = {
+				#		check_variable = { VTC.sov_global_thermonuclearwar = 1 }
+				#	}					
+				#	
+				#}
+
+
+				
+
+				set_variable = { tier_1_selected = 0 }
+				set_variable = { tier_2_selected = 0 }
+				set_variable = { tier_3_selected = 0 }
+
+				set_variable = { target_selected = 0 }
+
+				#set_variable = { show_super_event_korea_nuke = 1 }
+
+				set_variable = { key_hanging_selected = 1 }
+
+				set_variable = { key_turned = 1}
+				
+				set_variable = { ack_selected = 0 }
+
+				set_variable = { missile_selected = 0 }
+
+				add_to_variable = { refresh_wmd_menu = 1}
+
+
+
+
+
 			}
 		}
 		triggers = {
