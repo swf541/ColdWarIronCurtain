@@ -8,7 +8,7 @@
 
 #Global GDP Growth Formula
 #+ Ease of Business Modifier 
-#    + Womens Rights Semi-Traditionalism = no effect, regressive levels negative, equality+ beneficial
+#    + Womens Rights Semi-Traditionalism = o effect, regressive levels negative, equality+ beneficial
 #    + Labour Neutral = no effect, less worker rights = higher growth etc
 #    + Minority Rights = Equal Rights = no change, same for positive action, lower levels cause penalty
 #
@@ -35,7 +35,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_women_temp_0
         }
         add_to_variable = {
-            EoBM_Percentage = -0.02
+            EoBM_Percentage = -0.01
         }
     }
     if = {
@@ -43,7 +43,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_women_temp_1
         }
         add_to_variable = {
-            EoBM_Percentage = -0.01
+            EoBM_Percentage = -0.005
         }
     }
     if = {
@@ -51,7 +51,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_women_temp_2
         }
         add_to_variable = {
-            EoBM_Percentage = 0.01
+            EoBM_Percentage = 0.005
         }
     }
     if = {
@@ -59,7 +59,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_women_temp_3
         }
         add_to_variable = {
-            EoBM_Percentage = 0.02
+            EoBM_Percentage = 0.01
         }
     }
     if = {
@@ -70,7 +70,7 @@ GDP_Growt_Capitalist_Calc = {
             }
         }
         add_to_variable = {
-            EoBM_Percentage = 0.03
+            EoBM_Percentage = 0.02
         }
     }
     #Labor Adjustment
@@ -79,7 +79,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_union_temp_0
         }
         add_to_variable = {
-            EoBM_Percentage = 0.05
+            EoBM_Percentage = 0.01
         }
     }
     if = {
@@ -87,7 +87,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_union_temp_1
         }
         add_to_variable = {
-            EoBM_Percentage = 0.03
+            EoBM_Percentage = 0.005
         }
     }
     if = {
@@ -111,7 +111,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_union_temp_4
         }
         add_to_variable = {
-            EoBM_Percentage = -0.03
+            EoBM_Percentage = -0.02
         }
     }
     if = {
@@ -119,7 +119,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_union_temp_5
         }
         add_to_variable = {
-            EoBM_Percentage = -0.05
+            EoBM_Percentage = -0.04
         }
     }
     #Civil Rights Penalty
@@ -128,7 +128,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_minorities_temp_0
         }
         add_to_variable = {
-            EoBM_Percentage = -0.05
+            EoBM_Percentage = -0.02
         }
     }
     if = {
@@ -136,7 +136,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_minorities_temp_1
         }
         add_to_variable = {
-            EoBM_Percentage = -0.03
+            EoBM_Percentage = -0.01
         }
     }
     if = {
@@ -144,7 +144,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_minorities_temp_2
         }
         add_to_variable = {
-            EoBM_Percentage = -0.01
+            EoBM_Percentage = -0.005
         }
     }
     ##CPI## 
@@ -167,7 +167,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_taxrate_temp_1
         }
         add_to_variable = {
-            yearly_gdp_growth = 0.10
+            yearly_gdp_growth = 0.03
         }
     }
     if = {
@@ -175,7 +175,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_taxrate_temp_2
         }
         add_to_variable = {
-            yearly_gdp_growth = 0.05
+            yearly_gdp_growth = 0.015
         }
     }
     if = {
@@ -191,7 +191,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_taxrate_temp_4
         }
         add_to_variable = {
-            yearly_gdp_growth = -0.05
+            yearly_gdp_growth = -0.02
         }
     }
     if = {
@@ -199,7 +199,7 @@ GDP_Growt_Capitalist_Calc = {
             has_idea = policy_taxrate_temp_5
         }
         add_to_variable = {
-            yearly_gdp_growth = -0.10
+            yearly_gdp_growth = -0.05
         }
     }
 
@@ -307,6 +307,9 @@ GDP_Growt_Capitalist_Calc = {
     multiply_variable = {
         farm_ratio = yearly_gdp_growth
     }
+    add_to_variable = { farm_ratio = farm_carryover }
+    set_variable = { farm_carryover = 0 }
+
     multiply_variable = {
         industrial_complex_ratio = yearly_gdp_growth
     }
@@ -314,21 +317,305 @@ GDP_Growt_Capitalist_Calc = {
         office_park_ratio = yearly_gdp_growth
     }
     clear_array = gdp_build_state_array
+
+    set_variable = { total_state_count = 0 }
     every_owned_state = {
-        limit = {
-            NOT = { has_state_category = wasteland }
+        if = {
+            limit = {
+                NOT = { has_state_category = wasteland }
+            }
+            add_to_array = {
+                array = PREV.gdp_build_state_array
+                value = THIS.id
+            }
         }
-        add_to_array = {
-            array = PREV.gdp_build_state_array
-            value = THIS.id
-        }
+        clr_state_flag = agri_build_target
+        add_to_variable = { PREV.total_state_count = 1 }
     }
     #Building Pools
     divide_variable = { industrial_complex_ratio = industrial_complex_tech_calc }
     divide_variable = { office_park_ratio = office_park_tech_calc }
     divide_variable = { farm_ratio = farm_tech_calc }
 
+    set_variable = { farm_check_1 = 0 }
+    for_each_loop = {
+        array = gdp_build_state_array
+        if = {
+            limit = {
+                var:gdp_build_state_array^i = {
+                    OR = {
+                        has_state_flag = temperate
+                        has_state_flag = tropical
+                    }
+                    free_building_slots = {
+                        building = agri_industrial_complex
+                        size > 1
+                        include_locked = no
+                    }
+                }
+            }
+            var:gdp_build_state_array^i = { 
+                 set_state_flag = agri_build_target
+            }
+            add_to_variable = { PREV.farm_check_1 = 1 }
+        }
+      
+    }
+    set_variable = {
+        total_state_count_check = total_state_count
+    }
+    set_variable = {
+        farm_check_count = farm_check_1
+    }
+    divide_variable = {
+        farm_check_count = total_state_count_check
+    }
+    if = {
+        limit = {
+            check_variable = { farm_check_count > 0.3}
+        }
+        set_variable = { farm_check_1 = 0 }
+    }
+
+    if = {
+        limit = {
+            check_variable = { farm_check_1 = 0 }
+        }
+        for_each_loop = {
+            array = gdp_build_state_array
+            if = {
+                limit = {
+                    var:gdp_build_state_array^i = { 
+                        has_state_flag = boreal
+                        free_building_slots = {
+                            building = agri_industrial_complex
+                            size > 1
+                            include_locked = no
+                        }
+                    }
+                }
+                var:gdp_build_state_array^i = { 
+                    set_state_flag = agri_build_target
+                }
+                add_to_variable = { PREV.farm_check_1 = 1 }
+            }
+        }
+    }
+    set_variable = { 
+        farm_check_count = farm_check_carryover
+    }
+    set_variable = {
+        total_state_count_check = total_state_count
+    }
+    set_variable = {
+        farm_check_count = farm_check_1
+    }
+    divide_variable = {
+        farm_check_count = total_state_count_check
+    }
+    add_to_variable = {
+        farm_check_count = farm_check_carryover
+    }
+    if = {
+        limit = {
+            check_variable = { farm_check_count > 0.3}
+        }
+        set_variable = { farm_check_1 = 0 }
+    }
+    else_if = {
+        limit = {
+            check_variable = { farm_check_1 > 0 }
+        }
+    }
+    else_if = {
+        limit = {
+            check_variable = { farm_check_1 = 0 }
+        }
+        for_each_loop = {
+            array = gdp_build_state_array
+            if = {
+                limit = {
+                    var:gdp_build_state_array^i = { 
+                        has_state_flag = mountains
+                        free_building_slots = {
+                            building = agri_industrial_complex
+                            size > 1
+                            include_locked = no
+                        }
+                    }
+                }
+                var:gdp_build_state_array^i = { 
+                    set_state_flag = agri_build_target
+                }
+                add_to_variable = { PREV.farm_check_1 = 1 }
+            }
+        }        
+    }
+    set_variable = { 
+        farm_check_count = farm_check_carryover
+    }
+    set_variable = {
+        total_state_count_check = total_state_count
+    }
+    set_variable = {
+        farm_check_count = farm_check_1
+    }
+    divide_variable = {
+        farm_check_count = total_state_count_check
+    }
+    add_to_variable = {
+        farm_check_count = farm_check_carryover
+    }
+    if = {
+        limit = {
+            check_variable = { farm_check_count > 0.3}
+        }
+        set_variable = { farm_check_1 = 0 }
+    }
+    else_if = {
+        limit = {
+            check_variable = { farm_check_1 = 0 }
+        }
+        for_each_loop = {
+            array = gdp_build_state_array
+            if = {
+                limit = {
+                    var:gdp_build_state_array^i = {
+                        OR = {
+                            has_state_flag = desertlush
+                            has_state_flag = mountains
+                        }
+                        free_building_slots = {
+                            building = agri_industrial_complex
+                            size > 1
+                            include_locked = no
+                        }
+                    }
+                }
+                var:gdp_build_state_array^i = { 
+                    set_state_flag = agri_build_target
+                }
+                add_to_variable = { PREV.farm_check_1 = 1 }
+            }
+        }        
+    }
+    set_variable = { 
+        farm_check_count = farm_check_carryover
+    }
+    set_variable = {
+        total_state_count_check = total_state_count
+    }
+    set_variable = {
+        farm_check_count = farm_check_1
+    }
+    divide_variable = {
+        farm_check_count = total_state_count_check
+    }
+    add_to_variable = {
+        farm_check_count = farm_check_carryover
+    }
+    if = {
+        limit = {
+            check_variable = { farm_check_count > 0.3}
+        }
+        set_variable = { farm_check_1 = 0 }
+    }
+    else_if = {
+        limit = {
+            check_variable = { farm_check_1 = 0 }
+        }
+        for_each_loop = {
+            array = gdp_build_state_array
+            if = {
+                limit = {
+                    var:gdp_build_state_array^i = {
+                        OR = {
+                            has_state_flag = cold
+                            has_state_flag = desert
+                        }
+                        free_building_slots = {
+                            building = agri_industrial_complex
+                            size > 1
+                            include_locked = no
+                        }
+                    }
+                }
+                var:gdp_build_state_array^i = { 
+                    set_state_flag = agri_build_target
+                }
+                add_to_variable = { PREV.farm_check_1 = 1 }
+            }
+        }        
+    }
+    else_if = {
+        limit = {
+            check_variable = { farm_check_1 = 0 }
+        }
+        for_each_loop = {
+            array = gdp_build_state_array
+            if = {
+                limit = {
+                    var:gdp_build_state_array^i = {
+                        has_state_flag = mountainshot
+                        free_building_slots = {
+                            building = agri_industrial_complex
+                            size > 1
+                            include_locked = no
+                        }
+                    }
+                }
+                var:gdp_build_state_array^i = { 
+                    set_state_flag = agri_build_target
+                }
+                add_to_variable = { PREV.farm_check_1 = 1 }
+            }
+        }        
+    }
+    else = {
+        add_to_variable = { farm_carryover = farm_ratio }
+        set_variable = { farm_ratio = 0 }
+    }
+    set_variable = { farm_ratio_test = farm_ratio }
+    while_loop_effect = {
+        limit = {
+            OR = {
+                check_variable = {
+                    farm_ratio = 1
+                }
+                check_variable = {
+                    farm_ratio > 1
+                }
+            }
+            any_owned_state = {
+                free_building_slots = {
+                    building = agri_industrial_complex
+                    size > 1
+                    include_locked = no
+                }
+                has_state_flag = agri_build_target           
+            }
+        }  
+        random_owned_controlled_state = {
+            limit = {
+                has_state_flag = agri_build_target
+                free_building_slots = {
+                    building = agri_industrial_complex
+                    size > 1
+                    include_locked = no
+                }
+            }
+            add_building_construction = {
+                type = agri_industrial_complex
+                level = 1
+                instant_build = yes
+            }
+        }
+        subtract_from_variable = { PREV.farm_ratio = 1 }
+    }
+    add_to_variable = { farm_carryover = farm_ratio }
+    set_variable = { farm_ratio = 0 }
+    #Farm Done
+
     #industrial_complex_tech_calc
     #office_park_tech_calc
-    #farm_tech_calc
 }
