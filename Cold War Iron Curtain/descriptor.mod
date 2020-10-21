@@ -1,5 +1,5 @@
 name="Cold War Iron Curtain Dev Build"
-path="C:/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV/mod/cwicdevbasenew"
+path="C:/Users/Alex/Documents/Paradox Interactive/Hearts of Iron IV/mod/Cold War Iron Curtain"
 
 tags={
 	"Gameplay"
