@@ -15,7 +15,21 @@ focus_tree = {
 		cost = 10.00
 		x = 6
 		y = 0
-
+		completion_reward = {
+			news_event = PWK.2
+			add_dynamic_modifier = {
+				modifier = personality_cult_strength
+			}
+			set_variable = {
+				personality_cult_neg = -0.01
+			}
+			set_variable = {
+				personality_cult_strength = 0.05
+			}
+			set_variable = {
+				personality_cult_pp = 0.05
+			}
+		}
 	}
 	focus = {
 		id = KPA_Establish_Room_35 
@@ -27,7 +41,12 @@ focus_tree = {
 		}
 		x = 8
 		y = 3
-
+		completion_reward = {
+			create_intelligence_agency = { 
+				name = "Room 35" 
+				#icon = "GFX_intelligence_agency_logo_kpa"
+			 }
+		}
 	}
 	focus = {
 		id = KPA_Premier_Kim_il_Sung 
@@ -36,7 +55,9 @@ focus_tree = {
 		cost = 10.00
 		x = 19
 		y = 0
-
+		completion_reward = {
+			add_political_power = 100
+		}
 	}
 	focus = {
 		id = KPA_The_Korean_Peoples_Army 
@@ -45,7 +66,11 @@ focus_tree = {
 		cost = 10.00
 		x = 34
 		y = 0
-
+		completion_reward = {
+			army_experience = 25
+			navy_experience = 25
+			air_experience = 25
+		}
 	}
 	focus = {
 		id = KPA_The_Three_Year_Plan 
@@ -54,7 +79,16 @@ focus_tree = {
 		cost = 10.00
 		x = 6
 		y = 7
-
+		available = {
+			date > 1953.1.1
+			NOT = { 
+				has_war_with = KOR
+			}
+		}
+		completion_reward = {
+			remove_ideas = Firebombing_Devestation
+			add_ideas = Firebombing_Devestation1
+		}
 	}
 	focus = {
 		id = KPA_Launch_the_First_Five_Year_Plan 
@@ -63,7 +97,9 @@ focus_tree = {
 		cost = 10.00
 		x = 6
 		y = 13
-
+		available = {
+			has_completed_focus = KPA_Rebuild_Hydroelctric_Dams
+		}
 	}
 	focus = {
 		id = KPA_Emulate_Soviet_Culture 
@@ -75,7 +111,9 @@ focus_tree = {
 		}
 		x = 2
 		y = 1
-
+		completion_reward = {
+			add_ideas = workers_culture
+		}
 	}
 	focus = {
 		id = KPA_Enforce_State_Atheism 
@@ -87,7 +125,16 @@ focus_tree = {
 		}
 		x = 0
 		y = 2
-
+		completion_reward = {
+			add_ideas = policy_religion_temp_0a
+			hidden_effect = {
+				remove_ideas = policy_religion_temp_0
+				remove_ideas = policy_religion_temp_1
+				remove_ideas = policy_religion_temp_2
+				remove_ideas = policy_religion_temp_3
+				remove_ideas = policy_religion_temp_31
+			}
+		}
 	}
 	focus = {
 		id = KPA_Crackdown_on_Nationalist_Christians 
@@ -99,7 +146,18 @@ focus_tree = {
 		}
 		x = 0
 		y = 3
-
+		completion_reward = {
+			add_popularity = {
+				ideology = nationalism 
+				popularity = -0.025
+			}
+			every_owned_state = {
+				add_to_variable = {
+					ReligionAtheistMission = 1
+				}
+			}
+			custom_effect_tooltip = atheism_drift_TT
+		}
 	}
 	focus = {
 		id = KPA_Rebuild_Pyeongyang_Steel_Production 
@@ -159,7 +217,9 @@ focus_tree = {
 		}
 		x = 4
 		y = 2
-
+		completion_reward = {
+			add_ideas = socialist_realism
+		}
 	}
 	focus = {
 		id = KPA_Establish_The_Writers_Union 
@@ -171,7 +231,9 @@ focus_tree = {
 		}
 		x = 4
 		y = 3
-
+		completion_reward = {
+			add_research_slot = 1
+		}
 	}
 	focus = {
 		id = KPA_Promote_Russian_Language_Educaiton 
@@ -186,7 +248,67 @@ focus_tree = {
 		}
 		x = 2
 		y = 4
+		completion_reward = {
+			if = {
+				limit = {
+					has_idea = asian_illiteracy_3
+				}
+				remove_ideas = asian_illiteracy_3
+				add_ideas = asian_illiteracy_2
+			}
+			else_if = {
+				limit = {
+					has_idea = asian_illiteracy_2
+				}
+				remove_ideas = asian_illiteracy_2
+				add_ideas = asian_illiteracy_1
+			}
+			else_if = {
+				limit = {
+					has_idea = asian_illiteracy_1
+				}
+				remove_ideas = asian_illiteracy_1
+				add_ideas = asian_illiteracy_0
+			}
+			else_if = {
+				limit = {
+					has_idea = asian_illiteracy_0
+				}
+				remove_ideas = asian_illiteracy_0
+			}
+			else = {
+			}
 
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = SOV }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = SOV.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			custom_effect_tooltip = SOV_INFLUENCE_GAIN_TT	
+			add_opinion_modifier = {
+				target = SOV
+				modifier = large_increase
+			}	
+			SOV = {
+				add_opinion_modifier = {
+					target = KPA
+					modifier = large_increase
+				}				
+			}		
+		}
 	}
 	focus = {
 		id = KPA_Purge_the_Japanese_Collaborationist_Bureacracy 
@@ -198,7 +320,9 @@ focus_tree = {
 		}
 		x = 6
 		y = 1
-
+		completion_reward = {
+			remove_ideas = Traitorous_Bureacracy
+		}
 	}
 	focus = {
 		id = KPA_Establish_the_Political_Security_Agency 
@@ -246,7 +370,9 @@ focus_tree = {
 		}
 		x = 10
 		y = 1
-
+		completion_reward = {
+			add_ideas = one_party_state
+		}
 	}
 	focus = {
 		id = KPA_Infilitrate_the_Democratic_Party 
@@ -259,6 +385,9 @@ focus_tree = {
 		x = 8
 		y = 2
 
+		completion_reward = {
+			remove_ideas = Intense_Opposition
+		}
 	}
 	focus = {
 		id = KPA_Expand_Farm_Production 
@@ -300,7 +429,15 @@ focus_tree = {
 		}
 		x = 8
 		y = 10
-
+		completion_reward = {
+			every_owned_state = {
+				add_building_construction = {	
+					type = water_infrastructure
+					level = 1
+					instant_build = yes
+				}		
+			}
+		}
 	}
 	focus = {
 		id = KPA_Establish_the_Sangnong_Mine 
@@ -357,7 +494,12 @@ focus_tree = {
 		}
 		x = 8
 		y = 16
-
+		completion_reward = {
+			add_to_variable = { CG_CG = 0.02 }
+			add_to_variable = { CG_Effiency = 0.05 }
+			add_to_variable = { CG_Research = 0.02 }
+			custom_effect_tooltip = Increase_CG_Spending_TT
+		}
 	}
 	focus = {
 		id = KPA_Subsidize_the_Chondoist_Chongu_Party 
@@ -369,7 +511,17 @@ focus_tree = {
 		}
 		x = 12
 		y = 2
-
+		completion_reward = {
+			add_political_power = 50
+			add_ideas = pseudo_opposition
+			add_to_variable = {
+				kwp_strength_stability = 0.25
+			}
+			add_to_variable = {
+				kwp_strength_pp = 0.025
+			}		
+			custom_effect_tooltip = kwp_strength_increase_TT	
+		}
 	}
 	focus = {
 		id = KPA_Reaffirm_The_United_Front 
@@ -396,7 +548,9 @@ focus_tree = {
 		}
 		x = 10
 		y = 4
-
+		completion_reward = {
+			add_ideas = idea_young_pioneers
+		}
 	}
 	focus = {
 		id = KPA_An_Asian_Peoples_Democracy 
@@ -414,7 +568,34 @@ focus_tree = {
 		}
 		x = 6
 		y = 5
+		completion_reward = {
+			add_political_power = 50
+			add_stability = 0.02
+			add_popularity = {
+				ideology = communism
+				popularity = 0.03
+			}
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = SOV }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = SOV.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			custom_effect_tooltip = SOV_INFLUENCE_GAIN_TT	
 
+		}
 	}
 	focus = {
 		id = KPA_Purge_the_Domestic_Faction 
@@ -426,7 +607,9 @@ focus_tree = {
 		}
 		x = 17
 		y = 1
-
+		completion_reward = {
+			country_event = KPA_Purge.1
+		}
 	}
 	focus = {
 		id = KPA_Integrate_the_intelligentsia  
@@ -438,7 +621,9 @@ focus_tree = {
 		}
 		x = 21
 		y = 1
-
+		completion_reward = {
+			add_research_slot = 1
+		}
 	}
 	focus = {
 		id = KPA_Establish_the_Korean_Workers_Party 
@@ -453,7 +638,18 @@ focus_tree = {
 		}
 		x = 19
 		y = 2
-
+		completion_reward = {
+			news_event = PWK.1
+			add_dynamic_modifier = {
+				modifier = kwp_party_strength
+			}
+			set_variable = {
+				kwp_strength_stability = 0.05
+			}
+			set_variable = {
+				kwp_strength_pp = 0.05
+			}
+		}
 	}
 	focus = {
 		id = KPA_The_Fatherland_Liberation_War 
@@ -465,7 +661,10 @@ focus_tree = {
 		}
 		x = 19
 		y = 3
-
+		completion_reward = {
+			set_country_flag = kor_war_clear 
+			activate_decision = unify_korea
+		}
 	}
 	focus = {
 		id = KPA_Launch_Sweeping_Purges 
@@ -477,7 +676,18 @@ focus_tree = {
 		}
 		x = 19
 		y = 4
-
+		completion_reward = {		
+			add_to_variable = {
+				kwp_strength_stability = -0.025
+			}
+			add_to_variable = {
+				kwp_strength_pp = -0.025
+			}			
+			add_to_variable = { gulag_factor_neg = -0.01 }		
+			add_to_variable = { gulag_factor_five = 0.05 }			
+			custom_effect_tooltip = gulag_factor_increase_TT
+			custom_effect_tooltip = kwp_strength_decrease_TT
+		}
 	}
 	focus = {
 		id = KPA_The_Structure_of_The_Workers_Party 
@@ -489,7 +699,9 @@ focus_tree = {
 		}
 		x = 15
 		y = 5
-
+		completion_reward = {
+			country_event = KPA_POL.1
+		}
 	}
 	focus = {
 		id = KPA_Reverse_the_Purges 
@@ -504,7 +716,16 @@ focus_tree = {
 		}
 		x = 13
 		y = 6
-
+		completion_reward = {		
+			add_political_power = 50
+			add_to_variable = {
+				kwp_strength_stability = 0.025
+			}
+			add_to_variable = {
+				kwp_strength_pp = 0.025
+			}			
+			custom_effect_tooltip = kwp_strength_increase_TT
+		}
 	}
 	focus = {
 		id = KPA_Emulate_the_Soviet_Model 
@@ -519,7 +740,15 @@ focus_tree = {
 		}
 		x = 17
 		y = 6
-
+		completion_reward = {
+			add_to_variable = {
+				kwp_strength_research = 0.02
+			}			
+			add_to_variable = {
+				kwp_strength_stability = 0.025
+			}	
+			custom_effect_tooltip = kwp_strength_professional_increase_TT
+		}
 	}
 	focus = {
 		id = KPA_Execute_Cho_man_sik 
@@ -531,7 +760,13 @@ focus_tree = {
 		}
 		x = 19
 		y = 5
-
+		completion_reward = {
+			news_event = KPA_Purge.3
+			add_popularity = {
+				ideology = nationalism
+				popularity = -0.03
+			}
+		}
 	}
 	focus = {
 		id = KPA_Launch_New_Show_Trials 
@@ -543,7 +778,14 @@ focus_tree = {
 		}
 		x = 19
 		y = 8
-
+		completion_reward = {
+			custom_effect_tooltip = domestic_influence_gain
+			add_to_variable = { var = domestic_influence_amount value = 100 }
+			recalculate_influence = yes				
+			add_to_variable = { gulag_factor_neg = -0.01 }		
+			add_to_variable = { gulag_factor_five = 0.05 }			
+			custom_effect_tooltip = gulag_factor_increase_TT			
+		}
 	}
 	focus = {
 		id = KPA_Finding_a_Scapegoat 
@@ -555,7 +797,11 @@ focus_tree = {
 		}
 		x = 23
 		y = 5
-
+		completion_reward = {
+			army_experience = 15
+			add_political_power = 50
+			add_stability = 0.02
+		}
 	}
 	focus = {
 		id = KPA_Criticize_The_Inability_of_the_Domestic_Faction 
@@ -567,7 +813,21 @@ focus_tree = {
 		}
 		x = 21
 		y = 6
-
+		completion_reward = {
+			country_event = KPA_POL.2
+			add_political_power = 50
+			#Failure of Southern Uprising
+			custom_effect_tooltip = personality_cult_strength_increase
+			add_to_variable = {
+				personality_cult_neg = -0.01
+			}
+			add_to_variable = {
+				personality_cult_strength = 0.05
+			}
+			add_to_variable = {
+				personality_cult_pp = 0.05
+			}
+		}
 	}
 	focus = {
 		id = KPA_Purge_Southern_Communists 
@@ -579,6 +839,45 @@ focus_tree = {
 		}
 		x = 21
 		y = 7
+		completion_reward = {
+			country_event = KPA_POL.3
+			if = {
+				limit = {
+					has_idea = disjointed_party_apparatus5
+				}
+				remove_ideas = disjointed_party_apparatus5
+				add_ideas = disjointed_party_apparatus4
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus4
+				}
+				remove_ideas = disjointed_party_apparatus4
+				add_ideas = disjointed_party_apparatus3
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus3
+				}
+				remove_ideas = disjointed_party_apparatus3
+				add_ideas = disjointed_party_apparatus2
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus2
+				}
+				remove_ideas = disjointed_party_apparatus2
+				add_ideas = disjointed_party_apparatus1
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus1
+				}
+				remove_ideas = disjointed_party_apparatus1
+			}
+			else = {
+			}
+		}
 
 	}
 	focus = {
@@ -591,7 +890,9 @@ focus_tree = {
 		}
 		x = 27
 		y = 1
-
+		completion_reward = {
+			air_experience = 50
+		}
 	}
 	focus = {
 		id = KPA_Request_Yak_18s 
@@ -603,7 +904,23 @@ focus_tree = {
 		}
 		x = 25
 		y = 2
-
+		completion_reward = {
+			create_equipment_variant = { 
+				name = "Yakovlev Yak-18" 
+				type = CAS_equipment_3 
+				upgrades = { 
+					plane_cas_upgrade = 2
+					plane_engine_upgrade = 2
+					plane_reliability_upgrade = 2
+				}
+			}	
+			add_equipment_to_stockpile = {
+				type = CAS_equipment_3
+				amount = 50
+				producer = KPA
+			}
+ 			
+		}
 	}
 	focus = {
 		id = KPA_Blame_Yanan_Generals_for_Disaster 
@@ -615,6 +932,24 @@ focus_tree = {
 		}
 		x = 25
 		y = 6
+		completion_reward = {
+			retire_unit_leader = 33003
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = PRC }
+					}
+					add_to_variable = { influence_array_val^v = -100 }
+					set_country_flag = found
+				}
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			custom_effect_tooltip = PRC_INFLUENCE_LOWER_TT				
+			news_event = KPA_Purge.4
+		}
 
 	}
 	focus = {
@@ -627,7 +962,9 @@ focus_tree = {
 		}
 		x = 25
 		y = 7
-
+		completion_reward = {
+			add_ideas = leftwing_deathsquads
+		}
 	}
 	focus = {
 		id = KPA_Arrest_Pak_Hon-yong 
@@ -642,7 +979,12 @@ focus_tree = {
 		}
 		x = 23
 		y = 8
-
+		completion_reward = {
+			country_event = KPA_PURGE.6
+			add_to_variable = { gulag_factor_neg = -0.01 }		
+			add_to_variable = { gulag_factor_five = 0.05 }			
+			custom_effect_tooltip = gulag_factor_increase_TT			
+		}
 	}
 	focus = {
 		id = KPA_Import_Soviet_Lavochkin_La_9s 
@@ -654,7 +996,13 @@ focus_tree = {
 		}
 		x = 29
 		y = 2
-
+		completion_reward = {
+			add_equipment_to_stockpile = {
+				type = fighter_equipment_3
+				amount = 350
+				producer = POL
+			}		
+		}
 	}
 	focus = {
 		id = KPA_Soviet_MiG_15s 
@@ -669,7 +1017,13 @@ focus_tree = {
 		}
 		x = 27
 		y = 3
-
+		completion_reward = {
+			add_equipment_to_stockpile = {
+				type = jet_multirole_equipment_2
+				amount = 200
+				producer = CUM
+			}		
+		}
 	}
 	focus = {
 		id = KPA_MiG_21s 
@@ -681,7 +1035,13 @@ focus_tree = {
 		}
 		x = 27
 		y = 4
-
+		completion_reward = {
+			add_equipment_to_stockpile = {
+				type = jet_multirole_equipment_4
+				amount = 150
+				producer = CUM
+			}		
+		}
 	}
 	focus = {
 		id = KPA_The_Korean_Peoples_Army_Ground_Force 
@@ -693,7 +1053,9 @@ focus_tree = {
 		}
 		x = 34
 		y = 1
-
+		completion_reward = {
+			army_experience = 50
+		}
 	}
 	focus = {
 		id = KPA_Soviet_T_34_85s 
@@ -705,7 +1067,13 @@ focus_tree = {
 		}
 		x = 32
 		y = 2
-
+		completion_reward = {
+			add_equipment_to_stockpile = {
+				type = mbt_equipment_0
+				amount = 400
+				producer = CUM
+			}
+		}
 	}
 	focus = {
 		id = KPA_Soviet_Weapon_Shipments 
@@ -717,7 +1085,13 @@ focus_tree = {
 		}
 		x = 36
 		y = 2
-
+		completion_reward = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment_0
+				amount = 25000
+				producer = CUM
+			}
+		}
 	}
 	focus = {
 		id = KPA_Import_the_PT_76 
@@ -732,7 +1106,13 @@ focus_tree = {
 		}
 		x = 34
 		y = 3
-
+		completion_reward = {
+			add_equipment_to_stockpile = {
+				type = lt_equipment_3
+				amount = 250
+				producer = CUM
+			}
+		}
 	}
 	focus = {
 		id = KPA_The_Type_58_Assault_Rifle 
@@ -744,7 +1124,12 @@ focus_tree = {
 		}
 		x = 34
 		y = 4
-
+		completion_reward = {
+			set_technology = {
+				infantry_equip_2 = 1
+			}			
+		}
+		
 	}
 	focus = {
 		id = KPA_The_Korean_Peoples_Navy 
@@ -756,7 +1141,9 @@ focus_tree = {
 		}
 		x = 41
 		y = 1
-
+		completion_reward = {
+			navy_experience = 50
+		}
 	}
 	focus = {
 		id = KPA_Increase_Naval_Landing_Capabilitites 
@@ -768,7 +1155,14 @@ focus_tree = {
 		}
 		x = 39
 		y = 2
-
+		completion_reward = {
+			add_tech_bonus = {
+				name = landing_naval_bonus
+				bonus = 1.75
+				uses = 1
+				category = tp_tech
+			}
+		}
 	}
 	focus = {
 		id = KPA_Establish_Naval_Training_Academies 
@@ -778,9 +1172,17 @@ focus_tree = {
 		prerequisite = {
 			focus = KPA_The_Korean_Peoples_Navy
 		}
-		x = 43
+		x = 43 
 		y = 2
-
+		completion_reward = {
+			navy_experience = 25
+			add_tech_bonus = {
+				name = navy_op_bonus
+				bonus = 1.5
+				uses = 2
+				category = naval_doctrine
+			}
+		}
 	}
 	focus = {
 		id = KPA_Expand_the_Wonsan_Naval_Base 
@@ -795,7 +1197,15 @@ focus_tree = {
 		}
 		x = 41
 		y = 3
-
+		completion_reward = {
+			920 = {
+				add_building_construction = {
+					type = naval_base
+					level = 2
+					instant_build = yes
+				}	
+			}
+		}
 	}
 	focus = {
 		id = KPA_Projects_613_Submarines 
@@ -807,7 +1217,16 @@ focus_tree = {
 		}
 		x = 41
 		y = 4
-
+		completion_reward = {
+			if = {
+				limit = { has_dlc = "Man the Guns" }
+				load_oob = KPA_Submarine_Purchase_MTG
+			}		
+			if = {
+				limit = { NOT = {  has_dlc = "Man the Guns" } }
+				load_oob = KPA_Submarine_Purchase_Legacy
+			}	
+		}
 	}
 	focus = {
 		id = KPA_Expand_the_Personality_Cult 
@@ -819,7 +1238,20 @@ focus_tree = {
 		}
 		x = 17
 		y = 10
-
+		completion_reward = {
+			add_dynamic_modifier = {
+				modifier = personality_cult_strength
+			}
+			add_to_variable = {
+				personality_cult_neg = -0.01
+			}
+			add_to_variable = {
+				personality_cult_strength = 0.05
+			}
+			add_to_variable = {
+				personality_cult_pp = 0.05
+			}
+		}
 	}
 	focus = {
 		id = KPA_Purge_Ho_ka_i 
@@ -831,7 +1263,12 @@ focus_tree = {
 		}
 		x = 13
 		y = 7
-
+		completion_reward = {
+			country_event = KPA_Purge.2
+			custom_effect_tooltip = domestic_influence_gain
+			add_to_variable = { var = domestic_influence_amount value = 200 }
+			recalculate_influence = yes				
+		}
 	}
 	focus = {
 		id = KPA_An_Elite_Communist_Party 
@@ -843,22 +1280,62 @@ focus_tree = {
 		}
 		x = 17
 		y = 7
-
+		completion_reward = {
+			add_to_variable = {
+				kwp_strength_research = 0.02
+			}			
+			custom_effect_tooltip = kwp_strength_professional_increase_TT
+		}
 	}
 	focus = {
-		id = KPA_The_Rehabilitation_of-the_Workers_Party 
- completion_reward = {log = "[GetDateText]: [Root.GetName]: id = KPA_The_Rehabilitation_of-the_Workers_Party"}
+		id = KPA_The_Rehabilitation_of_the_Workers_Party 
+ completion_reward = {log = "[GetDateText]: [Root.GetName]: id = KPA_The_Rehabilitation_of_the_Workers_Party"}
 		icon = GFX_goal_unknown
 		cost = 10.00
 		prerequisite = {
 			focus = KPA_An_Elite_Communist_Party
-		}
-		prerequisite = {
 			focus = KPA_Purge_Ho_ka_i
 		}
 		x = 15
 		y = 8
-
+		completion_reward = {
+			if = {
+				limit = {
+					has_idea = disjointed_party_apparatus5
+				}
+				remove_ideas = disjointed_party_apparatus5
+				add_ideas = disjointed_party_apparatus4
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus4
+				}
+				remove_ideas = disjointed_party_apparatus4
+				add_ideas = disjointed_party_apparatus3
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus3
+				}
+				remove_ideas = disjointed_party_apparatus3
+				add_ideas = disjointed_party_apparatus2
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus2
+				}
+				remove_ideas = disjointed_party_apparatus2
+				add_ideas = disjointed_party_apparatus1
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus1
+				}
+				remove_ideas = disjointed_party_apparatus1
+			}
+			else = {
+			}			
+		}
 	}
 	focus = {
 		id = KPA_Rebuild_Hydroelctric_Dams 
@@ -911,7 +1388,7 @@ focus_tree = {
 		icon = GFX_goal_unknown
 		cost = 10.00
 		prerequisite = {
-			focus = KPA_The_Rehabilitation_of-the_Workers_Party
+			focus = KPA_The_Rehabilitation_of_the_Workers_Party
 		}
 		prerequisite = {
 			focus = KPA_Arrest_Pak_Hon-yong
@@ -921,7 +1398,12 @@ focus_tree = {
 		}
 		x = 19
 		y = 9
-
+		available = {
+			has_global_flag = stalin_dead
+		}
+		bypass = { 
+			has_global_flag = stalin_dead
+		}
 	}
 	focus = {
 		id = KPA_Execute_Ho_ka_i 
@@ -933,7 +1415,24 @@ focus_tree = {
 		}
 		x = 16
 		y = 11
-
+		completion_reward = {
+			add_political_power = 50
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = SOV }
+					}
+					add_to_variable = { influence_array_val^v = -100 }
+					set_country_flag = found
+				}
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			custom_effect_tooltip = SOV_INFLUENCE_LOWER_TT				
+			news_event = KPA_Purge.5
+		}
 	}
 	focus = {
 		id = KPA_Execute_Pak_Hon-yong 
@@ -957,7 +1456,9 @@ focus_tree = {
 		}
 		x = 19
 		y = 14
-
+		completion_reward = {
+			country_event = August_Faction.1
+		}
 	}
 	focus = {
 		id = KPA_Execute_Pak_Il-u 
@@ -1002,7 +1503,9 @@ focus_tree = {
 		}
 		x = 18
 		y = 12
-
+		completion_reward = {
+			news_event = KPA_POL.5	#North Korean Take on Destalinization
+		}
 	}
 	focus = {
 		id = KPA_The_Second_Arduous_March 
@@ -1014,7 +1517,9 @@ focus_tree = {
 		}
 		x = 24
 		y = 15
-
+		completion_reward = {
+			news_event = August_Faction.2
+		}
 	}
 	focus = {
 		id = KPA_Purge_the_Yanan_Faction 
@@ -1026,7 +1531,68 @@ focus_tree = {
 		}
 		x = 22
 		y = 16
-
+		completion_reward = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = PRC }
+					}
+					add_to_variable = { influence_array_val^v = -100 }
+					set_country_flag = found
+				}
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			custom_effect_tooltip = PRC_INFLUENCE_LOWER_TT
+			add_opinion_modifier = {
+				target = PRC
+				modifier = large_decrease
+			}	
+			PRC = {
+				add_opinion_modifier = {
+					target = KPA
+					modifier = large_decrease
+				}				
+			}	
+			if = {
+				limit = {
+					has_idea = disjointed_party_apparatus5
+				}
+				remove_ideas = disjointed_party_apparatus5
+				add_ideas = disjointed_party_apparatus4
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus4
+				}
+				remove_ideas = disjointed_party_apparatus4
+				add_ideas = disjointed_party_apparatus3
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus3
+				}
+				remove_ideas = disjointed_party_apparatus3
+				add_ideas = disjointed_party_apparatus2
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus2
+				}
+				remove_ideas = disjointed_party_apparatus2
+				add_ideas = disjointed_party_apparatus1
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus1
+				}
+				remove_ideas = disjointed_party_apparatus1
+			}
+			else = {
+			}			
+		}
 	}
 	focus = {
 		id = KPA_Purge_the_Soviet_Faction 
@@ -1038,7 +1604,68 @@ focus_tree = {
 		}
 		x = 26
 		y = 16
-
+		completion_reward = {
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = SOV }
+					}
+					add_to_variable = { influence_array_val^v = -100 }
+					set_country_flag = found
+				}
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			custom_effect_tooltip = SOV_INFLUENCE_LOWER_TT
+			add_opinion_modifier = {
+				target = SOV
+				modifier = large_decrease
+			}	
+			SOV = {
+				add_opinion_modifier = {
+					target = KPA
+					modifier = large_decrease
+				}				
+			}	
+			if = {
+				limit = {
+					has_idea = disjointed_party_apparatus5
+				}
+				remove_ideas = disjointed_party_apparatus5
+				add_ideas = disjointed_party_apparatus4
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus4
+				}
+				remove_ideas = disjointed_party_apparatus4
+				add_ideas = disjointed_party_apparatus3
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus3
+				}
+				remove_ideas = disjointed_party_apparatus3
+				add_ideas = disjointed_party_apparatus2
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus2
+				}
+				remove_ideas = disjointed_party_apparatus2
+				add_ideas = disjointed_party_apparatus1
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus1
+				}
+				remove_ideas = disjointed_party_apparatus1
+			}
+			else = {
+			}			
+		}
 	}
 	focus = {
 		id = KPA_The_Guerila_Faction_Triumphant 
@@ -1053,7 +1680,54 @@ focus_tree = {
 		}
 		x = 24
 		y = 17
-
+		completion_reward = {
+			custom_effect_tooltip = personality_cult_strength_increase
+			add_to_variable = {
+				personality_cult_neg = -0.01
+			}
+			add_to_variable = {
+				personality_cult_strength = 0.05
+			}
+			add_to_variable = {
+				personality_cult_pp = 0.05
+			}
+			if = {
+				limit = {
+					has_idea = disjointed_party_apparatus5
+				}
+				remove_ideas = disjointed_party_apparatus5
+				add_ideas = disjointed_party_apparatus4
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus4
+				}
+				remove_ideas = disjointed_party_apparatus4
+				add_ideas = disjointed_party_apparatus3
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus3
+				}
+				remove_ideas = disjointed_party_apparatus3
+				add_ideas = disjointed_party_apparatus2
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus2
+				}
+				remove_ideas = disjointed_party_apparatus2
+				add_ideas = disjointed_party_apparatus1
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus1
+				}
+				remove_ideas = disjointed_party_apparatus1
+			}
+			else = {
+			}			
+		}
 	}
 	focus = {
 		id = KPA_Reduce_Soviet_Influence 
@@ -1095,7 +1769,37 @@ focus_tree = {
 		}
 		x = 21
 		y = 17
-
+		completion_reward = {
+			if = {
+				limit = {
+					has_idea = asian_illiteracy_3
+				}
+				remove_ideas = asian_illiteracy_3
+				add_ideas = asian_illiteracy_2
+			}
+			else_if = {
+				limit = {
+					has_idea = asian_illiteracy_2
+				}
+				remove_ideas = asian_illiteracy_2
+				add_ideas = asian_illiteracy_1
+			}
+			else_if = {
+				limit = {
+					has_idea = asian_illiteracy_1
+				}
+				remove_ideas = asian_illiteracy_1
+				add_ideas = asian_illiteracy_0
+			}
+			else_if = {
+				limit = {
+					has_idea = asian_illiteracy_0
+				}
+				remove_ideas = asian_illiteracy_0
+			}
+			else = {
+			}			
+		}
 	}
 	focus = {
 		id = KPA_Decrease_Russian_Language_Education 
@@ -1146,7 +1850,46 @@ focus_tree = {
 		}
 		x = 16
 		y = 16
+		completion_reward = {
+			news_event = KPA_Purge.8
+			if = {
+				limit = {
+					has_idea = disjointed_party_apparatus5
+				}
+				remove_ideas = disjointed_party_apparatus5
+				add_ideas = disjointed_party_apparatus4
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus4
+				}
+				remove_ideas = disjointed_party_apparatus4
+				add_ideas = disjointed_party_apparatus3
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus3
+				}
+				remove_ideas = disjointed_party_apparatus3
+				add_ideas = disjointed_party_apparatus2
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus2
+				}
+				remove_ideas = disjointed_party_apparatus2
+				add_ideas = disjointed_party_apparatus1
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus1
+				}
+				remove_ideas = disjointed_party_apparatus1
+			}
+			else = {
+			}
 
+		}
 	}
 	focus = {
 		id = KPA_Dismantle_the_Personality_Cult 
@@ -1161,7 +1904,7 @@ focus_tree = {
 		}
 		x = 14
 		y = 17
-
+		
 	}
 	focus = {
 		id = KPA_Increase_Chinese_Cultural_Influences 
@@ -1188,7 +1931,67 @@ focus_tree = {
 		}
 		x = 13
 		y = 18
+		completion_reward = {
+			if = {
+				limit = {
+					has_idea = asian_illiteracy_3
+				}
+				remove_ideas = asian_illiteracy_3
+				add_ideas = asian_illiteracy_2
+			}
+			else_if = {
+				limit = {
+					has_idea = asian_illiteracy_2
+				}
+				remove_ideas = asian_illiteracy_2
+				add_ideas = asian_illiteracy_1
+			}
+			else_if = {
+				limit = {
+					has_idea = asian_illiteracy_1
+				}
+				remove_ideas = asian_illiteracy_1
+				add_ideas = asian_illiteracy_0
+			}
+			else_if = {
+				limit = {
+					has_idea = asian_illiteracy_0
+				}
+				remove_ideas = asian_illiteracy_0
+			}
+			else = {
+			}
 
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = PRC }
+					}
+					add_to_variable = { influence_array_val^v = 100 }
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = PRC.id }
+					add_to_array = { influence_array_val = 100 }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes	
+			custom_effect_tooltip = PRC_INFLUENCE_GAIN_TT	
+			add_opinion_modifier = {
+				target = PRC
+				modifier = large_increase
+			}	
+			PRC = {
+				add_opinion_modifier = {
+					target = KPA
+					modifier = large_increase
+				}				
+			}		
+		}
 	}
 	focus = {
 		id = KPA_Rehabilitate_Purged_Soviet_Korean_Writers 
@@ -1200,7 +2003,45 @@ focus_tree = {
 		}
 		x = 17
 		y = 17
-
+		completion_reward = {
+			if = {
+				limit = {
+					has_idea = disjointed_party_apparatus5
+				}
+				remove_ideas = disjointed_party_apparatus5
+				add_ideas = disjointed_party_apparatus4
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus4
+				}
+				remove_ideas = disjointed_party_apparatus4
+				add_ideas = disjointed_party_apparatus3
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus3
+				}
+				remove_ideas = disjointed_party_apparatus3
+				add_ideas = disjointed_party_apparatus2
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus2
+				}
+				remove_ideas = disjointed_party_apparatus2
+				add_ideas = disjointed_party_apparatus1
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus1
+				}
+				remove_ideas = disjointed_party_apparatus1
+			}
+			else = {
+			}
+			add_stability = 0.02
+		}
 	}
 	focus = {
 		id = KPA_Purge_Kim_Loyalists 
@@ -1215,7 +2056,45 @@ focus_tree = {
 		}
 		x = 15
 		y = 18
-
+		completion_reward = {
+			if = {
+				limit = {
+					has_idea = disjointed_party_apparatus5
+				}
+				remove_ideas = disjointed_party_apparatus5
+				add_ideas = disjointed_party_apparatus4
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus4
+				}
+				remove_ideas = disjointed_party_apparatus4
+				add_ideas = disjointed_party_apparatus3
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus3
+				}
+				remove_ideas = disjointed_party_apparatus3
+				add_ideas = disjointed_party_apparatus2
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus2
+				}
+				remove_ideas = disjointed_party_apparatus2
+				add_ideas = disjointed_party_apparatus1
+			}
+			else_if = {
+				limit = {
+					has_idea = disjointed_party_apparatus1
+				}
+				remove_ideas = disjointed_party_apparatus1
+			}
+			else = {
+			}
+			add_political_power = 50
+		}
 	}
 	focus = {
 		id = KPA_Embrace_Destalinization 
@@ -1230,7 +2109,11 @@ focus_tree = {
 		}
 		x = 14
 		y = 19
-
+		completion_reward = {
+			add_to_variable = { gulag_factor_neg = -0.02 }		
+			add_to_variable = { gulag_factor_five = 0.1 }			
+			custom_effect_tooltip = gulag_factor_decrease_TT			
+		}
 	}
 	focus = {
 		id = KPA_General_Secretary_Choe_Chang-ik 
@@ -1242,7 +2125,14 @@ focus_tree = {
 		}
 		x = 14
 		y = 15
-
+		completion_reward = {
+			news_event = August_Faction.3
+			create_country_leader = {
+				name = "Choe Chang-ik"
+				picture = "Choe_Chang_ik.dds"
+				ideology = liberal_communism
+			}			
+		}
 	}
 	focus = {
 		id = KPA_Promote_Kims_Supporters 
@@ -1254,7 +2144,15 @@ focus_tree = {
 		}
 		x = 21
 		y = 10
-
+		completion_reward = {
+			add_to_variable = {
+				kwp_strength_stability = 0.05
+			}
+			add_to_variable = {
+				kwp_strength_pp = 0.05
+			}		
+			custom_effect_tooltip = kwp_strength_increase_TT	
+		}
 	}
 	focus = {
 		id = KPA_Establishing_Juche 
@@ -1269,6 +2167,20 @@ focus_tree = {
 		}
 		x = 19
 		y = 13
-
+		completion_reward = {
+			news_event = Juche.1
+			add_dynamic_modifier = {
+				modifier = personality_cult_strength
+			}
+			set_variable = {
+				personality_cult_neg = -0.01
+			}
+			set_variable = {
+				personality_cult_strength = 0.05
+			}
+			set_variable = {
+				personality_cult_pp = 0.05
+			}
+		}
 	}
 }
