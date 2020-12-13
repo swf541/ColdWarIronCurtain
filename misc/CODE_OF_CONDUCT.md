@@ -33,7 +33,7 @@ The following behaviors are considered harassment and are unacceptable within ou
 *   Violence, threats of violence or violent language directed against another person.
 *   Sexist, racist, homophobic, transphobic, ableist or otherwise discriminatory jokes and language except where explicitly sanctioned by administrators.
 *   Posting or displaying sexually explicit or violent material.
-*   Posting or threatening to post other people’s personally identifying information ("doxing").
+*   Posting or threatening to post other people's personally identifying information ("doxing").
 *   Personal insults, particularly those related to gender, sexual orientation, race, religion, or disability.
 *   Deliberate intimidation, stalking or following (online or in person).
 *   Advocating for, or encouraging, any of the above behavior.
@@ -58,7 +58,7 @@ If you feel you have been falsely or unfairly accused of violating this Code of 
 
 ## 8. Scope
 
-We expect all community participants (contributors, paid or otherwise; sponsors; and other guests) to abide by this Code of Conduct in all community venues–online and in-person–as well as in all one-on-one communications pertaining to community business.
+We expect all community participants (contributors, paid or otherwise; sponsors; and other guests) to abide by this Code of Conduct in all community venues-online and in-person-as well as in all one-on-one communications pertaining to community business.
 
 This code of conduct and its related procedures also applies to unacceptable behavior occurring outside the scope of community activities when such behavior has the potential to adversely affect the safety and well-being of community members.
 
