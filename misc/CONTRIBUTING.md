@@ -45,7 +45,7 @@ At this point, you're ready to make your changes! Feel free to ask for help; eve
 4. [Submit a Pull Request](https://github.com/swf541/Cold-War--The-Iron-Curtain/pulls)
    - Explain your changes
    - Explain how you've tested them
-   - Tag any linked issues (i.e., `Fixes #69`)
+   - Tag any linked issues (i.e., 'Fixes #69')
 
 # How to report a bug
 1. Check the [open issues](https://github.com/swf541/Cold-War--The-Iron-Curtain/issues) and make sure your bug is not already reported
