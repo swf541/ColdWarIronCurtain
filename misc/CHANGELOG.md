@@ -94,7 +94,7 @@
 - General fixes and improvements
 - Fixed Israel gaining territory in South Korea
 - Fixed CTD when editing Soviet Division Templates
-- Fixed \"American Licence Agreements\" giving your licences to the USA
+- Fixed \"American License Agreements\" giving your licenses to the USA
 - Fixed countries keeping licenses from non-existing countries
 - Added Tooltips to Chemical Weapons
 - Fixed Algerian War not triggering
