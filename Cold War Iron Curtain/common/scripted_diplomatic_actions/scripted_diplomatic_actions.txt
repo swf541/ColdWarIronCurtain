@@ -6,7 +6,14 @@ scripted_diplomatic_actions = {
 			#always = yes
 		}
 		visible = {
-			#always = yes
+			ROOT = {
+				NOT = {
+					is_in_array = {
+						array = military_subsidies
+						value = PREV
+					}
+				}
+			}
 		}
 		selectable = {
 			custom_trigger_tooltip = {
@@ -227,7 +234,7 @@ scripted_diplomatic_actions = {
 			#always = yes
 		}
 		visible = {
-			#always = yes
+			NOT = { has_country_flag = is_being_exploited }
 		}
 		selectable = {
 			custom_trigger_tooltip = {
@@ -244,8 +251,6 @@ scripted_diplomatic_actions = {
 				check_variable = { influence_array^0 = ROOT }
 				check_variable = { influence_array_calc^0 > 0.64 }
 			}
-				
-			
 			custom_trigger_tooltip = {
 				tooltip = Influence_Action_EXPLOIT_CHECK_TT
 				#NOT = {
@@ -279,6 +284,7 @@ scripted_diplomatic_actions = {
 				}
 				ROOTTAG = "[?var:influence_array^0.GetTag]"
 			}
+			set_country_flag = { flag = is_being_exploited value = 1 }
 			
 			set_temp_variable = { influence_reduce = influence_array_val^0 }
 			multiply_temp_variable = { influence_reduce = 0.1 }
@@ -304,7 +310,7 @@ scripted_diplomatic_actions = {
 					target = ROOT
 					modifier = exploiter_neighbor
 				}
-			}		
+			}
 		}
 
 		# runs when the action is properly sent and rejected
@@ -319,6 +325,117 @@ scripted_diplomatic_actions = {
 			#always = yes
 		}
 		send_description = economic_exploitation_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+
+
+		# RECEIVE POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		# receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
+		reset_receive_effect = {
+
+		}
+		can_be_accepted = { # accept button will be disabled if no
+
+			always = no
+		}
+		receive_description = economic_exploitation_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+
+		
+		# PLAYER FEEDBACK ON ACCEPT/REJECT
+		 #can be overridden to customize accepted/rejected pop ups for the sender
+		
+		
+		
+	
+		
+		# AI
+
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+
+		}
+	}
+
+# Stop Economic Exploitation
+	opt_influence_stop_economic_exploition = {
+		allowed = {
+			#always = yes
+		}
+		visible = {
+			has_country_flag = is_being_exploited
+		}
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+			}
+			custom_trigger_tooltip = {
+				tooltip = Influence_Action_FPP_5_TT
+				check_variable = { ROOT.foriegnPowerProjection > 5 }
+			}
+			NOT = { is_puppet_of = ROOT }
+			custom_trigger_tooltip = {	
+				tooltip = Influence_Action_65_INFLUENCE_TT
+				check_variable = { influence_array^0 = ROOT }
+				check_variable = { influence_array_calc^0 > 0.64 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = Influence_Action_EXPLOIT_CHECK_TT
+				#NOT = {
+				#	meta_trigger = {
+				#		text = {
+				#			has_idea = [CHECKTAG]_exploit_idea
+				#		}
+				#		CHECKTAG = "[?var:influence_array^0.GetTag]"
+				#	}
+				#}
+			}
+		}
+		
+		requires_acceptance = no
+		cost = 100
+		command_power = 0
+		show_acceptance_on_action_button = no
+		
+		icon = 1
+		
+		on_sent_effect = {
+		}
+
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			meta_effect = {
+				text = {
+					remove_ideas = [ROOTTAG]_exploit_idea
+				}
+				ROOTTAG = "[?var:influence_array^0.GetTag]"
+			}
+			clr_country_flag = is_being_exploited
+			remove_opinion_modifier = {
+				target = ROOT
+				modifier = exploiter
+			}
+			every_neighbor_country = {
+				remove_opinion_modifier = {
+					target = ROOT
+					modifier = exploiter_neighbor
+				}
+			}
+		}
+
+		# runs when the action is properly sent and rejected
+		reject_effect = {
+		}
+
+		# SEND POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		# send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
+
+		can_be_sent = { # send button will be disabled if no
+			#always = yes
+		}
+		send_description = stop_economic_exploitation_send # if there is no scripted gui, this desc will be used in send yes/no pop up
 
 
 		# RECEIVE POPUP CUSTOMIZATION
@@ -692,7 +809,7 @@ scripted_diplomatic_actions = {
 	}
 
 
-#### Mutual Defense Agreement
+# Mutual Defense Agreement
 	opt_influence_mutual_defense_agreement = {
 		allowed = {
 			#always = yes
