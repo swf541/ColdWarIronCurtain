@@ -1,116 +1,116 @@
 scripted_diplomatic_actions = {
 
 # Influence Nation
-opt_influence_action = {
-	allowed = {
-	}
-
-	visible = {
-	}
-
-	selectable = {
-		custom_trigger_tooltip = {
-			tooltip = Influence_action_cooldown
-			ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+	opt_influence_action = {
+		allowed = {
 		}
-		NOT = { tag = ROOT }
-		custom_trigger_tooltip = {
-			tooltip = influence_FPP_1_TT
-			check_variable = { ROOT.foriegnPowerProjection > 1 }
+
+		visible = {
 		}
-		custom_trigger_tooltip = {
-			tooltip = Influence_Action_1_TT
-			OR = {
+
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+			}
+			NOT = { tag = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = influence_FPP_1_TT
+				check_variable = { ROOT.foriegnPowerProjection > 1 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = Influence_Action_1_TT
 				OR = {
-					check_variable = { influence_array^0 = ROOT }
-					check_variable = { influence_array^1 = ROOT }
-					check_variable = { influence_array^2 = ROOT }
-					check_variable = { influence_array^3 = ROOT }
-					check_variable = { influence_array^4 = ROOT }
-					check_variable = { influence_array^5 = ROOT }
-					check_variable = { influence_array^6 = ROOT }
-					check_variable = { influence_array^7 = ROOT }					
-				}
-				OR = {
-					AND = { NOT = { has_variable = influence_array^0 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
-					AND = { NOT = { has_variable = influence_array^1 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
-					AND = { NOT = { has_variable = influence_array^2 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
-					AND = { NOT = { has_variable = influence_array^3 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
-					AND = { NOT = { has_variable = influence_array^4 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
-					AND = { NOT = { has_variable = influence_array^5 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
-					AND = { NOT = { has_variable = influence_array^6 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
-					AND = { NOT = { has_variable = influence_array^7 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+					OR = {
+						check_variable = { influence_array^0 = ROOT }
+						check_variable = { influence_array^1 = ROOT }
+						check_variable = { influence_array^2 = ROOT }
+						check_variable = { influence_array^3 = ROOT }
+						check_variable = { influence_array^4 = ROOT }
+						check_variable = { influence_array^5 = ROOT }
+						check_variable = { influence_array^6 = ROOT }
+						check_variable = { influence_array^7 = ROOT }					
+					}
+					OR = {
+						AND = { NOT = { has_variable = influence_array^0 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^1 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^2 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^3 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^4 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^5 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^6 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^7 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+					}
 				}
 			}
 		}
-	}
 
-	requires_acceptance = no
-	cost = 50
-	command_power = 0
-	show_acceptance_on_action_button = no
-	icon = 1
+		requires_acceptance = no
+		cost = 50
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
 
-	on_sent_effect = {
-	}
+		on_sent_effect = {
+		}
 
-	# runs when the action is properly sent and accepted
-	complete_effect = {
-		ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
-		add_to_variable = { ROOT.foriegnPowerProjection = -1 }
-		set_temp_variable = { influence_gain = 50 }
-		multiply_variable = { influence_gain = decryptTotal }
-		for_loop_effect = {
-			end = influence_array^num
-			value = v
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			add_to_variable = { ROOT.foriegnPowerProjection = -1 }
+			set_temp_variable = { influence_gain = 50 }
+			multiply_variable = { influence_gain = decryptTotal }
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = {
+					limit = {
+						check_variable = { influence_array^v = ROOT }
+					}
+					add_to_variable = { influence_array_val^v = influence_gain }
+					set_country_flag = found
+				}
+			}
 			if = {
-				limit = {
-					check_variable = { influence_array^v = ROOT }
-				}
-				add_to_variable = { influence_array_val^v = influence_gain }
-				set_country_flag = found
+				limit = { NOT = { has_country_flag = found } }
+					add_to_array = { influence_array = ROOT.id }
+					add_to_array = { influence_array_val = influence_gain }
 			}
+			clr_country_flag = found
+			recalculate_influence = yes
 		}
-		if = {
-			limit = { NOT = { has_country_flag = found } }
-				add_to_array = { influence_array = ROOT.id }
-				add_to_array = { influence_array_val = influence_gain }
+
+		# runs when the action is properly sent and rejected
+		reject_effect = {
 		}
-		clr_country_flag = found
-		recalculate_influence = yes
-	}
 
-	# runs when the action is properly sent and rejected
-	reject_effect = {
-	}
+		# SEND POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		# send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
+		can_be_sent = { # send button will be disabled if no
+		}
+		send_description = influence_target_send # if there is no scripted gui, this desc will be used in send yes/no pop up
 
-	# SEND POPUP CUSTOMIZATION
-	# use diplomatic_action as context in scripted gui
-	# send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
-	can_be_sent = { # send button will be disabled if no
-	}
-	send_description = influence_target_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# RECEIVE POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		# receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
+		reset_receive_effect = {
+		}
 
-	# RECEIVE POPUP CUSTOMIZATION
-	# use diplomatic_action as context in scripted gui
-	# receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
-	reset_receive_effect = {
-	}
+		can_be_accepted = { # accept button will be disabled if no
+			always = no
+		}
+		receive_description = influence_target_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 
-	can_be_accepted = { # accept button will be disabled if no
-		always = no
-	}
-	receive_description = influence_target_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# PLAYER FEEDBACK ON ACCEPT/REJECT
+		#can be overridden to customize accepted/rejected pop ups for the sender
 
-	# PLAYER FEEDBACK ON ACCEPT/REJECT
-	 #can be overridden to customize accepted/rejected pop ups for the sender
-
-	# AI
-	# ai_will_do to decide if AI should send this action or not
-	ai_desire = {
-		base = 0
+		# AI
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
 	}
-}
 
 
 # Start Military Subsidies
@@ -155,7 +155,7 @@ opt_influence_action = {
 						text = {
 							has_country_flag = [CHECKTAG]_military_subsidizer
 						}
-						CHECKTAG = "[?var:influence_array^0.GetTag]"
+						CHECKTAG = "[ROOT.GetTag]"
 					}
 				}
 			}
@@ -180,7 +180,7 @@ opt_influence_action = {
 				text = {
 					set_country_flag = [ROOTTAG]_military_subsidizer
 				}
-				ROOTTAG = "[?var:influence_array^0.GetTag]"
+				ROOTTAG = "[ROOT.GetTag]"
 			}
 			set_variable = { mil_subsidy_id = ROOT.id }
 			set_temp_variable = { influence_gain = 200 } #Make Dynamic Later
@@ -330,7 +330,7 @@ opt_influence_action = {
 			NOT = {
 				meta_trigger = {
 					text = { has_country_flag = [CHECKTAG]_is_being_exploited }
-					CHECKTAG = "[?var:influence_array^0.GetTag]"
+					CHECKTAG = "[ROOT.GetTag]"
 				}
 			}
 		}
@@ -369,7 +369,7 @@ opt_influence_action = {
 					set_country_flag = { flag = [ROOTTAG]_is_being_exploited value = 1 }
 					add_ideas = [ROOTTAG]_exploit_idea
 				}
-				ROOTTAG = "[?var:influence_array^0.GetTag]"
+				ROOTTAG = "[ROOT.GetTag]"
 			}
 
 			add_to_variable = { ROOT.foriegnPowerProjection = -5 }
@@ -439,7 +439,7 @@ opt_influence_action = {
 		visible = {
 			meta_trigger = {
 				text = { has_country_flag = [CHECKTAG]_is_being_exploited }
-				CHECKTAG = "[?var:influence_array^0.GetTag]"
+				CHECKTAG = "[ROOT.GetTag]"
 			}
 		}
 
@@ -477,7 +477,7 @@ opt_influence_action = {
 					clr_country_flag = [ROOTTAG]_is_being_exploited
 					remove_ideas = [ROOTTAG]_exploit_idea
 				}
-				ROOTTAG = "[?var:influence_array^0.GetTag]"
+				ROOTTAG = "[ROOT.GetTag]"
 			}
 			clr_country_flag = is_being_exploited
 			remove_opinion_modifier = {
@@ -1025,101 +1025,93 @@ opt_influence_action = {
 
 
 # Trade Steering
-opt_influence_trade_agreement_action = {
-	allowed = {
-	}
-
-	visible = {
-	}
-
-	send_description = trade_agreement_yes_send
-	selectable = {
-		custom_trigger_tooltip = {
-			tooltip = Influence_action_cooldown
-			ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+	opt_influence_trade_agreement_action = {
+		allowed = {
 		}
-		custom_trigger_tooltip = {
-			tooltip = influence_MAJORITY_TT
-			check_variable = { influence_array^0 = ROOT }
-			check_variable = { influence_array_calc^0 > 0.50 }
-		}
-		custom_trigger_tooltip = {
-			tooltip = influence_FPP_3
-			check_variable = { ROOT.foriegnPowerProjection > 3 }
-		}
-		NOT = { is_puppet_of = ROOT }
-		custom_trigger_tooltip = {
-			tooltip = influence_TRADE_AGREEMENT_TT
-			#NOT = {
-			#	meta_trigger = {
-			#		text = {
-			#			has_idea = trade_treaty_[ROOTTAG]
-			#		}
-			#		CHECKTAG = "[?var:influence_array^0.GetTag]"
-			#	}
-			#}
-		}
-	}
 
-	requires_acceptance = no
-	cost = 100
-	command_power = 0
-	show_acceptance_on_action_button = no
-	icon = 1
+		visible = {
+		}
 
-	on_sent_effect = {
-	}
-
-	# runs when the action is properly sent and accepted
-	complete_effect = {
-		ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
-		set_temp_variable = { target = THIS.id }
-		add_to_variable = { ROOT.foriegnPowerProjection -3 }
-		for_loop_effect = {
-			end = influence_array^num
-			value = v
-			meta_effect = {
-				text = {
-					add_ideas = trade_treaty_[ROOTTAG]
-					ROOT = { add_ideas = trade_treaty_[CURRENTTAG] }
-				}
-				ROOTTAG = "[?var:influence_array^0.GetTag]"
-				CURRENTTAG = "[?var:target]"
+		send_description = trade_agreement_yes_send
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
 			}
-		}		
-	}
+			custom_trigger_tooltip = {
+				tooltip = influence_MAJORITY_TT
+				check_variable = { influence_array^0 = ROOT }
+				check_variable = { influence_array_calc^0 > 0.50 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = influence_FPP_3
+				check_variable = { ROOT.foriegnPowerProjection > 3 }
+			}
+			NOT = { is_puppet_of = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = influence_TRADE_AGREEMENT_TT
+			}
+		}
 
-	# runs when the action is properly sent and rejected
-	reject_effect = {
-	}
+		requires_acceptance = no
+		cost = 100
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
 
-	# SEND POPUP CUSTOMIZATION
-	# use diplomatic_action as context in scripted gui
-	# send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
-	can_be_sent = { # send button will be disabled if no
-	}
-	send_description = trade_agreement_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		on_sent_effect = {
+		}
 
-	# RECEIVE POPUP CUSTOMIZATION
-	# use diplomatic_action as context in scripted gui
-	# receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
-	reset_receive_effect = {
-	}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			set_temp_variable = { target = THIS.id }
+			add_to_variable = { ROOT.foriegnPowerProjection -3 }
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				meta_effect = {
+					text = {
+						add_ideas = trade_treaty_[ROOTTAG]
+						ROOT = { add_ideas = trade_treaty_[CURRENTTAG] }
+					}
+					ROOTTAG = "[ROOT.GetTag]"
+					CURRENTTAG = "[?var:target]"
+				}
+			}		
+		}
 
-	can_be_accepted = { # accept button will be disabled if no
-		always = no
-	}
-	receive_description = trade_agreement_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# runs when the action is properly sent and rejected
+		reject_effect = {
+		}
 
-	# PLAYER FEEDBACK ON ACCEPT/REJECT
-	 #can be overridden to customize accepted/rejected pop ups for the sender
+		# SEND POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		# send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
+		can_be_sent = { # send button will be disabled if no
+		}
+		send_description = trade_agreement_send # if there is no scripted gui, this desc will be used in send yes/no pop up
 
-	# AI
-	# ai_will_do to decide if AI should send this action or not
-	ai_desire = {
-		base = 0
+		# RECEIVE POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		# receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
+		reset_receive_effect = {
+		}
+
+		can_be_accepted = { # accept button will be disabled if no
+			always = no
+		}
+		receive_description = trade_agreement_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+
+		# PLAYER FEEDBACK ON ACCEPT/REJECT
+		#can be overridden to customize accepted/rejected pop ups for the sender
+
+		# AI
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
 	}
-}
 
 
 # Trade Agreement
@@ -1129,6 +1121,7 @@ opt_influence_trade_agreement_action = {
 
 		visible = {
 		}
+
 		selectable = {
 			custom_trigger_tooltip = {
 				tooltip = Influence_action_cooldown
@@ -1142,14 +1135,6 @@ opt_influence_trade_agreement_action = {
 			NOT = { is_puppet_of = ROOT }
 			custom_trigger_tooltip = {
 				tooltip = influence_TRADE_AGREEMENT_TT
-				#NOT = {
-				#	meta_trigger = {
-				#		text = {
-				#			has_idea = trade_treaty_[ROOTTAG]
-				#		}
-				#		CHECKTAG = "[?var:influence_array^0.GetTag]"
-				#	}
-				#}
 			}
 		}
 
@@ -1174,7 +1159,7 @@ opt_influence_trade_agreement_action = {
 						add_ideas = trade_treaty_[ROOTTAG]
 						ROOT = { add_ideas = trade_treaty_[CURRENTTAG] }
 					}
-					ROOTTAG = "[?var:influence_array^0.GetTag]"
+					ROOTTAG = "[ROOT.GetTag]"
 					CURRENTTAG = "[?var:target]"
 				}
 			}		
@@ -1222,7 +1207,7 @@ opt_influence_trade_agreement_action = {
 			NOT = {
 				meta_trigger = {
 					text = { has_country_flag = [CHECKTAG]_mutual_defense_agreement }
-					CHECKTAG = "[?var:influence_array^0.GetTag]"
+					CHECKTAG = "[ROOT.GetTag]"
 				}
 			}
 		}
@@ -1256,7 +1241,13 @@ opt_influence_trade_agreement_action = {
 			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
 			meta_effect = {
 				text = { set_country_flag = [ROOTTAG]_mutual_defense_agreement }
-				ROOTTAG = "[?var:influence_array^0.GetTag]"
+				ROOTTAG = "[ROOT.GetTag]"
+			}
+			ROOT = {
+				meta_effect = {
+					text = { set_country_flag = [TARGETTAG]_mutual_defense_agreement }
+					TARGETTAG = "[PREV.GetTag]"
+				}
 			}
 			ROOT = {
 				give_guarantee = PREV
@@ -1313,7 +1304,6 @@ opt_influence_trade_agreement_action = {
 		# use diplomatic_action as context in scripted gui
 		# send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
 		can_be_sent = { # send button will be disabled if no
-			#always = yes
 		}
 		send_description = mutual_defense_treaty_send # if there is no scripted gui, this desc will be used in send yes/no pop up
 
@@ -1347,7 +1337,7 @@ opt_influence_trade_agreement_action = {
 		visible = {
 			meta_trigger = {
 				text = { has_country_flag = [CHECKTAG]_mutual_defense_agreement }
-				CHECKTAG = "[?var:influence_array^0.GetTag]"
+				CHECKTAG = "[ROOT.GetTag]"
 			}
 		}
 
@@ -1380,7 +1370,13 @@ opt_influence_trade_agreement_action = {
 			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
 			meta_effect = {
 				text = { clr_country_flag = [ROOTTAG]_mutual_defense_agreement }
-				ROOTTAG = "[?var:influence_array^0.GetTag]"
+				ROOTTAG = "[ROOT.GetTag]"
+			}
+			ROOT = {
+				meta_effect = {
+					text = { clr_country_flag = [TARGETTAG]_mutual_defense_agreement }
+					TARGETTAG = "[PREV.GetTag]"
+				}
 			}
 			add_to_variable = { ROOT.foriegnPowerProjection = -5 }
 			ROOT = {
@@ -1435,141 +1431,36 @@ opt_influence_trade_agreement_action = {
 			clr_country_flag = found
 			recalculate_influence = yes
 
-			# runs when the action is properly sent and rejected
-			reject_effect = {
-			}
+		}
+		# runs when the action is properly sent and rejected
+		reject_effect = {
+		}
 
-			# SEND POPUP CUSTOMIZATION
-			# use diplomatic_action as context in scripted gui
-			# send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
-			can_be_sent = { # send button will be disabled if no
-			}
-			send_description = break_mutual_defense_treaty_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# SEND POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		# send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
+		can_be_sent = { # send button will be disabled if no
+		}
+		send_description = break_mutual_defense_treaty_send # if there is no scripted gui, this desc will be used in send yes/no pop up
 
-			# RECEIVE POPUP CUSTOMIZATION
-			# use diplomatic_action as context in scripted gui
-			# receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
-			reset_receive_effect = {
-			}
+		# RECEIVE POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		# receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
+		reset_receive_effect = {
+		}
 
-			can_be_accepted = { # accept button will be disabled if no
-				always = no
-			}
-			receive_description = mutual_defense_treaty_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		can_be_accepted = { # accept button will be disabled if no
+			always = no
+		}
+		receive_description = mutual_defense_treaty_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 
-			# PLAYER FEEDBACK ON ACCEPT/REJECT
-			#can be overridden to customize accepted/rejected pop ups for the sender
+		# PLAYER FEEDBACK ON ACCEPT/REJECT
+		#can be overridden to customize accepted/rejected pop ups for the sender
 
-			# AI
-			# ai_will_do to decide if AI should send this action or not
-			ai_desire = {
-				base = 0
-			}
+		# AI
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
 		}
 	}
 }
-
-#scripted_diplomatic_actions = {
-#
-#	action_key = { # will be used in most localizations
-#	
-#		# root is the initiator of action and this is the target country
-#		allowed = { #if action is valid
-#			#always = yes
-#		}
-#		visible = { #if action is visible on gui
-#			#always = yes
-#		}
-#		selectable = { #if action is selectable on gui
-#			#always = yes
-#		}
-#
-#		requires_acceptance = yes # if true the action will require acceptance of target country
-#		cost = 10 # pp cost, can be zero
-#		command_power = 10 # cp cost, can be zero
-#
-#		cost_string = loc_key # if you have a custom cost, use this loc to display it
-#		show_acceptance_on_action_button = yes # set to no if acceptance shouldn't be displayed on the action button
-#
-#		icon = 1 # icon frame to use in notification
-#
-#       #for effects/triggers/variables, root is the sender and this is receiver
-#
-#		# runs when the action is sent
-#		on_sent_effect = {
-#		}
-#
-#		# runs when the action is properly sent and accepted
-#		complete_effect = {
-#		}
-#
-#		# runs when the action is properly sent and rejected
-#		reject_effect = {
-#		}
-#
-#		# SEND POPUP CUSTOMIZATION
-#		# use diplomatic_action as context in scripted gui
-#		# send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
-#		reset_send_effect = { # if action has a send scripted gui, this effect will be used for clearing the state of gui (will run when player opens the scripted gui by sending the action or when ai proposes action
-#			# clear action
-#			if = {
-#				limit = { 
-#					root = {
-#						is_ai = yes
-#					}
-#				}
-#				# initialize for ai
-#			}
-#		}
-#		can_be_sent = { # send button will be disabled if no
-#			#always = yes
-#		}
-#		send_description = loc_key_send # if there is no scripted gui, this desc will be used in send yes/no pop up
-#
-#
-#		# RECEIVE POPUP CUSTOMIZATION
-#		# use diplomatic_action as context in scripted gui
-#		# receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
-#		reset_receive_effect = {
-#			# clear action
-#			if = {
-#				limit = { 
-#					is_ai = yes
-#				}
-#				# change stuff for ai
-#			}
-#		}
-#		can_be_accepted = { # accept button will be disabled if no
-#			#always = yes
-#		}
-#		receive_description = loc_key_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
-#
-#		
-#		# PLAYER FEEDBACK ON ACCEPT/REJECT
-#		 #can be overridden to customize accepted/rejected pop ups for the sender
-#		
-#		
-#		
-#	
-#		
-#		# AI
-#		# a list of ai_will_do entries that will be used to decide if AI should accept or reject a request
-#		ai_acceptance = {
-#			condition = { # name is used for loc
-#				base = 100
-#			}
-#		}
-#
-#		# ai_will_do to decide if AI should send this action or not
-#		ai_desire = {
-#			base = -1
-#			modifier = {
-#				ROOT = {
-#					tag = ENG
-#				}
-#				tag = GER
-#				add = 1000
-#			}
-#		}
-#	}
-#}
