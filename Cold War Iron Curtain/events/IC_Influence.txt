@@ -1,7 +1,7 @@
 add_namespace = influence
 country_event = {
 	id = influence.1 
- immediate = {log = "[GetDateText]: [Root.GetName]: id = influence.1"}
+	immediate = {log = "[GetDateText]: [Root.GetName]: id = influence.1"}
 	title = ""
 	desc = ""
 
@@ -14,5 +14,69 @@ country_event = {
 	}
 	option = {
 
+	}
+}
+
+# Remove Influence actions if at war
+country_event = {
+	id = influence.10
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: id = influence.10"
+		log = "[FROM] at war against [ROOT]"
+	}
+
+	hidden = yes
+	is_triggered_only = yes
+
+	# ROOT: country being attacked
+	# FROM: country that declared war on ROOT
+	immediate = {
+		# Check Military Subsidies
+		if = {
+			limit = {
+				FROM = {
+					is_in_array = {
+						array = military_subsidies
+						value = ROOT
+					}
+				}
+			}
+			meta_effect = {
+				text = {
+					clr_country_flag = [FROMTAG]_military_subsidizer
+				}
+				FROMTAG = "[FROM.GetTag]"
+			}
+			clr_country_flag = military_subsidized
+			FROM = { remove_from_array = { military_subsidies = ROOT } }
+		}
+		# Check Economic Exploitation
+		if = {
+			limit = {
+				meta_trigger = {
+					text = { has_country_flag = [CHECKTAG]_is_being_exploited }
+					CHECKTAG = "[FROM.GetTag]"
+				}
+			}
+			meta_effect = {
+				text = {
+					clr_country_flag = [CHECKTAG]_is_being_exploited
+					remove_ideas = [CHECKTAG]_exploit_idea
+				}
+				CHECKTAG = "[FROM.GetTag]"
+			}
+			clr_country_flag = is_being_exploited
+			remove_opinion_modifier = {
+				target = FROM
+				modifier = exploiter
+			}
+			every_neighbor_country = {
+				remove_opinion_modifier = {
+					target = FROM
+					modifier = exploiter_neighbor
+				}
+			}
+		}
+		# TODO - check other options
 	}
 }
