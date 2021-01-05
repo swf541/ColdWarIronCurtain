@@ -22,9 +22,13 @@ industrial_pulse = {
 	set_variable = { synthetic_refinery_quantity = 0 }
 	set_variable = { tungsten_factory_quantity = 0 }
 	set_variable = { steel_factory_quantity = 0 }
-	set_variable = { food_consumption = 0 }
-	set_variable = { foodCheck = 0 }
 	set_variable = { food_bonus = 0 }
+	set_variable = { food_consumption = 0 }
+	set_variable = { oldFoodTotal = FoodProdTotal }
+	set_variable = { FoodProdTotal = 0 }
+	set_variable = { ConsumptionTotal = 0 }
+	set_variable = { FoodBalance = 0 }
+	set_variable = { FoodExport = 0 }
 
 	#WIP TEST THING
 	set_variable = { steel_test = resource_consumed@steel }
@@ -832,20 +836,32 @@ industrial_pulse = {
 	#round_variable = steel_consumption
 	
 	#Food Comparison
-	add_to_variable = { foodCheck = food_bonus }
-	add_to_variable = { foodCheck = resource_imported@rubber }
+	add_to_variable = { FoodProdTotal = resource@rubber }
+	round_variable = FoodProdTotal
+	round_variable = food_bonus
+	add_to_variable = { FoodProdTotal = food_bonus }
+	add_to_variable = { FoodProdTotal = resource_imported@rubber }
+	round_variable = food_consumption
+	add_to_variable = { ConsumptionTotal = food_consumption }
+	add_to_variable = { FoodExport = resource_exported@rubber }
+	round_variable = FoodExport
+	add_to_variable = { ConsumptionTotal = FoodExport }
+	add_to_variable = { FoodBalance = FoodProdTotal }
+	subtract_from_variable = { FoodBalance = ConsumptionTotal }
+	round_variable = FoodBalance
+
 	set_variable = { food_penalty = 0 }
 	set_variable = { food_penalty_construction = 0 }
 	set_variable = { food_penalty_production = 0 }
 	if = {
 		limit = {
-			check_variable = { foodCheck < food_consumption } 
+			check_variable = { FoodProdTotal < food_consumption } 
 		}
 		set_variable = { food_penalty = -1 }
-		set_variable = { foodCheckComp = foodCheck }
+		set_variable = { FoodProdTotalComp = FoodProdTotal }
 		set_variable = { foodConsumptionComp = food_consumption }
 		
-		subtract_from_variable = { foodConsumptionComp = foodCheckComp }
+		subtract_from_variable = { foodConsumptionComp = FoodProdTotalComp }
 		divide_variable = { foodConsumptionComp = food_consumption }
 		
 		multiply_variable = { foodConsumptionComp = 0.4 }
