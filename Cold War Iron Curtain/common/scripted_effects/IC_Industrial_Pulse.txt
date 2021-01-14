@@ -650,7 +650,7 @@ industrial_pulse = {
 		limit = { is_capital = yes }
 		if = {
 			limit = { NOT = { has_variable = PREV.CapitalState } }
-			set_variable = { prevCapitalState = THIS } # no capital was set before - 1st pulse - startup
+			set_temp_variable = { prevCapitalState = THIS } # no capital was set before - 1st pulse - startup or new country
 		}
 		else = {
 			if = {
@@ -663,24 +663,12 @@ industrial_pulse = {
 		}
 		set_variable = { PREV.CapitalState = THIS } # Store Capital for next pulse
 	}
-	if = {
-		limit = { var:prevCapitalState = { is_owned_by = ROOT } }
-		ROOT = {
+	var:prevCapitalState = {
+		owner = {
 			add_resource = {
 				type = rubber
-				amount = var:previousFoodBalance # remove previous if still owned
+				amount = var:previousFoodBalance # remove previous bonus
 				state = var:prevCapitalState
-			}
-		}
-	}
-	else = {
-		var:prevCapitalState = {
-			owner = {
-				add_resource = {
-					type = rubber
-					amount = var:previousFoodBalance # remove previous from new owner
-					state = var:prevCapitalState
-				}
 			}
 		}
 	}
