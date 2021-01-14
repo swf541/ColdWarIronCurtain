@@ -53,8 +53,27 @@ industrial_pulse = {
 		add_to_variable = { PREV.tungsten_factory_quantity = non_damaged_building_level@tungsten_factory }
 
 		if = {
-			limit = { has_resources_amount = { resource = rubber amount > 0 delivered = yes } } #only adds if state actually delivers
+			limit = { has_resources_amount = { resource = rubber amount > 0 delivered = yes } } # counts number of Agri-Complexes that actually deliver
 			add_to_variable = { PREV.agri_industrial_complex_quantity = non_damaged_building_level@agri_industrial_complex }
+		}
+		if = {
+			limit = {
+				has_resources_amount = { resource = rubber amount > 0 }
+				is_capital = no # check for leftover food in all states except capital
+			}
+			set_temp_variable = { temp_agri_industrial_complex_quantity = non_damaged_building_level@agri_industrial_complex } # number of Agri-Complexes in State
+			set_temp_variable = { temp_food_produced = resource@rubber } # total food production in State
+			subtract_from_temp_variable = { temp_food_produced = temp_agri_industrial_complex_quantity } # deduct food from Agri-Complexes
+			#if = { limit = { is_owned_by = POR } log = "POR: [THIS.GetName] - agri: [?temp_agri_industrial_complex_quantity] - total: [?resource@rubber] - extra: [?temp_food_produced]" }
+			if = {
+				limit = { NOT = { check_variable = { temp_food_produced = 0 } } }
+				log = "    [ROOT.GetTag]: removed/added [?temp_food_produced] from [THIS.GetName]"
+				multiply_temp_variable = { temp_food_produced = -1 }
+				add_resource = {
+					type = rubber
+					amount = temp_food_produced # remove/add leftovers from State (can happen in some cases where a country loses capital to another)
+				}
+			}
 		}
 	#	add_to_variable = { PREV.foodCheck = resource@rubber }
 		#Farm Production
@@ -618,7 +637,7 @@ industrial_pulse = {
 
 	# initial calculations - production, bonus and consumption
 	add_to_variable = { FoodProdTotal = agri_industrial_complex_quantity }
-	add_to_variable = { foodProduction = FoodProdTotal }
+	add_to_variable = { foodProduction = agri_industrial_complex_quantity }
 	round_variable = food_bonus
 	add_to_variable = { FoodProdTotal = food_bonus }
 	add_to_variable = { FoodBalance = food_bonus }
@@ -629,23 +648,53 @@ industrial_pulse = {
 	multiply_variable = { previousFoodBalance = -1 }
 	random_owned_state = {
 		limit = { is_capital = yes }
-		set_variable = { PREV.CapitalState = THIS }
+		if = {
+			limit = { NOT = { has_variable = PREV.CapitalState } }
+			set_variable = { prevCapitalState = THIS } # no capital was set before - 1st pulse - startup
+		}
+		else = {
+			if = {
+				limit = { check_variable =  { PREV.CapitalState = THIS } } # same capital
+				set_temp_variable = { prevCapitalState = THIS }
+			}
+			else = {
+				set_temp_variable = { prevCapitalState = PREV.CapitalState } # capital changed
+			}
+		}
+		set_variable = { PREV.CapitalState = THIS } # Store Capital for next pulse
+	}
+	if = {
+		limit = { var:prevCapitalState = { is_owned_by = ROOT } }
+		ROOT = {
+			add_resource = {
+				type = rubber
+				amount = var:previousFoodBalance # remove previous if still owned
+				state = var:prevCapitalState
+			}
+		}
+	}
+	else = {
+		var:prevCapitalState = {
+			owner = {
+				add_resource = {
+					type = rubber
+					amount = var:previousFoodBalance # remove previous from new owner
+					state = var:prevCapitalState
+				}
+			}
+		}
 	}
 	ROOT = {
 		add_resource = {
 			type = rubber
-			amount = var:previousFoodBalance # remove previous
+			amount = var:FoodBalance # add new to capital
 			state = var:CapitalState
 		}
-		add_resource = {
-			type = rubber
-			amount = var:FoodBalance # add new
-			state = var:CapitalState
-		}
-		if = { limit = { is_debug = yes } log = "     - [ROOT.GetTag]: removed [?previousFoodBalance] and added [?FoodBalance] Agri-Complexes" }
+		if = { limit = { is_debug = yes } log = "    [ROOT.GetTag]: removed [?previousFoodBalance] and added [?FoodBalance] Food to Capital" }
 	}
+	# End of Capital bonus
 
-	# account for negative resoureces in capital
+	# account for negative resources in capital
 	if = {
 		limit = { check_variable = { FoodBalance < 0 } } # in case of negative resources in capital
 		multiply_variable = { FoodBalance = -1 }
@@ -659,17 +708,17 @@ industrial_pulse = {
 
 	# Imports/Exports and Balance
 	add_to_variable = { FoodImported = resource_imported@rubber }
-	add_to_variable = { FoodProdTotal = resource_imported@rubber }
+	add_to_variable = { FoodExported = resource_exported@rubber }
+	round_variable = FoodExported
+	add_to_variable = { FoodProdTotal = FoodImported }
 	add_to_variable = { FoodBalanceTotal = FoodProdTotal }
 	round_variable = food_consumption
 	add_to_variable = { ConsumptionTotal = food_consumption }
-	add_to_variable = { FoodExported = resource_exported@rubber }
-	round_variable = FoodExported
 	add_to_variable = { ConsumptionTotal = FoodExported }
 	subtract_from_variable = { FoodBalanceTotal = ConsumptionTotal }
 	round_variable = FoodBalanceTotal
 	
-	#puppets
+	#puppets (this also accounts for unexpected discrepancies)
 	if = {
 		limit = { NOT = { has_dynamic_modifier = { modifier = food_negative_in_capital } } } # if negative on capital, this won't work - WIP
 		add_to_variable = { FoodFromPuppets = resource@rubber }
@@ -685,9 +734,8 @@ industrial_pulse = {
 		add_to_variable = { FoodBalanceTotal = FoodExported }
 		set_variable = { FoodExported = 0 }
 	}
-
+	# if = { limit = { is_debug = yes } log = "    [ROOT.GetTag]: rubber production: [?resource@rubber] - Balance: [?FoodBalanceTotal] = puppets: [?FoodFromPuppets]" }
 	
-	#if = { limit = { is_debug = yes } log = "     - [ROOT.GetTag]: rubber production: [?resource@rubber] - Balance: [?FoodBalanceTotal] = puppets: [?FoodFromPuppets]" }
 	#Food Comparison for famine
 	set_variable = { food_penalty = 0 }
 	set_variable = { food_penalty_construction = 0 }
@@ -732,4 +780,6 @@ industrial_pulse = {
 		limit = { check_variable = { food_penalty > 0 } }
 		set_country_flag = food_highprices
 	}
+
+	country_event = { id = food_pulse.1 days = 1 }
 }
