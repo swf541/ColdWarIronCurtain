@@ -2,12 +2,12 @@
 # NEW SPACE DECISIONS
 # Designed by Polarace / Coded by Harain
 ########################################
+
 space_race_decisions = {
+	# Decision 1
 	unmanned_object_in_orbit = {
 		icon = generic_research
-		allowed = {
-			always = yes
-		}
+		allowed = { always = yes }
 		available = {
 			has_tech = pressure_vessel2
 			has_tech = hybrid_propellant
@@ -19,84 +19,132 @@ space_race_decisions = {
 		}
 		cost = 0
 		fire_only_once = yes
-		days_remove = 180
-		modifier = {
-			civilian_factory_use = 10
-		}
-		visible = {
-		}
-		complete_effect = {
-			subtract_from_variable = { currentMoney = 100 }
-		}
+		days_remove = 1
+		visible = {}
+		modifier = { civilian_factory_use = 10 }
+		complete_effect = { subtract_from_variable = { currentMoney = 100 } }
 		remove_effect = {
+			log = " [ROOT.GetName] finished decision 1 [unmanned_object_in_orbit]"
 			set_country_flag = finished_unmanned_object_in_orbit
+			add_to_variable = { num_space_race_decisions = 1 }
+			add_to_array = { global.space_race_array_country = ROOT.id }
+			add_to_array = { global.space_race_array_num_decisions = 1 }
+			space_race_get_top_5 = yes
+			news_event = space_race_decision_event.1
 		}
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 10
-				date > 1955.1.1
-			}
+			base = 0
+			modifier = { add = 10 date > 1955.1.1 }
+			modifier = { factor = 10 OR = { Tag = USA Tag = SOV } }
+			modifier = { factor = 6 OR = { Tag = ENG Tag = PRC } }
+			modifier = { factor = 3 OR = { Tag = FRA Tag = RAJ } }
 		}
 	}
 
+	# Decision 2
 	animal_in_orbit = {
 		icon = generic_research
-		allowed = {
-		}
+		allowed = {}
 		available = {
 			has_tech = pressure_vessel2
 			has_tech = hybrid_propellant
+			num_of_civilian_factories_available_for_projects > 9
+			custom_trigger_tooltip = {
+				tooltip = money_100_TT
+				check_variable = { var = currentMoney value = 100 compare = greater_than_or_equals }
+			}
 		}
 		cost = 0
 		fire_only_once = yes
-		days_remove = 180
-		visible = {
-			has_country_flag = finished_unmanned_object_in_orbit
-		}
-		complete_effect = {
-		}
+		days_remove = 1
+		visible = { has_country_flag = finished_unmanned_object_in_orbit }
+		modifier = { civilian_factory_use = 10 }
+		complete_effect = { subtract_from_variable = { currentMoney = 100 } }
 		remove_effect = {
+			log = " [ROOT.GetName] finished decision 2 [animal_in_orbit]"
 			set_country_flag = finished_animal_in_orbit
+			add_to_variable = { num_space_race_decisions = 1 }
+			for_loop_effect = {
+				end = global.space_race_array_country^num
+				value = v
+				if = {
+					limit = { check_variable = { global.space_race_array_country^v = ROOT } }
+					add_to_variable = { global.space_race_array_num_decisions^v = 1 }
+					set_country_flag = found
+					log = "  [ROOT.GetName] finished decision 2 [animal_in_orbit] - decisions after [?global.space_race_array_num_decisions^v]"
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+				add_to_array = { global.space_race_array_country = ROOT.id }
+				add_to_array = { global.space_race_array_num_decisions = 1 }
+			}
+			clr_country_flag = found
+			space_race_get_top_5 = yes
+			news_event = space_race_decision_event.2
 		}
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 10
-				date > 1955.1.1
-			}
+			base = 0
+			modifier = { add = 10 date > 1955.1.1 }
+			modifier = { factor = 10 OR = { Tag = USA Tag = SOV } }
+			modifier = { factor = 6 OR = { Tag = ENG Tag = PRC } }
+			modifier = { factor = 3 OR = { Tag = FRA Tag = RAJ } }
 		}
 	}
 
+	# Decision 3
 	man_in_orbit = {
 		icon = generic_research
-		allowed = {
-		}
+		allowed = {}
 		available = {
 			has_tech = common_bulkhead
 			has_tech = balloon_tanks
 			has_tech = cryogenic_rocket
+			num_of_civilian_factories_available_for_projects > 9
+			custom_trigger_tooltip = {
+				tooltip = money_100_TT
+				check_variable = { var = currentMoney value = 100 compare = greater_than_or_equals }
+			}
 		}
 		cost = 0
 		fire_only_once = yes
-		days_remove = 180
-		visible = {
-			has_country_flag = finished_animal_in_orbit
-		}
-		complete_effect = {
-		}
+		days_remove = 1
+		visible = { has_country_flag = finished_animal_in_orbit }
+		modifier = { civilian_factory_use = 10 }
+		complete_effect = { subtract_from_variable = { currentMoney = 100 } }
 		remove_effect = {
+			log = " [ROOT.GetName] finished decision 3 [man_in_orbit] - decisions before [?num_space_race_decisions]"
 			set_country_flag = finished_man_in_orbit
+			add_to_variable = { num_space_race_decisions = 1 }
+			for_loop_effect = {
+				end = global.space_race_array_country^num
+				value = v
+				if = {
+					limit = { check_variable = { global.space_race_array_country^v = ROOT } }
+					add_to_variable = { global.space_race_array_num_decisions^v = 1 }
+					set_country_flag = found
+					log = "  [ROOT.GetName] finished decision 3 [man_in_orbit] - decisions after [?global.space_race_array_num_decisions^v]"
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+				add_to_array = { global.space_race_array_country = ROOT.id }
+				add_to_array = { global.space_race_array_num_decisions = 1 }
+			}
+			clr_country_flag = found
+			space_race_get_top_5 = yes
+			news_event = space_race_decision_event.3
 		}
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 10
-				#date > 1955.1.1
-			}
+			base = 0
+			modifier = { add = 10 date > 1960.1.1 }
+			modifier = { factor = 10 OR = { Tag = USA Tag = SOV } }
+			modifier = { factor = 6 OR = { Tag = ENG Tag = PRC } }
+			modifier = { factor = 3 OR = { Tag = FRA Tag = RAJ } }
 		}
 	}
 
+	# Decision 4
 	geosynchronous_orbit = {
 		icon = generic_research
 		allowed = {
@@ -105,27 +153,51 @@ space_race_decisions = {
 			has_tech = common_bulkhead
 			has_tech = balloon_tanks
 			has_tech = cryogenic_rocket
+			num_of_civilian_factories_available_for_projects > 9
+			custom_trigger_tooltip = {
+				tooltip = money_100_TT
+				check_variable = { var = currentMoney value = 100 compare = greater_than_or_equals }
+			}
 		}
 		cost = 0
 		fire_only_once = yes
-		days_remove = 180
-		visible = {
-			has_country_flag = finished_man_in_orbit
-		}
-		complete_effect = {
-		}
+		days_remove = 1
+		visible = { has_country_flag = finished_man_in_orbit }
+		modifier = { civilian_factory_use = 10 }
+		complete_effect = { subtract_from_variable = { currentMoney = 100 } }
 		remove_effect = {
+			log = " [ROOT.GetName] finished decision 4 [geosynchronous_orbit] - decisions before [?num_space_race_decisions]"
 			set_country_flag = finished_geosynchronous_orbit
+			add_to_variable = { num_space_race_decisions = 1 }
+			for_loop_effect = {
+				end = global.space_race_array_country^num
+				value = v
+				if = {
+					limit = { check_variable = { global.space_race_array_country^v = ROOT } }
+					add_to_variable = { global.space_race_array_num_decisions^v = 1 }
+					set_country_flag = found
+					log = "  [ROOT.GetName] finished decision 4 [geosynchronous_orbit] - decisions after [?global.space_race_array_num_decisions^v]"
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+				add_to_array = { global.space_race_array_country = ROOT.id }
+				add_to_array = { global.space_race_array_num_decisions = 1 }
+			}
+			clr_country_flag = found
+			space_race_get_top_5 = yes
+			news_event = space_race_decision_event.4
 		}
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 10
-				date > 1960.1.1
-			}
+			base = 0
+			modifier = { add = 10 date > 1960.1.1 }
+			modifier = { factor = 10 OR = { Tag = USA Tag = SOV } }
+			modifier = { factor = 6 OR = { Tag = ENG Tag = PRC } }
+			modifier = { factor = 3 OR = { Tag = FRA Tag = RAJ } }
 		}
 	}
 
+	# Decision 5
 	orbital_rendezvous = {
 		icon = generic_research
 		allowed = {
@@ -134,24 +206,47 @@ space_race_decisions = {
 			has_tech = common_bulkhead
 			has_tech = balloon_tanks
 			has_tech = cryogenic_rocket
+			num_of_civilian_factories_available_for_projects > 9
+			custom_trigger_tooltip = {
+				tooltip = money_100_TT
+				check_variable = { var = currentMoney value = 100 compare = greater_than_or_equals }
+			}
 		}
 		cost = 0
 		fire_only_once = yes
-		days_remove = 180
-		visible = {
-			has_country_flag = finished_geosynchronous_orbit
-		}
-		complete_effect = {
-		}
+		days_remove = 1
+		visible = { has_country_flag = finished_geosynchronous_orbit }
+		modifier = { civilian_factory_use = 10 }
+		complete_effect = { subtract_from_variable = { currentMoney = 100 } }
 		remove_effect = {
+			log = " [ROOT.GetName] finished decision 5 [orbital_rendezvous] - decisions before [?num_space_race_decisions]"
 			set_country_flag = finished_orbital_rendezvous
+			add_to_variable = { num_space_race_decisions = 1 }
+			for_loop_effect = {
+				end = global.space_race_array_country^num
+				value = v
+				if = {
+					limit = { check_variable = { global.space_race_array_country^v = ROOT } }
+					add_to_variable = { global.space_race_array_num_decisions^v = 1 }
+					set_country_flag = found
+					log = "  [ROOT.GetName] finished decision 5 [orbital_rendezvous] - decisions after [?global.space_race_array_num_decisions^v]"
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+				add_to_array = { global.space_race_array_country = ROOT.id }
+				add_to_array = { global.space_race_array_num_decisions = 1 }
+			}
+			clr_country_flag = found
+			space_race_get_top_5 = yes
+			news_event = space_race_decision_event.5
 		}
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 10
-				date > 1960.1.1
-			}
+			base = 0
+			modifier = { add = 10 date > 1960.1.1 }
+			modifier = { factor = 10 OR = { Tag = USA Tag = SOV } }
+			modifier = { factor = 6 OR = { Tag = ENG Tag = PRC } }
+			modifier = { factor = 3 OR = { Tag = FRA Tag = RAJ } }
 		}
 	}
 
