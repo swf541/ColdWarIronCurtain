@@ -2326,38 +2326,527 @@ news_event = {
 add_namespace = Syria_CIA
 add_namespace = CIA_SYRIA
 
+country_event = {
+	id = CIA_SYRIA.1
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.1"}
+	title = Operation Straggle Overview"
+	desc = CIA_SYRIA.1.d
+	picture = GFX_CIA_SYRIA_1
 
-CIA_SYRIA.1 Operation Straggle Overview
-CIA_SYRIA.2 Executing Operation Straggle
-CIA_SYRIA.3 Coup in Syria (Global)
-CIA_SYRIA.4 Failed Coup in Syria (Global)
-CIA_SYRIA.5 CIA Backed Coup (Syrian Perspective)
-CIA_SYRIA.6 Failure of CIA Backed Coup (Syrian Perspective)
-CIA_SYRIA.7 Analyzing Our Failure (Giving up on Syrian Regime Change)
+	is_triggered_only = yes
+	
+	option = {
+		name = "Noted"
+	}
+}
+country_event = {
+	id = CIA_SYRIA.5
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.5"}
+	title = "Launching Operation Straggle"
+	desc = CIA_SYRIA.5.d
+	picture = GFX_CIA_SYRIA_5
 
-CIA_SYRIA.99 Syria a Danger to Regional Stability?
-CIA_SYRIA.100 Join the American Coalition?
-CIA_SYRIA.101 American Lead Coalition Invasion of Syria
+	is_triggered_only = yes
+	
+	option = {
+		name = "The die is cast..."
+		hidden_effect = {
+			set_variable = {
+				straggle_chance = network_national_coverage@SYR
+			}
+			if = {
+				limit = {
+					check_variable = {
+						straggle_chance > 0.65
+					}					
+				}
+				SYR = {
+					country_event = CIA_SYRIA.5
+					news_event = CIA_SYRIA.3
+				}
+			}
+			else = {
+				SYR = {
+					country_event = CIA_SYRIA.4
+					news_event = CIA_SYRIA.6
+				}
+			}
+		}
+	}
+}
 
-CIA_SYRIA.50 (To Turkey) America inquires into Syrian Schemes
-CIA_SYRIA.51 Turkey Agrees
-CIA_SYRIA.52 Turkey Declines
-CIA_SYRIA.59 Turkish Intervention in Syria (For if Turkey agrees to invade northern Syria)
-CIA_SYRIA.60 Turkish Annexation of Northern Syria
-CIA_SYRIA.61 Syrian Victory over Turkey (Syria takes Hatay)
+news_event = {  
+	id = CIA_SYRIA.3
+    immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.3"}   
+	title = "[GetNewspaperHeader]Coup in Syria"   
+	desc = CIA_SYRIA.3.d
+	picture = GFX_CIA_SYRIA_3
+
+	major = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "Another CIA Ploy?"
+	}
+}	
+news_event = {  
+	id = CIA_SYRIA.4
+    immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.4"}   
+	title = "[GetNewspaperHeader]Failed Coup in Syria"   
+	desc = CIA_SYRIA.4.d
+	picture = GFX_CIA_SYRIA_4
+
+	major = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "More turmoil in the region"
+	}
+}	
+country_event = {
+	id = CIA_SYRIA.5
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.5"}
+	title = "Colonel Kabbani's Coup"
+	desc = CIA_SYRIA.5.d
+	picture = GFX_CIA_SYRIA_5
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "and the old regime is sweeped away..."
+		create_country_leader = {
+			name = "Umar Kabbani"
+			picture = "Umar_Kabbani.dds"
+			ideology = military_junta
+		}
+		set_politics = {
+			ruling_party = neutrality 
+			elections_allowed = no
+		}
+	}
+}
+country_event = {
+	id = CIA_SYRIA.6
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.6"}
+	title = "A Failed Coup"
+	desc = CIA_SYRIA.6.d
+	picture = GFX_CIA_SYRIA_6
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Pathetic"
+	}
+}
+
+country_event = {
+	id = CIA_SYRIA.7
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.7"}
+	title = "Analyzing Our Failure?"
+	desc = CIA_SYRIA.7.d
+	picture = GFX_CIA_SYRIA_7
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Unfortunate"
+	}
+}
+
+news_event = {  
+	id = CIA_SYRIA.99 
+    immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.99"}   
+	title = "[GetNewspaperHeader]Syria a Danger to Regional Stability?"   
+	desc = CIA_SYRIA.99.d
+	picture = GFX_CIA_SYRIA_99
+
+	major = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "Really?"
+		hidden_effect = {
+			news_event = {
+				id = CIA_SYRIA.101
+				days = 30
+			}
+			set_country_flag = SYRIA_COAL_YES
+		}
+	}
+}
+country_event = {
+	id = CIA_SYRIA.100
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.100"}
+	title = "Join the American Coalition?"
+	desc = CIA_SYRIA.100.d
+	picture = GFX_CIA_SYRIA_100
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "We will join"
+		set_country_flag = SYRIA_COAL_YES
+	}
+	option = {
+		name = "Let's pass"
+	}
+}
+ 
+news_event = {  
+	id = CIA_SYRIA.101
+    immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.101"}   
+	title = "[GetNewspaperHeader]Syria a Danger to Regional Stability?"   
+	desc = CIA_SYRIA.101.d
+	picture = GFX_CIA_SYRIA_101
+
+	major = yes
+	is_triggered_only = yes
+	immediate = {
+		if = {
+			limit = {
+				tag = USA
+			}
+			hidden_effect = {
+				create_faction = "American Coalition"
+				declare_war_on = {
+					target = SYR
+					type = annex_everything
+				}
+				SYR = {
+					set_country_flag = american_intervention_syr
+				}				
+			}
+		}
+	}
+
+	option = {
+		name = "Concerning"
+		hidden_effect = {
+			if = {
+				limit = {
+					has_country_flag = SYRIA_COAL_YES
+				}
+				USA = {
+					add_to_faction = PREV
+				}
+			}
+		}
+	}
+}
+country_event = {
+	id = CIA_SYRIA.50
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.53"}
+	title = "America inquires into Syrian Schemes"
+	desc = Iraq.53.d
+	picture = GFX_CIA_SYRIA_53
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Let's Go"
+		USA = {
+			country_event = CIA_SYRIA.51
+		}
+		set_country_flag = Syrian_Intervention_TUR
+		declare_war_on = {
+			target = SYR
+			type = annex_everything
+		}
+		news_event = CIA_SYRIA.59
+	}
+	option = {
+		name = "Let's Not"
+		USA = {
+			country_event = CIA_SYRIA.52
+		}
+	}
+}
+country_event = {
+	id = CIA_SYRIA.51
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.51"}
+	title = "Turkey Agrees"
+	desc = CIA_SYRIA.51.d
+	picture = GFX_CIA_SYRIA_51
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Great"
+	}
+}
+country_event = {
+	id = CIA_SYRIA.52
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.52"}
+	title = "Turkey Declines"
+	desc = CIA_SYRIA.52.d
+	picture = GFX_CIA_SYRIA_52
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Unfortunate"
+	}
+}
+news_event = {  
+	id = CIA_SYRIA.59
+    immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.59"}   
+	title = "[GetNewspaperHeader]Turkish Intervention in Syria"   
+	desc = CIA_SYRIA.59.d
+	picture = GFX_CIA_SYRIA_59
+
+	major = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "Was it really needed?"
+	}
+}
+news_event = {  
+	id = CIA_SYRIA.60
+    immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.60"}   
+	title = "[GetNewspaperHeader]Turkish Annexation of Northern Syria"   
+	desc = CIA_SYRIA.60.d
+	picture = GFX_CIA_SYRIA_60
+
+	major = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "Just what the region needed..."
+	}
+}
+news_event = {  
+	id = CIA_SYRIA.61 
+    immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.61"}   
+	title = "[GetNewspaperHeader]Syrian Victory over Turkey?"   
+	desc = CIA_SYRIA.61.d
+	picture = GFX_CIA_SYRIA_61
+
+	major = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "A major upset"
+	}
+}
+country_event = {
+	id = CIA_SYRIA.53
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.53"}
+	title = "America inquires into Syrian Schemes"
+	desc = Iraq.53.d
+	picture = GFX_CIA_SYRIA_53
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Let's Go"
+		USA = {
+			country_event = CIA_SYRIA.54
+		}
+		set_country_flag = Syrian_Intervention_IRQ
+		declare_war_on = {
+			target = SYR
+			type = annex_everything
+		}
+		news_event = CIA_SYRIA.56
+	}
+	option = {
+		name = "Let's Not"
+		USA = {
+			country_event = CIA_SYRIA.55
+		}
+	}
+}
+
+country_event = {
+	id = CIA_SYRIA.54
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.54"}
+	title = "Iraq Agrees"
+	desc = CIA_SYRIA.54.d
+	picture = GFX_CIA_SYRIA_54
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Great"
+	}
+}
+country_event = {
+	id = CIA_SYRIA.55
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.55"}
+	title = "Iraq Declines"
+	desc = CIA_SYRIA.55.d
+	picture = GFX_CIA_SYRIA_55
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Unfortunate"
+	}
+}
+news_event = {  
+	id = CIA_SYRIA.56
+    immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.56"}   
+	title = "[GetNewspaperHeader]Iraqi Intervention into Syria"   
+	desc = CIA_SYRIA.56.d
+	picture = GFX_CIA_SYRIA_56
+
+	major = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "Concerning"
+	}
+}
+news_event = {  
+	id = CIA_SYRIA.57
+    immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.57"}   
+	title = "[GetNewspaperHeader]Restoration of the Syrian Monarchy"   
+	desc = CIA_SYRIA.57.d
+	picture = GFX_CIA_SYRIA_57
+
+	major = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "and the clock turns back..."
+	}
+}
+news_event = {  
+	id = CIA_SYRIA.58
+    immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.58"}   
+	title = "[GetNewspaperHeader]Failed Iraqi Intervention in Syria"   
+	desc = CIA_SYRIA.58.d
+	picture = GFX_CIA_SYRIA_58
+
+	major = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
 
 
-CIA_SYRIA.53 (To Iraq) America inquires into Syrian Schemes
-CIA_SYRIA.54 Iraq Agrees
-CIA_SYRIA.55 Iraq Declines
-CIA_SYRIA.56 Iraqi Intervention into Syria
-CIA_SYRIA.57 Restoration of the Syrian Monarchy (Iraqi Victory)
-CIA_SYRIA.58 Failed Iraqi Intervention in Syria
+country_event = {
+	id = CIA_SYRIA.10
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.10"}
+	title = "Operation Wappen Overview"
+	desc = CIA_SYRIA.10.d
+	picture = GFX_CIA_SYRIA_10
 
-CIA_SYRIA.10 Operation Wappen
-CIA_SYRIA.11 No Price too High? (Debating how much to use in bribes, lowball it and no coup attempt)
-CIA_SYRIA.12 Generals Accept the Bribes (Coup Proceeds)
-CIA_SYRIA.13 Generals Reject the Bribes (Historical)
+	is_triggered_only = yes
+	
+	option = {
+		name = "Noted"
+	}
+}
+country_event = {
+	id = CIA_SYRIA.11
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.11"}
+	title = "No Price too High?"
+	desc = CIA_SYRIA.11.d
+	picture = GFX_CIA_SYRIA_11
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Lowball it at 3 Million"
+		add_to_variable = { currentMoney = -3 } 
+		hidden_effect = {
+			set_variable = {
+				wappen_chance = network_national_coverage@SYR
+			}
+			add_to_variable = {
+				wappen_chance = 0.1
+			}
+			if = {
+				limit = {
+					check_variable = {
+						wappen_chance > 0.65
+					}					
+				}
+				country_event = CIA_SYRIA.12
+				SYR = {
+					news_event = CIA_SYRIA.13
+					create_country_leader = {
+						name = "Umar Kabbani"
+						picture = "Umar_Kabbani.dds"
+						ideology = military_junta
+					}
+					set_politics = {
+						ruling_party = neutrality 
+						elections_allowed = no
+					}
+				}
+			}
+			else = {
+				country_event = CIA_SYRIA.13
+			}
+		}
+	}
+	option = {
+		name = "Raise it to 10 Million"
+		add_to_variable = { currentMoney = -10 } 
+		hidden_effect = {
+			set_variable = {
+				wappen_chance = network_national_coverage@SYR
+			}
+			add_to_variable = {
+				wappen_chance = 0.2
+			}
+			if = {
+				limit = {
+					check_variable = {
+						wappen_chance > 0.65
+					}					
+				}
+				country_event = CIA_SYRIA.12
+				SYR = {
+					news_event = CIA_SYRIA.13
+					create_country_leader = {
+						name = "Umar Kabbani"
+						picture = "Umar_Kabbani.dds"
+						ideology = military_junta
+					}
+					set_politics = {
+						ruling_party = neutrality 
+						elections_allowed = no
+					}
+				}
+			}
+			else = {
+				country_event = CIA_SYRIA.13
+			}
+		}
+	}
+}
+country_event = {
+	id = CIA_SYRIA.12
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.12"}
+	title = "Generals Accept the Bribes"
+	desc = CIA_SYRIA.12.d
+	picture = GFX_CIA_SYRIA_12
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Wonderful"
+	}
+}
+country_event = {
+	id = CIA_SYRIA.13
+ immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.13"}
+	title = "Generals Reject the Bribes"
+	desc = CIA_SYRIA.13.d
+	picture = GFX_CIA_SYRIA_13
+
+	is_triggered_only = yes
+	
+	option = {
+		name = "Did we just get ripped off?"
+	}
+}
 news_event = {  
 	id = CIA_SYRIA.14
     immediate = {log = "[GetDateText]: [Root.GetName]: id = CIA_SYRIA.14"}   
@@ -2428,3 +2917,9 @@ news_event = {
 		name = "Well that escalated quickly"
 	}
 }	
+#INDONESIA SECTION
+add_namespace = USA_INDONESIA
+add_namespace = INO_USA_WAR
+add_namespace = INO_CIA_EXPOSURE
+add_namespace = Sumatran_Revolt
+
