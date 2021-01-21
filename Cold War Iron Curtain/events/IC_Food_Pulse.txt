@@ -1,0 +1,44 @@
+add_namespace = food_pulse
+
+#runs 1 day after ic_Financial to ensure added/removed resources are tallied correctly
+country_event = {
+	id = food_pulse.1 
+	immediate = {log = "[GetDateText]: [Root.GetName]: id = food_pulse.1"}
+	hidden = yes
+	is_triggered_only = yes
+
+	# set and calculate the variables affected by adding or removing resources in previous Financial Pulse
+	immediate = {
+		set_variable = { FoodProdTotal = agri_industrial_complex_quantity }
+		set_variable = { foodProduction = agri_industrial_complex_quantity }
+		add_to_variable = { FoodProdTotal = food_bonus }
+
+		# Imports/Exports and Balance
+		set_variable = { FoodImported = resource_imported@rubber }
+		set_variable = { FoodExported = resource_exported@rubber }
+		round_variable = FoodExported
+		set_variable = { ConsumptionTotal = food_consumption }
+		add_to_variable = { ConsumptionTotal = FoodExported }
+		add_to_variable = { FoodProdTotal = FoodImported }
+		set_variable = { FoodBalanceTotal = FoodProdTotal }
+		subtract_from_variable = { FoodBalanceTotal = ConsumptionTotal }
+		round_variable = FoodBalanceTotal
+
+		# puppets (this also accounts for unexpected discrepancies)
+		if = {
+			limit = { NOT = { has_dynamic_modifier = { modifier = food_negative_in_capital } } } # if negative on capital, this won't work correctly - WIP
+			set_variable = { FoodFromPuppets = resource@rubber }
+			round_variable = FoodFromPuppets
+			subtract_from_variable = { FoodFromPuppets = FoodBalanceTotal }
+			add_to_variable = { FoodBalanceTotal = FoodFromPuppets }
+		}
+
+		# Final check for negative balance
+		if = {
+			limit = { check_variable = { FoodBalanceTotal < 0 } }
+			# because the resource_exported@rubber hasn't been updated yet (needs daily tick), reflecting the food_negative_in_capital modifier
+			add_to_variable = { FoodBalanceTotal = FoodExported }
+			set_variable = { FoodExported = 0 }
+		}
+	}
+}
