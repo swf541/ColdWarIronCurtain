@@ -10,24 +10,83 @@ scripted_gui = {
 		}		
 	}
 	legislation_menu_button = {
-
-		context_type = player_context
+        context_type = player_context
+        window_name = "legislation_menu_button"
 		parent_window_token = politics_tab
-		
-		window_name = "legislation_menu_button"
-
-		visible = {
-			always = yes
-		}
+        dynamic_lists = {
+            legislation_menu_button_grid = {
+                array = ROOT.country_politics_list
+				entry_container = legislation_menu_button_list_entry
+            }
+        }
 		effects = {
-			policy_switch_click = {
-				set_variable = { policy_legislation = 1 }
-			}
-			social_policy_switch_click = {
-				set_variable = { policy_legislation = 2 }
-			}
-			legislation_switch_click = {
-				set_variable = { policy_legislation = 3 }
+			policy_switch_click = { 
+				set_variable = { root.show_resolution = 0 }
+				if = {
+					limit = {
+						check_variable = { ROOT.country_politics_list^i = 1 }
+					}
+					set_variable = { policy_legislation = 1 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.country_politics_list^i = 2 }
+					}
+					set_variable = { policy_legislation = 2 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.country_politics_list^i = 3 }
+					}
+					set_variable = { policy_legislation = 3 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.country_politics_list^i = 25 }
+					}
+					set_temp_variable = { show = 1 }
+					subtract_from_temp_variable = { show = show_arab_league_main }
+					close_all_windows = yes
+					set_variable = { show_arab_league_main = show }
+								
+					if = {
+						#limit = { has_variable = show_arab_league_main }
+						limit = { check_variable = { show > 0 } }
+						add_to_variable = { QAT.main_screen = 0 }					
+						#clear_variable = show_arab_league_main
+						set_variable = { QAT.country_visible = 0 }
+						set_variable = { show_tutorial_menu = 0 }
+					}
+					else = {
+						set_variable = { root.arab_league_action_set = -1 }				#set res selection to default
+						set_variable = { root.arab_league_influence_action_set = -1 } 	#set inf selection to default
+						#set_variable = { show_arab_league_main = 1 }
+						add_to_variable = { QAT.main_screen = 0 }
+						set_variable = { QAT.country_visible = 0 }
+						set_variable = { show_tutorial_menu = 0 }
+					}
+
+					if = {
+						limit = {
+							NOT = {
+								check_variable = { QAT.session_length_increased=1 }
+							}
+						}
+						set_variable = { QAT.session_length = 120 }
+						set_variable = { QAT.session_cleanup_length = 125 }
+					}
+
+					every_country = {
+						limit = { has_country_flag = arab_league_member }
+						add_to_array = { QAT.arab_league_total_member_list = THIS.id }
+					}
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.country_politics_list^i = 50 }
+					}
+					set_variable = { usa_congress_show = 1 }
+				}
 			}
 		}
 	}
