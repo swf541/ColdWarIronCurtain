@@ -1,0 +1,39 @@
+on_actions = {
+
+    on_daily = {
+        effect = {
+			# daily check to increase influence
+            if = { 
+				limit = { has_country_flag = flag_influencing } # is influencing
+				add_to_variable = { foreignPowerProjection = -1 }
+				add_political_power = -50
+				set_temp_variable = { influence_gain = 50 }
+				multiply_variable = { var = influence_gain value = decryptTotal }
+
+				for_loop_effect = {
+					end = influence_target:influence_array^num
+					value = v
+					if = {
+						limit = { check_variable = { var = influence_target:influence_array^v value = ROOT.id } }
+						add_to_variable = { influence_target:influence_array_val^v = influence_gain }
+					}
+				}
+				var:influence_target = { recalculate_influence = yes }
+				# after daily influencing, check if it can afford the next daily tick
+				if = {
+					limit = {
+						OR = {
+							check_variable = { foreignPowerProjection < 1 } # can't afford, cancel it
+							has_political_power < 50
+						}
+					}
+					#log = "can't afford - canceling"
+					#remove_ideas = idea_influencing_daily # to be added if pdx fixes an issue with removing it
+					clr_country_flag = flag_influencing
+					var:influence_target = { clear_variable = influenced_by }
+					set_variable = { show_stop_influencing = 1 }
+				}
+			}
+        }
+    }
+}

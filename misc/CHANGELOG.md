@@ -94,7 +94,7 @@
 - General fixes and improvements
 - Fixed Israel gaining territory in South Korea
 - Fixed CTD when editing Soviet Division Templates
-- Fixed “American Licence Agreements” giving your licences to the USA
+- Fixed \"American License Agreements\" giving your licenses to the USA
 - Fixed countries keeping licenses from non-existing countries
 - Added Tooltips to Chemical Weapons
 - Fixed Algerian War not triggering
@@ -146,7 +146,7 @@
 - Added more military factories to USA start
 - Many many more bug fixes, with more to come in the future
 - Various Fixes
-- Bulgaria Focus Tree’s Myriad Problems Fixed
+- Bulgaria Focus Tree's Myriad Problems Fixed
 - Khrushchev and Brezhnev Routes now unlock properly
 - NATO can now be called in if in an offensive war with the PRC/ Soviet Union
 
@@ -198,7 +198,7 @@
 - Iran (1960s)
 - Greece (1960s)
 - Yugoslavia (1960s)
-- People’s Republic of China (1960s)
+- People's Republic of China (1960s)
 - Spain (1960s)
 - Portugal (1960s)
 - Nigeria (1960s)
