@@ -1,0 +1,256 @@
+add_namespace = influence
+country_event = {
+	id = influence.1 
+	immediate = {log = "[GetDateText]: [Root.GetName]: id = influence.1"}
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		var:influencer1 = {
+			save_event_target_as = influencer_1
+		}
+	}
+}
+
+# Remove Influence actions if at war
+country_event = {
+	id = influence.10
+	immediate = { log = "[GetDateText]: [Root.GetName]: id = influence.10" }
+	hidden = yes
+	is_triggered_only = yes
+
+	# ROOT: country being attacked
+	# FROM: country that declared war on ROOT
+	immediate = {
+	# Check if influencing
+		# ROOT influencing FROM
+		if = {
+			limit = {
+				ROOT = { has_country_flag = flag_influencing }
+				FROM = { check_variable = { influenced_by = ROOT } }
+			}
+			ROOT = {
+				clr_country_flag = flag_influencing
+				if = { limit = { is_ai = no } set_variable = { show_stop_influencing = 1 } }
+			}
+			FROM = { 
+				clear_variable = influenced_by
+				if = { limit = { is_ai = no } set_variable = { show_stop_influencing = 1 } }
+			}
+			log = "removed [ROOT.GetTag] influencing [FROM.GetTag]"
+		}
+		# FROM influencing ROOT
+		if = {
+			limit = {
+				FROM = { has_country_flag = flag_influencing }
+				ROOT = { check_variable = { influenced_by = FROM } }
+			}
+			FROM = {
+				clr_country_flag = flag_influencing
+				if = { limit = { is_ai = no } set_variable = { show_stop_influencing = 1 } }
+			}
+			ROOT = {
+				clear_variable = influenced_by
+				if = { limit = { is_ai = no } set_variable = { show_stop_influencing = 1 } }
+			}
+			log = "removed [FROM.GetTag] influencing [ROOT.GetTag]"
+		}
+	# Check Military Subsidies
+		# ROOT subsidizing FROM
+		if = {
+			limit = { ROOT = { is_in_array = { array = military_subsidies value = FROM } } }
+			ROOT = { remove_from_array = { military_subsidies = FROM } }
+			FROM = {
+				clr_country_flag = military_subsidized
+				meta_effect = {
+					text = { clr_country_flag = [ROOTTAG]_military_subsidizer }
+					ROOTTAG = "[ROOT.GetTag]"
+				}
+				clear_variable = mil_subsidy_id
+			}
+			log = "removed [ROOT.GetTag] subsidizing [FROM.GetTag]"
+		}
+		# FROM subsidizing ROOT
+		if = {
+			limit = { FROM = { is_in_array = { array = military_subsidies value = ROOT } } }
+			FROM = { remove_from_array = { military_subsidies = ROOT } }
+			ROOT = {
+				clr_country_flag = military_subsidized
+				meta_effect = {
+					text = { clr_country_flag = [FROMTAG]_military_subsidizer }
+					FROMTAG = "[FROM.GetTag]"
+				}
+				clear_variable = mil_subsidy_id
+			}
+			log = "removed [FROM.GetTag] subsidizing [ROOT.GetTag]"
+		}
+	# Check Economic Exploitation
+		# ROOT exploiting FROM
+		if = {
+			limit = {
+				meta_trigger = {
+					text = { has_country_flag = [CHECKTAG]_is_being_exploited }
+					CHECKTAG = "[FROM.GetTag]"
+				}
+			}
+			meta_effect = {
+				text = {
+					clr_country_flag = [CHECKTAG]_is_being_exploited
+					remove_ideas = [CHECKTAG]_exploit_idea
+				}
+				CHECKTAG = "[FROM.GetTag]"
+			}
+			clr_country_flag = is_being_exploited
+			remove_opinion_modifier = {
+				target = FROM
+				modifier = exploiter
+			}
+			every_neighbor_country = {
+				remove_opinion_modifier = {
+					target = FROM
+					modifier = exploiter_neighbor
+				}
+			}
+			log = "removed [ROOT.GetTag] being exploited by [FROM.GetTag]"
+		}
+		# FROM exploiting ROOT
+		if = {
+			limit = {
+				meta_trigger = {
+					text = { has_country_flag = [CHECKTAG]_is_being_exploited }
+					CHECKTAG = "[ROOT.GetTag]"
+				}
+			}
+			meta_effect = {
+				text = {
+					clr_country_flag = [CHECKTAG]_is_being_exploited
+					remove_ideas = [CHECKTAG]_exploit_idea
+				}
+				CHECKTAG = "[ROOT.GetTag]"
+			}
+			clr_country_flag = is_being_exploited
+			remove_opinion_modifier = {
+				target = ROOT
+				modifier = exploiter
+			}
+			every_neighbor_country = {
+				remove_opinion_modifier = {
+					target = ROOT
+					modifier = exploiter_neighbor
+				}
+			}
+			log = "removed [FROM.GetTag] being exploited by [ROOT.GetTag]"
+		}
+	# Check Economic Aid
+		# ROOT aiding FROM
+		if = { limit = { FROM = { has_idea = foreign_economic_growth } }
+			FROM = { remove_ideas = foreign_economic_growth }
+			log = "removed [ROOT.GetTag] econ aiding [FROM.GetTag]"
+		}
+		# FROM aiding ROOT
+		if = { limit = { ROOT = { has_idea = foreign_economic_growth } }
+			ROOT = { remove_ideas = foreign_economic_growth }
+			log = "removed [FROM.GetTag] econ aiding ro[ROOT.GetTag]"
+		}
+	# Check Military Aid
+		# ROOT aiding FROM
+		if = { limit = { FROM = { has_idea = foreign_military_aid } }
+			FROM = { remove_ideas = foreign_military_aid }
+			log = "removed [ROOT.GetTag] mil aiding [FROM.GetTag]"
+		}
+		# FROM aiding ROOT
+		if = { limit = { ROOT = { has_idea = foreign_military_aid } }
+			ROOT = { remove_ideas = foreign_military_aid }
+			log = "removed [FROM.GetTag] mil aiding [ROOT.GetTag]"
+		}
+		#TODO
+	# Check Trade Agreement/Steering
+		# same both ways
+		if = {
+			limit = { 
+				meta_trigger = {
+					text = {
+						FROM = { has_idea = trade_treaty_[ROOTTAG] }
+						ROOT = { has_idea = trade_treaty_[FROMTAG] }
+					}
+					ROOTTAG = "[ROOT.GetTag]"
+					FROMTAG = "[FROM.GetTag]"
+				}
+			}
+			meta_effect = {
+				text = {
+					FROM = {
+						remove_ideas = trade_treaty_[ROOTTAG]
+						clr_country_flag = trade_treaty1_with_[ROOTTAG]
+						clr_country_flag = trade_treaty2_with_[ROOTTAG]
+					}
+					ROOT = {
+						remove_ideas = trade_treaty_[FROMTAG]
+						clr_country_flag = trade_treaty1_with_[FROMTAG]
+						clr_country_flag = trade_treaty2_with_[FROMTAG]
+					}
+				}
+				ROOTTAG = "[ROOT.GetTag]"
+				FROMTAG = "[FROM.GetTag]"
+			}
+			log = "removed [FROM.GetTag] steering [ROOT.GetTag]"
+		}
+	# Mutual Defense Agreement
+		# same both ways
+		if = {
+			limit = { 
+				meta_trigger = {
+					text = {
+						FROM = { has_country_flag = [ROOTTAG]_mutual_defense_agreement }
+						ROOT = { has_country_flag = [FROMTAG]_mutual_defense_agreement }
+					}
+					ROOTTAG = "[ROOT.GetTag]"
+					FROMTAG = "[FROM.GetTag]"
+				}
+			}
+			meta_effect = {
+				text = {
+					FROM = { clr_country_flag = [ROOTTAG]_mutual_defense_agreement }
+					ROOT = { clr_country_flag = [FROMTAG]_mutual_defense_agreement }
+				}
+				ROOTTAG = "[ROOT.GetTag]"
+				FROMTAG = "[FROM.GetTag]"
+			}
+			ROOT = {
+				diplomatic_relation = {
+					country = FROM
+					relation = guarantee
+					active = no
+				}
+				diplomatic_relation = {
+					country = FROM
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = FROM
+					relation = docking_rights
+					active = no
+				}
+			}
+			FROM = {
+				diplomatic_relation = {
+					country = ROOT
+					relation = guarantee
+					active = no
+				}
+				diplomatic_relation = {
+					country = ROOT
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = ROOT
+					relation = docking_rights
+					active = no
+				}
+			}
+			log = "removed [FROM.GetTag] MDA with [ROOT.GetTag]"
+		}
+	}
+}
