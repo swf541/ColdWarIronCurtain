@@ -198,14 +198,15 @@ scripted_diplomatic_actions = {
 			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
 			ROOT = { add_to_array = { military_subsidies = PREV.id } }
 			set_country_flag = military_subsidized
-			add_to_variable = { ROOT.foreignPowerProjection = -5 }
 			meta_effect = {
 				text = {
 					set_country_flag = [ROOTTAG]_military_subsidizer
 				}
 				ROOTTAG = "[ROOT.GetTag]"
 			}
-			set_variable = { mil_subsidy_id = ROOT.id }
+			set_variable = { mil_subsidy_id = ROOT.id } # used for income generator
+
+			add_to_variable = { ROOT.foreignPowerProjection = -5 }
 			set_temp_variable = { influence_gain = 200 } #Make Dynamic Later
 			for_loop_effect = {
 				end = influence_array^num
@@ -273,14 +274,13 @@ scripted_diplomatic_actions = {
 		# runs when the action is properly sent and accepted
 		complete_effect = {
 			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
-			meta_effect = {
-				text = {
-					clr_country_flag = [ROOTTAG]_military_subsidizer
-				}
-				ROOTTAG = "[?var:mil_subsidy_id.GetTag]"
-			}
-			clr_country_flag = military_subsidized
 			ROOT = { remove_from_array = { military_subsidies = PREV } }
+			clr_country_flag = military_subsidized
+			meta_effect = {
+				text = { clr_country_flag = [ROOTTAG]_military_subsidizer }
+				ROOTTAG = "[ROOT.GetTag]"
+			}
+			clear_variable = mil_subsidy_id
 		}
 		reject_effect = {} # runs when the action is properly sent and rejected
 		can_be_sent = {} # send button will be disabled if no
@@ -294,6 +294,7 @@ scripted_diplomatic_actions = {
 			base = 0
 		}
 	}
+
 
 # Economic Exploitation
 	opt_influence_economic_exploition = {
@@ -1251,7 +1252,6 @@ opt_influence_stop_trade_agreement_yes_action = {
 					TARGETTAG = "[PREV.GetTag]"
 				}
 			}
-			add_to_variable = { ROOT.foreignPowerProjection = -5 }
 			ROOT = {
 				diplomatic_relation = {
 					country = PREV
