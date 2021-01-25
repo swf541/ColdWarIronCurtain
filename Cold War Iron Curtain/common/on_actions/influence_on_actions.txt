@@ -10,14 +10,18 @@ on_actions = {
 				set_temp_variable = { influence_gain = 50 }
 				multiply_variable = { var = influence_gain value = decryptTotal }
 
-				for_loop_effect = {
-					end = influence_target:influence_array^num
-					value = v
-					if = {
-						limit = { check_variable = { var = influence_target:influence_array^v value = ROOT.id } }
-						add_to_variable = { influence_target:influence_array_val^v = influence_gain }
+				if = {
+					limit = {
+						any_of = {
+							array = influence_target:influence_array
+							check_variable = { influence_target:influence_array^i = ROOT.id }
+							set_temp_variable = { tempIndex = i }
+						}
 					}
-				}
+					add_to_variable = { influence_target:influence_array_val^tempIndex = influence_gain }
+					log = "  i: [?tempIndex] / influence_array^i.Tag: [?influence_target:influence_array^i.GetTag]"
+					log = "  [ROOT.GetTag] is daily influencing [?influence_target.GetTag] by [?influence_gain]"
+				} 
 				var:influence_target = { recalculate_influence = yes }
 				# after daily influencing, check if it can afford the next daily tick
 				if = {
