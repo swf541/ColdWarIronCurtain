@@ -616,10 +616,9 @@ industrial_pulse = {
 
 	#Food Comparison for famine
 	set_variable = { food_penalty = 0 }
-	#set_variable = { food_penalty_construction = 0 }
-	#set_variable = { food_penalty_production = 0 }
-	if = {
-		limit = { check_variable = { FoodProdTotal < ConsumptionTotal } }
+	set_variable = { food_penalty_construction = 0 }
+	set_variable = { food_penalty_production = 0 }
+	if = { limit = { check_variable = { FoodProdTotal < ConsumptionTotal } }
 		#set_variable = { food_penalty = -1 }
 		set_variable = { FoodProdTotalComp = FoodProdTotal }
 		set_variable = { foodConsumptionComp = ConsumptionTotal }
@@ -629,13 +628,13 @@ industrial_pulse = {
 		
 		multiply_variable = { foodConsumptionComp = 0.4 }
 		set_variable = { food_penalty = foodConsumptionComp }
-		#multiply_variable = { food_penalty = foodConsumptionComp }
+		multiply_variable = { food_penalty = foodConsumptionComp }
 		
-		#set_variable = { food_penalty_production = modifier@production_factory_max_efficiency_factor }
-		#multiply_variable = { food_penalty_production = food_penalty }
+		set_variable = { food_penalty_production = modifier@production_factory_max_efficiency_factor }
+		multiply_variable = { food_penalty_production = food_penalty }
 		
-		#set_variable = { food_penalty_construction = modifier@production_speed_buildings_factor }
-		#multiply_variable = { food_penalty_construction = food_penalty }
+		set_variable = { food_penalty_construction = modifier@production_speed_buildings_factor }
+		multiply_variable = { food_penalty_construction = food_penalty }
 	}
 	clr_country_flag = food_famine_extreme
 	clr_country_flag = food_famine
@@ -652,6 +651,12 @@ industrial_pulse = {
 	}
 	else_if = { limit = { check_variable = { food_penalty > 0 } }
 		set_country_flag = food_highprices
+	}
+	# to force refresh famine warning display
+	if = { limit = { check_variable = { food_penalty > 0 } }
+		set_temp_variable = { show = 1 }
+		subtract_from_temp_variable = { show = show_food_main }
+		set_variable = { show_food_main = show }
 	}
 
 	country_event = { id = food_pulse.1 days = 1 } # call recalc in 1 day (because of added capital bonus which only reflects after daily tick)
