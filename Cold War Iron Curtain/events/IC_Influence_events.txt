@@ -33,10 +33,7 @@ country_event = {
 				clr_country_flag = flag_influencing
 				if = { limit = { is_ai = no } set_variable = { show_stop_influencing = 1 } }
 			}
-			FROM = { 
-				clear_variable = influenced_by
-				if = { limit = { is_ai = no } set_variable = { show_stop_influencing = 1 } }
-			}
+			FROM = {  clear_variable = influenced_by }
 			log = "removed [ROOT.GetTag] influencing [FROM.GetTag]"
 		}
 		# FROM influencing ROOT
@@ -49,10 +46,7 @@ country_event = {
 				clr_country_flag = flag_influencing
 				if = { limit = { is_ai = no } set_variable = { show_stop_influencing = 1 } }
 			}
-			ROOT = {
-				clear_variable = influenced_by
-				if = { limit = { is_ai = no } set_variable = { show_stop_influencing = 1 } }
-			}
+			ROOT = { clear_variable = influenced_by }
 			log = "removed [FROM.GetTag] influencing [ROOT.GetTag]"
 		}
 	# Check Military Subsidies
@@ -67,6 +61,10 @@ country_event = {
 					ROOTTAG = "[ROOT.GetTag]"
 				}
 				clear_variable = mil_subsidy_id
+				remove_opinion_modifier = {
+					target = ROOT
+					modifier = subsidizer
+				}
 			}
 			log = "removed [ROOT.GetTag] subsidizing [FROM.GetTag]"
 		}
@@ -81,6 +79,10 @@ country_event = {
 					FROMTAG = "[FROM.GetTag]"
 				}
 				clear_variable = mil_subsidy_id
+				remove_opinion_modifier = {
+					target = FROM
+					modifier = subsidizer
+				}
 			}
 			log = "removed [FROM.GetTag] subsidizing [ROOT.GetTag]"
 		}
@@ -117,26 +119,30 @@ country_event = {
 		if = {
 			limit = {
 				meta_trigger = {
-					text = { has_country_flag = [CHECKTAG]_is_being_exploited }
+					text = { FROM = { has_country_flag = [CHECKTAG]_is_being_exploited } }
 					CHECKTAG = "[ROOT.GetTag]"
 				}
 			}
 			meta_effect = {
 				text = {
-					clr_country_flag = [CHECKTAG]_is_being_exploited
-					remove_ideas = [CHECKTAG]_exploit_idea
+					FROM = {
+						clr_country_flag = [CHECKTAG]_is_being_exploited
+						remove_ideas = [CHECKTAG]_exploit_idea
+					}
 				}
 				CHECKTAG = "[ROOT.GetTag]"
 			}
-			clr_country_flag = is_being_exploited
-			remove_opinion_modifier = {
-				target = ROOT
-				modifier = exploiter
-			}
-			every_neighbor_country = {
+			FROM = {
+				clr_country_flag = is_being_exploited
 				remove_opinion_modifier = {
 					target = ROOT
-					modifier = exploiter_neighbor
+					modifier = exploiter
+				}
+				every_neighbor_country = {
+					remove_opinion_modifier = {
+						target = ROOT
+						modifier = exploiter_neighbor
+					}
 				}
 			}
 			log = "removed [FROM.GetTag] being exploited by [ROOT.GetTag]"
@@ -144,12 +150,24 @@ country_event = {
 	# Check Economic Aid
 		# ROOT aiding FROM
 		if = { limit = { FROM = { has_idea = foreign_economic_growth } }
-			FROM = { remove_ideas = foreign_economic_growth }
+			FROM = {
+				remove_ideas = foreign_economic_growth
+				remove_opinion_modifier = {
+					target = ROOT
+					modifier = gave_economic_aid
+				}
+			}
 			log = "removed [ROOT.GetTag] econ aiding [FROM.GetTag]"
 		}
 		# FROM aiding ROOT
 		if = { limit = { ROOT = { has_idea = foreign_economic_growth } }
-			ROOT = { remove_ideas = foreign_economic_growth }
+			ROOT = {
+				remove_ideas = foreign_economic_growth
+				remove_opinion_modifier = {
+					target = FROM
+					modifier = gave_economic_aid
+				}
+			}
 			log = "removed [FROM.GetTag] econ aiding ro[ROOT.GetTag]"
 		}
 	# Check Trade Agreement/Steering
@@ -180,6 +198,18 @@ country_event = {
 				}
 				ROOTTAG = "[ROOT.GetTag]"
 				FROMTAG = "[FROM.GetTag]"
+			}
+			FROM = {
+				remove_opinion_modifier = {
+					target = ROOT
+					modifier = has_trade_agreement
+				}
+			}
+			ROOT = {
+				remove_opinion_modifier = {
+					target = FROM
+					modifier = has_trade_agreement
+				}
 			}
 			log = "removed [FROM.GetTag] steering [ROOT.GetTag]"
 		}
@@ -236,6 +266,18 @@ country_event = {
 					country = ROOT
 					relation = docking_rights
 					active = no
+				}
+			}
+			FROM = {
+				remove_opinion_modifier = {
+					target = ROOT
+					modifier = has_mdt
+				}
+			}
+			ROOT = {
+				remove_opinion_modifier = {
+					target = FROM
+					modifier = has_mdt
 				}
 			}
 			log = "removed [FROM.GetTag] MDA with [ROOT.GetTag]"
