@@ -93,18 +93,6 @@ on_actions = {
 			100 = saf_elections.2
 			100 = saf_elections.3
 		}
-		random_events = {
-			100 = french_elections.2
-			100 = french_elections.3
-			100 = french_elections.1
-			100 = french_elections.4
-			100 = french_elections.5	
-			100 = french_elections.6	
-			100 = french_elections.7	
-			100 = french_elections.8	
-			100 = french_elections.9	
-			100 = french_elections.10
-		}
 		#random_events = {
 		#	100 = SWE_Elections.1
 		#	100 = SWE_Elections.2
@@ -1677,7 +1665,12 @@ on_actions = {
 				set_division_template_lock = { division_template = "Légion Étrangère Française" is_locked = yes }	
 			}
 			FRA = {
-				country_event = { id = French_PM.1 days = 135 }
+				if = {
+					limit = {
+						has_start_date < 1950.01.01
+					}
+					country_event = { id = French_PM.1 days = 135 }
+				}
 			}
 			BUL = {
 				if = {
@@ -1964,18 +1957,21 @@ on_actions = {
 		}
 	}
 
+	#ROOT is winner, FROM gets annexed
 	on_annex = {
 		effect = {
-		if = {
-			limit = {
-				date < 1959.12.31
-				FROM = { TAG = GRE }
-				ROOT = { TAG = PDG }				
+			if = {
+				limit = {
+					date < 1959.12.31
+					FROM = { TAG = GRE }
+					ROOT = { TAG = PDG }				
+				}
+				PDG = { set_capital = 47 }
 			}
-			PDG = {
-				set_capital = 47
-			    }
-			}
+			# hidden_effect = {
+			# 	# Remove Influence modifiers if any
+			# 	FROM = { country_event = influence.11 }
+			# }
 		}
 	}
 }

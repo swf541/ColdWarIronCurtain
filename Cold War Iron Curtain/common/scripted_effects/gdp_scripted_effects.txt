@@ -382,11 +382,9 @@ create_gdp_graph = {
 			set_variable = { gdpdiff = grossdomesticproduct_fake }
 			subtract_from_variable = { gdpdiff = gdpbase }
 			divide_variable = { gdpdiff = 9.5 }
-
 			for_loop_effect = {
 				start = 120
 				end = 129
-				
 				add_to_variable = { gdpbase = gdpdiff }
 				set_variable = { gdp_graph^v = gdpbase }    #set value of y-axis
 				multiply_variable = { gdp_graph^v = graph_mult }
@@ -394,7 +392,7 @@ create_gdp_graph = {
 			set_variable = { gdpbase = grossdomesticproduct_fake }
 			#log = "    year 13 - v: [?v] - graph: [?gdp_graph^v]"
 		}
-				
+
 		##fourteenth year
 		if = {
 			limit = {
@@ -404,12 +402,11 @@ create_gdp_graph = {
 			}
 			set_variable = { gdp_graph^v = grossdomesticproduct_fake }    #set value of y-axis
 			multiply_variable = { gdp_graph^v = graph_mult }
-			
+
 			#smoothcurve
 			set_variable = { gdpdiff = grossdomesticproduct_fake }
 			subtract_from_variable = { gdpdiff = gdpbase }
 			divide_variable = { gdpdiff = 9.5 }
-							
 			for_loop_effect = {
 				start = 130
 				end = 139
@@ -421,7 +418,7 @@ create_gdp_graph = {
 			set_variable = { gdpbase = grossdomesticproduct_fake }
 			#log = "    year 14 - v: [?v] - graph: [?gdp_graph^v]"
 		}
-				
+
 		##fifteenth year
 		if = {
 			limit = {
@@ -436,11 +433,9 @@ create_gdp_graph = {
 			set_variable = { gdpdiff = grossdomesticproduct_fake }
 			subtract_from_variable = { gdpdiff = gdpbase }
 			divide_variable = { gdpdiff = 9.5 }
-							
 			for_loop_effect = {
 				start = 140
 				end = 149
-				
 				add_to_variable = { gdpbase = gdpdiff }
 				set_variable = { gdp_graph^v = gdpbase }    #set value of y-axis
 				multiply_variable = { gdp_graph^v = graph_mult }
@@ -458,23 +453,22 @@ graph_shift = {
 	for_loop_effect = {
 		start = 0
 		end = 10
-								
 		remove_from_array = {
 			array = gdp_graph
 			index = pop_position
 		}
 		add_to_variable = { pop_position = 1 }
 	}
-}			
+}
    
 graph_append = {
-	set_variable = {push_position = 140 }
+	set_variable = { push_position = 140 }
 	
 	for_loop_effect = {
-		start=140
-		end=150
-					
-		if = {					
+		start = 140
+		end = 150
+
+		if = {
 			limit = {
 				check_variable = { push_position = 149 }
 			}
@@ -506,8 +500,8 @@ calculate_gdp_growth = {
 	set_variable = { gdp_growth_curr = grossdomesticproduct_fake } # current gdp
 	
 	subtract_from_variable = { gdp_growth_curr = gdp_growth_prev } #subtract previous GDP
-	#divide_variable = { gdp_growth_curr = gdpbase }
-	#multiply_variable = { gdp_growth_curr = 100 }
+	divide_variable = { gdp_growth_curr = gdpbase }
+	multiply_variable = { gdp_growth_curr = 100 }
 	
 	##storing GDP growth stats in an array
 	#add_to_variable = { gdp_growth_iteration_start = 0 }
@@ -517,6 +511,7 @@ calculate_gdp_growth = {
 	# 	start = gdp_growth_iteration_start
 	# 	end = gdp_growth_iteration_end
 	
+	add_to_array = { gdp_year = global.year } # will store the current year - requires new game
 	add_to_array = { gdp_array = grossdomesticproduct_fake } # will store yearly gdp - requires new game
 	add_to_array = { gdp_growth_array = gdp_growth_curr } # will store yearly gdp growth - requires new game
 
@@ -530,8 +525,55 @@ test_show_gdp_growth_array = {
 	for_loop_effect = {
 		start = 0
 		end = var:gdp_growth_array^num
-		log = "gdp_growth_array^[?v] = [?gdp_growth_array^v]"
+		log = "gdp_array^[?v] = [?gdp_array^v] / gdp_growth_array^[?v] = [?gdp_growth_array^v]"
 	}	
+}
+
+test_rebuild_gdp_graph = {
+	set_temp_variable = { startYearIndex = 0 }
+	set_temp_variable = { numYears = gdp_growth_array^num }
+	set_temp_variable = { prevIndex = 0 }
+	log = "numYears^num: [?numYears]"
+	if = { limit = { check_variable = { numYears > 15 } } # if more than 15 years, shift graph left
+		set_temp_variable = { startYearIndex = 15 }
+		subtract_from_temp_variable = { startYearIndex = numYears }
+		multiply_temp_variable = { startYearIndex = -1 }
+		#get previous year's gdp (start of graph value)
+		set_temp_variable = { prevIndex = startYearIndex }
+		subtract_from_temp_variable = { prevIndex = 1 }
+	}
+	log = "startYearIndex: [?startYearIndex]"
+	
+	clear_array = gdp_graph
+	set_temp_variable = { xIndex = 0 }
+
+	for_loop_effect = {
+		start = startYearIndex
+		end = gdp_growth_array^num
+		value = v
+
+		set_temp_variable = { yearIncrement = gdp_growth_array^v } # this year's growth
+		log = "  v: [?v] / yearGDP: [?gdp_array^v] / yearIncrement: [?yearIncrement] / xIndex: [?xIndex]"
+		divide_temp_variable = { yearIncrement = 10 }
+
+		for_loop_effect = {
+			start = 1
+			end = 11
+			value = i
+
+			add_to_array = {
+				array = gdp_graph
+				value = gdp_array^prevIndex
+			}
+			set_temp_variable = { currentIncrement = yearIncrement }
+			multiply_temp_variable = { currentIncrement = i }
+			add_to_variable = { gdp_graph^xIndex = currentIncrement }
+			multiply_variable = { gdp_graph^xIndex = graph_mult }
+			add_to_temp_variable = { xIndex = 1 }
+			#log = "    i: [?i] / gdp_array^v: [?gdp_array^v] / gdp_graph^i: [?gdp_graph^i] / currentIncrement: [?currentIncrement]"
+		}
+		add_to_temp_variable = { prevIndex = 1 }
+	}
 }
 
 zoom_in_graph = {
