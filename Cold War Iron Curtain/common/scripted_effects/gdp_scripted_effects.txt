@@ -1,7 +1,7 @@
 # Graph generator by Karan
+# Fixed mutiple issues (Harain)
 
 create_gdp_graph = {
-
 	resize_array = {
 		array = gdp_graph
 		value = 3000   #1 is the base y-value position
@@ -448,50 +448,35 @@ create_gdp_graph = {
 }
 
 graph_shift = {
-	set_variable = { pop_position = 0 }
-	
+	# shift array 10 to the left
+	set_temp_variable = { pop_position = 10 }
 	for_loop_effect = {
 		start = 0
-		end = 10
-		remove_from_array = {
-			array = gdp_graph
-			index = pop_position
-		}
-		add_to_variable = { pop_position = 1 }
+		end = 140
+		set_variable = { gdp_graph^v = gdp_graph^pop_position }
+		add_to_temp_variable = { pop_position = 1 }
 	}
 }
    
 graph_append = {
-	set_variable = { push_position = 140 }
+	# replace the last 10 values with the current year
+	set_variable = { gdp_graph^149 = grossdomesticproduct_fake }    #set value of y-axis
+	multiply_variable = { gdp_graph^149 = graph_mult }
 	
+	#smoothcurve
+	set_variable = { gdpdiff = grossdomesticproduct_fake }
+	subtract_from_variable = { gdpdiff = gdpbase }
+	divide_variable = { gdpdiff = 10 }
+					
 	for_loop_effect = {
 		start = 140
-		end = 150
-
-		if = {
-			limit = {
-				check_variable = { push_position = 149 }
-			}
-			set_variable = { gdp_graph^v = grossdomesticproduct_fake }    #set value of y-axis
-			multiply_variable = { gdp_graph^v = graph_mult }
-			
-			#smoothcurve
-			set_variable = { gdpdiff = grossdomesticproduct_fake }
-			subtract_from_variable = { gdpdiff = gdpbase }
-			divide_variable = { gdpdiff = 9 }
-							
-			for_loop_effect = {
-				start = 140
-				end = 149
-				
-				add_to_variable = { gdpbase = gdpdiff }
-				set_variable = { gdp_graph^v = gdpbase }    #set value of y-axis
-				multiply_variable = { gdp_graph^v = graph_mult }
-			}	
-			set_variable = { gdpbase = grossdomesticproduct_fake }
-		}
-		add_to_variable = { push_position = 1 }
-	}
+		end = 149
+		
+		add_to_variable = { gdpbase = gdpdiff }
+		set_variable = { gdp_graph^v = gdpbase }    #set value of y-axis
+		multiply_variable = { gdp_graph^v = graph_mult }
+	}	
+	set_variable = { gdpbase = grossdomesticproduct_fake }
 }
   
 calculate_gdp_growth = {
@@ -723,7 +708,8 @@ x_axis_scale_init = {
 	}
 }
 				
-x_axis_scale_shift = {	
+x_axis_scale_shift = {
+	# shifts GDP graph x axis years to the left
 	remove_from_array = {
 		array = date_scale
 		index = 0
@@ -736,6 +722,7 @@ x_axis_scale_shift = {
 }
 						
 x_axis_scale_append = {
+	# appends current year to GDP graph x axis
 	set_variable = { final_index = 0 }
 	
 	for_loop_effect = {
