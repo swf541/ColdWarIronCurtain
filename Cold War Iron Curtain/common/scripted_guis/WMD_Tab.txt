@@ -19,6 +19,88 @@ scripted_gui = {
 			check_variable = { show_wmd = 1 }
 		}	
 		triggers = {
+			defconbutton_raise_click_enabled = {
+				if = { limit = { has_idea = defcon_system_5 }
+					custom_trigger_tooltip = {
+						tooltip = highest_defcon_TT
+						NOT = { has_idea = defcon_system_5 }
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = DEFCON_cooldown_TT
+					NOT = { check_variable = { DEFCON_cooldown = 1 } }
+				}
+				custom_trigger_tooltip = {
+					tooltip = has_nukes_TT
+					check_variable = { num_of_nukes > 0 }
+				}
+			}
+
+			defconbutton_lower_click_enabled = {
+				if = { limit = { has_idea = defcon_system_1 }
+					custom_trigger_tooltip = {
+						tooltip = lowest_defcon_TT
+						NOT = { has_idea = defcon_system_1 }
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = DEFCON_cooldown_TT
+					NOT = { check_variable = { DEFCON_cooldown = 1 } }
+				}
+				custom_trigger_tooltip = {
+					tooltip = has_nukes_TT
+					check_variable = { num_of_nukes > 0 }
+				}
+				if = { limit = { has_idea = defcon_system_5 }
+					custom_trigger_tooltip = {
+						tooltip = needs_60_WT_TT
+						threat > 0.6
+					}
+				}
+				else_if = { limit = { has_idea = defcon_system_4 }
+					custom_trigger_tooltip = {
+						tooltip = needs_80_WT_TT
+						threat > 0.8
+					}
+				}
+				else_if = { limit = { has_idea = defcon_system_3 }
+					custom_trigger_tooltip = {
+						tooltip = needs_90_WT_TT
+						threat > 0.9
+					}
+				}
+				else_if = { limit = { has_idea = defcon_system_2 }
+					custom_trigger_tooltip = {
+						tooltip = needs_100_WT_TT
+						threat > 0.999
+					}
+				}
+			}
+
+			wmd_defcon_1_visible = {
+				has_idea = defcon_system_1
+			}
+			wmd_defcon_2_visible = {
+				has_idea = defcon_system_2
+			}
+			wmd_defcon_3_visible = {
+				has_idea = defcon_system_3
+			}
+			wmd_defcon_4_visible = {
+				has_idea = defcon_system_4
+			}
+			wmd_defcon_5_visible = {
+				has_idea = defcon_system_5
+			}
+			wmd_defcon_none_visible = {
+				NOT = {
+					has_idea = defcon_system_1
+					has_idea = defcon_system_2
+					has_idea = defcon_system_3
+					has_idea = defcon_system_4
+					has_idea = defcon_system_5
+				}
+			}
 			wmd_authorize_click_enabled = { check_variable = { ack_authorize = 0 } }
 			WMD_Key_Right_0_visible = { check_variable = { key_turned = 0 } }
 			WMD_Key_Right_1_visible = { check_variable = { key_turned = 1 } }
@@ -27,7 +109,83 @@ scripted_gui = {
 			WMD_Key_Left_1_visible = { check_variable = { left_key_turned = 1 } }
 			WMD_Key_Left_2_visible = { check_variable = { left_key_turned = 2 } }
 		}
+
 		effects = {
+			defconbutton_raise_click = {
+				if = { limit = {  has_idea = defcon_system_1 }
+					log = "defcon 1 to 2"
+					remove_ideas = defcon_system_1
+					add_ideas = defcon_system_2
+				}
+				else_if = { limit = { has_idea = defcon_system_2 }
+					log = "defcon 2 to 3"
+					remove_ideas = defcon_system_2
+					add_ideas = defcon_system_3				
+				}
+				else_if = { limit = { has_idea = defcon_system_3 }
+					log = "defcon 3 to 4"
+					remove_ideas = defcon_system_3
+					add_ideas = defcon_system_4			
+				}
+				else_if = { limit = { has_idea = defcon_system_4 }
+					log = "defcon 4 to 5"
+					remove_ideas = defcon_system_4
+					add_ideas = defcon_system_5			
+				}				
+				else = {
+					log = "raise defcon fail"
+				}	
+				#add_timed_idea = {
+				#	idea = DEFCON_COOLDOWN
+				#	days = 2
+				#}	
+
+				set_variable = { DEFCON_cooldown = 1}
+				add_to_variable = { refresh_wmd_menu = 1}
+
+				THIS = {
+					activate_mission = WMD_defcon_cooldown
+				}
+			}
+
+			defconbutton_lower_click = {
+				if = { limit = { has_idea = defcon_system_5 }
+					log = "defcon 5 to 4"
+					remove_ideas = defcon_system_5
+					add_ideas = defcon_system_4
+				}
+				else_if = {  limit = { has_idea = defcon_system_4 }
+					log = "defcon 4 to 3"
+					remove_ideas = defcon_system_4
+					add_ideas = defcon_system_3				
+				}
+				else_if = { limit = { has_idea = defcon_system_3 }
+					log = "defcon 3 to 2"
+					remove_ideas = defcon_system_3
+					add_ideas = defcon_system_2			
+				}
+				else_if = { limit = { has_idea = defcon_system_2 }
+					log = "defcon 2 to 1"
+					remove_ideas = defcon_system_2
+					add_ideas = defcon_system_1			
+				}				
+				else = {
+					log = "defcon none to 5"
+					add_ideas = defcon_system_5
+				}
+				#add_timed_idea = {
+				#	idea = DEFCON_COOLDOWN
+				#	days = 2
+				#}	
+
+				set_variable = { DEFCON_cooldown = 1}
+				add_to_variable = { refresh_wmd_menu = 1}	
+
+				THIS = {
+					activate_mission = WMD_defcon_cooldown
+				}
+			}
+
 			wmd_reset_click = {
 				ROOT = {
 					add_to_variable = {refresh_wmd_menu = 1}
@@ -292,7 +450,6 @@ scripted_gui = {
 
 			show_nuclear_powers_click = {
 				ROOT = {
-					
 					if = { limit = { check_variable = { right_display = 1 }  }					
 						set_variable = { right_display = 2 }
 					}
@@ -301,82 +458,6 @@ scripted_gui = {
 					}
 				}	
 				add_to_variable = { refresh_wmd_menu = 1}		
-			}
-
-			defconbutton_raise_click = {
-				log = "raise defcon"
-				if = { limit = {  has_idea = defcon_system_1 }
-					log = "defcon 1 to 2"
-					remove_ideas = defcon_system_1
-					add_ideas = defcon_system_2
-				}
-				else_if = { limit = { has_idea = defcon_system_2 }
-					log = "defcon 2 to 3"
-					remove_ideas = defcon_system_2
-					add_ideas = defcon_system_3				
-				}
-				else_if = { limit = { has_idea = defcon_system_3 }
-					log = "defcon 3 to 4"
-					remove_ideas = defcon_system_3
-					add_ideas = defcon_system_4			
-				}
-				else_if = { limit = { has_idea = defcon_system_4 }
-					log = "defcon 4 to 5"
-					remove_ideas = defcon_system_4
-					add_ideas = defcon_system_5			
-				}				
-				else = {
-					log = "hmm"
-				}	
-				#add_timed_idea = {
-				#	idea = DEFCON_COOLDOWN
-				#	days = 2
-				#}	
-
-				set_variable = { DEFCON_cooldown = 1}
-				add_to_variable = { refresh_wmd_menu = 1}
-
-				THIS = {
-					activate_mission = WMD_defcon_cooldown
-				}
-			}
-
-			defconbutton_lower_click = {
-				log = "lower defcon"
-				if = { limit = { has_idea = defcon_system_5 }
-					log = "defcon 5 to 4"
-					remove_ideas = defcon_system_5
-					add_ideas = defcon_system_4
-				}
-				else_if = {  limit = { has_idea = defcon_system_4 }
-					log = "defcon 4 to 3"
-					remove_ideas = defcon_system_4
-					add_ideas = defcon_system_3				
-				}
-				else_if = { limit = { has_idea = defcon_system_3 }
-					log = "defcon 3 to 2"
-					remove_ideas = defcon_system_3
-					add_ideas = defcon_system_2			
-				}
-				else_if = { limit = { has_idea = defcon_system_2 }
-					log = "defcon 2 to 1"
-					remove_ideas = defcon_system_2
-					add_ideas = defcon_system_1			
-				}				
-				else = {
-					log = "hmm"
-				}
-				#add_timed_idea = {
-				#	idea = DEFCON_COOLDOWN
-				#	days = 2
-				#}	
-
-				set_variable = { DEFCON_cooldown = 1}
-				add_to_variable = { refresh_wmd_menu = 1}	
-
-				THIS = {
-					activate_mission = WMD_defcon_cooldown
-				}
 			}
 
 			denuclearize_click = {
@@ -454,64 +535,6 @@ scripted_gui = {
 					set_variable = { key_turned = 0 }
 				}
 				add_to_variable = {refresh_wmd_menu = 1}
-			}
-		}
-
-		triggers = {
-			defconbutton_raise_click_enabled = {
-				custom_trigger_tooltip = {
-					tooltip = highest_defcon_TT
-					has_idea = defcon_system_1
-					has_idea = defcon_system_2
-					has_idea = defcon_system_3
-					has_idea = defcon_system_4
-				}
-				custom_trigger_tooltip = {
-					tooltip = DEFCON_cooldown_TT
-					NOT = { check_variable = { DEFCON_cooldown = 1 } }
-				}
-				custom_trigger_tooltip = {
-					tooltip = has_nukes_TT
-					check_variable = { num_of_nukes > 0 }
-				}
-			}
-			defconbutton_lower_click_enabled = {
-				custom_trigger_tooltip = {
-					tooltip = lowest_defcon_TT
-					NOT = { has_idea = defcon_system_1 }
-				}
-				custom_trigger_tooltip = {
-					tooltip = DEFCON_cooldown_TT
-					NOT = { check_variable = { DEFCON_cooldown = 1 } }
-				}
-				custom_trigger_tooltip = {
-					tooltip = has_nukes_TT
-					check_variable = { num_of_nukes > 0 }
-				}
-			}
-			wmd_defcon_1_visible = {
-				has_idea = defcon_system_1
-			}
-			wmd_defcon_2_visible = {
-				has_idea = defcon_system_2
-			}
-			wmd_defcon_3_visible = {
-				has_idea = defcon_system_3
-			}
-			wmd_defcon_4_visible = {
-				has_idea = defcon_system_4
-			}
-			wmd_defcon_5_visible = {
-				has_idea = defcon_system_5
-			}
-			wmd_defcon_none_visible = {
-				NOT = {
-					has_idea = defcon_system_1
-					has_idea = defcon_system_2
-					has_idea = defcon_system_3
-					has_idea = defcon_system_4
-					has_idea = defcon_system_5
-				}
 			}
 		}
 	}
