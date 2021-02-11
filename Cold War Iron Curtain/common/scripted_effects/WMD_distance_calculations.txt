@@ -52,52 +52,6 @@ wmd_nuclear_cost_and_damage = {
 	else_if = { limit = { has_tech = atomic_weapons_armament_0 } add_to_variable = { warhead_damage = 5 } }
 }
 
-distance_calculator_chemical_stateview = {
-	clear_array = WarCrimeTargetListChemical
-	every_state = {
-		limit = {
-			#Is owned by an enemy country
-			any_country = {
-				controls_state = PREV
-				has_war_with = ROOT
-			}
-			OR = {
-				ROOT = {
-					any_owned_state = {
-						air_base > 0
-						check_variable = { THIS.distance_to@PREV.PREV < 200 }	#MAP_SCALE_PIXEL_TO_KM = 7.114
-					}
-				}
-				any_country = {
-					is_subject_of = ROOT
-					any_owned_state = {
-						air_base > 0
-						check_variable = { THIS.distance_to@PREV.PREV < 200 }	#MAP_SCALE_PIXEL_TO_KM = 7.114
-					}
-				}
-				any_country = {
-					is_in_faction_with = ROOT
-					any_owned_state = {
-						air_base > 0
-						check_variable = { THIS.distance_to@PREV.PREV < 200 }	#MAP_SCALE_PIXEL_TO_KM = 7.114
-					}
-				}
-			}
-		}
-		if = {
-			limit = {
-				NOT = {
-					is_in_array = {
-						array = ROOT.WarCrimeTargetListChemical
-						value = THIS.id
-					}
-				}
-			}
-			add_to_array = { ROOT.WarCrimeTargetListChemical = THIS.id }
-		}
-	}
-}
-
 ####################################
 # TIER 3 strike
 distance_calculator_tier_3 = {
@@ -107,7 +61,7 @@ distance_calculator_tier_3 = {
 
 	wmd_nuclear_range_calculation = yes
 
-	log = "TIER 3 STRIKE / ICBM_Distance = [?ROOT.ICBM_Distance]"
+	log = "TIER 3 STRIKE / Strike Distance = [?ROOT.WMD_Strike_Distance]"
 	every_state = {
 		limit = {
 			#Is owned by an enemy country
@@ -182,7 +136,7 @@ distance_calculator_tier_2 = {
 
 	wmd_nuclear_range_calculation = yes
 
-	log = "TIER 2 STRIKE / ICBM_Distance = [?ROOT.ICBM_Distance]"
+	log = "TIER 2 STRIKE / Strike Distance = [?ROOT.WMD_Strike_Distance]"
 	every_state = {
 		limit = {
 			#Is owned by an enemy country
@@ -251,7 +205,7 @@ distance_calculator_tier_1 = {
 
 	wmd_nuclear_range_calculation = yes
 
-	log = "TIER 1 STRIKE / ICBM_Distance = [?ROOT.ICBM_Distance]"
+	log = "TIER 1 STRIKE / Strike Distance = [?ROOT.WMD_Strike_Distance]"
 	every_state = {
 		limit = {
 			#Is owned by an enemy country
@@ -481,4 +435,50 @@ distance_calculator_usa_cubamc = {
 		}
 	}
 	wmd_nuclear_cost_and_damage = yes
+}
+
+distance_calculator_chemical_stateview = {
+	clear_array = WarCrimeTargetListChemical
+	every_state = {
+		limit = {
+			#Is owned by an enemy country
+			any_country = {
+				controls_state = PREV
+				has_war_with = ROOT
+			}
+			OR = {
+				ROOT = {
+					any_owned_state = {
+						air_base > 0
+						check_variable = { THIS.distance_to@PREV.PREV < 200 }	#MAP_SCALE_PIXEL_TO_KM = 7.114
+					}
+				}
+				any_country = {
+					is_subject_of = ROOT
+					any_owned_state = {
+						air_base > 0
+						check_variable = { THIS.distance_to@PREV.PREV < 200 }	#MAP_SCALE_PIXEL_TO_KM = 7.114
+					}
+				}
+				any_country = {
+					is_in_faction_with = ROOT
+					any_owned_state = {
+						air_base > 0
+						check_variable = { THIS.distance_to@PREV.PREV < 200 }	#MAP_SCALE_PIXEL_TO_KM = 7.114
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					is_in_array = {
+						array = ROOT.WarCrimeTargetListChemical
+						value = THIS.id
+					}
+				}
+			}
+			add_to_array = { ROOT.WarCrimeTargetListChemical = THIS.id }
+		}
+	}
 }
