@@ -654,7 +654,6 @@ scripted_gui = {
 
 		effects = {
 			strike_level_tier1_click = { 
-				log = "strike_level_tier1_selected: [?strike_level_tier1_selected] / strike_level_tier1_icon: [strike_level_tier1_icon]"
 				distance_calculator_tier_1 = yes
 				## check for missiles and nukes
 				if = {
@@ -731,7 +730,7 @@ scripted_gui = {
 			}
 
 			strike_level_tier3_click = { 
-				distance_calculator = yes
+				distance_calculator_tier_3 = yes
 				if = { limit = { check_variable = { strike_level_tier3_selected = 0 } }
 					set_variable = { strike_level_tier1_selected = 0 }
 					set_variable = { strike_level_tier2_selected = 0 }
@@ -761,9 +760,9 @@ scripted_gui = {
 					set_country_flag = samson_option_executed
 				}
 				for_each_loop = {
-					array = WarCrimeTargetList
+					array = WMD_target_states_array
 					launch_nuke = {
-						state = var:WarCrimeTargetList^i
+						state = var:WMD_target_states_array^i
 						use_nuke = yes
 					}
 					multiply_variable = { warhead_damage_local = ROOT.warhead_damage }
@@ -995,9 +994,15 @@ scripted_gui = {
 		#dirty = refresh_wmd_menu
 		dynamic_lists = {
 			wmd_state_listing_grid = {
-				array = ROOT.WarCrimeTargetList
+				array = ROOT.WMD_target_states_array
 				change_scope = yes
 				entry_container = wmd_state_listing_entry
+			}
+		}
+		triggers = {
+			WMD_no_targets_visible = {
+				check_variable = { WMD_num_target_states = 0 }
+				check_variable = { enemies^num > 0 }
 			}
 		}
 	}
@@ -1011,7 +1016,7 @@ scripted_gui = {
 
 		dynamic_lists = {
 			wmd_war_listing_grid = {
-				array = ROOT.enemies #wmd_enemy_array
+				array = ROOT.enemies
 				change_scope = yes
 				entry_container = wmd_war_listing_entry
 			}
@@ -1023,21 +1028,18 @@ scripted_gui = {
 				set_variable = { THIS.checkmark = 1 }
 				if = { limit = { check_variable = { ROOT.strike_level_tier1_selected = 1 } }
 					###Very important below
-					clear_array = ROOT.WarCrimeTargetList
-					clear_array = ROOT.wmd_enemy_array
-					ROOT= { distance_calculator_tier_1 = yes }
+					clear_array = ROOT.WMD_target_states_array
+					ROOT = { distance_calculator_tier_1 = yes }
 				}
 				else_if = { limit = { check_variable = { ROOT.strike_level_tier2_selected = 1 } }
 					###Very important below
-					clear_array = ROOT.WarCrimeTargetList
-					clear_array = ROOT.wmd_enemy_array
-					ROOT= { distance_calculator_tier_2 = yes }
+					clear_array = ROOT.WMD_target_states_array
+					ROOT = { distance_calculator_tier_2 = yes }
 				}
 				else = {
 					###Very important below
-					clear_array = ROOT.WarCrimeTargetList
-					clear_array = ROOT.wmd_enemy_array
-					ROOT= { distance_calculator = yes }
+					clear_array = ROOT.WMD_target_states_array
+					ROOT = { distance_calculator_tier_3 = yes }
 				}
 				## check for missiles and nukes
 				if = {
@@ -1054,8 +1056,8 @@ scripted_gui = {
 				}
 				####################
 
-				#distance_calculator = yes
-				#clear_array = ROOT.WarCrimeTargetList
+				#distance_calculator_tier_3 = yes
+				#clear_array = ROOT.WMD_target_states_array
 				add_to_variable = { ROOT.refresh_wmd_menu = 1 }
 				add_to_variable = { ROOT.nations_selected = 1 }
 			}
@@ -1066,25 +1068,22 @@ scripted_gui = {
 				set_variable = { THIS.checkmark = 0 }
 				if = { limit = { check_variable = { ROOT.strike_level_tier1_selected = 1 } }
 					###Very important below
-					clear_array = ROOT.WarCrimeTargetList
-					clear_array = ROOT.wmd_enemy_array
+					clear_array = ROOT.WMD_target_states_array
 					set_variable = { ROOT.warhead_cost = 0 }
 					set_variable = { ROOT.nuke_cost = 0 }
 					ROOT= { distance_calculator_tier_1 = yes }
 				}
 				else_if = { limit = { check_variable = { ROOT.strike_level_tier2_selected = 1 } }
 					###Very important below
-					clear_array = ROOT.WarCrimeTargetList
-					clear_array = ROOT.wmd_enemy_array
+					clear_array = ROOT.WMD_target_states_array
 					set_variable = { ROOT.warhead_cost = 0 }
 					ROOT= { distance_calculator_tier_2 = yes }
 				}
 				else = {
 					###Very important below
-					clear_array = ROOT.WarCrimeTargetList
-					clear_array = ROOT.wmd_enemy_array
+					clear_array = ROOT.WMD_target_states_array
 					set_variable = { ROOT.warhead_cost = 0 }
-					ROOT= { distance_calculator = yes }
+					ROOT= { distance_calculator_tier_3 = yes }
 				}
 				## check for missiles and nukes
 				if = {
@@ -1101,8 +1100,8 @@ scripted_gui = {
 				}
 				####################
 
-				#distance_calculator = yes
-				#clear_array = ROOT.WarCrimeTargetList
+				#distance_calculator_tier_3 = yes
+				#clear_array = ROOT.WMD_target_states_array
 				add_to_variable = { ROOT.refresh_wmd_menu = 1 }
 				subtract_from_variable = { ROOT.nations_selected = 1 }
 			}
@@ -1110,9 +1109,19 @@ scripted_gui = {
 
 		triggers = {
 			enemy_box_checked_visible = { check_variable = { THIS.checkmark = 0 } }
-			enemy_box_checked_click_enabled = { check_variable = { ROOT.target_selected = 1 } }
+			enemy_box_checked_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = enemy_box_enabled_TT
+					check_variable = { ROOT.target_selected = 1 }
+				}
+			}
 			enemy_box_unchecked_visible = { check_variable = { THIS.checkmark = 1 } }
-			enemy_box_unchecked_click_enabled = { check_variable = { ROOT.target_selected = 1 } }
+			enemy_box_unchecked_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = enemy_box_enabled_TT
+					check_variable = { ROOT.target_selected = 1 }
+				}
+			}
 		}
 	}
 }
