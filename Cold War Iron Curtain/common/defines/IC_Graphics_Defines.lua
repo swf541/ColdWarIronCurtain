@@ -15,3 +15,4 @@ NDefines_Graphics.NGraphics.BLOOM_SCALE = 2.9
 
 NDefines_Graphics.NSound.BATTLE_SOUND_MIN_UNIT_COUNT = 4
 NDefines_Graphics.NGraphics.POLITICAL_GRID_SMALL_BOX_LIMIT = 100             	-- Don't even touch this.
+NDefines.NGraphics.MAX_NUMBER_OF_TEXTURES = 25000
