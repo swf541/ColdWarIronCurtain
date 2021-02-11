@@ -105,13 +105,17 @@ scripted_gui = {
 			wmd_reset_click_enabled = {
 				custom_trigger_tooltip = {
 					tooltip = wmd_reset_enabled_TT
-					check_variable = { ack_authorize = 1 }
+					check_variable = { wmd_authorize = 1 }
 				}
 			}
 			wmd_authorize_click_enabled = {
 				custom_trigger_tooltip = {
-					tooltip = wmd_authorize_enabled_TT
-					check_variable = { ack_authorize = 0 }
+					tooltip = wmd_authorize_enabled_target_TT
+					check_variable = { WMD_num_target_states > 0 }
+				}
+				custom_trigger_tooltip = {
+					tooltip = wmd_authorize_enabled_auth_TT
+					check_variable = { wmd_authorize = 0 }
 				}
 			}
 		}
@@ -168,17 +172,14 @@ scripted_gui = {
 			wmd_reset_click = {
 				ROOT = {
 					add_to_variable = { refresh_wmd_menu = 1 }
-
 					set_variable = { strike_level_tier1_selected = 0 }
 					set_variable = { strike_level_tier2_selected = 0 }
 					set_variable = { strike_level_tier3_selected = 0 }
 					set_variable = { target_selected = 0 }
-					#set_variable = { show_super_event_korea_nuke = 1 }
-					set_variable = { key_hanging_selected = 0 } # WIP check if used
-					set_variable = { key_turned = 0 } # WIP check if used
-					set_variable = { left_key_turned = 0 } # WIP check if used
+					set_variable = { key_turned = 0 }
+					set_variable = { left_key_turned = 0 }
 					set_variable = { ack_selected = 0 }
-					set_variable = { ack_authorize = 0 }
+					set_variable = { wmd_authorize = 0 }
 					set_variable = { activation_code = 0 }
 					set_variable = { missile_selected = 0 }
 
@@ -189,11 +190,10 @@ scripted_gui = {
 					}
 				}
 				wmd_stockpile_loc = yes
-				nuclear_power_array = yes
 			}
 
 			wmd_authorize_click = {
-				set_variable = { ack_authorize = 1 }
+				set_variable = { wmd_authorize = 1 }
 				add_to_variable = { ack_selected = 0.50 }
 				set_variable = { activation_code = 1 }
 
@@ -500,27 +500,24 @@ scripted_gui = {
 		#dirty = refresh_wmd_menu
 
 		effects = {
-			#wmd_tab_open_click = {
 			nuke_count_click = {
 				ROOT = {
 					set_temp_variable = { show = 1 }
 					subtract_from_temp_variable = { show = show_wmd }
 					close_all_windows = yes
-					if = { limit = { check_variable = { show_wmd = 1 } } set_variable = { ack_authorize = 0 } } # or it starts all messed up
+					if = { limit = { check_variable = { show_wmd = 1 } } set_variable = { wmd_authorize = 0 } } # or it starts all messed up
 					set_variable = { show_wmd = show }
 
-					set_variable = { strike_level_tier1_selected = 0 }
-					set_variable = { strike_level_tier2_selected = 0 }
-					set_variable = { strike_level_tier3_selected = 0 }
-					set_variable = { target_selected = 0 }
-					#set_variable = { show_super_event_korea_nuke = 1 }
-					set_variable = { key_hanging_selected = 0 } # WIP check if used
-					set_variable = { key_turned = 0 } # WIP check if used
-					set_variable = { left_key_turned = 0 } # WIP check if used
-					set_variable = { ack_selected = 0 }
-					set_variable = { ack_authorize = 0 }
-					set_variable = { activation_code = 0 }
-					set_variable = { missile_selected = 0 }
+					# set_variable = { strike_level_tier1_selected = 0 }
+					# set_variable = { strike_level_tier2_selected = 0 }
+					# set_variable = { strike_level_tier3_selected = 0 }
+					# set_variable = { target_selected = 0 }
+					# set_variable = { key_turned = 0 }
+					# set_variable = { left_key_turned = 0 }
+					# set_variable = { ack_selected = 0 }
+					# set_variable = { wmd_authorize = 0 }
+					# set_variable = { activation_code = 0 }
+					# set_variable = { missile_selected = 0 }
 					clear_array = ROOT.nuclear_power_custom_array
 					every_country = {
 						limit = { check_variable = { num_of_nukes > 0 } }
@@ -528,23 +525,9 @@ scripted_gui = {
 					}
 				}
 				wmd_stockpile_loc = yes
-				nuclear_power_array = yes
 			}
 		}
 	}
-
-	#wmd_nuclear_powers_list = {
-	#	context_type = player_context
-	#	window_name = "wmd_list"
-	#	parent_window_name = WMD_tab
-	#	 dynamic_lists = {
-	#		nuclear_power_listing_grid = {
-	#			array = ROOT.nuclear_power_custom_array
-	#			change_scope = yes
-	#			entry_container = nuclear_power_listing_entry
-	#		}
-	#	}
-	#}
 
 	######################################
 	# nuclear powers list
@@ -563,15 +546,8 @@ scripted_gui = {
 		properties = { flag = { image = "[This.GetFlag]" } }
 	}
 
-	# ###################################
-	# # WMD STOCKPILE LIST
-	# wmd_stockpile_list = {
-	# 	context_type = player_context
-	# 	window_name = "wmd_mid_portion"
-	# 	parent_window_name = WMD_tab
-	# 	#dirty = refresh_wmd_menu
-	# }
-
+	######################################
+	# bottom part of WMD window
 	wmd_bottom = {
 		context_type = player_context
 		window_name = "wmd_bottom_portion"
@@ -579,6 +555,46 @@ scripted_gui = {
 		#dirty = refresh_wmd_menu
 
 		triggers = {
+			strike_level_tier1_click_enabled = {
+				OR = {
+					custom_trigger_tooltip = {
+						tooltip = strike_level_tier1_2_enabled_bomber_TT
+						has_tech = strategic_bomber3
+					}
+					custom_trigger_tooltip = {
+						tooltip = strike_level_tier1_2_enabled_irbm_TT
+						has_tech = irbm1
+					}
+					custom_trigger_tooltip = {
+						tooltip = strike_level_tier3_enabled_TT
+						has_tech = icbm1
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = strike_level_must_be_at_war_TT
+					has_war = yes
+				}
+			}
+			strike_level_tier2_click_enabled = {
+				OR = {
+					custom_trigger_tooltip = {
+						tooltip = strike_level_tier1_2_enabled_bomber_TT
+						has_tech = strategic_bomber3
+					}
+					custom_trigger_tooltip = {
+						tooltip = strike_level_tier1_2_enabled_irbm_TT
+						has_tech = irbm1
+					}
+					custom_trigger_tooltip = {
+						tooltip = strike_level_tier3_enabled_TT
+						has_tech = icbm1
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = strike_level_must_be_at_war_TT
+					has_war = yes
+				}
+			}
 			strike_level_tier3_click_enabled = {
 				OR = {
 					if = { limit = { tag = USA }
@@ -598,6 +614,10 @@ scripted_gui = {
 						has_tech = icbm1
 					}
 				}
+				custom_trigger_tooltip = {
+					tooltip = strike_level_must_be_at_war_TT
+					has_war = yes
+				}
 			}
 			### not needed i think
 			# strike_level_tier1_active_visible = { has_country_flag = WMD_STRIKE_LEVEL_1 }
@@ -609,8 +629,8 @@ scripted_gui = {
 			nuke_box_unchecked_click_enabled = { always = no }
 			##########
 			#authorization_code_visible = { check_variable = { view_authorization_code = 1 } }
-			authorization_code_visible = { check_variable = { ack_authorize = 1 } }
-			authorization_code_two_visible = { check_variable = { ack_authorize = 1 } }
+			authorization_code_visible = { check_variable = { wmd_authorize = 1 } }
+			authorization_code_two_visible = { check_variable = { wmd_authorize = 1 } }
 			wmd_button_launch_off_visible = {
 				OR = {
 					has_equipment = { icbm_equipment < var:warhead_cost }
@@ -975,11 +995,10 @@ scripted_gui = {
 				set_variable = { strike_level_tier2_selected = 0 }
 				set_variable = { strike_level_tier3_selected = 0 }
 				set_variable = { target_selected = 0 }
-				#set_variable = { show_super_event_korea_nuke = 1 }
-				set_variable = { key_hanging_selected = 1 } # WIP check if used
-				set_variable = { key_turned = 1 } # WIP check if used
+				set_variable = { key_turned = 1 }
+				set_variable = { letf_key_turned = 1 }
 				set_variable = { ack_selected = 0 }
-				set_variable = { ack_authorize = 0 }
+				set_variable = { wmd_authorize = 0 }
 				set_variable = { activation_code = 0 }
 				set_variable = { missile_selected = 0 }
 				add_to_variable = { refresh_wmd_menu = 1 }
@@ -1000,8 +1019,13 @@ scripted_gui = {
 			}
 		}
 		triggers = {
-			WMD_no_targets_visible = {
+			WMD_no_targets_in_range_visible = {
 				check_variable = { WMD_num_target_states = 0 }
+				check_variable = { wmd_num_targets_selected > 0 }
+				check_variable = { enemies^num > 0 }
+			}
+			WMD_no_targets_selected_visible = {
+				check_variable = { wmd_num_targets_selected = 0 }
 				check_variable = { enemies^num > 0 }
 			}
 		}
@@ -1024,7 +1048,8 @@ scripted_gui = {
 		effects = {
 			###################
 			## enable button
-			enemy_box_checked_click = { 
+			enemy_box_checked_click = {
+				add_to_variable = { ROOT.wmd_num_targets_selected = 1 }
 				set_variable = { THIS.checkmark = 1 }
 				if = { limit = { check_variable = { ROOT.strike_level_tier1_selected = 1 } }
 					###Very important below
@@ -1054,17 +1079,15 @@ scripted_gui = {
 				else = {
 					set_variable = { ROOT.missile_selected = 0}
 				}
-				####################
 
-				#distance_calculator_tier_3 = yes
-				#clear_array = ROOT.WMD_target_states_array
 				add_to_variable = { ROOT.refresh_wmd_menu = 1 }
 				add_to_variable = { ROOT.nations_selected = 1 }
 			}
 
 			###################
 			## disable button
-			enemy_box_unchecked_click = { 
+			enemy_box_unchecked_click = {
+				subtract_from_variable = { ROOT.wmd_num_targets_selected = 1 }
 				set_variable = { THIS.checkmark = 0 }
 				if = { limit = { check_variable = { ROOT.strike_level_tier1_selected = 1 } }
 					###Very important below
