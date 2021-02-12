@@ -13,7 +13,7 @@ NDefines.NAI.RESEARCH_NAVAL_DOCTRINE_NEED_GAIN_FACTOR = 0.075 -- Multiplies valu
 
 NDefines.NAir.AIR_WING_MAX_STATS_SPEED = 15000
 NDefines.NAir.CAS_NIGHT_ATTACK_FACTOR = 0.8 -- CAS damaged get multiplied by this in land combats at night
-NDefines.NAir.STRATEGIC_BOMBER_NUKE_AIR_SUPERIORITY = 0.0 -- How much air superiority is needed for a tactical bomber to be able to nuke a province
+NDefines.NAir.STRATEGIC_BOMBER_NUKE_AIR_SUPERIORITY = 10.0 -- How much air superiority is needed for a tactical bomber to be able to nuke a province
 NDefines.NAir.NAVAL_COMBAT_EXTERNAL_PLANES_JOIN_RATIO = 0.02 -- Max planes that can join a combat comparing to the total strength of the ships
 NDefines.NAir.COMBAT_STACK_LIMIT = 1 -- The biggest allowed dogfight combination (1vs1 or 2vs1). Bigger value cause that amount of airplanes matters more then their stats. Only used in naval air combat, for land air combat see COMBAT_MULTIPLANE_CAP
 NDefines.NAir.COMBAT_MULTIPLANE_CAP = 2  -- How many planes can shoot at each plane on other side
