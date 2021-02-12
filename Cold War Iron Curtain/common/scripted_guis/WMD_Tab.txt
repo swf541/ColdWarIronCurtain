@@ -30,12 +30,12 @@ scripted_gui = {
 					has_idea = defcon_system_5
 				}
 			}
-			WMD_Key_Right_0_visible = { check_variable = { key_turned = 0 } }
-			WMD_Key_Right_1_visible = { check_variable = { key_turned = 1 } }
-			WMD_Key_Right_2_visible = { check_variable = { key_turned = 2 } }
 			WMD_Key_Left_0_visible = { check_variable = { left_key_turned = 0 } }
 			WMD_Key_Left_1_visible = { check_variable = { left_key_turned = 1 } }
 			WMD_Key_Left_2_visible = { check_variable = { left_key_turned = 2 } }
+			WMD_Key_Right_0_visible = { check_variable = { right_key_turned = 0 } }
+			WMD_Key_Right_1_visible = { check_variable = { right_key_turned = 1 } }
+			WMD_Key_Right_2_visible = { check_variable = { right_key_turned = 2 } }
 
 			# button enabled triggers
 			defconbutton_raise_click_enabled = {
@@ -118,6 +118,22 @@ scripted_gui = {
 					check_variable = { wmd_authorize = 0 }
 				}
 			}
+			WMD_Key_Left_0_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = wmd_key_turn_enabled_TT
+					check_variable = { wmd_authorize = 1 }
+				}
+			}
+			WMD_Key_Left_1_click_enabled = { check_variable = { wmd_target_selected = 1 } }
+			WMD_Key_Left_2_click_enabled = { check_variable = { wmd_target_selected = 1 } }
+			WMD_Key_Right_0_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = wmd_key_turn_enabled_TT
+					check_variable = { wmd_authorize = 1 }
+				}
+			}
+			WMD_Key_Right_1_click_enabled = { check_variable = { wmd_target_selected = 1 } }
+			WMD_Key_Right_2_click_enabled = { check_variable = { wmd_target_selected = 1 } }
 		}
 
 		effects = {
@@ -170,202 +186,176 @@ scripted_gui = {
 			}
 
 			wmd_reset_click = {
-				ROOT = {
-					add_to_variable = { refresh_wmd_menu = 1 }
-					set_variable = { strike_level_tier1_selected = 0 }
-					set_variable = { strike_level_tier2_selected = 0 }
-					set_variable = { strike_level_tier3_selected = 0 }
-					set_variable = { target_selected = 0 }
-					set_variable = { key_turned = 0 }
-					set_variable = { left_key_turned = 0 }
-					set_variable = { ack_selected = 0 }
-					set_variable = { wmd_authorize = 0 }
-					set_variable = { activation_code = 0 }
-					set_variable = { missile_selected = 0 }
-
-					clear_array = ROOT.nuclear_power_custom_array
-					every_country = {
-						limit = { check_variable = { num_of_nukes > 0 } }
-						add_to_array = { ROOT.nuclear_power_custom_array = THIS.id }
-					}
+				log = "tag: [this.gettag]"
+				add_to_variable = { refresh_wmd_menu = 1 }
+				set_variable = { strike_level_tier1_selected = 0 }
+				set_variable = { strike_level_tier2_selected = 0 }
+				set_variable = { strike_level_tier3_selected = 0 }
+				set_variable = { WMD_num_target_states = 0 }
+				set_variable = { wmd_target_selected = 0 }
+				set_variable = { right_key_turned = 0 }
+				set_variable = { left_key_turned = 0 }
+				set_variable = { wmd_ready_status = 0 }
+				set_variable = { wmd_authorize = 0 }
+				set_variable = { activation_code = 0 }
+				set_variable = { missile_selected = 0 }
+				for_each_scope_loop = {
+					array = enemies
+					set_variable = { THIS.checkmark = 0 }
+				}
+				clear_array = WMD_target_states_array
+				set_variable = { wmd_num_targets_selected = 0 }
+				clear_array = nuclear_power_custom_array
+				every_country = {
+					limit = { check_variable = { num_of_nukes > 0 } }
+					add_to_array = { ROOT.nuclear_power_custom_array = THIS.id }
 				}
 				wmd_stockpile_loc = yes
+				log = "wmd_target_selected: [?wmd_target_selected]"
 			}
 
 			wmd_authorize_click = {
 				set_variable = { wmd_authorize = 1 }
-				add_to_variable = { ack_selected = 0.50 }
+				add_to_variable = { wmd_ready_status = 0.50 }
 				set_variable = { activation_code = 1 }
-
 				#random_code_generator
 				set_variable = { authorization_code_bit_1 = random }
 				multiply_variable = { authorization_code_bit_1 = 100 }
 				round_variable = authorization_code_bit_1
-
 				set_variable = { authorization_code_bit_2 = random }
 				multiply_variable = { authorization_code_bit_2 = 100 }
 				round_variable = authorization_code_bit_2
-
 				set_variable = { authorization_code_bit_3 = random }
 				multiply_variable = { authorization_code_bit_3 = 100 }
 				round_variable = authorization_code_bit_3
-
 				set_variable = { authorization_code_bit_4 = random }
 				multiply_variable = { authorization_code_bit_4 = 100 }
 				round_variable = authorization_code_bit_4
-
 				set_variable = { authorization_code_bit_5 = random }
 				multiply_variable = { authorization_code_bit_5 = 100 }
 				round_variable = authorization_code_bit_5
-
 				set_variable = { authorization_code_bit_6 = random }
 				multiply_variable = { authorization_code_bit_6 = 100 }
 				round_variable = authorization_code_bit_6
-
 				set_variable = { authorization_code_bit_7 = random }
 				multiply_variable = { authorization_code_bit_7 = 100 }
 				round_variable = authorization_code_bit_7
-
 				set_variable = { authorization_code_bit_8 = random }
 				multiply_variable = { authorization_code_bit_8 = 100 }
 				round_variable = authorization_code_bit_8
-
 				set_variable = { authorization_code_bit_9 = random }
 				multiply_variable = { authorization_code_bit_9 = 100 }
 				round_variable = authorization_code_bit_9
-
 				set_variable = { authorization_code_bit_10 = random }
 				multiply_variable = { authorization_code_bit_10 = 100 }
 				round_variable = authorization_code_bit_11
-
 				set_variable = { authorization_code_bit_12 = random }
 				multiply_variable = { authorization_code_bit_13 = 100 }
 				round_variable = authorization_code_bit_13
-
 				set_variable = { authorization_code_bit_14 = random }
 				multiply_variable = { authorization_code_bit_14 = 100 }
 				round_variable = authorization_code_bit_14
-
 				set_variable = { authorization_code_bit_15 = random }
 				multiply_variable = { authorization_code_bit_15 = 100 }
 				round_variable = authorization_code_bit_15
-
 				set_variable = { authorization_code_bit_16 = random }
 				multiply_variable = { authorization_code_bit_16 = 100 }
 				round_variable = authorization_code_bit_16
-
 				set_variable = { authorization_code_bit_17 = random }
 				multiply_variable = { authorization_code_bit_17 = 100 }
 				round_variable = authorization_code_bit_17
-
 				set_variable = { authorization_code_bit_18 = random }
 				multiply_variable = { authorization_code_bit_18 = 100 }
 				round_variable = authorization_code_bit_18
-
 				set_variable = { authorization_code_bit_19 = random }
 				multiply_variable = { authorization_code_bit_19 = 100 }
 				round_variable = authorization_code_bit_19
-
 				set_variable = { authorization_code_bit_20 = random }
 				multiply_variable = { authorization_code_bit_20 = 100 }
 				round_variable = authorization_code_bit_20
-
 				set_variable = { authorization_code_bit_21 = random }
 				multiply_variable = { authorization_code_bit_21 = 100 }
 				round_variable = authorization_code_bit_21
-
 				set_variable = { authorization_code_bit_22 = random }
 				multiply_variable = { authorization_code_bit_22 = 100 }
 				round_variable = authorization_code_bit_22
-
 				set_variable = { authorization_code_bit_23 = random }
 				multiply_variable = { authorization_code_bit_23 = 100 }
 				round_variable = authorization_code_bit_23
-
 				set_variable = { authorization_code_bit_24 = random }
 				multiply_variable = { authorization_code_bit_24 = 100 }
 				round_variable = authorization_code_bit_24
-
 				set_variable = { authorization_code_bit_25 = random }
 				multiply_variable = { authorization_code_bit_25 = 100 }
 				round_variable = authorization_code_bit_25
-
 				set_variable = { authorization_code_bit_26 = random }
 				multiply_variable = { authorization_code_bit_26 = 100 }
 				round_variable = authorization_code_bit_26
-
 				set_variable = { authorization_code_bit_27 = random }
 				multiply_variable = { authorization_code_bit_27 = 100 }
 				round_variable = authorization_code_bit_27
-
 				set_variable = { authorization_code_bit_28 = random }
 				multiply_variable = { authorization_code_bit_28 = 100 }
 				round_variable = authorization_code_bit_28
-
 				set_variable = { authorization_code_bit_29 = random }
 				multiply_variable = { authorization_code_bit_29 = 100 }
 				round_variable = authorization_code_bit_29
-
 				set_variable = { authorization_code_bit_30 = random }
 				multiply_variable = { authorization_code_bit_30 = 100 }
 				round_variable = authorization_code_bit_30
-
 				set_variable = { authorization_code_bit_31 = random }
 				multiply_variable = { authorization_code_bit_31 = 100 }
 				round_variable = authorization_code_bit_31
-
 				set_variable = { authorization_code_bit_32 = random }
 				multiply_variable = { authorization_code_bit_32 = 100 }
 				round_variable = authorization_code_bit_32
-
 				add_to_variable = { refresh_wmd_menu = 1 }
 			}
 
 			WMD_Key_Right_1_click = {
-				if = { limit = { check_variable = { key_turned = 0 } }
-					set_variable = { key_turned = 1 }
-					add_to_variable = { ack_selected = 0.125 }
+				if = { limit = { check_variable = { right_key_turned = 0 } }
+					set_variable = { right_key_turned = 1 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
-				else_if = { limit = { check_variable = { key_turned = 1 } }
-					set_variable = { key_turned = 2 }
-					add_to_variable = { ack_selected = 0.125 }
+				else_if = { limit = { check_variable = { right_key_turned = 1 } }
+					set_variable = { right_key_turned = 2 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
 				else = {
-					set_variable = { key_turned = 0 }
-					subtract_from_variable = { ack_selected = 0.25 }
+					set_variable = { right_key_turned = 0 }
+					subtract_from_variable = { wmd_ready_status = 0.25 }
 				}
 				add_to_variable = { refresh_wmd_menu = 1 }
 			}
 
 			WMD_Key_Right_2_click = {
-				if = { limit = { check_variable = { key_turned = 0 } }
-					set_variable = { key_turned = 1 }
-					add_to_variable = { ack_selected = 0.125 }
+				if = { limit = { check_variable = { right_key_turned = 0 } }
+					set_variable = { right_key_turned = 1 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
-				else_if = { limit = { check_variable = { key_turned = 1 } }
-					set_variable = { key_turned = 2 }
-					add_to_variable = { ack_selected = 0.125 }
+				else_if = { limit = { check_variable = { right_key_turned = 1 } }
+					set_variable = { right_key_turned = 2 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
 				else = {
-					set_variable = { key_turned = 0 }
-					subtract_from_variable = { ack_selected = 0.250 }
-
+					set_variable = { right_key_turned = 0 }
+					subtract_from_variable = { wmd_ready_status = 0.25 }
 				}
 				add_to_variable = { refresh_wmd_menu = 1 }
 			}
 
 			WMD_Key_Right_0_click = {
-				if = { limit = { check_variable = { key_turned = 0 } }
-					set_variable = { key_turned = 1 }
-					add_to_variable = { ack_selected = 0.125 }
+				if = { limit = { check_variable = { right_key_turned = 0 } }
+					set_variable = { right_key_turned = 1 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
-				else_if = { limit = { check_variable = { key_turned = 1 } }
-					set_variable = { key_turned = 2 }
-					add_to_variable = { ack_selected = 0.125 }
+				else_if = { limit = { check_variable = { right_key_turned = 1 } }
+					set_variable = { right_key_turned = 2 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
 				else = {
-					set_variable = { key_turned = 0 }
-					subtract_from_variable = { ack_selected = 0.250 }
+					set_variable = { right_key_turned = 0 }
+					subtract_from_variable = { wmd_ready_status = 0.250 }
 				}
 				add_to_variable = { refresh_wmd_menu = 1 }
 			}
@@ -373,15 +363,15 @@ scripted_gui = {
 			WMD_Key_Left_1_click = {
 				if = { limit = { check_variable = { left_key_turned = 0 } }
 					set_variable = { left_key_turned = 1 }
-					add_to_variable = { ack_selected = 0.125 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
 				else_if = { limit = { check_variable = { left_key_turned = 1 } }
 					set_variable = { left_key_turned = 2 }
-					add_to_variable = { ack_selected = 0.125 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
 				else = {
 					set_variable = { left_key_turned = 0 }
-					subtract_from_variable = { ack_selected = 0.25 }
+					subtract_from_variable = { wmd_ready_status = 0.25 }
 				}
 				add_to_variable = { refresh_wmd_menu = 1 }
 			}
@@ -389,31 +379,32 @@ scripted_gui = {
 			WMD_Key_Left_2_click = {
 				if = { limit = { check_variable = { left_key_turned = 0 } }
 					set_variable = { left_key_turned = 1 }
-					add_to_variable = { ack_selected = 0.125 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
 				else_if = { limit = { check_variable = { left_key_turned = 1 } }
 					set_variable = { left_key_turned = 2 }
-					add_to_variable = { ack_selected = 0.125 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
 				else = {
 					set_variable = { left_key_turned = 0 }
-					subtract_from_variable = { ack_selected = 0.25 }
+					subtract_from_variable = { wmd_ready_status = 0.25 }
 				}
 				add_to_variable = { refresh_wmd_menu = 1 }
 			}
 
 			WMD_Key_Left_0_click = {
+				log = "tag: [this.gettag] - wmd_target_selected: [?ROOT.wmd_target_selected]"
 				if = { limit = { check_variable = { left_key_turned = 0 } }
 					set_variable = { left_key_turned = 1 }
-					add_to_variable = { ack_selected = 0.125 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
 				else_if = { limit = { check_variable = { left_key_turned = 1 } }
 					set_variable = { left_key_turned = 2 }
-					add_to_variable = { ack_selected = 0.125 }
+					add_to_variable = { wmd_ready_status = 0.125 }
 				}
 				else = {
 					set_variable = { left_key_turned = 0 }
-					subtract_from_variable = { ack_selected = 0.25 }
+					subtract_from_variable = { wmd_ready_status = 0.25 }
 				}
 				add_to_variable = { refresh_wmd_menu = 1 }
 			}
@@ -505,19 +496,9 @@ scripted_gui = {
 					set_temp_variable = { show = 1 }
 					subtract_from_temp_variable = { show = show_wmd }
 					close_all_windows = yes
-					if = { limit = { check_variable = { show_wmd = 1 } } set_variable = { wmd_authorize = 0 } } # or it starts all messed up
+					if = { limit = { check_variable = { show_wmd = 1 } } set_variable = { wmd_authorize = 0 } } # or it loads all messed up
 					set_variable = { show_wmd = show }
 
-					# set_variable = { strike_level_tier1_selected = 0 }
-					# set_variable = { strike_level_tier2_selected = 0 }
-					# set_variable = { strike_level_tier3_selected = 0 }
-					# set_variable = { target_selected = 0 }
-					# set_variable = { key_turned = 0 }
-					# set_variable = { left_key_turned = 0 }
-					# set_variable = { ack_selected = 0 }
-					# set_variable = { wmd_authorize = 0 }
-					# set_variable = { activation_code = 0 }
-					# set_variable = { missile_selected = 0 }
 					clear_array = ROOT.nuclear_power_custom_array
 					every_country = {
 						limit = { check_variable = { num_of_nukes > 0 } }
@@ -619,47 +600,43 @@ scripted_gui = {
 					has_war = yes
 				}
 			}
-			### not needed i think
-			# strike_level_tier1_active_visible = { has_country_flag = WMD_STRIKE_LEVEL_1 }
-			# strike_level_tier2_active_visible = { has_country_flag = WMD_STRIKE_LEVEL_2 }
-			# strike_level_tier3_active_visible = { has_country_flag = WMD_STRIKE_LEVEL_3 }
+			### WIP
 			chem_box_unchecked_click_enabled = { always = no }
 			chem_box_checked_click_enabled = { always = no }
 			nuke_box_checked_click_enabled = { always = no }
 			nuke_box_unchecked_click_enabled = { always = no }
 			##########
-			#authorization_code_visible = { check_variable = { view_authorization_code = 1 } }
 			authorization_code_visible = { check_variable = { wmd_authorize = 1 } }
 			authorization_code_two_visible = { check_variable = { wmd_authorize = 1 } }
 			wmd_button_launch_off_visible = {
-				OR = {
-					has_equipment = { icbm_equipment < var:warhead_cost }
-					num_of_nukes < var:nuke_cost
-					check_variable = { ROOT.nations_selected < 0 }
-					check_variable = { missile_selected = 0 }
-					check_variable = { target_selected = 0 }
-					check_variable = { ack_selected = 0 }
-					AND = {
-						check_variable = { strike_level_tier1_selected = 0 }
-						check_variable = { strike_level_tier2_selected = 0 }
-						check_variable = { strike_level_tier3_selected = 0 }
-					}
-				}
+				check_variable = { wmd_ready_status < 1 }
+				# OR = {
+				# 	has_equipment = { icbm_equipment < var:warhead_cost }
+				# 	num_of_nukes < var:nuke_cost
+				# 	check_variable = { wmd_num_targets_selected = 0 }
+				# 	check_variable = { missile_selected = 0 }
+				# 	check_variable = { wmd_target_selected = 0 }
+				# 	check_variable = { wmd_ready_status = 0 }
+				# 	AND = {
+				# 		check_variable = { strike_level_tier1_selected = 0 }
+				# 		check_variable = { strike_level_tier2_selected = 0 }
+				# 		check_variable = { strike_level_tier3_selected = 0 }
+				# 	}
+				# }
 			}
-
-
 			wmd_button_launch_visible = {
-				has_equipment = { icbm_equipment > var:warhead_cost }
-				num_of_nukes > var:nuke_cost
-				check_variable = { ROOT.nations_selected > 0 }
-				check_variable = { missile_selected = 1 }
-				check_variable = { target_selected = 1 }
-				check_variable = { ack_selected = 1 }
-				OR = {
-					check_variable = { strike_level_tier1_selected = 1 }
-					check_variable = { strike_level_tier2_selected = 1 }
-					check_variable = { strike_level_tier3_selected = 1 }
-				}
+				check_variable = { wmd_ready_status = 1 }
+				# has_equipment = { icbm_equipment > var:warhead_cost }
+				# num_of_nukes > var:nuke_cost
+				# check_variable = { wmd_num_targets_selected > 0 }
+				# check_variable = { missile_selected = 1 }
+				# check_variable = { wmd_target_selected = 1 }
+				# check_variable = { wmd_ready_status = 1 }
+				# OR = {
+				# 	check_variable = { strike_level_tier1_selected = 1 }
+				# 	check_variable = { strike_level_tier2_selected = 1 }
+				# 	check_variable = { strike_level_tier3_selected = 1 }
+				# }
 			}
 		}
 
@@ -669,7 +646,7 @@ scripted_gui = {
 			strike_level_tier3 = { image = "[strike_level_tier3_icon]" }
 			target_icon = { image = "[target_status]" }
 			missile_icon = { image = "[missile_status]" }
-			ack_icon = { image = "[ack_status]" }
+			confirm_icon = { image = "[confirm_status]" }
 		}
 
 		effects = {
@@ -696,11 +673,11 @@ scripted_gui = {
 					set_variable = { strike_level_tier1_selected = 1 }
 					set_variable = { strike_level_tier2_selected = 0 }
 					set_variable = { strike_level_tier3_selected = 0 }
-					set_variable = { target_selected = 1 }
+					set_variable = { wmd_target_selected = 1 }
 				}
 				else = { #limit = { check_variable = { strike_level_tier1_selected = 1 } }
 					set_variable = { strike_level_tier1_selected = 0 }
-					set_variable = { target_selected = 0 }
+					set_variable = { wmd_target_selected = 0 }
 					set_variable = { missile_selected = 0 }
 				}
 
@@ -731,11 +708,11 @@ scripted_gui = {
 					set_variable = { strike_level_tier1_selected = 0 }
 					set_variable = { strike_level_tier2_selected = 1 }
 					set_variable = { strike_level_tier3_selected = 0 }
-					set_variable = { target_selected = 1 }
+					set_variable = { wmd_target_selected = 1 }
 				}
 				else_if = { limit = { check_variable = { strike_level_tier2_selected = 1 } }
 					set_variable = { strike_level_tier2_selected = 0 }
-					set_variable = { target_selected = 0 }
+					set_variable = { wmd_target_selected = 0 }
 					set_variable = { missile_selected = 0 }
 				}
 				else = {
@@ -755,11 +732,11 @@ scripted_gui = {
 					set_variable = { strike_level_tier1_selected = 0 }
 					set_variable = { strike_level_tier2_selected = 0 }
 					set_variable = { strike_level_tier3_selected = 1 }
-					set_variable = { target_selected = 1 }
+					set_variable = { wmd_target_selected = 1 }
 				}
 				else = { # limit = { check_variable = { strike_level_tier3_selected = 1 } }
 					set_variable = { strike_level_tier3_selected = 0 }
-					set_variable = { target_selected = 0 }
+					set_variable = { wmd_target_selected = 0 }
 					set_variable = { missile_selected = 0 }
 				}
 
@@ -994,10 +971,10 @@ scripted_gui = {
 				set_variable = { strike_level_tier1_selected = 0 }
 				set_variable = { strike_level_tier2_selected = 0 }
 				set_variable = { strike_level_tier3_selected = 0 }
-				set_variable = { target_selected = 0 }
-				set_variable = { key_turned = 1 }
+				set_variable = { wmd_target_selected = 0 }
+				set_variable = { right_key_turned = 1 }
 				set_variable = { letf_key_turned = 1 }
-				set_variable = { ack_selected = 0 }
+				set_variable = { wmd_ready_status = 0 }
 				set_variable = { wmd_authorize = 0 }
 				set_variable = { activation_code = 0 }
 				set_variable = { missile_selected = 0 }
@@ -1079,9 +1056,7 @@ scripted_gui = {
 				else = {
 					set_variable = { ROOT.missile_selected = 0}
 				}
-
 				add_to_variable = { ROOT.refresh_wmd_menu = 1 }
-				add_to_variable = { ROOT.nations_selected = 1 }
 			}
 
 			###################
@@ -1121,12 +1096,7 @@ scripted_gui = {
 				else = {
 					set_variable = { ROOT.missile_selected = 0}
 				}
-				####################
-
-				#distance_calculator_tier_3 = yes
-				#clear_array = ROOT.WMD_target_states_array
 				add_to_variable = { ROOT.refresh_wmd_menu = 1 }
-				subtract_from_variable = { ROOT.nations_selected = 1 }
 			}
 		}
 
@@ -1135,14 +1105,14 @@ scripted_gui = {
 			enemy_box_checked_click_enabled = {
 				custom_trigger_tooltip = {
 					tooltip = enemy_box_enabled_TT
-					check_variable = { ROOT.target_selected = 1 }
+					check_variable = { ROOT.wmd_target_selected = 1 }
 				}
 			}
 			enemy_box_unchecked_visible = { check_variable = { THIS.checkmark = 1 } }
 			enemy_box_unchecked_click_enabled = {
 				custom_trigger_tooltip = {
 					tooltip = enemy_box_enabled_TT
-					check_variable = { ROOT.target_selected = 1 }
+					check_variable = { ROOT.wmd_target_selected = 1 }
 				}
 			}
 		}
