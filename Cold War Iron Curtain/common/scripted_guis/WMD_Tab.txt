@@ -619,9 +619,30 @@ scripted_gui = {
 			wmd_button_launch_off_click_enabled = {
 				check_variable = { wmd_ready_status < 1 }
 				custom_trigger_tooltip = {
-					tooltip = strike_level_must_be_at_war_TT
-					has_war = yes
+					tooltip = wmd_must_have_defcon_1_TT
+					has_idea = defcon_system_1
 				}
+				custom_trigger_tooltip = {
+					tooltip = wmd_authorize_enabled_target_TT
+					check_variable = { WMD_num_target_states > 0 }
+				}
+				custom_trigger_tooltip = {
+					tooltip = wmd_has_authorize_code_TT
+					check_variable = { wmd_authorize = 1 }
+				}
+				has_equipment = { icbm_equipment > var:warhead_cost }
+				num_of_nukes > var:nuke_cost
+				custom_trigger_tooltip = {
+					tooltip = wmd_all_keys_turned_TT
+					check_variable = { wmd_ready_status = 1 }
+				}
+			}
+			wmd_button_launch_visible = {
+				check_variable = { wmd_ready_status = 1 }
+				has_equipment = { icbm_equipment > var:warhead_cost }
+				num_of_nukes > var:nuke_cost
+			}
+			wmd_button_launch_click_enabled = {
 				custom_trigger_tooltip = {
 					tooltip = wmd_must_have_defcon_1_TT
 					has_idea = defcon_system_1
@@ -636,18 +657,10 @@ scripted_gui = {
 				}
 				has_equipment = { icbm_equipment > var:warhead_cost }
 				num_of_nukes > var:nuke_cost
-			}
-			wmd_button_launch_visible = {
-				check_variable = { wmd_ready_status = 1 }
-				has_equipment = { icbm_equipment > var:warhead_cost }
-				num_of_nukes > var:nuke_cost
-				# check_variable = { missile_selected = 1 }
-			}
-			wmd_button_launch_click_enabled = {
-				check_variable = { wmd_ready_status = 1 }
-				# has_equipment = { icbm_equipment > var:warhead_cost }
-				# num_of_nukes > var:nuke_cost
-				# check_variable = { missile_selected = 1 }
+				custom_trigger_tooltip = {
+					tooltip = wmd_all_keys_turned_TT
+					check_variable = { wmd_ready_status = 1 }
+				}
 			}
 		}
 
@@ -744,29 +757,47 @@ scripted_gui = {
 				add_to_variable = { refresh_wmd_menu = 1 }
 			}
 
-			wmd_button_launch_click = { 
+			wmd_button_launch_click = {
+				log = "[GetDateText]: [Root.GetName]: id = wmd_button_launch_click"
+				# threat added - 5 per states nuked
+				set_temp_variable = { tmp_threat = WMD_target_states_array^num }
+				multiply_temp_variable = { tmp_threat = 5 }
+				log = "  Threat [?tmp_threat] from Nuclear Attack on [?WMD_target_states_array^num] states"
+				ROOT = { add_named_threat = { threat = tmp_threat name = "Nuclear Attack on [?WMD_target_states_array^num] states" } }
 				if = {
 					limit = {
 						tag = ISR
-						NOT = { has_country_flag = samson_option_executed }
+						NOT = { has_country_flag = samson_option_executed } # WIP
 					}
 					samson_option_super_event = yes
 					set_country_flag = samson_option_executed
 				}
 				for_each_loop = {
+					# array for nuking events
 					array = WMD_target_states_array
-					launch_nuke = {
-						state = var:WMD_target_states_array^i
-						use_nuke = yes
-					}
-					multiply_variable = { warhead_damage_local = ROOT.warhead_damage }
-					for_loop_effect = {
-						start = 0
-						end = warhead_damage
-						wmd_damage_loop_effect = yes
-					}
-					set_variable = { warhead_damage_local = 0 }
+					add_to_array = { temp_nuke_target = WMD_target_states_array^i }
 				}
+				for_each_loop = {
+					array = WMD_target_states_array
+					set_variable = { wmd_nuke_target_state = WMD_target_states_array^i.id }
+					set_temp_variable = { temp_delay = var:i }
+					multiply_temp_variable = { temp_delay = 6 }
+					#log = "temp_nuke_target^num: [?temp_nuke_target^num]"
+					if = { limit = { check_variable = { i = 0 } }
+						log = "  calling wmd_nuke.1"
+						country_event = wmd_nuke.1
+					}
+					else = {
+						log = "  calling wmd_nuke.1 with [?temp_delay] hours delay"
+						country_event = { id = wmd_nuke.1 hours = temp_delay }
+					}
+					#WIP
+					multiply_variable = { warhead_damage_local = ROOT.warhead_damage }
+					# log = "State: [THIS.GetName] - warhead_damage_local: [?warhead_damage_local] - ROOT.warhead_damage [?ROOT.warhead_damage]"
+					clear_variable = warhead_damage_local
+					wmd_stockpile_loc = yes
+				}
+				clear_variable = wmd_nuke_target_state 
 				set_variable = { icbm_cost = warhead_cost }
 				multiply_variable = { icbm_cost = -1 }
 				meta_effect = {

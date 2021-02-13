@@ -2,7 +2,30 @@
 # Nuclear Bomb Events
 ###########################
 
+add_namespace = wmd_nuke
 add_namespace = nuke_dropped
+
+country_event = {
+	id = wmd_nuke.1
+	is_triggered_only = yes
+	hidden = yes
+	#fire_only_once = yes
+	immediate = {
+		set_temp_variable = { tempIx = temp_nuke_target^num }
+		subtract_from_temp_variable = { tempIx = 1}
+		log = "  wmd_nuke.1([ROOT.GetTag]): Nuking state [?temp_nuke_target^tempIx.GetName]"
+		launch_nuke = {
+			state = var:temp_nuke_target^tempIx
+			use_nuke = yes
+		}
+		if = { limit = { check_variable = { tempIx = 0 } }
+			clear_array = temp_nuke_target
+		}
+		else = {
+			resize_array = { array = temp_nuke_target size = tempIx }
+		}
+	}
+}
 
 # Hidden event to set flag on nuke dropped
 news_event = {
