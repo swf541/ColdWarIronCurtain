@@ -186,32 +186,7 @@ scripted_gui = {
 			}
 
 			wmd_reset_click = {
-				log = "tag: [this.gettag]"
-				add_to_variable = { refresh_wmd_menu = 1 }
-				set_variable = { strike_level_tier1_selected = 0 }
-				set_variable = { strike_level_tier2_selected = 0 }
-				set_variable = { strike_level_tier3_selected = 0 }
-				set_variable = { WMD_num_target_states = 0 }
-				set_variable = { wmd_target_selected = 0 }
-				set_variable = { right_key_turned = 0 }
-				set_variable = { left_key_turned = 0 }
-				set_variable = { wmd_ready_status = 0 }
-				set_variable = { wmd_authorize = 0 }
-				set_variable = { activation_code = 0 }
-				set_variable = { missile_selected = 0 }
-				for_each_scope_loop = {
-					array = enemies
-					set_variable = { THIS.checkmark = 0 }
-				}
-				clear_array = WMD_target_states_array
-				set_variable = { wmd_num_targets_selected = 0 }
-				clear_array = nuclear_power_custom_array
-				every_country = {
-					limit = { check_variable = { num_of_nukes > 0 } }
-					add_to_array = { ROOT.nuclear_power_custom_array = THIS.id }
-				}
-				wmd_stockpile_loc = yes
-				log = "wmd_target_selected: [?wmd_target_selected]"
+				wmd_reset = yes
 			}
 
 			wmd_authorize_click = {
@@ -537,6 +512,10 @@ scripted_gui = {
 
 		triggers = {
 			strike_level_tier1_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = wmd_strike_ongoing_TT
+					check_variable = { wmd_strike_ongoing = 0 }
+				}
 				OR = {
 					custom_trigger_tooltip = {
 						tooltip = strike_level_tier1_2_enabled_bomber_TT
@@ -557,6 +536,10 @@ scripted_gui = {
 				}
 			}
 			strike_level_tier2_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = wmd_strike_ongoing_TT
+					check_variable = { wmd_strike_ongoing = 0 }
+				}
 				OR = {
 					custom_trigger_tooltip = {
 						tooltip = strike_level_tier1_2_enabled_bomber_TT
@@ -577,6 +560,10 @@ scripted_gui = {
 				}
 			}
 			strike_level_tier3_click_enabled = {
+				custom_trigger_tooltip = {
+					tooltip = wmd_strike_ongoing_TT
+					check_variable = { wmd_strike_ongoing = 0 }
+				}
 				OR = {
 					if = { limit = { tag = USA }
 						custom_trigger_tooltip = {
@@ -772,6 +759,7 @@ scripted_gui = {
 					samson_option_super_event = yes
 					set_country_flag = samson_option_executed
 				}
+				set_variable = { wmd_strike_ongoing = 1 }
 				for_each_loop = {
 					# array for nuking events
 					array = WMD_target_states_array
@@ -795,218 +783,209 @@ scripted_gui = {
 					multiply_variable = { warhead_damage_local = ROOT.warhead_damage }
 					# log = "State: [THIS.GetName] - warhead_damage_local: [?warhead_damage_local] - ROOT.warhead_damage [?ROOT.warhead_damage]"
 					clear_variable = warhead_damage_local
-					wmd_stockpile_loc = yes
+					wmd_reset = yes
 				}
 				clear_variable = wmd_nuke_target_state 
 				set_variable = { icbm_cost = warhead_cost }
 				multiply_variable = { icbm_cost = -1 }
-				meta_effect = {
-					text = {
+				# meta_effect = {
+				# 	text = {
 						add_equipment_to_stockpile = {
 							type = icbm_equipment
-							amount = [AMNT]
+							amount = icbm_cost
 						}
-					}
-					AMNT = "icbm_cost"
-				}
-
-				###################################################
-				# MAD
-				#USA triggered MAD
-				if = {
-					limit = {
-						ROOT = {
-							check_variable = { THIS.id = USA.id }
-							check_variable = { strike_level_tier3_selected = 1 }
-							OR = {
-								SOV = { check_variable = { THIS.checkmark = 1 } }
-								POL = { check_variable = { THIS.checkmark = 1 } }
-								CZE = { check_variable = { THIS.checkmark = 1 } }
-								HUN = { check_variable = { THIS.checkmark = 1 } }
-								ALB = { check_variable = { THIS.checkmark = 1 } }
-								ROM = { check_variable = { THIS.checkmark = 1 } }
-								BUL= { check_variable = { THIS.checkmark = 1 } }
-							}
-						}
-					}
-					#add_to_variable = { VTC.usa_global_thermonuclearwar = 1 }
-
-					################################################
-					# draw striking array/ NATO
-					clear_array = SOV.COUNTERATTACK
-					#SOV = {
-						every_state = {
-							limit = {
-								#Is owned by an enemy country
-								any_country = {
-									controls_state = PREV
-									has_war_with = SOV
-								}
-							}
-							if = {
-								limit = {
-									NOT = {
-										is_in_array = {
-											array = SOV.COUNTERATTACK
-											value = THIS.id
-										}
-									}
-									OR = {
-										is_capital = yes
-										state_population_k > 4000
-										#controller = {
-										#	divisions_in_state = {
-										#		size > 4
-										#		state = PREV
-										#	}
-										#}
-										#nuclear_reactor > 0
-									}
-								}
-								add_to_array = { SOV.COUNTERATTACK = THIS.id }
-								add_to_variable = { SOV.COUNTERATTACK_warhead_cost = 1 }
-								set_variable = { state_pop_total = state_population_k }
-								if = { limit = { check_variable = { state_pop_total > 1000 } }
-									divide_variable = { state_pop_total = 1000 }
-									round_variable = state_pop_total
-									add_to_variable = { SOV.COUNTERATTACK_warhead_cost = state_pop_total }
-								}
-							}
-						}
-					#}
-
-					#event
-					every_country = {
-						#limit = {
-						#	is_ai = no
-						#}
-						if = { limit = { tag = SOV }
-							country_event = WMD.2
-							news_event = WMD.31
-						}
-						else = {
-							news_event = WMD.31
-						}
-					}
-					if = {
-						limit = { SOV = { is_ai = yes }
-						}
-						SOV = { activate_mission = WMD_USA_MAD }
-						#every_country = {
-						#	limit = { is_ai = no }
-							#news_event = UN_RESOLUTION.1
-						#}
-					}
-				}
-				#event
-				#if = {
-				#	limit = {
-				#		check_variable = { VTC.usa_global_thermonuclearwar = 1 }
-				#	}
+					# 		amount = [AMNT]
+					# 	}
+					# }
+					# AMNT = "icbm_cost"
 				#}
 
-				#SOV triggered MAD
-				if = {
-					limit = {
-						ROOT = {
-							check_variable = { THIS.id = SOV.id }
-							check_variable = { strike_level_tier3_selected = 1 }
-							OR = {
-								USA= { check_variable = { THIS.checkmark = 1 } }
-								WGR= { check_variable = { THIS.checkmark = 1 } }
-								DEN = { check_variable = { THIS.checkmark = 1 } }
-								ENG = { check_variable = { THIS.checkmark = 1 } }
-								HOL = { check_variable = { THIS.checkmark = 1 } }
-								BEL = { check_variable = { THIS.checkmark = 1 } }
-								FRA = { check_variable = { THIS.checkmark = 1 } }
-								ITA= { check_variable = { THIS.checkmark = 1 } }
-							}
-						}
-					}
-					#add_to_variable = { VTC.sov_global_thermonuclearwar = 1 }
+				# ###################################################
+				# # MAD
+				# #USA triggered MAD
+				# if = {
+				# 	limit = {
+				# 		ROOT = {
+				# 			check_variable = { THIS.id = USA.id }
+				# 			check_variable = { strike_level_tier3_selected = 1 }
+				# 			OR = {
+				# 				SOV = { check_variable = { THIS.checkmark = 1 } }
+				# 				POL = { check_variable = { THIS.checkmark = 1 } }
+				# 				CZE = { check_variable = { THIS.checkmark = 1 } }
+				# 				HUN = { check_variable = { THIS.checkmark = 1 } }
+				# 				ALB = { check_variable = { THIS.checkmark = 1 } }
+				# 				ROM = { check_variable = { THIS.checkmark = 1 } }
+				# 				BUL= { check_variable = { THIS.checkmark = 1 } }
+				# 			}
+				# 		}
+				# 	}
+				# 	#add_to_variable = { VTC.usa_global_thermonuclearwar = 1 }
 
-					################################################
-					# draw striking array/ USSR
-					clear_array = USA.COUNTERATTACK
-					#USA = {
-						every_state = {
-							limit = {
-								#Is owned by an enemy country
-								any_country = {
-									controls_state = PREV
-									has_war_with = USA
-								}
-							}
-							if = {
-								limit = {
-									NOT = {
-										is_in_array = {
-										array = USA.COUNTERATTACK
-										value = THIS.id
-										}
-									}
-									OR = {
-										is_capital = yes
-										state_population_k > 4000
-										#controller = {
-										#	divisions_in_state = {
-										#		size > 4
-										#		state = PREV
-										#	}
-										#}
-										#nuclear_reactor > 0
-									}
-								}
-								add_to_array = { USA.COUNTERATTACK = THIS.id }
-								add_to_variable = { USA.COUNTERATTACK_warhead_cost = 1 }
-								set_variable = { state_pop_total = state_population_k }
-								if = { limit = { check_variable = { state_pop_total > 1000 } }
-									divide_variable = { state_pop_total = 1000 }
-									round_variable = state_pop_total
-									add_to_variable = { USA.COUNTERATTACK_warhead_cost = state_pop_total }
-								}
-							}
-						}
-					#}
+				# 	################################################
+				# 	# draw striking array/ NATO
+				# 	clear_array = SOV.COUNTERATTACK
+				# 	#SOV = {
+				# 		every_state = {
+				# 			limit = {
+				# 				#Is owned by an enemy country
+				# 				any_country = {
+				# 					controls_state = PREV
+				# 					has_war_with = SOV
+				# 				}
+				# 			}
+				# 			if = {
+				# 				limit = {
+				# 					NOT = {
+				# 						is_in_array = {
+				# 							array = SOV.COUNTERATTACK
+				# 							value = THIS.id
+				# 						}
+				# 					}
+				# 					OR = {
+				# 						is_capital = yes
+				# 						state_population_k > 4000
+				# 						#controller = {
+				# 						#	divisions_in_state = {
+				# 						#		size > 4
+				# 						#		state = PREV
+				# 						#	}
+				# 						#}
+				# 						#nuclear_reactor > 0
+				# 					}
+				# 				}
+				# 				add_to_array = { SOV.COUNTERATTACK = THIS.id }
+				# 				add_to_variable = { SOV.COUNTERATTACK_warhead_cost = 1 }
+				# 				set_variable = { state_pop_total = state_population_k }
+				# 				if = { limit = { check_variable = { state_pop_total > 1000 } }
+				# 					divide_variable = { state_pop_total = 1000 }
+				# 					round_variable = state_pop_total
+				# 					add_to_variable = { SOV.COUNTERATTACK_warhead_cost = state_pop_total }
+				# 				}
+				# 			}
+				# 		}
+				# 	#}
 
-					#event
-					every_country = {
-						#limit = {
-						#	is_ai = no
-						#}
-						if = { limit = { tag = USA }
-							country_event = WMD.1
-							news_event = WMD.3
-						}
-						else = {
-							news_event = WMD.3
-						}
-					}
-					if = {
-						limit = { USA = { is_ai = yes } }
-						USA = { activate_mission = WMD_SOV_MAD }
-						#every_country = {
-						#	limit = { is_ai = no }
-						#	#news_event = UN_RESOLUTION.1
-						#}
-					}
-				}
+				# 	#event
+				# 	every_country = {
+				# 		#limit = {
+				# 		#	is_ai = no
+				# 		#}
+				# 		if = { limit = { tag = SOV }
+				# 			country_event = WMD.2
+				# 			news_event = WMD.31
+				# 		}
+				# 		else = {
+				# 			news_event = WMD.31
+				# 		}
+				# 	}
+				# 	if = {
+				# 		limit = { SOV = { is_ai = yes }
+				# 		}
+				# 		SOV = { activate_mission = WMD_USA_MAD }
+				# 		#every_country = {
+				# 		#	limit = { is_ai = no }
+				# 			#news_event = UN_RESOLUTION.1
+				# 		#}
+				# 	}
+				# }
+				# #event
+				# #if = {
+				# #	limit = {
+				# #		check_variable = { VTC.usa_global_thermonuclearwar = 1 }
+				# #	}
+				# #}
+
+				# #SOV triggered MAD
+				# if = {
+				# 	limit = {
+				# 		ROOT = {
+				# 			check_variable = { THIS.id = SOV.id }
+				# 			check_variable = { strike_level_tier3_selected = 1 }
+				# 			OR = {
+				# 				USA= { check_variable = { THIS.checkmark = 1 } }
+				# 				WGR= { check_variable = { THIS.checkmark = 1 } }
+				# 				DEN = { check_variable = { THIS.checkmark = 1 } }
+				# 				ENG = { check_variable = { THIS.checkmark = 1 } }
+				# 				HOL = { check_variable = { THIS.checkmark = 1 } }
+				# 				BEL = { check_variable = { THIS.checkmark = 1 } }
+				# 				FRA = { check_variable = { THIS.checkmark = 1 } }
+				# 				ITA= { check_variable = { THIS.checkmark = 1 } }
+				# 			}
+				# 		}
+				# 	}
+				# 	#add_to_variable = { VTC.sov_global_thermonuclearwar = 1 }
+
+				# 	################################################
+				# 	# draw striking array/ USSR
+				# 	clear_array = USA.COUNTERATTACK
+				# 	#USA = {
+				# 		every_state = {
+				# 			limit = {
+				# 				#Is owned by an enemy country
+				# 				any_country = {
+				# 					controls_state = PREV
+				# 					has_war_with = USA
+				# 				}
+				# 			}
+				# 			if = {
+				# 				limit = {
+				# 					NOT = {
+				# 						is_in_array = {
+				# 						array = USA.COUNTERATTACK
+				# 						value = THIS.id
+				# 						}
+				# 					}
+				# 					OR = {
+				# 						is_capital = yes
+				# 						state_population_k > 4000
+				# 						#controller = {
+				# 						#	divisions_in_state = {
+				# 						#		size > 4
+				# 						#		state = PREV
+				# 						#	}
+				# 						#}
+				# 						#nuclear_reactor > 0
+				# 					}
+				# 				}
+				# 				add_to_array = { USA.COUNTERATTACK = THIS.id }
+				# 				add_to_variable = { USA.COUNTERATTACK_warhead_cost = 1 }
+				# 				set_variable = { state_pop_total = state_population_k }
+				# 				if = { limit = { check_variable = { state_pop_total > 1000 } }
+				# 					divide_variable = { state_pop_total = 1000 }
+				# 					round_variable = state_pop_total
+				# 					add_to_variable = { USA.COUNTERATTACK_warhead_cost = state_pop_total }
+				# 				}
+				# 			}
+				# 		}
+				# 	#}
+
+				# 	#event
+				# 	every_country = {
+				# 		#limit = {
+				# 		#	is_ai = no
+				# 		#}
+				# 		if = { limit = { tag = USA }
+				# 			country_event = WMD.1
+				# 			news_event = WMD.3
+				# 		}
+				# 		else = {
+				# 			news_event = WMD.3
+				# 		}
+				# 	}
+				# 	if = {
+				# 		limit = { USA = { is_ai = yes } }
+				# 		USA = { activate_mission = WMD_SOV_MAD }
+				# 		#every_country = {
+				# 		#	limit = { is_ai = no }
+				# 		#	#news_event = UN_RESOLUTION.1
+				# 		#}
+				# 	}
+				# }
 
 				#event
 				#if = {
 				#	limit = { check_variable = { VTC.sov_global_thermonuclearwar = 1 } }
 				#}
-				set_variable = { strike_level_tier1_selected = 0 }
-				set_variable = { strike_level_tier2_selected = 0 }
-				set_variable = { strike_level_tier3_selected = 0 }
-				set_variable = { wmd_target_selected = 0 }
-				set_variable = { right_key_turned = 1 }
-				set_variable = { letf_key_turned = 1 }
-				set_variable = { wmd_ready_status = 0 }
-				set_variable = { wmd_authorize = 0 }
-				set_variable = { activation_code = 0 }
-				set_variable = { missile_selected = 0 }
-				add_to_variable = { refresh_wmd_menu = 1 }
 			}
 		}
 	}
