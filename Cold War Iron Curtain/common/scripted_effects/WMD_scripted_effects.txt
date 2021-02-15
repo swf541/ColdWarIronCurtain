@@ -16,7 +16,7 @@ wmd_reset = {
 	set_variable = { strike_level_tier1_selected = 0 }
 	set_variable = { strike_level_tier2_selected = 0 }
 	set_variable = { strike_level_tier3_selected = 0 }
-	set_variable = { WMD_num_target_states = 0 }
+	#set_variable = { WMD_num_target_states = 0 } #WMD_target_states_array^num
 	set_variable = { wmd_target_selected = 0 }
 	set_variable = { right_key_turned = 0 }
 	set_variable = { left_key_turned = 0 }
@@ -85,417 +85,76 @@ wmd_damage_loop_effect = {
 		}
 	}
 
-	#####ARMAMENT POPULATION AND RADS#####
-	###ARMAMENT 0###
-	log = "    reduce manpower: ARMAMENT 0 (state: [?wmd_nuke_target_state.GetName]"
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_0 }
-			NOT = { ROOT = { has_tech = atomic_weapons_armament_I } }
-			var:wmd_nuke_target_state = {
-				state_population > 50000
-				NOT = { state_population > 100000 }
-			}
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -1000
-			add_to_variable = { var = radiation value = 36 }
-		}
+	#####ARMAMENT/DELIVERY POPULATION AND RADS#####
+	# Apply Rads to state based on atomic_weapons_armament tech lvl
+	# and set manpower reduction factor based on atomic_weapons_armament tech lvl
+	set_temp_variable = { tempManpowerReductionFactor = 0 }
+	if = { limit = { ROOT = { has_tech = atomic_weapons_armament_0 NOT = { has_tech = atomic_weapons_armament_I } } }
+		log = "    reduce manpower factor for ARMAMENT 0 = 1 / add 36 rads to state"
+		add_to_temp_variable = { tempManpowerReductionFactor = 1 }
+		add_to_variable = { var = radiation value = 36 }
 	}
-	if = {
-		limit = {
-			ROOT = {
-				has_tech = atomic_weapons_armament_0
-				NOT = { has_tech = atomic_weapons_armament_I }
-			}
-			var:wmd_nuke_target_state = { 
-				state_population > 100000
-				NOT = { state_population > 1000000 }
-			}
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -10000
-			add_to_variable = { var = radiation value = 36 }
-		}
+	else_if = { limit = { ROOT = { has_tech = atomic_weapons_armament_I NOT = { has_tech = atomic_weapons_armament_II } } }
+		log = "    reduce manpower factor for ARMAMENT I = 2 / add 48 rads to state (36 to neighbor states)"
+		add_to_temp_variable = { tempManpowerReductionFactor = 2 }
+		add_to_variable = { var = radiation value = 48 }
+		every_neighbor_state = { add_to_variable = { var = radiation value = 36 } }
 	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_0 }
-			NOT = { ROOT = { has_tech = atomic_weapons_armament_I } }
-			var:wmd_nuke_target_state = { state_population > 1000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 2000000 } }
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -25000
-			add_to_variable = { var = radiation value = 36 }
-		}
+	else_if = { limit = { ROOT = { has_tech = atomic_weapons_armament_II } }
+		log = "    reduce manpower factor for ARMAMENT II = 6 / add 80 rads to state (64 to neighbor states)"
+		add_to_temp_variable = { tempManpowerReductionFactor = 6 }
+		add_to_variable = { var = radiation value = 80 }
+		every_neighbor_state = { add_to_variable = { var = radiation value = 64 } }
 	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_0 }
-			NOT = { ROOT = { has_tech = atomic_weapons_armament_I } }
-			var:wmd_nuke_target_state = {
-				state_population > 2000000
-				NOT = { state_population > 5000000 }
-			}
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -50000
-			add_to_variable = { var = radiation value = 36 }
-		}
+	####
+	# add to manpower reduction factor based on atomic_weapons_delivery tech lvl
+	if = { limit = { ROOT = { has_tech = atomic_weapons_delivery_I NOT = { has_tech = atomic_weapons_delivery_III } } }
+		log = "    reduce manpower factor for DELIVERY I = 1"
+		add_to_temp_variable = { tempManpowerReductionFactor = 1 }
 	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_0 }
-			NOT = { ROOT = { has_tech = atomic_weapons_armament_I } }
-			var:wmd_nuke_target_state = {
-				state_population > 5000000
-				NOT = { state_population > 10000000 }
-			}
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -100000
-			add_to_variable = { var = radiation value = 36 }
-		}
+	else_if = { limit = { ROOT = { has_tech = atomic_weapons_delivery_III NOT = { has_tech = atomic_weapons_delivery_V } } }
+		log = "    reduce manpower factor for DELIVERY III = 2"
+		add_to_temp_variable = { tempManpowerReductionFactor = 2 }
 	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_0 }
-			NOT = { ROOT = { has_tech = atomic_weapons_armament_I } }
-			var:wmd_nuke_target_state = { state_population > 10000000 }
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -150000
-			add_to_variable = { var = radiation value = 36 }
-		}
+	else_if = { limit = { ROOT = { has_tech = atomic_weapons_delivery_V } }
+		log = "    reduce manpower factor for DELIVERY V = 6"
+		add_to_temp_variable = { tempManpowerReductionFactor = 6 }
 	}
+	log = "   total manpower factor from techs = [?tempManpowerReductionFactor]"
+	
+	# Reduce manpower on state based on state pop and reduction factor from atomic_weapons_armament
+	if = { limit = { var:wmd_nuke_target_state = { state_population > 50000 state_population < 100001 } }
+		set_temp_variable = { tempManpowerReduction = 1000 }
+		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		var:wmd_nuke_target_state = { add_manpower = tempManpowerReduction }
+	}
+	else_if = { limit = { var:wmd_nuke_target_state = { state_population > 100000 state_population < 1000001 } }
+		set_temp_variable = { tempManpowerReduction = 10000 }
+		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		var:wmd_nuke_target_state = { add_manpower = tempManpowerReduction }
+	}
+	else_if = { limit = { var:wmd_nuke_target_state = { state_population > 1000000 state_population < 2000001 } }
+		set_temp_variable = { tempManpowerReduction = 25000 }
+		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		var:wmd_nuke_target_state = { add_manpower = tempManpowerReduction }
+	}
+	else_if = { limit = { var:wmd_nuke_target_state = { state_population > 2000000 state_population < 5000001 } }
+		set_temp_variable = { tempManpowerReduction = 50000 }
+		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		var:wmd_nuke_target_state = { add_manpower = tempManpowerReduction }
+	}
+	else_if = { limit = { var:wmd_nuke_target_state = { state_population > 5000000 state_population < 1000001 } }
+		set_temp_variable = { tempManpowerReduction = 100000 }
+		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		var:wmd_nuke_target_state = { add_manpower = tempManpowerReduction }
+	}
+	else_if = { limit = { var:wmd_nuke_target_state = { state_population > 10000000 } }
+		set_temp_variable = { tempManpowerReduction = 150000 }
+		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		var:wmd_nuke_target_state = { add_manpower = tempManpowerReduction }
+	}
+	log = "   total manpower reduction from techs = [?tempManpowerReduction]"
 
-	###ARMAMENT I###
-	log = "    reduce manpower: ARMAMENT I (state: [?wmd_nuke_target_state.GetName])"
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_armament_II } }
-			var:wmd_nuke_target_state = {
-				state_population > 50000
-				NOT = { state_population > 100000 }
-			}
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -2000
-			add_to_variable = { var = radiation value = 48 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 36 } }
-		}
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_armament_II } }
-			var:wmd_nuke_target_state = {
-				state_population > 100000
-				NOT = { state_population > 1000000 }
-			}
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -20000
-			add_to_variable = { var = radiation value = 48 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 36 } }
-		}
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_armament_II } }
-			var:wmd_nuke_target_state = {
-				state_population > 1000000
-				NOT = { state_population > 2000000 }
-			}
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -50000
-			add_to_variable = { var = radiation value = 48 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 36 } }
-		}
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_armament_II } }
-			var:wmd_nuke_target_state = {
-				state_population > 2000000
-				NOT = { state_population > 5000000 }
-			}
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -100000
-			add_to_variable = { var = radiation value = 48 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 36 } }
-		}
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_armament_II } }
-			var:wmd_nuke_target_state = {
-				state_population > 5000000
-				NOT = { state_population > 10000000 }
-			}
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -200000
-			add_to_variable = { var = radiation value = 48 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 36 } }
-		}
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_armament_II } }
-			var:wmd_nuke_target_state = { state_population > 10000000 }
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -300000
-			add_to_variable = { var = radiation value = 48 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 36 } }
-		}
-	}
-
-	###ARMAMENT II###
-	log = "    reduce manpower: ARMAMENT II (state: [?wmd_nuke_target_state.GetName])"
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_II }
-			var:wmd_nuke_target_state = { state_population > 50000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 100000 } }
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -6000
-			add_to_variable = { var = radiation value = 80 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 64 } }
-		}
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_II }
-			var:wmd_nuke_target_state = { state_population > 100000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 1000000 } }
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -60000
-			add_to_variable = { var = radiation value = 80 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 64 } }
-		}
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_II }
-			var:wmd_nuke_target_state = { state_population > 1000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 2000000 } }
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -150000
-			add_to_variable = { var = radiation value = 80 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 64 } }
-		}
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_II }
-			var:wmd_nuke_target_state = { state_population > 2000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 5000000 } }
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -300000
-			add_to_variable = { var = radiation value = 80 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 64 } }
-		}
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_II }
-			var:wmd_nuke_target_state = { state_population > 5000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 10000000 } }
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -600000
-			add_to_variable = { var = radiation value = 80 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 64 } }
-		}
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_armament_II }
-			var:wmd_nuke_target_state = { state_population > 10000000 }
-		}
-		var:wmd_nuke_target_state = {
-			add_manpower = -800000
-			add_to_variable = { var = radiation value = 80 }
-			every_neighbor_state = { add_to_variable = { var = radiation value = 64 } }
-		}
-	}
-
-	#####DELIVERY POPULATION#####
-	###DELIVERY I###
-	log = "    reduce manpower: DELIVERY I (state: [?wmd_nuke_target_state.GetName])"
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_III } }
-			var:wmd_nuke_target_state = { state_population > 50000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 100000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -1000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_III } }
-			var:wmd_nuke_target_state = { state_population > 100000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 1000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -10000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_III } }
-			var:wmd_nuke_target_state = { state_population > 1000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 2000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -25000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_III } }
-			var:wmd_nuke_target_state = { state_population > 2000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 5000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -50000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_III } }
-			var:wmd_nuke_target_state = { state_population > 5000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 10000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -100000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_III } }
-			var:wmd_nuke_target_state = { state_population > 10000000 }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -150000 }
-	}
-
-	###DELIVERY III###
-	log = "    reduce manpower: DELIVERY III (state: [?wmd_nuke_target_state.GetName])"
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_III }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_V } }
-			var:wmd_nuke_target_state = { state_population > 50000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 100000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -4000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_III }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_V } }
-			var:wmd_nuke_target_state = { state_population > 100000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 1000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -40000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_III }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_V } }
-			var:wmd_nuke_target_state = { state_population > 1000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 2000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -100000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_III }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_V } }
-			var:wmd_nuke_target_state = { state_population > 2000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 5000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -200000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_III }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_V } }
-			var:wmd_nuke_target_state = { state_population > 5000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 10000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -400000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_III }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_V } }
-			var:wmd_nuke_target_state = { state_population > 10000000 }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -600000 }
-	}
-
-	###DELIVERY V###
-	log = "    reduce manpower: DELIVERY V (state: [?wmd_nuke_target_state.GetName])"
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_V }
-			var:wmd_nuke_target_state = { state_population > 50000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 100000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -6000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_V }
-			var:wmd_nuke_target_state = { state_population > 100000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 1000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -60000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_V }
-			var:wmd_nuke_target_state = {state_population > 1000000}
-			var:wmd_nuke_target_state = { NOT = { state_population > 2000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -150000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_V }
-			var:wmd_nuke_target_state = { state_population > 2000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 5000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -300000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_V }
-			var:wmd_nuke_target_state = { state_population > 5000000 }
-			var:wmd_nuke_target_state = { NOT = { state_population > 10000000 } }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -600000 }
-	}
-	if = {
-		limit = {
-			ROOT = { has_tech = atomic_weapons_delivery_V }
-			var:wmd_nuke_target_state = { state_population > 10000000 }
-		}
-		var:wmd_nuke_target_state = { add_manpower = -800000 }
-	}
 
 	#####DELIVERY BUILDING DAMAGE#####
 	if = {
@@ -504,7 +163,7 @@ wmd_damage_loop_effect = {
 			NOT = { ROOT = { has_tech = atomic_weapons_delivery_II } }
 			#NOT = { var:wmd_nuke_target_state = { nuclear_bunker > 0 } }
 		}
-		log = "    building damage: atomic_weapons_delivery_I/NOT atomic_weapons_delivery_II (state: [?wmd_nuke_target_state.GetName])"
+		log = "    building damage: atomic_weapons_delivery_I (state: [?wmd_nuke_target_state.GetName])"
 		var:wmd_nuke_target_state = {
 			remove_building = { type = arms_factory level = 2 }
 			remove_building = { type = industrial_complex level = 2 }
@@ -524,13 +183,13 @@ wmd_damage_loop_effect = {
 			damage_building = { type = agri_industrial_complex damage = 8 }
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			ROOT = { has_tech = atomic_weapons_delivery_II }
 			NOT = { ROOT = { has_tech = atomic_weapons_delivery_III } }
 			#NOT = { var:wmd_nuke_target_state = { nuclear_bunker > 0 } }
 		}
-		log = "    building damage: atomic_weapons_delivery_II/NOT atomic_weapons_delivery_III (state: [?wmd_nuke_target_state.GetName])"
+		log = "    building damage: atomic_weapons_delivery_II (state: [?wmd_nuke_target_state.GetName])"
 		var:wmd_nuke_target_state = {
 			remove_building = { type = arms_factory level = 2 }
 			remove_building = { type = industrial_complex level = 2 }
@@ -550,13 +209,13 @@ wmd_damage_loop_effect = {
 			damage_building = { type = agri_industrial_complex damage = 12 }
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			ROOT = { has_tech = atomic_weapons_delivery_III }
 			NOT = { ROOT = { has_tech = atomic_weapons_delivery_IV } }
 			#NOT = { var:wmd_nuke_target_state = { nuclear_bunker > 0 } }
 		}
-		log = "    building damage: atomic_weapons_delivery_III/NOT atomic_weapons_delivery_IV (state: [?wmd_nuke_target_state.GetName])"
+		log = "    building damage: atomic_weapons_delivery_III (state: [?wmd_nuke_target_state.GetName])"
 		var:wmd_nuke_target_state = {
 			remove_building = { type = arms_factory level = 2 }
 			remove_building = { type = industrial_complex level = 2 }
@@ -576,13 +235,13 @@ wmd_damage_loop_effect = {
 			damage_building = { type = agri_industrial_complex damage = 15 }
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			ROOT = { has_tech = atomic_weapons_delivery_IV }
 			NOT = { ROOT = { has_tech = atomic_weapons_delivery_V } }
 			#NOT = { var:wmd_nuke_target_state = { nuclear_bunker > 0 } }
 		}
-		log = "    building damage: atomic_weapons_delivery_IV/NOT atomic_weapons_delivery_V (state: [?wmd_nuke_target_state.GetName])"
+		log = "    building damage: atomic_weapons_delivery_IV (state: [?wmd_nuke_target_state.GetName])"
 		var:wmd_nuke_target_state = {
 			remove_building = { type = arms_factory level = 2 }
 			remove_building = { type = industrial_complex level = 2 }
@@ -602,7 +261,7 @@ wmd_damage_loop_effect = {
 			damage_building = { type = agri_industrial_complex damage = 25 }
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			ROOT = { has_tech = atomic_weapons_delivery_V }
 			#NOT = { var:wmd_nuke_target_state = { nuclear_bunker > 0 } }
@@ -627,13 +286,14 @@ wmd_damage_loop_effect = {
 			damage_building = { type = agri_industrial_complex damage = 28 }
 		}
 	}
+	#####ARMAMENT BUILDING DAMAGE#####
 	if = {
 		limit = {
 			ROOT = { has_tech = atomic_weapons_armament_0 }
 			NOT = { ROOT = { has_tech = atomic_weapons_armament_I } }
 			#NOT = { var:wmd_nuke_target_state = { nuclear_bunker > 0 } }
 		}
-		log = "    building damage: atomic_weapons_armament_0/NOT atomic_weapons_armament_I (state: [?wmd_nuke_target_state.GetName])"
+		log = "    building damage: atomic_weapons_armament_0 (state: [?wmd_nuke_target_state.GetName])"
 		var:wmd_nuke_target_state = {
 			damage_building = { type = arms_factory damage = 12 }
 			damage_building = { type = industrial_complex damage = 8 }
@@ -645,13 +305,13 @@ wmd_damage_loop_effect = {
 			damage_building = { type = agri_industrial_complex damage = 8 }
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			ROOT = { has_tech = atomic_weapons_armament_I }
-			NOT = { ROOT = { has_tech = atomic_weapons_delivery_II } }
+			NOT = { ROOT = { has_tech = atomic_weapons_armament_II } }
 			#NOT = { var:wmd_nuke_target_state = { nuclear_bunker > 0 } }
 		}
-		log = "    building damage: atomic_weapons_armament_I/NOT atomic_weapons_delivery_II (state: [?wmd_nuke_target_state.GetName])"
+		log = "    building damage: atomic_weapons_armament_I (state: [?wmd_nuke_target_state.GetName])"
 		var:wmd_nuke_target_state = {
 			damage_building = { type = arms_factory damage = 16 }
 			damage_building = { type = industrial_complex damage = 12 }
@@ -663,7 +323,7 @@ wmd_damage_loop_effect = {
 			damage_building = { type = agri_industrial_complex damage = 12 }
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			ROOT = { has_tech = atomic_weapons_armament_II }
 			#NOT = { var:wmd_nuke_target_state = { nuclear_bunker > 0 } }
