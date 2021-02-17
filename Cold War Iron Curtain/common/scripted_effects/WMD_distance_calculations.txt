@@ -36,8 +36,8 @@ wmd_nuclear_range_calculation = {
 	if = { limit = { check_variable = { Strat_Distance > WMD_Strike_Distance } } set_variable = { WMD_Strike_Distance = Strat_Distance } }
 }
 
-wmd_nuclear_cost_and_damage = {
-	set_variable = { nuke_cost = warhead_cost }
+wmd_nuclear_warhead_cost = {
+	set_variable = { missile_cost = warhead_cost }
 	if = { limit = { has_tech = atomic_weapons_delivery_V } divide_variable = { warhead_cost = 8 } }
 	else_if = { limit = { has_tech = atomic_weapons_delivery_IV } divide_variable = { warhead_cost = 8 } }
 	else_if = { limit = { has_tech = atomic_weapons_delivery_III } divide_variable = { warhead_cost = 8 } }
@@ -45,11 +45,13 @@ wmd_nuclear_cost_and_damage = {
 	else_if = { limit = { has_tech = atomic_weapons_delivery_Ia } divide_variable = { warhead_cost = 8 } }
 	else_if = { limit = { has_tech = atomic_weapons_delivery_I } divide_variable = { warhead_cost = 4 } }
 	round_variable = warhead_cost
-
-	set_variable = { warhead_damage = 0 }
-	if = { limit = { has_tech = atomic_weapons_armament_II } add_to_variable = { warhead_damage = 100 } }
-	else_if = { limit = { has_tech = atomic_weapons_armament_I } add_to_variable = { warhead_damage = 50 } }
-	else_if = { limit = { has_tech = atomic_weapons_armament_0 } add_to_variable = { warhead_damage = 5 } }
+	if = { 
+		limit = { 
+			check_variable = { missile_cost > 0 }
+			check_variable = { warhead_cost = 0 }
+		}
+		set_variable = { warhead_cost = 1 }
+	}
 }
 
 # STRIKES states selection
@@ -141,7 +143,6 @@ distance_calculator_all_tiers = {
 			add_to_array = { ROOT.WMD_target_states_array = THIS.id }
 			add_to_variable = { ROOT.warhead_cost = 1 }
 			set_variable = { state_pop_total = state_population_k }
-			add_to_variable = { warhead_damage_local = 1 }
 
 			if = { limit = { check_variable = { state_pop_total > 1000 } }
 				divide_variable = { state_pop_total = 1000 }
@@ -151,7 +152,6 @@ distance_calculator_all_tiers = {
 				}
 				else_if = { limit = { check_variable = { ROOT.strike_level_tier2_selected = 1 } }
 					add_to_variable = { ROOT.warhead_cost = 1 }
-					add_to_variable = { warhead_damage_local = 1 }
 				}
 				else_if = { limit = { check_variable = { ROOT.strike_level_tier3_selected = 1 } }
 					add_to_variable = { ROOT.warhead_cost = state_pop_total }
@@ -160,7 +160,7 @@ distance_calculator_all_tiers = {
 		}
 	}
 	log = "Target States: [?ROOT.WMD_target_states_array^num]"
-	wmd_nuclear_cost_and_damage = yes
+	wmd_nuclear_warhead_cost = yes
 	add_to_variable = { ROOT.refresh_wmd_menu = 1 }
 }
 
@@ -192,7 +192,7 @@ slbm_mid_east_calc = {
 
 distance_calculator_sov_cubamc = {
 	clear_array = WMD_target_states_array
-	set_variable = { warhead_cost = 0 }
+	set_variable = { ROOT.warhead_cost = 0 }
 
 	wmd_nuclear_range_calculation = yes
 
@@ -262,12 +262,12 @@ distance_calculator_sov_cubamc = {
 			}
 		}
 	}
-	wmd_nuclear_cost_and_damage = yes
+	wmd_nuclear_warhead_cost = yes
 }
 
 distance_calculator_usa_cubamc = {
 	clear_array = WMD_target_states_array
-	set_variable = { warhead_cost = 0 }
+	set_variable = { ROOT.warhead_cost = 0 }
 
 	wmd_nuclear_range_calculation = yes
 
@@ -336,7 +336,7 @@ distance_calculator_usa_cubamc = {
 			}
 		}
 	}
-	wmd_nuclear_cost_and_damage = yes
+	wmd_nuclear_warhead_cost = yes
 }
 
 distance_calculator_chemical_stateview = {
