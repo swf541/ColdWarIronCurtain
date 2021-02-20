@@ -483,10 +483,14 @@ calculate_gdp_growth = {
 	##calculating GDP growth - gets called before create_gdp_graph or graph_append
 	set_variable = { gdp_growth_prev = gdpbase } # gpdbase is zero at start and stored at the end of the previous create_gdp_graph (with that year's GDP)
 	set_variable = { gdp_growth_curr = grossdomesticproduct_fake } # current gdp
-	
 	subtract_from_variable = { gdp_growth_curr = gdp_growth_prev } #subtract previous GDP
-	divide_variable = { gdp_growth_curr = gdpbase }
-	multiply_variable = { gdp_growth_curr = 100 }
+	if = { limit = { NOT = { check_variable = { gdpbase = 0 } } } 
+		divide_variable = { gdp_growth_curr = gdpbase }
+		multiply_variable = { gdp_growth_curr = 100 }
+	}
+	else = {
+		set_variable = { gdp_growth_curr = 0 } #1st game year, so no growth
+	}
 	
 	##storing GDP growth stats in an array
 	#add_to_variable = { gdp_growth_iteration_start = 0 }
