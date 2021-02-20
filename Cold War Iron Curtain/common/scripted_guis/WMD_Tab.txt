@@ -610,8 +610,8 @@ scripted_gui = {
 			wmd_button_launch_off_visible = {
 				OR = {
 					check_variable = { wmd_ready_status < 1 }
-					NOT = { has_equipment = { icbm_equipment > var:missile_cost } }
-					NOT = { num_of_nukes > var:warhead_cost }
+					check_variable = { wmd_missiles_total < var:missile_cost }
+					num_of_nukes < var:warhead_cost
 				 	check_variable = { missile_selected = 0 }
 				}
 			}
@@ -629,7 +629,10 @@ scripted_gui = {
 					tooltip = wmd_has_authorize_code_TT
 					check_variable = { wmd_authorize = 1 }
 				}
-				has_equipment = { icbm_equipment > var:missile_cost }
+				custom_trigger_tooltip = {
+					tooltip = wmd_has_enough_missiles_TT
+					check_variable = { var = wmd_missiles_total value = var:missile_cost compare = greater_than_or_equals }
+				}
 				num_of_nukes > var:warhead_cost
 				custom_trigger_tooltip = {
 					tooltip = wmd_all_keys_turned_TT
@@ -638,7 +641,7 @@ scripted_gui = {
 			}
 			wmd_button_launch_visible = {
 				check_variable = { wmd_ready_status = 1 }
-				has_equipment = { icbm_equipment > var:missile_cost }
+				check_variable = { var = wmd_missiles_total value = var:missile_cost compare = greater_than_or_equals }
 				num_of_nukes > var:warhead_cost
 			}
 			wmd_button_launch_click_enabled = {
@@ -654,7 +657,10 @@ scripted_gui = {
 					tooltip = wmd_has_authorize_code_TT
 					check_variable = { wmd_authorize = 1 }
 				}
-				has_equipment = { icbm_equipment > var:missile_cost }
+				custom_trigger_tooltip = {
+					tooltip = wmd_has_enough_missiles_TT
+					check_variable = { var = wmd_missiles_total value = var:missile_cost compare = greater_than_or_equals }
+				}
 				num_of_nukes > var:warhead_cost
 				custom_trigger_tooltip = {
 					tooltip = wmd_all_keys_turned_TT
@@ -675,21 +681,7 @@ scripted_gui = {
 		effects = {
 			strike_level_tier1_click = { 
 				# check for missiles and nukes
-				if = {
-					limit = {
-						OR = {
-							check_variable = { ICBMTotal > 0 }
-							check_variable = { IRBMTotal > 0 }
-							check_variable = { SLBMTotal > 0 }
-							check_variable = { SRBMTotal > 0 }
-						}
-						check_variable = { NukeTotal > 0 }
-					}
-					set_variable = { missile_selected = 1 }
-				}
-				else = {
-					set_variable = { missile_selected = 0}
-				}
+				wmd_check_strike_missiles = yes
 
 				if = { limit = { check_variable = { strike_level_tier1_selected = 0 } }
 					set_variable = { strike_level_tier1_selected = 1 }
@@ -707,21 +699,9 @@ scripted_gui = {
 			}
 
 			strike_level_tier2_click = { 
-				## check for missiles and nukes
-				if = {
-					limit = {
-						OR = {
-							check_variable = { ICBMTotal > 0 }
-							check_variable = { IRBMTotal > 0 }
-							check_variable = { SLBMTotal > 0 }
-						}
-						check_variable = { NukeTotal > 0 }
-					}
-					set_variable = { missile_selected = 1 }
-				}
-				else = {
-					set_variable = { missile_selected = 0}
-				}
+				# check for missiles and nukes
+				wmd_check_strike_missiles = yes
+
 				if = { limit = { check_variable = { strike_level_tier2_selected = 0 } }
 					set_variable = { strike_level_tier1_selected = 0 }
 					set_variable = { strike_level_tier2_selected = 1 }
@@ -741,21 +721,9 @@ scripted_gui = {
 			}
 
 			strike_level_tier3_click = { 
-				## check for missiles and nukes
-				if = {
-					limit = {
-						OR = {
-							check_variable = { ICBMTotal > 0 }
-							check_variable = { IRBMTotal > 0 }
-							check_variable = { SLBMTotal > 0 }
-						}
-						check_variable = { NukeTotal > 0 }
-					}
-					set_variable = { missile_selected = 1 }
-				}
-				else = {
-					set_variable = { missile_selected = 0}
-				}
+				# check for missiles and nukes
+				wmd_check_strike_missiles = yes
+
 				if = { limit = { check_variable = { strike_level_tier3_selected = 0 } }
 					set_variable = { strike_level_tier1_selected = 0 }
 					set_variable = { strike_level_tier2_selected = 0 }
@@ -1047,57 +1015,39 @@ scripted_gui = {
 			}
 		}
 		effects = {
-			###################
 			## select enemy button
 			enemy_box_checked_click = {
-				add_to_variable = { ROOT.wmd_num_targets_selected = 1 }
 				set_variable = { THIS.checkmark = 1 }
-				ROOT = { distance_calculator_all_tiers = yes }
-				# check for missiles and nukes
-				if = {
-					limit = {
-						ROOT = {
-							has_equipment = { icbm_equipment > var:missile_cost }
-							check_variable = { num_of_nukes > warhead_cost }
-						}
-					}
-					set_variable = { ROOT.missile_selected = 1 }
+				ROOT = {
+					add_to_variable = { wmd_num_targets_selected = 1 }
+					distance_calculator_all_tiers = yes
+					# check for missiles and nukes
+					wmd_check_strike_missiles = yes
+
+					add_to_variable = { refresh_wmd_menu = 1 }
 				}
-				else = {
-					set_variable = { ROOT.missile_selected = 0}
-				}
-				add_to_variable = { ROOT.refresh_wmd_menu = 1 }
 			}
 
-			###################
 			## deselect enemy button
 			enemy_box_unchecked_click = {
-				subtract_from_variable = { ROOT.wmd_num_targets_selected = 1 }
-				#log = "wmd_num_targets_selected: [?ROOT.wmd_num_targets_selected]"
 				set_variable = { THIS.checkmark = 0 }
-				if = { limit = { check_variable = { ROOT.wmd_num_targets_selected < 1 } }
-					set_variable = { ROOT.right_key_turned = 0 }
-					set_variable = { ROOT.left_key_turned = 0 }
-					set_variable = { ROOT.wmd_ready_status = 0 }
-					set_variable = { ROOT.wmd_authorize = 0 }
-					set_variable = { ROOT.activation_code = 0 }
-					set_variable = { ROOT.missile_selected = 0 }
-				}
-				ROOT = { distance_calculator_all_tiers = yes }
-				# check for missiles and nukes
-				if = {
-					limit = {
-						ROOT = {
-							has_equipment = { icbm_equipment > var:missile_cost }
-							check_variable = { num_of_nukes > warhead_cost }
-						}
+				ROOT = {
+					subtract_from_variable = { wmd_num_targets_selected = 1 }
+					#log = "wmd_num_targets_selected: [?wmd_num_targets_selected]"
+					if = { limit = { check_variable = { wmd_num_targets_selected < 1 } }
+						set_variable = { right_key_turned = 0 }
+						set_variable = { left_key_turned = 0 }
+						set_variable = { wmd_ready_status = 0 }
+						set_variable = { wmd_authorize = 0 }
+						set_variable = { activation_code = 0 }
+						set_variable = { missile_selected = 0 }
 					}
-					set_variable = { ROOT.missile_selected = 1 }
+					distance_calculator_all_tiers = yes
+					# check for missiles and nukes
+					wmd_check_strike_missiles = yes
+
+					add_to_variable = { refresh_wmd_menu = 1 }
 				}
-				else = {
-					set_variable = { ROOT.missile_selected = 0 }
-				}
-				add_to_variable = { ROOT.refresh_wmd_menu = 1 }
 			}
 		}
 
