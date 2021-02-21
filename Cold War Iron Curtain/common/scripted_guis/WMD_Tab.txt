@@ -740,8 +740,17 @@ scripted_gui = {
 			}
 
 			wmd_button_launch_click = {
-				log = "[GetDateText]: [Root.GetName]: id = wmd_button_launch_click"
-				# threat added - 5 per states nuked
+				log = "[GetDateText]: [Root.GetTag]: id = wmd_button_launch_click"
+				# set News Events target country
+				set_variable = { wmd_target_country = enemies^0 }
+				if = { limit = { check_variable = { enemies^num > 1 } }
+					for_each_scope_loop = {
+						array = enemies
+						if = { limit = { THIS = { is_faction_leader = yes } } set_variable = { ROOT.wmd_target_country = THIS.id } }
+					}
+				}
+
+				# threat added - 5 per state nuked
 				set_temp_variable = { tmp_threat = WMD_target_states_array^num }
 				multiply_temp_variable = { tmp_threat = 5 }
 				log = "  Threat [?tmp_threat] from Nuclear Attack on [?WMD_target_states_array^num] states"
