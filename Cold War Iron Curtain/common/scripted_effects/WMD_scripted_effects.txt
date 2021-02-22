@@ -64,8 +64,9 @@ wmd_damage_loop_effect = {
 	##### CIVIL DEVASTATION#####
 	log = "  start loop on state: [?PREV.FROM.GetName]"
 	if = { limit = { ROOT = { has_tech = atomic_weapons_armament_I } }
-		log = "    reduce state category (state: [?PREV.FROM.GetName])"
+		log = "    reduce state development (state: [?PREV.FROM.GetName])"
 		PREV.FROM = {
+			log = "    reduce state development (state: [?THIS.GetName])"
 			if = { limit = { has_state_category = pop1dev1 } set_state_category = pop1 }
 			if = { limit = { has_state_category = pop1dev2 } set_state_category = pop1dev1 }
 			if = { limit = { has_state_category = pop1dev3 } set_state_category = pop1dev2 }
@@ -110,80 +111,88 @@ wmd_damage_loop_effect = {
 	# and set manpower reduction factor based on atomic_weapons_armament tech lvl
 	set_temp_variable = { tempManpowerReductionFactor = 0 }
 	if = { limit = { ROOT = { has_tech = atomic_weapons_armament_0 NOT = { has_tech = atomic_weapons_armament_I } } }
-		log = "    reduce manpower factor for ARMAMENT 0 = 1 / add 36 rads to state"
+		log = "    reduce manpower factor for atomic_weapons_armament_0 = 1 / add 36 rads to state"
 		add_to_temp_variable = { tempManpowerReductionFactor = 1 }
-		add_to_variable = { var = radiation value = 36 }
+		add_to_variable = { var = PREV.FROM.radiation value = 36 }
 	}
 	else_if = { limit = { ROOT = { has_tech = atomic_weapons_armament_I NOT = { has_tech = atomic_weapons_armament_II } } }
-		log = "    reduce manpower factor for ARMAMENT I = 2 / add 48 rads to state (36 to neighbor states)"
+		log = "    reduce manpower factor for atomic_weapons_armament_I / add 48 rads to state (36 to neighbor states)"
 		add_to_temp_variable = { tempManpowerReductionFactor = 2 }
-		add_to_variable = { var = radiation value = 48 }
-		every_neighbor_state = { add_to_variable = { var = radiation value = 36 } }
+		add_to_variable = { var = PREV.FROM.radiation value = 48 }
+		every_neighbor_state = { add_to_variable = { var = PREV.FROM.radiation value = 36 } }
 	}
 	else_if = { limit = { ROOT = { has_tech = atomic_weapons_armament_II } }
-		log = "    reduce manpower factor for ARMAMENT II = 6 / add 80 rads to state (64 to neighbor states)"
+		log = "    reduce manpower factor for atomic_weapons_armament_II = 6 / add 80 rads to state (64 to neighbor states)"
 		add_to_temp_variable = { tempManpowerReductionFactor = 6 }
-		add_to_variable = { var = radiation value = 80 }
-		every_neighbor_state = { add_to_variable = { var = radiation value = 64 } }
+		add_to_variable = { var = PREV.FROM.radiation value = 80 }
+		every_neighbor_state = { add_to_variable = { var = PREV.FROM.radiation value = 64 } }
 	}
 	####
 	# add to manpower reduction factor based on atomic_weapons_delivery tech lvl
 	if = { limit = { ROOT = { has_tech = atomic_weapons_delivery_I NOT = { has_tech = atomic_weapons_delivery_III } } }
-		log = "    reduce manpower factor for DELIVERY I = 1"
+		log = "    reduce manpower factor for atomic_weapons_delivery_I = 1"
 		add_to_temp_variable = { tempManpowerReductionFactor = 1 }
 	}
 	else_if = { limit = { ROOT = { has_tech = atomic_weapons_delivery_III NOT = { has_tech = atomic_weapons_delivery_V } } }
-		log = "    reduce manpower factor for DELIVERY III = 2"
+		log = "    reduce manpower factor for atomic_weapons_delivery_III = 2"
 		add_to_temp_variable = { tempManpowerReductionFactor = 2 }
 	}
 	else_if = { limit = { ROOT = { has_tech = atomic_weapons_delivery_V } }
-		log = "    reduce manpower factor for DELIVERY V = 6"
+		log = "    reduce manpower factor for atomic_weapons_delivery_V = 6"
 		add_to_temp_variable = { tempManpowerReductionFactor = 6 }
 	}
+	multiply_temp_variable = { tempManpowerReductionFactor = -1 }
 	log = "    total manpower factor from techs = [?tempManpowerReductionFactor]"
 	
 	# Reduce manpower on state based on state pop and reduction factor from atomic_weapons_armament
-	if = { limit = { PREV.FROM = { state_population > 50000 state_population < 100001 } }
+	log = "    state manpower = [?PREV.FROM.state_population_k]"
+	if = { limit = { PREV.FROM = { state_population_k > 50 state_population_k < 101 } }
 		set_temp_variable = { tempManpowerReduction = 1000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
 		PREV.FROM = { add_manpower = tempManpowerReduction }
+		log = "    state pop size 1: lose [?tempManpowerReduction] pop"
 	}
-	else_if = { limit = { PREV.FROM = { state_population > 100000 state_population < 1000001 } }
+	else_if = { limit = { PREV.FROM = { state_population_k > 100 state_population_k < 1001 } }
 		set_temp_variable = { tempManpowerReduction = 10000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
 		PREV.FROM = { add_manpower = tempManpowerReduction }
+		log = "    state pop size 2: lose [?tempManpowerReduction] pop"
 	}
-	else_if = { limit = { PREV.FROM = { state_population > 1000000 state_population < 2000001 } }
+	else_if = { limit = { PREV.FROM = { state_population_k > 1000 state_population_k < 2001 } }
 		set_temp_variable = { tempManpowerReduction = 25000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
 		PREV.FROM = { add_manpower = tempManpowerReduction }
+		log = "    state pop size 3: lose [?tempManpowerReduction] pop"
 	}
-	else_if = { limit = { PREV.FROM = { state_population > 2000000 state_population < 5000001 } }
+	else_if = { limit = { PREV.FROM = { state_population_k > 2000 state_population_k < 5001 } }
 		set_temp_variable = { tempManpowerReduction = 50000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
 		PREV.FROM = { add_manpower = tempManpowerReduction }
+		log = "    state pop size 4: lose [?tempManpowerReduction] pop"
 	}
-	else_if = { limit = { PREV.FROM = { state_population > 5000000 state_population < 1000001 } }
+	else_if = { limit = { PREV.FROM = { state_population_k > 5000 state_population_k < 10001 } }
 		set_temp_variable = { tempManpowerReduction = 100000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
 		PREV.FROM = { add_manpower = tempManpowerReduction }
+		log = "    state pop size 5: lose [?tempManpowerReduction] pop"
 	}
-	else_if = { limit = { PREV.FROM = { state_population > 10000000 } }
+	else_if = { limit = { PREV.FROM = { state_population_k > 10000 } }
 		set_temp_variable = { tempManpowerReduction = 150000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
 		PREV.FROM = { add_manpower = tempManpowerReduction }
+		log = "    state pop size 6: lose [?tempManpowerReduction] pop"
 	}
-	log = "    total manpower reduction from techs = [?tempManpowerReduction]"
 
 	#####ARMAMENT BUILDING DAMAGE#####
 	set_temp_variable = { basic_destroy = 0 }
 	set_temp_variable = { advanced_destroy = 0 }
 	set_temp_variable = { infrastructure_destroy = 0 }
 	set_temp_variable = { facilities_destroy = 0 }
-	set_temp_variable = { basic_damage = 0 }
-	set_temp_variable = { advanced_damage = 0 }
-	set_temp_variable = { infrastructure_damage = 0 }
-	set_temp_variable = { facilities_damage = 0 }
+	#### Unfortunatelly, can't do damage with a variable (damned pdx), even meta_effect doesn't seem to do anything
+	# set_temp_variable = { basic_damage = 0 }
+	# set_temp_variable = { advanced_damage = 0 }
+	# set_temp_variable = { infrastructure_damage = 0 }
+	# set_temp_variable = { facilities_damage = 0 }
 	if = {
 		limit = {
 			ROOT = { has_tech = atomic_weapons_armament_0 }
@@ -195,10 +204,34 @@ wmd_damage_loop_effect = {
 		set_temp_variable = { advanced_destroy = 1 }
 		set_temp_variable = { infrastructure_destroy = 1 }
 		set_temp_variable = { facilities_destroy = 2 }
-		set_temp_variable = { basic_damage = 6 }
-		set_temp_variable = { advanced_damage = 2 }
-		set_temp_variable = { infrastructure_damage = 2 }
-		set_temp_variable = { facilities_damage = 4 }
+		# set_temp_variable = { basic_damage = 6 }
+		# set_temp_variable = { advanced_damage = 2 }
+		# set_temp_variable = { infrastructure_damage = 2 }
+		# set_temp_variable = { facilities_damage = 4 }
+		PREV.FROM = {
+			damage_building = { type = arms_factory damage = 6 }
+			damage_building = { type = industrial_complex damage = 6 }
+			damage_building = { type = dockyard damage = 6 }
+			damage_building = { type = office_park damage = 6 }
+			damage_building = { type = agri_industrial_complex damage = 2 }
+			damage_building = { type = fossil_fuel_powerplant damage = 2 }
+			damage_building = { type = renewable_powerplant damage = 2 }
+			damage_building = { type = nuclear_powerplant damage = 2 }
+			damage_building = { type = synthetic_refinery damage = 2 }
+			damage_building = { type = steel_factory damage = 2 }
+			damage_building = { type = tungsten_factory damage = 2 }
+			damage_building = { type = fuel_silo damage = 2 }
+			damage_building = { type = nuclear_reactor damage = 2 }
+			damage_building = { type = infrastructure damage = 2 }
+			damage_building = { type = state_infrastructure damage = 2 }
+			damage_building = { type = water_infrastructure damage = 2 }
+			damage_building = { type = air_base damage = 4 }
+			damage_building = { type = anti_air_building damage = 4 }
+			damage_building = { type = radar_station damage = 4 }
+			# damage_building = { type = naval_base damage = 4 province = { all_provinces = yes } } }
+			# damage_building = { type = bunker damage = 4 province = { all_provinces = yes } } }
+			# damage_building = { type = coastal_bunker damage = 4 province = { all_provinces = yes } } }
+		}
 	}
 	else_if = {
 		limit = {
@@ -211,10 +244,34 @@ wmd_damage_loop_effect = {
 		set_temp_variable = { advanced_destroy = 1 }
 		set_temp_variable = { infrastructure_destroy = 2 }
 		set_temp_variable = { facilities_destroy = 4 }
-		set_temp_variable = { basic_damage = 12 }
-		set_temp_variable = { advanced_damage = 3 }
-		set_temp_variable = { infrastructure_damage = 4 }
-		set_temp_variable = { facilities_damage = 8 }
+		# set_temp_variable = { basic_damage = 12 }
+		# set_temp_variable = { advanced_damage = 3 }
+		# set_temp_variable = { infrastructure_damage = 4 }
+		# set_temp_variable = { facilities_damage = 8 }
+		PREV.FROM = {
+			damage_building = { type = arms_factory damage = 12 }
+			damage_building = { type = industrial_complex damage = 12 }
+			damage_building = { type = dockyard damage = 12 }
+			damage_building = { type = office_park damage = 12 }
+			damage_building = { type = agri_industrial_complex damage = 3 }
+			damage_building = { type = fossil_fuel_powerplant damage = 3 }
+			damage_building = { type = renewable_powerplant damage = 3 }
+			damage_building = { type = nuclear_powerplant damage = 3 }
+			damage_building = { type = synthetic_refinery damage = 3 }
+			damage_building = { type = steel_factory damage = 3 }
+			damage_building = { type = tungsten_factory damage = 3 }
+			damage_building = { type = fuel_silo damage = 3 }
+			damage_building = { type = nuclear_reactor damage = 3 }
+			damage_building = { type = infrastructure damage = 4 }
+			damage_building = { type = state_infrastructure damage = 4 }
+			damage_building = { type = water_infrastructure damage = 4 }
+			damage_building = { type = air_base damage = 8 }
+			damage_building = { type = anti_air_building damage = 8 }
+			damage_building = { type = radar_station damage = 8 }
+			# damage_building = { type = naval_base damage = 8 province = { all_provinces = yes } } }
+			# damage_building = { type = bunker damage = 8 province = { all_provinces = yes } } }
+			# damage_building = { type = coastal_bunker damage = 8 province = { all_provinces = yes } } }
+		}
 	}
 	else_if = {
 		limit = {
@@ -226,62 +283,116 @@ wmd_damage_loop_effect = {
 		set_temp_variable = { advanced_destroy = 2 }
 		set_temp_variable = { infrastructure_destroy = 3 }
 		set_temp_variable = { facilities_destroy = 6 }
-		set_temp_variable = { basic_damage = 18 }
-		set_temp_variable = { advanced_damage = 4 }
-		set_temp_variable = { infrastructure_damage = 6 }
-		set_temp_variable = { facilities_damage = 12 }
-	}
-	PREV.FROM = {
-		log = "      damaging buildings in state [PREV.FROM.GetName] - facilities_damage = [?facilities_damage]"
-		remove_building = { type = arms_factory level = basic_destroy }
-		remove_building = { type = industrial_complex level = basic_destroy }
-		remove_building = { type = dockyard level = basic_destroy }
-		remove_building = { type = office_park level = basic_destroy }
-		remove_building = { type = agri_industrial_complex level = advanced_destroy }
-		remove_building = { type = fossil_fuel_powerplant level = advanced_destroy }
-		remove_building = { type = renewable_powerplant level = advanced_destroy }
-		remove_building = { type = nuclear_powerplant level = advanced_destroy }
-		remove_building = { type = synthetic_refinery level = advanced_destroy }
-		remove_building = { type = steel_factory level = advanced_destroy }
-		remove_building = { type = tungsten_factory level = advanced_destroy }
-		remove_building = { type = fuel_silo level = advanced_destroy }
-		remove_building = { type = nuclear_reactor level = advanced_destroy }
-		remove_building = { type = infrastructure level = infrastructure_destroy }
-		remove_building = { type = state_infrastructure level = infrastructure_destroy }
-		remove_building = { type = water_infrastructure level = infrastructure_destroy }
-		remove_building = { type = air_base level = facilities_destroy }
-		remove_building = { type = anti_air_building level = facilities_destroy }
-		remove_building = { type = radar_station level = facilities_destroy }
-		remove_building = { type = naval_base level = facilities_destroy }
-		remove_building = { type = bunker level = facilities_destroy }
-		remove_building = { type = coastal_bunker level = facilities_destroy }
-		meta_effect = {
-			text = { damage_building = { type = arms_factory damage = [DAMAGE_BASIC] } }
-			text = { damage_building = { type = industrial_complex damage = [DAMAGE_BASIC] } }
-			text = { damage_building = { type = dockyard damage = [DAMAGE_BASIC] } }
-			text = { damage_building = { type = office_park damage = [DAMAGE_BASIC] } }
-			DAMAGE_BASIC = "[?basic_damage]"
-			text = { damage_building = { type = agri_industrial_complex damage = [DAMAGE_ADV] } }
-			text = { damage_building = { type = fossil_fuel_powerplant damage = [DAMAGE_ADV] } }
-			text = { damage_building = { type = renewable_powerplant damage = [DAMAGE_ADV] } }
-			text = { damage_building = { type = nuclear_powerplant damage = [DAMAGE_ADV] } }
-			text = { damage_building = { type = synthetic_refinery damage = [DAMAGE_ADV] } }
-			text = { damage_building = { type = steel_factory damage = [DAMAGE_ADV] } }
-			text = { damage_building = { type = tungsten_factory damage = [DAMAGE_ADV] } }
-			text = { damage_building = { type = fuel_silo damage = [DAMAGE_ADV] } }
-			text = { damage_building = { type = nuclear_reactor damage = [DAMAGE_ADV] } }
-			DAMAGE_ADV = "[?advanced_damage]"
-			text = { damage_building = { type = infrastructure damage = [DAMAGE_INFRA] } }
-			text = { damage_building = { type = state_infrastructure damage = [DAMAGE_INFRA] } }
-			text = { damage_building = { type = water_infrastructure damage = [DAMAGE_INFRA] } }
-			DAMAGE_INFRA = "[?infrastructure_damage]"
-			text = { damage_building = { type = air_base damage = [DAMAGE_FACILITIES] } }
-			text = { damage_building = { type = anti_air_building damage = [DAMAGE_FACILITIES] } }
-			text = { damage_building = { type = radar_station damage = [DAMAGE_FACILITIES] } }
-			text = { damage_building = { type = naval_base damage = [DAMAGE_FACILITIES] province = { all_provinces = yes } } }
-			text = { damage_building = { type = bunker damage = [DAMAGE_FACILITIES] province = { all_provinces = yes } } }
-			text = { damage_building = { type = coastal_bunker damage = [DAMAGE_FACILITIES] province = { all_provinces = yes } } }
-			DAMAGE_FACILITIES = "[?facilities_damage]"
+		# set_temp_variable = { basic_damage = 18 }
+		# set_temp_variable = { advanced_damage = 4 }
+		# set_temp_variable = { infrastructure_damage = 6 }
+		# set_temp_variable = { facilities_damage = 12 }
+		PREV.FROM = {
+			damage_building = { type = arms_factory damage = 18 }
+			damage_building = { type = industrial_complex damage = 18 }
+			damage_building = { type = dockyard damage = 18 }
+			damage_building = { type = office_park damage = 18 }
+			damage_building = { type = agri_industrial_complex damage = 4 }
+			damage_building = { type = fossil_fuel_powerplant damage = 4 }
+			damage_building = { type = renewable_powerplant damage = 4 }
+			damage_building = { type = nuclear_powerplant damage = 4 }
+			damage_building = { type = synthetic_refinery damage = 4 }
+			damage_building = { type = steel_factory damage = 4 }
+			damage_building = { type = tungsten_factory damage = 4 }
+			damage_building = { type = fuel_silo damage = 4 }
+			damage_building = { type = nuclear_reactor damage = 4 }
+			damage_building = { type = infrastructure damage = 6 }
+			damage_building = { type = state_infrastructure damage = 6 }
+			damage_building = { type = water_infrastructure damage = 6 }
+			damage_building = { type = air_base damage = 12 }
+			damage_building = { type = anti_air_building damage = 12 }
+			damage_building = { type = radar_station damage = 12 }
+			# damage_building = { type = naval_base damage = 12 province = { all_provinces = yes } } }
+			# damage_building = { type = bunker damage = 12 province = { all_provinces = yes } } }
+			# damage_building = { type = coastal_bunker damage = 12 province = { all_provinces = yes } } }
 		}
 	}
+	PREV.FROM = {
+		#log = "      destroying [?basic_destroy] arms_factory in state [PREV.FROM.GetName]"
+		remove_building = { type = arms_factory level = basic_destroy }
+		#log = "      destroying [?basic_destroy] industrial_complex in state [PREV.FROM.GetName]"
+		remove_building = { type = industrial_complex level = basic_destroy }
+		#log = "      destroying [?basic_destroy] dockyard in state [PREV.FROM.GetName]"
+		remove_building = { type = dockyard level = basic_destroy }
+		#log = "      destroying [?basic_destroy] office_park in state [PREV.FROM.GetName]"
+		remove_building = { type = office_park level = basic_destroy }
+		#log = "      destroying [?advanced_destroy] agri_industrial_complex in state [PREV.FROM.GetName]"
+		remove_building = { type = agri_industrial_complex level = advanced_destroy }
+		#log = "      destroying [?advanced_destroy] fossil_fuel_powerplant in state [PREV.FROM.GetName]"
+		remove_building = { type = fossil_fuel_powerplant level = advanced_destroy }
+		#log = "      destroying [?advanced_destroy] renewable_powerplant in state [PREV.FROM.GetName]"
+		remove_building = { type = renewable_powerplant level = advanced_destroy }
+		#log = "      destroying [?advanced_destroy] nuclear_powerplant in state [PREV.FROM.GetName]"
+		remove_building = { type = nuclear_powerplant level = advanced_destroy }
+		#log = "      destroying [?advanced_destroy] synthetic_refinery in state [PREV.FROM.GetName]"
+		remove_building = { type = synthetic_refinery level = advanced_destroy }
+		#log = "      destroying [?advanced_destroy] steel_factory in state [PREV.FROM.GetName]"
+		remove_building = { type = steel_factory level = advanced_destroy }
+		#log = "      destroying [?advanced_destroy] tungsten_factory in state [PREV.FROM.GetName]"
+		remove_building = { type = tungsten_factory level = advanced_destroy }
+		#log = "      destroying [?advanced_destroy] fuel_silo in state [PREV.FROM.GetName]"
+		remove_building = { type = fuel_silo level = advanced_destroy }
+		#log = "      destroying [?advanced_destroy] nuclear_reactor in state [PREV.FROM.GetName]"
+		remove_building = { type = nuclear_reactor level = advanced_destroy }
+		#log = "      destroying [?infrastructure_destroy] infrastructure in state [PREV.FROM.GetName]"
+		remove_building = { type = infrastructure level = infrastructure_destroy }
+		#log = "      destroying [?infrastructure_destroy] state_infrastructure in state [PREV.FROM.GetName]"
+		remove_building = { type = state_infrastructure level = infrastructure_destroy }
+		#log = "      destroying [?infrastructure_destroy] water_infrastructure in state [PREV.FROM.GetName]"
+		remove_building = { type = water_infrastructure level = infrastructure_destroy }
+		#log = "      destroying [?facilities_destroy] air_base in state [PREV.FROM.GetName]"
+		remove_building = { type = air_base level = facilities_destroy }
+		#log = "      destroying [?facilities_destroy] anti_air_building in state [PREV.FROM.GetName]"
+		remove_building = { type = anti_air_building level = facilities_destroy }
+		#log = "      destroying [?facilities_destroy] radar_station in state [PREV.FROM.GetName]"
+		remove_building = { type = radar_station level = facilities_destroy }
+		# log = "      destroying [?facilities_destroy] naval_base in state [PREV.FROM.GetName] (all provinces)"
+		# remove_building = { type = naval_base level = facilities_destroy province = { all_provinces = yes } }
+		# log = "      destroying [?facilities_destroy] bunker in state [PREV.FROM.GetName] (all provinces)"
+		# remove_building = { type = bunker level = facilities_destroy province = { all_provinces = yes } }
+		# log = "      destroying [?facilities_destroy] coastal_bunker in state [PREV.FROM.GetName] (all provinces)"
+		# remove_building = { type = coastal_bunker level = facilities_destroy province = { all_provinces = yes } }
+
+		#### Unfortunatelly, can't do damage with a variable (damned pdx)
+		# meta_effect = {
+		# 	text = { damage_building = { type = arms_factory damage = [DAMAGE_BASIC] } }
+		# 	text = { damage_building = { type = industrial_complex damage = [DAMAGE_BASIC] } }
+		# 	text = { damage_building = { type = dockyard damage = [DAMAGE_BASIC] } }
+		# 	text = { damage_building = { type = office_park damage = [DAMAGE_BASIC] } }
+		# 	DAMAGE_BASIC = "[?basic_damage]"
+		# }
+		# meta_effect = {
+		# 	text = { damage_building = { type = agri_industrial_complex damage = [DAMAGE_ADV] } }
+		# 	text = { damage_building = { type = fossil_fuel_powerplant damage = [DAMAGE_ADV] } }
+		# 	text = { damage_building = { type = renewable_powerplant damage = [DAMAGE_ADV] } }
+		# 	text = { damage_building = { type = nuclear_powerplant damage = [DAMAGE_ADV] } }
+		# 	text = { damage_building = { type = synthetic_refinery damage = [DAMAGE_ADV] } }
+		# 	text = { damage_building = { type = steel_factory damage = [DAMAGE_ADV] } }
+		# 	text = { damage_building = { type = tungsten_factory damage = [DAMAGE_ADV] } }
+		# 	text = { damage_building = { type = fuel_silo damage = [DAMAGE_ADV] } }
+		# 	text = { damage_building = { type = nuclear_reactor damage = [DAMAGE_ADV] } }
+		# 	DAMAGE_ADV = "[?advanced_damage]"
+		# }
+		# meta_effect = {
+		# 	text = { damage_building = { type = infrastructure damage = [DAMAGE_INFRA] } }
+		# 	text = { damage_building = { type = state_infrastructure damage = [DAMAGE_INFRA] } }
+		# 	text = { damage_building = { type = water_infrastructure damage = [DAMAGE_INFRA] } }
+		# 	DAMAGE_INFRA = "[?infrastructure_damage]"
+		# }
+		# meta_effect = {
+		# 	text = { damage_building = { type = air_base damage = [DAMAGE_FACILITIES] } }
+		# 	text = { damage_building = { type = anti_air_building damage = [DAMAGE_FACILITIES] } }
+		# 	text = { damage_building = { type = radar_station damage = [DAMAGE_FACILITIES] } }
+		# 	# text = { damage_building = { type = naval_base damage = [DAMAGE_FACILITIES] province = { all_provinces = yes } } }
+		# 	# text = { damage_building = { type = bunker damage = [DAMAGE_FACILITIES] province = { all_provinces = yes } } }
+		# 	# text = { damage_building = { type = coastal_bunker damage = [DAMAGE_FACILITIES] province = { all_provinces = yes } } }
+		# 	DAMAGE_FACILITIES = "[?facilities_damage]"
+		# }
+	}
+	log = "  end loop on state: [?PREV.FROM.GetName]"
 }
