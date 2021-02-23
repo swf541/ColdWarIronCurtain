@@ -609,3 +609,257 @@ count_agency_upgrades = {
 		add_to_variable = { num_agency_upgrades_real = 1 }
 	}
 }
+export_script_for_pool = {
+	every_country = {
+		set_variable = {
+			chromiumExportRa1e = modifier@min_export
+		}
+		set_variable = {
+			oilExportRate = modifier@min_export
+		}
+		set_variable = {
+			foodExportRate = modifier@min_export
+		}
+		set_variable = {
+			steelExportRate = modifier@min_export
+		}
+		set_variable = {
+			aluminiumExportRate = modifier@min_export
+		}
+		set_variable = {
+			rareEarthExportRate = modifier@min_export
+		}
+		#Oil Section
+		set_variable = {
+			oilExport = resource_produced@oil
+		}
+		multiply_variable = {
+			oilExport = oilExportRate
+		}	
+		#Food Section
+		set_variable = {
+			foodExport = resource_produced@rubber
+		}
+		multiply_variable = {
+			foodExport = foodExportRate
+		}	
+		#Steel Section
+		set_variable = {
+			steelExport = resource_produced@steel
+		}
+		multiply_variable = {
+			steelExport = steelExportRate
+		}	
+		#Nuclear Section
+		set_variable = {
+			chromiumExport = resource_produced@chromium
+		}
+		multiply_variable = {
+			chromiumExport = chromiumExportRa1e
+		}	
+		#Aluminium
+		set_variable = {
+			aluminiumExport = resource_produced@aluminium
+		}
+		multiply_variable = {
+			aluminiumExport = aluminiumExportRate
+		}	
+		#Rare Earth
+		set_variable = {
+			rareEarthExport = resource_produced@tungsten
+		}
+		multiply_variable = {
+			rareEarthExport = rareEarthExportRate
+		}	
+		#Current Export Rate Calcs
+		set_variable = {
+			currentAvailableOilExport = oilExport
+		}
+		round_variable = currentAvailableOilExport
+		subtract_from_variable = {
+			currentAvailableOilExport = currentExportedOil
+		}
+		if = {
+			limit = {
+				check_variable = {
+					currentExportedOil < 0
+				}
+				oilDeliveryCuts = yes
+			}
+		}
+		
+		set_variable = {
+			currentAvailableFoodExport = foodExport
+		}
+		round_variable = currentAvailableFoodExport
+		subtract_from_variable = {
+			currentAvailableFoodExport = currentExportedFood
+		}
+		if = {
+			limit = {
+				check_variable = {
+					currentExportedFood < 0
+				}
+				foodDeliveryCuts = yes
+			}
+		}
+		set_variable = {
+			currentAvailableSteelExport = steelExport
+		}
+		round_variable = currentAvailableSteelExport
+		subtract_from_variable = {
+			currentAvailableSteelExport = currentExportedSteel
+		}
+		if = {
+			limit = {
+				check_variable = {
+					currentExportedSteel < 0
+				}
+				steekDeliveryCuts = yes
+			}
+		}	
+		set_variable = {
+			currentAvailableChromiumExport = chromiumExport
+		}
+		round_variable = currentAvailableChromiumExport
+		subtract_from_variable = {
+			currentAvailableChromiumExport = currentExportedChromium
+		}
+		if = {
+			limit = {
+				check_variable = {
+					currentExportedChromium < 0
+				}
+				chromiumDeliveryCuts = yes
+			}
+		}	
+		set_variable = {
+			currentAvailableAluminiumExport = aluminiumExport
+		}
+		round_variable = currentAvailableAluminiumExport
+		subtract_from_variable = {
+			currentAvailableAluminiumExport = currentExportedAluminium
+		}
+		if = {
+			limit = {
+				check_variable = {
+					currentExportedAluminium < 0
+				}
+				aluminiumDeliveryCuts = yes
+			}
+		}	
+		
+
+		set_variable = {
+			currentAvailableRareEarthExport = rareEarthExport
+		}
+		round_variable = currentAvailableRareEarthExport
+		subtract_from_variable = {
+			currentAvailableRareEarthExport = currentExportedRareEarth
+		}
+		if = {
+			limit = {
+				check_variable = {
+					currentExportedRareEarth < 0
+				}
+				rareEarthDeliveryCuts = yes
+			}
+		}
+		
+	}
+}
+
+generate_available_chromium_import_array = {
+	clear_array = ROOT.chromiumExporters
+	clear_array = ROOT.chromiumExporterInfo
+	every_country = {
+		limit = {
+			check_variable = {
+				currentAvailableChromiumExport > 0.99
+			}
+			NOT = {
+				tag = ROOT
+			}
+			NOT = {
+				has_relation_modifier = {
+					target = ROOT 
+					modifier = trade_embargo
+				}
+			}
+			NOT = {
+				has_war_with = ROOT
+			}
+		}
+		add_to_array = {
+			ROOT.chromiumExporters = THIS.id
+		}
+		add_to_array = {
+			ROOT.chromiumExporterInfo = THIS.currentAvailableChromiumExport
+		}
+	}
+}
+
+startup_price_setting = { 
+	set_variable = { global.oilBasePrice = 0.2 }
+	set_variable = { global.steelBasePrice = 0.1 }
+	set_variable = { global.foodBasePrice = 0.15 }
+	set_variable = { global.chromiumBasePrice = 2 }
+	set_variable = { global.rareEarthBasePrice = 0.3 }
+	set_variable = { global.aluminiumBasePrice = 0.1 } 
+}
+test_script = {
+	startup_price_setting = yes
+	USA = {
+		export_script_for_pool = yes
+		buy_20_nuclear_material_sov = yes
+	}
+}
+buy_20_nuclear_material_sov = {
+	set_variable = {
+		purchase_amount = 20
+	}
+	SOV = {
+		subtract_from_variable = {
+			currentAvailableChromiumExport = ROOT.purchase_amount
+		}
+		add_to_variable = {
+			ROOT.nuclearImports = ROOT.purchase_amount
+		}
+		add_to_array = {
+			chromiumExportTarget = ROOT.id
+		}
+		add_to_array = {
+			chromiumExportTargetAmount = ROOT.purchase_amount
+		}
+		set_variable = {
+			price_of_goods = global.chromiumBasePrice
+		}
+		set_variable = {
+			price_adjustment = 1
+		}
+		add_to_variable = {
+			price_adjustment = price_change_chromium
+		}
+		multiply_variable = {
+			price_of_goods = price_adjustment
+		}
+		add_to_array = {
+			chromiumExportTargetMonthly = price_of_goods
+		}
+		add_to_array = {
+			ROOT.chromiumImportTargetMonthly = price_of_goods
+		}
+		add_to_array = {
+			ROOT.chromiumImportTarget = SOV.id
+		}
+		add_to_array = {
+			ROOT.chromiumImportTargetAmount = ROOT.purchase_amount
+		}
+		set_variable = {
+			price_of_goods = 0
+		}
+		set_variable = {
+			PREV.purchase_amount = 0
+		}
+	}
+}
