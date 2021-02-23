@@ -34,6 +34,9 @@ wmd_reset = {
 	set_variable = { strike_level_tier1_selected = 0 }
 	set_variable = { strike_level_tier2_selected = 0 }
 	set_variable = { strike_level_tier3_selected = 0 }
+	set_variable = { strike_level_sov_cubamc_selected = 0 }
+	set_variable = { strike_level_usa_cubamc_selected = 0 }
+
 	set_variable = { warhead_cost = 0 }
 	set_variable = { missile_cost = 0 }
 	
@@ -45,10 +48,7 @@ wmd_reset = {
 	set_variable = { wmd_authorize = 0 }
 	set_variable = { activation_code = 0 }
 	set_variable = { missile_selected = 0 }
-	for_each_scope_loop = {
-		array = enemies
-		set_variable = { THIS.checkmark = 0 }
-	}
+	wmd_deselect_all_enemies = yes
 	clear_array = WMD_target_states_array
 	set_variable = { wmd_num_targets_selected = 0 }
 	clear_array = nuclear_power_custom_array
@@ -60,11 +60,85 @@ wmd_reset = {
 	add_to_variable = { refresh_wmd_menu = 1 }
 }
 
+wmd_select_all_enemies = {
+	for_each_scope_loop = {
+		array = enemies
+		set_variable = { THIS.checkmark = 1 }
+	}
+}
+
+wmd_deselect_all_enemies = {
+	for_each_scope_loop = {
+		array = enemies
+		set_variable = { THIS.checkmark = 0 }
+	}
+}
+
+wmd_nuke_launch = {
+	# set News Events target country
+	set_variable = { wmd_target_country = enemies^0 }
+	if = { limit = { check_variable = { enemies^num > 1 } }
+		for_each_scope_loop = {
+			array = enemies
+			if = { limit = { THIS = { is_faction_leader = yes } } set_variable = { ROOT.wmd_target_country = THIS.id } }
+		}
+	}
+
+	# threat added - 5 per state nuked
+	set_temp_variable = { tmp_threat = WMD_target_states_array^num }
+	multiply_temp_variable = { tmp_threat = 5 }
+	log = "  Threat [?tmp_threat] from Nuclear Attack on [?WMD_target_states_array^num] states"
+	ROOT = { add_named_threat = { threat = tmp_threat name = "Nuclear Attack on [?WMD_target_states_array^num] states" } }
+	if = {
+		limit = {
+			tag = ISR
+			NOT = { has_country_flag = samson_option_executed } # WIP
+		}
+		samson_option_super_event = yes
+		set_country_flag = samson_option_executed
+	}
+	set_variable = { wmd_temp_news_tier = 0 }
+	if = { limit = { check_variable = { strike_level_tier1_selected = 1 } } set_variable = { wmd_temp_news_tier = 1 } }
+	else_if = { limit = { check_variable = { strike_level_tier2_selected = 1 } } set_variable = { wmd_temp_news_tier = 2 } }
+	else_if = { limit = { check_variable = { strike_level_tier3_selected = 1 } } set_variable = { wmd_temp_news_tier = 3 } }
+	set_variable = { wmd_strike_ongoing = 1 }
+	for_each_loop = {
+		# array for nuking events
+		array = WMD_target_states_array
+		add_to_array = { temp_nuke_target = WMD_target_states_array^i }
+	}
+	for_each_loop = {
+		array = WMD_target_states_array
+		index = i
+		set_variable = { wmd_nuke_target_state = WMD_target_states_array^i.id }
+		if = { limit = { check_variable = { i = 0 } }
+			#log = "  calling wmd_nuke.1"
+			country_event = wmd_nuke.1
+		}
+		else = {
+			#log = "  calling wmd_nuke.1 with 1 hour delay"
+			country_event = { id = wmd_nuke.1 hours = i }
+		}
+	}
+	wmd_reset = yes
+	clear_variable = wmd_nuke_target_state 
+	set_temp_variable = { icbm_cost = missile_cost }
+	multiply_temp_variable = { icbm_cost = -1 }
+	if = { limit =  { has_tech = icbm1 }
+		add_equipment_to_stockpile = { type = icbm_equipment amount = icbm_cost }
+	}
+	else_if = { limit =  { has_tech = irbm1 }
+		add_equipment_to_stockpile = { type = irbm_equipment amount = icbm_cost }
+	}
+	else = {
+		add_equipment_to_stockpile = { type = srbm_equipment amount = icbm_cost }
+	}
+}
+
 wmd_damage_loop_effect = {
 	##### CIVIL DEVASTATION#####
 	log = "  start loop on state: [?PREV.FROM.GetName]"
 	if = { limit = { ROOT = { has_tech = atomic_weapons_armament_I } }
-		log = "    reduce state development (state: [?PREV.FROM.GetName])"
 		PREV.FROM = {
 			log = "    reduce state development (state: [?THIS.GetName])"
 			if = { limit = { has_state_category = pop1dev1 } set_state_category = pop1 }
@@ -142,45 +216,44 @@ wmd_damage_loop_effect = {
 		add_to_temp_variable = { tempManpowerReductionFactor = 6 }
 	}
 	multiply_temp_variable = { tempManpowerReductionFactor = -1 }
-	log = "    total manpower factor from techs = [?tempManpowerReductionFactor]"
+	#log = "    total manpower factor from techs = [?tempManpowerReductionFactor]"
 	
 	# Reduce manpower on state based on state pop and reduction factor from atomic_weapons_armament
-	log = "    state manpower = [?PREV.FROM.state_population_k]"
 	if = { limit = { PREV.FROM = { state_population_k > 50 state_population_k < 101 } }
 		set_temp_variable = { tempManpowerReduction = 1000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		log = "    state pop size 1 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
-		log = "    state pop size 1: lose [?tempManpowerReduction] pop"
 	}
 	else_if = { limit = { PREV.FROM = { state_population_k > 100 state_population_k < 1001 } }
 		set_temp_variable = { tempManpowerReduction = 10000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		log = "    state pop size 2 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
-		log = "    state pop size 2: lose [?tempManpowerReduction] pop"
 	}
 	else_if = { limit = { PREV.FROM = { state_population_k > 1000 state_population_k < 2001 } }
 		set_temp_variable = { tempManpowerReduction = 25000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		log = "    state pop size 3 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
-		log = "    state pop size 3: lose [?tempManpowerReduction] pop"
 	}
 	else_if = { limit = { PREV.FROM = { state_population_k > 2000 state_population_k < 5001 } }
 		set_temp_variable = { tempManpowerReduction = 50000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		log = "    state pop size 4 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
-		log = "    state pop size 4: lose [?tempManpowerReduction] pop"
 	}
 	else_if = { limit = { PREV.FROM = { state_population_k > 5000 state_population_k < 10001 } }
 		set_temp_variable = { tempManpowerReduction = 100000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		log = "    state pop size 5 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
-		log = "    state pop size 5: lose [?tempManpowerReduction] pop"
 	}
 	else_if = { limit = { PREV.FROM = { state_population_k > 10000 } }
 		set_temp_variable = { tempManpowerReduction = 150000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
+		log = "    state pop size 6 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
-		log = "    state pop size 6: lose [?tempManpowerReduction] pop"
 	}
 
 	#####ARMAMENT BUILDING DAMAGE#####
@@ -199,7 +272,7 @@ wmd_damage_loop_effect = {
 			NOT = { ROOT = { has_tech = atomic_weapons_armament_I } }
 			#NOT = { PREV.FROM = { nuclear_bunker > 0 } }
 		}
-		log = "    building damage: atomic_weapons_armament_0 (state: [?PREV.FROM.GetName])"
+		#log = "    building damage: atomic_weapons_armament_0 (state: [?PREV.FROM.GetName])"
 		set_temp_variable = { basic_destroy = 1 }
 		set_temp_variable = { advanced_destroy = 1 }
 		set_temp_variable = { infrastructure_destroy = 1 }
@@ -239,7 +312,7 @@ wmd_damage_loop_effect = {
 			NOT = { ROOT = { has_tech = atomic_weapons_armament_II } }
 			#NOT = { PREV.FROM = { nuclear_bunker > 0 } }
 		}
-		log = "    building damage: atomic_weapons_armament_I (state: [?PREV.FROM.GetName])"
+		#log = "    building damage: atomic_weapons_armament_I (state: [?PREV.FROM.GetName])"
 		set_temp_variable = { basic_destroy = 2 }
 		set_temp_variable = { advanced_destroy = 1 }
 		set_temp_variable = { infrastructure_destroy = 2 }
@@ -278,7 +351,7 @@ wmd_damage_loop_effect = {
 			ROOT = { has_tech = atomic_weapons_armament_II }
 			#NOT = { PREV.FROM = { nuclear_bunker > 0 } }
 		}
-		log = "    building damage: atomic_weapons_armament_II (state: [?PREV.FROM.GetName])"
+		#log = "    building damage: atomic_weapons_armament_II (state: [?PREV.FROM.GetName])"
 		set_temp_variable = { basic_destroy = 3 }
 		set_temp_variable = { advanced_destroy = 2 }
 		set_temp_variable = { infrastructure_destroy = 3 }

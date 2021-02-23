@@ -227,12 +227,14 @@ country_event = {
 				factor = 0
 			}
 		}
-		SOV = { country_event = cubamc.10 }
-		news_event = cubamc.28
 		declare_war_on = {
 			target = CUB
 			type = annex_everything
 		}
+		#Form NATO
+		country_event = NATO.21
+		SOV = { country_event = cubamc.10 }
+		news_event = cubamc.28
 		hidden_effect = {
 			news_event = cubamc.11
 			SOV = { country_event = cubamc.29 }
@@ -253,13 +255,13 @@ country_event = {
 		
 	}
 }
+
 country_event = {
 	id = cubamc.10 
  immediate = {log = "[GetDateText]: [Root.GetName]: id = cubamc.10"}
 	title = "Americans invade Cuba"
 	desc = cubamc.10.d
 	picture = GFX_cubamc_10
-
 	is_triggered_only = yes
 	
 	option = {
@@ -267,13 +269,21 @@ country_event = {
 		clr_country_flag = Cuban_Missiles
 		ai_chance = {
 			factor = 0
+			modifier = {
+				is_historical_focus_on = no
+				OR = {
+					USA = { is_ai = no }
+					SOV = { is_ai = no }
+				}
+				add = 25
+			}
 		}
 	}
 	option = {
 		name = "Back down, Castro is on his own"
 		clr_country_flag = Cuban_Missiles
 		ai_chance = {
-			factor = 100
+			factor = 50
 			modifier = {
 				is_historical_focus_on = yes
 				factor = 100
@@ -281,34 +291,32 @@ country_event = {
 		}
 	}
 	option = {
+		# Cuba Missile Crisis - SOV Strike on USA
 		name = "Full Scale Nuclear Retaliation"
 		ai_chance = {
 			factor = 0
-		}
-		USA = { country_event = cubamc.25 }
-		add_to_faction = CUB
-		distance_calculator_sov_cubamc = yes
-		for_each_loop = {
-			array = WMD_target_states_array
-			launch_nuke = {
-				state = var:WMD_target_states_array^i
-				use_nuke = yes
-			}
-			wmd_damage_loop_effect = yes
-		}
-		set_variable = { icbm_cost = missile_cost }
-		multiply_variable = { icbm_cost = -1 }
-		meta_effect = {
-			text = {
-				add_equipment_to_stockpile = {
-					type = icbm_equipment
-					amount = [AMNT]
+			modifier = {
+				is_historical_focus_on = no
+				OR = {
+					USA = { is_ai = no }
+					SOV = { is_ai = no }
 				}
+				add = 25
 			}
-			AMNT = "icbm_cost"
-		}		
+		}
+		add_to_faction = CUB
+		# select nuclear strike and execute
+		ROOT = { add_named_threat = { threat = 20 name = "Nuclear Attack on Florida" } }
+		log = "[GetDateText]: [Root.GetTag]: id = cubamc.10 - Nuking state [?366.GetName]"
+		log = "  Threat 20 from Nuclear Attack on Florida"
+		launch_nuke = {
+			province = 1843
+			use_nuke = yes
+		}
+		USA = { country_event = { id = cubamc.25 days = 1 } } # USA retaliation on SOV attack
 	}
 }
+
 news_event = {
 	id = cubamc.11 
  immediate = {log = "[GetDateText]: [Root.GetName]: id = cubamc.11"}
@@ -592,6 +600,8 @@ news_event = {
 		name = "The End is Nigh"
 	}
 }
+
+# Cuba Missile Crisis - retaliation USA Strike on SOV
 country_event = {
 	id = cubamc.25 
  immediate = {log = "[GetDateText]: [Root.GetName]: id = cubamc.25"}
@@ -614,32 +624,20 @@ country_event = {
 				}
 				USA = { add_to_faction = PREV }
 			}
-			distance_calculator_usa_cubamc = yes
-			for_each_loop = {
-				array = WMD_target_states_array
-				launch_nuke = {
-					state = var:WMD_target_states_array^i
-					use_nuke = yes
-				}
-				wmd_damage_loop_effect = yes
-			}
-			set_variable = { icbm_cost = missile_cost }
-			multiply_variable = { icbm_cost = -1 }
-			meta_effect = {
-				text = {
-					add_equipment_to_stockpile = {
-						type = icbm_equipment
-						amount = [AMNT]
-					}
-				}
-				AMNT = "icbm_cost"
-			}		
+			# select nuclear strike and execute
+			set_variable = { strike_level_usa_cubamc_selected = 1 }
+			wmd_distance_calculator = yes
+			wmd_nuke_launch = yes
+			wmd_deselect_all_enemies = yes
 		}
 	}
 	option = {
 		name = "God have mercy..."
+		SOV = { country_event = { id = cubamc.26 days = 1 } } # SOV retaliation on USA strike
 	}
 }
+
+# Cuba Missile Crisis - SOV Strike on USA
 country_event = {
 	id = cubamc.26 
  immediate = {log = "[GetDateText]: [Root.GetName]: id = cubamc.26"}
@@ -652,28 +650,14 @@ country_event = {
 	option = {
 		name = "Endgame..."
 		add_to_faction = CUB
-		distance_calculator_sov_cubamc = yes
-		for_each_loop = {
-			array = WMD_target_states_array
-			launch_nuke = {
-				state = var:WMD_target_states_array^i
-				use_nuke = yes
-			}
-			wmd_damage_loop_effect = yes
-		}
-		set_variable = { icbm_cost = missile_cost }
-		multiply_variable = { icbm_cost = -1 }
-		meta_effect = {
-			text = {
-				add_equipment_to_stockpile = {
-					type = icbm_equipment
-					amount = [AMNT]
-				}
-			}
-			AMNT = "icbm_cost"
-		}		
+		# select nuclear strike and execute
+		set_variable = { strike_level_sov_cubamc_selected = 1 }
+		wmd_distance_calculator = yes
+		wmd_nuke_launch = yes
+		wmd_deselect_all_enemies = yes
 	}
 }
+
 news_event = {
 	id = cubamc.28 
  immediate = {log = "[GetDateText]: [Root.GetName]: id = cubamc.28"}
