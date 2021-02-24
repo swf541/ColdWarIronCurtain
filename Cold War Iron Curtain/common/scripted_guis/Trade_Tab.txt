@@ -26,6 +26,61 @@ scripted_gui = {
 			#}
 		}
 	}
+	Chroium_Buy_Prompt = {
+
+		context_type = player_context
+		window_name = "PURCHASE_CHROMIUM"
+
+		visible = { 
+            check_variable = { chromium_prompt = 1 } 
+		}
+		triggers = {
+			decrease_chromium_click_enabled = {
+				NOT = {
+					check_variable = {
+						purchase_amount = 0
+					}
+				}
+			}
+			increase_chromium_click_enabled = {
+				var:currentPurchaser = {
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount > currentAvailableChromiumExport
+						}
+					}
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount = currentAvailableChromiumExport
+						}
+					}
+				}
+			}
+		}
+        effects = {
+            increase_chromium_click = {
+				add_to_variable = {
+					purchase_amount = 1
+				}
+            }
+            decrease_chromium_click = {
+				add_to_variable = {
+					purchase_amount = -1
+				}
+            }
+			confirm_chromium_purchase_click = {
+				set_variable = {
+					chromium_prompt = 0
+				}
+			    buy_nuclear_material = yes
+			}
+			cancel_button_click = {
+				set_variable = {
+					chromium_prompt = 0
+				}
+			}
+        } 
+    }
 	chromium_exporter_list = {
 		context_type = player_context
 		window_name = "chromium_export_list"
@@ -40,8 +95,12 @@ scripted_gui = {
 		}
 		effects = {
 			buy_chromium_click = {
-				startup_price_setting = yes
-				buy_nuclear_material = yes
+				set_variable = {
+					ROOT.chromium_prompt = 1
+				}
+				set_variable = {
+					ROOT.currentPurchaser = THIS.id
+				}
 			}
 		}
 	}
