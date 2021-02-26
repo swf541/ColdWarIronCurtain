@@ -819,6 +819,47 @@ generate_available_chromium_import_array = {
 		add_to_array = {
 			ROOT.chromiumExporterInfo = THIS.currentAvailableChromiumExport
 		}
+		set_variable = {
+			chromiumExportCash = global.chromiumBasePrice
+		}
+		set_variable = {
+			price_Adj = 0
+		}
+		set_temp_variable = {
+			price_Adjuster = 0
+		}
+		if = {
+			limit = {
+				is_subject_of = ROOT
+			}
+			set_variable = {
+				price_Adj = modifier@extra_trade_to_overlord_factor
+			}
+			set_variable = {
+				price_Adj2 = 1
+			}
+			subtract_from_variable = {
+				price_Adj = price_Adj2
+			}
+			set_temp_variable = {
+				price_Adjuster = 1
+			}
+		}
+		if = {
+			limit = {
+				check_variable = {
+					price_Adjuster = 1
+				}
+			}
+			multiply_variable = {
+				chromiumExportCash = price_Adj
+			}
+		}
+
+		clear_variable = price_Adjuster
+		set_variable = {
+			chromiumExporterPrice^ROOT = chromiumExportCash
+		}
 	}
 }
 
@@ -850,10 +891,10 @@ buy_nuclear_material = {
 			ROOT.nuclearImports = ROOT.purchase_amount
 		}
 		add_to_array = {
-			chromiumExportTarget = ROOT.id
-		}
-		add_to_array = {
-			chromiumExportTargetAmount = ROOT.purchase_amount
+			chromiumExportTarget^ROOT = ROOT.id
+		} 
+		set_variable = {
+			chromiumExportTargetAmount^ROOT = ROOT.purchase_amount
 		}
 		set_variable = {
 			price_of_goods = global.chromiumBasePrice
@@ -871,7 +912,7 @@ buy_nuclear_material = {
 			price_of_goods = ROOT.purchase_amount
 		}
 		add_to_array = {
-			chromiumExportTargetMonthly = price_of_goods
+			chromiumExportTargetMonthly^ROOT = price_of_goods
 		}
 		add_to_array = {
 			ROOT.chromiumImportTargetMonthly = price_of_goods
@@ -925,4 +966,74 @@ buy_nuclear_material = {
 		}
 	}
 	
+}
+
+
+#chromiumExporterPrice
+
+sort_resource_number_chromium = {
+	clear_array = chromiumCurrentImport
+	every_country = { 
+		for_loop_effect = {
+			end = chromiumExportTarget^num
+			value = v
+			if = {
+				limit = {
+					check_variable = { chromiumExportTarget^v = ROOT.id }
+				}
+				add_to_array = { ROOT.chromiumCurrentImport = chromiumExportTargetAmount^i }
+
+			}
+			else = {
+				add_to_array = { ROOT.chromiumCurrentImport = 0 }
+			}
+		}
+	}
+	#Creates the Sample Array	
+	resize_temp_array = {
+		array = chromiumExporterInfo_temp #values
+		size = chromiumExporterInfo^num
+	}
+	resize_temp_array = {
+		array = chromiumExporters_temp #tags
+		size = chromiumExporterInfo^num
+	}
+
+	for_loop_effect = {
+		end = chromiumExporterInfo^num
+		value = v
+		find_highest_in_array = {
+			array = chromiumExporterInfo
+			value = max
+			index = max_index
+		}
+		set_temp_variable = { chromiumExporterInfo_temp^v = max } #sets biggest at the earliest available position
+		set_temp_variable = { chromiumExporters_temp^v = chromiumExporters^max_index } #sets biggest TAG at the earliest available position
+		set_variable = { chromiumExporterInfo^max_index = -1 } #removes it from selection
+	}
+	clear_array = chromiumExporterInfo
+	clear_array = chromiumExporters
+	#restores destroyed arrays in the above process - i.e. if they were deleted due to being less then 1%
+	for_each_loop = {
+		array = chromiumExporterInfo_temp
+		add_to_array = { chromiumExporterInfo = v }
+		
+	}
+	for_each_loop = {
+		array = chromiumExporters_temp
+		add_to_array = { chromiumExporters = v  }
+	}
+	clear_temp_array = chromiumExporterInfo_temp
+	clear_temp_array = chromiumExporters_temp
+
+
+
+}
+
+test_for_Trade_modifiers = {
+
+
+	set_variable = {
+		test3 = NGA.modifier@extra_trade_to_overlord_factor
+	}
 }
