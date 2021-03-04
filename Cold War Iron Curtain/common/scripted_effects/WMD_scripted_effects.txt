@@ -76,11 +76,16 @@ wmd_deselect_all_enemies = {
 
 wmd_nuke_launch = {
 	# set News Events target country
-	set_variable = { wmd_target_country = enemies^0 }
-	if = { limit = { check_variable = { enemies^num > 1 } }
-		for_each_scope_loop = {
-			array = enemies
-			if = { limit = { THIS = { is_faction_leader = yes } } set_variable = { ROOT.wmd_target_country = THIS.id } }
+	set_temp_variable = { ROOT.tmp_found = 0 }
+	for_each_scope_loop = {
+		array = enemies
+		if = {
+			limit = {
+				check_variable = { THIS.checkmark = 1 }
+				check_variable = { ROOT.tmp_found = 0 }
+			}
+			set_variable = { ROOT.wmd_target_country = THIS.id } # pick a country in enemies array
+			if = { limit = { THIS = { is_faction_leader = yes } } set_temp_variable = { ROOT.tmp_found = 1 } } # found faction leader
 		}
 	}
 
