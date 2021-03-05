@@ -63,6 +63,24 @@ scripted_gui = {
 						}
 					}
 				}
+				OR = {
+					check_variable = {
+						trade_infrastructure_total_available > purchase_amount
+					}
+					check_variable = {
+						trade_infrastructure_total_available = purchase_amount
+					}
+				}
+			}
+			confirm_chromium_purchase_click_enabled = {
+				OR = {
+					check_variable = {
+						trade_infrastructure_total_available > purchase_amount
+					}
+					check_variable = {
+						trade_infrastructure_total_available = purchase_amount
+					}
+				}
 			}
 		}
         effects = {
@@ -194,7 +212,32 @@ scripted_gui = {
 				image = "[THIS.GetFlag]"
 			}	
 		}
-		dynamic_lists = {
+		dynamic_lists = { 
+			food_trade_listing_grid = {
+				array = foodExporters
+				change_scope = yes
+				entry_container = food_export_listing_entry
+			}
+			steel_trade_listing_grid = {
+				array = steelExporters
+				change_scope = yes
+				entry_container = steel_export_listing_entry
+			}
+			aluminum_trade_listing_grid = {
+				array = aluminiumExporters
+				change_scope = yes
+				entry_container = aluminum_export_listing_entry
+			}
+			rare_earth_trade_listing_grid = {
+				array = rareEarthExporters
+				change_scope = yes
+				entry_container = rare_earth_export_listing_entry
+			}
+			oil_trade_listing_grid = {
+				array = oilExporters
+				change_scope = yes
+				entry_container = oil_export_listing_entry
+			}
 			chromium_trade_listing_grid = {
 				array = chromiumExporters
 				change_scope = yes
@@ -202,6 +245,54 @@ scripted_gui = {
 			}
 		}
 		effects = {
+			cancel_oil_imports_click = {
+				set_variable = { oilImports = 0 }
+			}
+			cancel_aluminum_imports_click = {
+				set_variable = { aluminiumImports = 0 }
+			}
+			cancel_food_imports_click = {
+				set_variable = { foodImports = 0 }
+			}
+			cancel_rare_earth_imports_click = {
+				set_variable = { rareEarthImports = 0 }
+			}
+			cancel_steel_imports_click = {
+				set_variable = { steelImports = 0 }
+			}
+			cancel_nuclear_imports_click = {
+				add_to_variable = {
+					trade_infrastructure_total_available = nuclearImports
+				}
+				subtract_from_variable = {
+					trade_infrastructure_total_used = nuclearImports
+				}
+				set_variable = { nuclearImports = 0 }
+				every_country = {
+					set_variable = {
+						chromiumExportTarget^ROOT = 0
+					}
+					set_variable = {
+						chromiumExportTargetAmount^ROOT = 0
+					}
+					set_variable = {
+						chromiumExportTargetMonthly^ROOT = 0
+					}
+					set_variable = {
+						ROOT.chromiumImportTargetMonthly^THIS = 0
+					}
+					set_variable = {
+						ROOT.chromiumImportTarget^THIS = 0
+					}
+					set_variable = {
+						ROOT.chromiumImportTargetAmount^THIS = 0
+					}
+				}
+			}
+			cancel_electricity_imports_click = {
+				set_variable = { electricImports = 0 }
+			}
+			##############
 			sort_export_click = {	#Export Total
 				sort_resource_number_chromium = yes
 			}
@@ -259,6 +350,8 @@ scripted_gui = {
 			}
 			food_button_sorted_click = {
 				set_variable = { food_trade = 0 }
+				clear_array = foodExporters
+				clear_array = foodExporterInfo
 			}
 			food_button_sort_click = {
 				
@@ -269,7 +362,9 @@ scripted_gui = {
 				set_variable = { aluminum_trade = 0 }
 				set_variable = { oil_trade = 0 }
 				set_variable = { food_trade = 1 }	
-				generate_available_food_import_array = yes				
+
+				generate_available_food_import_array = yes
+				sort_resource_number_food = yes		
 			}
 			aluminum_button_sorted_click = {
 				set_variable = { aluminum_trade = 0 }
@@ -300,6 +395,27 @@ scripted_gui = {
 				generate_available_oil_import_array = yes
 			}
 			#Grid
+			buy_food_click = {
+				set_variable = {
+					ROOT.chromium_prompt = 1
+				}
+				set_variable = {
+					ROOT.currentPurchaser = THIS.id
+				}
+				set_variable = {
+					ROOT.currentAvailablefoodExportPrompt = currentAvailablefoodExport
+				}
+				set_variable = {
+					ROOT.pricePerUnit = foodExporterPrice^ROOT
+				}
+				save_global_event_target_as = this_trade_country
+				set_variable = {
+					ROOT.purchase_amount = foodExportTargetAmount^ROOT 
+				}
+				set_variable = {
+					ROOT.purchase_amount_prior = foodExportTargetAmount^ROOT 
+				}	
+			}
 			buy_chromium_click = {
 				set_variable = {
 					ROOT.chromium_prompt = 1
