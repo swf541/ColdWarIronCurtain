@@ -100,6 +100,7 @@ variables_calculation_category = {
 			set_variable = { root.un_state_target_owner = 0 }
 			set_variable = { root.un_action_set = 0 }
 			set_variable = { root.un_nation_target = 0 }			
+			set_variable = { UNS.coalition_tag = 0 }
 
 			clear_array = UNS.un_vote_abstain_list
 			clear_array = UNS.un_vote_no_list
@@ -294,7 +295,7 @@ variables_calculation_category = {
 					news_event = UN_RESOLUTION.20
 					UNS = {
 						create_faction = "The United Nations"
-						add_to_faction = var:UNS.un_nation_target
+						add_to_faction = var:UNS.coalition_tag
 					}
 					#UNS.un_nation_target = {
 					#	#create_unit		#Automatic Peacekeepers
@@ -307,12 +308,12 @@ variables_calculation_category = {
 					news_event = UN_RESOLUTION.21
 					UNS = {
 						create_faction = "The United Nations"
-						add_to_faction = var:UNS.un_nation_target
+						add_to_faction = var:UNS.coalition_tag
 					}
 					every_country = {
 						limit = {
 							NOT = {
-								has_war_with = var:UNS.un_nation_target
+								has_war_with = var:UNS.coalition_tag
 							}
 						}
 						country_event = UN_RESOLUTION.22
@@ -429,28 +430,23 @@ variables_calculation_category = {
 			is_ai = yes
 		}
 
-
 		#is_good = yes
-
 		selectable_mission = yes
 		days_mission_timeout = 1
 		days_remove = 30
-		
-
-		
+	
 		timeout_effect = {
-			log = "[GetDateText]: [Root.GetName]: ic_pulse"
+			log = "[GetDateText]: [Root.GetTag]: ic_pulse (VTC)"
 			clr_country_flag = ic_pulse_one_flag
 			random_country = {
 				limit = { tag = VTC }
 				set_country_flag = ic_pulse_one_flag
-				ic_pulse = yes
+				ROOT = { ic_pulse = yes }
 			}
 		}
 
-
 		complete_effect = {
-			log = "[GetDateText]: [Root.GetName]: ic_pulse"
+			log = "[GetDateText]: [Root.GetTag]: ic_pulse"
 			every_country = {
 				ic_pulse = yes
 			}
@@ -479,12 +475,12 @@ variables_calculation_category = {
 		
 		timeout_effect = {
 			hidden_effect = {
-				log = "[GetDateText]: [Root.GetName]: gdp calc effect"
+				log = "[GetDateText]: [Root.GetTag]: gdp calc effect"
 				gdp_calculation = yes
 				
 				export_script_for_pool = yes
 
-				log = "[GetDateText]: [Root.GetName]: income effect"
+				log = "[GetDateText]: [Root.GetTag]: income effect"
 				income_effect = yes
 				set_variable = { steel_resource_bonus = 0 }
 				set_variable = { oil_resource_bonus = 0 }
@@ -496,14 +492,14 @@ variables_calculation_category = {
 				set_variable = { tungstenConcessionsGains = 0 }
 				set_variable = { tungstenConcession = 0 }
 
-				log = "[GetDateText]: [Root.GetName]: resource bonus effect"
+				log = "[GetDateText]: [Root.GetTag]: resource bonus effect"
 				resource_bonus_script = yes
-				log = "[GetDateText]: [Root.GetName]: industrial pulse effect"
+				log = "[GetDateText]: [Root.GetTag]: industrial pulse effect"
 				industrial_pulse = yes
 
 				activate_mission = ic_Financial
 
-				log = "[GetDateText]: [Root.GetName]: chemical weapon effect and removal calc"
+				log = "[GetDateText]: [Root.GetTag]: chemical weapon effect and removal calc"
 				every_owned_state = {
 					limit = {
 						has_state_flag = napalm_attacked
@@ -618,13 +614,13 @@ variables_calculation_category = {
 						}
 					}
 				}
-				log = "[GetDateText]: [Root.GetName]: emergency_policy_replanning scripted effect"
+				log = "[GetDateText]: [Root.GetTag]: emergency_policy_replanning scripted effect"
 				emergency_policy_replanning = yes
 			}
 		}
 		complete_effect = {
 			hidden_effect = {
-				log = "[GetDateText]: [Root.GetName]: income effect every_country scripted effect"
+				log = "[GetDateText]: [Root.GetTag]: income effect every_country scripted effect"
 				every_country = {
 					income_effect = yes
 				}
@@ -653,7 +649,7 @@ variables_calculation_category = {
 		
 		timeout_effect = {
 			hidden_effect = {
-				log = "[GetDateText]: [Root.GetName]: industrial pulse effect"
+				log = "[GetDateText]: [Root.GetTag]: industrial pulse effect"
 				industrial_pulse = yes
 				monthly_power_projection_gain = yes
 			}
@@ -1393,6 +1389,10 @@ operations = {
 
 	Retreat_to_Manchuria = {
 		icon = generic_prepare_civil_war
+		visible = {
+			tag = PRC
+			NOT = { has_global_flag = chinese_civil_war_over }
+		}
 		allowed = {
 			tag = PRC
 		}
@@ -1402,6 +1402,7 @@ operations = {
 		activation = {
 			tag = PRC
 			has_war_with = CHI
+			NOT = { has_global_flag = chinese_civil_war_over }
 			CHI = {
 				controls_state = 606
 				controls_state = 613

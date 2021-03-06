@@ -694,7 +694,7 @@ scripted_gui = {
 					set_variable = { wmd_target_selected = 0 }
 					set_variable = { missile_selected = 0 }
 				}
-				distance_calculator_all_tiers = yes
+				wmd_distance_calculator = yes
 				add_to_variable = { refresh_wmd_menu = 1 }
 			}
 
@@ -716,7 +716,7 @@ scripted_gui = {
 				else = {
 					set_variable = { missile_selected = 0 }
 				}
-				distance_calculator_all_tiers = yes
+				wmd_distance_calculator = yes
 				add_to_variable = { refresh_wmd_menu = 1 }
 			}
 
@@ -735,55 +735,16 @@ scripted_gui = {
 					set_variable = { wmd_target_selected = 0 }
 					set_variable = { missile_selected = 0 }
 				}
-				distance_calculator_all_tiers = yes
+				wmd_distance_calculator = yes
 				add_to_variable = { refresh_wmd_menu = 1 }
 			}
 
 			wmd_button_launch_click = {
-				log = "[GetDateText]: [Root.GetName]: id = wmd_button_launch_click"
-				# threat added - 5 per states nuked
-				set_temp_variable = { tmp_threat = WMD_target_states_array^num }
-				multiply_temp_variable = { tmp_threat = 5 }
-				log = "  Threat [?tmp_threat] from Nuclear Attack on [?WMD_target_states_array^num] states"
-				ROOT = { add_named_threat = { threat = tmp_threat name = "Nuclear Attack on [?WMD_target_states_array^num] states" } }
-				if = {
-					limit = {
-						tag = ISR
-						NOT = { has_country_flag = samson_option_executed } # WIP
-					}
-					samson_option_super_event = yes
-					set_country_flag = samson_option_executed
-				}
-				if = { limit = { check_variable = { strike_level_tier1_selected = 1 } } set_variable = { wmd_temp_news_tier = 1 } }
-				else_if = { limit = { check_variable = { strike_level_tier2_selected = 1 } } set_variable = { wmd_temp_news_tier = 2 } }
-				else_if = { limit = { check_variable = { strike_level_tier3_selected = 1 } } set_variable = { wmd_temp_news_tier = 3 } }
-				set_variable = { wmd_strike_ongoing = 1 }
-				for_each_loop = {
-					# array for nuking events
-					array = WMD_target_states_array
-					add_to_array = { temp_nuke_target = WMD_target_states_array^i }
-				}
-				for_each_loop = {
-					array = WMD_target_states_array
-					index = i
-					set_variable = { wmd_nuke_target_state = WMD_target_states_array^i.id }
-					if = { limit = { check_variable = { i = 0 } }
-						#log = "  calling wmd_nuke.1"
-						country_event = wmd_nuke.1
-					}
-					else = {
-						#log = "  calling wmd_nuke.1 with 1 hour delay"
-						country_event = { id = wmd_nuke.1 hours = i }
-					}
-				}
-				wmd_reset = yes
-				clear_variable = wmd_nuke_target_state 
-				set_variable = { icbm_cost = missile_cost }
-				multiply_variable = { icbm_cost = -1 }
-				add_equipment_to_stockpile = {
-					type = icbm_equipment
-					amount = icbm_cost
-				}
+				log = "[GetDateText]: [Root.GetTag]: id = wmd_button_launch_click"
+				wmd_nuke_launch = yes
+				wmd_deselect_all_enemies = yes
+
+				# WIP - Retaliation
 
 				# ###################################################
 				# # MAD
@@ -1020,7 +981,7 @@ scripted_gui = {
 				set_variable = { THIS.checkmark = 1 }
 				ROOT = {
 					add_to_variable = { wmd_num_targets_selected = 1 }
-					distance_calculator_all_tiers = yes
+					wmd_distance_calculator = yes
 					# check for missiles and nukes
 					wmd_check_strike_missiles = yes
 
@@ -1042,7 +1003,7 @@ scripted_gui = {
 						set_variable = { activation_code = 0 }
 						set_variable = { missile_selected = 0 }
 					}
-					distance_calculator_all_tiers = yes
+					wmd_distance_calculator = yes
 					# check for missiles and nukes
 					wmd_check_strike_missiles = yes
 
