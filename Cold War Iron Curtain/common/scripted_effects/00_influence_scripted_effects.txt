@@ -1260,6 +1260,13 @@ sort_influence = {
 		array = influence_array_temp #tags
 		size = influence_array_val^num
 	}
+	# for a special case in a focus where influence became negative messing up the following step
+	for_loop_effect = {
+		end = influence_array_val^num
+		value = v
+		if = { limit = { check_variable = { influence_array_val^v < 0 } } set_variable = { influence_array_val^v = 0 } }
+	}
+	####
 	for_loop_effect = {
 		end = influence_array_val^num
 		value = v
@@ -1268,6 +1275,7 @@ sort_influence = {
 			value = max
 			index = max_index
 		}
+		if = { limit = { tag = BEL } log = "[This.GetTag]: max = [?max] / max_index = [?max_index] / influence_array^max_index = [?influence_array^max_index.GetTag]" }
 		set_temp_variable = { influence_array_val_temp^v = max } #sets biggest at the earliest available position
 		set_temp_variable = { influence_array_temp^v = influence_array^max_index } #sets biggest TAG at the earliest available position
 		set_variable = { influence_array_val^max_index = -1 } #removes it from selection
@@ -1309,8 +1317,7 @@ sort_influence = {
 	round_variable = domestic_influence_amount_calc
 	divide_variable = { domestic_influence_amount_calc = influence_total }
 	clamp_variable = { var = domestic_influence_amount_calc min = 0 max = 1 }
-	if = {
-		limit = { NOT = { has_variable = domestic_influence_amount } } # check to prevent error if empty
+	if = { limit = { NOT = { has_variable = domestic_influence_amount } } # check to prevent error if empty
 		set_variable = { domestic_influence_amount = 0 }
 	}
 	clamp_variable = { var = domestic_influence_amount min = 0 max = influence_total }
