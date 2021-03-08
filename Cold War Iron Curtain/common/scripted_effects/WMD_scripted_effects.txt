@@ -76,16 +76,18 @@ wmd_deselect_all_enemies = {
 
 wmd_nuke_launch = {
 	# set News Events target country
-	set_temp_variable = { ROOT.tmp_found = 0 }
+	clr_country_flag = found
 	for_each_scope_loop = {
 		array = enemies
+		log = "[THIS.GetTag]"
 		if = {
 			limit = {
 				check_variable = { THIS.checkmark = 1 }
-				check_variable = { ROOT.tmp_found = 0 }
+				ROOT = { NOT = { has_country_flag = found } }
 			}
 			set_variable = { ROOT.wmd_target_country = THIS.id } # pick a country in enemies array
-			if = { limit = { THIS = { is_faction_leader = yes } } set_temp_variable = { ROOT.tmp_found = 1 } } # found faction leader
+			log = "set [THIS.GetTag]"
+			if = { limit = { THIS = { is_faction_leader = yes } } ROOT = { set_country_flag = found } log = "[THIS.GetTag] is leader" } # found faction leader
 		}
 	}
 
@@ -142,10 +144,10 @@ wmd_nuke_launch = {
 
 wmd_damage_loop_effect = {
 	##### CIVIL DEVASTATION#####
-	log = "  start loop on state: [?PREV.FROM.GetName]"
+	#log = "  start loop on state: [?PREV.FROM.GetName]"
 	if = { limit = { ROOT = { has_tech = atomic_weapons_armament_I } }
 		PREV.FROM = {
-			log = "    reduce state development (state: [?THIS.GetName])"
+			#log = "    reduce state development (state: [?THIS.GetName])"
 			if = { limit = { has_state_category = pop1dev1 } set_state_category = pop1 }
 			if = { limit = { has_state_category = pop1dev2 } set_state_category = pop1dev1 }
 			if = { limit = { has_state_category = pop1dev3 } set_state_category = pop1dev2 }
@@ -190,18 +192,18 @@ wmd_damage_loop_effect = {
 	# and set manpower reduction factor based on atomic_weapons_armament tech lvl
 	set_temp_variable = { tempManpowerReductionFactor = 0 }
 	if = { limit = { ROOT = { has_tech = atomic_weapons_armament_0 NOT = { has_tech = atomic_weapons_armament_I } } }
-		log = "    reduce manpower factor for atomic_weapons_armament_0 = 1 / add 36 rads to state"
+		#log = "    reduce manpower factor for atomic_weapons_armament_0 = 1 / add 36 rads to state"
 		add_to_temp_variable = { tempManpowerReductionFactor = 1 }
 		add_to_variable = { var = PREV.FROM.radiation value = 36 }
 	}
 	else_if = { limit = { ROOT = { has_tech = atomic_weapons_armament_I NOT = { has_tech = atomic_weapons_armament_II } } }
-		log = "    reduce manpower factor for atomic_weapons_armament_I / add 48 rads to state (36 to neighbor states)"
+		#log = "    reduce manpower factor for atomic_weapons_armament_I / add 48 rads to state (36 to neighbor states)"
 		add_to_temp_variable = { tempManpowerReductionFactor = 2 }
 		add_to_variable = { var = PREV.FROM.radiation value = 48 }
 		PREV.FROM = { every_neighbor_state = { add_to_variable = { var = radiation value = 36 } } }
 	}
 	else_if = { limit = { ROOT = { has_tech = atomic_weapons_armament_II } }
-		log = "    reduce manpower factor for atomic_weapons_armament_II = 6 / add 80 rads to state (64 to neighbor states)"
+		#log = "    reduce manpower factor for atomic_weapons_armament_II = 6 / add 80 rads to state (64 to neighbor states)"
 		add_to_temp_variable = { tempManpowerReductionFactor = 6 }
 		add_to_variable = { var = PREV.FROM.radiation value = 80 }
 		PREV.FROM = { every_neighbor_state = { add_to_variable = { var = radiation value = 64 } } }
@@ -209,15 +211,15 @@ wmd_damage_loop_effect = {
 	####
 	# add to manpower reduction factor based on atomic_weapons_delivery tech lvl
 	if = { limit = { ROOT = { has_tech = atomic_weapons_delivery_I NOT = { has_tech = atomic_weapons_delivery_III } } }
-		log = "    reduce manpower factor for atomic_weapons_delivery_I = 1"
+		#log = "    reduce manpower factor for atomic_weapons_delivery_I = 1"
 		add_to_temp_variable = { tempManpowerReductionFactor = 1 }
 	}
 	else_if = { limit = { ROOT = { has_tech = atomic_weapons_delivery_III NOT = { has_tech = atomic_weapons_delivery_V } } }
-		log = "    reduce manpower factor for atomic_weapons_delivery_III = 2"
+		#log = "    reduce manpower factor for atomic_weapons_delivery_III = 2"
 		add_to_temp_variable = { tempManpowerReductionFactor = 2 }
 	}
 	else_if = { limit = { ROOT = { has_tech = atomic_weapons_delivery_V } }
-		log = "    reduce manpower factor for atomic_weapons_delivery_V = 6"
+		#log = "    reduce manpower factor for atomic_weapons_delivery_V = 6"
 		add_to_temp_variable = { tempManpowerReductionFactor = 6 }
 	}
 	multiply_temp_variable = { tempManpowerReductionFactor = -1 }
@@ -227,37 +229,37 @@ wmd_damage_loop_effect = {
 	if = { limit = { PREV.FROM = { state_population_k > 50 state_population_k < 101 } }
 		set_temp_variable = { tempManpowerReduction = 1000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
-		log = "    state pop size 1 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
+		#log = "    state pop size 1 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
 	}
 	else_if = { limit = { PREV.FROM = { state_population_k > 100 state_population_k < 1001 } }
 		set_temp_variable = { tempManpowerReduction = 10000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
-		log = "    state pop size 2 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
+		#log = "    state pop size 2 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
 	}
 	else_if = { limit = { PREV.FROM = { state_population_k > 1000 state_population_k < 2001 } }
 		set_temp_variable = { tempManpowerReduction = 25000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
-		log = "    state pop size 3 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
+		#log = "    state pop size 3 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
 	}
 	else_if = { limit = { PREV.FROM = { state_population_k > 2000 state_population_k < 5001 } }
 		set_temp_variable = { tempManpowerReduction = 50000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
-		log = "    state pop size 4 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
+		#log = "    state pop size 4 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
 	}
 	else_if = { limit = { PREV.FROM = { state_population_k > 5000 state_population_k < 10001 } }
 		set_temp_variable = { tempManpowerReduction = 100000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
-		log = "    state pop size 5 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
+		#log = "    state pop size 5 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
 	}
 	else_if = { limit = { PREV.FROM = { state_population_k > 10000 } }
 		set_temp_variable = { tempManpowerReduction = 150000 }
 		multiply_temp_variable = { tempManpowerReduction = tempManpowerReductionFactor }
-		log = "    state pop size 6 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
+		#log = "    state pop size 6 ([?PREV.FROM.state_population_k]k): lose [?tempManpowerReduction] pop"
 		PREV.FROM = { add_manpower = tempManpowerReduction }
 	}
 
@@ -472,5 +474,5 @@ wmd_damage_loop_effect = {
 		# 	DAMAGE_FACILITIES = "[?facilities_damage]"
 		# }
 	}
-	log = "  end loop on state: [?PREV.FROM.GetName]"
+	#log = "  end loop on state: [?PREV.FROM.GetName]"
 }
