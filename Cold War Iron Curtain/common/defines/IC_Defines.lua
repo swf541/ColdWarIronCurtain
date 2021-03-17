@@ -11,13 +11,29 @@ NDefines.NAI.RESEARCH_BONUS_FACTOR = 1.5 -- To which extent AI should care about
 NDefines.NAI.RESEARCH_LAND_DOCTRINE_NEED_GAIN_FACTOR = 0.1 -- Multiplies value based on relative military industry size / country size.
 NDefines.NAI.RESEARCH_NAVAL_DOCTRINE_NEED_GAIN_FACTOR = 0.075 -- Multiplies value based on relative naval industry size / country size.
 
-NDefines.NAir.AIR_WING_MAX_STATS_SPEED = 15000
+NDefines.NAir.AIR_WING_FLIGHT_SPEED_MULT = 0.02					-- Global speed multiplier for airplanes (affects fe.transferring to another base)
+NDefines.NAir.AIR_WING_MAX_STATS_ATTACK = 1000					-- Max stats
+NDefines.NAir.AIR_WING_MAX_STATS_DEFENCE = 1000
+NDefines.NAir.AIR_WING_MAX_STATS_AGILITY = 1000
+NDefines.NAir.AIR_WING_MAX_STATS_SPEED = 10000
+NDefines.NAir.AIR_WING_MAX_STATS_BOMBING = 1000
+NDefines.NAir.AIR_WING_MAX_SIZE = 1000 							-- Max amount of airplanes in wing
+NDefines.NAir.AIR_WING_BOMB_DAMAGE_FACTOR = 2					-- Used to balance the damage done while bombing.
+NDefines.NAir.COMBAT_STAT_IMPORTANCE_SPEED = 2 				-- How important is speed when comparing stats.
+NDefines.NAir.COMBAT_STAT_IMPORTANCE_AGILITY = 1				-- How important is agility when comparing stats.
+NDefines.NAir.BIGGEST_AGILITY_FACTOR_DIFF = 2.5					-- biggest factor difference in agility for doing damage (caps to this)
+NDefines.NAir.COMBAT_DAMAGE_STATS_MULTILIER = 0.3
+NDefines.NAir.COMBAT_BETTER_AGILITY_DAMAGE_REDUCTION = 0.6 		-- How much the better agility (then opponent's) can reduce their damage to us.
+NDefines.NAir.COMBAT_MAX_WINGS_AT_ONCE = 10000						-- Max amount of air wings in one combat simulation. The higher value, the quicker countries may loose their wings. It's a gameplay balance value.
+NDefines.NAir.COMBAT_MAX_WINGS_AT_GROUND_ATTACK = 10000	        	-- we can really pounce a land strike and escalate
+NDefines.NAir.COMBAT_MAX_WINGS_AT_ONCE_PORT_STRIKE = 10000      -- we can really pounce a naval strike and escalate
+NDefines.NAir.AIR_REGION_SUPERIORITY_PIXEL_SCALE = 0.04          -- air superiority scale = superiority/(pixels*this)
+NDefines.NAir.COMBAT_MULTIPLANE_CAP = 3						-- How many planes can shoot at each plane on other side ( if there are 100 planes we are atttacking COMBAT_MULTIPLANE_CAP * 100 of our planes can shoot )
+NDefines.NAir.COMBAT_DAMAGE_SCALE = 0.2						-- Higher value = more shot down planes
 NDefines.NAir.CAS_NIGHT_ATTACK_FACTOR = 0.8 -- CAS damaged get multiplied by this in land combats at night
 NDefines.NAir.STRATEGIC_BOMBER_NUKE_AIR_SUPERIORITY = 10.0 -- How much air superiority is needed for a tactical bomber to be able to nuke a province
 NDefines.NAir.NAVAL_COMBAT_EXTERNAL_PLANES_JOIN_RATIO = 0.02 -- Max planes that can join a combat comparing to the total strength of the ships
-NDefines.NAir.COMBAT_STACK_LIMIT = 1 -- The biggest allowed dogfight combination (1vs1 or 2vs1). Bigger value cause that amount of airplanes matters more then their stats. Only used in naval air combat, for land air combat see COMBAT_MULTIPLANE_CAP
-NDefines.NAir.COMBAT_MULTIPLANE_CAP = 2  -- How many planes can shoot at each plane on other side
-NDefines.NAir.COMBAT_DAMAGE_SCALE = 0.05 -- Higher value means more shot down planes
+NDefines.NAir.COMBAT_STACK_LIMIT = 3 -- The biggest allowed dogfight combination (1vs1 or 2vs1). Bigger value cause that amount of airplanes matters more then their stats. Only used in naval air combat, for land air combat see COMBAT_MULTIPLANE_CAP
 NDefines.NAir.NAVAL_STRIKE_DAMAGE_TO_STR = 2 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
 NDefines.NAir.MISSION_COMMAND_POWER_COSTS = {  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
 NDefines.NAir.MISSION_FUEL_COSTS = {  1.0, 0.5, 0.2, 1.3, 1.3, 20.0, 3.0, 1.0, 1.3, 2.0, 0.5, 2.0, 2.0, 1.0 }
