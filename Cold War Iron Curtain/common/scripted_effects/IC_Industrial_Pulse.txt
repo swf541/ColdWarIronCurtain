@@ -56,6 +56,86 @@ industrial_pulse = {
 	set_variable = { FoodBalanceTotal = 0 } # FoodProdTotal - ConsumptionTotal +/- FoodFromPuppets
 	set_variable = { FoodExported = 0 } # used just for correct topbar tooltip display (rounding issues)
 	set_variable = { FoodImported = 0 } # used just for correct topbar tooltip display (rounding issues)
+	
+	set_variable = { eco = global.eco_output_factor }
+	
+
+    #general moddifers
+	#Tech Modifiers
+		set_variable = { farm_tech = 1 }
+		if = { limit = { has_tech = agriculture_I }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_II }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_III }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_IV }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_V }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_VI }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_VII }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_VIII }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+	
+        #Agricultural Dysnfunction
+		set_variable = { farm_output_modif = 1 }
+		
+		if = { limit = { has_idea = agricultural_dysfunction_0 }
+			multiply_variable = { farm_output_modif = 0.5 }
+		}
+		if = { limit = { has_idea = agricultural_dysfunction_1 }
+			multiply_variable = { farm_output_modif = 0.4 }
+		}
+		if = { limit = { has_idea = agricultural_dysfunction_2 }
+			multiply_variable = { farm_output_modif = 0.3 }
+		}
+		if = { limit = { has_idea = agricultural_dysfunction_3 }
+			multiply_variable = { farm_output_modif = 0.2 }
+		}
+		if = { limit = { has_idea = agricultural_dysfunction_4 }
+			multiply_variable = { farm_output_modif = 0.1 }
+		}
+		if = { limit = { has_idea = sov_crop_rotation }
+			multiply_variable = { farm_output_modif = 1.1 }
+		}
+		if = { limit = { has_idea = sov_agr_subs }
+			multiply_variable = { farm_output_modif = 1.05 }
+		}
+		if = { limit = { has_idea = sov_agr_prod_choose }
+			multiply_variable = { farm_output_modif = 1.05 }
+		}
+		if = { limit = { has_idea = sov_agr_ca_pop }
+			multiply_variable = { farm_output_modif = 1.025 }
+		}
+		if = { limit = { has_idea = sov_agr_bur_reduce }
+			multiply_variable = { farm_output_modif = 1.025 }
+		}
+		if = { limit = { has_idea = sov_agr_proc_mod }
+			multiply_variable = { farm_output_modif = 1.05 }
+		}
+		if = { limit = { has_idea = sov_agr_mach_mod }
+			multiply_variable = { farm_output_modif = 1.05 }
+		}
+		if = { limit = { has_idea = sov_ex_meat_production }
+			multiply_variable = { farm_output_modif = 0.95 }
+		}
+		if = { limit = { has_idea = sov_sensible_meat }
+			multiply_variable = { farm_output_modif = 0.975 }
+		}
+	multiply_variable = { farm_output_modif = PREV.eco }
+
+
 
 	#WIP TEST THING
 	set_variable = { steel_test = resource_consumed@steel }
@@ -92,7 +172,7 @@ industrial_pulse = {
 				}
 			}
 		}
-	#	add_to_variable = { PREV.foodCheck = resource@rubber }
+		#	add_to_variable = { PREV.foodCheck = resource@rubber }
 		#Farm Production
 		set_variable = { farm_output = 1 }
 		#if = {
@@ -132,33 +212,11 @@ industrial_pulse = {
 		if = { limit = { has_state_flag = tropical }
 			add_to_variable = { farm_output = 3 }
 		}
-		add_to_variable = { farm_output = local_agri_bonus }
-		#Tech Modifiers
-		set_variable = { farm_tech = 1 }
-		if = { limit = { controller = { has_tech = agriculture_I } }
-			add_to_variable = { farm_tech = 0.15 }
-		}
-		if = { limit = { controller = { has_tech = agriculture_II } }
-			add_to_variable = { farm_tech = 0.15 }
-		}
-		if = { limit = { controller = { has_tech = agriculture_III } }
-			add_to_variable = { farm_tech = 0.15 }
-		}
-		if = { limit = { controller = { has_tech = agriculture_IV } }
-			add_to_variable = { farm_tech = 0.15 }
-		}
-		if = { limit = { controller = { has_tech = agriculture_V } }
-			add_to_variable = { farm_tech = 0.15 }
-		}
-		if = { limit = { controller = { has_tech = agriculture_VI } }
-			add_to_variable = { farm_tech = 0.15 }
-		}
-		if = { limit = { controller = { has_tech = agriculture_VII } }
-			add_to_variable = { farm_tech = 0.15 }
-		}
-		if = { limit = { controller = { has_tech = agriculture_VIII } }
-			add_to_variable = { farm_tech = 0.15 }
-		}
+		
+		################
+		set_variable = { farm_tech_local = PREV.farm_tech }
+		
+		
 		
 		#Water Infra Modifiers
 		if = { limit = { water_infrastructure < 1 }
@@ -169,64 +227,26 @@ industrial_pulse = {
 				water_infrastructure < 3
 				water_infrastructure > 1
 			}
-			add_to_variable = { farm_tech = 0.25 }
+			add_to_variable = { farm_tech_local = 0.25 }
 		}
 		if = {
 			limit = {
 				water_infrastructure < 4
 				water_infrastructure > 2
 			}
-			add_to_variable = { farm_tech = 0.5 } 
+			add_to_variable = { farm_tech_local = 0.5 } 
 		}
 		if = { limit = { water_infrastructure > 3 }
-			add_to_variable = { farm_tech = 0.75 }
+			add_to_variable = { farm_tech_local = 0.75 }
 		}
-		#Agricultural Dysnfunction
-		if = { limit = { controller = { has_idea = agricultural_dysfunction_0 } }
-			multiply_variable = { farm_output = 0.5 }
-		}
-		if = { limit = { controller = { has_idea = agricultural_dysfunction_1 } }
-			multiply_variable = { farm_output = 0.4 }
-		}
-		if = { limit = { controller = { has_idea = agricultural_dysfunction_2 } }
-			multiply_variable = { farm_output = 0.3 }
-		}
-		if = { limit = { controller = { has_idea = agricultural_dysfunction_3 } }
-			multiply_variable = { farm_output = 0.2 }
-		}
-		if = { limit = { controller = { has_idea = agricultural_dysfunction_4 } }
-			multiply_variable = { farm_output = 0.1 }
-		}
-		if = { limit = { controller = { has_idea = sov_crop_rotation } }
-			multiply_variable = { farm_output = 1.1 }
-		}
-		if = { limit = { controller = { has_idea = sov_agr_subs } }
-			multiply_variable = { farm_output = 1.05 }
-		}
-		if = { limit = { controller = { has_idea = sov_agr_prod_choose } }
-			multiply_variable = { farm_output = 1.05 }
-		}
-		if = { limit = { controller = { has_idea = sov_agr_ca_pop } }
-			multiply_variable = { farm_output = 1.025 }
-		}
-		if = { limit = { controller = { has_idea = sov_agr_bur_reduce } }
-			multiply_variable = { farm_output = 1.025 }
-		}
-		if = { limit = { controller = { has_idea = sov_agr_proc_mod } }
-			multiply_variable = { farm_output = 1.05 }
-		}
-		if = { limit = { controller = { has_idea = sov_agr_mach_mod } }
-			multiply_variable = { farm_output = 1.05 }
-		}
-		if = { limit = { controller = { has_idea = sov_ex_meat_production } }
-			multiply_variable = { farm_output = 0.95 }
-		}
-		if = { limit = { controller = { has_idea = sov_sensible_meat } }
-			multiply_variable = { farm_output = 0.975 }
-		}
+		
+		##########
+		
 
-		multiply_variable = { farm_output = farm_tech }
-		multiply_variable = { farm_output = global.eco_output_factor }
+		
+
+		multiply_variable = { farm_output = farm_tech_local }
+		multiply_variable = { farm_output = PREV.farm_output_modif }
 		add_to_variable = { farm_output = global.eco_output_rate }
 		#multiply_variable = { farm_output = farmBonusTotal }
 		multiply_variable = { farm_output = non_damaged_building_level@agri_industrial_complex }
@@ -538,13 +558,13 @@ industrial_pulse = {
 	set_variable = { electricity_consumption = 0 }
 	
 	add_to_variable = { oil_consumption = industrial_complex_oil_consumption }
-	add_to_variable = { steel_consumption = industrial_complex_steel_consumption }
 	add_to_variable = { oil_consumption = office_park_oil_consumption }
-	add_to_variable = { aluminium_consumption = office_park_aluminium_consumption }
 	add_to_variable = { oil_consumption = fossil_fuel_plant_oil_consumption }
+	add_to_variable = { oil_consumption = steel_factory_oil_consumption }
+
+	add_to_variable = { steel_consumption = industrial_complex_steel_consumption }
 	
-	add_to_variable = { steel_factory_electricity_consumption = electricity_consumption }
-	add_to_variable = { steel_factory_oil_consumption = oil_consumption }
+	add_to_variable = { aluminium_consumption = office_park_aluminium_consumption }
 	
 	add_to_variable = { nuclear_consumption = nuclear_reactor_chromium_consumption }
 	add_to_variable = { nuclear_consumption = nuclear_power_consumption }
@@ -553,6 +573,7 @@ industrial_pulse = {
 	add_to_variable = { electricity_consumption = nuclear_reactor_electricity_consumption }
 	add_to_variable = { electricity_consumption = dockyard_consumption }
 	add_to_variable = { electricity_consumption = office_park_electricity_consumption }
+	add_to_variable = { electricity_consumption = steel_factory_electricity_consumption }
 	
 	#round_variable = oil_consumption
 	#round_variable = steel_consumption
@@ -645,7 +666,8 @@ industrial_pulse = {
 		limit = { NOT = { has_dynamic_modifier = { modifier = food_negative_in_capital } } } # if negative on capital, this won't work - WIP
 		add_to_variable = { FoodFromPuppets = resource@rubber }
 		round_variable = FoodFromPuppets
-		subtract_from_variable = { FoodFromPuppets = FoodBalanceTotal }
+		#subtract_from_variable = { FoodFromPuppets = FoodBalanceTotal } ### error
+		subtract_from_variable = { FoodFromPuppets = agri_industrial_complex_quantity }
 		add_to_variable = { FoodBalanceTotal = FoodFromPuppets }
 	}
 
