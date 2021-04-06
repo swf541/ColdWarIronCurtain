@@ -188,9 +188,15 @@ generate_available_chromium_import_array = {
 	clear_array = ROOT.chromiumExporterInfo
 	every_country = {
 		limit = {
-			check_variable = {
-				currentAvailableChromiumExport > 0.99
-			}
+            OR = {
+                check_variable = {
+                    currentAvailableChromiumExport > 0.99
+                }
+                check_variable = {
+                    currentExportedChromium > 0.99
+                }
+            }
+
 			NOT = {
 				tag = ROOT
 			}
@@ -388,9 +394,174 @@ buy_nuclear_material = {
 	}
 	
 }
+sort_price_number_aluminium = {
+    #clear_array = aluminiumCurrentImport
+    clear_array = aluminiumExportPriceRate
+    
+    for_each_scope_loop = {
+        array = aluminiumExporters
+        end = aluminiumExporters^num
+        value = v
+        add_to_array = { 
+            PREV.aluminiumExportPriceRate = aluminiumExporterPrice^ROOT
+        }
+    }
+	clear_array = aluminiumCurrentImport
+	every_country = { 
+		for_loop_effect = {
+			end = aluminiumExportTarget^num
+			value = v
+			if = {
+				limit = {
+					check_variable = { aluminiumExportTarget^v = ROOT.id }
+				}
+				add_to_array = { ROOT.aluminiumCurrentImport = aluminiumExportTargetAmount^i }
+
+			}
+			else = {
+				add_to_array = { ROOT.aluminiumCurrentImport = 0 }
+			}
+		}
+	}
+	#Creates the Sample Array	
+	resize_temp_array = {
+		array = aluminiumExporterInfo_temp #values
+		size = aluminiumExporterInfo^num
+	}
+	resize_temp_array = {
+		array = aluminiumExportPriceRate_temp #values 2
+		size = aluminiumExporterInfo^num
+	}
+	resize_temp_array = {
+		array = aluminiumExporters_temp #tags
+		size = aluminiumExporterInfo^num
+	}
+
+    set_temp_variable = { start_temp = aluminiumExportPriceRate^num }
+    subtract_from_temp_variable = { start_temp = 1 }
+    for_loop_effect = {
+        start = start_temp
+        end = 0
+        compare = greater_than_or_equals
+        add = -1
+        value = v
+		find_highest_in_array = {
+			array = aluminiumExportPriceRate
+			value = max
+			index = max_index
+		}
+		set_temp_variable = { aluminiumExportPriceRate_temp^v = max } #sets biggest at the earliest available position
+		set_temp_variable = { aluminiumExporterInfo_temp^v = aluminiumExporters^max_index } #sets biggest TAG at the earliest available position
+		set_temp_variable = { aluminiumExporters_temp^v = aluminiumExporters^max_index } #sets biggest TAG at the earliest available position
+		set_variable = { aluminiumExportPriceRate^max_index = -1 } #removes it from selection
+	}
+	clear_array = aluminiumExporterInfo
+	clear_array = aluminiumExporters
+    clear_array = aluminiumExportPriceRate
+	#restores destroyed arrays in the above process - i.e. if they were deleted due to being less then 1%
+	for_each_loop = {
+		array = aluminiumExportPriceRate_temp
+		add_to_array = { aluminiumExportPriceRate = v }
+	}
+	for_each_loop = {
+		array = aluminiumExporterInfo_temp
+		add_to_array = { aluminiumExporterInfo = v }
+	}
+	for_each_loop = {
+		array = aluminiumExporters_temp
+		add_to_array = { aluminiumExporters = v  }
+	}
+	clear_temp_array = aluminiumExporterInfo_temp
+	clear_temp_array = aluminiumExporters_temp
+    clear_temp_array = aluminiumExportPriceRate_temp
+}
 
 
 #chromiumExporterPrice
+
+
+
+sort_price_number_chromium = {
+    #clear_array = chromiumCurrentImport
+    clear_array = chromiumExportPriceRate
+    
+    for_each_scope_loop = {
+        array = chromiumExporters
+        end = chromiumExporters^num
+        value = v
+        add_to_array = { 
+            PREV.chromiumExportPriceRate = chromiumExporterPrice^ROOT
+        }
+    }
+	clear_array = chromiumCurrentImport
+	every_country = { 
+		for_loop_effect = {
+			end = chromiumExportTarget^num
+			value = v
+			if = {
+				limit = {
+					check_variable = { chromiumExportTarget^v = ROOT.id }
+				}
+				add_to_array = { ROOT.chromiumCurrentImport = chromiumExportTargetAmount^i }
+
+			}
+			else = {
+				add_to_array = { ROOT.chromiumCurrentImport = 0 }
+			}
+		}
+	}
+	#Creates the Sample Array	
+	resize_temp_array = {
+		array = chromiumExporterInfo_temp #values
+		size = chromiumExporterInfo^num
+	}
+	resize_temp_array = {
+		array = chromiumExportPriceRate_temp #values 2
+		size = chromiumExporterInfo^num
+	}
+	resize_temp_array = {
+		array = chromiumExporters_temp #tags
+		size = chromiumExporterInfo^num
+	}
+
+    set_temp_variable = { start_temp = chromiumExportPriceRate^num }
+    subtract_from_temp_variable = { start_temp = 1 }
+    for_loop_effect = {
+        start = start_temp
+        end = 0
+        compare = greater_than_or_equals
+        add = -1
+        value = v
+		find_highest_in_array = {
+			array = chromiumExportPriceRate
+			value = max
+			index = max_index
+		}
+		set_temp_variable = { chromiumExportPriceRate_temp^v = max } #sets biggest at the earliest available position
+		set_temp_variable = { chromiumExporterInfo_temp^v = chromiumExporters^max_index } #sets biggest TAG at the earliest available position
+		set_temp_variable = { chromiumExporters_temp^v = chromiumExporters^max_index } #sets biggest TAG at the earliest available position
+		set_variable = { chromiumExportPriceRate^max_index = -1 } #removes it from selection
+	}
+	clear_array = chromiumExporterInfo
+	clear_array = chromiumExporters
+    clear_array = chromiumExportPriceRate
+	#restores destroyed arrays in the above process - i.e. if they were deleted due to being less then 1%
+	for_each_loop = {
+		array = chromiumExportPriceRate_temp
+		add_to_array = { chromiumExportPriceRate = v }
+	}
+	for_each_loop = {
+		array = chromiumExporterInfo_temp
+		add_to_array = { chromiumExporterInfo = v }
+	}
+	for_each_loop = {
+		array = chromiumExporters_temp
+		add_to_array = { chromiumExporters = v  }
+	}
+	clear_temp_array = chromiumExporterInfo_temp
+	clear_temp_array = chromiumExporters_temp
+    clear_temp_array = chromiumExportPriceRate_temp
+}
 
 sort_resource_number_chromium = {
 	clear_array = chromiumCurrentImport
@@ -516,6 +687,7 @@ chromium_import_ai = {
 	set_variable = {
 		nuclear_total = resource@chromium
 	}
+
 	if = {
 		limit = {
 			check_variable = {
@@ -525,88 +697,166 @@ chromium_import_ai = {
 				trade_infrastructure_total_available > 0
 			}
 		}
-		export_script_for_pool = yes
 		generate_available_chromium_import_array = yes
+        sort_price_number_chromium = yes
 
-		while_loop_effect = {
-			limit = {
-				check_variable = {
-					nuclear_total < 0
-				}
-				check_variable = {
-					trade_infrastructure_total_available > 0
-				}
-			}
-			random_country = {
-				limit = {
-					is_in_array = {
-						array = ROOT.chromiumExporters
-						value = THIS.id
-					}	
-					check_variable = {
-						currentAvailableChromiumExport > 0
-					}
-				}
-				set_variable = {
-					ROOT.purchase_amount = 1
-				}
-				subtract_from_variable = {
-					ROOT.purchase_amount = ROOT.purchase_amount_prior
-				}
-				subtract_from_variable = {
-					currentAvailableChromiumExport = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
-				}
-				subtract_from_variable = {
-					ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					currentExportedChromium = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					ROOT.nuclearImports = ROOT.purchase_amount
-				}
-				set_variable = {
-					chromiumExportTarget^ROOT = ROOT.id
-				} 
-				add_to_variable = {
-					chromiumExportTargetAmount^ROOT = ROOT.purchase_amount
-				}
-				set_variable = {
-					price_of_goods = chromiumExporterPrice^ROOT
-				}
+        #Loops thru cheapest countries to buy from
+        for_each_scope_loop = {
+            array = ROOT.chromiumExporters
+            index = i
+            break = cheapest_brk
+
+            #Checks if the country's goods are cheaper & shipping is affordabole 
+            #TODO - Shipping cost
+            if = {
+                limit = {
+                    check_variable = { currentAvailableChromiumExport > 0 }
+                    OR = {
+                        NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
+                        NOT = { check_variable = { ROOT.nuclear_total > -1 } }
+                    }
+                }
+                set_variable = {
+                    nuclear_need = ROOT.nuclear_total
+                }
 				multiply_variable = {
-					price_of_goods = ROOT.purchase_amount
+					nuclear_need = -1
 				}
-				add_to_variable = {
-					chromiumExportTargetMonthly^ROOT = price_of_goods
-				}
-				add_to_variable = {
-					ROOT.chromiumImportTargetMonthly^THIS = price_of_goods
-				}
-				set_variable = {
-					ROOT.chromiumImportTarget^THIS = THIS.id
-				}
-				add_to_variable = {
-					ROOT.chromiumImportTargetAmount^THIS = ROOT.purchase_amount
-				}
-				set_variable = {
-					price_of_goods = 0
-				}
-				set_variable = {
-					ROOT.purchase_amount = 0
-				}	
-				add_to_variable = {
-					ROOT.nuclear_total = 1
-				}			
-			}
-		}
+                if = {
+                    limit = {
+                        check_variable = {
+                            currentAvailableChromiumExport > nuclear_need
+                        }
+                    }
+
+                    set_variable = {
+                        ROOT.purchase_amount = nuclear_need
+                    }
+                    add_to_variable = {
+                        ROOT.nuclear_total = ROOT.purchase_amount
+                    }
+
+                    subtract_from_variable = {
+                        ROOT.purchase_amount = ROOT.purchase_amount_prior
+                    }
+                    subtract_from_variable = {
+                        currentAvailableChromiumExport = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        currentExportedChromium = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.nuclearImports = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        chromiumExportTarget^ROOT = ROOT.id
+                    } 
+                    add_to_variable = {
+                        chromiumExportTargetAmount^ROOT = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = chromiumExporterPrice^ROOT
+                    }
+                    multiply_variable = {
+                        price_of_goods = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        chromiumExportTargetMonthly^ROOT = price_of_goods
+                    }
+                    add_to_variable = {
+                        ROOT.chromiumImportTargetMonthly^THIS = price_of_goods
+                    }
+                    set_variable = {
+                        ROOT.chromiumImportTarget^THIS = THIS.id
+                    }
+                    add_to_variable = {
+                        ROOT.chromiumImportTargetAmount^THIS = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = 0
+                    }
+                    set_variable = {
+                        ROOT.purchase_amount = 0
+                    }
+                }
+                else = {
+                    set_variable = {
+                        nuclear_need = currentAvailableChromiumExport
+                    }			
+                    set_variable = {
+                        ROOT.purchase_amount = nuclear_need
+                    }
+                    add_to_variable = {
+                        ROOT.nuclear_total = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.purchase_amount = ROOT.purchase_amount_prior
+                    }
+                    subtract_from_variable = {
+                        currentAvailableChromiumExport = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        currentExportedChromium = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.nuclearImports = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        chromiumExportTarget^ROOT = ROOT.id
+                    } 
+                    add_to_variable = {
+                        chromiumExportTargetAmount^ROOT = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = chromiumExporterPrice^ROOT
+                    }
+                    multiply_variable = {
+                        price_of_goods = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        chromiumExportTargetMonthly^ROOT = price_of_goods
+                    }
+                    add_to_variable = {
+                        ROOT.chromiumImportTargetMonthly^THIS = price_of_goods
+                    }
+                    set_variable = {
+                        ROOT.chromiumImportTarget^THIS = THIS.id
+                    }
+                    add_to_variable = {
+                        ROOT.chromiumImportTargetAmount^THIS = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = 0
+                    }
+                    set_variable = {
+                        ROOT.purchase_amount = 0
+                    }
+                }
+            }
+            else_if = {
+                limit = {
+                    OR = {
+                        NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
+                        NOT = { check_variable = { ROOT.nuclear_total > -1 } }
+                    }
+                }
+                set_temp_variable = { cheapest_brk = 1 }
+            }
+        }
 	}
-	
-}
-##Food Section
+}##Food Section
 
 
 generate_available_food_import_array = {
@@ -614,9 +864,14 @@ generate_available_food_import_array = {
 	clear_array = ROOT.foodExporterInfo
 	every_country = {
 		limit = {
-			check_variable = {
-				currentAvailablefoodExport > 0.99
-			}
+            OR = {
+                check_variable = {
+                    currentAvailablefoodExport > 0.99
+                }
+                check_variable = {
+                    currentExportedfood > 0.99
+                }
+            }
 			NOT = {
 				tag = ROOT
 			}
@@ -1083,7 +1338,7 @@ food_import_ai = {
                     add_to_variable = {
                         ROOT.food_total = ROOT.purchase_amount
                     }
-
+                    log = "[GetDateText]:Buyer [Root.GetTag] Seller [THIS.GetTag]: fin_pulse buy food ammount [ROOT.purchase_amount]"
                     subtract_from_variable = {
                         ROOT.purchase_amount = ROOT.purchase_amount_prior
                     }
@@ -1191,9 +1446,6 @@ food_import_ai = {
                     set_variable = {
                         ROOT.purchase_amount = 0
                     }
-
-
-      
                 }
             }
             else_if = {
@@ -1216,9 +1468,15 @@ generate_available_oil_import_array = {
 	clear_array = ROOT.oilExporterInfo
 	every_country = {
 		limit = {
-			check_variable = {
-				currentAvailableoilExport > 0.99
-			}
+
+            OR = {
+                check_variable = {
+                    currentAvailableoilExport > 0.99
+                }
+                check_variable = {
+                    currentExportedoil > 0.99
+                }
+            }
 			NOT = {
 				tag = ROOT
 			}
@@ -1478,6 +1736,87 @@ sort_resource_number_oil = {
 
 
 }
+sort_price_number_oil = {
+    #clear_array = oilCurrentImport
+    clear_array = oilExportPriceRate
+    
+    for_each_scope_loop = {
+        array = oilExporters
+        end = oilExporters^num
+        value = v
+        add_to_array = { 
+            PREV.oilExportPriceRate = oilExporterPrice^ROOT
+        }
+    }
+	clear_array = oilCurrentImport
+	every_country = { 
+		for_loop_effect = {
+			end = oilExportTarget^num
+			value = v
+			if = {
+				limit = {
+					check_variable = { oilExportTarget^v = ROOT.id }
+				}
+				add_to_array = { ROOT.oilCurrentImport = oilExportTargetAmount^i }
+
+			}
+			else = {
+				add_to_array = { ROOT.oilCurrentImport = 0 }
+			}
+		}
+	}
+	#Creates the Sample Array	
+	resize_temp_array = {
+		array = oilExporterInfo_temp #values
+		size = oilExporterInfo^num
+	}
+	resize_temp_array = {
+		array = oilExportPriceRate_temp #values 2
+		size = oilExporterInfo^num
+	}
+	resize_temp_array = {
+		array = oilExporters_temp #tags
+		size = oilExporterInfo^num
+	}
+
+    set_temp_variable = { start_temp = oilExportPriceRate^num }
+    subtract_from_temp_variable = { start_temp = 1 }
+    for_loop_effect = {
+        start = start_temp
+        end = 0
+        compare = greater_than_or_equals
+        add = -1
+        value = v
+		find_highest_in_array = {
+			array = oilExportPriceRate
+			value = max
+			index = max_index
+		}
+		set_temp_variable = { oilExportPriceRate_temp^v = max } #sets biggest at the earliest available position
+		set_temp_variable = { oilExporterInfo_temp^v = oilExporters^max_index } #sets biggest TAG at the earliest available position
+		set_temp_variable = { oilExporters_temp^v = oilExporters^max_index } #sets biggest TAG at the earliest available position
+		set_variable = { oilExportPriceRate^max_index = -1 } #removes it from selection
+	}
+	clear_array = oilExporterInfo
+	clear_array = oilExporters
+    clear_array = oilExportPriceRate
+	#restores destroyed arrays in the above process - i.e. if they were deleted due to being less then 1%
+	for_each_loop = {
+		array = oilExportPriceRate_temp
+		add_to_array = { oilExportPriceRate = v }
+	}
+	for_each_loop = {
+		array = oilExporterInfo_temp
+		add_to_array = { oilExporterInfo = v }
+	}
+	for_each_loop = {
+		array = oilExporters_temp
+		add_to_array = { oilExporters = v  }
+	}
+	clear_temp_array = oilExporterInfo_temp
+	clear_temp_array = oilExporters_temp
+    clear_temp_array = oilExportPriceRate_temp
+}
 
 
 oilDeliveryCuts = {
@@ -1544,6 +1883,7 @@ oil_import_ai = {
 	set_variable = {
 		oil_total = resource@oil
 	}
+
 	if = {
 		limit = {
 			check_variable = {
@@ -1553,86 +1893,339 @@ oil_import_ai = {
 				trade_infrastructure_total_available > 0
 			}
 		}
-		export_script_for_pool = yes
 		generate_available_oil_import_array = yes
+        sort_price_number_oil = yes
 
-		while_loop_effect = {
-			limit = {
-				check_variable = {
-					oil_total < 0
-				}
-				check_variable = {
-					trade_infrastructure_total_available > 0
-				}
-			}
-			random_country = {
-				limit = {
-					is_in_array = {
-						array = ROOT.oilExporters
-						value = THIS.id
-					}	
-					check_variable = {
-						currentAvailableoilExport > 0
-					}
-				}
-				set_variable = {
-					ROOT.purchase_amount = 1
-				}
-				subtract_from_variable = {
-					ROOT.purchase_amount = ROOT.purchase_amount_prior
-				}
-				subtract_from_variable = {
-					currentAvailableoilExport = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
-				}
-				subtract_from_variable = {
-					ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					currentExportedoil = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					ROOT.oilImports = ROOT.purchase_amount
-				}
-				set_variable = {
-					oilExportTarget^ROOT = ROOT.id
-				} 
-				add_to_variable = {
-					oilExportTargetAmount^ROOT = ROOT.purchase_amount
-				}
-				set_variable = {
-					price_of_goods = oilExporterPrice^ROOT
-				}
+        #Loops thru cheapest countries to buy from
+        for_each_scope_loop = {
+            array = ROOT.oilExporters
+            index = i
+            break = cheapest_brk
+
+            #Checks if the country's goods are cheaper & shipping is affordabole 
+            #TODO - Shipping cost
+            if = {
+                limit = {
+                    check_variable = { currentAvailableoilExport > 0 }
+                    OR = {
+                        NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
+                        NOT = { check_variable = { ROOT.oil_total > -1 } }
+                    }
+                }
+                set_variable = {
+                    oil_need = ROOT.oil_total
+                }
 				multiply_variable = {
-					price_of_goods = ROOT.purchase_amount
+					oil_need = -1
 				}
-				add_to_variable = {
-					oilExportTargetMonthly^ROOT = price_of_goods
-				}
-				add_to_variable = {
-					ROOT.oilImportTargetMonthly^THIS = price_of_goods
-				}
-				set_variable = {
-					ROOT.oilImportTarget^THIS = THIS.id
-				}
-				add_to_variable = {
-					ROOT.oilImportTargetAmount^THIS = ROOT.purchase_amount
-				}
-				set_variable = {
-					price_of_goods = 0
-				}
-				set_variable = {
-					ROOT.purchase_amount = 0
-				}	
-				add_to_variable = {
-					ROOT.oil_total = 1
-				}			
+                if = {
+                    limit = {
+                        check_variable = {
+                            currentAvailableoilExport > oil_need
+                        }
+                    }
+
+                    set_variable = {
+                        ROOT.purchase_amount = oil_need
+                    }
+                    add_to_variable = {
+                        ROOT.oil_total = ROOT.purchase_amount
+                    }
+
+                    subtract_from_variable = {
+                        ROOT.purchase_amount = ROOT.purchase_amount_prior
+                    }
+                    subtract_from_variable = {
+                        currentAvailableoilExport = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        currentExportedoil = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.oilImports = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        oilExportTarget^ROOT = ROOT.id
+                    } 
+                    add_to_variable = {
+                        oilExportTargetAmount^ROOT = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = oilExporterPrice^ROOT
+                    }
+                    multiply_variable = {
+                        price_of_goods = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        oilExportTargetMonthly^ROOT = price_of_goods
+                    }
+                    add_to_variable = {
+                        ROOT.oilImportTargetMonthly^THIS = price_of_goods
+                    }
+                    set_variable = {
+                        ROOT.oilImportTarget^THIS = THIS.id
+                    }
+                    add_to_variable = {
+                        ROOT.oilImportTargetAmount^THIS = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = 0
+                    }
+                    set_variable = {
+                        ROOT.purchase_amount = 0
+                    }
+                }
+                else = {
+                    set_variable = {
+                        oil_need = currentAvailableoilExport
+                    }			
+                    set_variable = {
+                        ROOT.purchase_amount = oil_need
+                    }
+                    add_to_variable = {
+                        ROOT.oil_total = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.purchase_amount = ROOT.purchase_amount_prior
+                    }
+                    subtract_from_variable = {
+                        currentAvailableoilExport = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        currentExportedoil = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.oilImports = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        oilExportTarget^ROOT = ROOT.id
+                    } 
+                    add_to_variable = {
+                        oilExportTargetAmount^ROOT = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = oilExporterPrice^ROOT
+                    }
+                    multiply_variable = {
+                        price_of_goods = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        oilExportTargetMonthly^ROOT = price_of_goods
+                    }
+                    add_to_variable = {
+                        ROOT.oilImportTargetMonthly^THIS = price_of_goods
+                    }
+                    set_variable = {
+                        ROOT.oilImportTarget^THIS = THIS.id
+                    }
+                    add_to_variable = {
+                        ROOT.oilImportTargetAmount^THIS = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = 0
+                    }
+                    set_variable = {
+                        ROOT.purchase_amount = 0
+                    }
+                }
+            }
+            else_if = {
+                limit = {
+                    OR = {
+                        NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
+                        NOT = { check_variable = { ROOT.oil_total > -1 } }
+                    }
+                }
+                set_temp_variable = { cheapest_brk = 1 }
+            }
+        }
+	}
+}
+steel_import_ai = {
+	set_variable = {
+		steel_total = resource@steel
+	}
+
+	if = {
+		limit = {
+			check_variable = {
+				steel_total < 0
+			}
+			check_variable = {
+				trade_infrastructure_total_available > 0
 			}
 		}
+		generate_available_steel_import_array = yes
+        sort_price_number_steel = yes
+
+        #Loops thru cheapest countries to buy from
+        for_each_scope_loop = {
+            array = ROOT.steelExporters
+            index = i
+            break = cheapest_brk
+
+            #Checks if the country's goods are cheaper & shipping is affordabole 
+            #TODO - Shipping cost
+            if = {
+                limit = {
+                    check_variable = { currentAvailablesteelExport > 0 }
+                    OR = {
+                        NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
+                        NOT = { check_variable = { ROOT.steel_total > -1 } }
+                    }
+                }
+                set_variable = {
+                    steel_need = ROOT.steel_total
+                }
+				multiply_variable = {
+					steel_need = -1
+				}
+                if = {
+                    limit = {
+                        check_variable = {
+                            currentAvailablesteelExport > steel_need
+                        }
+                    }
+
+                    set_variable = {
+                        ROOT.purchase_amount = steel_need
+                    }
+                    add_to_variable = {
+                        ROOT.steel_total = ROOT.purchase_amount
+                    }
+
+                    subtract_from_variable = {
+                        ROOT.purchase_amount = ROOT.purchase_amount_prior
+                    }
+                    subtract_from_variable = {
+                        currentAvailablesteelExport = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        currentExportedsteel = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.steelImports = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        steelExportTarget^ROOT = ROOT.id
+                    } 
+                    add_to_variable = {
+                        steelExportTargetAmount^ROOT = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = steelExporterPrice^ROOT
+                    }
+                    multiply_variable = {
+                        price_of_goods = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        steelExportTargetMonthly^ROOT = price_of_goods
+                    }
+                    add_to_variable = {
+                        ROOT.steelImportTargetMonthly^THIS = price_of_goods
+                    }
+                    set_variable = {
+                        ROOT.steelImportTarget^THIS = THIS.id
+                    }
+                    add_to_variable = {
+                        ROOT.steelImportTargetAmount^THIS = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = 0
+                    }
+                    set_variable = {
+                        ROOT.purchase_amount = 0
+                    }
+                }
+                else = {
+                    set_variable = {
+                        steel_need = currentAvailablesteelExport
+                    }			
+                    set_variable = {
+                        ROOT.purchase_amount = steel_need
+                    }
+                    add_to_variable = {
+                        ROOT.steel_total = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.purchase_amount = ROOT.purchase_amount_prior
+                    }
+                    subtract_from_variable = {
+                        currentAvailablesteelExport = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        currentExportedsteel = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.steelImports = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        steelExportTarget^ROOT = ROOT.id
+                    } 
+                    add_to_variable = {
+                        steelExportTargetAmount^ROOT = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = steelExporterPrice^ROOT
+                    }
+                    multiply_variable = {
+                        price_of_goods = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        steelExportTargetMonthly^ROOT = price_of_goods
+                    }
+                    add_to_variable = {
+                        ROOT.steelImportTargetMonthly^THIS = price_of_goods
+                    }
+                    set_variable = {
+                        ROOT.steelImportTarget^THIS = THIS.id
+                    }
+                    add_to_variable = {
+                        ROOT.steelImportTargetAmount^THIS = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = 0
+                    }
+                    set_variable = {
+                        ROOT.purchase_amount = 0
+                    }
+                }
+            }
+            else_if = {
+                limit = {
+                    OR = {
+                        NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
+                        NOT = { check_variable = { ROOT.steel_total > -1 } }
+                    }
+                }
+                set_temp_variable = { cheapest_brk = 1 }
+            }
+        }
 	}
-	
 }
 ##Steel##
 
@@ -1642,9 +2235,14 @@ generate_available_steel_import_array = {
 	clear_array = ROOT.steelExporterInfo
 	every_country = {
 		limit = {
-			check_variable = {
-				currentAvailablesteelExport > 0.99
-			}
+            OR = {
+                check_variable = {
+                    currentAvailablesteelExport > 0.99
+                }
+                check_variable = {
+                    currentExportedsteel > 0.99
+                }
+            }
 			NOT = {
 				tag = ROOT
 			}
@@ -1845,6 +2443,87 @@ buy_steel = {
 
 
 #steelExporterPrice
+sort_price_number_steel = {
+    #clear_array = steelCurrentImport
+    clear_array = steelExportPriceRate
+    
+    for_each_scope_loop = {
+        array = steelExporters
+        end = steelExporters^num
+        value = v
+        add_to_array = { 
+            PREV.steelExportPriceRate = steelExporterPrice^ROOT
+        }
+    }
+	clear_array = steelCurrentImport
+	every_country = { 
+		for_loop_effect = {
+			end = steelExportTarget^num
+			value = v
+			if = {
+				limit = {
+					check_variable = { steelExportTarget^v = ROOT.id }
+				}
+				add_to_array = { ROOT.steelCurrentImport = steelExportTargetAmount^i }
+
+			}
+			else = {
+				add_to_array = { ROOT.steelCurrentImport = 0 }
+			}
+		}
+	}
+	#Creates the Sample Array	
+	resize_temp_array = {
+		array = steelExporterInfo_temp #values
+		size = steelExporterInfo^num
+	}
+	resize_temp_array = {
+		array = steelExportPriceRate_temp #values 2
+		size = steelExporterInfo^num
+	}
+	resize_temp_array = {
+		array = steelExporters_temp #tags
+		size = steelExporterInfo^num
+	}
+
+    set_temp_variable = { start_temp = steelExportPriceRate^num }
+    subtract_from_temp_variable = { start_temp = 1 }
+    for_loop_effect = {
+        start = start_temp
+        end = 0
+        compare = greater_than_or_equals
+        add = -1
+        value = v
+		find_highest_in_array = {
+			array = steelExportPriceRate
+			value = max
+			index = max_index
+		}
+		set_temp_variable = { steelExportPriceRate_temp^v = max } #sets biggest at the earliest available position
+		set_temp_variable = { steelExporterInfo_temp^v = steelExporters^max_index } #sets biggest TAG at the earliest available position
+		set_temp_variable = { steelExporters_temp^v = steelExporters^max_index } #sets biggest TAG at the earliest available position
+		set_variable = { steelExportPriceRate^max_index = -1 } #removes it from selection
+	}
+	clear_array = steelExporterInfo
+	clear_array = steelExporters
+    clear_array = steelExportPriceRate
+	#restores destroyed arrays in the above process - i.e. if they were deleted due to being less then 1%
+	for_each_loop = {
+		array = steelExportPriceRate_temp
+		add_to_array = { steelExportPriceRate = v }
+	}
+	for_each_loop = {
+		array = steelExporterInfo_temp
+		add_to_array = { steelExporterInfo = v }
+	}
+	for_each_loop = {
+		array = steelExporters_temp
+		add_to_array = { steelExporters = v  }
+	}
+	clear_temp_array = steelExporterInfo_temp
+	clear_temp_array = steelExporters_temp
+    clear_temp_array = steelExportPriceRate_temp
+}
 
 sort_resource_number_steel = {
 	clear_array = steelCurrentImport
@@ -1966,100 +2645,6 @@ steelDeliveryCuts = {
 			}	
 		}
 }
-steel_import_ai = {
-	set_variable = {
-		steel_total = resource@steel
-	}
-	if = {
-		limit = {
-			check_variable = {
-				steel_total < 0
-			}
-			check_variable = {
-				trade_infrastructure_total_available > 0
-			}
-		}
-		export_script_for_pool = yes
-		generate_available_steel_import_array = yes
-
-		while_loop_effect = {
-			limit = {
-				check_variable = {
-					steel_total < 0
-				}
-				check_variable = {
-					trade_infrastructure_total_available > 0
-				}
-			}
-			random_country = {
-				limit = {
-					is_in_array = {
-						array = ROOT.steelExporters
-						value = THIS.id
-					}	
-					check_variable = {
-						currentAvailablesteelExport > 0
-					}
-				}
-				set_variable = {
-					ROOT.purchase_amount = 1
-				}
-				subtract_from_variable = {
-					ROOT.purchase_amount = ROOT.purchase_amount_prior
-				}
-				subtract_from_variable = {
-					currentAvailablesteelExport = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
-				}
-				subtract_from_variable = {
-					ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					currentExportedsteel = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					ROOT.steelImports = ROOT.purchase_amount
-				}
-				set_variable = {
-					steelExportTarget^ROOT = ROOT.id
-				} 
-				add_to_variable = {
-					steelExportTargetAmount^ROOT = ROOT.purchase_amount
-				}
-				set_variable = {
-					price_of_goods = steelExporterPrice^ROOT
-				}
-				multiply_variable = {
-					price_of_goods = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					steelExportTargetMonthly^ROOT = price_of_goods
-				}
-				add_to_variable = {
-					ROOT.steelImportTargetMonthly^THIS = price_of_goods
-				}
-				set_variable = {
-					ROOT.steelImportTarget^THIS = THIS.id
-				}
-				add_to_variable = {
-					ROOT.steelImportTargetAmount^THIS = ROOT.purchase_amount
-				}
-				set_variable = {
-					price_of_goods = 0
-				}
-				set_variable = {
-					ROOT.purchase_amount = 0
-				}	
-				add_to_variable = {
-					ROOT.steel_total = 1
-				}			
-			}
-		}
-	}
-	
-}
 
 ##Aluminum
 generate_available_aluminium_import_array = {
@@ -2067,9 +2652,14 @@ generate_available_aluminium_import_array = {
 	clear_array = ROOT.aluminiumExporterInfo
 	every_country = {
 		limit = {
-			check_variable = {
-				currentAvailablealuminiumExport > 0.99
-			}
+            OR = {
+                check_variable = {
+                    currentAvailablealuminiumExport > 0.99
+                }
+                check_variable = {
+                    currentExportedaluminium > 0.99
+                }
+            }
 			NOT = {
 				tag = ROOT
 			}
@@ -2275,9 +2865,14 @@ generate_available_rareEarth_import_array = {
 	clear_array = ROOT.rareEarthExporterInfo
 	every_country = {
 		limit = {
-			check_variable = {
-				currentAvailablerareEarthExport > 0.99
-			}
+            OR = {
+                check_variable = {
+                    currentAvailablerareEarthExport > 0.99
+                }
+                check_variable = {
+                    currentExportedrareEarth > 0.99
+                }
+            }
 			NOT = {
 				tag = ROOT
 			}
@@ -2478,6 +3073,87 @@ buy_rareEarth = {
 
 
 #rareEarthExporterPrice
+sort_price_number_rareEarth = {
+    #clear_array = rareEarthCurrentImport
+    clear_array = rareEarthExportPriceRate
+    
+    for_each_scope_loop = {
+        array = rareEarthExporters
+        end = rareEarthExporters^num
+        value = v
+        add_to_array = { 
+            PREV.rareEarthExportPriceRate = rareEarthExporterPrice^ROOT
+        }
+    }
+	clear_array = rareEarthCurrentImport
+	every_country = { 
+		for_loop_effect = {
+			end = rareEarthExportTarget^num
+			value = v
+			if = {
+				limit = {
+					check_variable = { rareEarthExportTarget^v = ROOT.id }
+				}
+				add_to_array = { ROOT.rareEarthCurrentImport = rareEarthExportTargetAmount^i }
+
+			}
+			else = {
+				add_to_array = { ROOT.rareEarthCurrentImport = 0 }
+			}
+		}
+	}
+	#Creates the Sample Array	
+	resize_temp_array = {
+		array = rareEarthExporterInfo_temp #values
+		size = rareEarthExporterInfo^num
+	}
+	resize_temp_array = {
+		array = rareEarthExportPriceRate_temp #values 2
+		size = rareEarthExporterInfo^num
+	}
+	resize_temp_array = {
+		array = rareEarthExporters_temp #tags
+		size = rareEarthExporterInfo^num
+	}
+
+    set_temp_variable = { start_temp = rareEarthExportPriceRate^num }
+    subtract_from_temp_variable = { start_temp = 1 }
+    for_loop_effect = {
+        start = start_temp
+        end = 0
+        compare = greater_than_or_equals
+        add = -1
+        value = v
+		find_highest_in_array = {
+			array = rareEarthExportPriceRate
+			value = max
+			index = max_index
+		}
+		set_temp_variable = { rareEarthExportPriceRate_temp^v = max } #sets biggest at the earliest available position
+		set_temp_variable = { rareEarthExporterInfo_temp^v = rareEarthExporters^max_index } #sets biggest TAG at the earliest available position
+		set_temp_variable = { rareEarthExporters_temp^v = rareEarthExporters^max_index } #sets biggest TAG at the earliest available position
+		set_variable = { rareEarthExportPriceRate^max_index = -1 } #removes it from selection
+	}
+	clear_array = rareEarthExporterInfo
+	clear_array = rareEarthExporters
+    clear_array = rareEarthExportPriceRate
+	#restores destroyed arrays in the above process - i.e. if they were deleted due to being less then 1%
+	for_each_loop = {
+		array = rareEarthExportPriceRate_temp
+		add_to_array = { rareEarthExportPriceRate = v }
+	}
+	for_each_loop = {
+		array = rareEarthExporterInfo_temp
+		add_to_array = { rareEarthExporterInfo = v }
+	}
+	for_each_loop = {
+		array = rareEarthExporters_temp
+		add_to_array = { rareEarthExporters = v  }
+	}
+	clear_temp_array = rareEarthExporterInfo_temp
+	clear_temp_array = rareEarthExporters_temp
+    clear_temp_array = rareEarthExportPriceRate_temp
+}
 
 sort_resource_number_rareEarth = {
 	clear_array = rareEarthCurrentImport
@@ -2603,6 +3279,7 @@ rareEarth_import_ai = {
 	set_variable = {
 		rareEarth_total = resource@tungsten
 	}
+
 	if = {
 		limit = {
 			check_variable = {
@@ -2612,88 +3289,166 @@ rareEarth_import_ai = {
 				trade_infrastructure_total_available > 0
 			}
 		}
-		export_script_for_pool = yes
 		generate_available_rareEarth_import_array = yes
+        sort_price_number_rareEarth = yes
 
-		while_loop_effect = {
-			limit = {
-				check_variable = {
-					rareEarth_total < 0
-				}
-				check_variable = {
-					trade_infrastructure_total_available > 0
-				}
-			}
-			random_country = {
-				limit = {
-					is_in_array = {
-						array = ROOT.rareEarthExporters
-						value = THIS.id
-					}	
-					check_variable = {
-						currentAvailablerareEarthExport > 0
-					}
-				}
-				set_variable = {
-					ROOT.purchase_amount = 1
-				}
-				subtract_from_variable = {
-					ROOT.purchase_amount = ROOT.purchase_amount_prior
-				}
-				subtract_from_variable = {
-					currentAvailablerareEarthExport = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
-				}
-				subtract_from_variable = {
-					ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					currentExportedrareEarth = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					ROOT.rareEarthImports = ROOT.purchase_amount
-				}
-				set_variable = {
-					rareEarthExportTarget^ROOT = ROOT.id
-				} 
-				add_to_variable = {
-					rareEarthExportTargetAmount^ROOT = ROOT.purchase_amount
-				}
-				set_variable = {
-					price_of_goods = rareEarthExporterPrice^ROOT
-				}
+        #Loops thru cheapest countries to buy from
+        for_each_scope_loop = {
+            array = ROOT.rareEarthExporters
+            index = i
+            break = cheapest_brk
+
+            #Checks if the country's goods are cheaper & shipping is affordabole 
+            #TODO - Shipping cost
+            if = {
+                limit = {
+                    check_variable = { currentAvailablerareEarthExport > 0 }
+                    OR = {
+                        NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
+                        NOT = { check_variable = { ROOT.rareEarth_total > -1 } }
+                    }
+                }
+                set_variable = {
+                    rareEarth_need = ROOT.rareEarth_total
+                }
 				multiply_variable = {
-					price_of_goods = ROOT.purchase_amount
+					rareEarth_need = -1
 				}
-				add_to_variable = {
-					rareEarthExportTargetMonthly^ROOT = price_of_goods
-				}
-				add_to_variable = {
-					ROOT.rareEarthImportTargetMonthly^THIS = price_of_goods
-				}
-				set_variable = {
-					ROOT.rareEarthImportTarget^THIS = THIS.id
-				}
-				add_to_variable = {
-					ROOT.rareEarthImportTargetAmount^THIS = ROOT.purchase_amount
-				}
-				set_variable = {
-					price_of_goods = 0
-				}
-				set_variable = {
-					ROOT.purchase_amount = 0
-				}	
-				add_to_variable = {
-					ROOT.rareEarth_total = 1
-				}			
-			}
-		}
-	}
-	
-}
+                if = {
+                    limit = {
+                        check_variable = {
+                            currentAvailablerareEarthExport > rareEarth_need
+                        }
+                    }
 
+                    set_variable = {
+                        ROOT.purchase_amount = rareEarth_need
+                    }
+                    add_to_variable = {
+                        ROOT.rareEarth_total = ROOT.purchase_amount
+                    }
+
+                    subtract_from_variable = {
+                        ROOT.purchase_amount = ROOT.purchase_amount_prior
+                    }
+                    subtract_from_variable = {
+                        currentAvailablerareEarthExport = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        currentExportedrareEarth = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.rareEarthImports = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        rareEarthExportTarget^ROOT = ROOT.id
+                    } 
+                    add_to_variable = {
+                        rareEarthExportTargetAmount^ROOT = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = rareEarthExporterPrice^ROOT
+                    }
+                    multiply_variable = {
+                        price_of_goods = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        rareEarthExportTargetMonthly^ROOT = price_of_goods
+                    }
+                    add_to_variable = {
+                        ROOT.rareEarthImportTargetMonthly^THIS = price_of_goods
+                    }
+                    set_variable = {
+                        ROOT.rareEarthImportTarget^THIS = THIS.id
+                    }
+                    add_to_variable = {
+                        ROOT.rareEarthImportTargetAmount^THIS = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = 0
+                    }
+                    set_variable = {
+                        ROOT.purchase_amount = 0
+                    }
+                }
+                else = {
+                    set_variable = {
+                        rareEarth_need = currentAvailablerareEarthExport
+                    }			
+                    set_variable = {
+                        ROOT.purchase_amount = rareEarth_need
+                    }
+                    add_to_variable = {
+                        ROOT.rareEarth_total = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.purchase_amount = ROOT.purchase_amount_prior
+                    }
+                    subtract_from_variable = {
+                        currentAvailablerareEarthExport = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        currentExportedrareEarth = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.rareEarthImports = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        rareEarthExportTarget^ROOT = ROOT.id
+                    } 
+                    add_to_variable = {
+                        rareEarthExportTargetAmount^ROOT = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = rareEarthExporterPrice^ROOT
+                    }
+                    multiply_variable = {
+                        price_of_goods = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        rareEarthExportTargetMonthly^ROOT = price_of_goods
+                    }
+                    add_to_variable = {
+                        ROOT.rareEarthImportTargetMonthly^THIS = price_of_goods
+                    }
+                    set_variable = {
+                        ROOT.rareEarthImportTarget^THIS = THIS.id
+                    }
+                    add_to_variable = {
+                        ROOT.rareEarthImportTargetAmount^THIS = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = 0
+                    }
+                    set_variable = {
+                        ROOT.purchase_amount = 0
+                    }
+                }
+            }
+            else_if = {
+                limit = {
+                    OR = {
+                        NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
+                        NOT = { check_variable = { ROOT.rareEarth_total > -1 } }
+                    }
+                }
+                set_temp_variable = { cheapest_brk = 1 }
+            }
+        }
+	}
+}
 
 #aluminiumExporterPrice
 
@@ -2817,10 +3572,12 @@ aluminiumDeliveryCuts = {
 			}	
 		}
 }
+
 aluminium_import_ai = {
 	set_variable = {
 		aluminium_total = resource@aluminium
 	}
+
 	if = {
 		limit = {
 			check_variable = {
@@ -2830,93 +3587,174 @@ aluminium_import_ai = {
 				trade_infrastructure_total_available > 0
 			}
 		}
-		export_script_for_pool = yes
 		generate_available_aluminium_import_array = yes
+        sort_price_number_aluminium = yes
 
-		while_loop_effect = {
-			limit = {
-				check_variable = {
-					aluminium_total < 0
-				}
-				check_variable = {
-					trade_infrastructure_total_available > 0
-				}
-			}
-			random_country = {
-				limit = {
-					is_in_array = {
-						array = ROOT.aluminiumExporters
-						value = THIS.id
-					}	
-					check_variable = {
-						currentAvailablealuminiumExport > 0
-					}
-				}
-				set_variable = {
-					ROOT.purchase_amount = 1
-				}
-				subtract_from_variable = {
-					ROOT.purchase_amount = ROOT.purchase_amount_prior
-				}
-				subtract_from_variable = {
-					currentAvailablealuminiumExport = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
-				}
-				subtract_from_variable = {
-					ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					currentExportedaluminium = ROOT.purchase_amount
-				}
-				add_to_variable = {
-					ROOT.aluminiumImports = ROOT.purchase_amount
-				}
-				set_variable = {
-					aluminiumExportTarget^ROOT = ROOT.id
-				} 
-				add_to_variable = {
-					aluminiumExportTargetAmount^ROOT = ROOT.purchase_amount
-				}
-				set_variable = {
-					price_of_goods = aluminiumExporterPrice^ROOT
-				}
+        #Loops thru cheapest countries to buy from
+        for_each_scope_loop = {
+            array = ROOT.aluminiumExporters
+            index = i
+            break = cheapest_brk
+
+            #Checks if the country's goods are cheaper & shipping is affordabole 
+            #TODO - Shipping cost
+            if = {
+                limit = {
+                    check_variable = { currentAvailablealuminiumExport > 0 }
+                    OR = {
+                        NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
+                        NOT = { check_variable = { ROOT.aluminium_total > -1 } }
+                    }
+                }
+                set_variable = {
+                    aluminium_need = ROOT.aluminium_total
+                }
 				multiply_variable = {
-					price_of_goods = ROOT.purchase_amount
+					aluminium_need = -1
 				}
-				add_to_variable = {
-					aluminiumExportTargetMonthly^ROOT = price_of_goods
-				}
-				add_to_variable = {
-					ROOT.aluminiumImportTargetMonthly^THIS = price_of_goods
-				}
-				set_variable = {
-					ROOT.aluminiumImportTarget^THIS = THIS.id
-				}
-				add_to_variable = {
-					ROOT.aluminiumImportTargetAmount^THIS = ROOT.purchase_amount
-				}
-				set_variable = {
-					price_of_goods = 0
-				}
-				set_variable = {
-					ROOT.purchase_amount = 0
-				}	
-				add_to_variable = {
-					ROOT.aluminium_total = 1
-				}			
-			}
-		}
+                if = {
+                    limit = {
+                        check_variable = {
+                            currentAvailablealuminiumExport > aluminium_need
+                        }
+                    }
+
+                    set_variable = {
+                        ROOT.purchase_amount = aluminium_need
+                    }
+                    add_to_variable = {
+                        ROOT.aluminium_total = ROOT.purchase_amount
+                    }
+
+                    subtract_from_variable = {
+                        ROOT.purchase_amount = ROOT.purchase_amount_prior
+                    }
+                    subtract_from_variable = {
+                        currentAvailablealuminiumExport = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        currentExportedaluminium = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.aluminiumImports = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        aluminiumExportTarget^ROOT = ROOT.id
+                    } 
+                    add_to_variable = {
+                        aluminiumExportTargetAmount^ROOT = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = aluminiumExporterPrice^ROOT
+                    }
+                    multiply_variable = {
+                        price_of_goods = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        aluminiumExportTargetMonthly^ROOT = price_of_goods
+                    }
+                    add_to_variable = {
+                        ROOT.aluminiumImportTargetMonthly^THIS = price_of_goods
+                    }
+                    set_variable = {
+                        ROOT.aluminiumImportTarget^THIS = THIS.id
+                    }
+                    add_to_variable = {
+                        ROOT.aluminiumImportTargetAmount^THIS = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = 0
+                    }
+                    set_variable = {
+                        ROOT.purchase_amount = 0
+                    }
+                }
+                else = {
+                    set_variable = {
+                        aluminium_need = currentAvailablealuminiumExport
+                    }			
+                    set_variable = {
+                        ROOT.purchase_amount = aluminium_need
+                    }
+                    add_to_variable = {
+                        ROOT.aluminium_total = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.purchase_amount = ROOT.purchase_amount_prior
+                    }
+                    subtract_from_variable = {
+                        currentAvailablealuminiumExport = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
+                    }
+                    subtract_from_variable = {
+                        ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        currentExportedaluminium = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        ROOT.aluminiumImports = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        aluminiumExportTarget^ROOT = ROOT.id
+                    } 
+                    add_to_variable = {
+                        aluminiumExportTargetAmount^ROOT = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = aluminiumExporterPrice^ROOT
+                    }
+                    multiply_variable = {
+                        price_of_goods = ROOT.purchase_amount
+                    }
+                    add_to_variable = {
+                        aluminiumExportTargetMonthly^ROOT = price_of_goods
+                    }
+                    add_to_variable = {
+                        ROOT.aluminiumImportTargetMonthly^THIS = price_of_goods
+                    }
+                    set_variable = {
+                        ROOT.aluminiumImportTarget^THIS = THIS.id
+                    }
+                    add_to_variable = {
+                        ROOT.aluminiumImportTargetAmount^THIS = ROOT.purchase_amount
+                    }
+                    set_variable = {
+                        price_of_goods = 0
+                    }
+                    set_variable = {
+                        ROOT.purchase_amount = 0
+                    }
+                }
+            }
+            else_if = {
+                limit = {
+                    OR = {
+                        NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
+                        NOT = { check_variable = { ROOT.aluminium_total > -1 } }
+                    }
+                }
+                set_temp_variable = { cheapest_brk = 1 }
+            }
+        }
 	}
-	
 }
 
-
 trade_check = {
-    add_political_power = 100
-    export_script_for_pool = yes
 	food_import_ai = yes
+    oil_import_ai = yes
+    steel_import_ai = yes
+    aluminium_import_ai = yes
+    rareEarth_import_ai = yes
+    chromium_import_ai = yes
 }
 
 
