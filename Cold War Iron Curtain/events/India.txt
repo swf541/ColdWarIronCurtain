@@ -1508,27 +1508,140 @@ country_event = {
 		}
 	}
 }
+country_event = {
+	id = Pak_India_War_65.7
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = Pak_India_War_65.7"}	
+	title = "Kashmir in Turmoil"
+	desc = Pak_India_War_65.7.d
+	picture = GFX_Pak_India_War_65_7
 
-Kashmir in Turmoil (Indian Event)
-Pak_India_War_65.7
--Launch the offensives (in a day, Pakistan gets "Indian Offensives on Kashmir Border")
--Announce the plebiscite (infrastructure damage in Kashmir, in a few days event "India Agrees to Plebiscite" end this chain and starting that chain, Operation Nusrat idea removed from Pakistan
+	is_triggered_only = yes
 
-Indian Offensives on Kashmir Border (Pakistan event)
-Pak_India_War_65.8
--All will be well (India starts border war in Kashmir, if they win, Indian Forces Make Gains is fired, if not, Indian Forces Repulsed is fired)
+	option = {
+		name = "Launch the offensives"
+		PAK = {
+			country_event = {
+				id = Pak_India_War_65.8
+				days = 1
+			}
+		}	
+	}
+	option = {
+		name = "Announce the plebiscite"
+		PAK = {
+			country_event = {
+				id = UN_KASHMIR.10
+				days = 3
+			}
+			remve_ideas = Operation_Nursat
+		}
+	}
+}
+country_event = {
+	id = Pak_India_War_65.8
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = Pak_India_War_65.8"}	
+	title = "Indian Offensives on Kashmir Border"
+	desc = Pak_India_War_65.8.d
+	picture = GFX_Pak_India_War_65_8
 
-Indian Forces Repulsed (Pakistan/India event)
-Pak_India_War_65.9
--Keep the pressure on? (if focus Operation Gibraltar completed, event Operation Gibraltar fires, India gains national spirit "Kashmir setback" small drop in organization, morale, attack, and defense)
+	is_triggered_only = yes
 
-Indian Forces Make Gains (Pakistan Event)
-Pak_India_War_65.10
--A befitting reply (Haji Pir Pass ceded to India, if focus Operation Gibraltar completed, event Operation Gibraltar fires, India gains spirit "Kashmir advantage" small increase in organization, morale, attack and defense, Pakistan loses spirit "Operation Nusrat"
+	option = {
+		name = "All will be well"
+		start_border_war = {
+			change_state_after_war = no
+			attacker = {
+				state = 1562
+				num_provinces = 2
+				on_win = Pak_India_War_65.10
+				on_lose = Pak_India_War_65.9
+			}
+			defender = {
+				state = 1144
+				num_provinces = 2
+				on_win = Pak_India_War_65.9
+				on_lose = Pak_India_War_65.10
+			}
+		}
+	}
+}
+country_event = {
+	id = Pak_India_War_65.9
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = Pak_India_War_65.9"}	
+	title = "Indian Forces Repulsed"
+	desc = Pak_India_War_65.9.d
+	picture = GFX_Pak_India_War_65_9
 
-Operation Grand Slam (if focus completed and one of the pre-request events has fired, Pakistan event)
-Pak_India_War_65.11
--Launch the operation (new border war launched by Pakistan, if it wins, Operation Grand Slam Makes Gains launches, if not, Operation Grand Slam Stalls follows
+	is_triggered_only = yes
+
+	option = {
+		name = "Keep the pressure on?"
+		if = {
+			limit = {
+				tag = PAK
+				has_completed_focus = PAK_Operation_Grand_Slam
+			}
+			country_event = Pak_India_War_65.11
+		}
+		RAJ = {
+			add_ideas = Kashmiri_Setback	#"Kashmir setback" small drop in organization, morale, attack, and defense)
+		}
+	}
+}
+country_event = {
+	id = Pak_India_War_65.10
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = Pak_India_War_65.10"}	
+	title = "Indian Forces Make Gains"
+	desc = Pak_India_War_65.10.d
+	picture = GFX_Pak_India_War_65_10
+
+	is_triggered_only = yes
+
+	option = {
+		name = "A befitting reply"
+		if = {
+			limit = {
+				tag = PAK
+				has_completed_focus = PAK_Operation_Grand_Slam
+			}
+			country_event = Pak_India_War_65.11
+		}
+		RAJ = {
+			add_ideas = Kashmiri_Advantage	#small increase in organization, morale, attack and defense, Pakistan loses spirit "Operation Nusrat"
+		}
+		PAK = {
+			reove_ideas = Operation_Nursat
+		}
+	}
+}
+country_event = {
+	id = Pak_India_War_65.11
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = Pak_India_War_65.11"}	
+	title = "Operation Grand Slam"
+	desc = Pak_India_War_65.11.d
+	picture = GFX_Pak_India_War_65_11
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Launch the operation"
+		start_border_war = {
+			change_state_after_war = no
+			attacker = {
+				state = 1144
+				num_provinces = 2
+				on_win = Pak_India_War_65.12
+				on_lose = Pak_India_War_65.13
+			}
+			defender = {
+				state = 1562 
+				num_provinces = 2
+				on_win = Pak_India_War_65.16
+				on_lose = Pak_India_War_65.14
+			}
+		}
+	}
+}
 
 Operation Grand Slam Makes Gains (Pakistan event)
 Pak_India_War_65.12
@@ -1536,7 +1649,7 @@ Pak_India_War_65.12
 
 Operation Grand Slam Stalls 
 Pak_India_War_65.13
--Hold firm! (Pakistan loses spirit Operation Nusrat, India gets event "Expand the Conflict Zone?")
+-Hold firm! (Pakistan loses spirit Operation Nusrat)
 
 Akhnoor Threatened: Expanding the Conflict Zone? (Indian Player)
 Pak_India_War_65.14
@@ -1544,7 +1657,7 @@ Pak_India_War_65.14
 -Inform the UN (launches event "India Agrees to Plebiscite" ending the chain for 65 War, Pakistan loses Operation Nusrat spirit and India loses Kashmir Advantage spirit, if not mentioned elsewhere, by the end of the Kashmir chain, before 65 War these spirits should be removed)
 -Do nothing (leads to Pakistan Captures Kashmir Valley, do not know why player or AI would ever pick this, I guess if they are sick of Kashmir)
 
-Pakistan Captures Kashmir Valley
+Pakistan Captures Kashmir Valley (Global)
 Pak_India_War_65.15
 -Pakistan-Kashmir Zindabad! (event chain ends here, Pakistan gains Kashmir Valley, If it hasn’t happened, Pakistan loses Operation Nusrat spirit and India loses Kashmir Advantage spirit)
 
@@ -1559,7 +1672,7 @@ Pak_India_War_65.17
 
 East Pakistan Theatre? (Pakistan Event)
 Pak_India_War_65.18
--Keep the front quiet (if India also selects this, then the event ���East Pakistan Front Quiet")
+-Keep the front quiet (if India also selects this, then the event "East Pakistan Front Quiet")
 -Move to battle positions (Eastern front open, will lead to event, "East Pakistan Front Opens"
 
 Eastern Front? (Indian Event, received once war breaks out)
@@ -1569,7 +1682,8 @@ Pak_India_War_65.19
 
 East Pakistan Front Quiet (Global)
 Pak_India_War_65.20
--All quiet on the eastern front (both Pakistan and India get a decision to activate the front, if selected, than East Pakistan Front Opens event fires. All the provinces along the East Pakistan border should be made into demilitarized areas to prevent fighting)
+-All quiet on the eastern front 
+
 
 East Pakistan Front Opens (Global)
 Pak_India_War_65.21
@@ -1612,7 +1726,7 @@ Pak_India_War_65.29
 
 Pakistan Approaches UN (Comes from Pakistan focus, Pakistan event)
 Pak_India_War_65.30
--approach the un (in a day or two, india gets "Accept UN Ceasefire")
+-Approach the UN (in a day or two, india gets "Accept UN Ceasefire")
 
 Accept UN Ceasefire? (India)
 Pak_India_War_65.31
