@@ -1,11 +1,1075 @@
-########################
-# French Events
-########################
-
+add_namespace = fra_crisis
+add_namespace = fra_army
+add_namespace = FRAPCF
+add_namespace = FRA_NATO_PCF
+add_namespace = ALG_Partition
+add_namespace = Gladio_Reveal
+add_namespace = VIN_PCF
+add_namespace = French_Euroskepticism
+add_namespace = ALG_Comp
+add_namespace = FFL_Relocation
+add_namespace = FRA_Referendum
+add_namespace = MNA
+add_namespace = FRA_event
+add_namespace = EEC_event
+add_namespace = EUROPE_space
 add_namespace = fra
-add_namespace = algeria_war
 add_namespace = indochina_war
+add_namespace = fra_news
+add_namespace = algerian_war_news
+###########May 58 Crisis############
+###############SETUP################
+country_event = { #Public Opinion on the Suez #FLAG = suez_crisis_ended_bad
+	id = fra_crisis.1
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.1"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	#picture = PICTURE WILL BE SUEZ CANAL
+	title = {
+		text = fra_crisis.1.crisis_end_well_title #The Suez Crisis ended with an egyptian defeat and the government is congratulated for that
+		trigger = {
+			EGY = {
+				NOT = {
+					owns_state = 743
+					owns_state = 1279
+				}	
+			}
+		}
+	}
+	title = {
+		text = fra_crisis.1.crisis_end_bad_title #The Suez Crisis ended with an egyptian victory and the government is blamed for that
+		trigger = {
+			EGY = {
+				owns_state = 743
+				owns_state = 1279
+			}
+		}
+	}
+	desc = {
+		text = fra_crisis.1.crisis_end_well_desc #The Suez Crisis ended with an egyptian defeat and the government is congratulated for that
+		trigger = {
+			EGY = {
+				NOT = {
+					owns_state = 743
+					owns_state = 1279
+				}	
+			}
+		}
+	}
+	desc = {
+		text = fra_crisis.1.crisis_end_bad_desc #The Suez Crisis ended with an egyptian victory and the government is blamed for that
+		trigger = {
+			EGY = {
+				owns_state = 743
+				owns_state = 1279
+			}
+		}
+	}
+	option = {
+		name = fra_crisis.1.crisis_end_well_option #With the victory at the Suez the government is praised
+		trigger = {
+			EGY = {
+				NOT = {
+					owns_state = 743
+					owns_state = 1279
+				}	
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = fra_crisis.1.crisis_end_bad_option #With the defeat at the Suez the government is blamed
+		trigger = {
+			EGY = {
+				owns_state = 743
+				owns_state = 1279
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+		set_country_flag = suez_crisis_ended_bad
+	}
+}
+country_event = { #Bombing of Sakiet Sidi Youssef - FRANCE #FLAG = sakiet_sidi_bombed
+	id = fra_crisis.2
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.2"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.2.bombing_sakiet_sidi_title #Should we bomb the town ?
+	desc = fra_crisis.2.bombing_sakiet_sidi_desc #The ALN raids from Tunisia get more and more intense and relations with Tunisia are getting worse, military ask if we should authorize a raid of the village
+	#picture = PICTURE WILL BE FRENCH BOMBER FLYING
+	option = {
+		name = fra_crisis.2.bombing_sakiet_sidi_option_a #Autorise the Raid
+		TUN = {
+			country_event = fra_crisis.3
+		}
+		set_country_flag = sakiet_sidi_bombed
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = fra_crisis.2.bombing_sakiet_sidi_option_b #Forbid the Raid
+		##WILL GET AN EVENT ABOUT ALN REINFORCING AND ATTACKING IN CONSTANTINE
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #Bombing of Sakiet Sidi Youssef - TUNISIA
+	id = fra_crisis.3
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.3"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.3.bombing_sakiet_sidi_title #our town was bombed
+	desc = fra_crisis.3.bombing_sakiet_sidi_desc #explain the situation from tunisian side and ask to end diplomatic ties
+	#picture = PICTURE WILL BE A TUNISIAN VILLAGE
+	option = {
+		name = fra_crisis.3.bombing_sakiet_sidi_option #Cut diplomatic ties and internationalise the algerian war
+		FRA = {
+			country_event = {
+					id = fra_crisis.4
+					days = 66
+			}
+		}
+		news_event = fra_crisis.31
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+news_event = { #Bombing of Sakiet Sidi Youssef - WORLD
+	id = fra_crisis.31
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.31"}
+	title = fra_crisis.31.bombing_sakiet_sidi_title
+	desc = fra_crisis.31.bombing_sakiet_sidi_desc
+	#picture = PICTURE WILL BE A TUNISIAN VILLAGE BEING BOMBED
 
+	fire_only_once = yes
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = fra_crisis.31.bombing_sakiet_sidi_option
+	}
+}
+#############SETUP END##############
+############CRISIS START############
+country_event = { #National Assembly vote a motion of non confidence
+	id = fra_crisis.4
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.4"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.4.motion_of_non_confidence_title #National assembly vote a motion of non confidence
+	desc = fra_crisis.4.motion_of_non_confidence_desc #Recent events regarding Tunisia made the National Assembly vote a motion of non confidence on the government
+	#picture = PICTURE WILL BE NATIONAL ASSEMBLY
+	option = {
+		name = fra_crisis.4.motion_of_non_confidence_option #Ugh...Another government change
+		country_event = {
+				id = fra_crisis.5
+				days = 23
+		}
+		hidden_effect = {
+			country_event = {
+					id = fra_crisis.6
+					days = 24
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #Both Pleven and Bidault fail to form a new government President ask to speed up
+	id = fra_crisis.5
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.5"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.5.motion_of_non_confidence_title #Both Pleven and Bidault fail to form a new government President ask to speed up
+	desc = fra_crisis.5.motion_of_non_confidence_desc #Troubles in the civil ordre President ask to speed up
+	#picture = PICTURE WILL BE BIDAULT AND PLEVEN
+	option = {
+		name = fra_crisis.5.motion_of_non_confidence_option #This situation could degenerate quickly
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #FLN Announce execution of french soldiers
+	id = fra_crisis.6
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.6"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.6.motion_of_non_confidence_title #FLN Announce execution of three french soldiers
+	desc = fra_crisis.6.motion_of_non_confidence_desc #It doesnt make things better
+	#picture = PICTURE WILL BE CAPTURED FRENCH SOLDIERS
+	option = {
+		name = fra_crisis.6.motion_of_non_confidence_option #This situation could degenerate quickly
+		ai_chance = {
+			factor = 1
+		}
+		country_event = {
+				id = fra_crisis.7
+				days = 3
+		}
+	}
+}
+country_event = { #Alger coup
+	id = fra_crisis.7
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.7"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.7.motion_of_non_confidence_title #Coup D'état in Alger
+	desc = fra_crisis.7.motion_of_non_confidence_desc #Explain the reaction of the government and elect Pierre Pfimlin and Massu speech
+	#picture = PICTURE OF THE GROUP OF SEVEN
+	immediate = {
+		complete_national_focus = FRA_1958_Crisis
+	}
+	option = {
+		name = fra_crisis.7.motion_of_non_confidence_option #This is getting worse
+		country_event = {
+				id = fra_crisis.8
+				days = 1
+		}
+		retire_country_leader = yes
+		create_country_leader = {
+			name = "Pierre Pflimlin"
+			picture = "Pierre_Pfimlin.dds"
+			ideology = christian_democracy
+		}
+		set_politics = {
+			ruling_party = Christian_Democratic
+			elections_allowed = no
+		}
+		hidden_effect = {
+			set_country_flag = Pierre_PM
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #Salan speech
+	id = fra_crisis.8
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.8"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.8.motion_of_non_confidence_title #General Raoul Salan speech
+	desc = fra_crisis.8.motion_of_non_confidence_desc #Speech of Raoul Salan, De gaulle say he is ready to assume power
+	#picture = PICTURE OF Raoul Salan
+	option = {
+		name = fra_crisis.8.motion_of_non_confidence_option #Vive De gaulle ?
+		country_event = {
+				id = fra_crisis.9
+				days = 5
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #De gaulle Speech
+	id = fra_crisis.9
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.9"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.9.motion_of_non_confidence_title #General De gaulle press conference
+	desc = fra_crisis.9.motion_of_non_confidence_desc #De gaulle press conference, De gaulle says "who think i will start a carreer of dictator at 67 ?"
+	#picture = PICTURE Of De gaulle
+	option = {
+		name = fra_crisis.9.motion_of_non_confidence_option #Vive De gaulle ?
+		country_event = {
+				id = fra_crisis.10
+				days = 3
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #Formation of the CSPAS
+	id = fra_crisis.10
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.10"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.10.motion_of_non_confidence_title #Salan announce the CSPAS
+	desc = fra_crisis.10.motion_of_non_confidence_desc #Salan announce the CSPAS
+	#picture = PICTURE Of algeria
+	option = {
+		name = fra_crisis.10.motion_of_non_confidence_option #Worrying.
+		country_event = {
+				id = fra_crisis.11
+				days = 2
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #Operation Resurrection 
+	id = fra_crisis.11
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.11"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.11.motion_of_non_confidence_title #Operation resurrection, takeover of Corsica
+	desc = fra_crisis.11.motion_of_non_confidence_desc #they send an ultimatum until the 29
+	#picture = PICTURE Of Corsica
+	option = {
+		name = fra_crisis.11.motion_of_non_confidence_option #Worrying.
+		country_event = {
+				id = fra_crisis.12
+				days = 2
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #De Gaulle meet Pfimlin 
+	id = fra_crisis.12
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.12"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.12.motion_of_non_confidence_title #De Gaulle meet Pfimlin 
+	desc = fra_crisis.12.motion_of_non_confidence_desc #no accords is found
+	#picture = PICTURE Of De gaulle and Pfimlin
+	option = {
+		name = fra_crisis.12.motion_of_non_confidence_option #He doesn't make things easier.
+		country_event = {
+				id = fra_crisis.13
+				days = 2
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #Pfimlin government resign
+	id = fra_crisis.13
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.13"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.13.motion_of_non_confidence_title #Pfimlin government resign 
+	desc = fra_crisis.13.motion_of_non_confidence_desc #Pfimlin government resign the assembly vote to refuse president threaten to demission and ultimatum is ending
+	#picture = PICTURE OF THE ELYSEE
+	option = {
+		name = fra_crisis.13.motion_of_non_confidence_option_a #Assembly abandon and agree to let de gaulle in power
+		country_event = {
+				id = fra_crisis.14
+				days = 2
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = fra_crisis.13.motion_of_non_confidence_option_b #Assembly refuse
+		country_event = fra_crisis.15
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #De gaulle is back
+	id = fra_crisis.14
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.14"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.14.motion_of_non_confidence_title #De gaulle is back
+	desc = fra_crisis.14.motion_of_non_confidence_desc #Coty Speech about calling back de gaulle
+	#picture = PICTURE OF DE GAULLE
+	option = {
+		name = fra_crisis.13.motion_of_non_confidence_option_a #Vive la France!
+		custom_effect_tooltip = FRAcrisis.tt.2
+		set_country_flag = Degaulle_called_back
+		complete_national_focus = FRA_Give_full_power_to_Degaulle_56
+		news_event = fra_crisis.141
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+news_event = { #DE GAULLE BACK IN POWER
+	id = fra_crisis.141
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.141"}
+	title = fra_crisis.141.motion_of_non_confidence_title
+	desc = fra_crisis.141.motion_of_non_confidence_desc
+	#picture = PICTURE WILL BE DE GAULLE
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = fra_crisis.141.motion_of_non_confidence_option
+	}
+}
+country_event = { #Operation Resurrection 2
+	id = fra_crisis.15
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.15"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.15.motion_of_non_confidence_title #Should the CSPAS launch the second part of operation resurrection ?
+	desc = fra_crisis.15.motion_of_non_confidence_desc #Explanation of the second part
+	#picture = PICTURE OF Paris
+	option = {
+		name = fra_crisis.15.motion_of_non_confidence_option_a #The coup is a success
+		country_event = fra_crisis.16
+		trigger = {
+			has_country_flag = suez_crisis_ended_bad
+			NOT = {
+				has_country_flag = sakiet_sidi_bombed
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = fra_crisis.15.motion_of_non_confidence_option_b #The Coup is a failure
+		country_event = fra_crisis.17
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #Arrestation of the opposition
+	id = fra_crisis.16
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.16"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.16.motion_of_non_confidence_title #Opposition is arrested
+	desc = fra_crisis.16.motion_of_non_confidence_desc #Operation Ressurection is happening
+	#picture = PICTURE OF Parachutistes
+	option = {
+		name = fra_crisis.16.motion_of_non_confidence_option_a #CSP of Paris is declared
+		custom_effect_tooltip = FRAcrisis.tt.3
+		set_country_flag = Comite_Takeover
+		complete_national_focus = FRA_Comite_du_Salut_Public_Takeover
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+news_event = { #MILITARY COUP IN FRANCE
+	id = fra_crisis.161
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.161"}
+	title = fra_crisis.161.motion_of_non_confidence_title
+	desc = fra_crisis.161.motion_of_non_confidence_desc
+	#picture = PICTURE WILL BE SALAN
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = fra_crisis.161.motion_of_non_confidence_option
+	}
+}
+country_event = { #Arrestation of the CSPAS and government decide to leave Algeria
+	id = fra_crisis.17
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.17"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_crisis.17.motion_of_non_confidence_title #Arrestation of the CSPAS and government decide to leave Algeria
+	desc = fra_crisis.17.motion_of_non_confidence_desc #President find a compromise and no coup
+	#picture = PICTURE OF Pied Noir
+	option = {
+		name = fra_crisis.17.motion_of_non_confidence_option_a #Partition plan of Algeria
+		custom_effect_tooltip = FRAcrisis.tt.1
+		set_country_flag = Algerian_Compromise
+		complete_national_focus = FRA_Algerian_Compromise
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+news_event = { #MILITARY COUP AVERTED IN FRANCE
+	id = fra_crisis.171
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.171"}
+	title = fra_crisis.171.motion_of_non_confidence_title
+	desc = fra_crisis.171.motion_of_non_confidence_desc
+	#picture = PICTURE WILL BE SALAN
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = fra_crisis.171.motion_of_non_confidence_option
+	}
+}
+##############CRISIS END##############
+#########MILITARY TREE EVENTS#########
+country_event = { #France ask for increase of the MAP
+	id = fra_army.1
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_army.1"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_army.1.title #France ask for increase of the MAP
+	desc = fra_army.1.desc #France ask for increase of the MAP
+	#picture = PICTURE WILL BE FRENCH AND AMERICAN SOLDIERS
+	option = {
+		name = fra_army.1.option_a #Accept
+		FRA = {
+			country_event = fra_army.2
+			add_to_variable = {
+				MutualAssistanceProgramFunding = 20
+			}
+			custom_effect_tooltip = moderately_increase_mutual_assistance_funding
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = fra_army.1.option_b #Refuse
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #America Accept
+	id = fra_army.2
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_army.2"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_army.2.title #America Accept
+	desc = fra_army.2.desc #America Accept
+	#picture = PICTURE WILL BE FRENCH AND AMERICAN SOLDIERS
+	option = {
+		name = fra_army.2.option_a #Great
+		custom_effect_tooltip = moderately_increase_mutual_assistance_funding
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #France commision for aircraft carrier
+	id = fra_army.3
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_army.3"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_army.3.title #France commision for aircraft carrier
+	desc = fra_army.3.desc #France commision for aircraft carrier
+	#picture = PICTURE WILL BE AIRCRAFT CARRIER
+	option = {
+		name = fra_army.3.option_a #Accept
+		FRA = {
+			country_event = fra_army.4
+		}
+		effect_tooltip = {
+			USA = {
+				destroy_ships = {
+					type = carrier_hull
+					count = 1
+				}
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = fra_army.3.option_b #Refuse
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+country_event = { #America Accept
+	id = fra_army.4
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_army.4"}
+	is_triggered_only = yes
+	fire_only_once = yes
+	title = fra_army.4.title #America Accept
+	desc = fra_army.4.desc #America Accept
+	#picture = PICTURE WILL BE AIRCRAFT CARRIER
+	option = {
+		name = fra_army.4.option_a #the commissions arrive
+		USA = {
+			destroy_ships = {
+				type = carrier_hull
+				count = 1
+			}
+		}
+		if = {
+			limit = {
+				has_dlc = "Man the Guns"
+			}
+			load_oob = "USS_LANGLEY"
+			else = {
+				load_oob = "USS_LANGLEY_Legacy"
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+######################################
+##1959 Alternate History tree events##
+country_event = { #France Endorses Indochinese Liberation Movements
+	id = FRAPCF.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRAPCF.1"}
+	title = "France Endorses Indochinese Liberation Movements"
+	desc = FRAPCF.1.d
+	picture = GFX_Indochinese_Liberation_Generic
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "Unsuprising"
+	}
+}
+country_event = { #France Turns to Eurocommunism
+	id = FRAPCF.2 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRAPCF.2"}
+	title = "France Turns to Eurocommunism"
+	desc = FRAPCF.2.d
+	picture = GFX_French_Eurocom_Turn
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "A challenge to Moscow's Authority?"
+	}
+}
+country_event = { #France Embraces Anarcho-Syndicalism
+	id = FRAPCF.3 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRAPCF.3"}
+	title = "France Embraces Anarcho-Syndicalism"
+	desc = FRAPCF.3.d
+	picture = GFX_France_Anarchist_Turn
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "Unexpected....."
+	}
+}
+country_event = { #France Announces the Liberation of Algeria
+	id = FRAPCF.4
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRAPCF.4"}
+	title = "France Announces the Liberation of Algeria"
+	desc = PCF_ALG.1.d
+	picture = GFX_Algerian_Com_Freedom
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "An End of an Era"
+	}
+}
+country_event = { #Petain buried in the Douaumont Necropolis
+	id = FRAPCF.5
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRAPCF.5"}
+	title = "Petain buried in the Douaumont Necropolis"
+	desc = Petain.100.d
+	picture = GFX_Douaumont_Necropolis
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "This will outrage the French leftists...."
+	}
+}
+country_event = { #Brutal Crackdown in French Algeria
+	id = FRAPCF.6
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRAPCF.6"}
+	title = "Brutal Crackdown in French Algeria"
+	desc = ALG_CRACKDOWN.1.d
+	picture = GFX_Algerian_Crackdown
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "l'Algerie est francaise"
+	}
+}
+news_event = {
+	id = ALG_Partition.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = ALG_Partition.1"}
+	title = "[GetNewspaperHeader]The Partition of Algeria"
+	desc = ALG_Partition.1.d
+	picture = GFX_FRA_Partition
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+
+		name = "An Interesting Solution"
+
+	}
+}
+news_event = {
+	id = Gladio_Reveal.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = Gladio_Reveal.1"}
+	title = "[GetNewspaperHeader]Gladio: NATO's Secret Army?"
+	desc = Gladio_Reveal.1.d
+	picture = GFX_FRA_Gladio
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "A Shocking Development"
+	}
+}
+news_event = {
+	id = VIN_PCF.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = VIN_PCF.1"}
+	title = "[GetNewspaperHeader]The Liberation of Vietnam"
+	desc = VIN_PCF.1.d
+	picture = GFX_PCF_Vietnam
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "The East is Red...."
+	}
+}
+news_event = {
+	id = French_Euroskepticism.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = French_Euroskepticism.1"}
+	title = "[GetNewspaperHeader]French Rejection of the Treaty of Rome"
+	desc = French_Euroskepticism.1.d
+	picture = GFX_FRA_Euroskeptickism
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "Is European Integration Doomed?"
+	}
+}
+news_event = {
+	id = ALG_Comp.3 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = ALG_Comp.3"}
+	title = "[GetNewspaperHeader]An Algerien Coup"
+	desc = ALG_Comp.3.d
+	picture = GFX_ALG_Comp3
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "Unexpected...."
+	}
+}
+news_event = {
+	id = ALG_Comp.4 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = ALG_Comp.4"}
+	title = "[GetNewspaperHeader]France Severs Ties with Algerie"
+	desc = ALG_Comp.4.d
+	picture = GFX_ALG_Comp4
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "How Long Can Algerie Survive?"
+	}
+}
+news_event = {
+	id = ALG_Comp.5 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = ALG_Comp.5"}
+	title = "[GetNewspaperHeader]The Resignation of Rene Coty"
+	desc = ALG_Comp.5.d
+	picture = GFX_FRA_Rene_Coty_Resignation
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "A Rough Decade for France"
+	}
+}
+news_event = {
+	id = FRA_NATO_PCF.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRA_NATO_PCF.1"}
+	title = "[GetNewspaperHeader]France Withdrawal From NATO"
+	desc = FRA_NATO_PCF.1.d
+	picture = GFX_PCF_NATO
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+
+		name = "A Major Geopolitical Shift"
+
+	}
+}
+country_event = {
+	id = FFL_Relocation.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FFL_Relocation.1"}
+	title = "The Relocation of the French Foreign Legion"
+	desc = FFL_Relocation.1.d
+	picture = GFX_FFL_Relocation
+
+	is_triggered_only = yes
+
+	option = {
+		name = "We will need them in the wars to come"
+	}
+}
+country_event = {
+	id = FRA_Referendum.10 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRA_Referendum.10"}
+	title = "A Constitutional Referendum"
+	desc = FRA_Referendum.10.d
+	picture = GFX_FRA_Refferendum
+
+	is_triggered_only = yes
+
+	option = {
+		name = "A Long Needed Set of Reforms"
+	}
+}
+country_event = {
+	id = ALG_Comp.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = ALG_Comp.1"}
+	title = "A Proposed Referendum"
+	desc = ALG_Comp.1.d
+	picture = GFX_ALG_Comp1
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Hopefully this will calm tensions"
+	}
+}
+country_event = {
+	id = ALG_Comp.2 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = ALG_Comp.2"}
+	title = "The Pied-Noir Referendum"
+	desc = ALG_Comp.2.d
+	picture = GFX_ALG_Comp2
+
+	is_triggered_only = yes
+
+	option = {
+		name = "This may have been a mistake...."
+	}
+}
+country_event = {
+	id = MNA.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = MNA.1"}
+	title = "Covertly Aid the Algerian National Movement"
+	desc = MNA.1.d
+	picture = GFX_MNA1
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Long Live French Algeria"
+	}
+}
+#############FRANCE 1970s#############
+country_event = { #TRENTES GLORIEUSUS END
+	id = FRA_event.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRA_event.1"}
+	title = FRA_event.1.t
+	desc = FRA_event.1.d
+	picture = GFX_FRA_event_1
+	is_triggered_only = yes
+	
+	option = {
+		name = FRA_event.1.a
+	}
+}
+country_event = { #ARREST THE MAOISTS IN FRANCE
+	id = FRA_event.2 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRA_event.2"}
+	title = FRA_event.2.t
+	desc = FRA_event.2.d
+	picture = GFX_FRA_event_2
+	is_triggered_only = yes
+	
+	option = {
+		name = FRA_event.2.a
+	}
+}
+country_event = { #EXTEND LARZAC CAMP
+	id = FRA_event.3 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRA_event.3"}
+	title = FRA_event.3.t
+	desc = FRA_event.3.d
+	picture = GFX_FRA_event_3
+	is_triggered_only = yes
+	
+	option = {
+		name = FRA_event.3.a
+	}
+}
+news_event = { #FRANCE LEAVES NATO
+	id = FRA_event.4 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRA_event.4"}
+	title = FRA_event.4.t
+	desc = FRA_event.4.d
+	picture = GFX_FRA_event_4
+	is_triggered_only = yes
+	major = yes
+	
+	option = {
+		name = FRA_event.4.a
+	}
+	option = {
+		name = FRA_event.4.b
+		trigger = {
+			NOT = { has_idea = nato_member }
+		}
+	}
+	option = {
+		name = FRA_event.4.c
+		trigger = {
+			NOT = {
+				has_government = communism
+				has_government = maoism
+			}
+		}
+	}
+}
+country_event = { #FRANCE DENUCLEARIZES
+	id = FRA_event.5 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRA_event.5"}
+	title = FRA_event.5.t
+	desc = FRA_event.5.d
+	picture = GFX_FRA_event_5
+	is_triggered_only = yes
+	
+	option = {
+		name = FRA_event.5.a
+	}
+}
+country_event = { #STOP ATMOSPHERIC NUCLEAR TESTS
+	id = FRA_event.6 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRA_event.6"}
+	title = FRA_event.6.t
+	desc = FRA_event.6.d
+	picture = GFX_FRA_event_6
+	is_triggered_only = yes
+	
+	option = {
+		name = FRA_event.6.a
+	}
+}
+country_event = { #SUPPORT THE PLO
+	id = FRA_event.7 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRA_event.7"}
+	title = FRA_event.7.t
+	desc = FRA_event.7.d
+	picture = GFX_FRA_event_7
+	is_triggered_only = yes
+	
+	option = {
+		name = FRA_event.7.a
+	}
+}
+country_event = { #ESTABLISH THE UDF
+	id = FRA_event.8 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = FRA_event.8"}
+	title = FRA_event.8.t
+	desc = FRA_event.8.d
+	picture = GFX_FRA_event_8
+	is_triggered_only = yes
+	
+	option = {
+		name = FRA_event.8.a
+	}
+}
+country_event = { #WE MADE THE EURO
+	id = EEC_event.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = EEC_event.1"}
+	title = EEC_event.1.t
+	desc = EEC_event.1.d
+	picture = GFX_EEC_event_1
+	is_triggered_only = yes
+	
+	option = {
+		name = EEC_event.1.a
+	}
+}
+country_event = { #WE ADOPTED THE EURO
+	id = EEC_event.2 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = EEC_event.2"}
+	title = EEC_event.2.t
+	desc = EEC_event.2.d
+	picture = GFX_EEC_event_1
+	is_triggered_only = yes
+	
+	option = {
+		name = EEC_event.2.a
+	}
+}
+country_event = { #LEAVE SNAKE IN THE TUNNEL
+	id = EEC_event.3 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = EEC_event.3"}
+	title = EEC_event.3.t
+	desc = EEC_event.3.d
+	picture = GFX_EEC_event_3
+	is_triggered_only = yes
+	
+	option = {
+		name = EEC_event.3.a
+	}
+}
+country_event = { #INVITATION TO THE EEC
+	id = EEC_event.4 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = EEC_event.4"}
+	title = EEC_event.4.t
+	desc = EEC_event.4.d
+	picture = GFX_EEC_event_1
+	is_triggered_only = yes
+	
+	option = {
+		name = EEC_event.4.a
+		add_ideas = Member_of_EEC
+		if = {
+			limit = {
+				has_global_flag = EEC_currency_created
+			}
+			add_ideas = EEC_Currency
+		}
+	}
+	option = {
+		name = EEC_event.4.b
+	}
+}
+news_event = { #EUROPEAN SPACE AGNECY
+	id = EUROPE_space.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = EUROPE_space.1"}
+	title = EUROPE_space.1.t
+	desc = EUROPE_space.1.d
+	picture = GFX_EUROPE_space_1
+	is_triggered_only = yes
+	major = yes
+	
+	option = {
+		name = EUROPE_space.1.a
+	}
+	option = {
+		name = EUROPE_space.1.b
+	}
+	option = {
+		name = EUROPE_space.1.c
+		trigger = {
+			NOT = {
+				tag = SOV
+			}
+			num_of_civilian_factories > 25
+		}
+	}
+}
+#############FRANCE 1970s#############
 # Death of Jean Delattre de Tassigny
 country_event = {
 	id = indochina_war.1 
@@ -36,7 +1100,19 @@ country_event = {
 		}
 	}
 }
+news_event = {
+	id = fra.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra.1"}
+	title = fra.14.t
+	desc = fra.14.d
+	picture = GFX_news_event_Pleven_Plan_Signed
+	is_triggered_only = yes
+	major = yes
 
+	option = {
+		name = "Interesting."
+	}
+}
 # UN recognition of PRC
 country_event = {
 	id = fra.2 
@@ -62,7 +1138,6 @@ country_event = {
 		set_global_flag = fra_no_prc_un_recognition
 	}
 }
-
 # UN recognition of PRC
 country_event = {
 	id = fra.4 
@@ -76,7 +1151,6 @@ country_event = {
 		name = "Thanks I guess"
 	}
 }
-
 # Join the ECSC
 country_event = {
 	id = fra.5 
@@ -116,7 +1190,6 @@ country_event = {
 		}
 	}
 }
-
 # [From.GetName] joined the ECSC
 country_event = {
 	id = fra.6 
@@ -130,7 +1203,6 @@ country_event = {
 		name = "Great!"
 	}
 }
-
 # ECSC created
 news_event = {
 	id = fra.7 
@@ -146,125 +1218,6 @@ news_event = {
 		name = "Interesting."
 	}
 }
-
-#Independence of Guinea
-country_event = {
-	id = fra.8 
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra.8"}
-	title = fra.8.t
-	desc = fra.8.d
-
-	fire_only_once = yes
-	is_triggered_only = yes
-
-	option = {
-		ai_chance = {
-			factor = 90
-		}
-		name = fra.8.a
-		SEN = { # french west africa
-			release = GNA
-		}
-		GNA = {
-			if = {
-				limit = {
-					has_war_with = VIN
-				}
-				white_peace = VIN
-			}
-			set_politics = {
-				ruling_party = socialist
-				elections_allowed = yes
-			}
-			create_country_leader = {
-				name = "Ahmed Sékou Touré"
-				picture = "Ahmed_Sekou_Toure.dds"
-				expire = "2005.1.1"
-				ideology = african_socialism
-			}
-		}
-	}
-	option = {
-		ai_chance = {
-			factor = 10
-		}
-		name = fra.8.b
-		add_political_power = -125
-	}
-}
-
-#Independence of Niger
-country_event = {
-  id = fra.9 
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra.9"}
-	title = fra.9.t
-	desc = fra.9.d
-
-  fire_only_once = yes
-	is_triggered_only = yes
-
-	option = {
-		ai_chance = {
-			factor = 90
-		}
-		name = fra.9.a
-		set_autonomy = { target = NGR autonomy_state = autonomy_free }
-		NGR = {
-				set_politics = {
-					ruling_party = nationalist
-					elections_allowed = yes
-				}
-				drop_cosmetic_tag = yes
-				transfer_state = 765
-				transfer_state = 766
-				transfer_state = 1029
-		}
-	}
-
-	option = {
-		ai_chance = {
-			factor = 10
-		}
-		name = fra.9.b
-		add_political_power = -125
-	}
-}
-
-#Independence of Chad
-country_event = {
-  id = fra.10 
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra.10"}
-	title = fra.10.t
-	desc = fra.10.d
-
-	fire_only_once = yes
-	is_triggered_only = yes
-
-	option = {
-	  ai_chance = {
-		  factor = 90
-		}
-		name = fra.10.a
-
-		set_autonomy = { target = CHA autonomy_state = autonomy_free }
-		CHA = {
-			drop_cosmetic_tag = yes
-			release = CAR
-			release = RCG
-			release = GAB
-		}
-	}
-
-	option = {
-	  ai_chance = {
-		  factor = 10
-		}
-		name = fra.10.b
-		add_political_power = -125
-	}
-}
-
-
 # Join the Pleven Plan
 country_event = {
 	id = fra.12 
@@ -300,7 +1253,6 @@ country_event = {
 		}
 	}
 }
-
 # [From.GetName] joined the Pleven Plan
 country_event = {
 	id = fra.13 
@@ -314,91 +1266,265 @@ country_event = {
 		name = "Great!"
 	}
 }
-
-# Pleven Plan signed
+#Nuclear test on humans subjects
 news_event = {
-	id = fra.14 
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra.14"}
-	title = fra.14.t
-	desc = fra.14.d
+	id = algerian_war_news.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = algerian_war_news.1"}
+	title = algerian_war_news.1.t
+	desc = algerian_war_news.1.d
 
-	picture = GFX_news_event_Pleven_Plan_Signed
-
-	is_triggered_only = yes
-	major = yes
-
-	option = {
-		name = "Interesting."
-	}
-}
-
-news_event = {
-	id = fra.15 
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra.15"}
-	title = "[GetNewspaperHeader]Philippe Petain Dies at age 95"
-	desc = fra.15.d
-
-	picture = news_event_petain_ded
+	picture = GFX_FRA_Nuclear_test
 	fire_only_once = yes
 	is_triggered_only = yes
 
-	major = yes
+	option = {
+		name = algerian_war_news.1.a
+	}
+}
+#Assassination discovered
+news_event = {
+	id = algerian_war_news.2 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = algerian_war_news.2"}
+	title = algerian_war_news.2.t
+	desc = algerian_war_news.2.d
+
+	picture = GFX_FRA_Weeks_of_Barricades
+	fire_only_once = yes
+	is_triggered_only = yes
 
 	option = {
-		name = "A Traitor of Our People"
+		name = algerian_war_news.2.a
+	}
+}
+#New Franc Introduction
+news_event = {
+	id = fra_news.1 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.1"}
+	title = fra_news.1.t
+	desc = fra_news.1.d
+
+	picture = GFX_news_event_new_franc
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = fra_news.1.a
+	}
+}
+#SAC Creation
+news_event = {
+	id = fra_news.2 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.2"}
+	title = fra_news.2.t
+	desc = fra_news.2.d
+	picture = GFX_SAC_Creation
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = fra_news.2.a
+	}
+}
+#Weeks of Barricades
+news_event = {
+	id = fra_news.3 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.3"}
+	title = fra_news.3.t
+	desc = fra_news.3.d
+	picture = GFX_FRA_Weeks_of_Barricades
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = fra_news.3.a
+	}
+}
+#Death of Camus
+news_event = {
+	id = fra_news.4 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.4"}
+	title = fra_news.4.t
+	desc = fra_news.4.d
+	picture = GFX_news_event_death_of_Camus
+	fire_only_once = yes
+	is_triggered_only = yes
+	option = {
+		name = fra_news.4.a
+	}
+}
+#Michel Debré get full powers
+news_event = {
+	id = fra_news.5 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.5"}
+	title = fra_news.5.t
+	desc = fra_news.5.d
+	picture = GFX_news_event_Michel_Debre_Power
+	fire_only_once = yes
+	is_triggered_only = yes
+	option = {
+		name = fra_news.5.a
+	}
+}
+#Gerboise Bleue
+news_event = {
+	id = fra_news.6 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.6"}
+	title = fra_news.6.t
+	desc = fra_news.6.d
+	picture = GFX_FRA_nuclear_test_2
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = fra_news.6.a
+	}
+}
+#Réseau Jeanson and FLN arrestation in Metropole
+news_event = {
+	id = fra_news.7
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.7"}
+	title = fra_news.7.t
+	desc = fra_news.7.d
+	picture = GFX_news_event_Reseau_Jeanson
+	fire_only_once = yes
+	is_triggered_only = yes
+	option = {
+		name = fra_news.7.a
+	}
+}
+#"Tournée des Popotes" of De Gaulle in Algeria
+news_event = {
+	id = fra_news.8 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.8"}
+	title = fra_news.8.t
+	desc = fra_news.8.d
+	picture = GFX_news_event_Tournee_Popotes
+	fire_only_once = yes
+	is_triggered_only = yes
+	option = {
+		name = fra_news.8.a
+	}
+}
+#Soviet Leader Visit
+news_event = {
+	id = fra_news.9 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.9"}
+	title = fra_news.9.t
+	desc = fra_news.9.d
+	picture = GFX_news_event_Soviet_in_France
+	fire_only_once = yes
+	is_triggered_only = yes
+	option = {
+		name = fra_news.9.a
+	}
+}
+#Fondation of the Unified Socialist Party
+news_event = {
+	id = fra_news.10
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.10"}
+	title = fra_news.10.t
+	desc = fra_news.10.d
+	picture = GFX_news_event_PSU_united
+	fire_only_once = yes
+	is_triggered_only = yes
+	option = {
+		name = fra_news.9.a
+	}
+}
+#Alger Coup
+news_event = {
+	id = fra_news.21 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.21"}
+	title = {
+		text = fra_news.21.t.fal
+		trigger = { FRA = { has_country_flag = coup_fail } }
+	}
+	desc = {
+		text = fra_news.21.d.fal
+		trigger = { FRA = { has_country_flag = coup_fail } }
+	}
+	title = {
+		text = fra_news.21.t.suc
+		trigger = { FRA = { has_country_flag = coup_success } }
+	}
+	desc = {
+		text = fra_news.21.d.suc
+		trigger = { FRA = { has_country_flag = coup_success } }
+	}
+	picture = GFX_news_event_generals_coup
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = fra_news.21.a
 		trigger = {
-			tag = FRA
+			has_country_flag = coup_fail
+			original_tag = FRA
+		}
+
+	}
+	option = {
+		name = fra_news.21.b
+		trigger = {
+			has_country_flag = coup_success
+			original_tag = FRA
 		}
 	}
 	option = {
-		name = "Farewell"
+		name = fra_news.21.c
+		trigger = {
+			NOT = { tag = FRA }
+		}
 	}
 }
-
-country_event = {
-	id = algeria_war.1 
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = algeria_war.1"}
-	title = "The Algerian War of Independence"
-	desc = "After major demonstrations in Algiers and other cities, the native population in Algeria has launched a revolutionary struggle against our rightful rule!"
-
-	is_triggered_only = yes
+#US President Visit France
+news_event = {
+	id = fra_news.31 
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_news.31"}
+	title = {
+		text = fra_news.31.t.jfk
+		trigger = { USA = { has_global_flag = jfk_60 } }
+	}
+	title = {
+		text = fra_news.31.t.gen
+		trigger = {
+			USA = {
+				NOT = {
+				has_global_flag = jfk_60
+				}
+			}
+		}
+	}
+	desc = {
+		text = fra_news.31.d.jfk
+		trigger = { USA = { has_global_flag = jfk_60 } }
+	}
+	desc = {
+		text = fra_news.31.d.gen
+		trigger = {
+			USA = {
+				NOT = {
+				has_global_flag = jfk_60
+				}
+			}
+		}
+	}
+	picture = GFX_news_event_degaulle_meet_kennedy
 	fire_only_once = yes
-
-	option = {
-		name = "Algeria is French!"
-		set_global_flag = algeria_war
-		ALG = {
-			load_oob = ALG_1949
-			transfer_state = 513
-			transfer_state = 514
-			transfer_state = 1147
-			transfer_state = 1148
-			transfer_state = 1149
-			transfer_state = 1151
-			transfer_state = 1152
-			transfer_state = 1153
-			transfer_state = 1154
-			transfer_state = 1156
-			transfer_state = 1157
-		}
-		declare_war_on = { target = ALG type = annex_everything }
-	}
-}
-
-country_event = {
-	id = algeria_war.2 
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = algeria_war.2"}
-	title = "America Demands we Make Peace with Algeria"
-	desc = "America Demands we Make Peace with Algeria"
 	is_triggered_only = yes
-
 	option = {
-		name = "We Must Concede to the Americans"
-		annex_country = { target = ALG }
-		release = ALG
+		name = fra_news.31.a
+		trigger = {
+			USA = { NOT = { has_global_flag = jfk_60 } }
+		}
 	}
 	option = {
-		name = "Reject the Americans Offer"
-
+		name = fra_news.31.b
+		trigger = {
+			USA = { has_global_flag = jfk_60 }
+		}
 	}
 }
