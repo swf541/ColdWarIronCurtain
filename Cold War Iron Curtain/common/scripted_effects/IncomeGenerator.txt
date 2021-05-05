@@ -46,11 +46,6 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	set_variable = { inc_productivity = 0.5 }
 	add_to_variable = { var = inc_productivity value = modifier@production_factory_max_efficiency_factor }
 
-	
-	set_variable = { ROOT.trade_infrastructure_total = 0 }
-
-
-
 	#reset upgradeable states
 	set_variable = { upgrade_estimate_preindustrial = 0 }
 	set_variable = { num_of_preindustrial_states = 0 }
@@ -73,7 +68,6 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	clear_array = upgrade_estimate_automated_states_array
 	clear_array = upgrade_estimate_automated_states_cost_array
 	####
-
 	every_owned_state = {
 		add_to_variable = { ROOT.industrial_complex_total = building_level@industrial_complex }
 		add_to_variable = { ROOT.farm_total = building_level@agri_industrial_complex }
@@ -86,17 +80,6 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 		add_to_variable = { ROOT.nuclear_powerplant_total = building_level@nuclear_powerplant }
 		add_to_variable = { ROOT.tourism_infrastructure_total = tourism_infrastructure }
 		add_to_variable = { ROOT.office_park_total = building_level@office_park }	#+2
-
-		add_to_variable = { ROOT.trade_infrastructure_total = building_level@air_base }
-		#add_to_variable = { ROOT.trade_infrastructure_total = building_level@naval_base }
-		add_to_variable = { ROOT.trade_infrastructure_total = office_park_total }
-		#
-		add_to_variable = { ROOT.trade_infrastructure_total = building_level@state_infrastructure }
-		#
-		
-
-
-		
 		if = { #Add to upgrade progress
 			limit = {
 				check_variable = { upgrade_progress > 0 }
@@ -142,7 +125,6 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 			}
 			add_to_variable = { upgrade_progress = global.upgrade_per_month_nominal }
 		}
-
 		else_if = {
 			limit = {
 				check_variable = { upgrade_progress > 0 }
@@ -184,21 +166,11 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 			full_upgrade_estimate = yes
 		}
 	}
-	multiply_variable = { ROOT.trade_infrastructure_total = 8 }
-	set_variable = {
-		ROOT.trade_infrastructure_total_available = ROOT.trade_infrastructure_total
-	}
-	subtract_from_variable = {
-		ROOT.trade_infrastructure_total_available = ROOT.trade_infrastructure_total_used
-	}
-	#industrial_complex Modifiers
-
 
 #### INCOME ####
 	#if = { limit = { is_ai = no } log = "------ INCOME ------" }
 	#if = { limit = { is_ai = no } log = "current income = [?IncomeTotal]" }
 #industrial_complex Modifiers
-
 	multiply_variable = { industrial_complex_total = global.GlobalCredit } #DIVIDER
 	set_variable = { industrial_complex_tech = 1 }
 	add_to_variable = { industrial_complex_tech = industry_credit_factor_difference }
@@ -331,25 +303,11 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	if = { limit = { has_tech = consumer_electronics_VI } add_to_variable = { office_park_tech = 0.15 } }
 	if = { limit = { has_tech = consumer_electronics_VII } add_to_variable = { office_park_tech = 0.15 } }
 	if = { limit = { has_tech = consumer_electronics_VIII } add_to_variable = { office_park_tech = 0.15 } }
-	add_to_variable = {
-		office_park_tech = modifier@office_park_income_adjustment
-	}
 	add_to_variable = { office_park_tech = commerce_credit_factor_difference }
 	multiply_variable = { office_park_tech = inc_productivity }
 	multiply_variable = { office_park_total = office_park_tech }
 	set_variable = { office_park_tech_calc = office_park_tech }
 	#add_to_variable = { office_park_tech_calc = -1 }
-
-	if = {
-		limit = {
-			has_country_flag = office_park_penalty
-		}
-		multiply_variable = {
-			office_park_total = office_park_penalty_rate
-		}
-	}
-
-
 	add_to_variable = { IncomeTotal = office_park_total }
 	set_variable = { OP_Display = office_park_total }
 	#if = { limit = { is_ai = no } log = "current income = [?IncomeTotal] / office_park_total = [?office_park_total]" }
@@ -396,15 +354,6 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	set_variable = { chromium_exports = resource_exported@chromium }
 	multiply_variable = { chromium_exports = 0.025 }
 
-	for_each_loop = {
-		array = chromiumExportTargetMonthly
-		index = i
-
-		add_to_variable = { chromium_exports = chromiumExportTargetMonthly^i }
-	}
-
-
-
 	add_to_variable = { resource_income = oil_exports }
 	add_to_variable = { resource_income = aluminium_exports }
 	add_to_variable = { resource_income = rubber_exports }
@@ -443,14 +392,6 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	multiply_variable = { steel_imports = 0.01 }
 	set_variable = { chromium_imports = resource_imported@chromium }
 	multiply_variable = { chromium_imports = 0.05 }
-
-	for_each_loop = {
-		array = chromiumImportTargetMonthly
-		index = i
-
-		add_to_variable = { chromium_imports = chromiumImportTargetMonthly^i }
-	}
-
 	add_to_variable = { resource_cost = oil_imports }
 	add_to_variable = { resource_cost = aluminium_imports }
 	add_to_variable = { resource_cost = rubber_imports }

@@ -60,7 +60,7 @@ NDefines.NCountry.MIN_COUP_SUCCESS_STABILITY = -2 -- NO COUPS ALLOWED!!!!
 NDefines.NCountry.BASE_FUEL_GAIN_PER_OIL = 4 -- VANILLA 2
 
 NDefines.NCountry.AIR_VOLUNTEER_PLANES_LIMIT = 0.5	-- Ratio for volunteer planes available for sending in relation to sender air force
-NDefines.NCountry.AIR_VOLUNTEER_BASES_CAPACITY_LIMIT = 0.75	-- Ratio for volunteer planes available for sending in relation to receiver air base capacity
+NDefines.NCountry.AIR_VOLUNTEER_BASES_CAPACITY_LIMIT = 0.5	-- Ratio for volunteer planes available for sending in relation to receiver air base capacity
 
 
 NDefines.NDiplomacy.BASE_PEACE_TAKE_UNCONTROLLED_STATE_FACTOR = 10.0 -- Base factor for taking state you do not control in %
