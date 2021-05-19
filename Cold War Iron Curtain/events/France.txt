@@ -94,7 +94,7 @@ country_event = { #Public Opinion on the Suez #FLAG = suez_crisis_ended_bad
 	}
 }
 country_event = { #Bombing of Sakiet Sidi Youssef - FRANCE #FLAG = sakiet_sidi_bombed
-	id = fra_crisis.2
+	id = fra_crisis.2 # 8 February 1958
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.2"}
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -131,7 +131,7 @@ country_event = { #Bombing of Sakiet Sidi Youssef - TUNISIA
 		name = fra_crisis.3.bombing_sakiet_sidi_option #Cut diplomatic ties and internationalise the algerian war
 		FRA = {
 			country_event = {
-					id = fra_crisis.4
+					id = fra_crisis.4  #15 April 1958
 					days = 66
 			}
 		}
@@ -1235,8 +1235,10 @@ country_event = {
 
 	is_triggered_only = yes
 
-	option = {
+	option = { #FRA
 		name = "Yes, let's join"
+		trigger = { tag = FRA }
+		set_global_flag = FRA_JOIN_CECA
 		ai_chance = {
 			factor = 90
 			modifier = {
@@ -1244,18 +1246,155 @@ country_event = {
 				is_historical_focus_on = yes
 			}
 		}
-		add_ideas = Member_of_ECSC
-		add_opinion_modifier = {
-			target = FROM
-			modifier = WGR_Formation_of_the_ECSC_opinion
+		WGR = { country_event = fra.5 }
+	}
+	option = { #WGR
+		name = "Yes, let's join"
+		trigger = { tag = WGR }
+		set_global_flag = WGR_JOIN_CECA
+		ai_chance = {
+			factor = 90
+			modifier = {
+				factor = 1
+				is_historical_focus_on = yes
+			}
+		}
+		BEL = { country_event = fra.5 }
+	}
+	option = { #BEL
+		name = "Yes, let's join"
+		trigger = { tag = BEL }
+		set_global_flag = BEL_JOIN_CECA
+		ai_chance = {
+			factor = 90
+			modifier = {
+				factor = 1
+				is_historical_focus_on = yes
+			}
 		}
 		hidden_effect = {
-			FROM = { country_event = { id = fra.6 hours = 12 } } 
+			LUX = { country_event = fra.5 }
 		}
 	}
-
+	option = { #LUX
+		name = "Yes, let's join"
+		trigger = { tag = LUX }
+		set_global_flag = LUX_JOIN_CECA
+		ai_chance = {
+			factor = 90
+			modifier = {
+				factor = 1
+				is_historical_focus_on = yes
+			}
+		}
+		hidden_effect = {
+			HOL = { country_event = fra.5 }
+		}
+	}
+	option = { #HOL
+		name = "Yes, let's join"
+		trigger = { tag = HOL }
+		set_global_flag = HOL_JOIN_CECA
+		ai_chance = {
+			factor = 90
+			modifier = {
+				factor = 1
+				is_historical_focus_on = yes
+			}
+		}
+		hidden_effect = {
+			ITA = { country_event = fra.5 }
+		}
+	}
+	option = { #ITA
+		name = "Yes, let's join"
+		trigger = { tag = ITA }
+		set_global_flag = ITA_JOIN_CECA
+		ai_chance = {
+			factor = 90
+			modifier = {
+				factor = 1
+				is_historical_focus_on = yes
+			}
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					AND = {
+						has_global_flag = FRA_JOIN_CECA
+						has_global_flag = HOL_JOIN_CECA
+						has_global_flag = WGR_JOIN_CECA
+						has_global_flag = ITA_JOIN_CECA
+						has_global_flag = BEL_JOIN_CECA
+						has_global_flag = LUX_JOIN_CECA
+					}
+				}
+				news_event = {
+					id = fra.7
+					days = 2
+				}
+				FRA = {
+					add_ideas = Member_of_ECSC
+				}
+				BEL = {
+					add_ideas = Member_of_ECSC
+				}
+				WGR = {
+					add_ideas = Member_of_ECSC
+				}
+				LUX = {
+					add_ideas = Member_of_ECSC
+				}
+				HOL = {
+					add_ideas = Member_of_ECSC
+				}
+				ITA = {
+					add_ideas = Member_of_ECSC
+				}
+			}
+			else = {
+				news_event = {
+					id = fra.6 
+					days = 2
+				}
+			}
+		}
+	}
 	option = {
 		name = "No thanks"
+		if = {
+			limit = {
+				tag = FRA
+			}
+			WGR = { country_event = fra.5 }
+		}
+		else_if = {
+			limit = {
+				tag = WGR
+			}
+			BEL = { country_event = fra.5 }
+		}
+		else_if = {
+			limit = {
+				tag = BEL
+			}
+			LUX = { country_event = fra.5 }
+		}
+		else_if = {
+			limit = {
+				tag = LUX
+			}
+			HOL = { country_event = fra.5 }
+		}
+		else_if = {
+			limit = {
+				tag = HOL
+			}
+			ITA = { country_event = fra.5 }
+		}
+		else = {
+			news_event = fra.6
+		}
 		ai_chance = {
 			factor = 10
 			modifier = {
@@ -1265,17 +1404,18 @@ country_event = {
 		}
 	}
 }
-# [From.GetName] joined the ECSC
-country_event = {
-	id = fra.6 
+# ECSC failed
+news_event = {
+	id = fra.6
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra.6"}
 	title = fra.6.t
 	desc = fra.6.d
-
+	major = yes
 	is_triggered_only = yes
+	picture = GFX_news_event_ECSC_created
 
 	option = {
-		name = "Great!"
+		name = "A dark day for European Unity!"
 	}
 }
 # ECSC created
@@ -1284,7 +1424,7 @@ news_event = {
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra.7"}
 	title = fra.7.t
 	desc = fra.7.d
-
+	major = yes
 	picture = GFX_news_event_ECSC_created
 
 	is_triggered_only = yes
