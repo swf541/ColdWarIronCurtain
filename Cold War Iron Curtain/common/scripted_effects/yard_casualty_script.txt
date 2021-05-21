@@ -1,0 +1,82 @@
+count_inflicted_casualties_on_current_enemies = {
+	set_temp_variable = { effect_root = THIS }
+	every_enemy_country = {
+		limit = {
+			var:original_tag = {
+				OR = {
+					NOT = { has_variable = effect_root:current_inflicted_casualties_on_@THIS }
+					casualties_inflicted_by = {
+						opponent = var:effect_root
+						thousands > effect_root:current_inflicted_casualties_on_@THIS
+					}
+				}
+			}
+		}
+		clear_array = effect_root:digits
+		resize_array = {
+			array = effect_root:digits
+			size = 9
+		}
+		for_each_loop = {
+			array = effect_root:digits
+			index = i
+			value = v
+			break = b
+			for_loop_effect = {
+				start = 0
+				end = 10
+				value = j
+				set_variable = { effect_root:digits^i = j }
+				meta_effect = {
+					text = {
+						set_temp_variable = {
+							inflicted_casualties_temp = [DIGIT0][DIGIT1][DIGIT2][DIGIT3][DIGIT4][DIGIT5].[DIGIT6][DIGIT7][DIGIT8]
+						}
+					}
+					DIGIT0 = "[?effect_root:digits^0|0]"
+					DIGIT1 = "[?effect_root:digits^1|0]"
+					DIGIT2 = "[?effect_root:digits^2|0]"
+					DIGIT3 = "[?effect_root:digits^3|0]"
+					DIGIT4 = "[?effect_root:digits^4|0]"
+					DIGIT5 = "[?effect_root:digits^5|0]"
+					DIGIT6 = "[?effect_root:digits^6|0]"
+					DIGIT7 = "[?effect_root:digits^7|0]"
+					DIGIT8 = "[?effect_root:digits^8|0]"
+				}
+				if = {
+					limit = {
+						casualties_inflicted_by = {
+							opponent = PREV
+							thousands < inflicted_casualties_temp
+						}
+					}
+					subtract_from_variable = { effect_root:digits^i = 1 }
+					set_temp_variable = { break = 1 }
+				}
+			}
+		}
+		subtract_from_temp_variable = { inflicted_casualties_temp = 0.001 }
+		set_temp_variable = { inflicted_casualties_diff = inflicted_casualties_temp }
+		var:original_tag = {
+			subtract_from_temp_variable = { inflicted_casualties_diff = effect_root:current_inflicted_casualties_on_@THIS }
+			add_to_variable = { effect_root:inflicted_casualties = inflicted_casualties_diff }
+			add_to_variable = { effect_root:current_inflicted_casualties_on_@THIS = inflicted_casualties_diff }
+			add_to_variable = { effect_root:inflicted_casualties_on_@THIS = inflicted_casualties_diff }
+		}
+	}
+	clear_array = digits
+}
+
+# put this in on_peace
+clear_current_inflicted_casualties = {
+	for_each_scope_loop = {
+		array = global.countries
+		if = {
+			limit = {
+				NOT = { has_war_with = PREV }
+			}
+			clear_variable = PREV.current_inflicted_casualties_on_@THIS
+			clear_variable = current_inflicted_casualties_on_@PREV
+		}
+	}
+}
