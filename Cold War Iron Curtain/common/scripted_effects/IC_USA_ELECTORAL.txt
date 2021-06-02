@@ -1,0 +1,588 @@
+
+electoral_value_normalization = {
+	every_owned_state = {
+		set_variable = {
+			weighted_total = 0
+		}
+		add_to_variable = {
+			weighted_total = dem_support
+		}
+		add_to_variable = {
+			weighted_total = gop_support
+		}
+		add_to_variable = {
+			weighted_total = aip_support
+		}	
+		divide_variable = {
+			dem_support = weighted_total
+		}
+		divide_variable = {
+			gop_support = weighted_total
+		}
+		divide_variable = {
+			aip_support = weighted_total
+		}
+		multiply_variable = {
+			dem_support = 100
+		}
+		multiply_variable = {
+			gop_support = 100
+		}
+		multiply_variable = {
+			aip_support = 100
+		}
+		#Three Way Stuff
+		set_variable = {
+			dem_support_check = dem_support
+		}
+		set_variable = {
+			gop_support_check = gop_support
+		}
+		set_variable = {
+			aip_support_check = aip_support
+		}
+		add_to_variable = { dem_support_check = 4 }
+		add_to_variable = { gop_support_check = 4 }
+		add_to_variable = { aip_support_check = 4 }
+	}
+}
+additional_starting_data_1952 = {
+	set_variable = {
+		dem_support_local = 50
+	}
+	set_variable = {
+		gop_support_local = 50
+	}
+	#Korean War Active Y/N
+	if = {
+		limit = {
+			OR = {
+				KOR = {
+					has_war_with = KPA
+				}
+				PRC = {
+					has_war_with = CHI	#For Testing
+				}
+			}
+
+		}
+		subtract_from_variable = {
+			dem_support_local = 3
+		}
+		add_to_variable = {
+			gop_support_local = 3
+		}
+	}
+	#if N who won
+	if = {	#South Korea
+		limit = {
+			KOR = {
+				owns_state = 747
+			}
+		}
+		subtract_from_variable = {
+			gop_support_local = 4
+		}
+		add_to_variable = {
+			dem_support_local = 4
+		}
+	}
+	if = {	#North Korea
+		limit = {
+			KPA = {
+				owns_state = 750	#Seoul
+			}
+		}
+		subtract_from_variable = {
+			dem_support_local = 5
+		}
+		add_to_variable = {
+			gop_support_local = 5
+		}
+	}
+	#McCarthyism Results
+	if = {
+		limit = {
+			has_country_flag = Liberal_Justices
+		}
+		subtract_from_variable = {
+			gop_support_local = 2
+		}
+		add_to_variable = {
+			dem_support_local = 2
+		}
+	}
+	if = {
+		limit = {
+			has_country_flag = Conservative_Justices
+		}
+		subtract_from_variable = {
+			dem_support_local = 2
+		}
+		add_to_variable = {
+			gop_support_local = 2
+		}
+	}
+	
+
+	#Truman Impeached Y/N
+}
+
+Election_Starting_Support = {
+    every_owned_state = {
+        if = {
+            limit = {
+                check_variable = {
+                    d_pvi > r_pvi
+                }
+            }
+            set_variable = {
+                elect_d_pvi = d_pvi
+            }
+            multiply_variable = {
+                elect_d_pvi = 100
+            }
+            divide_variable = {
+                elect_d_pvi = 2
+            }
+            set_variable = {
+                dem_support = USA.dem_support_local
+            }
+            set_variable = {
+                gop_support = USA.gop_support_local
+            }
+			randomize_temp_variable = {
+				var = statistical_noise
+				distribution = uniform
+				min = -2
+				max = 2
+			}
+			set_variable = {
+				random_test = statistical_noise
+			}			
+            add_to_variable = {
+                dem_support = statistical_noise
+            }
+            subtract_from_variable = {
+                gop_support = statistical_noise
+            }
+            add_to_variable = {
+                dem_support = elect_d_pvi
+            }
+            subtract_from_variable = {
+                gop_support = elect_d_pvi
+            }
+        }
+        else_if = {
+            limit = {
+                check_variable = {
+                    r_pvi > d_pvi
+                }
+            }
+            set_variable = {
+                elect_r_pvi = r_pvi
+            }
+            multiply_variable = {
+                elect_r_pvi = 100
+            }
+            divide_variable = {
+                elect_r_pvi = 2
+            }
+            set_variable = {
+                dem_support = USA.dem_support_local
+            }
+            set_variable = {
+                gop_support = USA.gop_support_local
+            }
+			randomize_temp_variable = {
+				var = statistical_noise
+				distribution = uniform
+				min = -2
+				max = 2
+			}
+			set_variable = {
+				random_test = statistical_noise
+			}
+            add_to_variable = {
+                dem_support = statistical_noise
+            }
+            subtract_from_variable = {
+                gop_support = statistical_noise
+            }
+            add_to_variable = {
+                gop_support = elect_r_pvi 
+            }
+            subtract_from_variable = {
+                dem_support = elect_r_pvi
+            }
+        }
+        else = {
+            set_variable = {
+                dem_support = USA.dem_support_local
+            }
+            set_variable = {
+                gop_support = USA.gop_support_local
+            }
+			randomize_temp_variable = {
+				var = statistical_noise
+				distribution = uniform
+				min = -2
+				max = 2
+			}
+			set_variable = {
+				random_test = statistical_noise
+			}
+            add_to_variable = {
+                dem_support = statistical_noise
+            }
+            subtract_from_variable = {
+                gop_support = statistical_noise
+            }
+        }
+    }
+}
+
+
+USA_1952_and_1956_Issues = {
+    386 = {	
+        set_variable = { Civil_Rights_Level = 3 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 9 }
+    }
+    385 = {
+        set_variable = { Civil_Rights_Level = 3 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 6 }
+    }
+    378 = {
+        set_variable = { Civil_Rights_Level = 3 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 32 }
+    }
+    379 = {
+        set_variable = { Civil_Rights_Level = 3 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 3 }
+        set_variable = { Union_Prescense_Level = 2 } 
+		set_variable = { electoral_votes = 3 }
+    }
+    375 = {
+        set_variable = { Civil_Rights_Level = 1 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 3 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 24 }
+    }
+    366 = {
+        set_variable = { Civil_Rights_Level = 1 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 3 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 11 }
+    }
+    377 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 4 }
+    }
+    380 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 2 } 
+		set_variable = { electoral_votes = 4 }
+    }
+    388 = {
+        set_variable = { Civil_Rights_Level = 3 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 3 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 4 }
+    }
+    387 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 2 } 
+		set_variable = { electoral_votes = 4 }
+    }
+    382 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 2 } 
+		set_variable = { electoral_votes = 6 }
+    }
+    381 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 3 }
+    }
+    376 = {
+        set_variable = { Civil_Rights_Level = 3 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 4 }
+    }
+    389 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 4 }
+    }
+    390 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 4 }
+    }
+    384 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 2 } 
+		set_variable = { electoral_votes = 6 }
+    }
+    383 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 2 } 
+		set_variable = { electoral_votes = 8 }
+    }
+    374 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 8 }
+    }
+    392 = {
+        set_variable = { Civil_Rights_Level = 3 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 10 }
+    }
+    373 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 3 }
+        set_variable = { Union_Prescense_Level = 2 } 
+		set_variable = { electoral_votes = 13 }
+    }
+    372 = {
+        set_variable = { Civil_Rights_Level = 1 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 8 }
+    }
+    371 = {
+        set_variable = { Civil_Rights_Level = 1 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 10 }
+    }
+    370 = {
+        set_variable = { Civil_Rights_Level = 1 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 8 }
+    }
+    367 = {
+        set_variable = { Civil_Rights_Level = 1 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 11 }
+    }
+    368 = {
+        set_variable = { Civil_Rights_Level = 1 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 2 } 
+		set_variable = { electoral_votes = 11 }
+    }
+    365 = {
+        set_variable = { Civil_Rights_Level = 1 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 12 }
+    }
+    363 = {
+        set_variable = { Civil_Rights_Level = 1 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 14 }
+    }
+    364 = {
+        set_variable = { Civil_Rights_Level = 1 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 8 }
+    }
+    362 = {
+        set_variable = { Civil_Rights_Level = 1 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 12 }
+    }
+    369 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 10 }
+    }
+    361 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 3 }
+        set_variable = { Union_Prescense_Level = 2 } 
+		set_variable = { electoral_votes = 9 }
+    }
+    359 = {
+        set_variable = { Civil_Rights_Level = 3 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 3 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 16 }
+    }
+    860 = {
+        set_variable = { Civil_Rights_Level = 3 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 3 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 3 }
+    }
+    358 = {
+        set_variable = { Civil_Rights_Level = 4 }
+        set_variable = { CW_Outlook_Level = 3 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 45 }
+    }
+    360 = {
+        set_variable = { Civil_Rights_Level = 4 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 32 }
+    }
+    393 = {
+        set_variable = { Civil_Rights_Level = 4 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 20 }
+    }
+    394 = {
+        set_variable = { Civil_Rights_Level = 3 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 12 }
+    }
+    395 = {
+        set_variable = { Civil_Rights_Level = 4 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 27 }
+    }
+    396 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 13 }
+    }
+    261 = {
+        set_variable = { Civil_Rights_Level = 3 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 25 }
+    }
+    859 = {
+        set_variable = { Civil_Rights_Level = 2 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 8 }
+    }
+    357 = {
+        set_variable = { Civil_Rights_Level = 4 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 16 }
+    }
+    864 = {
+        set_variable = { Civil_Rights_Level = 4 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 4 }
+    }
+    863 = {
+        set_variable = { Civil_Rights_Level = 4 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 8 }
+    }
+    861 = {
+        set_variable = { Civil_Rights_Level = 4 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 5 }
+    }
+    865 = {
+        set_variable = { Civil_Rights_Level = 4 }
+        set_variable = { CW_Outlook_Level = 1 }
+        set_variable = { Economic_Outlook_Level = 1 }
+        set_variable = { Union_Prescense_Level = 1 } 
+		set_variable = { electoral_votes = 3 }
+    }
+    862 = {
+        set_variable = { Civil_Rights_Level = 4 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 2 }
+        set_variable = { Union_Prescense_Level = 2 } 
+		set_variable = { electoral_votes = 4 }
+    }
+    391 = {
+        set_variable = { Civil_Rights_Level = 4 }
+        set_variable = { CW_Outlook_Level = 2 }
+        set_variable = { Economic_Outlook_Level = 4 }
+        set_variable = { Union_Prescense_Level = 3 } 
+		set_variable = { electoral_votes = 11 }
+    }
+}
+campaign_of_1952 = {
+	additional_starting_data_1952 = yes
+	Election_Starting_Support = yes
+	USA_1952_and_1956_Issues = yes
+}
