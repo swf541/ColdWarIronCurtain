@@ -83,10 +83,10 @@ NDefines.NDiplomacy.TENSION_TIME_SCALE_MIN = 0.0 -- Timed tension scale won't de
 NDefines.NDiplomacy.TENSION_TIME_SCALE_MONTHLY_FACTOR = 0.00 -- Timed tension scale will be modified by this amount starting with TENSION_TIME_SCALE_START_DATE
 NDefines.NDiplomacy.TENSION_TIME_SCALE_START_DATE = "1999.1.1.12" -- Starting at this date the tension values will be scaled down (will be equal to 1 before that)
 NDefines.NDiplomacy.VOLUNTEERS_DIVISIONS_REQUIRED = 1 -- This many divisons are required for the country to be able to send volunteers.
-NDefines.NDiplomacy.VOLUNTEERS_PER_COUNTRY_ARMY = 0.10 -- Each army unit owned by the source country contributes this amount of volunteers to the limit.
-NDefines.NDiplomacy.VOLUNTEERS_PER_TARGET_PROVINCE = 0.10 -- Each province owned by the target country contributes this amount of volunteers to the limit.
+NDefines.NDiplomacy.VOLUNTEERS_PER_COUNTRY_ARMY = 0.05 -- Each army unit owned by the source country contributes this amount of volunteers to the limit.
+NDefines.NDiplomacy.VOLUNTEERS_PER_TARGET_PROVINCE = 0.05 -- Each province owned by the target country contributes this amount of volunteers to the limit.
 
-NDefines.NDiplomacy.VOLUNTEERS_TRANSFER_SPEED = 14
+NDefines.NDiplomacy.VOLUNTEERS_TRANSFER_SPEED = 21
 
 NDefines.NGame.END_DATE = "2050.5.23.12"
 NDefines.NGame.START_DATE = "1945.5.23.12"
