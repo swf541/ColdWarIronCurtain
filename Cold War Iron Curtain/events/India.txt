@@ -2193,6 +2193,551 @@ country_event = {
 		}
 	}
 }
+#Events for Tree IND_Indian_Economic_Policies
+add_namespace = Mahalanobis
+country_event = {
+	id = Mahalanobis.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = Mahalanobis.1"}	
+	title = "Continue the Mahalanobis Model?"
+	desc = Mahalanobis.1.d
+	picture = GFX_Mahalanobis_1
+
+	is_triggered_only = yes
+
+
+	option = {
+		name = "The model continues"
+		complete_national_focus = IND_60s_Continue_The_Model
+	}
+	option = {
+		name = "Adjust the model"
+		complete_national_focus = IND_60s_Adjust_The_Model
+	}
+}
+
+#Events for Tree IND_Foreign_Policy_Direction
+add_namespace = CPI_FP
+
+news_event = {
+	id = CPI_FP.3
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CPI_FP.3"}
+	title = "[GetNewspaperHeader]Indo-Soviet Treaty of Friendship"
+	desc = CPI_FP.3.d
+	picture = GFX_CPI_FP_3
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		trigger = {
+			tag = PAK 
+			tag = PRC 
+			tag = USA 
+		}
+		name = "Concerning"
+	}
+	option = {
+		trigger = {
+			NOT = { tag = RAJ }
+			NOT = { tag = SOV }
+			NOT = { tag = PAK }
+			NOT = { tag = PRC }
+			NOT = { tag = USA }
+		}
+		name = "Interesting"
+	}
+	option = {
+		trigger = {
+			tag = RAJ
+			tag = SOV 
+		}
+		name = "A wonderful agreement"
+	}
+} 
+add_namespace = IND_PAK60s
+
+country_event = {
+	id = IND_PAK60s.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = IND_PAK60s.1"}	
+	title = "Host Pakistan for Regional Security Talks?"
+	desc = IND_PAK60s.1.d
+	picture = GFX_IND_PAK60s_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Invite Pakistan"
+		PAK = { 
+			country_event = IND_PAK60s.2
+		}
+	}
+	option = {
+		name = "Decline"
+	}
+}
+
+country_event = {
+	id = IND_PAK60s.2
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = IND_PAK60s.2"}	
+	title = "India Invites us for Regional Security Talks"
+	desc = IND_PAK60s.2.d
+	picture = GFX_IND_PAK60s_2
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Accept"
+		PAK = { 
+			country_event = {
+				id = IND_PAK60s.3
+				days = 7
+			}
+		}
+		RAJ = {
+			country_event = {
+				id = IND_PAK60s.3
+				days = 7
+			}
+		}
+	}
+	option = {
+		name = "Decline"
+		country_event = {
+			id = IND_PAK60s.7
+			days = 7
+		}
+	}
+}
+country_event = {
+	id = IND_PAK60s.3
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = IND_PAK60s.2"}	
+	title = "India-Pakistan Security Talks Begin"
+	desc = IND_PAK60s.2.d
+	picture = GFX_IND_PAK60s_2
+
+	is_triggered_only = yes
+
+	option = {
+		name = "The talks begin"
+		if = {
+			limit = {
+				tag = PAK
+			}
+			country_event = IND_PAK60s.4
+		}
+	}
+}
+country_event = {
+	id = IND_PAK60s.4
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = IND_PAK60s.4"}	
+	title = "India Invites us for Regional Security Talks"
+	desc = IND_PAK60s.4.d
+	picture = GFX_IND_PAK60s_4
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Accept"
+		add_stability = -0.10
+		set_country_flag = Defense_Pact_with_India
+		diplomatic_relation = {
+			country = PAK
+			relation = guarantee
+			active = yes
+		}
+		PAK = {
+			diplomatic_relation = {
+				country = RAJ
+				relation = guarantee
+				active = yes
+			}	
+		}
+		RAJ = {
+			set_country_flag = Defense_Pact_with_India
+			country_event = {
+				id = IND_PAK60s.3
+				days = 7
+			}
+		}
+	}
+	option = {
+		name = "Decline"	#Historical
+		add_stability = 0.05
+		RAJ = {
+			country_event = IND_PAK60s.5
+			country_event = {
+				id = IND_PAK60s.7
+				days = 7
+			}
+		}
+	}
+}
+
+country_event = {
+	id = IND_PAK60s.5
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = IND_PAK60s.7"}	
+	title = "Pakistan Declines"
+	desc = IND_PAK60s.7.d
+	picture = GFX_IND_PAK60s_7
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Oh well"
+	}
+}
+country_event = {
+	id = IND_PAK60s.6
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = IND_PAK60s.6"}	
+	title = "Pakistan Accepts"
+	desc = IND_PAK60s.6.d
+	picture = GFX_IND_PAK60s_6
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Wonderful"
+		country_event = {
+			id = IND_PAK60s.7
+			days = 7
+		}
+		hidden_effect = {
+			news_event = {
+				id = IND_PAK60s.8
+				days = 1825
+			}
+		}
+		RAJ = {
+			add_opinion_modifier = {
+				target = PAK
+				modifier = large_increase
+			}
+		}
+		PAK = {
+			add_opinion_modifier = {
+				target = RAJ
+				modifier = large_increase
+			}
+		}
+	}
+}
+
+country_event = {
+	id = IND_PAK60s.7
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = IND_PAK60s.7"}	
+	title = "America Appreciates Indian Efforts"
+	desc = IND_PAK60s.7.d
+	picture = GFX_IND_PAK60s_7
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Excellent"
+		RAJ = {
+			add_opinion_modifier = {
+				target = USA
+				modifier = medium_increase
+			}
+		}
+		USA = {
+			add_opinion_modifier = {
+				target = RAJ
+				modifier = medium_increase
+			}
+		}
+	}
+}
+news_event = {
+	id = IND_PAK60s.8
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = IND_PAK60s.8"}
+	title = "[GetNewspaperHeader]Indo-Pakistani Defensive Pact Expires"
+	desc = IND_PAK60s.6.d
+	picture = GFX_IND_PAK60s_8
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "End of an era"
+		hidden_effect = {
+			if = {
+				limit = {
+					tag = RAJ
+				}
+				diplomatic_relation = {
+					country = PAK
+					relation = guarantee
+					active = no
+				}
+				PAK = {
+					diplomatic_relation = {
+						country = RAJ
+						relation = guarantee
+						active = no
+					}	
+				}				
+			}
+		}
+	}
+}
+add_namespace = USA_INDIA60s
+
+country_event = {
+	id = USA_INDIA60s.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = USA_INDIA60s.1"}	
+	title = "India Asks for Military Mission"
+	desc = USA_INDIA60s.1.d
+	picture = GFX_USA_INDIA60s_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Accept"
+		RAJ = {
+			add_opinion_modifier = {
+				target = USA
+				modifier = large_increase
+			}
+		}
+		USA = {
+			add_opinion_modifier = {
+				target = RAJ
+				modifier = large_increase
+			}
+		}
+	}
+	option = {
+		name = "Decline"
+		RAJ = {
+			add_opinion_modifier = {
+				target = USA
+				modifier = medium_decrease
+			}
+		}
+		USA = {
+			add_opinion_modifier = {
+				target = RAJ
+				modifier = medium_decrease
+			}
+		}
+	}
+}
+country_event = {
+	id = USA_INDIA60s.2
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = USA_INDIA60s.2"}	
+	title = "America Declines"
+	desc = USA_INDIA60s.2.d
+	picture = GFX_USA_INDIA60s_2
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Oh well"
+	}
+}
+
+country_event = {
+	id = USA_INDIA60s.3
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = USA_INDIA60s.3"}	
+	title = "United States Proposes Military Package"
+	desc = USA_INDIA60s.3.d
+	picture = GFX_USA_INDIA60s_3
+
+	is_triggered_only = yes
+	immediate = {
+		hidden_effect = {
+			USA = {
+				country_event = {
+					id = USA_INDIA60s.4
+					days = 7
+				}
+			}
+		}
+	}
+
+	option = {
+		name = "Accept Equipment"
+		generic_grant_5_percent_influence_of_USA = yes
+		add_equipment_to_stockpile = {
+			type = infantry_equipment_2	
+			amount = 2000
+			producer = CAP
+		}
+		add_equipment_to_stockpile = {
+			type = motorized_equipment_2
+			amount = 750
+			producer = CAP
+		}
+		add_equipment_to_stockpile = {
+			type = artillery_equipment_3
+			amount = 150
+			producer = CAP
+		}				
+		add_equipment_to_stockpile = {
+			type = mbt_equipment_2
+			amount = 75
+			producer = CAP
+		}		
+	}
+	option = {
+		name = "Accept Training Mission"
+		generic_grant_10_percent_influence_of_USA = yes
+		add_equipment_to_stockpile = {
+			type = infantry_equipment_2	
+			amount = 2000
+			producer = CAP
+		}
+		add_equipment_to_stockpile = {
+			type = motorized_equipment_2
+			amount = 750
+			producer = CAP
+		}
+		add_equipment_to_stockpile = {
+			type = artillery_equipment_3
+			amount = 150
+			producer = CAP
+		}				
+		add_equipment_to_stockpile = {
+			type = mbt_equipment_2
+			amount = 75
+			producer = CAP
+		}	
+		add_tech_bonus = {
+			name = special_forces_bonus
+			bonus = 1.75
+			uses = 4
+			category = sf_forces
+		}
+		add_tech_bonus = {
+			name = land_doctrine_bonus
+			bonus = 1.75
+			uses = 2
+			category = land_doctrine
+		}
+		army_experience = 25
+	}
+}
+
+country_event = {
+	id = USA_INDIA60s.4
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = USA_INDIA60s.4"}	
+	title = "Pakistan Sends Scathing Criticism"
+	desc = USA_INDIA60s.4.d
+	picture = GFX_USA_INDIA60s_4
+
+	is_triggered_only = yes
+
+	option = {
+		name = "As expected..."
+		PAK = {
+			add_opinion_modifier = {
+				target = USA
+				modifier = medium_decrease
+			}
+		}
+		USA = {
+			add_opinion_modifier = {
+				target = PAK
+				modifier = medium_decrease
+			}
+		}
+	}
+}
+
+#Events from IND_1962_General_Elections
+add_namespace = India_Com60s
+country_event = {
+	id = India_Com60s.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = India_Com60s.1"}	
+	title = "Selecting a Foriegn Sponsor"
+	desc = India_Com60s.1.d
+	picture = GFX_India_Com60s_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Pick the Soviets"
+		complete_national_focus = IND_60s_Soviet_Guidance
+	}
+	option = {
+		name = "Pick the Chinese"
+		complete_national_focus = IND_60s_Chinese_Guidance
+	}
+}
+
+country_event = {
+	id = India_Com60s.2
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = India_Com60s.2"}	
+	title = "Selecting a Foriegn Sponsor"
+	desc = India_Com60s.2.d
+	picture = GFX_India_Com60s_2
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Keep the Course"	#Default to this
+		add_popularity = {
+			ideology = communism
+			popularity = 0.15
+		}
+	}
+	option = {
+		name = "Embrace Maoism"
+		add_popularity = {
+			ideology = maoism
+			popularity = 0.35
+		}
+		set_politics = {
+			ruling_party = maoism 
+			elections_allowed = no
+		}
+		set_country_flag = CPI_India_Maoist_Dominant
+	}
+}
+
+add_namespace = INC_1962
+country_event = {
+	id = INC_1962.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = INC_1962.1"}	
+	title = "Relationship with the Defence Establishment"
+	desc = INC_1962.1.d
+	picture = GFX_INC_1962_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Strengthen Civilian Oversight"
+		set_country_flag = Strengthened_Civilian_Oversight
+	}
+	option = {
+		name = "Cede more control to the military"
+		set_country_flag = Ceded_Control_to_Military
+	}
+}
+country_event = {
+	id = INC_1962.2
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = INC_1962.2"}	
+	title = "Reforming the Civil-Military Relationship"
+	desc = INC_1962.2.d
+	picture = GFX_INC_1962_2
+
+	is_triggered_only = yes
+
+	option = {
+		name = "Firm Civilian Control"
+		add_timed_idea = {
+			idea = Strict Civil Oversight in Defence
+			days = 1825
+		}
+	}
+	option = {
+		name = "Give Military Leeway"	#Historical
+		set_country_flag = Ceded_Control_to_Military
+		add_timed_idea = {
+			idea = Loose Civil Oversight in Defence
+			days = 1825
+		}
+	}
+}
 
 #Events from IND_1967_General_Elections
 add_namespace = INDIA_COM_NEP
