@@ -814,7 +814,7 @@ country_event = {
 country_event = {
 	id = BAN_Liberation_War.13
     immediate = {log = "[GetDateText]: [Root.GetTag]: id = BAN_Liberation_War.13"}	
-	title = "Pakistan Asks for Return of POWs"
+	title = "India Demands Recognition of Bangladesh for POWs"
 	desc = BAN_Liberation_War.13.d
 	picture = GFX_BAN_Liberation_War_13
 
@@ -1660,38 +1660,263 @@ country_event = {
         } 
     }
 }
+country_event = {
+	id = Bangladesh_War.14
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = Bangladesh_War.14"}	
+	title = "UN Ceasefire Comes into Effect"
+	desc = Bangladesh_War.14.d
+	picture = GFX_Bangladesh_War_14
 
-UN Ceasefire Comes into effect (Pakistan/India event)
--Beginning of peace (Pak-India war ends, troops remain in place, either Surrender of Dacca or India Thwarted event follows)
+	is_triggered_only = yes
+    immediate = {
+        hidden_effect = {
+            if = {
+                limit = {
+                    tag = PAK
+                    PAK = {
+                        controls_state = 919
+                        controls_state = 430
+                    }
+                    check_variable = {
+                        global.province_controllers^3456 = PAK.id
+                    }
+                    check_variable = {
+                        global.province_controllers^12822 = PAK.id
+                    }
+                    check_variable = {
+                        global.province_controllers^8022 = PAK.id
+                    }
+                }
+                news_event = Bangladesh_War.18
+                PAK = {
+                    annex_country = {
+                        target = BAN
+                        transfer_troops = no
+                    }
+                }
+            }
+            else = {
+                news_event = Bangladesh_War.16
+            }
+            white_peace = RAJ
+        }
+    }
+	option = {
+        name = "Beginning of peace?" 
+    }
+}
 
 #India Requests UN Ceasefire (Pakistan event)   Bangladesh_War.15 Superceded by BAN_Liberation_War.7
 #-Accept the ceasefire ("UN Ceasefire Comes into Effect" event fires)
 #-Delay for ten days (after 10 days, "UN Ceasefire Comes into Effect" event fires)
+news_event = {
+	id = Bangladesh_War.16
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = Bangladesh_War.16"}
+	title = "[GetNewspaperHeader]Surrender of Dacca"
+	desc = Bangladesh_War.16.d
+	picture = GFX_Bangladesh_War_16
 
-Surrender of Dacca (event launches if UN ceasefire comes in and India controls all major VP in East Pakistan except Dacca, would still fire if they control all of East Pakistan too. Also Pakistan player should have a decision, "Surrender of Dacca" that can fire at anytime, ending the war immediately)
--A historic day (East Pakistan annexed by India, starts an event chain for India for the independence of Pakistan, launches event "Yahya Khan Hands Over Power", Pakistan gets spirit "POWs In India" which should severely impact manpower, completes Indian focus IND_Surrender_Of_Dacca)
+	is_triggered_only = yes
+	major = yes
+    immediate = {
+        hidden_effect = {
+            if = {
+                limit = {
+                    tag = RAJ
+                }
+                PAK = {
+                    country_event = Bangladesh_War.17
+                    add_ideas = POWs_In_India
+                }
+                RAJ = {
+                    complete_national_focus = IND_60s_Surrender_Of_Dhaka
+                    puppet = BAN
+                    dismantle_faction = yes
+                }
+                BAN = {
+                    transfer_state = 919
+                    transfer_state = 918
+                    transfer_state = 917
+                    transfer_state = 430
+                    transfer_state = 1555
+                    transfer_state = 1107
+                    transfer_state = 1108
+                    transfer_state = 1073
+                    transfer_state = 1072
+                    transfer_state = 1067
+                    set_cosmetic_tag = INDIAN_OCCUPIED_BANGLADESH
+                }
+            }
+        }
+    }
+	option = {
+		name = "A historic day"
+	}
+}
+country_event = {
+	id = Bangladesh_War.17
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = Bangladesh_War.17"}	
+	title = "Yahya Khan Hands Over Power"
+	desc = Bangladesh_War.17.d
+	picture = GFX_Bangladesh_War_17
 
-Yahya Khan Hands Over Power
--A new era (Bhutto is the new leader of Pakistan, fires the focus PAK_CML_Bhutto, opening that tree)
+	is_triggered_only = yes
 
-India Thwarted (event launches if UN ceasefire comes in and Pakistan retains control of Chittagong and Dhakka, along with Karachi, Lahore, and Islamabad)
--Pakistan zindabad! (pre-war borders restored between India and Pakistan, lead to event for Pakistan, "Aftermath of Heroic Defense", 5 year national spirit "Heroic Victory" which should give big stability boost and small increase in efficiency/production, event "Offensive Stalls" for India)
+    option = {
+        name = "A new era"
+        load_focus_tree = 60s_PAK_CML_Bhutto
+        set_politics = {
+            ruling_party = Social_Democratic
+            elections_allowed = no
+        }
+    }
+}
+news_event = {
+	id = Bangladesh_War.18
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = Bangladesh_War.18"}
+	title = "[GetNewspaperHeader]India Thwarted in East Pakistan"
+	desc = Bangladesh_War.18.d
+	picture = GFX_Bangladesh_War_18
 
-Aftermath of Heroic Defense
--First steps to peace (in 45 days, Mujibur Rahman Returns to East Pakistan fires, Pakistan gains spirit "East Pakistan in Disarray" which should have significant impact in terms of increased construction costs, manpower reduction) 
+	is_triggered_only = yes
+	major = yes
+    option = {
+        trigger = {
+            NOT = { tag = PAK }
+            NOT = { tag = RAJ }
+        }
+    }
+    option = {
+        trigger = {
+            tag = RAJ
+        }
+        name = "Damn"
+        country_event = BAN_Liberation_War.20
+    }
+    option = {
+        trigger = {
+            tag = PAK
+        }
+        name = "Pakistan zindabad!"
+        country_event = Bangladesh_War.19
+        add_timed_idea = {
+            idea = Heroic_Victory       #big stability boost and small increase in efficiency/production
+            days = 1825
+        }
+    }       
+}
 
-Mujibur Rahman Returns to East Pakistan
--A step towards a resolution (modifies spirit "East Pakistan in Disarray" by reducing the penalties)
+country_event = {
+	id = Bangladesh_War.19
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = Bangladesh_War.19"}	
+	title = "Aftermath of Heroic Defense"
+	desc = Bangladesh_War.19.d
+	picture = GFX_Bangladesh_War_19
 
-Referendum Held on Future of East Pakistan
--Pakistan Continues (East Pakistan becomes an independent state but is a puppet of Pakistan, leads to event "A New Era for Pakistan" removes spirit "East Pakistan in Disarray")
+	is_triggered_only = yes
+	option = {
+        name = "First steps to peace"
+        add_ideas = East_Pakistan_in_Disarray   #which should have significant impact in terms of increased construction costs, manpower reduction) 
+        country_event = {
+            id = Bangladesh_War.20
+            days = 45
+        }
+    }
+}
+country_event = {
+	id = Bangladesh_War.20
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = Bangladesh_War.20"}	
+	title = "Mujibur Rahman Returns to East Pakistan"
+	desc = Bangladesh_War.20.d
+	picture = GFX_Bangladesh_War_20
 
-A New Era for Pakistan
--They will understand (event "Military Hands Power to Zulfiqar Bhutto" fires in three months, gains spirit "Population Frustrated With Military Rule" which should have the same effects as "East Pakistan in Disarray")
+	is_triggered_only = yes
+	option = {
+        name = "A step towards a resolution"
+        remove_ideas = East_Pakistan_in_Disarray
+        add_ideas = East_Pakistan_in_Disarray2
+        country_event = {
+            id = Bangladesh_War.21
+            days = 30
+        }
+    }
+}
+country_event = {
+	id = Bangladesh_War.21
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = Bangladesh_War.21"}	
+	title = "Referendum Held on Future of East Pakistan"
+	desc = Bangladesh_War.21.d
+	picture = GFX_Bangladesh_War_21
 
-Military Hands Power to Zulfiqar Bhutto
--Zulfiqar Bhutto takes the helm (Bhutto in power, his tree as CML opens up and we continue down the path, remove spirit "Population Frustrated With Military Rule")
+	is_triggered_only = yes
+	option = {
+        name = "Pakistan Continues"
+        remove_ideas = East_Pakistan_in_Disarray2
+        release = BAN
+        puppet = BAN
+        country_event = {
+            id = Bangladesh_War.22
+            days = 10
+        }
+        BAN = {
+            set_cosmetic_tag = BAN_EAST_PAKISTAN_FEDERATION
+            load_focus_tree = BAN_East_Pakistan_Cofederation
+            set_politics = {
+                ruling_party = socialist
+                elections_allowed = no
+            }
+        }
 
+    }
+}
+
+country_event = {
+	id = Bangladesh_War.22
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = Bangladesh_War.22"}	
+	title = "A New Era for Pakistan"
+	desc = Bangladesh_War.22.d
+	picture = GFX_Bangladesh_War_22
+
+	is_triggered_only = yes
+
+    option = {
+        name = "They will understand"
+        add_ideas = Population_Frustrated_With_Military_Rule
+        news_event = {
+            id = Bangladesh_War.23
+            days = 90
+        }
+    }
+}
+news_event = {
+	id = Bangladesh_War.23
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = Bangladesh_War.23"}
+	title = "[GetNewspaperHeader]Military Hands Power to Zulfiqar Bhutto"
+	desc = Bangladesh_War.23.d
+	picture = GFX_Bangladesh_War_23
+
+	is_triggered_only = yes
+	major = yes
+    
+    immediate = {
+        if = {
+            limit = {
+                tag = PAK
+            }
+            hidden_effect = {
+                load_focus_tree = 60s_PAK_CML_Bhutto
+                set_politics = {
+                    ruling_party = Social_Democratic
+                    elections_allowed = no
+                }
+                remove_ideas = Population_Frustrated_With_Military_Rule
+            }
+        }
+    }
+	option = {
+		name = "Zulfiqar Bhutto takes the helm"
+	}
+}
 #Insurgency Events
 add_namespace = Mukti_Bahini
 country_event = {
