@@ -31,7 +31,7 @@ NDefines.NAir.AIR_REGION_SUPERIORITY_PIXEL_SCALE = 0.04          -- air superior
 NDefines.NAir.COMBAT_MULTIPLANE_CAP = 3						-- How many planes can shoot at each plane on other side ( if there are 100 planes we are atttacking COMBAT_MULTIPLANE_CAP * 100 of our planes can shoot )
 NDefines.NAir.COMBAT_DAMAGE_SCALE = 0.2						-- Higher value = more shot down planes
 NDefines.NAir.CAS_NIGHT_ATTACK_FACTOR = 0.8 -- CAS damaged get multiplied by this in land combats at night
-NDefines.NAir.STRATEGIC_BOMBER_NUKE_AIR_SUPERIORITY = 0 -- How much air superiority is needed for a tactical bomber to be able to nuke a province
+NDefines.NAir.STRATEGIC_BOMBER_NUKE_AIR_SUPERIORITY = 10.0 -- How much air superiority is needed for a tactical bomber to be able to nuke a province
 NDefines.NAir.NAVAL_COMBAT_EXTERNAL_PLANES_JOIN_RATIO = 0.02 -- Max planes that can join a combat comparing to the total strength of the ships
 NDefines.NAir.COMBAT_STACK_LIMIT = 3 -- The biggest allowed dogfight combination (1vs1 or 2vs1). Bigger value cause that amount of airplanes matters more then their stats. Only used in naval air combat, for land air combat see COMBAT_MULTIPLANE_CAP
 NDefines.NAir.NAVAL_STRIKE_DAMAGE_TO_STR = 2 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
