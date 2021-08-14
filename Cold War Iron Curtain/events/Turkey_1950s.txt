@@ -1311,47 +1311,336 @@ country_event = {
 
 add_namespace = TUR_ARAB
 
-The Pan Arab Threat (fires if UAR forms)
--Listen to the proposal... (completes the next focus in the tree and fires the next event)
--Leave the situation for now... (nothing happens, can to the next focus later)
+country_event = {
+	id = TUR_ARAB.1
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.1"}	
+	title = "The Pan Arab Threat"
+	desc = TUR_ARAB.1.d
+	picture = GFX_TUR_ARAB_1
 
-Launch Border Clashes with Syria? (event from focus TUR_Launch_Border_Clashes_With_Syria)
--Have the option (Decision to launch border conflict with Syria)
--Recognize UAR (leads to event "Turkey-UAR Normalize Ties", no decision to launch borer conflict)
+	is_triggered_only = yes
 
-Turkey-UAR Normalize Ties (Turkey/UAR event)
+	option = {  
+        name = "Listen to the proposal..."
+        complete_national_focus = TUR_Launch_Border_Clashes_with_Syria
+    }
+	option = {  
+        name = "Leave the situation for now..."
+    }
+}
+country_event = {
+	id = TUR_ARAB.2
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.2"}	
+	title = "The Pan Arab Threat"
+	desc = TUR_ARAB.2.d
+	picture = GFX_TUR_ARAB_2
 
-Turkish Forces Dominate UAR Troops (fires if Turkey wins first border conflict)
--Escalate? (leads to "Escalate the Clashes", Turkey controls northern Syria)
--Maintain the bufferzone (Turkey controls northern Syria)
+	is_triggered_only = yes
 
-Turkish Forces Halted by UAR Troops (fires if Turkey loses first border conflict)
--(Turkey gets 3 year spirit "Lost border war)
+	option = {  
+        name = "Have the option"
+        set_country_flag = Prepare_UAR_Clashes  #Decision to launch border conflict with Syria
+    }
+	option = {  
+        name = "Recognize the UAR"
+        complete_national_focus = TUR_Recognize_the_UAR
+    }
+}
+news_event = {
+	id = TUR_ARAB.3
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.3"}
+	title = "[GetNewspaperHeader]Turkey-UAR Normalize Ties"
+	desc = TUR_ARAB.3.d
+	picture = GFX_TUR_ARAB_3
 
-Escalate the Clashes? (Event from TUR_Escalate_the_Clashes)
--Push for Regime Change (declares war on UAR)
--Seize northern Syria (Starts new border war, already wrote events for this scenario, can use those)
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Interesting"
+	}
+}
+country_event = {
+	id = TUR_ARAB.4
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.4"}	
+	title = "Turkish Forces Dominate UAR Troops"
+	desc = TUR_ARAB.4.d
+	picture = GFX_TUR_ARAB_4
 
-Return Northern Syria? (Fires if regime change succeeds/UAR breaks up)
--Return the territory (non-aggression pact with Syria, return northern Syria)
--Keep northern Syria (relations with Syria drops, resistance modifier added)
+	is_triggered_only = yes
+	option = {  
+        name = "Unfortunate..."
+        trigger = {
+            tag = EGY
+        }
+    }
+	option = {  
+        name = "Escalate?"
+        trigger = {
+            tag = TUR
+        }
+         complete_national_focus = TUR_Escalate_the_Clashes
+    }
+	option = {  
+        name = "Maintain the bufferzone"
+        trigger = {
+            tag = TUR
+        }
+        transfer_state = 894
+        transfer_state = 677
+        transfer_state = 810
+        transfer_state = 777
+        transfer_state = 680
+    }
+}
+country_event = {
+	id = TUR_ARAB.5
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.5"}	
+	title = "Turkish Forces Halted by UAR Troops"
+	desc = TUR_ARAB.5.d
+	picture = GFX_TUR_ARAB_5
+
+	is_triggered_only = yes
+
+    option = {
+        name = "Excellent"
+        trigger = {
+            tag = EGY
+        }
+    }
+
+	option = {  
+        name = "Damn"
+        trigger = {
+            tag = TUR
+        }
+         add_timed_idea = {
+             idea = Lost_Border_War
+             days = 1050
+         }
+    }
+}
+country_event = {
+	id = TUR_ARAB.6
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.6"}	
+	title = "Escalate the Clashes?"
+	desc = TUR_ARAB.6.d
+	picture = GFX_TUR_ARAB_6
+
+	is_triggered_only = yes
+
+    option = {
+        name = "Push for Regime Change"
+        complete_national_focus = TUR_Push_for_Regime_Change
+    }
+    option = {
+        name = "Seize Northern Syria"
+        complete_national_focus = TUR_Seize_Northern_Syria
+    }
+}
+country_event = {   #Fires if regime change succeeds/UAR breaks up
+	id = TUR_ARAB.7
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.7"}	
+	title = "Return Northern Syria?"
+	desc = TUR_ARAB.7.d
+	picture = GFX_TUR_ARAB_7
+
+	is_triggered_only = yes
+
+    option = {
+        name = "Return the territory"
+        SYR = {
+            transfer_state = 894
+            transfer_state = 677
+            transfer_state = 810
+            transfer_state = 777
+            transfer_state = 680            
+        }
+        TUR = {
+            add_opinion_modifier = {
+                target = SYR
+                modifier = large_increase
+            }
+        }
+        SYR = {
+            add_opinion_modifier = {
+                target = TUR
+                modifier = large_increase
+            }
+            diplomatic_relation = { country = TUR relation = non_aggression_pact }
+        }
+        diplomatic_relation = { country = SYR relation = non_aggression_pact }
+    }
+    option = {
+        name = "Keep northern Syria"
+        TUR = {
+            add_opinion_modifier = {
+                target = SYR
+                modifier = large_decrease
+            }
+        }
+        SYR = {
+            add_opinion_modifier = {
+                target = TUR
+                modifier = large_decrease
+            }
+        }
+    }
+}
 
 #Turkish UAR War (30 days long)
+news_event = {
+	id = TUR_ARAB.8
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.8"}
+	title = "[GetNewspaperHeader]Turkish Forces Invade the United Arab Republic"
+	desc = TUR_ARAB.8.d
+	picture = GFX_TUR_ARAB_8
 
-Turkish Forces Invade UAR
--It begins (Turkey declares war on UAR)
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "It begins..."
+	}
+}
+news_event = {
+	id = TUR_ARAB.9
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.9"}
+	title = "[GetNewspaperHeader]UN Ceasefire Enforced"
+	desc = TUR_ARAB.9.d
+	picture = GFX_TUR_ARAB_9
 
-UN Ceasefire Enforced (Will fire regardless, after 30 days of fighting)
+	is_triggered_only = yes
+	major = yes
+    immediate = {
+        if = {
+            limit = {
+                tag = TUR
+            }
+            hidden_effect = {
+                if = {
+                    limit = {
+                        TUR = {
+                            controls_state = 905
+                            controls_state = 554
+                        }
+                    }
+                    news_event = TUR_ARAB.10
+                    EGY = {
+                        drop_cosmetic_tag = yes
+                        release = SYR
+                    }
+                    SYR = {
+                        load_oob = SYR_1960
+                        load_focus_tree = 60s_SYR
+                        #set_country_flag =
+                        set_politics = {
+                            ruling_party = liberal
+                            last_election = "1957.1.1"
+                            election_frequency = 84
+                            elections_allowed = yes
+                        }
+                        set_popularities = {
+                            democratic = 0
+                            communism = 20
+                            fascism = 20
+                            nationalist = 10
+                            monarchism = 0
+                            neutrality = 0
+                            islamism = 10
+                            radical_shiaism = 0
+                            Social_Democratic = 0
+                            Social_Liberalism = 0
+                            Salafism = 0
+                            Liberal_Conservatism = 0
+                            conservative = 10
+                            Christian_Democratic = 0
+                            socialist = 0
+                            centrist = 0
+                            liberal = 30
+                            trotskyism = 0
+                            maoism = 0
+                        }
+                    }
 
-Turkey Establishes Syrian Regime (only occurs if Turkey controls its border cities and controls Damascus at end of ceasefire)
--(UAR dissolves, Syria/Egypt independent, Syria gets the government it would have gotten if UAR dissolved historically)
+                    white_peace = EGY
+                }
+                else_if = {
+                    limit = {
+                        EGY = {
+                            controls_state = 905
+                            controls_state = 554
+                        }
+                    }
+                    EGY = {
+                        transfer_state = 905
+                    }
+                    905 = {
+                        add_core_of = EGY
+                    }
+                    add_timed_idea = {
+                        idea = Lost_Major_War
+                        days = 1095
+                    }
+                    white_peace = EGY
+                    news_event = TUR_ARAB.12
+                }
+                else = {
+                    add_timed_idea = {
+                        idea = Failed_Invasion
+                        days = 1095
+                    }
+                    white_peace = EGY
+                    news_event = TUR_ARAB.11
+                }
+            }
+        }
+    }
+	option = {
+		name = "Good"
+	}
+}
 
-Turkish-UAR War Ends in Stalemate (if Damascus remains with UAR and Turkey controls its border cities)
--No change (pre-war borders restored, Turkey gets 3 year spirit "Failed Invasion")
+news_event = {
+	id = TUR_ARAB.9
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.9"}
+	title = "[GetNewspaperHeader]Turkey Establishes Syrian Regime"
+	desc = TUR_ARAB.9.d
+	picture = GFX_TUR_ARAB_9
 
-UAR Seizes Hatay (If at ceasefire UAR has Damascus and Hatay)
--(UAR gains Hatay, Turkey gets 5 year spirit "Lost a war")
+	is_triggered_only = yes
+	major = yes
 
+    option = {
+        name = "A major blow to Pan-Arabism"
+    }
+}
+news_event = {
+	id = TUR_ARAB.10
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.10"}
+	title = "[GetNewspaperHeader]Turkish-UAR War Ends in Stalemate"
+	desc = TUR_ARAB.10.d
+	picture = GFX_TUR_ARAB_10
+
+	is_triggered_only = yes
+	major = yes
+
+    option = {
+        name = "and nothing changes..."
+    }
+}
+news_event = {
+	id = TUR_ARAB.11
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = TUR_ARAB.11"}
+	title = "[GetNewspaperHeader]UAR Seizes Hatay"
+	desc = TUR_ARAB.11.d
+	picture = GFX_TUR_ARAB_11
+
+	is_triggered_only = yes
+	major = yes
+
+    option = {
+        name = "A major shift"
+    }
+}
 
 add_namespace = TUR_Kurdish
 
