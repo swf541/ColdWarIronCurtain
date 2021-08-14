@@ -706,46 +706,255 @@ country_event = {
     }
 }
 #Demand UN Action on Kashmir (PAK_Demand_UN_Action, will make small chain here but with new UN mechanics you might have a better way of doing this, should be available only after 360 days of upgrade radio free Kashmir focus is completed)
--Approach India First (India gets event, "Pakistan Offers Kashmir Talks")
--Go straight to the United Nations (India gets event, "Pakistan presents resolution to UN")
 
 #THIS EVENT CHAIN IS FOR PAKISTAN-INDIA BILATERAL NEGOTIATION ON RESOLVING KASHMIR
 add_namespace = KASHMIR_60s
-Pakistan Offers Kashmir Talks (India event)
--Hold talks with Pakistan (Leads to follow up event in 30 days, Murree Conference on Kashmir Initial Talks for India)
--Reject talks, Pakistan approaches UN (if rejected, this would end the chain but starts the UN chain on Kashmir)
+country_event = {
+	id = KASHMIR_60s.1
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = KASHMIR_60s.1"}	
+	title = "Pakistan Offers Kashmir Talks"
+	desc = KASHMIR_60s.1.d
+	picture = GFX_KASHMIR_60s_1
 
-Murree Conference on Kashmir Initial Talks (for India)
--Make Current Border Permanent (Pakistan gets event, India Calls for Permanent Border)
--Offer Communal Partition (Pakistan gets event, India Offers Kashmir Partition Plan)
--Implement Plebiscite (Pakistan gets event, India Offers Plebiscite)
--End talks (hurts relations with Pakistan, Pakistan ends event, Talks With India End in Failure)
+	is_triggered_only = yes
+	option = {  
+        name = "Hold talks with Pakistan"
+        RAJ = {
+            country_event = KASHMIR_60s.2
+        }
+    }
+	option = {  
+        name = "Reject talks"
+        hidden_effect = {
+            RAJ = {
+                country_event = {
+                    id = UN_KASHMIR.1
+                    days = 10
+                } 
+            }   
+        }
 
-India Calls for Permanent Border (Pakistan event)
--Accept the Permanent Border (basically we discussed making Indian and Pakistani Kashmir occupied territory, this would make it cores and integrated to each country, Pakistan gets event "Kashmir Ceasefire Line Made Permanent" India gets event "Kashmir Border Made Permanent"
--End the talks (Pakistan gets "Talks With India End in Failure")
+    }
+}
+country_event = {
+	id = KASHMIR_60s.2
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = KASHMIR_60s.2"}	
+	title = "Murree Conference on Kashmir: Initial Talks"
+	desc = KASHMIR_60s.2.d
+	picture = GFX_KASHMIR_60s_2
 
-Kashmir Ceasefire Line Made Permanent (Pakistan Event)
--Not well received (national spirit, twenty years "Kashmir Betrayed" drop in stability, production/efficiency, will consider that if Zia takes over in a coup he might get an event to restart the Kashmir conflict which would remove this spirit earlier)
+	is_triggered_only = yes
+	option = {  
+        name = "Make Current Border Permanent"
+        PAK = {
+            country_event = KASHMIR_60s.3
+        }
+    }
+	option = {  
+        name = "Offer Communal Partition"
+        PAK = {
+            country_event = KASHMIR_60s.6
+        }
+    }
+	option = {  
+        name = "Implement Plebiscite"
+        PAK = {
+            country_event = KASHMIR_60s.9
+        }
+    }
+	option = {  
+        name = "End talks"
+        PAK = {
+            country_event = KASHMIR_60s.10
+        }
+        RAJ = {
+            add_opinion_modifier = {
+                target = PAK
+                modifier = large_increase
+            }
+        }
+        PAK = {
+            add_opinion_modifier = {
+                target = PRC
+                modifier = large_decrease
+            }
+        }
+    }
+}
+country_event = {
+	id = KASHMIR_60s.3
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = KASHMIR_60s.3"}	
+	title = "India Calls for Permanent Border"
+	desc = KASHMIR_60s.3.d
+	picture = GFX_KASHMIR_60s_3
 
-Kashmir Border Made Permanent (Indian Event)
--A Toast to Srinagar (national spirit, "Kashmir Normalized", increase stability, slight increase in construction speed for civ/mil/office parks as more money can be spent on development)
+	is_triggered_only = yes
+    option = {
+        name = "Accept the Permanent Border"
+        PAK = {
+            every_owned_state = {
+                limit = {
+                    is_core_of = KAS
+                }
+                add_core_of = PAK
+            }
+            country_event = KASHMIR_60s.4
+        }
+        RAJ = {
+            every_owned_state = {
+                limit = {
+                    is_core_of = KAS
+                }
+                add_core_of = PAK
+            } 
+            country_event = KASHMIR_60s.5
+        }
+    }
+	option = {  
+        name = "End the talks"
+        country_event = KASHMIR_60s.10
+    }
+}
+country_event = {
+	id = KASHMIR_60s.4
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = KASHMIR_60s.4"}	
+	title = "Kashmir Ceasefire Line Made Permanent"
+	desc = KASHMIR_60s.4.d
+	picture = GFX_KASHMIR_60s_4
 
-Kashmir Partition Plan (Pakistan event)
--Agree to the Partition Plan (Kashmir Valley ceded to Pakistan, occupied territories become cores, Pakistan gets event 60 days later "Indo-Pakistan Partition Plan Enacted" India gets event 60 days later "Indo-Pakistan Partition Plan Implemented"
--End the talks (Pakistan gets "Talks With India End in Failure")
+	is_triggered_only = yes
+    option = {
+        name = "Not well received"
+        add_timed_idea = {
+            idea = Kashmir_Betrayed #(national spirit, twenty years "Kashmir Betrayed" drop in stability, production/efficiency, will consider that if Zia takes over in a coup he might get an event to restart the Kashmir conflict which would remove this spirit earlier
+            days = 7300
+        }
+    }
+}
+country_event = {
+	id = KASHMIR_60s.5
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = KASHMIR_60s.5"}	
+	title = "Kashmir Border Made Permanent"
+	desc = KASHMIR_60s.5.d
+	picture = GFX_KASHMIR_60s_5
 
-Indo-Pakistan Partition Plan Enacted (Pakistan Event)
--Srinagar is Liberated (national idea ten years "Kashmir United" big boost in stability, slight construction bonus for infra/civil/office park as more resources can be put to development now
+	is_triggered_only = yes
+    option = {
+        name = "A Toast to Srinagar"
+        add_timed_idea = {
+            idea = Kashmir_Normalized #(national spirit, "Kashmir Normalized", increase stability, slight increase in construction speed for civ/mil/office parks as more money can be spent on development)
+            days = 7300
+        }
+    }
+}
+country_event = {
+	id = KASHMIR_60s.6
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = KASHMIR_60s.6"}	
+	title = "Kashmir Partition Plan"
+	desc = KASHMIR_60s.6.d
+	picture = GFX_KASHMIR_60s_6
 
-Indo-Pakistan Partition Plan Implemented (Indian Event)
--Everyone cannot be happy with a compromise (national idea ten years "Jammu Secure" slight drop in production/efficiency and stability)
+	is_triggered_only = yes
+    option = {
+        name = "Agree to the Partition Plan"
+        PAK = {
+            transfer_state = 441
+            transfer_state = 1562
+            every_owned_state = {
+                limit = {
+                    is_core_of = KAS
+                }
+                add_core_of = PAK
+            }
+            country_event = {
+                id = KASHMIR_60s.7
+                days = 10
+            } 
+        }
+        RAJ = {
+            every_owned_state = {
+                limit = {
+                    is_core_of = KAS
+                }
+                add_core_of = PAK
+            } 
+            country_event = {
+                id = KASHMIR_60s.8
+                days = 10
+            } 
+        }
+    }
+	option = {  
+        name = "End the talks"
+        country_event = KASHMIR_60s.10
+    }
+}
+country_event = {
+	id = KASHMIR_60s.7
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = KASHMIR_60s.7"}	
+	title = "Indo-Pakistan Partition Plan Enacted"
+	desc = KASHMIR_60s.7.d
+	picture = GFX_KASHMIR_60s_7
 
-India Offers Plebiscite (Pakistan event)
--To the UN (after 30 days, will jump into the UN event chain but start at the event "India Agrees to Plebiscite")
+	is_triggered_only = yes
+    option = {
+        name = "Srinagar is Liberated"
+        add_timed_idea = {
+            idea = Kashmir_United   #"Kashmir United" big boost in stability, slight construction bonus for infra/civil/office park as more resources can be put to development now
+            days = 3650
+        }
+    }
+}
+country_event = {
+	id = KASHMIR_60s.8
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = KASHMIR_60s.8"}	
+	title = "Indo-Pakistan Partition Plan Implemented"
+	desc = KASHMIR_60s.8.d
+	picture = GFX_KASHMIR_60s_8
 
-Talks with India End in Failure (Pakistan/India event)
--Disappointing Result ("Pakistan Presents Resolution to UN" event in 30 days) 
+	is_triggered_only = yes
+    option = {
+        name = "Everyone cannot be happy with a compromise"
+        add_timed_idea = {
+            idea = Jamm_Secure   #"Jammu Secure" slight drop in production/efficiency and stability
+            days = 3650
+        }
+    }
+}
+country_event = {
+	id = KASHMIR_60s.9
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = KASHMIR_60s.9"}	
+	title = "India Offers Plebiscite"
+	desc = KASHMIR_60s.9.d
+	picture = GFX_KASHMIR_60s_9
+
+	is_triggered_only = yes
+    option = {
+        name = "To the UN"
+        country_event = {
+            id = UN_KASHMIR.10
+            days = 30
+        }
+    }
+}
+country_event = {
+	id = KASHMIR_60s.10
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = KASHMIR_60s.10"}	
+	title = "Talks with India End in Failure"
+	desc = KASHMIR_60s.10.d
+	picture = GFX_KASHMIR_60s_10
+
+	is_triggered_only = yes
+    option = {
+        name = "Disappointing Result"
+        RAJ = {
+            country_event = {
+                id = UN_KASHMIR.1
+                days = 30
+            }
+        }
+    }
+}
 
 #UN Resolution Route On Kashmir
 add_namespace = UN_KASHMIR
