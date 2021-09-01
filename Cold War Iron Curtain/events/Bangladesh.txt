@@ -2277,53 +2277,258 @@ country_event = {
 #(September 1977) Japan Airlines Flight 472, event chain fires inf Ziaur Rahman in power
 add_namespace = JAF_472
 
-Hijacked Japan Airlines Flight 472 Lands in Dacca		#News Event
-JAF_472.1.d:0 "The Japanese Red Army (JRA) successfully hijacked Japan Airlines Flight 472 from Bombay. Five armed hijackers took control of the airplane and directed the pilot to Dacca. The hijackers are now sitting in the plane, on the tarmac, holding the 156 passengers and crew hostage. The JRA is demanding six million dollars and the release of nine imprisoned JRA members. The Japanese government is holding an emergency meeting to discuss a response. The Bangladeshi government has surrounded the plane but will await the Japanese response. President Ziaur Rahman is holding talks with his top security officials." 
--Government must react (leads to "Bogra Cantonment Unrest", leads to "Government Responds to Japanese Red Army Demands" for Japan)
+news_event = {
+	id = JAF_472.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = JAF_472.1"}
+	title = "[GetNewspaperHeader]Hijacked Japan Airlines Flight 472 Lands in Dacca"
+	desc = JAF_472.1.d
+	picture = GFX_JAF_472_1
 
-Bogra Cantonment Unrest (Bangladesh event)
-JAF_472.2.d:0 "There are reports of unrest at the Bogra Cantonment. The recent Japanese Airline hostage crisis in Dacca has led to rumors and unrest among anti-government military personnel who believe a wider coup is occurring. Armed troops were seen taking control of local government buildings and there are reports senior officers in the cantonment are under arrest. A column of loyal troops were sent to Bogra. After a tense standoff, the rebellion was quelled. However, the quelling of Bogra has not ended the rumors and there are reports of similar revolts in other garrisons. The government must brace itself for further incidents."
--Fools (lead to "Dacca Cantonment Revolt" in three days)
+	is_triggered_only = yes
+	major = yes
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = {
+					tag = JAP
+				}
+				country_event = {
+					id = JAF_472.4
+					days = 1
+				} 
+			}
+			if = {
+				limit = {
+					tag = BAN
+				}
+				country_event = {
+					id = JAF_472.2
+					days = 1
+				} 
+			}
+		}
+	}
+	option = {
+		name = "Interesting"
+		trigger = {
+			NOT = { tag = JAP }
+			NOT = { tag = BAN }
+		}
+	}
+	option = {
+		trigger = {
+			tag = JAP
+		}
+		name = "Damn it!"
+	}
+	option = {
+		trigger = {
+			tag = BAN
+		}
+		name = "We must react..."
+	}
+}
+country_event = {
+	id = JAF_472.2
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = JAF_472.2"}
+	title = "Bogra Cantonment Unrest"	
+	desc = JAF_472.2.d
+	picture = GFX_JAF_472_2
 
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "Fools"
+		country_event = {
+			id = JAF_472.3
+			days = 3
+		} 
+	}
+}
+country_event = {
+	id = JAF_472.3
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = JAF_472.3"}
+	title = "Dacca Cantonment Revolt"	
+	desc = JAF_472.3.d
+	picture = GFX_JAF_472_3
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "Damn"
+		if = {
+			limit = {
+				check_variable = {
+					JSD_Strength > 40
+				}				
+			}
+			country_event = {
+				id = JAF_472.10
+				days = 1
+			} 
+		}
+		else = {
+			country_event = {
+				id = JAF_472.9
+				days = 14
+			} 
+		}
+
+	}
+}
 Dacca Cantonment Revolt (Bangladesh event)
-JAF_472.3.d:0 "An assault on the residence of President Ziaur Rahman was thwarted. Anti-government members of the Air Force with Army sympathizers launched a revolt, believing they were supporting a national coup against the President. The rebel troops temporarily seized Dacca Radio and at the international airport, at least two dozen Air Force personnel, including officers were killed. These officers were negotiating with the Japanese Red Army terrorists currently holding a Japan Airlines flight hostage on the runway. Thankfully, local Air Force and Army sector commanders were able to put down the revolt, detaining many of the rebels. The government has directed the military to immediately detain any dissident personnel."
 -Damn (in two weeks, event "Respond to the Uprising")
 
-Government Responds to Japanese Red Army Demands (Japan event)
-JAF_472.4.d:0 "A Japan Airlines flight from Bombay was recently hijacked by armed Japan Red Army members. The plane is currently in Dacca, the hijackers are demanding six million dollars and the release of nine of their members from prison. The public is adamant we get the 156 hostages returned safely. Our international partners are urging us to refuse the demands, saying it will set a bad precedent not just for the global community but for Japan. However, the sentiment of our people and most officials is that saving human life, no matter the cost, must be the guiding ideal. A decision must be made."
--Give in to demands (leads to "Red Army Members Released")
--Refuse demands ("Situation Escalates" for Bangladesh/Japan)
+country_event = {
+	id = JAF_472.4
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = JAF_472.4"}
+	title = "Government Responds to Japanese Red Army Demands"	
+	desc = JAF_472.4.d
+	picture = GFX_JAF_472_4
 
-Red Army Members Released (Japan event)
-"JAF_472.5.d:0 The government agreed to the Japan Red Army hijackers demands. A Japan Airlines flight is being chartered to Dacca with the six million dollars for the hostage takers. The plane will also bring home the 156 hostages. We also released the prisoners, as instructed. Although many internationally are condemning the decision as appeasing terrorism, the Prime Minister released a statement, noting the life of a single person outweighs the earth. This sentiment resonates with the Japanese people who welcome the news. With the situation resolved, the government also announced plans to establish a robust anti-terrorism force to handle future crisis like this."
--Oh well (leads to "Hijackers Allowed to Leave" for Bangladesh)
+	fire_only_once = yes
+	is_triggered_only = yes
 
-Situation Escalates
-JAF_472.6.d:0 "The Japanese government refused the demands of the Japan Red Army hijackers currently holding a plane of 156 hostages on the tarmac in Dacca. This is a major escalation, and there are fears the hijackers may act rashly. Upon hearing the news, the hijackers demanded the Bangladesh government refuel the plane and allow it to leave. President Ziaur Rahman is faced with a difficult choice, he can acquiesce to the demand, allowing the crisis to leave Bangladesh, or send in troops to storm the jet. Storming the jet will be incredibly risky, but show terrorists that Bangladesh is not a location from which to issue demands or conduct operations."
--Fuel the plane ("Hijackers Allowed to Leave")
--Storm the jet (leads to "Bangladesh Ends Hostage Crisis")
+	option = {
+		name = "Give in to demands"
+		country_event = JAF_472.5
+	}
+	option = {
+		name = "Refuse demands"
+		BAN = {	
+			country_event = JAF_472.6
+		}
+	}
+}
+country_event = {
+	id = JAF_472.5
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = JAF_472.5"}
+	title = "Red Army Members Released"	
+	desc = JAF_472.5.d
+	picture = GFX_JAF_472_5
 
-Hijackers Allowed to Leave #News Event
-JAF_472.7.d:0 "The Japan Airlines flight 472 hijacking continues after the Bangladesh government fueled the plane and allowed it to leave the country. The plane is headed towards the middle east, though a final destination has not been given. Five armed members of the Japan Red Army took the plane hostage from Bombay, landing it in Dacca. They demanded the release of several members in Japan along with six million dollars. The Japanese government refused the demands. To avoid a violent escalation, the Bangladeshi government complied with the terrorist demand that the plane be fueled and allowed to leave with its hostages. President Ziaur Rahman of Bangladesh expressed his wish that the crisis be resolved without the loss of innocent lives."
--The crisis continues (would lead to rest of chain for this hostage)
+	fire_only_once = yes
+	is_triggered_only = yes
 
-Bangladesh Ends Hostage Crisis		#News Event
-JAF_472.8.d:0 "In a stunning night time assault, Bangladeshi commandos stormed Japanese Airlines flight 472. The flight was recently hijacked by armed members of the Japan Red Army after it took off from Bombay. The plane was taken to Dacca where the hijackers demanded millions of dollars and the release of its members from Japanese prisons. After the Japanese government refused its demands, the Bangladeshi government decided to act to prevent the killing of hostages. The operation to storm the plane lasted only minutes, but resulted in reports heavy gunfire exchanges and explosions. The Bangladesh Army confirmed the plane was secured, with the terrorists neutralized. When asked about the condition of the hostages, the military admitted there were a number of casualties but most were rescued safely."
--Oh no (would need to make Japanese aftermath events)
+	option = {
+		name = "Oh well"
+		news_event = JAF_472.7
+	}
+}
+country_event = {
+	id = JAF_472.6
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = JAF_472.6"}
+	title = "Situation Escalates"	
+	desc = JAF_472.6.d
+	picture = GFX_JAF_472_6
 
-Respond to Uprising (Bangladesh event)
-JAF_472.9.d:0 "The recent Japan Airlines crisis led to rumors across Bangladesh, resulting in armed rebellions by anti-government military personnel. These men thought the government had collapsed or a wider coup was in motion, resulting in major uprisings across bases. These rebellions were quickly squashed with many of the ringleaders taken into custody. President Ziaur Rahman has received two lists, one of all the military personnel involved in the unrest. The other list includes suspected police, intelligence, and other security personnel believed to have facilitated the uprisings. He must decide whether to purge just the military, or his entire security apparatus of his enemies."
--Purge everything
--Purge only the military
+	fire_only_once = yes
+	is_triggered_only = yes
+	option = {
+		name = "Fuel the plane"
+		news_event = JAF_472.7
+	}
+	option = {
+		name = "Storm the jet"
+		news_event = JAF_472.8
+	}
+}
+news_event = {
+	id = JAF_472.7
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = JAF_472.7"}
+	title = "[GetNewspaperHeader]Hijackers Allowed to Leave"
+	desc = JAF_472.7.d
+	picture = GFX_JAF_472_7
 
-Dacca Mutiny Sees President Captured
-JAF_472.10.d:0 "The Japanese Airline hostage crisis has caused wild rumors to spread in military bases across the country. An earlier anti-government mutiny in Bogra was successfully quelled, but the uprising there inspired pro-JSD soldiers in Dacca to launch their own coup. The rebellious soldiers, with support from local JSD fighters not only seized control of the cantonment but also captured President Ziaur Rahman. Many senior Bangladeshi military officers, who were with the President to discuss the hostage crisis, were also captured. Pro-JSD elements are now taking control of military bases across the country, with loyalist forces paralyzed from action due to the lack of leadership."
--Oh no ("JSD Proclaims New Government")
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "The crisis continues"	#would lead to rest of chain for this hostage
+	}
+}
+news_event = {
+	id = JAF_472.8
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = JAF_472.8"}
+	title = "[GetNewspaperHeader]Bangladesh Ends Hostage Crisis"
+	desc = JAF_472.8.d
+	picture = GFX_JAF_472_8
 
-JSD Proclaims New Government		#News Event
-JAF_472.11.d:0 "The JSD announced the formation of a new government. Pro-JSD military personnel recently launched a coup, driven by rumors related to the ongoing Japanese Airline hostage crisis. The President along with senior military officials was captured by the rebel soldiers, inspiring JSD fighters and their supporters to seize control of the country. The JSD claims it will bring socialism to the people, end corruption, and bring take the Bangladeshi people to their true destiny. The people of Bangladesh are said to be stunned by this sudden reversal on the ground. In terms of the hostage crisis, the JSD said it will continue efforts to resolve the situation with the Japanese government."
--A new era? (JSD takes power, opens their tree)
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Oh no"
+	}
+}
+country_event = {
+	id = JAF_472.9
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = JAF_472.9"}
+	title = "Responding to the Uprising"	
+	desc = JAF_472.9.d
+	picture = GFX_JAF_472_9
 
+	fire_only_once = yes
+	is_triggered_only = yes
+	option = {
+		name = "Purge them all!"
+		add_timed_idea = {
+			idea = Military_and_Intelligence_Purges
+			days = 365
+		}
+	}
+	option = {
+		name = "Purge only the military"
+		add_timed_idea = {
+			idea = Military_Purges
+			days = 365
+		}
+	}
+}
+
+country_event = {
+	id = JAF_472.10
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = JAF_472.10"}
+	title = "Dacca Mutiny Sees President Captured"	
+	desc = JAF_472.10.d
+	picture = GFX_JAF_472_10
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "Oh no..."
+		news_event = JAF_472.11
+	}
+}
+news_event = {
+	id = JAF_472.11
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = JAF_472.11"}
+	title = "[GetNewspaperHeader]Jatiya Samajtantrik Dal Proclaims New Government Amid JAF 472 Hostage Crisis"
+	desc = JAF_472.11.d
+	picture = GFX_JAF_472_11
+
+	is_triggered_only = yes
+	major = yes
+	immediate = {
+		if = {
+			limit = {
+				tag = BAN
+			}
+			hidden_effect = {
+				set_politcs = {
+					ruling_party = trotskyism
+					elections_allowed = no
+				}
+				load_focus_tree = BAN_70s_JSD
+			}
+		}
+	}
+	
+    option = {
+        name = "This sure is a plot twist..."
+	}
+}
 
 #Assassination of Ziaur Rahman Chain
 add_namespace = Ziaur_Rahman_Assasination
