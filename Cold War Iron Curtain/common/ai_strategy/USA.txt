@@ -1,5 +1,82 @@
-# befriend
+# BEFRIEND
+# This will prompt USA to try and support countries who are fighting against extremist elements.
+# Should improve alt-history situations like democratic Germany fighting the USSR etc.
+USA_protect_against_extremism = { # Reverse strategy
+	reversed = yes
+
+	enable_reverse = {
+		USA = {
+			has_government = democratic
+		}
+	}
+
+	enable = {
+		NOT = { tag = USA }
+		NOT = { has_government = communism }
+		NOT = { has_government = fascism }
+		OR = {
+			capital_scope = {
+				is_on_continent = europe # lets avoid smaller conflicts elsewhere
+			}
+			AND = {
+				num_of_civilian_factories > 10
+				is_subject = no
+			}
+		}
+		any_of_scopes = {
+			array = enemies
+			NOT = { tag = USA }
+			OR = {
+				has_government = communism
+				has_government = fascism
+			}
+		}
+	}
+
+	abort = {
+		OR = {
+			has_war = no
+			OR = {
+				has_government = communism
+				has_government = fascism
+			}
+			USA = {
+				OR = {
+					NOT = {	has_government = democratic }
+					has_war_with = ROOT
+				}
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = support
+		id = "USA"
+		value = 100
+	}
+}
 # conquer
+USA_gang_up_SOV_with_NATO = {
+	allowed = {
+		tag = USA
+	}
+	enable = {
+		tag = USA
+		date > 1949.1.1
+	}
+	
+	# help fronts in europe & africa
+	ai_strategy = {
+		type = force_defend_ally_borders
+		value = 100
+		target = europe
+	}
+	ai_strategy = {
+		type = force_defend_ally_borders
+		value = 100
+		target = africa
+	}
+}
 # antagonize
 # build_ship
 # build_army
@@ -7,7 +84,50 @@
 # build_building
 # research_tech
 # garrison
-# protect
+# PROTECT
+
+# USA should put some buffer units in Europe and ENG to help with invasions
+USA_unit_buffer_for_europe = {
+	allowed = {
+		tag = USA
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = put_unit_buffers
+		
+		order_id = 2
+		
+		# south england
+		states = { 
+			127
+		}
+		
+		ratio = 0.05
+		
+		area = europe
+		
+		subtract_invasions_from_need = no
+	}
+	
+	ai_strategy = {
+		type = put_unit_buffers
+		
+		order_id = 2
+		
+		# West Germany, Fulda
+		states = { 
+			959
+			55
+		}
+		
+		ratio = 0.2
+		area = europe
+		
+		subtract_invasions_from_need = no
+	}
+}	
 # influence
 # alliance
 # ignore
