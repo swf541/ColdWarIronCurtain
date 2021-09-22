@@ -54,7 +54,7 @@ scripted_gui = {
 
 		triggers = {
             state_targets2_visible = {
-                check_variable = { QAT.country_visible = 10 }
+                check_variable = { UNS.country_visible = 10 }
             }
         }
 
@@ -160,25 +160,25 @@ scripted_gui = {
 						}
 					}
 					#country targets hidden
-					set_variable = { QAT.country_visible = 0 }
+					set_variable = { UNS.country_visible = 0 }
 
 					#set map mode to voting
-					set_variable = { QAT.main_screen = 1 }
+					set_variable = { UNS.main_screen = 1 }
 					
 					#trigger voting decisions
-					QAT = {
+					UNS = {
 						activate_mission = ARAB_LEAGUE_Vote
 						activate_mission = ARAB_LEAGUE_Vote_Cleanuo
 						set_country_flag = Current_ARAB_LEAGUE_Vote
 					}
 
-					set_variable = { QAT.country_visible = 0 }
-					set_variable = { QAT.state_visible = 0 }
+					set_variable = { UNS.country_visible = 0 }
+					set_variable = { UNS.state_visible = 0 }
 
-					set_variable = { QAT.arab_league_nation_target = root.arab_league_nation_target }
-					set_variable = { QAT.arab_league_action_set = root.arab_league_action_set }
-					set_variable = { QAT.arab_league_state_target = root.arab_league_state_target }
-					set_variable = { QAT.arab_league_host = THIS.id }
+					set_variable = { UNS.arab_league_nation_target = root.arab_league_nation_target }
+					set_variable = { UNS.arab_league_action_set = root.arab_league_action_set }
+					set_variable = { UNS.arab_league_state_target = root.arab_league_state_target }
+					set_variable = { UNS.arab_league_host = THIS.id }
 					
 					var:root.arab_league_nation_target = {
 						save_global_event_target_as = arab_league_nation_global_target
@@ -190,11 +190,11 @@ scripted_gui = {
 
 					var:root.arab_league_state_target = {
 						owner = {
-							set_variable = { QAT.arab_league_state_target_owner = THIS.id }
+							set_variable = { UNS.arab_league_state_target_owner = THIS.id }
 						}
 					}
 					
-					var:QAT.arab_league_state_target_owner = {
+					var:UNS.arab_league_state_target_owner = {
 						save_global_event_target_as = arab_league_state_owner_global_target
 					}		
 					
@@ -216,8 +216,8 @@ scripted_gui = {
 		}
 
 		triggers = {
-			submit_proposal_button_click_enabled = {
-				QAT = {
+			arab_league_submit_proposal_button_click_enabled = {
+				UNS = {
 					NOT = { has_country_flag = Current_ARAB_LEAGUE_Vote }
 				}
 				OR = {
@@ -243,7 +243,7 @@ scripted_gui = {
 		
         dynamic_lists = {
             arab_league_relations_listing_grid = {
-                array =  QAT.arab_league_relations_list
+                array =  UNS.arab_league_relations_list
                 change_scope = yes
 				entry_container = arab_league_relations_list_entry
             }
@@ -258,11 +258,27 @@ scripted_gui = {
 		
         dynamic_lists = {
             arab_league_influence_action_listing_grid = {
-                array =  QAT.arab_league_influence_option_list
+                array =  UNS.arab_league_influence_option_list
                 change_scope = yes
 				entry_container = arab_league_influence_action_target_list_entry
             }
         }
+		triggers = {
+			arab_league_submit_influence_proposal_button_click_enabled = {
+				check_variable = {
+					ROOT.influence_countdown = 0
+				}
+				check_variable = { ROOT.resolution_confirmed = 1 }
+			}
+			arab_league_influence_action_target_entry_button_click_enabled = {
+				check_variable = {
+					ROOT.influence_countdown = 0
+				}
+				check_variable = { ROOT.resolution_confirmed = 1 }
+			}
+			
+			
+		}
 		effects = {
 			#influence button click 
 			arab_league_submit_influence_proposal_button_click = {
@@ -282,7 +298,7 @@ scripted_gui = {
 					set_variable = { has_randomised = 0 }
 
 					#set map mode to voting
-					set_variable = { QAT.main_screen = 1 }
+					set_variable = { UNS.main_screen = 1 }
 					
 					#trigger voting decisions
 					THIS = {
@@ -290,238 +306,238 @@ scripted_gui = {
 					}
 					
 					#target nation set
-					set_variable = { QAT.arab_league_nation_influence_target = root.arab_league_nation_influence_target }
-					set_variable = { QAT.arab_league_influence_action_set = root.arab_league_influence_action_set }
-					set_variable = { QAT.arab_league_state_influence_target = root.arab_league_state_influence_target }
+					set_variable = { UNS.arab_league_nation_influence_target = root.arab_league_nation_influence_target }
+					set_variable = { UNS.arab_league_influence_action_set = root.arab_league_influence_action_set }
+					set_variable = { UNS.arab_league_state_influence_target = root.arab_league_state_influence_target }
 
 					#action 1-16 effects
-					add_to_variable = { QAT.randomised_acceptance_var = 0}
+					add_to_variable = { UNS.randomised_acceptance_var = 0}
 
 					##appease government
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 0 }
+							check_variable = { UNS.arab_league_influence_action_set = 0 }
 						}
 						var:root.arab_league_nation_influence_target = {
 										
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 5
 									max = 12
 							}
 
-							add_to_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					##denounce as anti arab state
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 1 }
+							check_variable = { UNS.arab_league_influence_action_set = 1 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 5
 									max = 12
 							}
-							subtract_from_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							subtract_from_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#Boost national influence
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 2 }
+							check_variable = { UNS.arab_league_influence_action_set = 2 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 5
 									max = 15
 							}
 
-							subtract_from_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							subtract_from_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#send economic aid
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 3 }
+							check_variable = { UNS.arab_league_influence_action_set = 3 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 18
 									max = 30
 							}
-							add_to_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#send insult
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 4 }
+							check_variable = { UNS.arab_league_influence_action_set = 4 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 8
 									max = 14
 							}
-							subtract_from_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							subtract_from_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#threaten sanctions
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 5 }
+							check_variable = { UNS.arab_league_influence_action_set = 5 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 15
 									max = 22
 							}
-							subtract_from_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							subtract_from_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#disparage internationally
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 6 }
+							check_variable = { UNS.arab_league_influence_action_set = 6 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 8
 									max = 18
 							}
-							subtract_from_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							subtract_from_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#strengthen diplomatic ties
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 7 }
+							check_variable = { UNS.arab_league_influence_action_set = 7 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 7
 									max = 13
 							}
-							add_to_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#send tanks
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 8 }
+							check_variable = { UNS.arab_league_influence_action_set = 8 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 12
 									max = 20
 							}
-							add_to_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#send aircraft
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 9 }
+							check_variable = { UNS.arab_league_influence_action_set = 9 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 15
 									max = 20
 							}
-							add_to_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#send naval craft
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 10 }
+							check_variable = { UNS.arab_league_influence_action_set = 10 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 20
 									max = 25
 							}
-							add_to_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#sign defensive treaty
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 11 }
+							check_variable = { UNS.arab_league_influence_action_set = 11 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 15
 									max = 25
 							}
 
-							add_to_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#make religious gestures
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 12 }
+							check_variable = { UNS.arab_league_influence_action_set = 12 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 7
 									max = 11
 							}
-							add_to_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
 					#bribe senior officials  (10 billion)
 					if = {
 						limit = {
-							check_variable = { QAT.arab_league_influence_action_set = 13 }
+							check_variable = { UNS.arab_league_influence_action_set = 13 }
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
-									var = QAT.randomised_acceptance_var
+									var = UNS.randomised_acceptance_var
 									distribution = uniform
 									min = 10
 									max = 18
 							}
-							add_to_variable = {randomised_acceptance = QAT.randomised_acceptance_var}
+							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
 					}
 
@@ -544,7 +560,7 @@ scripted_gui = {
 			arab_league_influence_action_target_entry_button_click = { 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 0 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 0 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 0 }
 					set_variable = { root.influence_chosen = 1 }
@@ -552,7 +568,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 1 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 1 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 1 }
 					set_variable = { root.influence_chosen = 1 }
@@ -560,7 +576,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 2 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 2 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 2 }
 					set_variable = { root.influence_chosen = 1 }
@@ -568,7 +584,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 3 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 3 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 3 }
 					set_variable = { root.influence_chosen = 1 }
@@ -576,7 +592,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 4 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 4 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 4 }
 					set_variable = { root.influence_chosen = 1 }
@@ -584,7 +600,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 5 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 5 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 5 }
 					set_variable = { root.influence_chosen = 1 }
@@ -592,7 +608,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 6 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 6 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 6 }
 					set_variable = { root.influence_chosen = 1 }
@@ -600,7 +616,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 7 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 7 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 7 }
 					set_variable = { root.influence_chosen = 1 }
@@ -608,7 +624,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 8 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 8 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 8 }
 					set_variable = { root.influence_chosen = 1 }
@@ -616,7 +632,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 9 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 9 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 9 }
 					set_variable = { root.influence_chosen = 1 }
@@ -624,7 +640,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 10 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 10 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 10 }
 					set_variable = { root.influence_chosen = 1 }
@@ -632,7 +648,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 11 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 11 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 11 }
 					set_variable = { root.influence_chosen = 1 }
@@ -640,7 +656,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 12 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 12 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 12 }
 					set_variable = { root.influence_chosen = 1 }
@@ -648,7 +664,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 13 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 13 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 13 }
 					set_variable = { root.influence_chosen = 1 }
@@ -656,7 +672,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 14 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 14 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 14 }
 					set_variable = { root.influence_chosen = 1 }
@@ -664,7 +680,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 15 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 15 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 15 }
 					set_variable = { root.influence_chosen = 1 }
@@ -672,7 +688,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 16 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 16 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 16 }
 					set_variable = { root.influence_chosen = 1 }
@@ -680,7 +696,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 17 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 17 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 17 }
 					set_variable = { root.influence_chosen = 1 }
@@ -688,7 +704,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 18 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 18 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 18 }
 					set_variable = { root.influence_chosen = 1 }
@@ -696,7 +712,7 @@ scripted_gui = {
 				
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 19 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 19 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 19 }
 					set_variable = { root.influence_chosen = 1 }
@@ -704,7 +720,7 @@ scripted_gui = {
 				
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 20 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 20 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 20 }
 					set_variable = { root.influence_chosen = 1 }
@@ -712,7 +728,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 21 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 21 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 21 }
 					set_variable = { root.influence_chosen = 1 }
@@ -720,7 +736,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 22 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 22 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 22 }
 					set_variable = { root.influence_chosen = 1 }
@@ -728,7 +744,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 23 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 23 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 23 }
 					set_variable = { root.influence_chosen = 1 }
@@ -736,7 +752,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 24 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 24 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 24 }
 					set_variable = { root.influence_chosen = 1 }
@@ -744,7 +760,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 25 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 25 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 25 }
 					set_variable = { root.influence_chosen = 1 }
@@ -752,7 +768,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 26 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 26 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 26 }
 					set_variable = { root.influence_chosen = 1 }
@@ -760,7 +776,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 27 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 27 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 27 }
 					set_variable = { root.influence_chosen = 1 }
@@ -768,7 +784,7 @@ scripted_gui = {
 
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_influence_option_list^i = 28 }
+						check_variable = { UNS.arab_league_influence_option_list^i = 28 }
 					}
 					set_variable = { root.arab_league_influence_action_set = 28 }
 					set_variable = { root.influence_chosen = 1 }
@@ -924,94 +940,127 @@ scripted_gui = {
 		parent_window_name = "arab_league_main_container"
         dynamic_lists = {
             arab_league_action_listing_grid = {
-                array =  QAT.arab_league_option_list
+                array =  UNS.arab_league_option_list
                 change_scope = yes
 				entry_container = arab_league_action_target_list_entry
             }
         }
 		triggers = {
 			arab_league_action_target_entry_button_click_enabled = {
-				AND = {
-					NOT = {
-						check_variable = { arab_league_option_list^i = 19 }
+				check_variable = { ROOT.resolution_confirmed = 0 }
+				NOT = {
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 19 }
 						has_global_flag = arab_league_1
 					}
 				}
-				AND = {
-					NOT = {
-						check_variable = { arab_league_option_list^i = 20 }
+				NOT = {
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 20 }
 						has_global_flag = arab_league_2
 					}
-					has_global_flag = arab_league_1
-				}
-				AND = {
-					NOT = {
-						check_variable = { arab_league_option_list^i = 21 }
+				}	
+				NOT = {
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 21 }
 						has_global_flag = arab_league_3
 					}
-					has_global_flag = arab_league_2
-				}
-				AND = {
-					NOT = {
-						check_variable = { arab_league_option_list^i = 22 }
+				}		
+				NOT = {
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 22 }
 						has_global_flag = arab_league_4
 					}
-					has_global_flag = arab_league_3
-				}
-				AND = {
-					NOT = {
-						check_variable = { arab_league_option_list^i = 23 }
+				}	
+				NOT = {
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 23 }
 						has_global_flag = arab_league_5
 					}
-					has_global_flag = arab_league_4
-				}
-				AND = {
-					NOT = {
-						check_variable = { arab_league_option_list^i = 24 }
+				}	
+				NOT = {
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 24 }
 						has_global_flag = arab_league_6
 					}
-					has_global_flag = arab_league_5
-				}
-				AND = {
-					NOT = {
-						check_variable = { arab_league_option_list^i = 25 }
+				}		
+				NOT = {
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 25 }
 						has_global_flag = arab_league_7
 					}
-					has_global_flag = arab_league_6
-				}
-				AND = {
-					NOT = {
-						check_variable = { arab_league_option_list^i = 26 }
+				}	
+				NOT = {
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 26 }
 						has_global_flag = arab_league_8
 					}
-					has_global_flag = arab_league_7
-				}
-				AND = {
-					NOT = {
-						check_variable = { arab_league_option_list^i = 27 }
+				}	
+				NOT = {
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 27 }
 						has_global_flag = arab_league_9
 					}
-					has_global_flag = arab_league_8
-				}
-				AND = {
-					NOT = {
-						check_variable = { arab_league_option_list^i = 28 }
+				}	
+				NOT = {
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 28 }
 						has_global_flag = arab_league_10
 					}
-					check_variable = { QAT.Domestic_Progressbar_Total > 89 }
-				
-					NOT = {
-						check_variable = { QAT.unite_league_done = 1}
+				}	
+				OR = {
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 20 }
+						has_global_flag = arab_league_1
 					}
-					has_global_flag = arab_league_9
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 21 }
+						has_global_flag = arab_league_2
+					}
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 22 }
+						has_global_flag = arab_league_3
+					}
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 23 }
+						has_global_flag = arab_league_4
+					}
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 24 }
+						has_global_flag = arab_league_5
+					}
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 25 }
+						has_global_flag = arab_league_6
+					}
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 26 }
+						has_global_flag = arab_league_7
+					}
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 27 }
+						has_global_flag = arab_league_8
+					}
+					AND = {
+						check_variable = { UNS.arab_league_option_list^i = 28 }
+						has_global_flag = arab_league_9
+						check_variable = { UNS.Domestic_Progressbar_Total > 89 }
+						NOT = {
+							check_variable = { UNS.unite_league_done = 1}
+						}
+					}
+					OR = {
+						check_variable = { UNS.arab_league_option_list^i < 20 }
+					}
 				}
+
 			}
 		}
 		effects = {
 			arab_league_action_target_entry_button_click = { 
 				clear_array = ROOT.arab_league_option_country_list
-				set_variable = { QAT.country_visible = 1}
-				set_variable = {QAT.state_visible = 0}
+				set_variable = { UNS.country_visible = 1}
+				set_variable = {UNS.state_visible = 0}
 				ROOT = {
 					add_to_variable = {refresh_arab_league= 1 }
 				}
@@ -1022,7 +1071,7 @@ scripted_gui = {
 				##Align with Superpower
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 0 }
+						check_variable = { UNS.arab_league_option_list^i = 0 }
 					}
 					set_variable = { root.arab_league_action_set = 0 }
 					clear_array = ROOT.arab_league_option_country_list
@@ -1033,7 +1082,7 @@ scripted_gui = {
 				##Condemn Colonialism
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 1 }
+						check_variable = { UNS.arab_league_option_list^i = 1 }
 					}
 					set_variable = { root.arab_league_action_set = 1 }
 					clear_array = ROOT.arab_league_option_country_list
@@ -1182,7 +1231,7 @@ scripted_gui = {
 				##Contain Foreign Influence
  				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 2 }
+						check_variable = { UNS.arab_league_option_list^i = 2 }
 					}
 					set_variable = { root.arab_league_action_set = 2 }
 					clear_array = ROOT.arab_league_option_country_list
@@ -1198,7 +1247,7 @@ scripted_gui = {
 				##Ban foreign Diplomats
  				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 3 }
+						check_variable = { UNS.arab_league_option_list^i = 3 }
 					}
 					set_variable = { root.arab_league_action_set = 3 }
 					clear_array = ROOT.arab_league_option_country_list
@@ -1213,11 +1262,11 @@ scripted_gui = {
 				##Demand Arab State
  				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 4 }
+						check_variable = { UNS.arab_league_option_list^i = 4 }
 					}
 					set_variable = { root.arab_league_action_set = 4 }
-					set_variable = { QAT.country_visible = 0}
-					set_variable = {QAT.state_visible = 1}
+					set_variable = { UNS.country_visible = 0}
+					set_variable = {UNS.state_visible = 1}
 					ROOT = {
 						add_to_variable = {refresh_arab_league= 1 }
 					}
@@ -1235,7 +1284,7 @@ scripted_gui = {
 				##Arab Trade Sanctions
  				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 5 }
+						check_variable = { UNS.arab_league_option_list^i = 5 }
 					}
 					set_variable = { root.arab_league_action_set = 5 }
 					clear_array = ROOT.arab_league_option_country_list
@@ -1279,7 +1328,7 @@ scripted_gui = {
 				##Denounce Internationally
  				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 6 }
+						check_variable = { UNS.arab_league_option_list^i = 6 }
 					}
 					set_variable = { root.arab_league_action_set = 6 }
 					clear_array = ROOT.arab_league_option_country_list
@@ -1307,7 +1356,7 @@ scripted_gui = {
 				##Enact Oil Embargo
  				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 7 }
+						check_variable = { UNS.arab_league_option_list^i = 7 }
 					}
 					set_variable = { root.arab_league_action_set = 7 }
 					clear_array = ROOT.arab_league_option_country_list
@@ -1332,7 +1381,7 @@ scripted_gui = {
 										value < -30
 									}
 								}
-								CHECKTAG = "[?QAT.arab_league_host.GetTag]"
+								CHECKTAG = "[?UNS.arab_league_host.GetTag]"
 							}
 						}
 						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
@@ -1357,7 +1406,7 @@ scripted_gui = {
 				##Request Arab Loans
  				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 8 }
+						check_variable = { UNS.arab_league_option_list^i = 8 }
 					}
 					set_variable = { root.arab_league_action_set = 8 }
 					clear_array = ROOT.arab_league_option_country_list
@@ -1373,11 +1422,11 @@ scripted_gui = {
 				##Request Control of State
  				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 9 }
+						check_variable = { UNS.arab_league_option_list^i = 9 }
 					}
 					set_variable = { root.arab_league_action_set = 9 }
-					set_variable = { QAT.country_visible = 0}
-					set_variable = {QAT.state_visible = 1}
+					set_variable = { UNS.country_visible = 0}
+					set_variable = {UNS.state_visible = 1}
 					ROOT = {
 						add_to_variable = {refresh_arab_league= 1 }
 					}
@@ -1405,7 +1454,7 @@ scripted_gui = {
 
 				##declare peacekeeping missions
  				if = {
-					limit = { check_variable = { QAT.arab_league_option_list^i = 10 } }
+					limit = { check_variable = { UNS.arab_league_option_list^i = 10 } }
 					set_variable = { root.arab_league_action_set = 10 }
 					clear_array = ROOT.arab_league_option_country_list
 					every_country = {
@@ -1422,7 +1471,7 @@ scripted_gui = {
 
 				##request arab intervention	
  				if = {
-					limit = { check_variable = { QAT.arab_league_option_list^i = 11 } }
+					limit = { check_variable = { UNS.arab_league_option_list^i = 11 } }
 					set_variable = { root.arab_league_action_set = 11 }
 					clear_array = ROOT.arab_league_option_country_list
 					every_country = {
@@ -1432,13 +1481,13 @@ scripted_gui = {
 						}
 						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
 					}
-					set_variable = { QAT.arab_league_nation_target = THIS.id }
+					set_variable = { UNS.arab_league_nation_target = THIS.id }
 				}	
 
 				##embargo arab state
  				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 12 }
+						check_variable = { UNS.arab_league_option_list^i = 12 }
 						has_defensive_war = yes 
 						OR = {
 							has_civil_war = yes
@@ -1452,7 +1501,7 @@ scripted_gui = {
 
 				##remove embargo
  				if = {
-					limit = { check_variable = { QAT.arab_league_option_list^i = 13 } }
+					limit = { check_variable = { UNS.arab_league_option_list^i = 13 } }
 					set_variable = { root.arab_league_action_set = 13 }
 					clear_array = ROOT.arab_league_option_country_list
 					every_country = {
@@ -1468,7 +1517,7 @@ scripted_gui = {
 
 				##send monetary aid
  				if = {
-					limit = { check_variable = { QAT.arab_league_option_list^i = 14 } }
+					limit = { check_variable = { UNS.arab_league_option_list^i = 14 } }
 					set_variable = { root.arab_league_action_set = 14 }
 					clear_array = ROOT.arab_league_option_country_list
 					every_country = {
@@ -1479,7 +1528,7 @@ scripted_gui = {
 
 				##send edu aid	
  				if = {
-					limit = { check_variable = { QAT.arab_league_option_list^i = 15 } }
+					limit = { check_variable = { UNS.arab_league_option_list^i = 15 } }
 					set_variable = { root.arab_league_action_set = 15 }
 					clear_array = ROOT.arab_league_option_country_list
 					every_country = {
@@ -1490,7 +1539,7 @@ scripted_gui = {
 
 				##release nation
  				if = {
-					limit = { check_variable = { QAT.arab_league_option_list^i = 16 } }
+					limit = { check_variable = { UNS.arab_league_option_list^i = 16 } }
 					set_variable = { root.arab_league_action_set = 16 }
 					clear_array = ROOT.arab_league_option_country_list
 					set_variable = { root.tag_list = 0 }
@@ -1536,18 +1585,18 @@ scripted_gui = {
 
 				##increase session length
 				if = {
-					limit = { check_variable = { QAT.arab_league_option_list^i = 17 } }
+					limit = { check_variable = { UNS.arab_league_option_list^i = 17 } }
 					set_variable = { root.arab_league_action_set = 17 }
 					clear_array = ROOT.arab_league_option_country_list
-					add_to_array = { ROOT.arab_league_option_country_list = QAT.arab_league_host }
+					add_to_array = { ROOT.arab_league_option_country_list = UNS.arab_league_host }
 				}
 
 				##reset session length
 				if = {
-					limit = { check_variable = { QAT.arab_league_option_list^i = 18 } }
+					limit = { check_variable = { UNS.arab_league_option_list^i = 18 } }
 					set_variable = { root.arab_league_action_set = 18 }
 					clear_array = ROOT.arab_league_option_country_list
-					add_to_array = { ROOT.arab_league_option_country_list = QAT.arab_league_host }
+					add_to_array = { ROOT.arab_league_option_country_list = UNS.arab_league_host }
 				}
 
 				##unification resolutions
@@ -1556,74 +1605,38 @@ scripted_gui = {
 				##establish a common economic zone
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 19 }
-						check_variable = { QAT.Domestic_Progressbar_Total > -1 }
-						NOT = {
-							check_variable = { QAT.common_zone_done = 1}
-						}
+						check_variable = { UNS.arab_league_option_list^i = 19 }
 					}
 					set_variable = { root.arab_league_action_set = 19 }
 					clear_array = ROOT.arab_league_option_country_list
-					add_to_array = { ROOT.arab_league_option_country_list = QAT.arab_league_host }
+					add_to_array = { ROOT.arab_league_option_country_list = UNS.arab_league_host }
 				}
 
 				##establish the azad (free movement) zone
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 20 }
-						check_variable = { QAT.Domestic_Progressbar_Total > 9 }
-						#check_variable = { QAT.unification_check > 0 }
-						NOT = {
-							check_variable = { QAT.azad_zone_done = 1}
-						}
+						check_variable = { UNS.arab_league_option_list^i = 20 }
 					}
 					set_variable = { root.arab_league_action_set = 20 }
 					clear_array = ROOT.arab_league_option_country_list
-					add_to_array = { ROOT.arab_league_option_country_list = QAT.arab_league_host }
-				}
-				else_if = {
-					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 20 }
-						NOT = {
-							check_variable = { QAT.unification_check > 0 }
-						}
-					}
-					set_variable = { root.arab_league_action_set = 30 }
+					add_to_array = { ROOT.arab_league_option_country_list = UNS.arab_league_host }
 				}
 
 				##establish research sharing
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 21 }
-						check_variable = { QAT.Domestic_Progressbar_Total > 19 }
-						#check_variable = { QAT.unification_check > 1 }
-						NOT = {
-							check_variable = { QAT.research_sharing_done = 1}
-						}
+						check_variable = { UNS.arab_league_option_list^i = 21 }
 					}
 					set_variable = { root.arab_league_action_set = 21 }
 					clear_array = ROOT.arab_league_option_country_list
-					add_to_array = { ROOT.arab_league_option_country_list = QAT.arab_league_host }
+					add_to_array = { ROOT.arab_league_option_country_list = UNS.arab_league_host }
 				}
-				else_if = {
-					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 21 }
-						NOT = {
-							check_variable = { QAT.unification_check > 1 }
-						}
-					}
-					set_variable = { root.arab_league_action_set = 31 }
-				}
+
 
 				##shift league HQ
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 22 }
-						check_variable = { QAT.Domestic_Progressbar_Total > 29 }
-						#check_variable = { QAT.unification_check > 2 }
-						NOT = {
-							check_variable = { QAT.shift_hq_done = 1}
-						}
+						check_variable = { UNS.arab_league_option_list^i = 22 }
 					}
 					set_variable = { root.arab_league_action_set = 22 }
 					clear_array = ROOT.arab_league_option_country_list
@@ -1634,146 +1647,64 @@ scripted_gui = {
 						add_to_array = { ROOT.arab_league_option_country_list = THIS.id }
 					}
 				}
-				else_if = {
-					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 22 }
-						NOT = {
-							check_variable = { QAT.unification_check > 2 }
-						}
-					}
-					set_variable = { root.arab_league_action_set = 32 }
-				}
 
 				##form arab parliament
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 23 }
-						check_variable = { QAT.Domestic_Progressbar_Total > 39 }
-						#check_variable = { QAT.unification_check > 3 }
-						NOT = {
-							check_variable = { QAT.arab_parliament_done = 1}
-						}
+						check_variable = { UNS.arab_league_option_list^i = 23 }
 					}
 					set_variable = { root.arab_league_action_set = 23 }
 					clear_array = ROOT.arab_league_option_country_list
-					add_to_array = { ROOT.arab_league_option_country_list = QAT.arab_league_host }
+					add_to_array = { ROOT.arab_league_option_country_list = UNS.arab_league_host }
 					
-				}
-				else_if = {
-					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 23 }
-						NOT = {
-							check_variable = { QAT.unification_check > 3 }
-						}
-					}
-					set_variable = { root.arab_league_action_set = 33 }
 				}
 
 				##reinforce pan arabism
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 24 }
-						check_variable = { QAT.Domestic_Progressbar_Total > 49 }
-						#check_variable = { QAT.unification_check > 4 }
-						NOT = {
-							check_variable = { QAT.reinforce_arabism_done = 1}
-						}
+						check_variable = { UNS.arab_league_option_list^i = 24 }
 					}
 					set_variable = { root.arab_league_action_set = 24 }
 					clear_array = ROOT.arab_league_option_country_list
-					add_to_array = { ROOT.arab_league_option_country_list = QAT.arab_league_host }
-				}
-				else_if = {
-					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 24 }
-						NOT = {
-							check_variable = { QAT.unification_check > 4 }
-						}
-					}
-					set_variable = { root.arab_league_action_set = 34 }
+					add_to_array = { ROOT.arab_league_option_country_list = UNS.arab_league_host }
 				}
 
 				##strengthen league unity
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 25 }
-						check_variable = { QAT.Domestic_Progressbar_Total > 59 }
-						#check_variable = { QAT.unification_check > 5 }
-						NOT = {
-							check_variable = { QAT.strengthen_unity_done = 1}
-						}
+						check_variable = { UNS.arab_league_option_list^i = 25 }
 					}
 					set_variable = { root.arab_league_action_set = 25 }
 					clear_array = ROOT.arab_league_option_country_list
-					add_to_array = { ROOT.arab_league_option_country_list = QAT.arab_league_host }
-				}
-				else_if = {
-					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 25 }
-						NOT = {
-							check_variable = { QAT.unification_check > 5 }
-						}
-					}
-					set_variable = { root.arab_league_action_set = 35 }
+					add_to_array = { ROOT.arab_league_option_country_list = UNS.arab_league_host }
 				}
 
 				##rally support for unification
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 26 }
-						check_variable = { QAT.Domestic_Progressbar_Total > 69 }
-						#check_variable = { QAT.unification_check > 6 }
-						NOT = {
-							check_variable = { QAT.rally_support_done = 1}
-						}
+						check_variable = { UNS.arab_league_option_list^i = 26 }
 					}
 					set_variable = { root.arab_league_action_set = 26 }
 					clear_array = ROOT.arab_league_option_country_list
-					add_to_array = { ROOT.arab_league_option_country_list = QAT.arab_league_host }
+					add_to_array = { ROOT.arab_league_option_country_list = UNS.arab_league_host }
 				}
-				else_if = {
-					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 26 }
-						NOT = {
-							check_variable = { QAT.unification_check > 6 }
-						}
-					}
-					set_variable = { root.arab_league_action_set = 36 }
-				}
-
 				##Form the arab front
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 27 }
-						check_variable = { QAT.Domestic_Progressbar_Total > 79 }
-						#check_variable = { QAT.unification_check > 7 }
-						NOT = {
-							check_variable = { QAT.arab_front_done = 1}
-						}
+						check_variable = { UNS.arab_league_option_list^i = 27 }
 					}
 					set_variable = { root.arab_league_action_set = 27 }
 					clear_array = ROOT.arab_league_option_country_list
-					add_to_array = { ROOT.arab_league_option_country_list = QAT.arab_league_host }
+					add_to_array = { ROOT.arab_league_option_country_list = UNS.arab_league_host }
 				}
-				else_if = {
-					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 27 }
-						NOT = {
-							check_variable = { QAT.unification_check > 7 }
-						}
-					}
-					set_variable = { root.arab_league_action_set = 37 }
-				}
-
 				##unite the league
 				if = {
 					limit = {
-						check_variable = { QAT.arab_league_option_list^i = 28 }
-
+						check_variable = { UNS.arab_league_option_list^i = 28 }
 					}
 					set_variable = { root.arab_league_action_set = 28 }
 					clear_array = ROOT.arab_league_option_country_list
-					add_to_array = { ROOT.arab_league_option_country_list = QAT.arab_league_host }
+					add_to_array = { ROOT.arab_league_option_country_list = UNS.arab_league_host }
 					
 				}
 			}
@@ -1791,7 +1722,7 @@ scripted_gui = {
 					check_variable = { root.arab_league_action_set = 4 }
 				}
 			}
-			check_variable = { QAT.country_visible = 1}
+			check_variable = { UNS.country_visible = 1}
 		}
         dynamic_lists = {
             arab_league_action_country_listing_grid = {
@@ -1823,7 +1754,7 @@ scripted_gui = {
 				check_variable = { root.arab_league_action_set = 9 }
 				check_variable = { root.arab_league_action_set = 4 }
 			}
-			check_variable = { QAT.state_visible = 1}
+			check_variable = { UNS.state_visible = 1}
 		}
         dynamic_lists = {
             arab_league_action_state_listing_grid = {
@@ -1852,7 +1783,7 @@ scripted_gui = {
 		parent_window_name = "arab_league_main_container"
         dynamic_lists = {
             arab_league_yes_vote_list_grid = {
-                array = QAT.arab_league_vote_yes_list
+                array = UNS.arab_league_vote_yes_list
                 change_scope = yes
 				entry_container = arab_league_yes_vote_list_entry
             }
@@ -1860,8 +1791,8 @@ scripted_gui = {
 		effects = {
 			yes_vote_button_click = {
 				set_country_flag = ARAB_LEAGUE_YES_ONGOING
-				clear_array = QAT.arab_league_vote_yes_list
-				add_to_variable = { QAT.arab_league_yes_count = 1 }
+				clear_array = UNS.arab_league_vote_yes_list
+				add_to_variable = { UNS.arab_league_yes_count = 1 }
 
 				#set for current nation
 				set_variable = { randomised_acceptance = 80}
@@ -1880,36 +1811,36 @@ scripted_gui = {
 
 				every_country = {
 					limit = { has_country_flag = ARAB_LEAGUE_YES_ONGOING }
-					add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+					add_to_array = { UNS.arab_league_vote_yes_list = THIS.id }
 				}
 				if = {
 					limit = { has_country_flag = ARAB_LEAGUE_VETO_ONGOING }
 					clr_country_flag = ARAB_LEAGUE_VETO_ONGOING
-					clear_array = QAT.arab_league_vote_veto_list
-					add_to_variable = { QAT.arab_league_veto_count = -1 }
+					clear_array = UNS.arab_league_vote_veto_list
+					add_to_variable = { UNS.arab_league_veto_count = -1 }
 					every_country = {
 						limit = { has_country_flag = ARAB_LEAGUE_VETO_ONGOING }
-						add_to_array = { QAT.arab_league_vote_veto_list = THIS.id }
+						add_to_array = { UNS.arab_league_vote_veto_list = THIS.id }
 					}
 				}
 				if = {
 					limit = { has_country_flag = ARAB_LEAGUE_NO_ONGOING }
-					add_to_variable = { QAT.arab_league_no_count = -1 }
+					add_to_variable = { UNS.arab_league_no_count = -1 }
 					clr_country_flag = ARAB_LEAGUE_NO_ONGOING
-					clear_array = QAT.arab_league_vote_no_list
+					clear_array = UNS.arab_league_vote_no_list
 					every_country = {
 						limit = { has_country_flag = ARAB_LEAGUE_NO_ONGOING }
-						add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+						add_to_array = { UNS.arab_league_vote_no_list = THIS.id }
 					}
 				}
 				if = {
 					limit = { has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING }
-					add_to_variable = { QAT.arab_league_abstain_count = -1 }
+					add_to_variable = { UNS.arab_league_abstain_count = -1 }
 					clr_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING
-					clear_array = QAT.arab_league_vote_abstain_list
+					clear_array = UNS.arab_league_vote_abstain_list
 					every_country = {
 						limit = { has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING }
-						add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+						add_to_array = { UNS.arab_league_vote_abstain_list = THIS.id }
 					}
 				}
 				add_to_variable = {refresh_arab_league= 1 }
@@ -1918,7 +1849,7 @@ scripted_gui = {
 		triggers = {
 			yes_vote_button_click_enabled = {
 				NOT = { has_country_flag = ARAB_LEAGUE_YES_ONGOING }
-				QAT = { has_country_flag = Current_ARAB_LEAGUE_Vote }
+				UNS = { has_country_flag = Current_ARAB_LEAGUE_Vote }
 			}
 		}
     } 
@@ -1930,14 +1861,14 @@ scripted_gui = {
 		parent_window_name = "arab_league_main_container"
         dynamic_lists = {
             arab_league_no_vote_list_grid = {
-                array = QAT.arab_league_vote_no_list
+                array = UNS.arab_league_vote_no_list
                 change_scope = yes
 				entry_container = arab_league_no_vote_list_entry
             }
         }
 		effects = {
 			no_vote_button_click = {
-				add_to_variable = { QAT.arab_league_no_count = 1 }
+				add_to_variable = { UNS.arab_league_no_count = 1 }
 				set_country_flag = ARAB_LEAGUE_NO_ONGOING
 
 				#set for current nation
@@ -1954,39 +1885,39 @@ scripted_gui = {
 					}
 					ARAB_LEAGUE_ai_influence_vote = yes
 				}
-				clear_array = QAT.arab_league_vote_no_list
+				clear_array = UNS.arab_league_vote_no_list
 				every_country = {
 					limit = { has_country_flag = ARAB_LEAGUE_NO_ONGOING }
-					add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+					add_to_array = { UNS.arab_league_vote_no_list = THIS.id }
 				}
 				if = {
 					limit = { has_country_flag = ARAB_LEAGUE_VETO_ONGOING }
 					clr_country_flag = ARAB_LEAGUE_VETO_ONGOING
-					clear_array = QAT.arab_league_vote_veto_list
-					add_to_variable = { QAT.arab_league_veto_count = -1 }
+					clear_array = UNS.arab_league_vote_veto_list
+					add_to_variable = { UNS.arab_league_veto_count = -1 }
 					every_country = {
 						limit = { has_country_flag = ARAB_LEAGUE_VETO_ONGOING }
-						add_to_array = { QAT.arab_league_vote_veto_list = THIS.id }
+						add_to_array = { UNS.arab_league_vote_veto_list = THIS.id }
 					}
 				}
 				if = {
 					limit = { has_country_flag = ARAB_LEAGUE_YES_ONGOING }
 					clr_country_flag = ARAB_LEAGUE_YES_ONGOING
-					clear_array = QAT.arab_league_vote_yes_list
-					add_to_variable = { QAT.arab_league_yes_count = -1 }
+					clear_array = UNS.arab_league_vote_yes_list
+					add_to_variable = { UNS.arab_league_yes_count = -1 }
 					every_country = {
 						limit = { has_country_flag = ARAB_LEAGUE_YES_ONGOING }
-						add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+						add_to_array = { UNS.arab_league_vote_yes_list = THIS.id }
 					}
 				}
 				if = {
 					limit = { has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING }
-					add_to_variable = { QAT.arab_league_abstain_count = -1 }
+					add_to_variable = { UNS.arab_league_abstain_count = -1 }
 					clr_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING
-					clear_array = QAT.arab_league_vote_abstain_list
+					clear_array = UNS.arab_league_vote_abstain_list
 					every_country = {
 						limit = { has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING }
-						add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+						add_to_array = { UNS.arab_league_vote_abstain_list = THIS.id }
 					}
 				}
 				add_to_variable = {refresh_arab_league= 1 }
@@ -1995,7 +1926,7 @@ scripted_gui = {
 		triggers = {
 			no_vote_button_click_enabled = {
 				NOT = { has_country_flag = ARAB_LEAGUE_NO_ONGOING }
-				QAT = { has_country_flag = Current_ARAB_LEAGUE_Vote }
+				UNS = { has_country_flag = Current_ARAB_LEAGUE_Vote }
 			}
 		}
     }
@@ -2007,14 +1938,14 @@ scripted_gui = {
 		parent_window_name = "arab_league_main_container"
         dynamic_lists = {
             arab_league_abstain_vote_list_grid = {
-                array = QAT.arab_league_vote_abstain_list
+                array = UNS.arab_league_vote_abstain_list
                 change_scope = yes
 				entry_container = arab_league_abstain_vote_list_entry
             }
         }
 		effects = {
 			abstain_vote_button_click = {
-				add_to_variable = { QAT.arab_league_abstain_count = 1 }
+				add_to_variable = { UNS.arab_league_abstain_count = 1 }
 				set_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING
 
 				#set for current nation
@@ -2032,39 +1963,39 @@ scripted_gui = {
 					ARAB_LEAGUE_ai_influence_vote = yes
 				}
 
-				clear_array = QAT.arab_league_vote_abstain_list
+				clear_array = UNS.arab_league_vote_abstain_list
 				every_country = {
 					limit = { has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING }
-					add_to_array = { QAT.arab_league_vote_abstain_list = THIS.id }
+					add_to_array = { UNS.arab_league_vote_abstain_list = THIS.id }
 				}
 				if = {
 					limit = { has_country_flag = ARAB_LEAGUE_VETO_ONGOING }
 					clr_country_flag = ARAB_LEAGUE_VETO_ONGOING
-					clear_array = QAT.arab_league_vote_veto_list
-					add_to_variable = { QAT.arab_league_veto_count = -1 }
+					clear_array = UNS.arab_league_vote_veto_list
+					add_to_variable = { UNS.arab_league_veto_count = -1 }
 					every_country = {
 						limit = { has_country_flag = ARAB_LEAGUE_VETO_ONGOING }
-						add_to_array = { QAT.arab_league_vote_veto_list = THIS.id }
+						add_to_array = { UNS.arab_league_vote_veto_list = THIS.id }
 					}
 				}
 				if = {
 					limit = { has_country_flag = ARAB_LEAGUE_YES_ONGOING }
 					clr_country_flag = ARAB_LEAGUE_YES_ONGOING
-					clear_array = QAT.arab_league_vote_yes_list
-					add_to_variable = { QAT.arab_league_yes_count = -1 }
+					clear_array = UNS.arab_league_vote_yes_list
+					add_to_variable = { UNS.arab_league_yes_count = -1 }
 					every_country = {
 						limit = { has_country_flag = ARAB_LEAGUE_YES_ONGOING }
-						add_to_array = { QAT.arab_league_vote_yes_list = THIS.id }
+						add_to_array = { UNS.arab_league_vote_yes_list = THIS.id }
 					}
 				}
 				if = {
 					limit = { has_country_flag = ARAB_LEAGUE_NO_ONGOING }
-					add_to_variable = { QAT.arab_league_no_count = -1 }
+					add_to_variable = { UNS.arab_league_no_count = -1 }
 					clr_country_flag = ARAB_LEAGUE_NO_ONGOING
-					clear_array = QAT.arab_league_vote_no_list
+					clear_array = UNS.arab_league_vote_no_list
 					every_country = {
 						limit = { has_country_flag = ARAB_LEAGUE_NO_ONGOING }
-						add_to_array = { QAT.arab_league_vote_no_list = THIS.id }
+						add_to_array = { UNS.arab_league_vote_no_list = THIS.id }
 					}
 				}
 				add_to_variable = {refresh_arab_league= 1 }
@@ -2073,7 +2004,7 @@ scripted_gui = {
 		triggers = {
 			abstain_vote_button_click_enabled = {
 				NOT = { has_country_flag = ARAB_LEAGUE_ABSTAIN_ONGOING }
-				QAT = { has_country_flag = Current_ARAB_LEAGUE_Vote }
+				UNS = { has_country_flag = Current_ARAB_LEAGUE_Vote }
 			}
 		}
     }
@@ -2085,7 +2016,7 @@ scripted_gui = {
 		parent_window_name = "arab_league_main_container"
         dynamic_lists = {
             arab_league_member_list_grid = {
-                array = QAT.arab_league_total_member_list
+                array = UNS.arab_league_total_member_list
                 change_scope = yes
 				entry_container = arab_league_member_list_entry
             }
@@ -2140,7 +2071,7 @@ scripted_gui = {
 				set_variable = { show_view_menu = 0 }
 			}	
 			deprecate_click = {
-				add_to_variable = { QAT.Domestic_Progressbar_Total = 10 }
+				add_to_variable = { UNS.Domestic_Progressbar_Total = 10 }
 				add_to_variable = { unity_menu_refresh = 1 }
 			}	
 
@@ -2177,7 +2108,7 @@ scripted_gui = {
 
 		properties = {
             unity_progressbar = {
-               frame = QAT.Domestic_Progressbar_Total
+               frame = UNS.Domestic_Progressbar_Total
             }
 			domestic_phase_progress_icon_10 = {
 				frame = ROOT.Domestic_Progressbar_1
@@ -2189,7 +2120,7 @@ scripted_gui = {
 				frame = ROOT.Domestic_Progressbar_3
 			}
 			domestic_progressbar_content = {
-				frame = QAT.Domestic_Progressbar_Total
+				frame = UNS.Domestic_Progressbar_Total
 			}
         }
 	}

@@ -1,0 +1,285 @@
+
+add_namespace = CWIC_ECON_PENALTIES
+
+country_event = {
+	id = CWIC_ECON_PENALTIES.1
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CWIC_ECON_PENALTIES.1"}
+	title = "Entering Austerity"	
+	desc = CWIC_ECON_PENALTIES.1.d
+	picture = GFX_CWIC_ECON_PENALTIES_1
+
+	fire_only_once = no
+	is_triggered_only = yes
+	
+	option = { 
+		name = "Unfortunate"
+        add_timed_idea = {
+            idea = Recent_Austerity_Measures
+            days = 1825
+        } 
+        decrease_union_policy = yes
+        decrease_union_policy = yes
+        decrease_service_policy = yes
+        decrease_service_policy = yes
+        decrease_education_rate = yes
+        reduce_welfare_rate = yes
+        reduce_welfare_rate = yes
+        for_loop_effect = {
+            end = influence_array^num
+            value = v
+            if = {
+                limit = {
+                    check_variable = { influence_array^v = GER }
+                }
+                add_to_variable = { influence_array_val^v = 150 }
+                set_country_flag = found
+            }
+        }
+        if = {
+            limit = { NOT = { has_country_flag = found } }
+            add_to_array = { influence_array = GER.id }
+            add_to_array = { influence_array_val = 150 }
+        }
+        clr_country_flag = found
+        recalculate_influence = yes	
+	}
+}
+
+country_event = {
+	id = CWIC_ECON_PENALTIES.2
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CWIC_ECON_PENALTIES.2"}
+	title = "Entering Default"	
+	desc = CWIC_ECON_PENALTIES.2.d
+	picture = GFX_CWIC_ECON_PENALTIES_2
+
+	fire_only_once = no
+	is_triggered_only = yes
+	
+	option = {
+		name = "Damn"
+        set_variable = { ROOT.default_industrial_complex = 0 }
+        set_variable = { ROOT.default_farms = 0 }
+        set_variable = { ROOT.default_dockyard = 0 }
+        set_variable = { ROOT.default_office_park = 0 }
+        set_variable = { ROOT.default_arms_factory = 0 }
+        every_owned_state = {
+            add_to_variable = { ROOT.default_industrial_complex = building_level@industrial_complex }
+            add_to_variable = { ROOT.default_farms = building_level@agri_industrial_complex }
+            add_to_variable = { ROOT.default_dockyard = building_level@dockyard }
+            add_to_variable = { ROOT.default_office_park = building_level@office_park }	
+            add_to_variable = { ROOT.default_arms_factory = building_level@arms_factory }
+        }
+        multiply_variable = { ROOT.default_industrial_complex = 0.10 }
+        multiply_variable = { ROOT.default_farms = 0.10 }
+        multiply_variable = { ROOT.default_dockyard = 0.10 }
+        multiply_variable = { ROOT.default_office_park = 0.10 }
+        multiply_variable = { ROOT.default_arms_factory = 0.10 }
+        round_variable = ROOT.default_industrial_complex
+        round_variable = ROOT.default_farms
+        round_variable = ROOT.default_dockyard
+        round_variable = ROOT.default_office_park
+        round_variable = ROOT.default_arms_factory
+
+        #Removal
+        while_loop_effect = {
+            limit = {
+                check_variable = {
+                    ROOT.default_arms_factory > 0
+                }
+            }
+			random_owned_controlled_state = {
+				limit = {
+					arms_factory > 0
+				}
+				remove_building = {
+					type = arms_factory
+					level = 1
+					
+				}
+			} 
+            add_to_variable = {
+                ROOT.default_arms_factory = -1
+            }          
+        }
+
+        while_loop_effect = {
+            limit = {
+                check_variable = {
+                    ROOT.default_office_park > 0
+                }
+            }
+			random_owned_controlled_state = {
+				limit = {
+					office_park > 0
+				}
+				remove_building = {
+					type = office_park
+					level = 1
+					
+				}
+			} 
+            add_to_variable = {
+                ROOT.default_office_park = -1
+            }          
+        }
+        while_loop_effect = {
+            limit = {
+                check_variable = {
+                    ROOT.default_dockyard > 0
+                }
+            }
+			random_owned_controlled_state = {
+				limit = {
+					dockyard > 0
+				}
+				remove_building = {
+					type = dockyard
+					level = 1
+					
+				}
+			} 
+            add_to_variable = {
+                ROOT.default_dockyard = -1
+            }          
+        }
+        while_loop_effect = {
+            limit = {
+                check_variable = {
+                    ROOT.default_industrial_complex > 0
+                }
+            }
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+				}
+				remove_building = {
+					type = industrial_complex
+					level = 1
+					
+				}
+			} 
+            add_to_variable = {
+                ROOT.default_industrial_complex = -1
+            }          
+        }
+        while_loop_effect = {
+            limit = {
+                check_variable = {
+                    ROOT.default_farms > 0
+                }
+            }
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+				}
+				remove_building = {
+					type = agri_industrial_complex
+					level = 1
+					
+				}
+			} 
+            add_to_variable = {
+                ROOT.default_farms = -1
+            }          
+        }
+        add_timed_idea = {
+            idea = Recent_Default   #That anhilates consumer goods and production eff cap and remove 10% of buildings and further increase IMF influence
+            days = 1825
+        } 
+        for_loop_effect = {
+            end = influence_array^num
+            value = v
+            if = {
+                limit = {
+                    check_variable = { influence_array^v = GER }
+                }
+                add_to_variable = { influence_array_val^v = 400 }
+                set_country_flag = found
+            }
+        }
+        if = {
+            limit = { NOT = { has_country_flag = found } }
+            add_to_array = { influence_array = GER.id }
+            add_to_array = { influence_array_val = 400 }
+        }
+        clr_country_flag = found
+        recalculate_influence = yes	
+        set_country_flag = {
+            flag = IMF_SAP_ENACTED
+            days = 1825
+            value = 1
+        }
+        hidden_effect = {
+            remove_ideas = policy_taxrate_temp_1
+
+            remove_ideas = policy_taxrate_temp_2
+            remove_ideas = policy_taxrate_temp_3
+            remove_ideas = policy_taxrate_temp_4
+            remove_ideas = policy_taxrate_temp_5
+
+
+            remove_ideas = policy_welfare_temp_0
+            remove_ideas = policy_welfare_temp_2
+            remove_ideas = policy_welfare_temp_3
+            remove_ideas = policy_welfare_temp_4
+            remove_ideas = policy_welfare_temp_5
+
+
+            remove_ideas = policy_education_temp_1
+            remove_ideas = policy_education_temp_3
+            remove_ideas = policy_education_temp_0
+            remove_ideas = policy_education_temp_4
+
+
+            remove_ideas = policy_healthcare_temp_0
+            remove_ideas = policy_healthcare_temp_2
+            remove_ideas = policy_healthcare_temp_3
+            remove_ideas = policy_healthcare_temp_4
+            remove_ideas = policy_healthcare_temp_5
+
+
+            remove_ideas = policy_services_temp_0
+            remove_ideas = policy_services_temp_2
+            remove_ideas = policy_services_temp_3
+        }
+        add_ideas = Currency_Devaluation
+        add_ideas = policy_taxrate_temp_1
+        add_ideas = policy_welfare_temp_1
+        add_ideas = policy_services_temp_1
+        add_ideas = policy_education_temp_1
+        add_ideas = policy_healthcare_temp_1
+        add_ideas = policy_union_temp_1
+        add_ideas = gen_materialist_2
+        add_ideas = free_trade
+        if = {
+            limit = {
+                has_idea = policy_women_temp_0
+            }
+            remove_ideas = policy_women_temp_0
+            add_ideas = policy_women_temp_1
+        }
+        else_if = {
+            limit = {
+                has_idea = policy_women_temp_1
+            }
+            remove_ideas = policy_women_temp_1
+            add_ideas = policy_women_temp_2
+
+        }
+        else_if = {
+            limit = {
+                has_idea = policy_women_temp_2
+            }
+            remove_ideas = policy_women_temp_2
+            add_ideas = policy_women_temp_3
+
+        }
+        else = {
+            remove_ideas = policy_women_temp_3
+            add_ideas = policy_women_temp_4
+
+        }
+
+    }
+}
+
