@@ -1,44 +1,439 @@
-# befriend
-# conquer
+######BEFRIEND########
+# This will prompt USA to try and support countries who are fighting against extremist elements.
+# Should improve alt-history situations like democratic Germany fighting the USSR etc.
+USA_protect_against_extremism = { # Reverse strategy
+	reversed = yes
+
+	enable_reverse = {
+		USA = {
+			has_government = democratic
+		}
+	}
+
+	enable = {
+		NOT = { tag = USA }
+		NOT = { has_government = communism }
+		NOT = { has_government = fascism }
+		OR = {
+			capital_scope = {
+				is_on_continent = europe # lets avoid smaller conflicts elsewhere
+			}
+			AND = {
+				num_of_civilian_factories > 10
+				is_subject = no
+			}
+		}
+		any_of_scopes = {
+			array = enemies
+			NOT = { tag = USA }
+			OR = {
+				has_government = communism
+				has_government = fascism
+			}
+		}
+	}
+
+	abort = {
+		OR = {
+			has_war = no
+			OR = {
+				has_government = communism
+				has_government = fascism
+			}
+			USA = {
+				OR = {
+					NOT = {	has_government = democratic }
+					has_war_with = ROOT
+				}
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = support
+		id = "USA"
+		value = 100
+	}
+}
+########CONQUER#############
+SOV_is_bad = {
+	allowed = {
+		tag = USA
+	}
+	
+	enable = {
+		SOV = {
+			exists = yes
+		}
+		NOT = { is_ally_with = SOV }
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = prepare_for_war
+		id = SOV
+		value = 120
+	}
+}
+DDR_is_bad = {
+	allowed = {
+		tag = USA
+	}
+	
+	enable = {
+		SOV = {
+			exists = yes
+		}
+		NOT = { is_ally_with = DDR }
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = prepare_for_war
+		id = DDR
+		value = 100
+	}
+}
+PRC_is_bad = {
+	allowed = {
+		tag = USA
+	}
+	
+	enable = {
+		SOV = {
+			exists = yes
+		}
+		NOT = { is_ally_with = PRC }
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = prepare_for_war
+		id = PRC
+		value = 100
+	}
+}
+USA_gang_up_SOV_with_NATO = {
+	allowed = {
+		tag = USA
+	}
+	enable = {
+		tag = USA
+		date > 1949.1.1
+	}
+	
+	# help fronts in europe & africa
+	ai_strategy = {
+		type = force_defend_ally_borders
+		value = 100
+		target = europe
+	}
+	ai_strategy = {
+		type = force_defend_ally_borders
+		value = 100
+		target = asia
+	}
+	ai_strategy = {
+		type = force_defend_ally_borders
+		value = 20
+		target = africa
+	}
+}
 # antagonize
 # build_ship
 # build_army
-# unit_ratio
-# build_building
-# research_tech
-# garrison
-# protect
-# influence
-# alliance
-# ignore
-# invade
+USA_build_peacetime_army = {
+	allowed = { tag = USA }
+	enable = { 
+		date > 1949.1.1
+		has_war = no
+		has_army_manpower = { size < 540000 }
+	}
+	abort_when_not_enabled = yes
 
-USA_template_design_1 = {
+	ai_strategy = { type = build_army id = motorized value = 100 }
+	ai_strategy = { type = build_army id = infantry value = 90 }
+	ai_strategy = { type = force_build_armies value = 90 }
+}
+USA_build_wartime_army = {
+	allowed = { tag = USA }
+	enable = { 
+		date > 1949.1.1
+		has_war = yes
+		has_army_manpower = { size < 2000000 }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = build_army id = motorized value = 100 }
+	ai_strategy = { type = build_army id = infantry value = 90 }
+	ai_strategy = { type = force_build_armies value = 90 }
+}
+USA_division_production = {
 	allowed = {
 		original_tag = USA
-	}	
-	enable = {
-		original_tag = USA			
 	}
-	
+	enable = {
+		always = yes
+		date > 1959.1.1
+	}
+	abort = {
+	date > 1959.1.1
+	}
 	ai_strategy = {
-		type = template_prio
-		id = medium_armor
-		value = 50
+		type = role_ratio
+		id = paratroopers
+		value = 4
 	}
 
 	ai_strategy = {
-		type = template_prio
+		type = role_ratio
+		id = mountaineers
+		value = 3
+	}
+
+	ai_strategy = {
+		type = role_ratio
+		id = marines
+		value = 3
+	}
+
+	ai_strategy = {
+		type = role_ratio
+		id = motorized
+		value = 100
+	}
+
+	ai_strategy = {
+		type = role_ratio
 		id = mechanized
-		value = 80
+		value = 30
+	}
+
+	ai_strategy = {
+		type = role_ratio
+		id = medium_armor
+		value = 30
+	}
+
+	ai_strategy = {
+		type = role_ratio
+		id = infantry
+		value = 0 #because doctrine 70
+	}
+}
+########unit_ratio##########
+USA_unit_production = {
+	allowed = {
+		original_tag = USA
+	}
+	enable = {
+		always = yes
+	}
+	abort = {
+		always = no
 	}
 	
 	ai_strategy = {
-		type = template_prio
-		id = infantry
+		type = role_ratio
+		id = garrison
+		value = 5
+	}
+
+	# Old garrison system against resistance
+	# ai_strategy = { 
+	# 	type = role_ratio
+	# 	id = suppression
+	# 	value = 3
+	# }
+
+	
+	
+	#Air unit factors
+	ai_strategy = {
+		type = unit_ratio
+		id = fighter
+		value = 40
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = cas
+		value = 2 #because doctrine this = 15
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = tactical_bomber
+		value = 5
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = strategic_bomber
+		value = -50 # we can add a strategy later to increase this once Germany is beaten
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = naval_bomber
+		value = 4
+	}
+	
+	
+	# Naval unit factors
+	ai_strategy = {
+		type = unit_ratio
+		id = capital_ship
+		value = 1
+	}
+	ai_strategy = {
+		type = unit_ratio
+		id = carrier
+		value = 1
+	}
+	ai_strategy = {
+		type = unit_ratio
+		id = submarine
+		value = 30 
+	}
+
+	ai_strategy = {
+		type = unit_ratio
+		id = screen_ship
 		value = 20
 	}
+
+	ai_strategy = {
+		type = unit_ratio
+		id = convoy
+		value = 20
+	}
+	
+	ai_strategy = {
+		type = equipment_production_factor
+		id = fighter
+		value = 25
+	}
+
+	ai_strategy = {
+		type = equipment_production_factor
+		id = tactical_bomber
+		value = -20
+	}
+
+	ai_strategy = {
+		type = equipment_production_factor
+		id = naval_bomber
+		value = -100
+	}
+	
+	ai_strategy = {
+		type = equipment_production_factor
+		id = infantry
+		value = 30
+	}
+	
+	ai_strategy = {
+		type = equipment_production_factor
+		id = artillery
+		value = 36
+	}
+	
+	ai_strategy = {
+		type = equipment_production_factor
+		id = armor
+		value = 5
+	}
+}	
+#########build_building##########
+# research_tech
+# garrison
+######PROTECT##########
+
+# USA should put some buffer units in Europe and ENG to help with invasions
+USA_unit_buffer_for_europe = {
+	allowed = {
+		tag = USA
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = put_unit_buffers
+		
+		order_id = 2
+		
+		# south england
+		states = { 
+			127
+		}
+		
+		ratio = 0.05
+		
+		area = europe
+		
+		subtract_invasions_from_need = no
+	}
+	
+	ai_strategy = {
+		type = put_unit_buffers
+		
+		order_id = 2
+		
+		# West Germany, Fulda
+		states = { 
+			959
+			55
+		}
+		
+		ratio = 0.2
+		area = europe
+		
+		subtract_invasions_from_need = no
+	}
+}	
+# influence
+# alliance
+########ignore#######
+
+USA_ignore_neighbours = {
+	allowed = { tag = USA }
+	enable = {
+		NOT = { 
+			OR = {
+				has_war_with = MEX
+				has_war_with = CAN
+			}
+		}
+	}
+	abort = {
+		OR = {
+			has_war_with = MEX
+			has_war_with = CAN
+		}
+	}
+	
+	ai_strategy = {
+		type = ignore
+		id = "CAN"			
+		value = 1000
+	}
+	
+	ai_strategy = {
+		type = ignore
+		id = "MEX"			
+		value = 1000
+	}
+
 }
+# invade
+
 USA_Dont_Invade_China = {
 	allowed = {
 		original_tag = USA
