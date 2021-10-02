@@ -1,0 +1,727 @@
+Karen_Conflict = {
+	#Liberate_the_Bamar_Homeland
+	#Preperations_for_Renewed_Assault_on_Communist_Strongholds
+	Launch_Campaign_against_the_Burmese_Government_Tenasserim_Hills = {
+
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = KAY
+		}
+
+		available = {
+			has_idea = unrecognized_state
+		}
+		cost = 0
+
+		days_re_enable = 180
+		fire_only_once = no
+		selectable_mission = no
+
+		days_remove = 5
+		
+		complete_effect = {
+			1264 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = KAY
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1264 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_karen_border_war_ongoing_nearby
+				}
+			}
+			1212 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = KAY
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1264 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_karen_border_war_ongoing_nearby
+				}
+			}
+			activate_mission = KAY_Campaign_against_the_Burmese_Government_Tenasserim_Hills
+			diplomatic_relation = { country = BRM relation = war_relation active = yes }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}	
+
+
+
+	KAY_Campaign_against_the_Burmese_Government_Tenasserim_Hills = {
+
+		icon = generic_prepare_civil_war
+
+
+		available = {
+			NOT = {
+				country_exists = BRM
+			}
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = no
+		selectable_mission = yes
+
+		days_mission_timeout = 20
+
+		days_re_enable = 180
+
+		complete_effect = {
+		}
+
+		timeout_effect = {
+            set_variable = {
+                KAY.Karen_Conflict_Strength_Old = KAY.Karen_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Karen_Conflict_Strength_Old = BRM.Karen_Conflict_Strength
+            }
+			count_inflicted_casualties_on_current_enemies = yes
+			BRM = {
+				count_inflicted_casualties_on_current_enemies = yes
+			}
+			set_variable = {
+				Burmese_Casualties_Karen_Conflict = current_inflicted_casualties_on_@BRM
+			}
+			set_variable = {
+				Karen_Casualties_Karen_Conflict = BRM.current_inflicted_casualties_on_@KAY
+			}
+			set_variable = {
+				Karen_Conflict_Strength_Bonus = Burmese_Casualties_Karen_Conflict
+			}
+			set_variable = {
+				Burma_Karen_Conflict_Strength_Bonus = Karen_Casualties_Karen_Conflict
+			}
+			set_variable = {
+				Burmese_Casualties_Karen_Conflict_Display = Burmese_Casualties_Karen_Conflict
+			}
+			set_variable = {
+				Karen_Casualties_Karen_Conflict_Display = Karen_Casualties_Karen_Conflict
+			}
+			multiply_variable = {
+				Burmese_Casualties_Karen_Conflict_Display = 1000
+			}
+			multiply_variable = {
+				Karen_Casualties_Karen_Conflict_Display = 1000
+			}
+			if = {
+				limit = {
+					check_variable = {
+						Burma_Karen_Conflict_Strength_Bonus > Karen_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Burma_Karen_Conflict_Strength_Bonus = Karen_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Burma_Karen_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = Burma_Karen_Conflict_Strength_Bonus
+				}
+				round_variable = BMR.Karen_Conflict_Strength
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						Karen_Conflict_Strength_Bonus > Burma_Karen_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Karen_Conflict_Strength_Bonus = Burma_Karen_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Karen_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					Karen_Conflict_Strength = Karen_Conflict_Strength_Bonus
+				}
+				round_variable = Karen_Conflict_Strength
+			}
+			else = { }
+			clear_current_inflicted_casualties = yes
+			#State 1267 = Bago			(1417 12127 12256)
+			#State 1264 = Karen			(4293 4408 7441 11081 12238)
+			#State 1212 = Tanintharyi	(1296 1315 1385 4275 7295 10217 12292)
+
+			#State 1266 = Mon
+			#State 1265 = Karenni
+			every_owned_state = {
+				limit = {
+					has_state_flag = burma_karen_border_war_ongoing_nearby						
+				}
+				remove_province_modifier = {
+					static_modifiers = { border_war_in_progress }
+					province = {
+						all_provinces = yes
+					}
+				}
+			}
+			BRM = {
+				every_owned_state = {
+					limit = {
+						has_state_flag = burma_karen_border_war_ongoing_nearby						
+					}
+					remove_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4293 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4408 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7441 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^11081 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12238 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			#Province 1330 = Rangoon
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1330 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 300
+				}
+			}
+            #Burmese Provinces        
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12292 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 5
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10217 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 5
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7295 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 5
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4275 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 5
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1385 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 5
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1315 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 5
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1296 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 5
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+
+			diplomatic_relation = { country = BRM relation = war_relation active = no }
+			BRM = { diplomatic_relation = { country = KAY relation = war_relation active = no } }
+            set_variable = {
+                KAY.Karen_Conflict_Strength_Current = KAY.Karen_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Karen_Conflict_Strength_Current = BRM.Karen_Conflict_Strength
+            }
+
+            subtract_from_variable = {
+                KAY.Karen_Conflict_Strength_Current = KAY.Karen_Conflict_Strength_Old
+            }
+            subtract_from_variable = {
+                BRM.Karen_Conflict_Strength_Current = BRM.Karen_Conflict_Strength_Old
+            }
+			set_variable = {
+				KAY.karen_check = 1
+			}
+			set_variable = {
+				BRM.karen_check = 1
+			}
+		}	
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+	Launch_Campaign_Against_the_Burmese_Government_Irrawaddy_Delta = {
+
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = KAY
+		}
+
+		available = {
+			has_idea = unrecognized_state
+		}
+		cost = 0
+
+		days_re_enable = 180
+		fire_only_once = no
+		selectable_mission = no
+
+		days_remove = 5
+		
+		complete_effect = {
+			1264 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = KAY
+						}
+						NOT = { state = 1267 }
+						NOT = { state = 1264 }
+						#NOT = { state = 1212 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_karen_border_war_ongoing_nearby
+				}
+			}
+			1267 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = KAY
+						}
+						NOT = { state = 1267 }
+						NOT = { state = 1264 }
+						#NOT = { state = 1212 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_karen_border_war_ongoing_nearby
+				}
+			}
+			activate_mission = KAY_Campaign_against_the_Burmese_Government_Irrawaddy_Delta
+			diplomatic_relation = { country = BRM relation = war_relation active = yes }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}	
+
+
+
+	KAY_Campaign_against_the_Burmese_Government_Irrawaddy_Delta = {
+
+		icon = generic_prepare_civil_war
+
+
+		available = {
+			NOT = {
+				country_exists = BRM
+			}
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = no
+		selectable_mission = yes
+
+		days_mission_timeout = 20
+
+		days_re_enable = 180
+
+		complete_effect = {
+		}
+
+		timeout_effect = {
+            set_variable = {
+                KAY.Karen_Conflict_Strength_Old = KAY.Karen_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Karen_Conflict_Strength_Old = BRM.Karen_Conflict_Strength
+            }
+			count_inflicted_casualties_on_current_enemies = yes
+			BRM = {
+				count_inflicted_casualties_on_current_enemies = yes
+			}
+			set_variable = {
+				Burmese_Casualties_Karen_Conflict = current_inflicted_casualties_on_@BRM
+			}
+			set_variable = {
+				Karen_Casualties_Karen_Conflict = BRM.current_inflicted_casualties_on_@KAY
+			}
+			set_variable = {
+				Karen_Conflict_Strength_Bonus = Burmese_Casualties_Karen_Conflict
+			}
+			set_variable = {
+				Burma_Karen_Conflict_Strength_Bonus = Karen_Casualties_Karen_Conflict
+			}
+			set_variable = {
+				Burmese_Casualties_Karen_Conflict_Display = Burmese_Casualties_Karen_Conflict
+			}
+			set_variable = {
+				Karen_Casualties_Karen_Conflict_Display = Karen_Casualties_Karen_Conflict
+			}
+			multiply_variable = {
+				Burmese_Casualties_Karen_Conflict_Display = 1000
+			}
+			multiply_variable = {
+				Karen_Casualties_Karen_Conflict_Display = 1000
+			}
+			if = {
+				limit = {
+					check_variable = {
+						Burma_Karen_Conflict_Strength_Bonus > Karen_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Burma_Karen_Conflict_Strength_Bonus = Karen_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Burma_Karen_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = Burma_Karen_Conflict_Strength_Bonus
+				}
+				round_variable = BRM.Karen_Conflict_Strength
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						Karen_Conflict_Strength_Bonus > Burma_Karen_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Karen_Conflict_Strength_Bonus = Burma_Karen_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Karen_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					Karen_Conflict_Strength = Karen_Conflict_Strength_Bonus
+				}
+				round_variable = Karen_Conflict_Strength
+			}
+			else = { }
+			clear_current_inflicted_casualties = yes
+			#State 1267 = Bago			(1417 12127 12256)
+			#State 1264 = Karen			(4293 4408 7441 11081 12238)
+			#State 1212 = Tanintharyi	(1296 1315 1385 4275 7295 10217 12292)
+
+			#State 1266 = Mon
+			#State 1265 = Karenni
+			every_owned_state = {
+				limit = {
+					has_state_flag = burma_karen_border_war_ongoing_nearby						
+				}
+				remove_province_modifier = {
+					static_modifiers = { border_war_in_progress }
+					province = {
+						all_provinces = yes
+					}
+				}
+			}
+			BRM = {
+				every_owned_state = {
+					limit = {
+						has_state_flag = burma_karen_border_war_ongoing_nearby						
+					}
+					remove_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4293 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4408 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7441 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^11081 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12238 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			#Province 1330 = Rangoon
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1330 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 300
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12127 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 5
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12256 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 5
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1417 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 5
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 5
+				}
+			}
+			diplomatic_relation = { country = BRM relation = war_relation active = no }
+			BRM = { diplomatic_relation = { country = KAY relation = war_relation active = no } }
+            set_variable = {
+                KAY.Karen_Conflict_Strength_Current = KAY.Karen_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Karen_Conflict_Strength_Current = BRM.Karen_Conflict_Strength
+            }
+
+            subtract_from_variable = {
+                KAY.Karen_Conflict_Strength_Current = KAY.Karen_Conflict_Strength_Old
+            }
+             subtract_from_variable = {
+                BRM.Karen_Conflict_Strength_Current = BRM.Karen_Conflict_Strength_Old
+            }
+			set_variable = {
+				KAY.karen_check = 1
+			}
+			set_variable = {
+				BRM.karen_check = 1
+			}
+		}	
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+}
+

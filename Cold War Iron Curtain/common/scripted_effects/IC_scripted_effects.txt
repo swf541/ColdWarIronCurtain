@@ -93,6 +93,49 @@ ic_pulse = {
 		}
 		set_global_flag = Twentieth_Congress_of_the_CPSU
 	}
+	#Jinnah_President.6			Jinnah Death July 1967
+	#PAK_1965_Election.1		Historical 1965 Election Start October 1964
+	#Baluchistan_Uprising.100	Precursor of the Baloch Conflict Feb 1973	 	
+	if = {
+		limit = {
+			tag = PAK
+			date > 1973.02.01
+			date < 1973.03.30
+			NOT = { has_country_flag = Baloch_Uprising_Precursor }
+		}
+		country_event = Baluchistan_Uprising.100
+		set_country_flag = Baloch_Uprising_Precursor
+	}
+	if = {
+		limit = {
+			tag = PAK
+			date > 1964.10.01
+			date < 1964.11.30
+			NOT = { has_country_flag = Pak_Election_65_Historical }
+		}
+		country_event = PAK_1965_Election.1
+		set_country_flag = Pak_Election_65_Historical
+	}
+	if = {
+		limit = {
+			tag = PAK
+			date > 1967.07.01
+			date < 1967.08.30
+			NOT = { has_country_flag = Fatima_Jinnah_End }
+		}
+		country_event = Jinnah_President.6
+		set_country_flag = Fatima_Jinnah_End
+	}
+	if = {
+		limit = {
+			tag = PAK
+			date > 1967.07.01
+			date < 1967.08.30
+			NOT = { has_country_flag = Fatima_Jinnah_End }
+		}
+		country_event = Jinnah_President.6
+		set_country_flag = Fatima_Jinnah_End
+	}
 	if = {
 		limit = {
 			tag = USA
@@ -2558,6 +2601,7 @@ ic_pulse = {
 			NOT = { tag = USA }
 			NOT = { tag = ENG }
 			NOT = { tag = BUL }
+			NOT = { tag = BCP }
 			NOT = { tag = DDR }
 			NOT = { tag = MLA }
 			NOT = { tag = SOV }
@@ -2591,6 +2635,7 @@ ic_pulse = {
 			NOT = { tag = ADR }
 			NOT = { tag = ETH }
 			NOT = { tag = WGR }
+			NOT = { tag = NGA }
 		}
 		load_focus_tree = generic_focus_60
 		set_country_flag = focus_tree_60_reset
@@ -2604,6 +2649,7 @@ ic_pulse = {
 			NOT = { has_country_flag = focus_tree_60_reset }
 			OR = {
 				tag = BUL
+				tag = BCP
 				tag = PDG
 				tag = ROM
 				tag = POL
@@ -2619,7 +2665,7 @@ ic_pulse = {
 				tag = PER
 				tag = GRE
 				tag = PRC
-				#tag = NGA
+				tag = NGA
 				tag = KOR
 				tag = KPA
 				tag = EGY
@@ -2675,16 +2721,22 @@ ic_pulse = {
 		}
 		if = {
 			limit = {
+				tag = BCP
+			}
+			load_focus_tree = BCP_60s
+		}
+		if = {
+			limit = {
 				tag = DDR
 			}
 			load_focus_tree = GDR_1960s
 		}
-		#if = {
-		#	limit = {
-		#		tag = NGA
-		#	}
-		#	load_focus_tree = NGA_1960s
-		#}
+		if = {
+			limit = {
+				tag = NGA
+			}
+			load_focus_tree = NGA_1960s
+		}
 		#if = {
 		#	limit = {
 		#		tag = SAF
@@ -4750,6 +4802,39 @@ ic_pulse = {
 	}
 	if = {
 		limit = {
+			tag = HAS
+			NGA = {
+				has_country_flag = hausaland_war
+			}	
+			check_variable = {
+				global.province_controllers^2050 = HAS.id
+			}
+		}
+		white_peace = NGA
+		#news_event = 
+		NGA = {
+			clr_country_flag = hausaland_war
+		}
+	}
+	if = {
+		limit = {
+			tag = BFR
+			NGA = {
+				has_country_flag = biafra_war
+			}
+			check_variable = {
+				global.province_controllers^2050 = BFR.id
+			}
+		}
+		white_peace = NGA
+		if = { limit = { country_exists = BNN } BNN = { white_peace = NGA } }
+		news_event = BFR.104
+		NGA = {
+			clr_country_flag = biafra_war
+		}		
+	}
+	if = {
+		limit = {
 			tag = WGR
 			NOT = { has_war = yes }
 			WGR = {
@@ -5059,55 +5144,6 @@ ic_pulse = {
 			}
 		}
 		country_event = decolonization.44
-	}
-	if = {
-		limit = {
-			date > 1967.07.01
-			date < 1967.09.01
-			NOT = { has_country_flag = Biafra_War_Start }
-			tag = NGA
-			country_exists = NGA
-		}
-		set_country_flag = Biafra_War_Start
-		NGA = {
-			#complete_national_focus = NGA_1960s_Biafran_War
-			remove_unit_leader = 196801
-		}
-		BFR = {
-			transfer_state = 1122
-			transfer_state = 1402
-			transfer_state = 1401
-			create_corps_commander = {
-				name = "Joseph Achuzie"
-				picture = "Portrait_Biafra_Joseph_Achuzie.dds"
-				traits = { trickster }
-				skill = 6
-				id = 196801
-			}
-			create_corps_commander = {
-				name = "Victor Banjo"
-				portrait_path = "gfx/leaders/NGA/Victor_Banjo.dds"
-				id = 129798
-				traits = { trait_reckless }
-				skill = 1
-				attack_skill = 1
-				defense_skill = 1
-				planning_skill = 1
-				logistics_skill = 1
-			}
-			load_oob = BFR_1949
-		}
-		if = {
-			limit = {
-				1106 = { is_owned_by = NGA }
-			}
-			BFR = {
-				transfer_state = 1106
-			}
-		}
-		news_event = Biafra_War.1
-		declare_war_on = { target = BFR type = annex_everything }
-		BFR = { activate_mission = Secure_Our_Independence_BFR }
 	}
 
 	#RADIATION CHECKS
@@ -7320,7 +7356,7 @@ ic_pulse = {
 		}
 		country_event = decolonization.43
 	}
-	#nigerian stuff
+	#nigerian 50s
 	if = {
 		limit = {
 			date > 1956.1.1
@@ -7335,10 +7371,44 @@ ic_pulse = {
 	if = {
 		limit = {
 			tag = NGA
+			date > 1955.2.1
+			date < 1955.2.10
+		}
+		country_event = nga50.12
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1958.10.10
+			date < 1958.10.20
+		}
+		country_event = nga50.13
+	}
+	if = {
+		limit = {
+			tag = NGA
+			focus_progress = {
+				focus = NGA_1950_grant_the_igbo_regional_autonomy
+				progress > 0.4
+			}
+		}
+		country_event = nga50.11
+	}
+	if = {
+		limit = {
+			tag = NGA
 			has_country_flag = colonial_nigeria_rebellions
 			has_civil_war = no
 		}
 		clr_country_flag = colonial_nigeria_rebellions
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1958.2.1
+			date < 1958.2.10
+		}
+		country_event = nga50.10
 	}
 	if = {
 		limit = {
@@ -7436,6 +7506,314 @@ ic_pulse = {
 		}
 		remove_unit_leader = 375673
 	}
+
+	#Nigeria 60s events
+	if = {
+		limit = {
+			tag = NGA
+			date > 1962.4.1
+			date < 1962.4.5
+		}
+		country_event = nga60.1
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1965.1.1
+			date < 1965.1.5
+			NOT = {
+				has_completed_focus = NGA_boycott_the_fifa_world_cup
+			}
+		}
+		complete_national_focus = NGA_boycott_the_fifa_world_cup
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1963.2.1
+			date < 1963.2.5
+		}
+		country_event = nga60.6
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1966.1.15
+			date < 1966.1.20
+		}
+		country_event = nga60.7
+	}
+	if = {
+		limit = {
+			tag = NGA
+			has_war_with = CMR
+			CMR = {
+				surrender_progress > 0.80
+			}
+
+		}
+		country_event = nga60.10
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1960.10.28
+			date < 1960.11.1
+		}
+		country_event = nga60.50
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1960.1.20
+			date < 1960.1.30
+		}
+		country_event = nga60.75
+	}
+	if = {
+		limit = {
+			tag = NGA
+			focus_progress = {
+				focus = NGA_militarize_the_cameroon_border
+				progress > 0.4
+			}
+		}
+		country_event = nga60.51
+	}
+	if = {
+		limit = {
+			tag = NGA
+			focus_progress = {
+				focus = NGA_solidify_union_rights
+				progress > 0.4
+			}
+		}
+		country_event = nga60.68
+	}
+	if = {
+		limit = {
+			tag = NGA
+			focus_progress = {
+				focus = NGA_found_the_federal_republic_of_nigeria
+				progress > 0.4
+			}
+		}
+		country_event = nga60.52
+	}
+	if = {
+		limit = {
+			tag = BFR
+			OR = {
+				focus_progress = {
+					focus = BFR_Our_National_Struggle
+					progress > 0.4
+				}
+				focus_progress = {
+					focus = BFR_The_Force_of_Arms
+					progress > 0.4
+				}
+			}
+		}
+		country_event = BFR.107
+	}
+	if = {
+		limit = {
+			tag = BFR
+			date > 1968.2.1
+			date < 1968.3.1
+		}
+		country_event = BFR.108
+	}
+	if = {
+		limit = {
+			tag = NGA
+			has_war_with = MLI
+			CMR = {
+				surrender_progress > 0.85
+			}
+
+		}
+		country_event = nga60.25
+	}
+	if = {
+		limit = {
+			tag = NGA
+			has_war_with = BFR
+			BFR = {
+				surrender_progress > 0.98
+			}
+
+		}
+		country_event = nga60.43
+	}
+	if = {
+		limit = {
+			tag = NGA
+			has_war_with = GHA
+			GHA = {
+				surrender_progress > 0.95
+			}
+
+		}
+		country_event = nga60.74
+	}
+	if = {
+		limit = {
+			1014 = {
+				is_fully_controlled_by = BFR
+			}
+			BFR = {
+				has_war_with = NGA
+			}
+		}
+		BNN = {
+			transfer_state = 1014
+		}
+	}
+	if = {
+		limit = {
+			tag = NGA
+			has_war_with = HAS
+			HAS = {
+				surrender_progress > 0.98
+			}
+
+		}
+		country_event = nga60.44
+	}
+	if = {
+		limit = {
+			tag = BFR
+			has_war_with = NGA
+			1011 = {
+				is_fully_controlled_by = BFR
+			}			
+		}
+		country_event = BFR.105
+	}
+	if = {
+		limit = {
+			tag = BFR
+			has_war_with = NGA
+			1403 = {
+				is_fully_controlled_by = BFR
+			}			
+		}
+		country_event = BFR.103
+	}
+	if = {
+		limit = {
+			tag = NGA
+			has_war_with = BFR
+			date > 1968.1.1
+			date > 1968.1.5
+
+		}
+		country_event = nga60.45
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1967.1.4
+			date < 1967.1.10
+		}
+		country_event = nga60.28
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1967.1.4
+			date < 1967.1.10
+			has_country_flag = northern_counter_coup_succeeded
+		}
+		country_event = nga60.28
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1967.1.4
+			date < 1967.1.10
+			has_country_flag = northern_counter_coup_failed
+		}
+		country_event = nga60.33
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1966.2.20
+			date < 1966.2.29
+		}
+		country_event = nga60.32
+	}
+	if = {
+		limit = {
+			tag = NGA
+			has_war_with = DLT
+			DLT = {
+				surrender_progress > 0.80
+			}
+		}
+		country_event = nga60.47
+	}
+	if = {
+		limit = {
+			tag = NGA
+			has_country_flag = biafran_war
+			has_country_flag = dlt_defeated
+			date > 1968.3.20
+			date < 1968.3.29
+		}
+		country_event = nga60.48
+	}
+	if = {
+		limit = {
+			tag = NGA
+			date > 1965.1.1
+			date < 1965.1.5
+		}
+		country_event = nga60.49
+	}
+	if = {
+		limit = {
+			tag = NGA
+			focus_progress = {
+				focus = NGA_mobilize_nigeria
+				progress > 0.4
+			}
+		}
+		country_event = nga60.35
+	}
+	if = {
+		limit = {
+			tag = NGA
+			has_war_with = BFR
+            check_variable = {
+                global.province_controllers^14329 = NGA.id
+            }
+		}
+		country_event = nga60.39
+	}
+	#Nigeria 70s
+	if = {
+		limit = {
+			tag = NGA
+			has_government = neutrality
+			has_country_flag = northern_counter_coup_succeeded
+			date > 1975.7.1
+			date < 1975.7.10
+		}
+		country_event = nga70.1
+	}
+	if = {
+		limit = {
+			tag = NGA
+			has_government = neutrality
+			has_country_flag = northern_counter_coup_succeeded
+			date > 1976.2.13
+			date < 1976.2.16
+		}
+		country_event = nga70.2
+	}
 	#Suriname decolonization
 	if = {
 		limit = {
@@ -7471,6 +7849,39 @@ ic_pulse = {
 					all_provinces = yes
 				}
 			}
+		}
+	}
+	if = {
+		limit = {
+			date > 1968.5.1
+			FRA = {
+				has_focus_tree = FRA_1960s_Maoist
+			}
+		}
+		FRA = {
+			complete_national_focus = FRA_SOV_60s_The_May_68_Coup
+		}
+	}
+	if = {
+		limit = {
+			date > 1953.03.06
+			tag = SRT
+			NOT = { has_country_flag = ankara_riots }
+		}
+		SRT = {
+			set_country_flag = ankara_riots
+			complete_national_focus = SRT_The_Ankara_Riots
+		}
+	}
+	if = {
+		limit = {
+			date > 1968.1.13
+			tag = ADR
+			NOT = { has_country_flag = Death_of_Koplenig }
+		}
+		ADR = {
+			set_country_flag = Death_of_Koplenig
+			complete_national_focus = ADR_60s_The_Death_of_Koplenig
 		}
 	}
 	if = {
