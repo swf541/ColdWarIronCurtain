@@ -523,97 +523,82 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	}
 
 	set_variable = { domesticTotalDebtK = domesticTotalDebt }
-	divide_variable = { domesticTotalDebtK = 1000 }
+	#divide_variable = { domesticTotalDebtK = 1000 }
+	set_variable = { TotalDebtk = currentDebt }
+	#divide_variable = { TotalDebtk = 1000 }
 	set_variable = { gdpDomesticDebtLimit = 0.40 }
 	if = { limit = { check_variable = { grossdomesticproduct > 1 } } add_to_variable = { gdpDomesticDebtLimit = 0.10 } }
 	if = { limit = { check_variable = { grossdomesticproduct > 5 } } add_to_variable = { gdpDomesticDebtLimit = 0.10 } }
 	if = { limit = { check_variable = { grossdomesticproduct > 10 } } add_to_variable = { gdpDomesticDebtLimit = 0.10 } }
 	if = { limit = { check_variable = { grossdomesticproduct > 100 } } add_to_variable = { gdpDomesticDebtLimit = 0.10 } }
 	if = { limit = { check_variable = { grossdomesticproduct > 1000 } } add_to_variable = { gdpDomesticDebtLimit = 0.10 } }
-	if = { limit = { check_variable = { currentMoney < 0 } }
-		if = { limit = { check_variable = { var = domesticTotalDebtK compare = less_than_or_equals value = gdpDomesticDebtLimit } }
-			set_variable = { pulse_deficit = currentMoney }
-			multiply_variable = { pulse_deficit = -1 }
-			add_to_variable = { currentMoney = pulse_deficit }
-			if = { limit = { check_variable = { defaultCheck < currentDebt } }
-				multiply_variable = { pulse_deficit = 1.10 } #Interest
-				if = {
-					limit = {
-						NOT = {
-							has_idea = Recent_Default
-						}
-					}
-					country_event = CWIC_ECON_PENALTIES.2
-				}
+	if = {	#Fallback
+		limit = {
+			check_variable = {
+				Interest_Rate = 0
 			}
-			else_if = { limit = { check_variable = { austerityCheck < currentDebt } }
-				multiply_variable = { pulse_deficit = 1.06 } #Interest
-				if = {
-					limit = {
-						NOT = {
-							has_idea = Recent_Austerity_Measures
-						}
-					}
-					country_event = CWIC_ECON_PENALTIES.1
-				}
-			}
-			else = {
-				multiply_variable = { pulse_deficit = 1.04 } #Interest
-			}
-
-			add_to_array = { array = debtOwnerArray value = THIS.id }
-			add_to_array = { array = debtTotalsArray value = pulse_deficit }
-
-			add_to_variable = { currentDebt = pulse_deficit }
-			add_to_variable = { domesticTotalDebt = pulse_deficit }
-			divide_variable = { pulse_deficit = 120 }
-			add_to_variable = { debtPayment = pulse_deficit }
-			add_to_array = { array = debtPaymentArray value = debtPayment }
-			add_to_array = { array = debtPaymentArray value = debtPayment }
-			add_to_variable = { currentDebtPayments = debtPayment }
 		}
-		if = { limit = { check_variable = { domesticTotalDebtK > gdpDomesticDebtLimit } }
-			set_variable = { pulse_deficit = currentMoney }
-			multiply_variable = { pulse_deficit = -1 }
-			add_to_variable = { currentMoney = pulse_deficit }
-			if = { limit = { check_variable = { defaultCheck < currentDebt } }
-				multiply_variable = { pulse_deficit = 1.10 } #Interest
-			}
-			else_if = { limit = { check_variable = { austerityCheck < currentDebt } }
-				multiply_variable = { pulse_deficit = 1.06 } #Interest
-			}
-			else = {
-				multiply_variable = { pulse_deficit = 1.04 } #Interest
-			}
-			add_to_array = { array = debtOwnerArray value = IND.id }
-			add_to_array = { array = debtTotalsArray value = pulse_deficit }
-
-			#for_loop_effect = {
-			#	end = influence_array^num
-			#	value = v
-			#	set_country_flag = found
-			#}
-			#if = {
-			#	limit = { NOT = { has_country_flag = found } }
-			#		add_to_array = { influence_array_val = pulse_deficit }
-			#}
-			#clr_country_flag = found
-			#recalculate_influence = yes
-
-			add_to_variable = { currentDebt = pulse_deficit }
-			divide_variable = { pulse_deficit = 36 }
-			add_to_variable = { debtPayment = pulse_deficit }
-			add_to_array = { array = debtPaymentArray value = debtPayment }
-			add_to_array = { array = debtPaymentArray value = debtPayment } # WIP - this has to be wrong
-			add_to_variable = { currentDebtPayments = debtPayment }
+		set_variable = {
+			Interest_Rate = 1.04
 		}
 	}
+	if ={ limit = { check_variable = { currentMoney < 0 } }
+		set_variable = { pulse_deficit = currentMoney }
+		multiply_variable = { pulse_deficit = -1 }
+		add_to_variable = { currentMoney = pulse_deficit }
+		if = { 
+			limit = { 
+				check_variable = { defaultCheck < currentDebt }
+				check_variable = { Credit_Rating < 10 }
+				NOT = {
+					check_variable = { defaultCheck = 0 }
+				}
+			}
+			multiply_variable = { pulse_deficit = Interest_Rate } #Interest
+			if = {
+				limit = {
+					NOT = {
+						has_idea = Recent_Default
+					}
+				}
+				country_event = CWIC_ECON_PENALTIES.2
+			}
+		}
+		else_if = { 
+			limit = { 
+				check_variable = { 
+					austerityCheck < currentDebt 
+				} 
+				NOT = {
+					check_variable = { defaultCheck = 0 }
+				}
+				check_variable = { Credit_Rating < 10 }
+			}
+			multiply_variable = { pulse_deficit = Interest_Rate } #Interest
+			if = {
+				limit = {
+					NOT = {
+						has_idea = Recent_Austerity_Measures
+					}
+				}
+				country_event = CWIC_ECON_PENALTIES.1
+			}
+		}
+		else = {
+			multiply_variable = { pulse_deficit = Interest_Rate } #Interest
+		}
 
-	set_variable = { austerityCheck = grossdomesticproduct }
-	multiply_variable = { austerityCheck = 2 }
-	set_variable = { defaultCheck = grossdomesticproduct }
-	multiply_variable = { defaultCheck = 6 }
+		add_to_array = { array = debtOwnerArray value = THIS.id }
+		add_to_array = { array = debtTotalsArray value = pulse_deficit }
 
+		add_to_variable = { currentDebt = pulse_deficit }
+		add_to_variable = { domesticTotalDebt = pulse_deficit }
+		divide_variable = { pulse_deficit = 120 }
+		add_to_variable = { debtPayment = pulse_deficit }
+		add_to_array = { array = debtPaymentArray value = debtPayment }
+		add_to_array = { array = debtPaymentArray value = debtPayment }
+		add_to_variable = { currentDebtPayments = debtPayment }
+	}
 	set_variable = { refinery_total = 0 }
 
 	add_to_variable = { refinery_total = tungsten_factory_total }
@@ -1290,26 +1275,31 @@ gdp_calculation = {
 	add_to_variable = { IncometotalGDP = office_park_totalGDP }
 
 	set_variable = { civindvalue = industrial_complex_totalGDP }
+	set_variable = { civindvaluedisplay = industrial_complex_totalGDP }
 	divide_variable = { civindvalue = 250 }
 
 	set_variable = { ofpvalue = office_park_totalGDP }
+	set_variable = { ofpvaluedisplay = office_park_totalGDP }
 	divide_variable = { ofpvalue = 250 }
 
 	set_variable = { dockvalue = dockyard_totalGDP }
+	set_variable = { dockvaluedisplay = dockyard_totalGDP }
 	divide_variable = { dockvalue = 250 }
 
 	set_variable = { farmvalue = farm_totalGDP }
+	set_variable = { farmvaluedisplay = farm_totalGDP }
 	divide_variable = { farmvalue = 250 }
 
 	set_variable = { refineryvalue = oil_refinery_totalGDP }
 	add_to_variable = {refineryvalue = steel_works_totalGDP }
 	add_to_variable = {refineryvalue = tungsten_factory_totalGDP }
+	set_variable = { refineryvaluedisplay = refineryvalue }
 	divide_variable ={ refineryvalue = 1000 }
 
 	##GDP calcs
 	set_variable = { grossdomesticproduct = IncometotalGDP }
 	set_variable = { grossdomesticproduct_fake = grossdomesticproduct }
-	divide_variable = { grossdomesticproduct_fake = 250 } #Fake display multiplier
+	divide_variable = { grossdomesticproduct_fake = 1050 } #Fake display multiplier
 
 	##monthly counter
 	add_to_variable = { checkdone = 0 } ##counts months since start
@@ -1369,6 +1359,28 @@ gdp_calculation = {
 		x_axis_scale_append = yes
 	}
 	add_to_variable = {checkdone = 1 }					##counts ingame months
+	#National Level Before Call
+	set_variable = {
+		industrial_base = 0
+	}
+	add_to_variable = {
+		industrial_base = office_park_totalGDP
+	}
+	add_to_variable = {
+		industrial_base = industrial_complex_totalGDP
+	}
+	add_to_variable = {
+		industrial_base = dockyard_totalGDP
+	}
+	add_to_variable = {
+		industrial_base = oil_refinery_totalGDP
+	}
+	add_to_variable = {
+		industrial_base = steel_works_totalGDP
+	}
+	add_to_variable = {
+		industrial_base = tungsten_factory_totalGDP
+	}
 
 	##final variable clear
 	set_variable = { IncometotalGDP = 0 }
@@ -1379,12 +1391,14 @@ gdp_calculation = {
 	set_variable = { ROOT.steel_works_totalGDP = 0 }
 	set_variable = { ROOT.tungsten_factory_totalGDP = 0 }
 	set_variable = { ROOT.office_park_totalGDP = 0 }
+
 }
 
 tax_rate = {
 	subtract_from_variable = { IncomeCheck = tax_base }
 	set_variable = { tax_base = 0 }
 	every_owned_state = {
+		
 		if = {
 			limit = {
 				OR = {
@@ -1490,6 +1504,9 @@ tax_rate = {
 	set_variable = { automated_population_tax = automated_population_census }
 	multiply_variable = { automated_population_tax = global.AutomatedTaxCredit }
 	add_to_variable = { tax_base = automated_population_tax }
+	set_variable = {
+		laffer_tax_base = tax_base
+	}
 
 	#total population
 	set_variable = { popTOTAL = 0 }
@@ -1498,6 +1515,121 @@ tax_rate = {
 	add_to_variable = { popTOTAL = developed_population_census }
 	add_to_variable = { popTOTAL = modern_population_census }
 	add_to_variable = { popTOTAL = automated_population_census }
+
+	set_variable = { preindustrial_population_census_lafter = preindustrial_population_census }
+	set_variable = { industrial_population_census_lafter = industrial_population_census }
+	set_variable = { developed_population_census_lafter = developed_population_census }
+	set_variable = { modern_population_census_lafter = modern_population_census }
+	set_variable = { automated_population_census_lafter = automated_population_census }
+
+	add_to_variable = { popTOTALLAFTER = preindustrial_population_census }
+	add_to_variable = { popTOTALLAFTER = industrial_population_census }
+	add_to_variable = { popTOTALLAFTER = developed_population_census }
+	add_to_variable = { popTOTALLAFTER = modern_population_census }
+	add_to_variable = { popTOTALLAFTER = automated_population_census }
+	
+    divide_variable = { automated_population_census_lafter = popTOTALLAFTER }
+    divide_variable = { modern_population_census_lafter = popTOTALLAFTER }
+    divide_variable = { developed_population_census_lafter = popTOTALLAFTER }
+    divide_variable = { industrial_population_census_lafter = popTOTALLAFTER }
+    divide_variable = { preindustrial_population_census_lafter = popTOTALLAFTER }
+
+    multiply_variable = { automated_population_census_lafter = 4 }
+    multiply_variable = { modern_population_census_lafter = 3 }
+    multiply_variable = { developed_population_census_lafter = 2 }
+
+    add_to_variable = { modern_population_census_lafter = 1 }
+    add_to_variable = { developed_population_census_lafter = 1 }
+    add_to_variable = { automated_population_census_lafter = 1 }
+
+
+	set_variable = {
+		undeveloped_penalty = 1
+	}
+	if = {
+		limit = {
+			check_variable = {
+				preindustrial_population_census_lafter > 0.1
+			}
+			subtract_from_variable = {
+				undeveloped_penalty = 0.15
+			}
+		}
+	}
+	if = {
+		limit = {
+			check_variable = {
+				preindustrial_population_census_lafter > 0.25
+			}
+			subtract_from_variable = {
+				undeveloped_penalty = 0.15
+			}
+		}
+	}
+	if = {
+		limit = {
+			check_variable = {
+				preindustrial_population_census_lafter > 0.5
+			}
+			subtract_from_variable = {
+				undeveloped_penalty = 0.15
+			}
+		}
+	}
+	subtract_from_variable = {
+		undeveloped_penalty = preindustrial_population_census_lafter
+	}
+	set_variable = {
+		underdeveloped_penalty = 1
+	}
+	subtract_from_variable = {
+		underdeveloped_penalty = industrial_population_census_lafter
+	}
+
+    divide_variable = {
+        preindustrial_population_census = popTOTAL
+    }
+    multiply_variable = {
+        preindustrial_population_census = 0.75
+    }
+    divide_variable = {
+        industrial_population_census = popTOTAL
+    }
+    multiply_variable = {
+        industrial_population_census = 1
+    }
+    divide_variable = {
+        developed_population_census = popTOTAL
+    }
+    multiply_variable = {
+        developed_population_census = 1.5
+    }
+    divide_variable = {
+        modern_population_census = popTOTAL
+    }
+    multiply_variable = {
+        modern_population_census = 2
+    }
+    divide_variable = {
+        automated_population_census = popTOTAL
+    }
+    multiply_variable = {
+        automated_population_census = 3
+    }
+	set_variable = { industrial_base_modifier = 0 }
+	add_to_variable = { industrial_base_modifier = preindustrial_population_census }
+	add_to_variable = { industrial_base_modifier = industrial_population_census }
+	add_to_variable = { industrial_base_modifier = developed_population_census }
+	add_to_variable = { industrial_base_modifier = modern_population_census }
+	add_to_variable = { industrial_base_modifier = automated_population_census }
+	multiply_variable = {
+		industrial_base = industrial_base_modifier
+	}
+	standard_deviation_for_industrial_base = yes
+	set_variable = { austerityCheck = grossdomesticproduct }
+	multiply_variable = { austerityCheck = austerity_multiplier }
+	set_variable = { defaultCheck = grossdomesticproduct }
+	multiply_variable = { defaultCheck = default_multiplier }
 
 	#multiply_variable = { ROOT.tax_base = 0.002 }
 	if = { limit = { has_idea = policy_taxrate_temp_1 } multiply_variable = { tax_base = 0.15 } }
@@ -1509,7 +1641,13 @@ tax_rate = {
 	multiply_variable = { tax_base = global.GlobalTaxCredit }
 	set_variable = { tax_display = 0 }
 	set_variable = { tax_display = tax_base }
+	laffer_curve_function = yes
+	multiply_variable = {
+		tax_display = effective_tax_rate
+	}
 	add_to_variable = { IncomeCheck = tax_base }
+
+
 }
 
 edict_expenditure = {
@@ -2372,3 +2510,831 @@ state_population_category_check = { #Directory for optimization
 		state_population_category_dev4 = yes
 	}
 }
+
+standard_deviation_for_industrial_base = {
+	UNS = {
+		set_variable = { country_total = 0 }
+		every_country = {
+			limit = {
+				NOT = { tag = USA }
+				NOT = { tag = SOV }
+				NOT = { tag = VTC }
+				NOT = { tag = UNS }
+				NOT = { tag = ENG }
+			}
+			add_to_variable = {
+				UNS.country_total = 1
+			}
+			add_to_variable = {
+				UNS.global_industrial_base_mean = industrial_base
+			}
+		}
+		divide_variable = {
+			UNS.global_industrial_base_mean = country_total
+		}
+		every_country = {
+			limit = {
+				NOT = { tag = USA }
+				NOT = { tag = SOV }
+				NOT = { tag = VTC }
+				NOT = { tag = UNS }
+				NOT = { tag = ENG }
+			}
+			set_variable = {
+				industrial_base_mean = industrial_base
+			}
+			subtract_from_variable = {
+				industrial_base_mean = UNS.global_industrial_base_mean
+			}
+			multiply_variable = {
+				industrial_base_mean = industrial_base_mean
+			}
+			add_to_variable = {
+				UNS.global_industrial_base_mean_squared = industrial_base_mean
+			}    
+		}
+		divide_variable = {
+			UNS.global_industrial_base_mean_squared = country_total
+		}
+		if = {
+			limit = {
+				check_variable = { UNS.global_industrial_base_mean_squared < 0.001 }
+			}
+			set_variable = { UNS.global_industrial_base_mean_deviation = 0 }
+		}
+		else = {
+			# overflow at 2147483.647
+			# therefore, highest possible square root * 2 is ~2931
+			set_temp_variable = { x = 2931 }
+
+			set_temp_variable = { y = 1 }
+			set_temp_variable = { e = 0.001 } # precision - game can't go any lower than this
+			while_loop_effect = {
+				limit = {
+					set_temp_variable = { t_x = x }
+					subtract_from_temp_variable = { t_x = y }
+					check_variable = { t_x > e }
+				}
+				add_to_temp_variable = { x = y }
+				divide_temp_variable = { x = 2 }
+				set_temp_variable = { y = UNS.global_industrial_base_mean_squared }
+				divide_temp_variable = { y = x }
+			}
+			set_variable = { UNS.global_industrial_base_mean_deviation = x }
+		}
+		log = "Global Industrial Base Mean Deviation: [?global_industrial_base_mean_deviation]"
+		log = "Global Industrial Base Mean: [?global_industrial_base_mean]"
+		every_country = {
+			limit = {
+				NOT = { tag = USA }
+				NOT = { tag = SOV }
+				NOT = { tag = VTC }
+				NOT = { tag = UNS }
+				NOT = { tag = ENG }
+			}
+			set_variable = {
+				industrial_base_z_score = industrial_base
+			}
+			subtract_from_variable = {
+				industrial_base_z_score = UNS.global_industrial_base_mean
+			}
+			divide_variable = {
+				industrial_base_z_score = UNS.global_industrial_base_mean_deviation
+			}
+			log = "[THIS.GetName] Industrial Base Z Score: [?industrial_base_z_score]"
+			if = {
+				limit = {
+					NOT = {
+						has_country_flag = Startup_Credit_Rating_Assigned
+					}
+				}
+				set_country_flag = Startup_Credit_Rating_Assigned
+				set_starting_credit_ratings = yes
+			}
+			if = {
+				limit = {
+					check_variable = {
+						industrial_base_z_score > 2
+					}
+				}
+				set_variable = {
+					industrial_base_tier = 6
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						industrial_base_z_score > 1.25
+					}
+				}
+				set_variable = {
+					industrial_base_tier = 5
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						industrial_base_z_score > 0.5
+					}
+				}
+				set_variable = {
+					industrial_base_tier = 4
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						industrial_base_z_score > 0
+					}
+				}
+				set_variable = {
+					industrial_base_tier = 3
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						industrial_base_z_score > -0.5
+					}
+				}
+				set_variable = {
+					industrial_base_tier = 2
+				}
+			}
+			else = {
+				set_variable = {
+					industrial_base_tier = 1
+				}   
+			}
+			process_credit_rating = yes
+		}
+		if = {
+			limit = {
+				UNS = {
+					NOT = {
+						has_country_flag = Startup_Credit_Rating_Assigned
+					}
+				}
+			}
+			set_country_flag = Startup_Credit_Rating_Assigned
+			USA = {
+				set_starting_credit_ratings = yes
+			}
+			UNS = {
+				set_starting_credit_ratings = yes
+			}
+			VTC = {
+				set_starting_credit_ratings = yes
+			}
+			ENG = {
+				set_starting_credit_ratings = yes
+			}
+			SOV = {
+				set_starting_credit_ratings = yes
+			}
+		}
+	}
+}
+#Industrial Base Tiers Defines
+#6 	= Superior
+#5	= Above Average
+#4	= Average 
+#3	= Below Average
+#2	= Poor
+#1 	= Shithole
+
+#Credit Rating Defines
+#10		AAA
+#9		AA
+#8		A
+#7		BBB
+#6		BB
+#5		B
+#4		CCC
+#3		CC
+#2		SD
+#1		D
+process_credit_rating = {
+	if = {
+		limit = {
+			OR = {
+				tag = USA
+				tag = UNS
+				tag = VTC
+				tag = SOV
+				tag = ENG
+			}
+		}
+		set_variable = {
+			Credit_Rating = 10
+		}
+	}
+	else = {
+		if = {
+			limit = {
+				check_variable = {
+					industrial_base_tier = 6
+				}
+			}
+			add_to_variable = { Credit_Progress = 1 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating < 9
+				}
+				check_variable = {
+					industrial_base_tier = 6
+				}
+			}
+			add_to_variable = { Credit_Progress = 2 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating < 8
+				}
+				check_variable = {
+					industrial_base_tier = 6
+				}
+			}
+			add_to_variable = { Credit_Progress = 2 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating < 7
+				}
+				check_variable = {
+					industrial_base_tier = 6
+				}
+			}
+			add_to_variable = { Credit_Progress = 2 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating < 6
+				}
+				check_variable = {
+					industrial_base_tier = 6
+				}
+			}
+			add_to_variable = { Credit_Progress = 2 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating < 5
+				}
+				check_variable = {
+					industrial_base_tier = 6
+				}
+			}
+			add_to_variable = { Credit_Progress = 2 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating < 9
+				}
+				check_variable = {
+					industrial_base_tier = 5
+				}
+			}
+			add_to_variable = { Credit_Progress = 1 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating < 6
+				}
+				check_variable = {
+					industrial_base_tier = 5
+				}
+			}
+			add_to_variable = { Credit_Progress = 2 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating < 4
+				}
+				check_variable = {
+					industrial_base_tier = 5
+				}
+			}
+			add_to_variable = { Credit_Progress = 4 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating > 7
+				}
+				check_variable = {
+					industrial_base_tier = 4
+				}
+			}
+			add_to_variable = { Credit_Progress = -1 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating < 6
+				}
+				check_variable = {
+					industrial_base_tier = 4
+				}
+			}
+			add_to_variable = { Credit_Progress = 1 }
+		}
+		if = {
+			limit = {
+				has_idea = UN_Sanctions
+			}
+			add_to_variable = { Credit_Progress = -1 }
+		}
+		if = {
+			limit = {
+				has_idea = unrecognized_state
+			}
+			add_to_variable = { Credit_Progress = -1 }
+		}
+		
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating < 4
+				}
+				check_variable = {
+					industrial_base_tier = 4
+				}
+			}
+			add_to_variable = { Credit_Progress = 1 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating > 5
+				}
+				check_variable = {
+					industrial_base_tier = 3
+				}
+			}
+			add_to_variable = { Credit_Progress = -2 }
+		}
+		if = {
+			limit = {
+				OR = {
+					check_variable = {
+						Credit_Rating = 2
+					}
+					check_variable = {
+						Credit_Rating = 3
+					}
+				}
+				check_variable = {
+					Credit_Rating > 5
+				}
+				check_variable = {
+					industrial_base_tier = 3
+				}
+			}
+			add_to_variable = { Credit_Progress = 1 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating > 4
+				}
+				check_variable = {
+					industrial_base_tier = 2
+				}
+			}
+			add_to_variable = { Credit_Progress = -2 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating > 3
+				}
+				check_variable = {
+					industrial_base_tier = 1
+				}
+			}
+			add_to_variable = { Credit_Progress = -2 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating = 1
+				}
+			}
+			set_variable = { Credit_Progress = 0 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating = 9
+				}
+			}
+			set_variable = { Credit_Progress = 0 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating > 6
+				}
+				check_variable = {
+					industrial_base_tier < 5
+				}
+			}
+			set_variable = { Credit_Progress = 0 }
+		}
+		if = {
+			limit = {
+				has_border_war = yes
+			}
+			add_to_variable = { Credit_Progress = -1 }
+		}
+		if = {
+			limit = {
+				has_country_flag = active_insurgency
+			}
+			add_to_variable = { Credit_Progress = -1 }
+		}
+		if = {
+			limit = {
+				has_war = yes
+			}
+			add_to_variable = { Credit_Progress = -1 }
+		}
+		if = {
+			limit = {
+				surrender_progress > 0.25
+			}
+			add_to_variable = { Credit_Progress = -1 }
+		}
+		if = {
+			limit = {
+				surrender_progress > 0.5
+			}
+			add_to_variable = { Credit_Progress = -2 }
+		}	
+		if = {
+			limit = {
+				surrender_progress > 0.75
+			}
+			add_to_variable = { Credit_Progress = -3 }
+		}		
+		if = {
+			limit = {
+				has_capitulated = yes
+			}
+			add_to_variable = { Credit_Progress = -4 }
+		}
+		set_variable = { DebtRiskAversionBad = grossdomesticproduct }
+		set_variable = { DebtRiskAversionGood = grossdomesticproduct }
+		if = {
+			limit = {
+				check_variable = {
+					Credit_Rating = 9
+				}
+			}
+			multiply_variable = {
+				DebtRiskAversionBad = 8
+			}
+			multiply_variable = {
+				DebtRiskAversionGood = 4
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					Credit_Rating = 8
+				}
+			}
+			multiply_variable = {
+				DebtRiskAversionBad = 6
+			}
+			multiply_variable = {
+				DebtRiskAversionGood = 3
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					Credit_Rating = 7
+				}
+			}
+			multiply_variable = {
+				DebtRiskAversionBad = 5
+			}
+			multiply_variable = {
+				DebtRiskAversionGood = 2.5
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					Credit_Rating = 6
+				}
+			}
+			multiply_variable = {
+				DebtRiskAversionBad = 4
+			}
+			multiply_variable = {
+				DebtRiskAversionGood = 2
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					Credit_Rating = 5
+				}
+			}
+			multiply_variable = {
+				DebtRiskAversionBad = 3
+			}
+			multiply_variable = {
+				DebtRiskAversionGood = 1.5
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					Credit_Rating = 4
+				}
+			}
+			multiply_variable = {
+				DebtRiskAversionBad = 2
+			}
+			multiply_variable = {
+				DebtRiskAversionGood = 1
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					Credit_Rating = 3
+				}
+			}
+			multiply_variable = {
+				DebtRiskAversionBad = 1
+			}
+			multiply_variable = {
+				DebtRiskAversionGood = 0.5
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					Credit_Rating = 2
+				}
+			}
+			multiply_variable = {
+				DebtRiskAversionBad = 0.75
+			}
+			multiply_variable = {
+				DebtRiskAversionGood = 0.35
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { currentDebt > DebtRiskAversionBad }
+			}
+			add_to_variable = { Credit_Progress = -1 }
+		}
+		if = {
+			limit = {
+				check_variable = { currentDebt < DebtRiskAversionGood }
+			}
+			add_to_variable = { Credit_Progress = 1 }
+		}	
+		if = {
+			limit = {
+				check_variable = { Credit_Progress > 99 }
+				NOT = {
+					check_variable = {
+						Credit_Rating = 1
+					}
+				}
+				NOT = {
+					check_variable = {
+						Credit_Rating = 9
+					}
+				}
+			}
+			raise_credit_rating = yes
+		}
+		if = {
+			limit = {
+				check_variable = { Credit_Progress < 0 }
+				NOT = {
+					check_variable = {
+						Credit_Rating < 4
+					}
+				}
+			}
+			lower_credit_rating = yes
+		}
+		set_interest_rates = yes
+	}
+}
+raise_credit_rating = {
+	add_to_variable = { Credit_Rating = 1 }
+}
+lower_credit_rating = {
+	add_to_variable = { Credit_Rating = -1 }
+}
+set_starting_credit_ratings = {
+	if = {
+		limit = {
+			OR = {
+				tag = USA
+				tag = UNS
+				tag = VTC
+				tag = SOV
+				tag = ENG
+			}
+		}
+		set_variable = {
+			Credit_Rating = 10
+		}
+	}
+	else_if = {
+		if = {
+			limit = {
+				check_variable = {
+					industrial_base_z_score > 3
+				}
+			}
+			set_variable = {
+				Credit_Rating = 9
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					industrial_base_z_score > 2
+				}
+			}
+			set_variable = {
+				Credit_Rating = 8
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					industrial_base_z_score > 1
+				}
+			}
+			set_variable = {
+				Credit_Rating = 7
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					industrial_base_z_score > 0.5
+				}
+			}
+			set_variable = {
+				Credit_Rating = 6
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					industrial_base_z_score > 0
+				}
+			}
+			set_variable = {
+				Credit_Rating = 5
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					industrial_base_z_score > -0.5
+				}
+			}
+			set_variable = {
+				Credit_Rating = 4
+			}
+		}
+		else = {
+			set_variable = {
+				Credit_Rating = 3
+			}
+		}
+	}
+	else = {
+		set_variable = {
+			Credit_Rating = 3
+		}   
+	}	
+}
+set_interest_rates = {
+	if = {
+		limit = {
+			check_variable = { Credit_Rating = 10 }
+		}
+		set_variable = {Interest_Rate = 0.0005}
+		
+	}
+	else_if = {
+		limit = {
+			check_variable = { Credit_Rating = 9 }
+		}
+		set_variable = {Interest_Rate = 0.01}
+		set_variable = { default_multiplier = 15 }
+		set_variable = { austerity_multiplier = 8 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { Credit_Rating = 8 }
+		}
+		set_variable = {Interest_Rate = 0.02}
+		set_variable = { default_multiplier = 12 }
+		set_variable = { austerity_multiplier = 6 }
+	}
+	else_if = {
+		limit = {
+			check_variable = {Credit_Rating = 7}
+		}
+		set_variable = {Interest_Rate = 0.05}
+		set_variable = { default_multiplier = 10 }
+		set_variable = { austerity_multiplier = 5 }
+	}
+	else_if = {
+		limit = {
+			check_variable = {Credit_Rating = 6}
+		}
+		set_variable = {Interest_Rate = 0.1}
+		set_variable = { default_multiplier = 8 }
+		set_variable = { austerity_multiplier = 4 }
+	}
+	else_if = {
+		limit = {
+			check_variable = {Credit_Rating = 5}
+		}
+		set_variable = {Interest_Rate = 0.15}
+		set_variable = { default_multiplier = 6 }
+		set_variable = { austerity_multiplier = 3 }
+	}
+	else_if = {
+		limit = {
+			check_variable = {Credit_Rating = 4}
+		}
+		set_variable = {Interest_Rate = 0.2}
+		set_variable = { default_multiplier = 4 }
+		set_variable = { austerity_multiplier = 2 }
+	}
+	else_if = {
+		limit = {
+			check_variable = {Credit_Rating = 3}
+		}
+		set_variable = {Interest_Rate = 0.25}
+		set_variable = { default_multiplier = 3 }
+		set_variable = { austerity_multiplier = 1 }
+	}
+	else_if = {
+		limit = {
+			check_variable = {Credit_Rating = 2}
+		}
+		set_variable = {Interest_Rate = 0.40}
+		set_variable = { default_multiplier = 2 }
+		set_variable = { austerity_multiplier = 0.75 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { Credit_Rating = 1 }
+		}
+		set_variable = {Interest_Rate = 0.50}
+		set_variable = { default_multiplier = 1 }
+		set_variable = { austerity_multiplier = 0.5 }
+	}
+	else = { }
+	set_variable = {
+		Interest_Rate_Display = Interest_Rate
+	}
+	add_to_variable = {
+		Interest_Rate = 1
+	}
+	set_variable = {
+		Domestic_Interest_Rate = Interest_Rate
+	}
+	multiply_variable = {
+		Domestic_Interest_Rate = 0.75
+	}
+	multiply_variable = {
+		Favorable_Interest_Rate = 0.65
+	}
+	set_variable = { austerityCheck = grossdomesticproduct }
+	multiply_variable = { austerityCheck = austerity_multiplier }
+	set_variable = { defaultCheck = grossdomesticproduct }
+	multiply_variable = { defaultCheck = default_multiplier }
+
+}
+
