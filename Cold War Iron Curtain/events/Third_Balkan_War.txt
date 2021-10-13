@@ -1,0 +1,1249 @@
+#Start of War Events NATO Turkey and Greece
+add_namespace = THIRD_BALKAN_WAR
+
+#Respond to Enosis (Event from TUR_Resond_Enosis) 
+#-Intervene (Turkish part of Cyprus occupied by Turkey, leads to Greece event "Turkish troops occupy parts of Cyprus", global event "Enosis Crisis Begins")
+
+news_event = {
+	id = THIRD_BALKAN_WAR.0
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.0"}
+	title = "[GetNewspaperHeader]Enosis Crisis Begins"
+	desc = THIRD_BALKAN_WAR.0.d
+	picture = GFX_THIRD_BALKAN_WAR_0
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Oh no"
+	}
+}
+country_event = {
+	id = THIRD_BALKAN_WAR.1
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.1"}	
+	title = "Turkey Occupies Parts of Cyprus"
+	desc = THIRD_BALKAN_WAR.1.d
+	picture = GFX_THIRD_BALKAN_WAR_1
+
+	is_triggered_only = yes
+
+	option = {  
+        name = "Seek partition with Turkey"
+		news_event = THIRD_BALKAN_WAR.2
+	}
+	option = {  
+        name = "Issue ultimatum"
+		news_event = THIRD_BALKAN_WAR.4
+		if = {
+			limit = {
+				GRE = {
+					owns_state = 43
+					has_idea = nato_member
+				}
+			}
+			USA = {
+				country_event = {
+					id = THIRD_BALKAN_WAR.5
+					days = 5
+				}
+			}	
+		}
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.2
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.2"}
+	title = "[GetNewspaperHeader]Greece Seeks a Resolution Over Cyprus"
+	desc = THIRD_BALKAN_WAR.2.d
+	picture = GFX_THIRD_BALKAN_WAR_2
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Interesting"
+        trigger = {
+            NOT = {
+				tag = GRE
+			}
+            NOT = {
+				tag = PDG
+			}
+            NOT = {
+				tag = TUR
+			}
+        }
+	}
+	option = {
+		name = "Let's see what happens"
+        trigger = {
+            OR = {
+				tag = GRE 
+				tag = PDG
+			}
+        }
+	}
+	option = {
+		name = "Accept the partition"
+        trigger = {
+            tag = TUR
+        }
+		
+		TUR = {
+			transfer_state = 912
+			country_event = THIRD_BALKAN_WAR.14
+		}
+		if = {
+			limit = {
+				country_exists = PDG
+			}
+			PDG = {
+				transfer_state = 183
+				transfer_state = 915
+				country_event = THIRD_BALKAN_WAR.13
+			}
+		}
+		else = {
+			GRE = {
+				transfer_state = 183
+				transfer_state = 915
+				country_event = THIRD_BALKAN_WAR.13
+			}
+		}
+	}
+	option = {
+		name = "Refuse"
+        trigger = {
+            tag = TUR
+        }
+		news_event = THIRD_BALKAN_WAR.3
+		hidden_effect = {
+			news_event = {
+				id = THIRD_BALKAN_WAR.4
+				days = 3
+			}
+			if = {
+				limit = {
+					GRE = {
+						owns_state = 43
+						has_idea = nato_member
+					}
+				}
+				USA = {
+					country_event = {
+						id = THIRD_BALKAN_WAR.5
+						days = 5
+					}
+				}	
+			}
+		}
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.3
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.3"}
+	title = "[GetNewspaperHeader]Turkey Refuses Cyprus Partition Plan"
+	desc = THIRD_BALKAN_WAR.3.d
+	picture = GFX_THIRD_BALKAN_WAR_3
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Damn"
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.4
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.4"}
+	title = "[GetNewspaperHeader]Greece Issues Cyprus Ultimatum"
+	desc = THIRD_BALKAN_WAR.4.d
+	picture = GFX_THIRD_BALKAN_WAR_4
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Oh no... "
+	}
+}
+country_event = {
+	id = THIRD_BALKAN_WAR.5
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.5"}	
+	title = "How to Respond to Enosis Crisis"
+	desc = THIRD_BALKAN_WAR.5.d
+	picture = GFX_THIRD_BALKAN_WAR_5
+
+	is_triggered_only = yes
+
+	option = {  
+        name = "Send emergency missions to Greece and Turkey"
+		GRE = {
+			country_event = THIRD_BALKAN_WAR.6
+		}
+	}
+}
+#(Greece gets "American Mission Arrives in Athens for Cyprus Talks", then after that, Turkey gets "American Mission Arrives in Ankara for Cyprus Talks"
+country_event = {
+	id = THIRD_BALKAN_WAR.6
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.6"}	
+	title = "American Mission Arrives in Athens for Cyprus Talks"
+	desc = THIRD_BALKAN_WAR.6.d
+	picture = GFX_THIRD_BALKAN_WAR_6
+
+	is_triggered_only = yes
+
+	option = {  
+        name = "Rescind Ultimatum"
+		set_country_flag = Rescinded_Ultimatum
+		news_event = THIRD_BALKAN_WAR.7
+		TUR = {
+			country_event = {
+				id = THIRD_BALKAN_WAR.9
+				days = 2
+			}
+		}
+	}
+	option = {  
+        name = "We will not be dictated to"
+		set_country_flag = No_Rescinded_Ultimatum
+		news_event = THIRD_BALKAN_WAR.8
+		TUR = {
+			country_event = {
+				id = THIRD_BALKAN_WAR.9
+				days = 2
+			}
+		}
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.7
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.7"}
+	title = "[GetNewspaperHeader]Greece Withdraws Ultimatum"
+	desc = THIRD_BALKAN_WAR.7.d
+	picture = GFX_THIRD_BALKAN_WAR_7
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Great News"
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.8
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.8"}
+	title = "[GetNewspaperHeader]Greece Resists US Pressure"
+	desc = THIRD_BALKAN_WAR.8.d
+	picture = GFX_THIRD_BALKAN_WAR_8
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Unfortunate..."
+	}
+}
+
+American Mission Arrives in Ankara for Cyprus Talks
+-Follow the American demands (leads to global event "Americans Claim Success in Turkey Talks")
+-Do not backdown (leads to global event "Americans Claim Failure in Turkey Talks")
+
+news_event = {
+	id = THIRD_BALKAN_WAR.10
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.10"}
+	title = "[GetNewspaperHeader]Americans Claim Success in Turkey Talks"
+	desc = THIRD_BALKAN_WAR.10.d
+	picture = GFX_THIRD_BALKAN_WAR_10
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Great"
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.11
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.11"}
+	title = "[GetNewspaperHeader]American-Turkish Talks End in Failure"
+	desc = THIRD_BALKAN_WAR.11.d
+	picture = GFX_THIRD_BALKAN_WAR_11
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Unfortunate..."
+	}
+}
+#Different Resulting Events Depending on US Effort
+
+#If Greece Withdraws Ultimatum and Turkey follows US Demands
+US Facilitates Resolution to Enosis Crisis (global)
+-Peace (Greece gets "Public Anger Over Cyprus Partition", Turkey gets "Public Disappointment Over Cyprus Partition")
+
+Public Anger Over Cyprus Partition (Greece event)
+-We will look forward to it (gain spirit "Enosis Incomplete" drop in stability, increase in military morale)
+
+Public Disappointment Over Cyprus Partition (Turkey event)
+-Peace for now (gain spirit "Enosis Incomplete", same effects as the one with Greece)
+
+#If Greece Withdraws Ultimatum and Turkey Does not Backdown
+Turkey Issues New Ultimatum (Greece/Turkey event)
+-The die is cast (leads to "United States Places Sanctions on Turkey", in two weeks get "Fighting Breaks Out in Cyprus")
+
+United States Places Sanctions on Turkey
+-Difficult times (United States puts economic/military sanctions on Turkey, in a week "NATO Meeting Discusses Turkish-Greek Tensions")
+
+NATO Meeting Discusses Turkish-Greek Tensions
+-Neutrality it will be (NATO states will get a decision to covertly back either side)
+
+#If Greece Resists US Efforts and Turkey follows US Demands
+United States Places Sanctions on Greece
+-Difficult times (United States puts economic/military sanctions on Greece, in a week "NATO Meeting Discusses Turkish-Greek Tensions")
+
+Respond to Greek Ultimatum (Turkey event)
+-The die is cast (leads to event "Fighting Breaks Out in Cyprus"
+
+Fighting Breaks Out in Cyprus
+-War in the Balkans? (war declared between Greece and Turkey)
+
+#If Greece Resists US Efforts and Turkey Does not Backdown
+United States Places Sanctions on Greece and Turkey
+-Difficult times (United States puts economic/military sanctions on Greece and Turkey, in a week "NATO Meeting Discusses Turkish-Greek Tensions", after the two-week deadline "Respond to Greek Ultimatum")
+
+#Start of War Anti-Revisionist Greece NATO Turkey
+#Enosis Crisis Begins
+#Turkey Occupies Parts of Cyprus (Greece event)
+#Greece Seeks a Resolution Over Cyprus (Turkish/Global event)
+#Turkey Refuses Cyprus Partition Plan
+#Greece Issues Cyprus Ultimatum
+#(leads to "United States Must Respond to Greek Ultimatum")
+United States Must Respond to Greek Ultimatum
+-Publicly declare support for Turkey ("US Issues Turkish Guarantee")
+-This is a bilateral issue ("US Refuses to Involve Itself in Cyprus Dispute")
+
+US Issues Turkish Guarantee
+-(leads to "US Threatening NATO Involvement")
+
+US Threatening NATO Involvement (Greece event)
+-Back down (leads to "Greece Removes Ultimatum")
+-We will not be cowed (US gets "Greece Refuses our Demand")
+
+Greece Removes Ultimatum (Turkey event)
+-Maintain the status quo (leads to "Uneasy Truce Between Greece and Turkey" )
+-Press our advantage (leads to "Turkey Issues Demands on Greece")
+
+Turkey Issues Demands on Greece (Greece event)
+-No way (leads to US gets event "Turkey Escalates Conflict" and in two weeks "Fighting Breaks Out in Cyprus")
+
+Turkey Escalates Conflict (US event)
+-We remain steadfast (when war breaks out leads to US event "What Level of Support for Turkey?"
+-Unacceptable ("US Criticizes Turkish Escalation")
+
+US Criticizes Turkish Escalation
+-Disappointment for the Turks (when war breaks out leads to US event "Offer Covert Support for Turkey", global event "NATO Will Not Involve Itself in Cyprus Crisis", relations drop)
+
+Uneasy Truce Between Greece and Turkey
+-Peace for now (no war, Greece gets event "Public Anger Over Cyprus Partition", Turkey gets "Public Disappointment Over Cyprus Partition)
+
+NATO Will Not Involve Itself in Cyprus Crisis (global event)
+-A decision is made (when war begins nato states get decision to covertly aid turkey when war begins)
+
+Greece Refuses Our Demand (US event)
+-Damn ("NATO Holds Emergency Meeting on Cyprus Crisis")
+ 
+NATO Holds Emergency Meeting on Cyprus Crisis
+-A decision is made (when war begins, gives nato states decision to aid turkey when war begins) 
+
+#Once War Begins
+Call on Albania? (Greece event)
+-Yes (leads to "Greece Call to Arms" for Albania
+-No
+
+Greek Call to Arms (Albania event)
+-Join the war (declares war on Turkey 
+-provide material support
+-We will not involve ourselves (drop in Greece relations)
+
+What Level of Support for Turkey (US event)
+-Full support (NATO states and US get decision Aid Turkey, relations with Greece drop)
+-Focus on diplomatic support (NATO states and US get decision Covertly Aid Turkey)
+
+Offer Covert Support for Turkey? (US event)
+-Do it
+-No
+
+#Non-Aligned Greece and NATO Turkey Start of War
+#SAME PATH AS LAST BRANCH, EXCEPT NO EVENTS INVOLVING ALBANIA/CHINA
+
+#Non-Aligned Greece and NATO Turkey War Started
+Call on Yugoslavia (Greece event)
+-Call on Yugoslavia (leads to "Greece Calls for Our Support")
+-No need
+
+Greece Calls for Our Support (Yugoslavia event)
+-Send arms and advisors (leads to "Yugoslavia Offers Support to Greece")
+-Join the war (leads to "Yugoslavia Enters Greco-Turkish War")
+-Condemn Turkey (leads to "Yugoslavia Condemns Turkish Aggression")
+
+Yugoslavia Offers Support to Greece
+-Excellent
+
+Yugoslavia Enters Greco-Turkish War
+-A major escalation
+
+Yugoslavia Condemns Turkish Aggression
+-Unsurprising
+
+Time to Take Advantage? (UAR event)
+-Prepare to intervene (global event "UAR Forces Mobilizing on Border", US gets "UAR Troop Buildup on Turkish Border" in a week)
+-Condemn Turkish Imperialism (leads to "UAR Condemns Turkish Imperialism")
+-Offer arms and advisors (leads to "UAR Pledges Material Support for Greece")
+
+UAR Condemns Turkish Imperialism
+-Interesting
+
+UAR Pledges Material Support for Greece
+-Interesting
+
+UAR Troop Buildup on Turkish Border (US event)
+-Warn UAR of intervention (leads to UAR event "US Threatening Action"
+-Warn UAR to stay put (leads to UAR event "US Issues Warning")
+
+US Threatening Action (UAR/Global)
+-A bluff (in a week "UAR Invades Hatay" and then "UAR Invades Hatay Despite Warning")
+-Backdown (ends chain, leads to event "UAR Denies Accusations")
+
+US Issues Warning (UAR/Global)
+-A bluff (in a week "UAR Invades Hatay")
+-Backdown (ends chain, leads to event "UAR Denies Accusations")
+
+UAR Denies Accusations (global)
+-What's going on?
+
+UAR Invades Hatay Despite Warning
+-Provide Turkey the Means of Defense (massive influx of arms to Turkey, leads to "Massive US Arms Transfer to Turkey")
+-We warned them (declare war on UAR or allow US to send a lot of volunteers to Turkey, leads to "United States Joins War Against UAR")
+
+Massive US Arms Transfer to Turkey
+-Concerning
+
+United States Joins War Against UAR
+-A Major Escalation
+
+UAR Invades Hatay
+-Another war...
+
+#(If Turkey has pro-Israel focuses completed and UAR declares war)
+Offer Turkey Support?
+-Offer material support and mobilize (leads to "Israeli Forces Mobilizing" and "Israel Pledges Support for Turkey")
+-Offer material aid and advisors ("Israel Privately Pledges Support for Turkey")
+-Condemn UAR Aggression ("Israel Condemns UAR Aggression")
+
+Israeli Forces Mobilizing (UAR event)
+-Concerning...
+
+Israel Pledges Support for Turkey (Turkish event)
+-Excellent
+
+Israel Condemns UAR Aggression (global)
+-Well then
+
+#(If Turkey goes pro-Arab focuses and at war with Greece in any scenario)
+Offer Greece Support?
+-Offer material support (leads to "Israel Pledges Military Support")
+-No need
+
+Israel Pledges Military Support (Greece event)
+-Excellent
+
+#Flavor Events
+
+news_event = {
+	id = THIRD_BALKAN_WAR.59
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.59"}
+	title = "[GetNewspaperHeader]Turkish Forces Enter Athens"
+	desc = THIRD_BALKAN_WAR.59.d
+	picture = GFX_THIRD_BALKAN_WAR_59
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "What a spectacle"
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.60
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.60"}
+	title = "[GetNewspaperHeader]Istanbul Falls to Greek Advance"
+	desc = THIRD_BALKAN_WAR.60.d
+	picture = GFX_THIRD_BALKAN_WAR_60
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "1453 Avenged?"
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.61
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.61"}
+	title = "[GetNewspaperHeader]Turkish Forces Clear Cyprus"
+	desc = THIRD_BALKAN_WAR.61.d
+	picture = GFX_THIRD_BALKAN_WAR_61
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Unsurprising"
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.62
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.62"}
+	title = "[GetNewspaperHeader]Greek Forces Capture Cyprus"
+	desc = THIRD_BALKAN_WAR.62.d
+	picture = GFX_THIRD_BALKAN_WAR_62
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Good news for Greece"
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.63
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.63"}
+	title = "[GetNewspaperHeader]UAR Occupies Hatay"
+	desc = THIRD_BALKAN_WAR.63.d
+	picture = GFX_THIRD_BALKAN_WAR_63
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Interesting"
+	}
+}
+country_event = {
+	id = THIRD_BALKAN_WAR.64
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.64"}	
+	title = "Occupying Aleppo"
+	desc = THIRD_BALKAN_WAR.64.d
+	picture = GFX_THIRD_BALKAN_WAR_64
+
+	is_triggered_only = yes
+
+	option = {  
+        name = "Declare a ceasefire"
+        news_event = THIRD_BALKAN_WAR.65
+        white_peace = EGY
+        EGY = {
+            country_event = THIRD_BALKAN_WAR.66
+    }
+	option = {  
+        name = "Keep on the pressure"
+    }
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.65
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.65"}
+	title = "[GetNewspaperHeader]Turkey Declares Ceasefire with UAR"
+	desc = THIRD_BALKAN_WAR.65.d
+	picture = GFX_THIRD_BALKAN_WAR_65
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Peace for now"
+	}
+}
+country_event = {
+	id = THIRD_BALKAN_WAR.66
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.66"}	
+	title = "Disastrous War with Turkey"
+	desc = THIRD_BALKAN_WAR.66.d
+	picture = GFX_THIRD_BALKAN_WAR_66
+
+	is_triggered_only = yes
+
+	option = {  
+        name = "Declare a ceasefire"
+        add_timed_idea = {
+            idea = Humiliating_Defeat # negative economic/military modifiers
+            days = 1825
+        }
+    }
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.67
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.67"}
+	title = "[GetNewspaperHeader]Greece Captures Edirne"
+	desc = THIRD_BALKAN_WAR.67.d
+	picture = GFX_THIRD_BALKAN_WAR_67
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Interesting"
+        trigger = {
+            NOT = {
+				tag = GRE
+			}
+            NOT = {
+				tag = PDG
+			}
+            NOT = {
+				tag = TUR
+			}
+        }
+	}
+	option = {
+		name = "Excellent"
+        trigger = {
+            OR = {
+				tag = GRE 
+				tag = PDG
+			}
+        }
+	}
+	option = {
+		name = "Damn"
+        trigger = {
+            tag = TUR
+        }
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.68
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.68"}
+	title = "[GetNewspaperHeader]Greece Captures Bursa"
+	desc = THIRD_BALKAN_WAR.68.d
+	picture = GFX_THIRD_BALKAN_WAR_68
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Interesting"
+        trigger = {
+            NOT = {
+				tag = GRE
+			}
+            NOT = {
+				tag = PDG
+			}
+            NOT = {
+				tag = TUR
+			}
+        }
+	}
+	option = {
+		name = "Excellent"
+        trigger = {
+            OR = {
+				tag = GRE 
+				tag = PDG
+			}
+        }
+	}
+	option = {
+		name = "Damn"
+        trigger = {
+            tag = TUR
+        }
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.69
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.69"}
+	title = "[GetNewspaperHeader]The Fall of Izmir"
+	desc = THIRD_BALKAN_WAR.69.d
+	picture = GFX_THIRD_BALKAN_WAR_69
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Interesting"
+        trigger = {
+            NOT = {
+				tag = GRE
+			}
+            NOT = {
+				tag = PDG
+			}
+            NOT = {
+				tag = TUR
+			}
+        }
+	}
+	option = {
+		name = "Excellent"
+        trigger = {
+            OR = {
+				tag = GRE 
+				tag = PDG
+			}
+        }
+	}
+	option = {
+		name = "Damn"
+        trigger = {
+            tag = TUR
+        }
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.70
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.70"}
+	title = "[GetNewspaperHeader]Greek Forces Advance into Ankara"
+	desc = THIRD_BALKAN_WAR.70.d
+	picture = GFX_THIRD_BALKAN_WAR_70
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Well then"
+        trigger = {
+            NOT = {
+				tag = GRE
+			}
+            NOT = {
+				tag = PDG
+			}
+            NOT = {
+				tag = TUR
+			}
+        }
+	}
+	option = {
+		name = "Glorious"
+        trigger = {
+            OR = {
+				tag = GRE 
+				tag = PDG
+			}
+        }
+	}
+	option = {
+		name = "We must fight on..."
+        trigger = {
+            tag = TUR
+        }
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.71
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.71"}
+	title = "[GetNewspaperHeader]Turkey Captures Kavala"
+	desc = THIRD_BALKAN_WAR.71.d
+	picture = GFX_THIRD_BALKAN_WAR_71
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Interesting"
+        trigger = {
+            NOT = {
+				tag = GRE
+			}
+            NOT = {
+				tag = PDG
+			}
+            NOT = {
+				tag = TUR
+			}
+        }
+	}
+	option = {
+		name = "Excellent"
+        trigger = {
+            tag = TUR
+        }
+	}
+	option = {
+		name = "Damn"
+        trigger = {
+            OR = {
+				tag = GRE 
+				tag = PDG
+			}
+        }
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.72
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.72"}
+	title = "[GetNewspaperHeader]Thessaloniki Falls to Turkish Advance"
+	desc = THIRD_BALKAN_WAR.72.d
+	picture = GFX_THIRD_BALKAN_WAR_72
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Interesting"
+        trigger = {
+            NOT = {
+				tag = GRE
+			}
+            NOT = {
+				tag = PDG
+			}
+            NOT = {
+				tag = TUR
+			}
+        }
+	}
+	option = {
+		name = "Excellent"
+        trigger = {
+            tag = TUR
+        }
+	}
+	option = {
+		name = "Damn"
+        trigger = {
+            OR = {
+				tag = GRE 
+				tag = PDG
+			}
+        }
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.73
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.73"}
+	title = "[GetNewspaperHeader]Turkey Captures Rhodes"
+	desc = THIRD_BALKAN_WAR.73.d
+	picture = GFX_THIRD_BALKAN_WAR_73
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Interesting"
+        trigger = {
+            NOT = {
+				tag = GRE
+			}
+            NOT = {
+				tag = PDG
+			}
+            NOT = {
+				tag = TUR
+			}
+        }
+	}
+	option = {
+		name = "Excellent"
+        trigger = {
+            tag = TUR
+        }
+	}
+	option = {
+		name = "Damn"
+        trigger = {
+            OR = {
+				tag = GRE 
+				tag = PDG
+			}
+        }
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.74
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.74"}
+	title = "[GetNewspaperHeader]Turkey Secures Ioannina"
+	desc = THIRD_BALKAN_WAR.74.d
+	picture = GFX_THIRD_BALKAN_WAR_74
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Interesting"
+        trigger = {
+            NOT = {
+				tag = GRE
+			}
+            NOT = {
+				tag = PDG
+			}
+            NOT = {
+				tag = TUR
+			}
+        }
+	}
+	option = {
+		name = "Excellent"
+        trigger = {
+            tag = TUR
+        }
+	}
+	option = {
+		name = "Damn"
+        trigger = {
+            OR = {
+				tag = GRE 
+				tag = PDG
+			}
+        }
+	}
+}
+
+#End of War Events
+UN Ceasefire Declared (after the fighting period has ended, Global/Turkey/Greece)
+
+#Cyprus Under Greek Control
+Greece in Control of Cyprus
+
+#Cyprus Under Turkish Control
+Turkey in Control of Cyprus
+
+#Cyprus Remains Divided
+Situation in Cyprus Unresolved
+
+#If Greece holds all its victory areas but Turkey controls Cyprus
+We Must Consider Our Negotiating Position (Turkey)
+-Offer Cyprus in exchange for return to pre-war borders (leads to "Turkey Makes Peace Offer")
+
+Turkey Makes Peace Offer
+-Accept terms ("Turkey Gives Cyprus for Return of Land")
+-No (Turkey controls Cyprus, proceed to route for Greece holds all victory areas and Turkey has none of its)
+
+Turkey Gives Cyprus for Return of Land
+-Peace? (Greece gets "Enosis Finally Achieved", Greece gains Cyprus, pre-war boundaries restored, Turkey gets "Public Anger Over Abandoning Cyprus")
+
+Enosis Finally Achieved (Greece)
+-Excellent ("Enosis Achieved" positive spirit for 5 years)
+
+Public Anger Over Abandoning Cyprus (Turkey)
+-Damn ("Cyprus Betrayed" negative spirit for 5 years)
+
+#If Greece holds all its victory areas and Turkey has none of its
+Determine Negotiating Position (Greece)
+-Press for Greater Greece (leads to US event "Greece Makes Large Territorial Demands")
+-Settle for Edirne and Istanbul (leads to "Greece Gains Edirne and Istanbul")
+
+Greece Gains Edirne and Istanbul
+-Return of Constantinople? (Edirne and Istanbul given to Greece; If both are NATO members, Turkey receives event "Questions Regarding NATO Membership" for Turkey)
+
+Questions Regarding NATO Membership for Turkey (Turkish event)
+-Threaten United States (US gets event "Turkey Considering Leaving NATO")
+-We must remain (no change, still in NATO)
+
+Turkey Considering Leaving NATO (US event)
+-Offer military/economic aid ("US Offers NATO Aid Package")
+-Offer our friendship ("US Urges Us to Stay in NATO")
+
+US Offers NATO Aid Package (Turkish)
+-Accept (gain economic/military spirit along with a bunch of weapons)
+-They are offering peanuts (leads to "Reconsider NATO Membership")
+
+US Urges us to Stay in NATO (Turkish)
+-We will decide (Leads to "Reconsider NATO Membership?")
+
+Greece Makes Large Territorial Demands (US event)
+-Do not intervene (Turkey gets "Reconsider NATO Membership?"
+-Inform Greece to scale back demands (leads to "US Threatens Sanctions" if route is Greece/Turkey are NATO states then get event "US Threatens Sanctions and NATO Expulsion")
+
+US Threatens Sanctions and NATO Expulsion (Greece)
+-Scale down (leads to "Greece Gains Edirne and Istanbul")
+-We will not be dictated to (leads to Greece event "Greece Defies NATO Demands", gains the total victory amount of territory)
+
+Greece Defies NATO Demands (US event)
+-Oh man (Turkey gets "Population in Uproar Over Crushing Defeat", United States "NATO Decides Fate of Greece")
+
+NATO Decides Fate of Greece
+-Expulsion, Sanctions (Greece gets "NATO Places Sanctions", removed from NATO)
+-Expulsion, Sanctions and Military Aid (Turkey gets evet "NATO Pledges Support", Greece gets "NATO Places Sanctions", removed from NATO)
+-Expulsion, Sanctions, Military Aid, and Economic Aid (Turkey gets "NATO Pledges Massive Support", Greece gets "NATO Places Sanctions" removed from NATO)
+
+US Threatens Sanctions (Greece (if not NATO member))
+-Scale down (leads to "Greece Gains Edirne and Istanbul")
+-We will not be dictated to (leads to Greece event "Greece Confirms Huge Gains")
+
+Greece Confirms Huge Gains (US/Global event)
+-Oh man (Turkey gets "Population in Uproar Over Crushing Defeat", United States "NATO Respond to Greek Territorial Gains")
+
+Population in Uproar Over Crushing Defeat (Turkey)
+-Damn ("National Humiliation" 5 year spirit, negative modifier on stability/economy/military)
+
+NATO Respond to Greek Territorial Gains
+-Sanctions (Greece gets "NATO Places Sanctions")
+-Sanctions and Military Aid (Turkey gets evet "NATO Pledges Support", Greece gets "NATO Places Sanctions)
+-Sanctions, Military Aid, and Economic Aid (Turkey gets "NATO Pledges Massive Support", Greece gets "NATO Places Sanctions)
+
+NATO Places Sanctions (Greece event)
+-Damn (trade sanctions by NATO states)
+
+NATO Pledges Support (Turkey)
+-Good (receive a bunch of military equipment)
+
+NATO Pledges Massive Support (Turkey)
+-Good (receive a bunch of military equipment and a five year modifier "NATO Economic Package" with boosts to economy)
+
+Reconsider NATO Membership (Turkey)
+-Not worth it (Turkey leaves NATO, event "Turkey Leaves NATO")
+-We cannot leave (Turkey stays in NATO)
+
+Turkey Leaves NATO (global)
+If Greece controls all its victory positions but Turkey controls at least two of its victory conditions from Greece
+
+Greece Gains Edirne and Istanbul
+-Return of Constantinople? 
+
+#If Turkey controls all its Victory areas but Greece controls Cyprus
+We Must Consider Our Negotiating Position (Greece)
+-Offer Cyprus in exchange for return to pre-war borders (leads to "Greece Makes Peace Offer")
+
+Greece Makes Peace Offer
+-Accept terms ("Greece Gives Cyprus for Return of Land")
+-No (Turkey controls Cyprus, proceed to route for Greece holds all victory areas and Turkey has none of its)
+
+Greece Gives Cyprus for Return of Land
+-Peace? (leads to "Determine Fate of Cyprus" for Turkey in a few weeks)
+
+Determine Fate of Cyprus (Turkey)
+-Restore Cyprus government (puppet Cyprus state leads to "Turkey Hands Power to New Cyprus Government")
+-Maintain Occupation (annex Cyprus, leads to "Turkey Continues Occupation of Cyprus"
+
+Turkey Continues Occupation of Cyprus
+-This can't end well
+
+Turkey Hands Power to New Cyprus Government
+-A Cyprus for all (Cyprus independent, Turkish puppet)
+
+#If Turkey controls all its Victory areas and Greece has none of its
+Determine Negotiating Position (Turkey)
+-Press for Northern Greece (leads to US event "Turkey Makes Large Territorial Demands")
+-Settle for Rhodes and Kavala (leads to "Turkey Gains Rhodes and Kavala")
+
+Turkey Gains Rhodes and Kavala
+-Moving forward (Rhodes and Kavala province given to Greece; If both are NATO members, Greece receives event "Questions Regarding NATO Membership for Greece")
+
+Questions Regarding NATO Membership for Greece (Greece event)
+-Threaten United States (US gets event "Greece Considering Leaving NATO")
+-We must remain (no change, still in NATO)
+
+Greece Considering Leaving NATO (US event)
+-Offer military/economic aid ("US Offers NATO Aid Package")
+-Offer our friendship ("US Urges Us to Stay in NATO")
+
+US Offers NATO Aid Package (Greece)
+-Accept (gain economic/military spirit along with a bunch of weapons)
+-They are offering peanuts (leads to "Reconsider NATO Membership")
+
+US Urges us to Stay in NATO (Greece)
+-We will decide (Leads to "Reconsider NATO Membership?")
+
+Turkey Makes Large Territorial Demands (US event)
+-Do not intervene (Greece gets "Reconsider NATO Membership?" "Turkey Confirms Huge Gains")
+-Inform Turkey to scale back demands (leads to "US Threatens Sanctions" if route is Greece/Turkey are NATO states then get event "US Threatens Sanctions and NATO Expulsion")
+
+US Threatens Sanctions (Turkey event)
+-Give in (leads to "Turkey Gains Rhodes and Kavala")
+-We will not be dictated to (leads to "US Slap Sanctions on Turkey"; "Turkey Confirms Huge Gains")
+
+US Slap Sanctions on Turkey
+-Damn (spirit "American Sanctions", in three years "Turkish Sanctions Quietly Lifted")
+
+Turkish Sanctions Quietly Lifted
+-Good to know ("American Sanctions" spirit removed from Turkey)
+
+US Threatens Sanctions and NATO Expulsion (Turkey)
+-Scale down (leads to "Turkey Gains Rhodes and Kavala")
+-We will not be dictated to (leads to Turkey event "Turkey Defies NATO Demands")
+
+Turkey Defies NATO Demands
+-Oh man (Greece gets "Population in Uproar Over Crushing Defeat", United States "NATO Decides Fate of Turkey")
+
+NATO Decides Fate of Turkey (US event)
+-Expulsion, Sanctions (Turkey gets "NATO Places Sanctions", removed from NATO)
+-Expulsion, Sanctions and Military Aid (Greece gets evet "NATO Pledges Support", Turkey gets "NATO Places Sanctions", removed from NATO)
+-Expulsion, Sanctions, Military Aid, and Economic Aid (Greece gets "NATO Pledges Massive Support", Turkey gets "NATO Places Sanctions" removed from NATO)
+
+Turkey Confirms Huge Gains
+-Oh man (Turkey gains all the land from First Balkan War, Greece gets "Population in Uproar Over Crushing Defeat")
+
+Population in Uproar Over Crushing Defeat (Greece)
+-Damn ("National Humiliation" 5 year spirit, negative modifier on stability/economy/military)
+
+NATO Places Sanctions (Turkey event)
+-Damn (sanctions by NATO states)
+
+NATO Pledges Support (Greece)
+-Good (receive a bunch of military equipment)
+
+NATO Pledges Massive Support (Greece)
+-Good (receive a bunch of military equipment and a five year modifier "NATO Economic Package" with boosts to economy)
+
+Reconsider NATO Membership (Greece)
+-Not worth it (Greece leaves NATO)
+-We cannot leave (Greece stays in NATO)
+
+#If Greece controls all its victory areas but Greece controls at least two of its victory conditions from Turkey
+#Turkey Gains Rhodes and Kavala
+
+#Greece and Turkey control a mix of each others victory positions
+news_event = {
+	id = THIRD_BALKAN_WAR.128
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.128"}
+	title = "[GetNewspaperHeader]Greco-Turkish War Ends Inconclusively"
+	desc = THIRD_BALKAN_WAR.128.d
+	picture = GFX_THIRD_BALKAN_WAR_128
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = "Was it worth it?"
+	}
+}
+#UAR Controls Hatay
+news_event = {
+	id = THIRD_BALKAN_WAR.129
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.129"}
+	title = "[GetNewspaperHeader]UAR Confirms Control of Hatay"
+	desc = THIRD_BALKAN_WAR.129.d
+	picture = GFX_THIRD_BALKAN_WAR_129
+
+	is_triggered_only = yes
+	major = yes
+	immediate = {
+		if = {
+			limit = {
+				tag = EGY
+			}
+			hidden_effect = {
+				transfer_state = 905
+			}
+		}
+	}
+	option = {
+		name = "An Arab victory"
+	}
+}
+#Turkey Controls Aleppo
+country_event = {
+	id = THIRD_BALKAN_WAR.130
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.130"}	
+	title = "The Fate of Northern Syria"
+	desc = THIRD_BALKAN_WAR.130.d
+	picture = GFX_THIRD_BALKAN_WAR_130
+
+	is_triggered_only = yes
+
+	option = {  
+		name = "Return the territory"
+		news_event = THIRD_BALKAN_WAR.131
+	}
+	option = {  
+		name = "Annex territory"
+		news_event = THIRD_BALKAN_WAR.132
+		EGY = {
+			add_timed_idea = {
+				idea = National_Defeat	#negative military/economic modifiers
+				days = 1095
+			}
+		}
+		894 = {
+			add_core_of = TUR
+		}
+		677 = {
+			add_core_of = TUR
+		}
+		810 = {
+			add_core_of = TUR
+		}
+		777 = {
+			add_core_of = TUR
+		}
+		680 = {
+			add_core_of = TUR
+		}
+		transfer_state = 894
+		transfer_state = 677
+		transfer_state = 810
+		transfer_state = 777
+		transfer_state = 680
+	}
+	option = {  
+		name = "Establish Syrian Government"
+		news_event = THIRD_BALKAN_WAR.133
+		EGY = {
+			add_timed_idea = {
+				idea = National_Defeat
+				days = 1095
+			}
+		}
+		SYR = {
+			transfer_state = 894
+			transfer_state = 677
+			transfer_state = 810
+			transfer_state = 777
+			transfer_state = 680
+		}
+		puppet = SYR
+		SYR = {
+			set_cosmetic_tag = TUR_SYR
+		}
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.131
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.131"}
+	title = "[GetNewspaperHeader]Turkey Returns UAR Territory"
+	desc = THIRD_BALKAN_WAR.131.d
+	picture = GFX_THIRD_BALKAN_WAR_131
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Good"
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.132
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.132"}
+	title = "[GetNewspaperHeader]Turkey Confirms Occupation of Aleppo"
+	desc = THIRD_BALKAN_WAR.132.d
+	picture = GFX_THIRD_BALKAN_WAR_132
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "Turkish return?"
+	}
+}
+news_event = {
+	id = THIRD_BALKAN_WAR.133
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = THIRD_BALKAN_WAR.133"}
+	title = "[GetNewspaperHeader]Turkey Announces Rebirth of Syria"
+	desc = THIRD_BALKAN_WAR.133.d
+	picture = GFX_THIRD_BALKAN_WAR_133
+
+	is_triggered_only = yes
+	major = yes
+	option = {
+		name = "We need a new map"
+	}
+}
+
+#Decision Stuff
+NATO Member Decision Descriptions
+
+Covertly Aid Greece
+"Although NATO agreed to remain neutral in the conflict, we know a Greek victory would work in our national interests. We have strong intelligence links and it would not be difficult to transfer arms to aid their effort."
+-Support them (small arms/supplies or any other arms you think works, boost to Greece relations)
+
+Covertly Aid Turkey
+"Although NATO agreed to remain neutral in the conflict, we know a Turkish victory would work in our national interests. We have strong intelligence links and it would not be difficult to transfer arms to aid their effort."
+-Support them (small arms/supplies or any other arms you think works, boost to Turkey relations)
+
+NATO States get decision: Aid Turkey
+Aid Turkey (decision)
+"Turkey is an important NATO ally. Although its conflict with Greece is largely a bilateral dispute, we enjoy strong diplomatic and military links. Many in the government feel it is our duty to provide military equipment to aid Turkey during this difficult time."
+
+NATO States get decision: Covertly Aid Turkey"
+Covertly Aid Turkey (decision)
+"Turkey is an important NATO ally. Although its conflict with Greece is largely a bilateral dispute, we enjoy strong diplomatic and military links. Many in the government feel it is our duty to provide military equipment to aid Turkey during this difficult time. However, since many in our nation feel Turkey is culpable for starting the conflict, such support will have to be covert."
+
+PRC get decision: Aid Greece
+
+Aid Greece (decision)
+"Greece is an important ideological partner internationally. Despite the differences, our peoples have found an ideological harmony. The people of Greece are currently engaged in a war against Turkey, a decadent, western puppet state. Our government has the ability to provide support for the people of Greece as they stand against western arrogance."
+-leads to global event "PRC Offers Aid to Greece"
+
+PRC Offers Aid to Greece
+"The Chinese government pledged to immediately dispatch vital aid to support the just struggle of Greece against Turkey. The announcement caught many by surprise, and there is little news on what such support would look like on the ground. Analysts believe the support may largely be in the form of economic or military equipment but cannot rule out a role for Chinese volunteers. The Turkish government condemned the Chinese announcement. The Greek government welcomed the decision, claiming it shows there are no boundaries between friends. The United States issued a warning that it would be monitoring the situation and level of Chinese support."
