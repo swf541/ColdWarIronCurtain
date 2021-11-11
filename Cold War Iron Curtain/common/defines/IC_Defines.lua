@@ -10,7 +10,7 @@ NDefines.NAI.RESEARCH_AIR_DOCTRINE_NEED_GAIN_FACTOR = 0.08 -- Multiplies value b
 NDefines.NAI.RESEARCH_BONUS_FACTOR = 1.5 -- To which extent AI should care about bonuses to research
 NDefines.NAI.RESEARCH_LAND_DOCTRINE_NEED_GAIN_FACTOR = 0.1 -- Multiplies value based on relative military industry size / country size.
 NDefines.NAI.RESEARCH_NAVAL_DOCTRINE_NEED_GAIN_FACTOR = 0.075 -- Multiplies value based on relative naval industry size / country size.
-NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 150
+NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 60
 
 NDefines.NAir.AIR_WING_FLIGHT_SPEED_MULT = 0.02					-- Global speed multiplier for airplanes (affects fe.transferring to another base)
 NDefines.NAir.AIR_WING_MAX_STATS_ATTACK = 1000					-- Max stats
