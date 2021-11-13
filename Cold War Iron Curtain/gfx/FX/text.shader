@@ -22,7 +22,7 @@ VertexStruct VS_INPUT
 {
     float4 vPosition  : POSITION;
     float2 vTexCoord  : TEXCOORD0;
-	float4 vColor	  : PDX_COLOR;
+	float4 vColor	  : COLOR;
 };
 
 VertexStruct VS_OUTPUT

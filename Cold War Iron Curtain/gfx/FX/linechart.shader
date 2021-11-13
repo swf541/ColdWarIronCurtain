@@ -10,7 +10,7 @@ VertexStruct VS_OUTPUT
 
 VertexStruct VS_INPUT
 {
-	float4 nOffset  : POSITION;
+	int4 nOffset  : POSITION;
 };
 
 ConstantBuffer( 0, 0 )
@@ -30,20 +30,21 @@ VertexShader =
 		VS_OUTPUT main(const VS_INPUT v )
 		{
 		    VS_OUTPUT Out;
-			int4 nOffsetInt = int4(v.nOffset.x, v.nOffset.y, v.nOffset.z, v.nOffset.w);
 		
-		  	float  vHeight = vColorHeight[nOffsetInt.x].w;
-			float  vOtherHeight = vColorHeight[ nOffsetInt.x + nOffsetInt.y ].w;
+			// OpenGL 2.0 does not support int input, backend will bind it as float, so we need an explicit cast
+			int2 nOffsetInt = int2(v.nOffset.x, v.nOffset.y);
+            float  vHeight = vColorHeight[nOffsetInt.x].w;
+            float  vOtherHeight = vColorHeight[ nOffsetInt.x + nOffsetInt.y ].w;
 			
-			float2 vLineVec = float2( vHalfLineWidthScale.y * nOffsetInt.y, vScreenPosWidthHeight.w * ( vHeight - vOtherHeight ) );
+			float2 vLineVec = float2( vHalfLineWidthScale.y * v.nOffset.y, vScreenPosWidthHeight.w * ( vHeight - vOtherHeight ) );
 			vLineVec = normalize( vLineVec );
 			vLineVec = float2( -vLineVec.y, vLineVec.x );
 			
 			float2 vCenterPoint = vScreenPosWidthHeight.xy; // screenpos of widget
-			vCenterPoint.x += nOffsetInt.x * vHalfLineWidthScale.y;
+			vCenterPoint.x += v.nOffset.x * vHalfLineWidthScale.y;
 			vCenterPoint.y += vScreenPosWidthHeight.w * (1.0f - vHeight);
 			
-			vLineVec.xy  *= vHalfLineWidthScale.x * nOffsetInt.z;
+			vLineVec.xy  *= vHalfLineWidthScale.x * v.nOffset.z;
 			vCenterPoint += vLineVec;
 			
 			Out.vPosition = mul( float4( vCenterPoint, 0, 1 ), InverseView );

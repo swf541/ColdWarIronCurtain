@@ -60,10 +60,11 @@ PixelShader =
 		return lerp(FOW_COLOR_MIN, FOW_COLOR_MAX, Color);
 	}
 	
-	void GetFogFactors( out float FogColorFactor, out float FogAlphaFactor, float3 WorldPosition, float ExtraHeight, in sampler2D NoiseTex, in sampler2D ExtraFOW, in sampler2D IntelMap)
+	void GetFogFactors( out float FogColorFactor, out float FogAlphaFactor, float3 WorldPosition, float ExtraHeight,
+						 in sampler2D NoiseTex, in sampler2D ExtraFOW, in sampler2D IntelMapSampler )
 	{
 		float FogHeightFactor = GetHeightFogFactor( WorldPosition + float3(0.0, ExtraHeight, 0.0) );		
-		float IntelFactor = GetIntelFactor( WorldPosition, IntelMap );
+		float IntelFactor = GetIntelFactor( WorldPosition, IntelMapSampler );
 
 		float FOWTransparency = GetFOWTransparency( WorldPosition, NoiseTex );
 		float FOWTransparencyRemapped = lerp(FOW_TRANSPARENCY_MIN, FOW_TRANSPARENCY_MAX, FOWTransparency);

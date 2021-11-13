@@ -300,9 +300,9 @@ PixelShader =
 {
 	Code
 	[[
-		float GetTreeMask( in sampler2D TreeMaskTexture, float3 vPos )
+		float GetTreeMask( in sampler2D TreeMaskTextureSampler, float3 vPos )
 		{
-			float vMask = tex2D( TreeMaskTexture, float2( ( ( vPos.x-0.5 ) / MAP_SIZE_X ), ( ( vPos.z+2.0f-MAP_SIZE_Y ) / -MAP_SIZE_Y )) ).a;
+			float vMask = tex2D( TreeMaskTextureSampler, float2( ( ( vPos.x-0.5 ) / MAP_SIZE_X ), ( ( vPos.z+2.0f-MAP_SIZE_Y ) / -MAP_SIZE_Y )) ).a;
 			return vMask;
 		}
 	]]
@@ -344,7 +344,7 @@ PixelShader =
 			vColor = GetOverlay( vColor, vSeasonColorMap, 0.25f );
 			
 			float vSeasonTreeFade = saturate( saturate( (In.vPos.z/MAP_SIZE_Y) - TREE_SEASON_MIN )*TREE_SEASON_FADE_TWEAK );
-			vColor += ( tex2D( SeasonMap, float2( In.vPrePos_vSeasonColumn.w, In.vTexCoord0_TintUV.w ) ).rgb-0.5f ) * vSeasonTreeFade;
+			vColor += saturate( tex2D( SeasonMap, float2( In.vPrePos_vSeasonColumn.w, In.vTexCoord0_TintUV.w ) ).rgb-0.5f ) * vSeasonTreeFade;
 		
 			float3 vNormalSample = normalize( tex2D( NormalMap, In.vTexCoord0_TintUV.xy  ).rgb - 0.5f );
 			float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), normalize( In.vNormal ) );

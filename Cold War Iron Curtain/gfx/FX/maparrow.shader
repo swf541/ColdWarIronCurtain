@@ -161,9 +161,11 @@ ConstantBuffer( 3, 32 ) # For arrow shader
 	float vSecondaryBodyUvScale;
 	float vTextureVariantScale; // 1.0f / (number of variants)
 	float fCullingOffset;
+	float vShadowFactor;
+	float vNormalMapFactor;
 };
 
-ConstantBuffer( 2, 32 ) # For symbol shader
+ConstantBuffer( 4, 32 ) # For symbol shader
 {
 	float4 SymbolColor;
 	float4 Position_Scale;
@@ -354,7 +356,7 @@ PixelShader =
 			vUV.y = lerp( vBodyV, vHeadV, vIsHead );
 
 			float vWaterValue = 0;
-			float3 vNormal = CalculateTerrainNormal( Input.uv_terrain, Input.uv_terrain_id, vWaterValue, vTime_IsSelected_FadeInOut.x );
+			float3 vNormal = vNormalMapFactor * CalculateTerrainNormal( Input.uv_terrain, Input.uv_terrain_id, vWaterValue, vTime_IsSelected_FadeInOut.x );
 			vUV += vNormal.xz * ( /*vNormal.y **/ MAP_ARROW_NORMALS_STR_TERR );
 			vUV -= vNormal.xz * ( vWaterValue * MAP_ARROW_NORMALS_STR_WATER );
 			vUV = clamp( vUV, 0.001f, 0.998f );
@@ -407,7 +409,8 @@ PixelShader =
 			vUV.y = ( ( vUV.y - 0.5f ) * vVariantBodyUvScale + 0.5f + vTextureVariant ) * vTextureVariantScale; // Adjust UV vertically to select the correct packed texture variant.
 
 			float vWaterValue = 0;
-			float3 vNormal = CalculateTerrainNormal( Input.uv_terrain, Input.uv_terrain_id, vWaterValue, vTime_IsSelected_FadeInOut.x );
+			float3 vNormal = vNormalMapFactor * CalculateTerrainNormal( Input.uv_terrain, Input.uv_terrain_id, vWaterValue, vTime_IsSelected_FadeInOut.x );
+
 			vUV += vNormal.xz * ( vNormal.y * MAP_ARROW_NORMALS_STR_TERR );
 			vUV -= vNormal.xz * ( vWaterValue * MAP_ARROW_NORMALS_STR_WATER );
 
@@ -437,7 +440,7 @@ PixelShader =
 				vColor.rgb = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor );
 			#endif
 			
-			vColor.rgb *= GetShadowScaled( SHADOW_WEIGHT_TERRAIN, Input.vScreenCoord, ShadowMap );
+			vColor.rgb *= GetShadowScaled( vShadowFactor * SHADOW_WEIGHT_TERRAIN, Input.vScreenCoord, ShadowMap );
 			vColor.rgb = ApplyDistanceFog( vColor.rgb, Input.prepos );
 			vColor.rgb = DayNightWithBlend( vColor.rgb, CalcGlobeNormal( Input.prepos.xz ), 0.2f );
 			return float4( vColor.rgb, vColor.a * vMaskValue );
@@ -531,6 +534,14 @@ Effect MapArrowDefaultWithDepth
 	VertexShader = "ArrowVertexShader"
 	PixelShader = "ArrowPixelShader"
 	DepthStencilState = "DefaultDepthNoStencil"
+}
+
+Effect MapArrowNoHeadWidthDepth
+{
+	VertexShader = "ArrowVertexShader"
+	PixelShader = "ArrowPixelShaderNoHead"
+	DepthStencilState = "DefaultDepthNoStencil"
+	Defines = { "ANIM_TEXTURE" }
 }
 
 Effect MapArrowNoHead

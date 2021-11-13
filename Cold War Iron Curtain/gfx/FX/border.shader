@@ -57,7 +57,7 @@ PixelShader =
 VertexStruct VS_INPUT_BORDER
 {
     float3 position			: POSITION;
-	float2 uv				: TEXCOORD0;
+	int2 uv					: TEXCOORD0;
 };
 
 VertexStruct VS_OUTPUT_BORDER

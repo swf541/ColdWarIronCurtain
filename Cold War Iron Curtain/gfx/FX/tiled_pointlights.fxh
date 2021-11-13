@@ -20,10 +20,11 @@ PixelShader =
 		return cellIndex * INV_LIGHT_INDEX_TEXTURE_SIZE;
 	}
 
-	void CalculatePointLights(LightingProperties aProperties, in sampler2D LightData_, in sampler2D LightIndexMap, inout float3 aDiffuseLightOut, inout float3 aSpecularLightOut)
+	void CalculatePointLights(LightingProperties aProperties, in sampler2D LightDataSampler, in sampler2D LightIndexMapSampler,
+								 inout float3 aDiffuseLightOut, inout float3 aSpecularLightOut)
 	{
 		float2 LightIndexUV = GetLightIndexUV(aProperties._WorldSpacePos);
-		float4 LightIndices = tex2Dlod(LightIndexMap, float4(LightIndexUV, 0, 0));
+		float4 LightIndices = tex2Dlod(LightIndexMapSampler, float4(LightIndexUV, 0, 0));
 		
 		for (int i = 0; i < 4; ++i)
 		{
@@ -31,8 +32,8 @@ PixelShader =
 			if (LightIndex >= 255.0)
 				break;
 			
-			float4 LightData1 = tex2Dlod(LightData_, float4((LightIndex * 2 + 0.5) * INV_LIGHT_DATA_TEXTURE_SIZE, 0, 0, 0));
-			float4 LightData2 = tex2Dlod(LightData_, float4((LightIndex * 2 + 1.5) * INV_LIGHT_DATA_TEXTURE_SIZE, 0, 0, 0));
+			float4 LightData1 = tex2Dlod(LightDataSampler, float4((LightIndex * 2 + 0.5) * INV_LIGHT_DATA_TEXTURE_SIZE, 0, 0, 0));
+			float4 LightData2 = tex2Dlod(LightDataSampler, float4((LightIndex * 2 + 1.5) * INV_LIGHT_DATA_TEXTURE_SIZE, 0, 0, 0));
 			PointLight pointlight = GetPointLight(LightData1, LightData2);
 				
 			CalculatePointLight(pointlight, aProperties, aDiffuseLightOut, aSpecularLightOut);

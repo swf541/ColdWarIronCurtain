@@ -148,7 +148,9 @@ VertexStruct VS_INPUT_PDXMESHSTANDARD
 	float3 vNormal      	: TEXCOORD0;
 	float4 vTangent			: TEXCOORD1;
 	float2 vUV0				: TEXCOORD2;
+@ifdef PDX_MESH_UV1
 	float2 vUV1				: TEXCOORD3;
+@endif
 };
 
 VertexStruct VS_INPUT_PDXMESHSTANDARD_SKINNED
@@ -157,7 +159,9 @@ VertexStruct VS_INPUT_PDXMESHSTANDARD_SKINNED
 	float3 vNormal      	: TEXCOORD0;
 	float4 vTangent			: TEXCOORD1;
 	float2 vUV0				: TEXCOORD2;
+@ifdef PDX_MESH_UV1
 	float2 vUV1				: TEXCOORD3;
+@endif
 	uint4 vBoneIndex 		: TEXCOORD4;
 	float3 vBoneWeight		: TEXCOORD5;
 };
@@ -216,6 +220,14 @@ ConstantBuffer( 1, 28 )
 	float vUVAnimSpeed;
 };
 
+#// this const buffer is only valid for trains
+ConstantBuffer( 1, 28 )
+{
+	float4x4 WorldMatrix2; // an alias of WorldMatrix. i have to put a matrix here to shift train user data by 4x4 matrix since WorldMatrix is actually valud and being used
+	float4 TrainColor;
+	float2 TrainAlphaStart;
+	float2 TrainAlphaDir;
+};
 
 ConstantBuffer( 2, 41 )
 {
@@ -252,8 +264,12 @@ VertexShader =
 			Out.vPosition = mul( ViewProjectionMatrix, Out.vPosition );
 			
 			Out.vUV0 = v.vUV0;
+#ifdef PDX_MESH_UV1
 			Out.vUV1 = v.vUV1;
-			
+#else
+			Out.vUV1 = v.vUV0;
+#endif
+		
 			return Out;
 		}
 	]]
@@ -299,8 +315,11 @@ VertexShader =
 			Out.vBitangent = normalize( mul( CastTo3x3(WorldMatrix), normalize( vSkinnedBitangent ) ) );
 		
 			Out.vUV0 = v.vUV0;
+#ifdef PDX_MESH_UV1
 			Out.vUV1 = v.vUV1;
-			
+#else
+			Out.vUV1 = v.vUV0;
+#endif			
 			return Out;
 		}
 	]]
@@ -554,7 +573,21 @@ PixelShader =
 */			
 
 			DebugReturn(vColor, lightingProperties, fShadowTerm);
+			
+		#ifdef TRAIN
+			alpha = TrainColor.a;
+			vColor *= TrainColor.rgb;
+			float2 toPos = vPos.xz - TrainAlphaStart;
+			float cosPos2d = dot( normalize( toPos ), TrainAlphaDir );
+			float clipalpha = step( 0.0f, cosPos2d );
+			float smoothalpha = smoothstep( 0.0f, 2.5f, length( toPos ) );
+
+			alpha *= clipalpha * smoothalpha;
+
+			return float4(vColor, alpha);
+		#else
 			return float4(vColor, max(alpha, MinMeshAlpha));
+		#endif
 		}
 	]]
 	
@@ -677,6 +710,13 @@ BlendState BlendStateAlphaTest
 	AlphaTest = yes
 }
 
+BlendState BlendStateAlphaTestTrain
+{
+	BlendEnable = yes
+	SourceBlend = "SRC_ALPHA"
+	DestBlend = "INV_SRC_ALPHA"
+	WriteMask = "RED|GREEN|BLUE"
+}
 
 Effect PdxMeshStandard
 {
@@ -890,4 +930,34 @@ Effect PdxMeshStandard_NoFoW_NoTISkinnedShadow
 {
 	VertexShader = "VertexPdxMeshStandardSkinnedShadow"
 	PixelShader = "PixelPdxMeshStandardShadow"
+}
+
+Effect PdxMeshTrain
+{
+	VertexShader = "VertexPdxMeshStandard"
+	PixelShader = "PixelPdxMeshStandard"
+	BlendState = "BlendStateAlphaTestTrain"
+	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "RIM_LIGHT" "TRAIN" "ALPHA_TEST" }
+}
+
+Effect PdxMeshTrainShadow
+{
+	VertexShader = "VertexPdxMeshStandardShadow"
+	PixelShader = "PixelPdxMeshStandardShadow"
+	Defines = { "TRAIN" }
+}
+
+Effect PdxMeshTrainSkinned
+{
+	VertexShader = "VertexPdxMeshStandardSkinned"
+	PixelShader = "PixelPdxMeshStandard"
+	BlendState = "BlendStateAlphaTestTrain"
+	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "RIM_LIGHT" "TRAIN" }
+}
+
+Effect PdxMeshTrainSkinnedShadow
+{
+	VertexShader = "VertexPdxMeshStandardSkinnedShadow"
+	PixelShader = "PixelPdxMeshStandardShadow"
+	Defines = { "TRAIN" }
 }
