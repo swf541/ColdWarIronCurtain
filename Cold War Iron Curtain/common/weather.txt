@@ -5,14 +5,17 @@ terrain_modifiers = {
   no_phenomenon = {
   }
   mud = {
-    terrain = { type = "mountain" value = -0.1 }
+    terrain = { type = "mountain" value = -0.3 }
     terrain = { type = "plains" value = 0.5 }
-    terrain = { type = "marsh" value = 0.8 }
-    terrain = { type = "desert" value = 0.5 }
+    terrain = { type = "marsh" value = 0.9 }
+    terrain = { type = "desert" value = 0.1 }
+    terrain = { type = "jungle" value = 0.2 }
   }
   rain_light = {
+    terrain = { type = "jungle" value = 0.2 }
   }
   rain_heavy = {
+    terrain = { type = "jungle" value = 0.2 }
   }
   snow = {
   	terrain = { type = "mountain" value = 0.8 }
@@ -29,14 +32,22 @@ terrain_modifiers = {
   	terrain = { type = "mountain" value = -1.0 }
   }
 
-  #temperature = {
+  temperature = {
   	#terrain = { type = "desert" value = 10.0 } ##Not unless we make separate day/night temp bonus
-  #}
+    terrain = { type = "mountain" value = -7.0 }
+    terrain = { type = "hills" value = -3.0 }
+    terrain = { type = "forest" value = -1.0 }
+    terrain = { type = "urban" value = 3.0 }
+    terrain = { type = "jungle" value = 5.0 }
+  }
 }
 
 settings = {
   temperature = {
-    variable = 0.25 # factor how much can vary between updates
+    temperature_variation = 2.0  # how much temperature change can vary each update
+    max_temperature_change = 6.0  # maximum temperature change
+    temperature_neighbor_smoothing = 0.3  # [0-1] make temperature be like province neighbors
+    temperature_change_neighbor_smoothing = 0.5  # [0-1] make temperature change be like province neighbors
 
     # Temperature range when should apply static modifiers
     weather_extreme_cold = { -100.0 -25.0 }
@@ -46,17 +57,17 @@ settings = {
   }
   mud = {
     # Amount of water collected by rain increases probability of mud
-    water_gain_on_rain_light = 1.0
-    water_gain_on_rain_heavy = 1.5
-    water_gain_max = 300.0
+    water_gain_on_rain_light = 0.5
+    water_gain_on_rain_heavy = 1.8
+    water_gain_max = 200.0
     water_gain_min = 5.0 # cutoff
 
     # (for text descriptions) - When rain gain reach max level, it'll be X cm of water. (fe. max 60.0*0.2 = 12cm of rainfall)
     water_gain_to_cm = 0.2
 
     # When not raining, high temperature increases water drying speed. Starts low because the soil should natuarally drain some water even in northern climates.
-    water_dryout_temperature = { 0.0 38.0 }
-    water_dryout_multiplier = { 0.0005 0.3 }
+    water_dryout_temperature = { 2.0 38.0 }
+    water_dryout_multiplier = { 0.0005 0.4 }
 
     # When temperature goes below, the mud disappears (it gets frozen).
     min_temperature = -1.0
@@ -69,8 +80,8 @@ settings = {
 
   snowing = {
     # Amount of snow collected affects the visual snow on the map
-    snow_gain_on_snowing = 3.0
-    snow_gain_on_blizzard = 8.0
+    snow_gain_on_snowing = 1.0
+    snow_gain_on_blizzard = 5.0
     snow_gain_max = 80.0
 
     # Visual fix, so even tiny amount of snow can be visible. (0-255)
@@ -84,23 +95,30 @@ settings = {
     snow_melt_multiplier = { 0.001 0.9 }
 
     # Max temperature allowed for snowing / min temperature for highest chance of snowing.
-    temperature = { 1.0 -10.0 }
+    temperature = { 1.0 -4.0 }
 
     weather_ground_snow_medium = { 20.0 40.0 }
     weather_ground_snow_high = { 40.0 1000.0 }
   }
 
   arctic_water = {
-	arctic_water_temperature = { -5.0 0.0 }
-	arctic_water_end_temperature = { 1.0 5.0 }
+    arctic_water_temperature = { -5.0 0.0 }
+    arctic_water_end_temperature = { 1.0 5.0 }
   }
   
   # Increase chance of X if was already X before. Decrease otherwise.
   chance_increase = {
-    mud = { 20.0 0.10 }
-    rain = { 1.75 0.25 }
-    snow = { 1.75 0.25 }
-    sandstorm = { 1.75 0.25 }
+    mud = { 15.0 0.10 }
+  }
+
+  # How many days this weather will go on once started. Random interval [min, max], weighted towards lower numbers (by picking smallest of two random numbers).
+  duration = {
+    no_phenomenon = { 5 12 }
+    rain_light = { 5 20 }
+    rain_heavy = { 2 15 }
+    snow = { 5 20 }
+    blizzard = { 2 15 }
+    sandstorm = { 2 10 }
   }
 
   # Performance tweaking

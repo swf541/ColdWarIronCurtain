@@ -64,23 +64,32 @@ float2 GetAnimatedTexcoord(float2 Texcoord, AnimationData Data)
 	return AnimatedTexcoord;
 }
 
-float3 Blend(float3 Base, float3 Blend, AnimationData Data)
+float4 Blend(float4 Dest, float4 Source, AnimationData Data)
 {
-	float3 Result = vec3(0.0);
+	float4 Result = float4(1.0, 0.0, 1.0, 1.0);
 	
 	if (Data.BlendMode == 0) // Add
 	{
-		Result = Base + Blend;
+		Result.rgb = lerp(Dest.rgb, Dest.rgb + Source.rgb, Source.a);
+		Result.a = max(Dest.a, Source.a);
 	}
 
 	if (Data.BlendMode == 1) // Multiply
 	{
-		Result = Base * Blend;
+		Result = Dest * Source;
 	}
 
 	if (Data.BlendMode == 2) // Overlay
 	{
-		Result = lerp(Base * Blend * 2.0, 1.0 - (2.0 * (1.0 - Base) * (1.0 - Blend)), step(0.5, Base));
+		// no idea what this is doing
+		Result.rgb = lerp(Dest.rgb * Source.rgb * 2.0, 1.0 - (2.0 * (1.0 - Dest.rgb) * (1.0 - Source.rgb)), step(0.5, Dest.rgb));
+		Result.a = Source.a;
+	}
+
+	if (Data.BlendMode == 3) // Normal (classic alpha blending with support for transparent destination)
+	{
+		Result.rgb = lerp(Dest.rgb * Dest.a, Source.rgb, Source.a);
+		Result.a = max(Source.a, Dest.a);
 	}
 
 	return Result;
@@ -107,9 +116,9 @@ PixelShader = {
 Code 
 [[
 
-float4 Animate(float4 BaseColor, in sampler2D MaskTexture_, float2 MaskTexcoord, in sampler2D AnimatedTexture_, float2 AnimatedTexcoord, AnimationData Data)
+float4 Animate(float4 BaseColor, in sampler2D MaskTextureSampler, float2 MaskTexcoord, in sampler2D AnimatedTextureSampler, float2 AnimatedTexcoord, AnimationData Data)
 {
-    float4 Mask = tex2D( MaskTexture_, MaskTexcoord );
+    float4 Mask = tex2D( MaskTextureSampler, MaskTexcoord );
 	float4 Anim = vec4(0.0);
 			
 	if (Data.Type == 3) // Pulse
@@ -118,26 +127,29 @@ float4 Animate(float4 BaseColor, in sampler2D MaskTexture_, float2 MaskTexcoord,
 	}
 	else
 	{
-		Anim = tex2D( AnimatedTexture_, AnimatedTexcoord );
+		Anim = tex2D( AnimatedTextureSampler, AnimatedTexcoord );
 		
 		if ((Data.ClampAnimation > 0.0f) && (AnimatedTexcoord.y < 0.0 || AnimatedTexcoord.y > 1.0))
 			Mask.a = 0.0;
 	}
 
-	float animationAlpha = Data.BlendFactor * Mask.a * Anim.a;
-	return float4(lerp(BaseColor.rgb, Blend(BaseColor.rgb, Anim.rgb * Mask.rgb, Data), animationAlpha), max(BaseColor.a, animationAlpha));
+	float4 Masked = Anim * Mask;
+	Masked.a *= Data.BlendFactor;
+	float4 Blended = Blend(BaseColor, Masked, Data);
+	return Blended;
 }
 
-float4 Animate(float4 BaseColor, float2 MaskTexcoord, float4 AnimatedTexcoord, in sampler2D MaskTexture_, in sampler2D AnimatedTexture_, in sampler2D MaskTexture2_, in sampler2D AnimatedTexture2_)
+float4 Animate(float4 BaseColor, float2 MaskTexcoord, float4 AnimatedTexcoord, in sampler2D MaskTextureSampler, in sampler2D AnimatedTextureSampler,
+				 in sampler2D MaskTexture2Sampler, in sampler2D AnimatedTexture2Sampler)
 {
 	AnimationData data = GetAnimationData(0);
 	
 	float4 color = BaseColor;
-	color = Animate(color, MaskTexture_, MaskTexcoord, AnimatedTexture_, AnimatedTexcoord.xy, data);
+	color = Animate(color, MaskTextureSampler, MaskTexcoord, AnimatedTextureSampler, AnimatedTexcoord.xy, data);
 	
 #ifdef NUM_ANIMATIONS_2
 	data = GetAnimationData(1);
-	color = Animate(color, MaskTexture2_, MaskTexcoord, AnimatedTexture2_, AnimatedTexcoord.zw, data);
+	color = Animate(color, MaskTexture2Sampler, MaskTexcoord, AnimatedTexture2Sampler, AnimatedTexcoord.zw, data);
 #endif	
 	
 	return color;

@@ -29,7 +29,7 @@ PixelShader =
 
 VertexStruct VS_INPUT
 {
-    float4 vPosition  : POSITION;
+    float3 vPosition  : POSITION;
     float2 vTexCoord  : TEXCOORD0;
 };
 
@@ -55,7 +55,7 @@ VertexShader =
 		VS_OUTPUT main(const VS_INPUT v )
 		{
 			VS_OUTPUT Out;
-			Out.vPosition  = mul( WorldViewProjectionMatrix, v.vPosition );
+			Out.vPosition  = mul( WorldViewProjectionMatrix, float4( v.vPosition.xyz, 1 ) );
 			Out.vTexCoord.zw = v.vTexCoord.xy;
 			Out.vTexCoord.xy = FlagCoords.xy;
 			Out.vTexCoord.xy += v.vTexCoord.xy * FlagCoords.zw;

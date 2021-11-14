@@ -5,7 +5,7 @@ Includes = {
 VertexStruct VS_INPUT
 {
     float2 vPosition  : POSITION;
- 	float4 vColor	  : PDX_COLOR;
+ 	float4 vColor	  : COLOR;
 };
 
 VertexStruct VS_OUTPUT

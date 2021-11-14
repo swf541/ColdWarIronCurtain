@@ -154,7 +154,7 @@ PixelShader =
 
 VertexStruct VS_INPUT_WATER
 {
-    float2 position			: POSITION;
+    int2 position			: POSITION;
 };
 
 VertexStruct VS_OUTPUT_WATER
@@ -170,7 +170,7 @@ VertexStruct VS_OUTPUT_WATER
 };
 
 
-ConstantBuffer( 2, 48 )
+ConstantBuffer( 3, 48 )
 {
 	float3 vTime_HalfPixelOffset;
 };

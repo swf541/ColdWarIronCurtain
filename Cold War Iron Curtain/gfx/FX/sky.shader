@@ -23,7 +23,7 @@ PixelShader =
 
 VertexStruct VS_INPUT_SKY
 {
-    float2 position			: POSITION;
+    int2 position			: POSITION;
 };
 
 VertexStruct VS_OUTPUT_SKY
