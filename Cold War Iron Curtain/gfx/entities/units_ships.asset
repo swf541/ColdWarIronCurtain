@@ -886,6 +886,105 @@ entity = {
 
 }
 
+entity = {
+	name = "USA_light_cruiser_entity"
+	pdxmesh = "USA_belknap_mesh"
+
+	default_state = idle
+	state = { name = "idle"	animation = "idle" animation_blend_time = 0.3
+		event = { trigger_once = yes time = 0 sound = { soundeffect = ship_idle_light_cruiser }}
+		event = { time = 0 particle = "ship_idle_particle"  keep_particle = yes  }
+	}
+
+	state = { name = "move"	animation = "idle" animation_blend_time = 0.3
+		event = { time = 0 node="front_moving_water_effect" particle = "ship_moving_front_fleet_particle"  keep_particle = yes trigger_once = yes }
+	}
+
+	state = { name = "attack"				animation = "attack"   animation_blend_time = 0.3
+		event = { sound = { soundeffect = "light_cruiser_attack" } }
+		event = { trigger_once = yes sound = { soundeffect = "distance_light_cruiser_attack" } }
+
+		game_data = {
+			hitmiss_effect = { time = 0.15 type = small }
+		}
+	}
+
+	state = { name = "defend"				animation = "defend"   animation_blend_time = 0.3
+
+
+		game_data = {
+			hitmiss_effect = { time = 0.1 type = small }
+			hitmiss_effect = { time = 0.45 type = small }
+			hitmiss_effect = { time = 0.65 type = small }
+		}
+	}
+
+	state = { name = damaged_attack looping = no animation = "damaged_attack" state_time = 3 next_state = damaged_attack_looping
+		event = { time = 0 node="hit_effect_locator2" particle = "ship_explosion_particle"  keep_particle = yes }
+		event = { time = 0.2 node="hit_effect_locator2" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+		#event = { time = 0.6 node="damaged_smoke2" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+		event = { sound = { soundeffect = "ships_light_cruiser_attacked" } }
+		event = { trigger_once = yes sound = { soundeffect = "distance_ships_light_cruiser_attacked" } }
+
+		game_data = {
+			hitmiss_effect = { time = 0.15 type = small }
+		}
+	}
+
+	state = { name = "damaged_attack_looping"				animation = "damaged_attack"   animation_blend_time = 0.3
+
+		#event = { time = 0 node="miss_effect_locator1" particle = "water_impact_particle"  keep_particle = yes }
+
+		event = { time = 0 node="hit_effect_locator2" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+		#event = { time = 0 node="damaged_smoke2" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+
+		event = { sound = { soundeffect = "light_cruiser_attack_damaged" } }
+		event = { trigger_once = yes sound = { soundeffect = "distance_light_cruiser_attack_damaged" } }
+
+		game_data = {
+			hitmiss_effect = { time = 0.15 type = small }
+		}
+	}
+
+	state = { name = damaged_defend looping = no animation = "damaged_defend" state_time = 3 next_state = damaged_defend_loop
+		event = { time = 0 particle = "ship_fire_water_shockwave_particle"  keep_particle = yes }
+
+		event = { time = 0 node="hit_effect_locator3" particle = "ship_explosion_particle"  keep_particle = yes }
+		event = { time = 0.2 node="hit_effect_locator3" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+
+		event = { sound = { soundeffect = "ships_light_cruiser_attacked" } }
+		event = { trigger_once = yes sound = { soundeffect = "distance_ships_light_cruiser_attacked" } }
+
+		game_data = {
+			hitmiss_effect = { time = 0.1 type = small }
+			hitmiss_effect = { time = 0.45 type = small }
+			hitmiss_effect = { time = 0.65 type = small }
+		}
+	}
+
+	state = { name = "damaged_defend_loop"				animation = "damaged_defend"   animation_blend_time = 0.3
+
+		event = { time = 0 node="hit_effect_locator3" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+
+		event = { sound = { soundeffect = "light_cruiser_defend_damaged_01" } }
+		event = { trigger_once = yes sound = { soundeffect = "distance_light_cruiser_defend_damaged_01" } }
+
+		game_data = {
+			hitmiss_effect = { time = 0.1 type = small }
+			hitmiss_effect = { time = 0.45 type = small }
+			hitmiss_effect = { time = 0.65 type = small }
+		}
+	}
+
+	state = { name = "death"	animation = "death"   animation_blend_time = 0.3  looping = no
+		event = { time = 0.1 particle = "ship_explosion_particle"  keep_particle = yes }
+		event = { sound = { soundeffect = "ships_light_cruiser_death" } }
+		event = { trigger_once = yes sound = { soundeffect = "distance_ships_light_cruiser_death" } }
+	}
+	scale = 2.0
+
+}
+
 
 ####
 # SUPER HEAVY BATTLESHIP
@@ -1167,9 +1266,19 @@ entity = { #DESTROYER
 	name = "screen_hull_heavy_entity"
 }
 entity = { #DESTROYER
+	clone = "USA_light_cruiser_entity"
+	pdxmesh = "USA_belknap_mesh"
+	name = "USA_screen_hull_heavy_entity"
+}
+entity = { #DESTROYER
 	clone = "light_cruiser_entity"
 	pdxmesh = "generic_light_cruiser_mesh"
 	name = "screen_hull_heavy_ww_entity"
+}
+entity = { #DESTROYER
+	clone = "USA_light_cruiser_entity"
+	pdxmesh = "USA_belknap_mesh"
+	name = "USA_screen_hull_heavy_ww_entity"
 }
 entity = { #DESTROYER
 	clone = "light_cruiser_entity"
@@ -1227,6 +1336,12 @@ entity = { #CRUISER
 	pdxmesh = "generic_heavy_cruiser_mesh"
 	name = "battle_hull_light_entity"
 }
+#US CRUISERS
+entity = { #BELKNAP
+	clone = "USA_light_cruiser_entity"
+	pdxmesh = "USA_belknap_mesh"
+	name = "USA_battle_hull_light_entity"
+}
 entity = { #FAST BATTLESHIP
 	clone = "super_heavy_battleship_entity"
 	pdxmesh = "generic_super_heavy_battleship_mesh"
@@ -1254,8 +1369,7 @@ entity = { #HELICARRIER
 	name = "carrier_hull_light_entity"
 }
 
-#USA
-
+#USA attack submarines
 entity = { #submarine
 	clone = "submarine_entity"
 	pdxmesh = "USA_skipjack_mesh"
@@ -1270,6 +1384,43 @@ entity = { #Submarine
 	clone = "submarine_entity"
 	pdxmesh = "USA_skipjack_mesh"
 	name = "USA_sub_hull_large_single_2_entity"
+}
+
+#SOV attack submarines
+entity = { #submarine
+	clone = "submarine_entity"
+	pdxmesh = "SOV_whiskey_mesh"
+	name = "SOV_sub_hull_large_single_0_entity"
+}
+entity = { #submarine
+	clone = "submarine_entity"
+	pdxmesh = "SOV_whiskey_mesh"
+	name = "SOV_sub_hull_large_single_1_entity"
+}
+entity = { #submarine
+	clone = "submarine_entity"
+	pdxmesh = "SOV_whiskey_mesh"
+	name = "SOV_sub_hull_large_single_2_entity"
+}
+entity = { #SMALL SUBMARINE
+	clone = "submarine_entity"
+	pdxmesh = "SOV_whiskey_mesh"
+	name = "SOV_sub_hull_small_single_entity"
+}
+entity = { #SMALL SUBMARINE
+	clone = "submarine_entity"
+	pdxmesh = "SOV_whiskey_mesh"
+	name = "SOV_sub_hull_small_single_0_entity"
+}
+entity = { #SMALL SUBMARINE
+	clone = "submarine_entity"
+	pdxmesh = "SOV_whiskey_mesh"
+	name = "SOV_sub_hull_small_single_1_entity"
+}
+entity = { #SMALL SUBMARINE
+	clone = "submarine_entity"
+	pdxmesh = "SOV_whiskey_mesh"
+	name = "SOV_sub_hull_small_single_2_entity"
 }
 
 
