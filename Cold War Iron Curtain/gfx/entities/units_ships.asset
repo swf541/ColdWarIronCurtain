@@ -546,6 +546,107 @@ entity = {
 	scale = 1.7
 }
 
+entity = {
+	name = "CWIC_destroyer_entity"
+	pdxmesh = "generic_destroyer_mesh"
+
+	state = { name = "idle"	animation = "idle" animation_blend_time = 0.3
+		event = { time = 0 particle = "ship_idle_small_particle"  keep_particle = yes  }
+		event = { trigger_once = yes time = 0 sound = { soundeffect = ship_idle_destroyer }}
+	}
+
+	state = { name = "move"	animation = "idle" animation_blend_time = 0.3
+		event = { time = 0 node="front_moving_water_effect" particle = "ship_moving_front_fleet_particle"  keep_particle = yes trigger_once = yes }
+	}
+
+	state = { name = "attack"			animation = "attack" animation_blend_time = 0.3
+
+		game_data = {
+			hitmiss_effect = { time = 0.1 type = small }
+		}
+	}
+	state = { name = "defend"			animation = "defend" animation_blend_time = 0.3
+
+		game_data = {
+			hitmiss_effect = { time = 0.15 type = small }
+		}
+	}
+	state = { name = "damaged_attack" looping = no animation = "damaged_attack" state_time = 3 next_state = damaged_attack_looping
+		event = { time = 0 node="hit_effect_locator1" particle = "ship_explosion_particle"  keep_particle = yes }
+		event = { sound = { soundeffect = "ships_destroyer_attacked" } }
+		event = { trigger_once = yes sound = { soundeffect = "distance_ships_destroyer_attacked" } }
+		#event = { time = 0 node="miss_effect_locator1" particle = "water_impact_particle"  keep_particle = yes }
+		#event = { time = 0.5 node="damaged_smoke1" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+		event = { time = 0 node="front1_cannon_muzzle" particle = "ship_fire_small_particle"  keep_particle = yes  }
+		event = { time = 0.2 node="hit_effect_locator1" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+
+		game_data = {
+			hitmiss_effect = { time = 0.1 type = small }
+		}
+	}
+
+	state = { name = "damaged_attack_looping"				animation = "damaged_attack"   animation_blend_time = 0.3
+		#event = { time = 0 node="waterfoam_01" particle = "ship_fire_water_particle"  keep_particle = yes }
+
+
+		#event = { time = 0 node="miss_effect_locator1" particle = "water_impact_particle"  keep_particle = yes }
+
+		#event = { time = 0 node="damaged_smoke1" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+		event = { time = 0 node="hit_effect_locator1" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+		event = { sound = { soundeffect = "ship_destroyer_damaged_attacking_01" } }
+		event = { trigger_once = yes sound = { soundeffect = "distance_ship_destroyer_damaged_attacking_01" } }
+
+		game_data = {
+			hitmiss_effect = { time = 0.1 type = small }
+		}
+	}
+
+	state = { name = "damaged_defend" looping = no animation = "damaged_defend" state_time = 3 next_state = damaged_defend_loop
+
+		event = { time = 0 node="hit_effect_locator1" particle = "ship_explosion_particle"  keep_particle = yes }
+		event = { time = 0.2 node="hit_effect_locator1" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+
+		event = { time = 0.9 node="hit_effect_locator2" particle = "ship_explosion_particle"  keep_particle = yes }
+		event = { time = 1.1 node="hit_effect_locator2" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+
+		game_data = {
+			hitmiss_effect = { time = 0.15 type = small }
+		}
+	}
+
+	state = { name = "damaged_defend_loop"				animation = "damaged_defend"   animation_blend_time = 0.3
+		#event = { time = 0 node="waterfoam_01" particle = "ship_fire_water_particle"  keep_particle = yes }
+
+
+		event = { time = 0 node="hit_effect_locator1" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+		event = { time = 0 node="hit_effect_locator2" particle = "ship_damaged_smoke_particle"  keep_particle = yes trigger_once = yes }
+
+		event = { sound = { soundeffect = "ship_destroyer_damaged_defending_01" } }
+
+		game_data = {
+			hitmiss_effect = { time = 0.15 type = small }
+		}
+	}
+
+	state = { name = "death"	animation = "death"   animation_blend_time = 0.3  looping = no
+		#event = { time = 0 node="waterfoam_01" particle = "ship_fire_water_particle"  keep_particle = yes }
+
+		#event = { time = 0 node="damaged_smoke1" particle = "ship_damaged_smoke_particle"  keep_particle = yes }
+		#event = { time = 0 node="damaged_smoke2" particle = "ship_damaged_smoke_particle"  keep_particle = yes }
+		#
+		event = { time = 0 particle = "ship_explosion_particle"  keep_particle = yes }
+		#event = { time = 0.4 node="hit_effect_locator1" particle = "ship_explosion_particle"  keep_particle = yes }
+		#event = { time = 0.7 node="back2_cannon_muzzle" particle = "ship_explosion_particle"  keep_particle = yes }
+		#event = { time = 1.2 node="front2_cannon_muzzle" particle = "ship_explosion_particle"  keep_particle = yes }
+		#event = { time = 1.6 node="damaged_smoke1" particle = "ship_explosion_particle"  keep_particle = yes }
+		event = { sound = { soundeffect = "ships_destroyer_death" } }
+		event = { trigger_once = yes sound = { soundeffect = "distance_ships_destroyer_death" } }
+	}
+
+
+	scale = 1.7
+}
+
 ####
 # FREIGHTER
 ####
@@ -1260,6 +1361,16 @@ entity = { #FRIGATE
 	pdxmesh = "generic_destroyer_mesh"
 	name = "screen_hull_medium_entity"
 }
+entity = { #FRIGATE
+	clone = "CWIC_destroyer_entity"
+	pdxmesh = "USA_spruance_mesh"
+	name = "USA_screen_hull_medium_entity"
+}
+entity = { #FRIGATE
+	clone = "CWIC_destroyer_entity"
+	pdxmesh = "USA_spruance_mesh"
+	name = "USA_screen_hull_medium_0_entity"
+}
 entity = { #DESTROYER
 	clone = "light_cruiser_entity"
 	pdxmesh = "generic_light_cruiser_mesh"
@@ -1357,6 +1468,17 @@ entity = { #CARRIER
 	clone = "carrier_entity"
 	pdxmesh = "generic_carrier_mesh"
 	name = "carrier_hull_medium_entity"
+}
+#USA CARRIERS
+entity = { #CARRIER
+	clone = "carrier_entity"
+	pdxmesh = "USA_forrestal_mesh"
+	name = "USA_carrier_hull_medium_entity"
+}
+entity = { #CARRIER
+	clone = "carrier_entity"
+	pdxmesh = "USA_forrestal_mesh"
+	name = "USA_carrier_hull_medium_0_entity"
 }
 entity = { #CARRIER
 	clone = "carrier_entity"
