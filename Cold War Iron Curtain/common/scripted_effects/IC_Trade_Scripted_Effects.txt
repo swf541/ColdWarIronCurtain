@@ -3,7 +3,7 @@
 export_script_for_pool = {
 	every_country = {	
 		set_variable = {
-			chromiumExportRa1e = modifier@chromium_export_rate
+			chromiumExportRa1e = 0.25	# modifier@chromium_export_rate
 		}
 		set_variable = {
 			oilExportRate = modifier@oil_export_rate
@@ -22,52 +22,131 @@ export_script_for_pool = {
 		}
 		#Oil Section
 		set_variable = {
-			oilExport = resource_produced@oil
+			oilExport = 0
+		}
+		every_controlled_state = {
+			add_to_variable = { PREV.oilExport = resource@oil }
+		}
+		subtract_from_variable = {
+			oilExport = oil_consumption
+		}
+		round_variable = oilExport
+		add_to_array = {
+			oil_produced_prior = oilExport
 		}
 		multiply_variable = {
 			oilExport = oilExportRate
 		}	
 		round_variable = oilExport
+		add_to_array = {
+			oil_export_prior = oilExport
+		}
+
 		#Food Section
 		set_variable = {
-			foodExport = resource_produced@rubber
+			foodExport = 0
+		}
+		every_controlled_state = {
+			add_to_variable = { PREV.foodExport = resource@rubber }
+		}
+		round_variable = foodExport
+		add_to_array = {
+			food_produced_prior = foodExport
 		}
 		multiply_variable = {
 			foodExport = foodExportRate
 		}	
 		round_variable = foodExport
+		add_to_array = {
+			food_export_prior = foodExport
+		}
 		#Steel Section
 		set_variable = {
-			steelExport = resource_produced@steel
+			steelExport = 0
+		}
+		every_controlled_state = {
+			add_to_variable = { PREV.steelExport = resource@steel }
+		}
+		subtract_from_variable = {
+			steelExport = steel_consumption
+		}
+		round_variable = steelExport
+		add_to_array = {
+			steel_produced_prior = steelExport
 		}
 		multiply_variable = {
 			steelExport = steelExportRate
 		}	
 		round_variable = steelExport
+		add_to_array = {
+			steel_export_prior = steelExport
+		}
+
 		#Nuclear Section
 		set_variable = {
-			chromiumExport = resource_produced@chromium
+			chromiumExport = 0
+		}
+		every_controlled_state = {
+			add_to_variable = { PREV.chromiumExport = resource@chromium }
+		}
+		subtract_from_variable = {
+			chromiumExport = chromium_consumption
+		}
+		round_variable = chromiumExport
+		add_to_array = {
+			chromium_produced_prior = chromiumExport
 		}
 		multiply_variable = {
 			chromiumExport = chromiumExportRa1e
 		}	
 		round_variable = chromiumExport
+		add_to_array = {
+			chromium_export_prior = chromiumExport
+		}
+
 		#Aluminium
 		set_variable = {
-			aluminiumExport = resource_produced@aluminium
+			aluminiumExport = 0
+		}
+		every_controlled_state = {
+			add_to_variable = { PREV.aluminiumExport = resource@aluminium }
+		}
+		subtract_from_variable = {
+			aluminiumExport = aluminium_consumption
+		}
+		round_variable = aluminiumExport
+		add_to_array = {
+			aluminium_produced_prior = aluminiumExport
 		}
 		multiply_variable = {
 			aluminiumExport = aluminiumExportRate
 		}	
 		round_variable = aluminiumExport
+		add_to_array = {
+			aluminium_export_prior = aluminiumExport
+		}
 		#Rare Earth
 		set_variable = {
-			rareEarthExport = resource_produced@tungsten
+			rareEarthExport = 0
+		}
+		every_controlled_state = {
+			add_to_variable = { PREV.rareEarthExport = resource@tungsten }
+		}
+		subtract_from_variable = {
+			rareEarthExport = rare_earth_consumption
+		}
+		round_variable = rareEarthExport
+		add_to_array = {
+			rareEarth_produced_prior = rareEarthExport
 		}
 		multiply_variable = {
 			rareEarthExport = rareEarthExportRate
 		}	
 		round_variable = rareEarthExport
+		add_to_array = {
+			rareEarth_export_prior = rareEarthExport
+		}
+
 		#Current Export Rate Calcs
 		set_variable = {
 			currentAvailableOilExport = oilExport
@@ -644,64 +723,63 @@ sort_resource_number_chromium = {
 
 
 chromiumDeliveryCuts = {
-
-
-		while_loop_effect = {
-			limit = {
-				check_variable = {
-					currentAvailableChromiumExport < 0
-				}	
-			}
-			random_country = {
-				limit = {
-					check_variable = { chromiumImportTargetAmount^PREV > 0 }				
-				}
-				subtract_from_variable = {
-					PREV.currentExportedChromium = 1
-				}				
-
-				
-				set_variable = {
-					priorExportTotal = PREV.chromiumExportTargetMonthly^THIS
-				}
-				set_variable = {
-					priorExportCash = PREV.chromiumExportTargetAmount^THIS
-				}
-				divide_variable = {
-					priorExportTotal = priorExportCash
-				}
-				add_to_variable = {
-					PREV.currentAvailableChromiumExport = 1
-				}
-				add_to_variable = {
-					trade_infrastructure_total_available = 1
-				}
-				add_to_variable = {
-					PREV.currentExportedChromium = 1
-				}
-				#subtract_from_variable = {
-				#	PREV.chromiumExport = 1
-				#}
-				subtract_from_variable = {
-					trade_infrastructure_total_used = 1
-				}
-				subtract_from_variable = { nuclearImports = 1 }
-				subtract_from_variable = {
-					PREV.chromiumExportTargetAmount^THIS = 1
-				}
-				subtract_from_variable = {
-					chromiumImportTargetAmount^PREV = 1
-				}
-
-				###NEED CALCS
-				subtract_from_variable = {
-					PREV.chromiumExportTargetMonthly^THIS = priorExportTotal
-				}
-				subtract_from_variable = {
-					chromiumImportTargetMonthly^PREV = priorExportTotal
-				}
+	while_loop_effect = {
+		limit = {
+			check_variable = {
+				currentAvailableChromiumExport < 0
 			}	
 		}
+		save_global_event_target_as = exporter_tag_target
+					
+		random_country = {
+			limit = {
+				check_variable = { chromiumImportTargetAmount^PREV > 0 }				
+			}
+			set_variable = {
+				cut_resource_target = THIS.id
+			}
+		}
+		add_to_variable = {
+			currentAvailableChromiumExport = 1
+		}
+		subtract_from_variable = {
+			currentExportedChromium = 1
+		}				
+		set_variable = {
+			priorExportTotal = chromiumExportTargetMonthly^cut_resource_target
+		}
+		set_variable = {
+			priorExportCash = chromiumExportTargetAmount^cut_resource_target
+		}
+		divide_variable = {
+			priorExportTotal = priorExportCash
+		}
+
+		add_to_variable = {
+			cut_resource_target.trade_infrastructure_total_available = 1
+		}
+		add_to_variable = {
+			currentExportedChromium = 1
+		}
+		subtract_from_variable = {
+			cut_resource_target.trade_infrastructure_total_used = 1
+		}
+		subtract_from_variable = { cut_resource_target.nuclearImports = 1 }
+		subtract_from_variable = {
+			chromiumExportTargetAmount^cut_resource_target = 1
+		}
+		subtract_from_variable = {
+			cut_resource_target.chromiumImportTargetAmount^THIS = 1
+		}
+		###NEED CALCS
+		subtract_from_variable = {
+			chromiumExportTargetMonthly^THIS = priorExportTotal
+		}
+		subtract_from_variable = {
+			cut_resource_target.chromiumImportTargetMonthly^THIS = priorExportTotal
+		}
+		
+	}
 }
 chromium_import_ai = {
 	set_variable = {
@@ -3857,4 +3935,102 @@ test_for_Trade_modifiers = {
 	set_variable = {
 		test3 = NGA.modifier@extra_trade_to_overlord_factor
 	}
+}
+reset_all_orders = {
+	#Oil
+	add_to_variable = {
+		trade_infrastructure_total_available = oilImports
+	}
+	subtract_from_variable = {
+		trade_infrastructure_total_used = oilImports
+	}
+	set_variable = { currentAvailableOilExport = oilExport}
+	set_variable = { oilImports = 0 }
+	set_variable = { currentExportedOil = 0 }
+	clear_array = oilImportTargetAmount
+	clear_array = oilImportTarget
+	clear_array = oilImportTargetMonthly
+	clear_array = oilExportTargetMonthly
+	clear_array = oilExportTargetAmount
+	clear_array = oilExportTarget
+	#Aluminium
+	add_to_variable = {
+		trade_infrastructure_total_available = aluminiumImports
+	}
+	subtract_from_variable = {
+		trade_infrastructure_total_used = aluminiumImports
+	}
+	set_variable = { currentAvailablealuminiumExport = aluminiumExport}
+	set_variable = { aluminiumImports = 0 }
+	set_variable = { currentExportedaluminium = 0 }
+	clear_array = aluminiumImportTargetAmount
+	clear_array = aluminiumImportTarget
+	clear_array = aluminiumImportTargetMonthly
+	clear_array = aluminiumExportTargetMonthly
+	clear_array = aluminiumExportTargetAmount
+	clear_array = aluminiumExportTarget
+	#Food
+    add_to_variable = {
+        trade_infrastructure_total_available = foodImports
+    }
+    subtract_from_variable = {
+        trade_infrastructure_total_used = foodImports
+    }
+    set_variable = { currentAvailablefoodExport = foodExport}
+    set_variable = { foodImports = 0 }
+    set_variable = { currentExportedfood = 0 }
+    clear_array = foodImportTargetAmount
+    clear_array = foodImportTarget
+    clear_array = foodImportTargetMonthly
+    clear_array = foodExportTargetMonthly
+    clear_array = foodExportTargetAmount
+    clear_array = foodExportTarget
+	#Rare Earth
+    add_to_variable = {
+        trade_infrastructure_total_available = rareEarthImports
+    }
+    subtract_from_variable = {
+        trade_infrastructure_total_used = rareEarthImports
+    }
+    set_variable = { currentAvailablerareEarthExport = rareEarthExport}
+    set_variable = { rareEarthImports = 0 }
+    set_variable = { currentExportedrareEarth = 0 }
+    clear_array = rareEarthImportTargetAmount
+    clear_array = rareEarthImportTarget
+    clear_array = rareEarthImportTargetMonthly
+    clear_array = rareEarthExportTargetMonthly
+    clear_array = rareEarthExportTargetAmount
+    clear_array = rareEarthExportTarget
+	#Steel
+    add_to_variable = {
+        trade_infrastructure_total_available = steelImports
+    }
+    subtract_from_variable = {
+        trade_infrastructure_total_used = steelImports
+    }
+    set_variable = { currentAvailablesteelExport = steelExport}
+    set_variable = { steelImports = 0 }
+    set_variable = { currentExportedsteel = 0 }
+    clear_array = steelImportTargetAmount
+    clear_array = steelImportTarget
+    clear_array = steelImportTargetMonthly
+    clear_array = steelExportTargetMonthly
+    clear_array = steelExportTargetAmount
+    clear_array = steelExportTarget
+	#Nuclear
+    add_to_variable = {
+        trade_infrastructure_total_available = nuclearImports
+    }
+    subtract_from_variable = {
+        trade_infrastructure_total_used = nuclearImports
+    }
+    set_variable = { currentAvailablechromiumExport = chromiumExport}
+    set_variable = { nuclearImports = 0 }
+    set_variable = { currentExportedchromium = 0 }
+    clear_array = chromiumImportTargetAmount
+    clear_array = chromiumImportTarget
+    clear_array = chromiumImportTargetMonthly
+    clear_array = chromiumExportTargetMonthly
+    clear_array = chromiumExportTargetAmount
+    clear_array = chromiumExportTarget
 }
