@@ -1,0 +1,296 @@
+DUTCH_INDONESIA_WAR_SANCTIONS_EFFECT = {
+    if = {
+        limit = {
+            UNS = {
+                has_country_flag = Current_UN_Vote
+            }
+        }
+        UN_VOTE_FORCE_END = yes
+    }
+    UNS = {
+        activate_mission = UN_Vote
+        activate_mission = UN_Vote_Cleanuo
+        set_country_flag = Current_UN_Vote
+    }		
+    UNS = {
+        set_country_flag = UN_Vote_Ongoing
+    }
+    set_variable = { UNS.un_nation_proposal = UNS.id }
+    set_variable = { UNS.un_nation_target = HOL.id }
+    set_variable = { UNS.un_action_set = 5 }
+    set_variable = { UNS.un_state_target = 0 }
+    var:UNS.un_nation_target = {
+        save_global_event_target_as = un_nation_global_target
+    }		
+    every_country = {
+        limit = {
+            is_ai = yes
+            OR = {
+                has_idea = un_member
+                has_idea = UN_Security_Council_Member_Perm
+            }
+        }
+        UN_ai_vote_sorting = yes
+    }
+    set_variable = { root.un_nation_target = 0 }
+    set_variable = { root.un_action_set = 0 }
+    set_variable = { root.un_state_target = 0 }
+}
+UN_VOTE_FORCE_END = {
+    UNS = {
+        if = {
+            limit = {
+                check_variable = { un_veto_count < 1 }
+                check_variable = { un_yes_count > un_no_count }
+            }
+            add_to_array = { UNS.un_nation_proposal_historical = UNS.un_nation_proposal }
+            add_to_array = { UNS.un_state_target_owner_historical = UNS.un_state_target_owner }
+            add_to_array = { UNS.un_action_set_historical = UNS.un_action_set }
+            add_to_array = { UNS.un_nation_target_historical = UNS.un_nation_target }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 0 }
+                }
+                news_event = UN_RESOLUTION.0
+                var:UNS.un_nation_target = {
+                    country_event = UN_RESOLUTION.1
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 1 }
+                }
+                news_event = UN_RESOLUTION.2
+                var:UNS.un_nation_target = {
+                    country_event = UN_RESOLUTION.3
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 2 }
+                }
+                news_event = UN_RESOLUTION.4
+                var:UNS.un_nation_target = {
+                    add_timed_idea = {
+                        idea = influence_increase_cost
+                        days = 3650
+                    }
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 3 }
+                }
+                var:UNS.un_nation_target = {
+                    add_timed_idea = {
+                        idea = UN_national_asset_freeze
+                        days = 3650
+                    }
+                }
+                news_event = UN_RESOLUTION.5
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 4 }
+                }
+                var:UNS.un_nation_target = {
+                    add_timed_idea = {
+                        idea = UN_officials_sanctioned
+                        days = 3650
+                    }
+                }
+                news_event = UN_RESOLUTION.6
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 5 }
+                }
+                var:UNS.un_nation_target = {
+                    add_ideas = UN_Trade_Sanctions
+                }
+                news_event = UN_RESOLUTION.7
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 6 }
+                }
+                var:UNS.un_nation_target = {
+                    add_ideas = UN_Weapon_Trade_Ban
+                }
+                news_event = UN_RESOLUTION.8
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 7 }
+                }
+                news_event = UN_RESOLUTION.9
+                var:UNS.un_nation_target = {
+                    country_event = UN_RESOLUTION.10
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 8 }
+                }
+                news_event = UN_RESOLUTION.11
+                var:UNS.un_nation_target = {
+                    country_event = UN_RESOLUTION.12
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 9 }
+                }
+                #State One
+                news_event = UN_RESOLUTION.13
+                var:UNS.un_state_target = {
+                    owner = {
+                        country_event = UN_RESOLUTION.14
+                    }
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 10 }
+                }
+                news_event = UN_RESOLUTION.15
+                var:UNS.un_nation_target = {
+                    set_country_flag = UN_Peacekeepers_Enabled
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 11 }
+                }
+                news_event = UN_RESOLUTION.16
+                var:UNS.un_nation_target = {
+                    every_enemy_country = {
+                        country_event = UN_RESOLUTION.17
+                        #Peace Agreement 	UN_RESOLUTION.18
+                        #Rejection 			UN_RESOLUTION.19
+                    }
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 12 }
+                }
+                news_event = UN_RESOLUTION.20
+                UNS = {
+                    create_faction = "The United Nations"
+                    add_to_faction = var:UNS.coalition_tag
+                }
+                #UNS.un_nation_target = {
+                #	#create_unit		#Automatic Peacekeepers
+                #}
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 13 }
+                }
+                news_event = UN_RESOLUTION.21
+                UNS = {
+                    create_faction = "The United Nations"
+                    add_to_faction = var:UNS.coalition_tag
+                }
+                every_country = {
+                    limit = {
+                        NOT = {
+                            has_war_with = var:UNS.coalition_tag
+                        }
+                    }
+                    country_event = UN_RESOLUTION.22
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 14 }
+                }
+                var:UNS.un_nation_target = {
+                    remove_ideas = UN_Trade_Sanctions
+                }
+                news_event = UN_RESOLUTION.23
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 15 }
+                }
+                var:UNS.un_nation_target = {
+                    remove_ideas = UN_Weapon_Trade_Ban
+                }
+                news_event = UN_RESOLUTION.24
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 16 }
+                }
+                news_event = UN_RESOLUTION.25
+                every_country = {
+                    limit = {
+                        any_owned_state = {
+                            is_core_of = var:UNS.un_nation_target
+                        }
+                    }
+                    country_event = UN_RESOLUTION.26
+                    #UN_RESOLUTION.27		Rejection
+                    #UN_RESOLUTION.28		Acceptance
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = { UNS.un_action_set = 17 }
+                }
+                var:UNS.un_nation_target = {
+                    add_ideas = un_member
+                }
+                news_event = UN_RESOLUTION.50
+            }
+        }
+        if = {
+            limit = {
+                check_variable = { un_veto_count < 1 }
+                check_variable = { un_yes_count < un_no_count }
+            }
+            news_event = UN_RESOLUTION.29
+        }
+        if = {
+            limit = {
+                check_variable = { un_veto_count > 0 }
+            }
+            news_event = UN_RESOLUTION.30
+        }
+        
+        set_country_flag = UN_Vote_Cleanup
+            
+        set_variable = { un_veto_count = 0 }
+        set_variable = { un_yes_count = 0 }
+        set_variable = { un_no_count = 0 }
+        set_variable = { un_abstain_count = 0 }
+        set_variable = { UNS.un_state_target_owner = 0 }
+        set_variable = { UNS.un_action_set = 0 }
+        set_variable = { UNS.un_nation_target = 0 }
+        set_variable = { UNS.un_nation_proposal = 0 }
+
+        set_variable = { root.un_state_target_owner = 0 }
+        set_variable = { root.un_action_set = 0 }
+        set_variable = { root.un_nation_target = 0 }			
+        set_variable = { UNS.coalition_tag = 0 }
+
+        clear_array = UNS.un_vote_abstain_list
+        clear_array = UNS.un_vote_no_list
+        clear_array = UNS.un_vote_veto_list
+        clear_array = UNS.un_vote_yes_list
+
+        clear_array = un_vote_abstain_list
+        clear_array = un_vote_no_list
+        clear_array = un_vote_veto_list
+        clear_array = un_vote_yes_list
+
+        clr_country_flag = Current_UN_Vote
+        clr_country_flag = UN_Vote_Cleanup
+        clr_country_flag = UN_YES_ONGOING
+        clr_country_flag = UN_VETO_ONGOING
+        clr_country_flag = UN_ABSTAIN_ONGOING
+        clr_country_flag = UN_NO_ONGOING
+    }
+}
