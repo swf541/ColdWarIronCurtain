@@ -1,4 +1,2331 @@
+Burma_Communist_Conflict = {
+	BCP_Launch_Campaign_in_the_Northern_Mountains  = {
+
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = BCP
+		}
+
+		available = {
+            country_exists = BRM
+            BCP = {
+                unrecognized_state
+                is_subject = no
+            }
+		}
+		cost = 0
+
+		days_re_enable = 180
+		fire_only_once = no
+		selectable_mission = no
+
+		days_remove = 5
+		
+		complete_effect = {
+			1558 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = BCP
+						}
+						NOT = { state = 1262 }
+                        NOT = { state = 1259 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_communist_border_war_ongoing_nearby
+				}
+			}
+			1259 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = BCP
+						}
+						NOT = { state = 1262 }
+                        NOT = { state = 1259 }
+						NOT = { state = 1558 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_communist_border_war_ongoing_nearby
+				}
+			}
+			1262 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = BCP
+						}
+						NOT = { state = 1262 }
+                        NOT = { state = 1259 }
+						NOT = { state = 1558 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_communist_border_war_ongoing_nearby
+				}
+			}
+			activate_mission = BCP_Campaign_in_the_Northern_Mountains 
+			diplomatic_relation = { country = BRM relation = war_relation active = yes }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}	
+
+
+
+	BCP_Campaign_in_the_Northern_Mountains  = {
+
+		icon = generic_prepare_civil_war
+
+
+		available = {
+			NOT = {
+				country_exists = BRM
+			}
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = no
+		selectable_mission = yes
+
+		days_mission_timeout = 20
+
+		days_re_enable = 180
+
+		complete_effect = {
+		}
+
+		timeout_effect = {
+            set_variable = {
+                BCP.Communist_Conflict_Strength_Old = BCP.Communist_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Communist_Conflict_Strength_Old = BRM.Communist_Conflict_Strength
+            }
+			count_inflicted_casualties_on_current_enemies = yes
+			BRM = {
+				count_inflicted_casualties_on_current_enemies = yes
+			}
+			set_variable = {
+				Burmese_Casualties_Communist_Conflict = current_inflicted_casualties_on_@BRM
+			}
+			set_variable = {
+				Communist_Casualties_Communist_Conflict = BRM.current_inflicted_casualties_on_@BCP
+			}
+			set_variable = {
+				Communist_Conflict_Strength_Bonus = Burmese_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				Burma_Communist_Conflict_Strength_Bonus = Communist_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				BRM.Burmese_Casualties_Communist_Conflict_Display = Burmese_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				BRM.Communist_Casualties_Communist_Conflict_Display = Communist_Casualties_Communist_Conflict
+			}
+			multiply_variable = {
+				BRM.Burmese_Casualties_Communist_Conflict_Display = 1000
+			}
+			multiply_variable = {
+				BRM.Communist_Casualties_Communist_Conflict_Display = 1000
+			}
+			add_to_variable = {
+				UNS.Communist_Conflcit_Communist_Casualities_Total = BRM.Communist_Casualties_Communist_Conflict_Display
+			}
+			add_to_variable = {
+				UNS.Communist_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Communist_Conflict_Display
+			}
+			if = {
+				limit = {
+					check_variable = {
+						Burma_Communist_Conflict_Strength_Bonus > Communist_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Burma_Communist_Conflict_Strength_Bonus = Communist_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Burma_Communist_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = Burma_Communist_Conflict_Strength_Bonus
+				}
+				round_variable = BMR.Communist_Conflict_Strength
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						Communist_Conflict_Strength_Bonus > Burma_Communist_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Communist_Conflict_Strength_Bonus = Burma_Communist_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Communist_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					Communist_Conflict_Strength = Communist_Conflict_Strength_Bonus
+				}
+				round_variable = Communist_Conflict_Strength
+			}
+			else = { }
+			clear_current_inflicted_casualties = yes
+
+			every_owned_state = {
+				limit = {
+					has_state_flag = burma_communist_border_war_ongoing_nearby						
+				}
+				remove_province_modifier = {
+					static_modifiers = { border_war_in_progress }
+					province = {
+						all_provinces = yes
+					}
+				}
+			}
+			BRM = {
+				every_owned_state = {
+					limit = {
+						has_state_flag = burma_communist_border_war_ongoing_nearby						
+					}
+					remove_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {    
+						global.province_controllers^1650 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10283 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}
+			}		
+
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10344 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}
+			}		 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^13678 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}
+			}
+			#Province 1330 = Rangoon
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1330 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 1000
+				}
+			}
+            #Burmese Provinces
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^1333 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^4019 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^4059 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^4541 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^7034 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^7163 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^7190 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^1492 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^4202 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^4626 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^12404 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^12449 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^13680 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			diplomatic_relation = { country = BRM relation = war_relation active = no }
+			BRM = { diplomatic_relation = { country = BCP relation = war_relation active = no } }
+            set_variable = {
+                BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength
+            }
+
+            subtract_from_variable = {
+                BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength_Old
+            }
+            subtract_from_variable = {
+                BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength_Old
+            }
+			set_variable = {
+				BCP.communist_check = 1
+			}
+			set_variable = {
+				BRM.communist_check = 1
+			}
+		}	
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+	BCP_Launch_Campaign_in_the_Bamar_Heartlands = {
+
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = BCP
+		}
+
+		available = {
+            country_exists = BRM
+            BCP = {
+                unrecognized_state
+                is_subject = no
+            }
+		}
+		cost = 0
+
+		days_re_enable = 180
+		fire_only_once = no
+		selectable_mission = no
+
+		days_remove = 5
+		
+		complete_effect = {
+			1558 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = BCP
+						}
+						NOT = { state = 1267 }
+                        NOT = { state = 288 }
+                        NOT = { state = 1263 }
+						NOT = { state = 1558 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_communist_border_war_ongoing_nearby
+				}
+			}
+			1212 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = BCP
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1558 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_communist_border_war_ongoing_nearby
+				}
+			}
+			activate_mission = BCP_Campaign_in_the_Bamar_Heartlands
+			diplomatic_relation = { country = BRM relation = war_relation active = yes }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}	
+
+
+
+	BCP_Campaign_in_the_Bamar_Heartlands = {
+
+		icon = generic_prepare_civil_war
+
+
+		available = {
+			NOT = {
+				country_exists = BRM
+			}
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = no
+		selectable_mission = yes
+
+		days_mission_timeout = 20
+
+		days_re_enable = 180
+
+		complete_effect = {
+		}
+
+		timeout_effect = {
+            set_variable = {
+                BCP.Communist_Conflict_Strength_Old = BCP.Communist_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Communist_Conflict_Strength_Old = BRM.Communist_Conflict_Strength
+            }
+			count_inflicted_casualties_on_current_enemies = yes
+			BRM = {
+				count_inflicted_casualties_on_current_enemies = yes
+			}
+			set_variable = {
+				Burmese_Casualties_Communist_Conflict = current_inflicted_casualties_on_@BRM
+			}
+			set_variable = {
+				Communist_Casualties_Communist_Conflict = BRM.current_inflicted_casualties_on_@BCP
+			}
+			set_variable = {
+				Communist_Conflict_Strength_Bonus = Burmese_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				Burma_Communist_Conflict_Strength_Bonus = Communist_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				BRM.Burmese_Casualties_Communist_Conflict_Display = Burmese_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				BRM.Communist_Casualties_Communist_Conflict_Display = Communist_Casualties_Communist_Conflict
+			}
+			multiply_variable = {
+				BRM.Burmese_Casualties_Communist_Conflict_Display = 1000
+			}
+			multiply_variable = {
+				BRM.Communist_Casualties_Communist_Conflict_Display = 1000
+			}
+			add_to_variable = {
+				UNS.Communist_Conflcit_Communist_Casualities_Total = BRM.Communist_Casualties_Communist_Conflict_Display
+			}
+			add_to_variable = {
+				UNS.Communist_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Communist_Conflict_Display
+			}
+			if = {
+				limit = {
+					check_variable = {
+						Burma_Communist_Conflict_Strength_Bonus > Communist_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Burma_Communist_Conflict_Strength_Bonus = Communist_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Burma_Communist_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = Burma_Communist_Conflict_Strength_Bonus
+				}
+				round_variable = BMR.Communist_Conflict_Strength
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						Communist_Conflict_Strength_Bonus > Burma_Communist_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Communist_Conflict_Strength_Bonus = Burma_Communist_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Communist_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					Communist_Conflict_Strength = Communist_Conflict_Strength_Bonus
+				}
+				round_variable = Communist_Conflict_Strength
+			}
+			else = { }
+			clear_current_inflicted_casualties = yes
+
+			every_owned_state = {
+				limit = {
+					has_state_flag = burma_communist_border_war_ongoing_nearby						
+				}
+				remove_province_modifier = {
+					static_modifiers = { border_war_in_progress }
+					province = {
+						all_provinces = yes
+					}
+				}
+			}
+			BRM = {
+				every_owned_state = {
+					limit = {
+						has_state_flag = burma_communist_border_war_ongoing_nearby						
+					}
+					remove_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {    
+						global.province_controllers^1650 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10283 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}		
+
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10344 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}		 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^13678 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}
+			#Province 1330 = Rangoon
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1330 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 1000
+				}
+			}
+            #Burmese Provinces
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^1417 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^12127 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^12256 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^10154 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^10267 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^7254 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^7382 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^10223 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^12197 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^12267 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^12284 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+
+			diplomatic_relation = { country = BRM relation = war_relation active = no }
+			BRM = { diplomatic_relation = { country = BCP relation = war_relation active = no } }
+            set_variable = {
+                BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength
+            }
+
+            subtract_from_variable = {
+                BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength_Old
+            }
+            subtract_from_variable = {
+                BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength_Old
+            }
+			set_variable = {
+				BCP.communist_check = 1
+			}
+			set_variable = {
+				BRM.communist_check = 1
+			}
+		}	
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	BCP_Launch_Campaign_into_Arakan = {
+
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = BCP
+		}
+
+		available = {
+            country_exists = BRM
+            BCP = {
+                unrecognized_state
+                is_subject = no
+            }
+		}
+		cost = 0
+
+		days_re_enable = 180
+		fire_only_once = no
+		selectable_mission = no
+
+		days_remove = 5
+		
+		complete_effect = {
+			1558 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = BCP
+						}
+						NOT = { state = 1186 }
+						NOT = { state = 1558 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_communist_border_war_ongoing_nearby
+				}
+			}
+			1186 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = BCP
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1558 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_communist_border_war_ongoing_nearby
+				}
+			}
+			activate_mission = BCP_Campaign_into_Arakan
+			diplomatic_relation = { country = BRM relation = war_relation active = yes }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}	
+
+
+
+	BCP_Campaign_into_Arakan = {
+
+		icon = generic_prepare_civil_war
+
+
+		available = {
+			NOT = {
+				country_exists = BRM
+			}
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = no
+		selectable_mission = yes
+
+		days_mission_timeout = 20
+
+		days_re_enable = 180
+
+		complete_effect = {
+		}
+
+		timeout_effect = {
+            set_variable = {
+                BCP.Communist_Conflict_Strength_Old = BCP.Communist_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Communist_Conflict_Strength_Old = BRM.Communist_Conflict_Strength
+            }
+			count_inflicted_casualties_on_current_enemies = yes
+			BRM = {
+				count_inflicted_casualties_on_current_enemies = yes
+			}
+			set_variable = {
+				Burmese_Casualties_Communist_Conflict = current_inflicted_casualties_on_@BRM
+			}
+			set_variable = {
+				Communist_Casualties_Communist_Conflict = BRM.current_inflicted_casualties_on_@BCP
+			}
+			set_variable = {
+				Communist_Conflict_Strength_Bonus = Burmese_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				Burma_Communist_Conflict_Strength_Bonus = Communist_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				BRM.Burmese_Casualties_Communist_Conflict_Display = Burmese_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				BRM.Communist_Casualties_Communist_Conflict_Display = Communist_Casualties_Communist_Conflict
+			}
+			multiply_variable = {
+				BRM.Burmese_Casualties_Communist_Conflict_Display = 1000
+			}
+			multiply_variable = {
+				BRM.Communist_Casualties_Communist_Conflict_Display = 1000
+			}
+			add_to_variable = {
+				UNS.Communist_Conflcit_Communist_Casualities_Total = BRM.Communist_Casualties_Communist_Conflict_Display
+			}
+			add_to_variable = {
+				UNS.Communist_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Communist_Conflict_Display
+			}
+			if = {
+				limit = {
+					check_variable = {
+						Burma_Communist_Conflict_Strength_Bonus > Communist_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Burma_Communist_Conflict_Strength_Bonus = Communist_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Burma_Communist_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = Burma_Communist_Conflict_Strength_Bonus
+				}
+				round_variable = BMR.Communist_Conflict_Strength
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						Communist_Conflict_Strength_Bonus > Burma_Communist_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Communist_Conflict_Strength_Bonus = Burma_Communist_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Communist_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					Communist_Conflict_Strength = Communist_Conflict_Strength_Bonus
+				}
+				round_variable = Communist_Conflict_Strength
+			}
+			else = { }
+			clear_current_inflicted_casualties = yes
+
+			every_owned_state = {
+				limit = {
+					has_state_flag = burma_communist_border_war_ongoing_nearby						
+				}
+				remove_province_modifier = {
+					static_modifiers = { border_war_in_progress }
+					province = {
+						all_provinces = yes
+					}
+				}
+			}
+			BRM = {
+				every_owned_state = {
+					limit = {
+						has_state_flag = burma_communist_border_war_ongoing_nearby						
+					}
+					remove_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {    
+						global.province_controllers^1650 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10283 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}		
+
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10344 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}		 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^13678 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}
+			#Province 1330 = Rangoon
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1330 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 1000
+				}
+			}
+            #Burmese Provinces
+			if = {   
+				limit = {
+					check_variable = {
+						global.province_controllers^1014 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+            if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^3651 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+
+            if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10182 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+
+            if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12090 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 1
+				}                
+            }
+
+			diplomatic_relation = { country = BRM relation = war_relation active = no }
+			BRM = { diplomatic_relation = { country = BCP relation = war_relation active = no } }
+            set_variable = {
+                BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength
+            }
+
+            subtract_from_variable = {
+                BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength_Old
+            }
+            subtract_from_variable = {
+                BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength_Old
+            }
+			set_variable = {
+				BCP.communist_check = 1
+			}
+			set_variable = {
+				BRM.communist_check = 1
+			}
+		}	
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	BRM_Launch_Campaign_Against_Communist_Jungle_Strongholds = {
+
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = BRM
+		}
+
+		available = {
+            BCP = {
+                unrecognized_state
+                is_subject = no
+            }
+		}
+		cost = 0
+
+		days_re_enable = 180
+		fire_only_once = no
+		selectable_mission = no
+
+		days_remove = 5
+		
+		complete_effect = {
+			1558 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = BCP
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1558 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_communist_border_war_ongoing_nearby
+				}
+			}
+			1212 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = BCP
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1558 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_communist_border_war_ongoing_nearby
+				}
+			}
+			activate_mission = BRM_Campaign_Against_Communist_Jungle_Strongholds
+			diplomatic_relation = { country = BCP relation = war_relation active = yes }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}	
+
+
+
+	BRM_Campaign_Against_Communist_Jungle_Strongholds = {
+
+		icon = generic_prepare_civil_war
+
+
+		available = {
+			NOT = {
+				country_exists = BRM
+			}
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = no
+		selectable_mission = yes
+
+		days_mission_timeout = 20
+
+		days_re_enable = 180
+
+		complete_effect = {
+		}
+
+		timeout_effect = {
+            set_variable = {
+                BCP.Communist_Conflict_Strength_Old = BCP.Communist_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Communist_Conflict_Strength_Old = BRM.Communist_Conflict_Strength
+            }
+			count_inflicted_casualties_on_current_enemies = yes
+			BRM = {
+				count_inflicted_casualties_on_current_enemies = yes
+			}
+			set_variable = {
+				Burmese_Casualties_Communist_Conflict = current_inflicted_casualties_on_@BRM
+			}
+			set_variable = {
+				Communist_Casualties_Communist_Conflict = BRM.current_inflicted_casualties_on_@BCP
+			}
+			set_variable = {
+				Communist_Conflict_Strength_Bonus = Burmese_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				Burma_Communist_Conflict_Strength_Bonus = Communist_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				BRM.Burmese_Casualties_Communist_Conflict_Display = Burmese_Casualties_Communist_Conflict
+			}
+			set_variable = {
+				BRM.Communist_Casualties_Communist_Conflict_Display = Communist_Casualties_Communist_Conflict
+			}
+			multiply_variable = {
+				BRM.Burmese_Casualties_Communist_Conflict_Display = 1000
+			}
+			multiply_variable = {
+				BRM.Communist_Casualties_Communist_Conflict_Display = 1000
+			}
+			add_to_variable = {
+				UNS.Communist_Conflcit_Communist_Casualities_Total = BRM.Communist_Casualties_Communist_Conflict_Display
+			}
+			add_to_variable = {
+				UNS.Communist_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Communist_Conflict_Display
+			}
+			if = {
+				limit = {
+					check_variable = {
+						Burma_Communist_Conflict_Strength_Bonus > Communist_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Burma_Communist_Conflict_Strength_Bonus = Communist_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Burma_Communist_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = Burma_Communist_Conflict_Strength_Bonus
+				}
+				round_variable = BMR.Communist_Conflict_Strength
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						Communist_Conflict_Strength_Bonus > Burma_Communist_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Communist_Conflict_Strength_Bonus = Burma_Communist_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Communist_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					Communist_Conflict_Strength = Communist_Conflict_Strength_Bonus
+				}
+				round_variable = Communist_Conflict_Strength
+			}
+			else = { }
+			clear_current_inflicted_casualties = yes
+			#State 1267 = Bago			(1417 12127 12256)
+			#State 1558 = Communist			(1403 4336 12125 11081 12238)
+			#State 1212 = Tanintharyi	(1296 1315 1385 4275 7295 10217 12292)
+
+			#State 1558 = Communist
+			#State 1265 = Communistni
+			every_owned_state = {
+				limit = {
+					has_state_flag = burma_communist_border_war_ongoing_nearby						
+				}
+				remove_province_modifier = {
+					static_modifiers = { border_war_in_progress }
+					province = {
+						all_provinces = yes
+					}
+				}
+			}
+			BRM = {
+				every_owned_state = {
+					limit = {
+						has_state_flag = burma_communist_border_war_ongoing_nearby						
+					}
+					remove_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {    
+						global.province_controllers^1650 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 2
+				}               
+            }
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10283 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}		
+            else = {
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 2
+				}               
+            }	 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10344 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 2
+				}               
+            }			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^13678 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Communist_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 2
+				}               
+            }
+			#Province 1330 = Rangoon
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1330 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 1000
+				}
+			}
+            #Burmese Provinces
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12127 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1650 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10283 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10344 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^13678 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1014 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^3651 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10182 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12090 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1417 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12127 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12256 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10154 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10267 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7254 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7382 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10223 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12197 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12267 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1228 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1333 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4019 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4059 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4541 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7034 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7163 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7190 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1492 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4202 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4626 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12404 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12449 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+ 			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^13680 = BCP.id
+					}
+				}
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 3
+				}
+			}
+
+			diplomatic_relation = { country = BRM relation = war_relation active = no }
+			BRM = { diplomatic_relation = { country = BCP relation = war_relation active = no } }
+            set_variable = {
+                BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength
+            }
+
+            subtract_from_variable = {
+                BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength_Old
+            }
+            subtract_from_variable = {
+                BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength_Old
+            }
+			set_variable = {
+				BCP.communist_check = 1
+			}
+			set_variable = {
+				BRM.communist_check = 1
+			}
+		}	
+
+		ai_will_do = {
+			factor = 1
+		}
+	}	
+}
 Karen_Conflict = {
+	Launch_Campaign_against_the_Karen = {
+
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = BRM
+		}
+
+		available = {
+            KAY = {
+                unrecognized_state
+                is_subject = no
+            }
+		}
+		cost = 0
+
+		days_re_enable = 180
+		fire_only_once = no
+		selectable_mission = no
+
+		days_remove = 5
+		
+		complete_effect = {
+			1264 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = KAY
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1264 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_karen_border_war_ongoing_nearby
+				}
+			}
+			1212 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = KAY
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1264 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_karen_border_war_ongoing_nearby
+				}
+			}
+			activate_mission = KAY_Campaign_against_the_Burmese_Government_Tenasserim_Hills
+			diplomatic_relation = { country = KAY relation = war_relation active = yes }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}	
+
+
+
+	BRM_Campaign_against_the_Karen_Insurgents = {
+
+		icon = generic_prepare_civil_war
+
+
+		available = {
+			NOT = {
+				country_exists = BRM
+			}
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = no
+		selectable_mission = yes
+
+		days_mission_timeout = 20
+
+		days_re_enable = 180
+
+		complete_effect = {
+		}
+
+		timeout_effect = {
+            set_variable = {
+                KAY.Karen_Conflict_Strength_Old = KAY.Karen_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Karen_Conflict_Strength_Old = BRM.Karen_Conflict_Strength
+            }
+			count_inflicted_casualties_on_current_enemies = yes
+			BRM = {
+				count_inflicted_casualties_on_current_enemies = yes
+			}
+			set_variable = {
+				Burmese_Casualties_Karen_Conflict = current_inflicted_casualties_on_@BRM
+			}
+			set_variable = {
+				Karen_Casualties_Karen_Conflict = BRM.current_inflicted_casualties_on_@KAY
+			}
+			set_variable = {
+				Karen_Conflict_Strength_Bonus = Burmese_Casualties_Karen_Conflict
+			}
+			set_variable = {
+				Burma_Karen_Conflict_Strength_Bonus = Karen_Casualties_Karen_Conflict
+			}
+			set_variable = {
+				BRM.Burmese_Casualties_Karen_Conflict_Display = Burmese_Casualties_Karen_Conflict
+			}
+			set_variable = {
+				BRM.Karen_Casualties_Karen_Conflict_Display = Karen_Casualties_Karen_Conflict
+			}
+			multiply_variable = {
+				BRM.Burmese_Casualties_Karen_Conflict_Display = 1000
+			}
+			multiply_variable = {
+				BRM.Karen_Casualties_Karen_Conflict_Display = 1000
+			}
+			add_to_variable = {
+				UNS.Karen_Conflcit_Karen_Casualities_Total = BRM.Karen_Casualties_Karen_Conflict_Display
+			}
+			add_to_variable = {
+				UNS.Karen_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Karen_Conflict_Display
+			}
+			if = {
+				limit = {
+					check_variable = {
+						Burma_Karen_Conflict_Strength_Bonus > Karen_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Burma_Karen_Conflict_Strength_Bonus = Karen_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Burma_Karen_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = Burma_Karen_Conflict_Strength_Bonus
+				}
+				round_variable = BMR.Karen_Conflict_Strength
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						Karen_Conflict_Strength_Bonus > Burma_Karen_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Karen_Conflict_Strength_Bonus = Burma_Karen_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Karen_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					Karen_Conflict_Strength = Karen_Conflict_Strength_Bonus
+				}
+				round_variable = Karen_Conflict_Strength
+			}
+			else = { }
+			clear_current_inflicted_casualties = yes
+			#State 1267 = Bago			(1417 12127 12256)
+			#State 1264 = Karen			(1403 4336 12125 11081 12238)
+			#State 1212 = Tanintharyi	(1296 1315 1385 4275 7295 10217 12292)
+
+			#State 1264 = Karen
+			#State 1265 = Karenni
+			every_owned_state = {
+				limit = {
+					has_state_flag = burma_karen_border_war_ongoing_nearby						
+				}
+				remove_province_modifier = {
+					static_modifiers = { border_war_in_progress }
+					province = {
+						all_provinces = yes
+					}
+				}
+			}
+			BRM = {
+				every_owned_state = {
+					limit = {
+						has_state_flag = burma_karen_border_war_ongoing_nearby						
+					}
+					remove_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4293 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 2
+				}               
+            }
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4408 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 3
+				}
+			}		
+            else = {
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 2
+				}               
+            }	 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7441 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 2
+				}               
+            }			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^11081 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 2
+				}               
+            }
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12238 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 3
+				}
+			}
+            else = {
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 2
+				}               
+            }
+			#Province 1330 = Rangoon
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1330 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 300
+				}
+			}
+            #Burmese Provinces
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12127 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12256 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1417 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12292 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10217 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7295 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4275 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1385 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1315 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1296 = KAY.id
+					}
+				}
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 3
+				}
+			}
+
+			diplomatic_relation = { country = BRM relation = war_relation active = no }
+			BRM = { diplomatic_relation = { country = KAY relation = war_relation active = no } }
+            set_variable = {
+                KAY.Karen_Conflict_Strength_Current = KAY.Karen_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Karen_Conflict_Strength_Current = BRM.Karen_Conflict_Strength
+            }
+
+            subtract_from_variable = {
+                KAY.Karen_Conflict_Strength_Current = KAY.Karen_Conflict_Strength_Old
+            }
+            subtract_from_variable = {
+                BRM.Karen_Conflict_Strength_Current = BRM.Karen_Conflict_Strength_Old
+            }
+			set_variable = {
+				KAY.karen_check = 1
+			}
+			set_variable = {
+				BRM.karen_check = 1
+			}
+		}	
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
 	#Liberate_the_Bamar_Homeland
 	#Preperations_for_Renewed_Assault_on_Communist_Strongholds
 	Launch_Campaign_against_the_Burmese_Government_Tenasserim_Hills = {
@@ -10,6 +2337,7 @@ Karen_Conflict = {
 
 		available = {
 			has_idea = unrecognized_state
+			is_subject = no
 		}
 		cost = 0
 
@@ -117,16 +2445,22 @@ Karen_Conflict = {
 				Burma_Karen_Conflict_Strength_Bonus = Karen_Casualties_Karen_Conflict
 			}
 			set_variable = {
-				Burmese_Casualties_Karen_Conflict_Display = Burmese_Casualties_Karen_Conflict
+				BRM.Burmese_Casualties_Karen_Conflict_Display = Burmese_Casualties_Karen_Conflict
 			}
 			set_variable = {
-				Karen_Casualties_Karen_Conflict_Display = Karen_Casualties_Karen_Conflict
+				BRM.Karen_Casualties_Karen_Conflict_Display = Karen_Casualties_Karen_Conflict
 			}
 			multiply_variable = {
-				Burmese_Casualties_Karen_Conflict_Display = 1000
+				BRM.Burmese_Casualties_Karen_Conflict_Display = 1000
 			}
 			multiply_variable = {
-				Karen_Casualties_Karen_Conflict_Display = 1000
+				BRM.Karen_Casualties_Karen_Conflict_Display = 1000
+			}
+			add_to_variable = {
+				UNS.Karen_Conflcit_Karen_Casualities_Total = BRM.Karen_Casualties_Karen_Conflict_Display
+			}
+			add_to_variable = {
+				UNS.Karen_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Karen_Conflict_Display
 			}
 			if = {
 				limit = {
@@ -201,7 +2535,7 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 3
 				}
 			}
 			 
@@ -212,7 +2546,7 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 3
 				}
 			}			 
 			if = {
@@ -222,7 +2556,7 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 3
 				}
 			}
 			 
@@ -233,7 +2567,7 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 3
 				}
 			}
 			
@@ -244,7 +2578,7 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 3
 				}
 			}
 			#Province 1330 = Rangoon
@@ -266,12 +2600,12 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					KAY.Karen_Conflict_Strength = 5
+					KAY.Karen_Conflict_Strength = 3
 				}
 			}
 			else = {
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 1
 				}
 			}
 			if = {
@@ -281,12 +2615,12 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					KAY.Karen_Conflict_Strength = 5
+					KAY.Karen_Conflict_Strength = 3
 				}
 			}
 			else = {
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 1
 				}
 			}
 			if = {
@@ -296,12 +2630,12 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					KAY.Karen_Conflict_Strength = 5
+					KAY.Karen_Conflict_Strength = 3
 				}
 			}
 			else = {
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 1
 				}
 			}
 			if = {
@@ -311,12 +2645,12 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					KAY.Karen_Conflict_Strength = 5
+					KAY.Karen_Conflict_Strength = 3
 				}
 			}
 			else = {
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 1
 				}
 			}
 			if = {
@@ -326,12 +2660,12 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					KAY.Karen_Conflict_Strength = 5
+					KAY.Karen_Conflict_Strength = 3
 				}
 			}
 			else = {
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 1
 				}
 			}
 			if = {
@@ -341,12 +2675,12 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					KAY.Karen_Conflict_Strength = 5
+					KAY.Karen_Conflict_Strength = 3
 				}
 			}
 			else = {
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 1
 				}
 			}
 			if = {
@@ -356,12 +2690,12 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					KAY.Karen_Conflict_Strength = 5
+					KAY.Karen_Conflict_Strength = 3
 				}
 			}
 			else = {
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 1
 				}
 			}
 
@@ -401,6 +2735,7 @@ Karen_Conflict = {
 
 		available = {
 			has_idea = unrecognized_state
+			is_subject = no
 		}
 		cost = 0
 
@@ -510,16 +2845,22 @@ Karen_Conflict = {
 				Burma_Karen_Conflict_Strength_Bonus = Karen_Casualties_Karen_Conflict
 			}
 			set_variable = {
-				Burmese_Casualties_Karen_Conflict_Display = Burmese_Casualties_Karen_Conflict
+				BRM.Burmese_Casualties_Karen_Conflict_Display = Burmese_Casualties_Karen_Conflict
 			}
 			set_variable = {
-				Karen_Casualties_Karen_Conflict_Display = Karen_Casualties_Karen_Conflict
+				BRM.Karen_Casualties_Karen_Conflict_Display = Karen_Casualties_Karen_Conflict
 			}
 			multiply_variable = {
-				Burmese_Casualties_Karen_Conflict_Display = 1000
+				BRM.Burmese_Casualties_Karen_Conflict_Display = 1000
 			}
 			multiply_variable = {
-				Karen_Casualties_Karen_Conflict_Display = 1000
+				BRM.Karen_Casualties_Karen_Conflict_Display = 1000
+			}
+			add_to_variable = {
+				UNS.Karen_Conflcit_Karen_Casualities_Total = BRM.Karen_Casualties_Karen_Conflict_Display
+			}
+			add_to_variable = {
+				UNS.Karen_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Karen_Conflict_Display
 			}
 			if = {
 				limit = {
@@ -594,7 +2935,7 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 3
 				}
 			}
 			 
@@ -605,7 +2946,7 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 3
 				}
 			}			 
 			if = {
@@ -615,7 +2956,7 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 3
 				}
 			}
 			 
@@ -626,7 +2967,7 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 3
 				}
 			}
 			
@@ -637,7 +2978,7 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 3
 				}
 			}
 			#Province 1330 = Rangoon
@@ -658,12 +2999,12 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					KAY.Karen_Conflict_Strength = 5
+					KAY.Karen_Conflict_Strength = 3
 				}
 			}
 			else = {
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 1
 				}
 			}
 			if = {
@@ -673,12 +3014,12 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					KAY.Karen_Conflict_Strength = 5
+					KAY.Karen_Conflict_Strength = 3
 				}
 			}
 			else = {
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 1
 				}
 			}
 			if = {
@@ -688,12 +3029,12 @@ Karen_Conflict = {
 					}
 				}
 				add_to_variable = {
-					KAY.Karen_Conflict_Strength = 5
+					KAY.Karen_Conflict_Strength = 3
 				}
 			}
 			else = {
 				add_to_variable = {
-					BRM.Karen_Conflict_Strength = 5
+					BRM.Karen_Conflict_Strength = 1
 				}
 			}
 			diplomatic_relation = { country = BRM relation = war_relation active = no }
@@ -716,6 +3057,1074 @@ Karen_Conflict = {
 			}
 			set_variable = {
 				BRM.karen_check = 1
+			}
+		}	
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+}
+Mon_Conflict = {
+	Launch_Campaign_against_the_Mon = {
+
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = BRM
+		}
+
+		available = {
+            MNL = {
+                unrecognized_state
+                is_subject = no
+            }
+		}
+		cost = 0
+
+		days_re_enable = 180
+		fire_only_once = no
+		selectable_mission = no
+
+		days_remove = 5
+		
+		complete_effect = {
+			1266 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = MNL
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1266 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_mon_border_war_ongoing_nearby
+				}
+			}
+			1212 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = MNL
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1266 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_mon_border_war_ongoing_nearby
+				}
+			}
+			activate_mission = BRM_Campaign_against_the_Mon_Insurgents
+			diplomatic_relation = { country = MNL relation = war_relation active = yes }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}	
+
+
+
+	BRM_Campaign_against_the_Mon_Insurgents = {
+
+		icon = generic_prepare_civil_war
+
+
+		available = {
+			NOT = {
+				country_exists = BRM
+			}
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = no
+		selectable_mission = yes
+
+		days_mission_timeout = 20
+
+		days_re_enable = 180
+
+		complete_effect = {
+		}
+
+		timeout_effect = {
+            set_variable = {
+                MNL.Mon_Conflict_Strength_Old = MNL.Mon_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Mon_Conflict_Strength_Old = BRM.Mon_Conflict_Strength
+            }
+			count_inflicted_casualties_on_current_enemies = yes
+			BRM = {
+				count_inflicted_casualties_on_current_enemies = yes
+			}
+			set_variable = {
+				Burmese_Casualties_Mon_Conflict = current_inflicted_casualties_on_@BRM
+			}
+			set_variable = {
+				Mon_Casualties_Mon_Conflict = BRM.current_inflicted_casualties_on_@MNL
+			}
+			set_variable = {
+				Mon_Conflict_Strength_Bonus = Burmese_Casualties_Mon_Conflict
+			}
+			set_variable = {
+				Burma_Mon_Conflict_Strength_Bonus = Mon_Casualties_Mon_Conflict
+			}
+			set_variable = {
+				BRM.Burmese_Casualties_Mon_Conflict_Display = Burmese_Casualties_Mon_Conflict
+			}
+			set_variable = {
+				BRM.Mon_Casualties_Mon_Conflict_Display = Mon_Casualties_Mon_Conflict
+			}
+			multiply_variable = {
+				BRM.Burmese_Casualties_Mon_Conflict_Display = 1000
+			}
+			multiply_variable = {
+				BRM.Mon_Casualties_Mon_Conflict_Display = 1000
+			}
+			add_to_variable = {
+				UNS.Mon_Conflcit_Mon_Casualities_Total = BRM.Mon_Casualties_Mon_Conflict_Display
+			}
+			add_to_variable = {
+				UNS.Mon_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Mon_Conflict_Display
+			}
+			if = {
+				limit = {
+					check_variable = {
+						Burma_Mon_Conflict_Strength_Bonus > Mon_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Burma_Mon_Conflict_Strength_Bonus = Mon_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Burma_Mon_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = Burma_Mon_Conflict_Strength_Bonus
+				}
+				round_variable = BMR.Mon_Conflict_Strength
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						Mon_Conflict_Strength_Bonus > Burma_Mon_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Mon_Conflict_Strength_Bonus = Burma_Mon_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Mon_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					Mon_Conflict_Strength = Mon_Conflict_Strength_Bonus
+				}
+				round_variable = Mon_Conflict_Strength
+			}
+			else = { }
+			clear_current_inflicted_casualties = yes
+			#State 1267 = Bago			(1417 12127 12256)
+			#State 1266 = Mon			(1403 4336 12125 11081 12238)
+			#State 1212 = Tanintharyi	(1296 1315 1385 4275 7295 10217 12292)
+
+			#State 1266 = Mon
+			#State 1265 = Monni
+			every_owned_state = {
+				limit = {
+					has_state_flag = burma_mon_border_war_ongoing_nearby						
+				}
+				remove_province_modifier = {
+					static_modifiers = { border_war_in_progress }
+					province = {
+						all_provinces = yes
+					}
+				}
+			}
+			BRM = {
+				every_owned_state = {
+					limit = {
+						has_state_flag = burma_mon_border_war_ongoing_nearby						
+					}
+					remove_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+				}
+			}
+			if = {  
+				limit = {
+					check_variable = {
+						global.province_controllers^1403 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 5
+				}
+			}
+			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4336 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 5
+				}
+			}			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12125 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 5
+				}
+			}
+			#Province 1330 = Rangoon
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1330 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 300
+				}
+			}
+            #Burmese Provinces
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12127 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12256 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1417 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12292 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10217 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7295 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4275 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1385 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1315 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1296 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+
+			diplomatic_relation = { country = BRM relation = war_relation active = no }
+			BRM = { diplomatic_relation = { country = MNL relation = war_relation active = no } }
+            set_variable = {
+                MNL.Mon_Conflict_Strength_Current = MNL.Mon_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Mon_Conflict_Strength_Current = BRM.Mon_Conflict_Strength
+            }
+
+            subtract_from_variable = {
+                MNL.Mon_Conflict_Strength_Current = MNL.Mon_Conflict_Strength_Old
+            }
+            subtract_from_variable = {
+                BRM.Mon_Conflict_Strength_Current = BRM.Mon_Conflict_Strength_Old
+            }
+			set_variable = {
+				MNL.mon_check = 1
+			}
+			set_variable = {
+				BRM.mon_check = 1
+			}
+		}	
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	Launch_Campaign_against_the_Burmese_Government_Tenasserim_Hills_MNL = {
+
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = MNL
+		}
+
+		available = {
+			has_idea = unrecognized_state
+			is_subject = no
+		}
+		cost = 0
+
+		days_re_enable = 180
+		fire_only_once = no
+		selectable_mission = no
+
+		days_remove = 5
+		
+		complete_effect = {
+			1266 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = MNL
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1266 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_mon_border_war_ongoing_nearby
+				}
+			}
+			1212 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = MNL
+						}
+						NOT = { state = 1212 }
+						NOT = { state = 1266 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_mon_border_war_ongoing_nearby
+				}
+			}
+			activate_mission = MNL_Campaign_against_the_Burmese_Government_Tenasserim_Hills
+			diplomatic_relation = { country = BRM relation = war_relation active = yes }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}	
+
+
+
+	MNL_Campaign_against_the_Burmese_Government_Tenasserim_Hills = {
+
+		icon = generic_prepare_civil_war
+
+
+		available = {
+			NOT = {
+				country_exists = BRM
+			}
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = no
+		selectable_mission = yes
+
+		days_mission_timeout = 20
+
+		days_re_enable = 180
+
+		complete_effect = {
+		}
+
+		timeout_effect = {
+            set_variable = {
+                MNL.Mon_Conflict_Strength_Old = MNL.Mon_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Mon_Conflict_Strength_Old = BRM.Mon_Conflict_Strength
+            }
+			count_inflicted_casualties_on_current_enemies = yes
+			BRM = {
+				count_inflicted_casualties_on_current_enemies = yes
+			}
+			set_variable = {
+				Burmese_Casualties_Mon_Conflict = current_inflicted_casualties_on_@BRM
+			}
+			set_variable = {
+				Mon_Casualties_Mon_Conflict = BRM.current_inflicted_casualties_on_@MNL
+			}
+			set_variable = {
+				Mon_Conflict_Strength_Bonus = Burmese_Casualties_Mon_Conflict
+			}
+			set_variable = {
+				Burma_Mon_Conflict_Strength_Bonus = Mon_Casualties_Mon_Conflict
+			}
+			set_variable = {
+				BRM.Burmese_Casualties_Mon_Conflict_Display = Burmese_Casualties_Mon_Conflict
+			}
+			set_variable = {
+				BRM.Mon_Casualties_Mon_Conflict_Display = Mon_Casualties_Mon_Conflict
+			}
+			multiply_variable = {
+				BRM.Burmese_Casualties_Mon_Conflict_Display = 1000
+			}
+			multiply_variable = {
+				BRM.Mon_Casualties_Mon_Conflict_Display = 1000
+			}
+			add_to_variable = {
+				UNS.Mon_Conflcit_Mon_Casualities_Total = BRM.Mon_Casualties_Mon_Conflict_Display
+			}
+			add_to_variable = {
+				UNS.Mon_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Mon_Conflict_Display
+			}
+			if = {
+				limit = {
+					check_variable = {
+						Burma_Mon_Conflict_Strength_Bonus > Mon_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Burma_Mon_Conflict_Strength_Bonus = Mon_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Burma_Mon_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = Burma_Mon_Conflict_Strength_Bonus
+				}
+				round_variable = BMR.Mon_Conflict_Strength
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						Mon_Conflict_Strength_Bonus > Burma_Mon_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Mon_Conflict_Strength_Bonus = Burma_Mon_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Mon_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					Mon_Conflict_Strength = Mon_Conflict_Strength_Bonus
+				}
+				round_variable = Mon_Conflict_Strength
+			}
+			else = { }
+			clear_current_inflicted_casualties = yes
+			#State 1267 = Bago			(1417 12127 12256)
+			#State 1266 = Mon			(1403 4336 12125 11081 12238)
+			#State 1212 = Tanintharyi	(1296 1315 1385 4275 7295 10217 12292)
+
+			#State 1266 = Mon
+			#State 1265 = Monni
+			every_owned_state = {
+				limit = {
+					has_state_flag = burma_mon_border_war_ongoing_nearby						
+				}
+				remove_province_modifier = {
+					static_modifiers = { border_war_in_progress }
+					province = {
+						all_provinces = yes
+					}
+				}
+			}
+			BRM = {
+				every_owned_state = {
+					limit = {
+						has_state_flag = burma_mon_border_war_ongoing_nearby						
+					}
+					remove_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1403 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 3
+				}
+			}
+			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4336 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 3
+				}
+			}			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12125 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 3
+				}
+			}
+			#Province 1330 = Rangoon
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1330 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 300
+				}
+			}
+            #Burmese Provinces        
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12292 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^10217 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^7295 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4275 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1385 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1315 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1296 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 1
+				}
+			}
+
+			diplomatic_relation = { country = BRM relation = war_relation active = no }
+			BRM = { diplomatic_relation = { country = MNL relation = war_relation active = no } }
+            set_variable = {
+                MNL.Mon_Conflict_Strength_Current = MNL.Mon_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Mon_Conflict_Strength_Current = BRM.Mon_Conflict_Strength
+            }
+
+            subtract_from_variable = {
+                MNL.Mon_Conflict_Strength_Current = MNL.Mon_Conflict_Strength_Old
+            }
+            subtract_from_variable = {
+                BRM.Mon_Conflict_Strength_Current = BRM.Mon_Conflict_Strength_Old
+            }
+			set_variable = {
+				MNL.mon_check = 1
+			}
+			set_variable = {
+				BRM.mon_check = 1
+			}
+		}	
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+	Launch_Campaign_Against_the_Burmese_Government_Irrawaddy_Delta_MNL = {
+
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = MNL
+		}
+
+		available = {
+			has_idea = unrecognized_state
+			is_subject = no
+		}
+		cost = 0
+
+		days_re_enable = 180
+		fire_only_once = no
+		selectable_mission = no
+
+		days_remove = 5
+		
+		complete_effect = {
+			1266 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = MNL
+						}
+						NOT = { state = 1267 }
+						NOT = { state = 1266 }
+						#NOT = { state = 1212 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_mon_border_war_ongoing_nearby
+				}
+			}
+			1267 = {
+				every_neighbor_state = {
+					limit = {
+						OR = {
+							is_owned_by = BRM
+							is_owned_by = MNL
+						}
+						NOT = { state = 1267 }
+						NOT = { state = 1266 }
+						#NOT = { state = 1212 }
+					}
+					add_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+					set_state_flag = burma_mon_border_war_ongoing_nearby
+				}
+			}
+			activate_mission = MNL_Campaign_against_the_Burmese_Government_Irrawaddy_Delta
+			diplomatic_relation = { country = BRM relation = war_relation active = yes }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}	
+
+
+
+	MNL_Campaign_against_the_Burmese_Government_Irrawaddy_Delta = {
+
+		icon = generic_prepare_civil_war
+
+
+		available = {
+			NOT = {
+				country_exists = BRM
+			}
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = no
+		selectable_mission = yes
+
+		days_mission_timeout = 20
+
+		days_re_enable = 180
+
+		complete_effect = {
+		}
+
+		timeout_effect = {
+            set_variable = {
+                MNL.Mon_Conflict_Strength_Old = MNL.Mon_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Mon_Conflict_Strength_Old = BRM.Mon_Conflict_Strength
+            }
+			count_inflicted_casualties_on_current_enemies = yes
+			BRM = {
+				count_inflicted_casualties_on_current_enemies = yes
+			}
+			set_variable = {
+				Burmese_Casualties_Mon_Conflict = current_inflicted_casualties_on_@BRM
+			}
+			set_variable = {
+				Mon_Casualties_Mon_Conflict = BRM.current_inflicted_casualties_on_@MNL
+			}
+			set_variable = {
+				Mon_Conflict_Strength_Bonus = Burmese_Casualties_Mon_Conflict
+			}
+			set_variable = {
+				Burma_Mon_Conflict_Strength_Bonus = Mon_Casualties_Mon_Conflict
+			}
+			set_variable = {
+				BRM.Burmese_Casualties_Mon_Conflict_Display = Burmese_Casualties_Mon_Conflict
+			}
+			set_variable = {
+				BRM.Mon_Casualties_Mon_Conflict_Display = Mon_Casualties_Mon_Conflict
+			}
+			multiply_variable = {
+				BRM.Burmese_Casualties_Mon_Conflict_Display = 1000
+			}
+			multiply_variable = {
+				BRM.Mon_Casualties_Mon_Conflict_Display = 1000
+			}
+			add_to_variable = {
+				UNS.Mon_Conflcit_Mon_Casualities_Total = BRM.Mon_Casualties_Mon_Conflict_Display
+			}
+			add_to_variable = {
+				UNS.Mon_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Mon_Conflict_Display
+			}
+			if = {
+				limit = {
+					check_variable = {
+						Burma_Mon_Conflict_Strength_Bonus > Mon_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Burma_Mon_Conflict_Strength_Bonus = Mon_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Burma_Mon_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = Burma_Mon_Conflict_Strength_Bonus
+				}
+				round_variable = BRM.Mon_Conflict_Strength
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						Mon_Conflict_Strength_Bonus > Burma_Mon_Conflict_Strength_Bonus
+					}
+				}
+				subtract_from_variable = {
+					Mon_Conflict_Strength_Bonus = Burma_Mon_Conflict_Strength_Bonus
+				}
+				multiply_variable = {
+					Mon_Conflict_Strength_Bonus = 10
+				}
+				add_to_variable = {
+					Mon_Conflict_Strength = Mon_Conflict_Strength_Bonus
+				}
+				round_variable = Mon_Conflict_Strength
+			}
+			else = { }
+			clear_current_inflicted_casualties = yes
+			#State 1267 = Bago			(1417 12127 12256)
+			#State 1266 = Mon			(1403 4336 12125 11081 12238)
+			#State 1212 = Tanintharyi	(1296 1315 1385 4275 7295 10217 12292)
+
+			#State 1266 = Mon
+			#State 1265 = Monni
+			every_owned_state = {
+				limit = {
+					has_state_flag = burma_mon_border_war_ongoing_nearby						
+				}
+				remove_province_modifier = {
+					static_modifiers = { border_war_in_progress }
+					province = {
+						all_provinces = yes
+					}
+				}
+			}
+			BRM = {
+				every_owned_state = {
+					limit = {
+						has_state_flag = burma_mon_border_war_ongoing_nearby						
+					}
+					remove_province_modifier = {
+						static_modifiers = { border_war_in_progress }
+						province = {
+							all_provinces = yes
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1403 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 3
+				}
+			}
+			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^4336 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 3
+				}
+			}			 
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12125 = BRM.id
+					}
+				}
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 3
+				}
+			}
+			#Province 1330 = Rangoon
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1330 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 300
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12127 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^12256 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						global.province_controllers^1417 = MNL.id
+					}
+				}
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 3
+				}
+			}
+			else = {
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 1
+				}
+			}
+			diplomatic_relation = { country = BRM relation = war_relation active = no }
+			BRM = { diplomatic_relation = { country = MNL relation = war_relation active = no } }
+            set_variable = {
+                MNL.Mon_Conflict_Strength_Current = MNL.Mon_Conflict_Strength
+            }
+            set_variable = {
+                BRM.Mon_Conflict_Strength_Current = BRM.Mon_Conflict_Strength
+            }
+
+            subtract_from_variable = {
+                MNL.Mon_Conflict_Strength_Current = MNL.Mon_Conflict_Strength_Old
+            }
+             subtract_from_variable = {
+                BRM.Mon_Conflict_Strength_Current = BRM.Mon_Conflict_Strength_Old
+            }
+			set_variable = {
+				MNL.mon_check = 1
+			}
+			set_variable = {
+				BRM.mon_check = 1
 			}
 		}	
 
