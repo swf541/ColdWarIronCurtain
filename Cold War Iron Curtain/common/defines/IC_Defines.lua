@@ -47,6 +47,7 @@ NDefines.NBuildings.MAX_BUILDING_LEVELS = 200
 NDefines.NBuildings.MAX_SHARED_SLOTS = 42
 NDefines.NBuildings.RADAR_RANGE_MAX = 400 -- Range is interpolated between building levels 1-15.
 NDefines.NBuildings.SUPPLY_PORT_LEVEL_THROUGHPUT = 5 -- Supply throughput per level of naval base. Vanilla value is 3.
+NDefines.NBuildings.SUPPLY_ROUTE_RESOURCE_BONUS = 0.0
 
 NDefines.NCountry.EVENT_PROCESS_OFFSET = 20 -- Events are checked every X day per country or state (1 is ideal, but CPU heavy)
 NDefines.NCountry.POLITICAL_POWER_CAP = 2000000.0
