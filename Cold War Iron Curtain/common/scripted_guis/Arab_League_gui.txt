@@ -363,7 +363,7 @@ scripted_gui = {
 						ROOT = {
 							add_political_power = -50
 						}
-						any country = {
+						every_country = {
 							if = {
 								limit = {
 									has_variable = arab_league_member
@@ -378,7 +378,6 @@ scripted_gui = {
 					}
 
 					#Boost national influence
-					#need to add influence and ideology
 					if = {
 						limit = {
 							AND = { 
@@ -396,6 +395,37 @@ scripted_gui = {
 									max = 15
 							}
 							subtract_from_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+							for_loop_effect = {
+								end = influence_array^num
+								value = v
+								if = {
+									limit = {
+										check_variable = {
+											influence_array^v = ROOT
+										}
+									}
+									add_to_variable = {
+										influence_array_val^v = 100
+									}
+									set_country_flag = found
+								}
+							}
+							if = {
+								limit = {
+									NOT = {
+										has_country_flag = found
+									}
+								}
+								add_to_array = {
+									influence_array = ROOT.id
+								}
+								add_to_array = {
+									influence_array_val = 100
+								}
+							}
+							clr_country_flag = found
+							recalculate_influence = yes
+						}
 						}
 						ROOT = {
 							add_political_power = -100
