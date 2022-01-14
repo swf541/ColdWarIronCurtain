@@ -328,6 +328,17 @@ scripted_gui = {
 							}
 
 							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+							add_opinion_modifier = {
+								target = ROOT
+								modifier = large_increase 
+							}
+							reverse_add_opinion_modifier = {
+                                target = ROOT
+                                modifier = large_increase
+                            }
+						}
+						ROOT = {
+							add_political_power = -100
 						}
 					}
 
@@ -344,13 +355,40 @@ scripted_gui = {
 									max = 12
 							}
 							subtract_from_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+							add_opinion_modifier = {
+								target = ROOT
+								modifier = large_decrease
+							}
+							every_country = {
+								if = {
+									limit = {
+										has_variable = arab_league_member
+									}
+									add_opinion_modifier = {
+										target = PREV
+										modifier = large_decrease
+									}
+									reverse_add_opinion_modifier = {
+										target = PREV
+										modifier = large_decrease
+									}
+								}
+							}
+						}
+						ROOT = {
+							add_political_power = -50
 						}
 					}
 
 					#Boost national influence
 					if = {
 						limit = {
-							check_variable = { UNS.arab_league_influence_action_set = 2 }
+							AND = { 
+								check_variable = { UNS.arab_league_influence_action_set = 2 }
+								ROOT = {
+									has_intelligence_agency = yes
+								}
+							}
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
@@ -359,8 +397,40 @@ scripted_gui = {
 									min = 5
 									max = 15
 							}
-
 							subtract_from_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+							for_loop_effect = {
+								end = influence_array^num
+								value = v
+								if = {
+									limit = {
+										check_variable = {
+											influence_array^v = ROOT
+										}
+									}
+									add_to_variable = {
+										influence_array_val^v = 100
+									}
+									set_country_flag = found
+								}
+							}
+							if = {
+								limit = {
+									NOT = {
+										has_country_flag = found
+									}
+								}
+								add_to_array = {
+									influence_array = ROOT.id
+								}
+								add_to_array = {
+									influence_array_val = 100
+								}
+							}
+							clr_country_flag = found
+							recalculate_influence = yes
+						}
+						ROOT = {
+							add_political_power = -100
 						}
 					}
 
@@ -373,10 +443,15 @@ scripted_gui = {
 							randomize_variable = {
 									var = UNS.randomised_acceptance_var
 									distribution = uniform
-									min = 18
-									max = 30
+									min = 5
+									max = 12
 							}
 							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+							add_timed_idea = { idea = moderate_foreign_economic_aid  days = 100 }
+							add_timed_idea = { idea = idea_arab_league_civs_positive  days = 100 }
+						}
+						ROOT = {
+							add_timed_idea = { idea = idea_arab_league_civs_negative  days = 100 }
 						}
 					}
 
@@ -393,6 +468,13 @@ scripted_gui = {
 									max = 14
 							}
 							subtract_from_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+							add_opinion_modifier = {
+								target = ROOT
+								modifier = large_decrease
+							}
+						}
+						ROOT = {
+							add_political_power = -10
 						}
 					}
 
@@ -402,13 +484,12 @@ scripted_gui = {
 							check_variable = { UNS.arab_league_influence_action_set = 5 }
 						}
 						var:root.arab_league_nation_influence_target = {
-							randomize_variable = {
-									var = UNS.randomised_acceptance_var
-									distribution = uniform
-									min = 15
-									max = 22
+							country_event = {
+								id = ARAB_LEAGUE_RESOLUTION.506
 							}
-							subtract_from_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+						}
+						ROOT = {
+							add_political_power = -100
 						}
 					}
 
@@ -437,10 +518,21 @@ scripted_gui = {
 							randomize_variable = {
 									var = UNS.randomised_acceptance_var
 									distribution = uniform
-									min = 7
-									max = 13
+									min = 3
+									max = 8
 							}
 							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+							add_opinion_modifier = {
+								target = ROOT
+								modifier = medium_increase 
+							}
+							reverse_add_opinion_modifier = {
+                                target = ROOT
+                                modifier = medium_increase
+                            }
+						}
+						ROOT = {
+							add_political_power = -50
 						}
 					}
 
@@ -453,10 +545,15 @@ scripted_gui = {
 							randomize_variable = {
 									var = UNS.randomised_acceptance_var
 									distribution = uniform
-									min = 12
-									max = 20
+									min = 15
+									max = 22
 							}
 							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+						}
+						send_equipment = {
+							target = var:root.arab_league_nation_influence_target
+							type = mbt_equipment
+							amount = 50
 						}
 					}
 
@@ -474,6 +571,11 @@ scripted_gui = {
 							}
 							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
+						send_equipment = {
+							target = var:root.arab_league_nation_influence_target
+							type = fighter_equipment
+							amount = 10
+						}
 					}
 
 					#send naval craft
@@ -485,10 +587,14 @@ scripted_gui = {
 							randomize_variable = {
 									var = UNS.randomised_acceptance_var
 									distribution = uniform
-									min = 20
-									max = 25
+									min = 15
+									max = 20
 							}
 							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+							add_timed_idea = { idea = idea_arab_league_docks_positive  days = 100 }
+						}
+						ROOT = {
+							add_timed_idea = { idea = idea_arab_league_docks_negative  days = 100 }
 						}
 					}
 
@@ -504,8 +610,13 @@ scripted_gui = {
 									min = 15
 									max = 25
 							}
-
 							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+							country_event = {
+								id = ARAB_LEAGUE_RESOLUTION.508
+							}
+						}
+						ROOT = {
+							add_political_power = -500
 						}
 					}
 
@@ -530,14 +641,32 @@ scripted_gui = {
 						limit = {
 							check_variable = { UNS.arab_league_influence_action_set = 13 }
 						}
-						var:root.arab_league_nation_influence_target = {
-							randomize_variable = {
-									var = UNS.randomised_acceptance_var
-									distribution = uniform
-									min = 10
-									max = 18
+						random_list = {
+							75 = {
+								var:root.arab_league_nation_influence_target = {
+									randomize_variable = {
+											var = UNS.randomised_acceptance_var
+											distribution = uniform
+											min = 18
+											max = 23
+									}
+									add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+									add_to_variable = {
+										CorruptionLevel = 0.05
+									}
+									corruption_idea_calc = yes
+								}
 							}
-							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
+							25 = {
+								var:root.arab_league_nation_influence_target = {
+									country_event = {
+										id = ARAB_LEAGUE_RESOLUTION.508
+									}
+								}
+							}
+						}
+						ROOT = {
+							subtract_from_variable = { currentMoney = 10 }
 						}
 					}
 
