@@ -1,0 +1,752 @@
+industrial_pulse = {	
+
+	set_variable = { oil_consumption = 1 }
+	set_variable = { steel_consumption = 1 }
+	set_variable = { aluminium_consumption = 1 }
+	set_variable = { rare_earth_consumption = 1 }
+	set_variable = { dockyard_consumption = 1 }
+	set_variable = { nuclear_reactor_electricity_consumption = 2 }
+	set_variable = { nuclear_reactor_chromium_consumption = 2 }
+	set_variable = { nuclear_power_consumption = 1 }
+	set_variable = { steel_factory_electricity_consumption = 2 }
+	set_variable = { steel_factory_oil_consumption = 1 }
+	set_variable = { tungsten_factory_electricity_consumption = 3 }
+	set_variable = { synthetic_refinery_electricity_consumption = 2 }
+	set_variable = { electricity_consumption = 1 }
+
+	set_variable = {
+		electricity_consumption_modifier = modifier@electricity_consumption_need
+	}
+
+	add_to_variable = { nuclear_reactor_electricity_consumption = electricity_consumption_modifier }
+	add_to_variable = { nuclear_reactor_electricity_consumption = electricity_consumption_modifier }
+
+	add_to_variable = { steel_factory_electricity_consumption = electricity_consumption_modifier }
+	add_to_variable = { steel_factory_electricity_consumption = electricity_consumption_modifier }
+
+	add_to_variable = { tungsten_factory_electricity_consumption = electricity_consumption_modifier }
+	add_to_variable = { tungsten_factory_electricity_consumption = electricity_consumption_modifier }
+	add_to_variable = { tungsten_factory_electricity_consumption = electricity_consumption_modifier }
+
+	add_to_variable = { synthetic_refinery_electricity_consumption = electricity_consumption_modifier }
+	add_to_variable = { synthetic_refinery_electricity_consumption = electricity_consumption_modifier }
+
+	add_to_variable = { electricity_consumption = electricity_consumption_modifier }
+	
+	set_variable = { fossil_fuel_plant_quantity = 0 }
+	set_variable = { industrial_complex_quantity = 0 }
+	set_variable = { office_park_quantity = 0 }
+	set_variable = { dockyard_quantity = 0 }
+	set_variable = { nuclear_reactor_quantity = 0 }
+	set_variable = { nuclear_powerplant_quantity = 0 }
+	set_variable = { synthetic_refinery_quantity = 0 }
+	set_variable = { tungsten_factory_quantity = 0 }
+	set_variable = { steel_factory_quantity = 0 }
+	set_variable = { agri_industrial_complex_quantity = 0 }
+
+	# food variables
+	set_variable = { previousFoodBalance = FoodBalance } # stores food balance (minus exports/imports) from previous pulse
+	set_variable = { foodProduction = 0} # stores base production from agri-complexes
+	set_variable = { food_bonus = 0 } # stores food bonus from modifiers/techs etc
+	set_variable = { food_consumption = 0 } # stores food consumption from states
+	set_variable = { FoodFromPuppets = 0 } # used to store how much food we get from puppets, also used to store extras (when deposits get created)
+	set_variable = { FoodProdTotal = 0 } # base + bonus + imports 
+	set_variable = { ConsumptionTotal = 0 } # consumption + exports
+	set_variable = { FoodBalance = 0 } # food_bonus - food_consumption
+	set_variable = { FoodBalanceTotal = 0 } # FoodProdTotal - ConsumptionTotal +/- FoodFromPuppets
+	set_variable = { FoodExported = 0 } # used just for correct topbar tooltip display (rounding issues)
+	set_variable = { FoodImported = 0 } # used just for correct topbar tooltip display (rounding issues)
+	
+	set_variable = { eco = global.eco_output_factor }
+	
+
+    #general moddifers
+	#Tech Modifiers
+		set_variable = { farm_tech = 1 }
+		if = { limit = { has_tech = agriculture_I }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_II }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_III }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_IV }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_V }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_VI }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_VII }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+		if = { limit = { has_tech = agriculture_VIII }
+			add_to_variable = { farm_tech = 0.15 }
+		}
+	
+        #Agricultural Dysnfunction
+		set_variable = { farm_output_modif = 1 }
+		
+		if = { limit = { has_idea = agricultural_dysfunction_0 }
+			multiply_variable = { farm_output_modif = 0.5 }
+		}
+		if = { limit = { has_idea = agricultural_dysfunction_1 }
+			multiply_variable = { farm_output_modif = 0.4 }
+		}
+		if = { limit = { has_idea = agricultural_dysfunction_2 }
+			multiply_variable = { farm_output_modif = 0.3 }
+		}
+		if = { limit = { has_idea = agricultural_dysfunction_3 }
+			multiply_variable = { farm_output_modif = 0.2 }
+		}
+		if = { limit = { has_idea = agricultural_dysfunction_4 }
+			multiply_variable = { farm_output_modif = 0.1 }
+		}
+		if = { limit = { has_idea = cotton_emphasis }
+			multiply_variable = { farm_output_modif = 0.35 }
+		}
+		if = { limit = { has_idea = banned_wheat_cultivation }
+			multiply_variable = { farm_output_modif = 0.5 }
+		}
+		if = { limit = { has_idea = sov_crop_rotation }
+			multiply_variable = { farm_output_modif = 1.1 }
+		}
+		if = { limit = { has_idea = sov_agr_subs }
+			multiply_variable = { farm_output_modif = 1.05 }
+		}
+		if = { limit = { has_idea = sov_agr_prod_choose }
+			multiply_variable = { farm_output_modif = 1.05 }
+		}
+		if = { limit = { has_idea = sov_agr_ca_pop }
+			multiply_variable = { farm_output_modif = 1.025 }
+		}
+		if = { limit = { has_idea = sov_agr_bur_reduce }
+			multiply_variable = { farm_output_modif = 1.025 }
+		}
+		if = { limit = { has_idea = sov_agr_proc_mod }
+			multiply_variable = { farm_output_modif = 1.05 }
+		}
+		if = { limit = { has_idea = sov_agr_mach_mod }
+			multiply_variable = { farm_output_modif = 1.05 }
+		}
+		if = { limit = { has_idea = sov_ex_meat_production }
+			multiply_variable = { farm_output_modif = 0.95 }
+		}
+		if = { limit = { has_idea = sov_sensible_meat }
+			multiply_variable = { farm_output_modif = 0.975 }
+		}
+	multiply_variable = { farm_output_modif = PREV.eco }
+
+
+
+	#WIP TEST THING
+	set_variable = { steel_test = resource_consumed@steel }
+	
+	every_owned_state = {
+		add_to_variable = { PREV.fossil_fuel_plant_quantity = non_damaged_building_level@fossil_fuel_powerplant }
+		add_to_variable = { PREV.industrial_complex_quantity = non_damaged_building_level@industrial_complex }
+		add_to_variable = { PREV.office_park_quantity = non_damaged_building_level@office_park }
+		add_to_variable = { PREV.dockyard_quantity = non_damaged_building_level@dockyard }
+		add_to_variable = { PREV.nuclear_reactor_quantity = non_damaged_building_level@nuclear_reactor }
+		add_to_variable = { PREV.nuclear_powerplant_quantity = non_damaged_building_level@nuclear_powerplant }
+		add_to_variable = { PREV.steel_factory_quantity = non_damaged_building_level@steel_factory }
+		add_to_variable = { PREV.synthetic_refinery_quantity = non_damaged_building_level@synthetic_refinery }
+		add_to_variable = { PREV.tungsten_factory_quantity = non_damaged_building_level@tungsten_factory }
+
+		if = { limit = { has_resources_amount = { resource = rubber amount > 0 delivered = yes } } # counts number of Agri-Complexes that actually deliver
+			add_to_variable = { PREV.agri_industrial_complex_quantity = non_damaged_building_level@agri_industrial_complex }
+			#if = { limit = { is_owned_by = AST } log = "AST: [THIS.GetName] - agri complexes: [?temp_agri_industrial_complex_quantity]" }		
+		}
+		if = {
+			limit = { has_resources_amount = { resource = rubber amount > 0 }
+				is_capital = no # check for leftover food in all states except capital
+			}
+			set_temp_variable = { temp_agri_industrial_complex_quantity = non_damaged_building_level@agri_industrial_complex } # number of Agri-Complexes in State
+			set_temp_variable = { temp_food_produced = resource@rubber } # total food production in State
+			subtract_from_temp_variable = { temp_food_produced = temp_agri_industrial_complex_quantity } # deduct food from Agri-Complexes
+			if = {
+				limit = { NOT = { check_variable = { temp_food_produced = 0 } } }
+				#log = "	[ROOT.GetTag]: removed/added [?temp_food_produced] from [THIS.GetName]"
+				multiply_temp_variable = { temp_food_produced = -1 }
+				add_resource = {
+					type = rubber
+					amount = temp_food_produced # remove/add leftovers from State (can happen in some cases where a country loses capital to another)
+				}
+			}
+		}
+		#	add_to_variable = { PREV.foodCheck = resource@rubber }
+		#Farm Production
+		set_variable = { farm_output = 1 }
+		#if = {
+		#	limit = {
+		#		controller = { has_idea =  }
+		#	}
+		#	add_to_variable = { farm_output = -0.1 }
+		#}
+		#End
+		if = { limit = { controller = { has_dynamic_modifier = { modifier = federation_european_union } } }
+			add_to_variable = { farm_output = global.federation_european_union_food}
+		}
+		if = { limit = { controller = { has_dynamic_modifier = { modifier = Soviet_Agriculture } } }
+			add_to_variable = { farm_output = SOV.Soviet_Agriculture_farmBonus}
+		}
+		if = { limit = { has_state_flag = mountainshot } 
+			add_to_variable = { farm_output = -0.5 }
+		}
+		if = { limit = { has_state_flag = cold  }
+			add_to_variable = { farm_output = 0 }
+		}
+		if = { limit = { has_state_flag = desert }
+			add_to_variable = { farm_output = 0 }
+		}
+		if = { limit = { has_state_flag = desertlush }
+			add_to_variable = { farm_output = 1 }
+		}
+		if = { limit = { has_state_flag = mountains }
+			add_to_variable = { farm_output = 1 }
+		}
+		if = { limit = { has_state_flag = boreal }
+			add_to_variable = { farm_output = 2 }
+		}
+		if = { limit = { has_state_flag = temperate }
+			add_to_variable = { farm_output = 3 }
+		}
+		if = { limit = { has_state_flag = tropical }
+			add_to_variable = { farm_output = 3 }
+		}
+		#Water
+		if = { limit = { has_state_flag = basic }
+			multiply_variable = { farm_output = 0.75 }
+		}
+		if = { limit = { has_state_flag = lakes }
+			multiply_variable = { farm_output = 1.25 }
+		}
+		if = { limit = { has_state_flag = river }
+			multiply_variable = { farm_output = 1.5 }
+		}
+		if = { limit = { has_state_flag = riverlarge }
+			multiply_variable = { farm_output = 1.75 }
+		}
+		if = { limit = { has_state_flag = freshwatersea }
+			multiply_variable = { farm_output = 2 }
+		}
+		################
+		set_variable = { farm_tech_local = PREV.farm_tech }
+		
+		
+		
+		#Water Infra Modifiers
+		if = { limit = { water_infrastructure < 1 }
+			multiply_variable = { farm_output = 0.5 }
+		}
+		if = {
+			limit = {
+				water_infrastructure < 3
+				water_infrastructure > 1
+			}
+			add_to_variable = { farm_tech_local = 0.25 }
+		}
+		if = {
+			limit = {
+				water_infrastructure < 4
+				water_infrastructure > 2
+			}
+			add_to_variable = { farm_tech_local = 0.5 } 
+		}
+		if = { limit = { water_infrastructure > 3 }
+			add_to_variable = { farm_tech_local = 0.75 }
+		}
+		
+		##########
+		
+
+		
+
+		multiply_variable = { farm_output = farm_tech_local }
+		multiply_variable = { farm_output = PREV.farm_output_modif }
+		add_to_variable = { farm_output = global.eco_output_rate }
+		#multiply_variable = { farm_output = farmBonusTotal }
+		multiply_variable = { farm_output = non_damaged_building_level@agri_industrial_complex }
+		set_variable = { farm_output_efficiency = farm_output }
+		multiply_variable = { farm_output_efficiency = resourceEfficiencyInfra }
+		add_to_variable = { farm_output = farm_output_efficiency }
+		set_variable = {
+			agri_prod_modifier = PREV.modifier@agricultural_complex_production_bonus
+		}
+		add_to_variable = {
+			agri_prod_modifier = 1
+		}
+		multiply_variable = {
+			farm_output = agri_prod_modifier
+		}
+		
+		add_to_variable = { PREV.food_bonus = farm_output }
+		
+		
+		#Food Consumption
+		if = { limit = { has_state_category = pop1 }
+			add_to_variable = { PREV.food_consumption = 0.5 }
+		}
+		if = { limit = { has_state_category = pop2 }
+			add_to_variable = { PREV.food_consumption = 1 }
+		}
+		if = { limit = { has_state_category = pop3 }
+			add_to_variable = { PREV.food_consumption = 1.5 }
+		}
+		if = { limit = { has_state_category = pop4 }
+			add_to_variable = { PREV.food_consumption = 2 }
+		}
+		if = { limit = { has_state_category = pop5 }
+			add_to_variable = { PREV.food_consumption = 2.5 }
+		}
+		if = { limit = { has_state_category = pop7 }
+			add_to_variable = { PREV.food_consumption = 3 }
+		}
+		if = { limit = { has_state_category = pop10 }
+			add_to_variable = { PREV.food_consumption = 4 }
+		}
+		if = { limit = { has_state_category = pop15 }
+			add_to_variable = { PREV.food_consumption = 6 }
+		}
+		if = { limit = { has_state_category = pop20 }
+			add_to_variable = { PREV.food_consumption = 7.5 }
+		}
+		if = { limit = { has_state_category = pop1dev1 }
+			add_to_variable = { PREV.food_consumption = 1 }
+		}
+		if = { limit = { has_state_category = pop2dev1 }
+			add_to_variable = { PREV.food_consumption = 2 }
+		}
+		if = { limit = { has_state_category = pop3dev1 }
+			add_to_variable = { PREV.food_consumption = 3 }
+		}
+		if = { limit = { has_state_category = pop4dev1 }
+			add_to_variable = { PREV.food_consumption = 4 }
+		}
+		if = { limit = { has_state_category = pop5dev1 }
+			add_to_variable = { PREV.food_consumption = 5 }
+		}
+		if = { limit = { has_state_category = pop7dev1 }
+			add_to_variable = { PREV.food_consumption = 6 }
+		}
+		if = { limit = { has_state_category = pop10dev1 }
+			add_to_variable = { PREV.food_consumption = 8 }
+		}
+		if = { limit = { has_state_category = pop15dev1 }
+			add_to_variable = { PREV.food_consumption = 12 }
+		}
+		if = { limit = { has_state_category = pop20dev1 }
+			add_to_variable = { PREV.food_consumption = 15 }
+		}
+		#Dev 2
+		if = { limit = { has_state_category = pop1dev2 }
+			add_to_variable = { PREV.food_consumption = 1 }
+		}
+		if = { limit = { has_state_category = pop2dev2 }
+			add_to_variable = { PREV.food_consumption = 2 }
+		}
+		if = { limit = { has_state_category = pop3dev2 }
+			add_to_variable = { PREV.food_consumption = 3 }
+		}
+		if = { limit = { has_state_category = pop4dev2 }
+			add_to_variable = { PREV.food_consumption = 4 }
+		}
+		if = { limit = { has_state_category = pop5dev2 }
+			add_to_variable = { PREV.food_consumption = 5 }
+		}
+		if = { limit = { has_state_category = pop7dev2 }
+			add_to_variable = { PREV.food_consumption = 6 }
+		}
+		if = { limit = { has_state_category = pop10dev2 }
+			add_to_variable = { PREV.food_consumption = 8 }
+		}
+		if = { limit = { has_state_category = pop15dev2 }
+			add_to_variable = { PREV.food_consumption = 12 }
+		}
+		if = { limit = { has_state_category = pop20dev2 }
+			add_to_variable = { PREV.food_consumption = 15 }
+		}
+		#Dev 3
+		if = { limit = { has_state_category = pop1dev3 }
+			add_to_variable = { PREV.food_consumption = 2 }
+		}
+		if = { limit = { has_state_category = pop2dev3 }
+			add_to_variable = { PREV.food_consumption = 4 }
+		}
+		if = { limit = { has_state_category = pop3dev3 }
+			add_to_variable = { PREV.food_consumption = 6 }
+		}
+		if = { limit = { has_state_category = pop4dev3 }
+			add_to_variable = { PREV.food_consumption = 8 }
+		}
+		if = { limit = { has_state_category = pop5dev3 }
+			add_to_variable = { PREV.food_consumption = 10 }
+		}
+		if = { limit = { has_state_category = pop7dev3 }
+			add_to_variable = { PREV.food_consumption = 12 }
+		}
+		if = { limit = { has_state_category = pop10dev3 }
+			add_to_variable = { PREV.food_consumption = 16 }
+		}
+		if = { limit = { has_state_category = pop15dev3 }
+			add_to_variable = { PREV.food_consumption = 24 }
+		}
+		if = { limit = { has_state_category = pop20dev3 }
+			add_to_variable = { PREV.food_consumption = 30 }
+		}
+		#dev4
+		if = { limit = { has_state_category = pop20dev4 }
+			add_to_variable = { PREV.food_consumption = 30 }
+		}
+		if = { limit = { has_state_category = pop2dev4 }
+			add_to_variable = { PREV.food_consumption = 4 }
+		}
+		if = { limit = { has_state_category = pop3dev4 }
+			add_to_variable = { PREV.food_consumption = 6 }
+		}
+		if = { limit = { has_state_category = pop4dev4 }
+			add_to_variable = { PREV.food_consumption = 8 }
+		}
+		if = { limit = { has_state_category = pop5dev4 }
+			add_to_variable = { PREV.food_consumption = 10 }
+		}
+		if = { limit = { has_state_category = pop7dev4 }
+			add_to_variable = { PREV.food_consumption = 12 }
+		}
+		if = { limit = { has_state_category = pop10dev4 }
+			add_to_variable = { PREV.food_consumption = 16 }
+		}
+		if = { limit = { has_state_category = pop15dev4 }
+			add_to_variable = { PREV.food_consumption = 24 }
+		}
+		if = { limit = { has_state_category = pop1dev4 }
+			add_to_variable = { PREV.food_consumption = 2 }
+		}
+		#dev5
+		if = { limit = { has_state_category = pop20dev5 }
+			add_to_variable = { PREV.food_consumption = 50 }
+		}
+		if = { limit = { has_state_category = pop2dev5 }
+			add_to_variable = { PREV.food_consumption = 5 }
+		}
+		if = { limit = { has_state_category = pop3dev5 }
+			add_to_variable = { PREV.food_consumption = 8 }
+		}
+		if = { limit = { has_state_category = pop4dev5 }
+			add_to_variable = { PREV.food_consumption = 10 }
+		}
+		if = { limit = { has_state_category = pop5dev5 }
+			add_to_variable = { PREV.food_consumption = 13 }
+		}
+		if = { limit = { has_state_category = pop7dev5 }
+			add_to_variable = { PREV.food_consumption = 18 }
+		}
+		if = { limit = { has_state_category = pop10dev5 }
+			add_to_variable = { PREV.food_consumption = 25 }
+		}
+		if = { limit = { has_state_category = pop15dev5 }
+			add_to_variable = { PREV.food_consumption = 38 }
+		}
+		if = { limit = { has_state_category = pop1dev5 }
+			add_to_variable = { PREV.food_consumption = 3 }
+		}
+	}
+	#Food Consumption End
+
+	#Tech stuff
+	if = { limit = { has_tech = chemistry_II }
+		add_to_variable = { synthetic_refinery_electricity_consumption = 1 } 
+	}
+	if = { limit = { has_tech = chemistry_IV }
+		add_to_variable = { synthetic_refinery_electricity_consumption = 1 } 
+	}
+	if = { limit = { has_tech = chemistry_VI }
+		add_to_variable = { synthetic_refinery_electricity_consumption = 1 } 
+	}
+	if = { limit = { has_tech = chemistry_IV }
+		add_to_variable = { tungsten_factory_electricity_consumption = 1 } 
+	}
+	if = { limit = { has_tech = chemistry_VII }
+		add_to_variable = { tungsten_factory_electricity_consumption = -0.5 }
+		add_to_variable = { synthetic_refinery_electricity_consumption = -0.5 }  
+	}
+	if = { limit = { has_tech = materials_II }
+		add_to_variable = { steel_factory_electricity_consumption = 1 } 
+	}
+	if = { limit = { has_tech = materials_III }
+		add_to_variable = { steel_factory_electricity_consumption = -0.1 } 
+	}
+	if = { limit = { has_tech = materials_IV }
+		add_to_variable = { steel_factory_electricity_consumption = 1 } 
+		add_to_variable = { steel_factory_oil_consumption = -0.1 } 
+	}
+	if = { limit = { has_tech = materials_VI }
+		add_to_variable = { steel_factory_electricity_consumption = 1 } 
+	}
+	if = { limit = { has_tech = materials_VII }
+		add_to_variable = { steel_factory_electricity_consumption = 2 } 
+		add_to_variable = { steel_factory_oil_consumption = -0.5 } 
+	}
+	if = { limit = { tag = DDR }
+		add_to_variable = { steel_factory_electricity_consumption = antiquated_industry_elec } 
+		add_to_variable = { steel_factory_oil_consumption = antiquated_industry_oil } 
+	}
+	#Dockyard Specific
+	if = { limit = { has_tech = ecoenergy_III }
+		add_to_variable = { dockyard_consumption = -0.1 }
+	}
+	if = { limit = { has_tech = ecoenergy_V }
+		add_to_variable = { dockyard_consumption = -0.1 }
+	}
+	if = { limit = { has_tech = ecoenergy_VI }
+		add_to_variable = { dockyard_consumption = -0.1 }
+	}
+	#End Dockyard Specific
+
+	if = { limit = { has_tech = management_IX }
+		add_to_variable = { steel_consumption = -0.1 } 
+	}
+	if = { limit = { has_tech = plastics_III }
+		add_to_variable = { steel_consumption = -0.1 } 
+	}
+	if = { limit = { has_tech = plastics_VI }
+		add_to_variable = { oil_consumption = -0.1 } 
+	}
+	if = { limit = { has_tech = electriccars }
+		add_to_variable = { oil_consumption = -0.25 } 
+		add_to_variable = { electricity_consumption = 0.5 }
+	}
+	if = { limit = { has_tech = ecoenergy_I }
+		add_to_variable = { electricity_consumption = -0.1 }
+	}
+	if = { limit = { has_tech = ecoenergy_II }
+		add_to_variable = { electricity_consumption = -0.1 }
+	}
+	if = { limit = { has_tech = ecoenergy_V }
+		add_to_variable = { electricity_consumption = -0.1 }
+	}
+	if = { limit = { has_tech = ecoenergy_VII }
+		add_to_variable = { electricity_consumption = -0.1 }
+	}
+	if = { limit = { tag = DDR }
+		add_to_variable = { electricity_consumption = antiquated_industry_elec } 
+		add_to_variable = { oil_consumption = antiquated_industry_oil } 
+	}		
+	#Tech/National Spirit modifiers to this building
+	set_variable = { office_park_oil_consumption = office_park_quantity }
+	set_variable = { office_park_aluminium_consumption = office_park_quantity }
+	set_variable = { office_park_electricity_consumption = office_park_quantity } 
+	
+	#add_to_variable = { industrial_complex_quantity = office_park_quantity }
+	set_variable = { fossil_fuel_plant_oil_consumption = fossil_fuel_plant_quantity }
+	multiply_variable = { fossil_fuel_plant_oil_consumption = oil_consumption }
+
+	set_variable = { industrial_complex_oil_consumption = industrial_complex_quantity }
+	set_variable = { industrial_complex_steel_consumption = industrial_complex_quantity }
+	set_variable = { industrial_complex_electricity_consumption = industrial_complex_quantity } 
+
+	multiply_variable = { industrial_complex_oil_consumption = oil_consumption }
+	multiply_variable = { industrial_complex_steel_consumption = steel_consumption }
+	multiply_variable = { industrial_complex_electricity_consumption = electricity_consumption } 
+	
+	multiply_variable = { office_park_oil_consumption = oil_consumption }
+	multiply_variable = { office_park_aluminium_consumption = steel_consumption }
+	multiply_variable = { office_park_electricity_consumption = electricity_consumption } 
+	
+	multiply_variable = { dockyard_consumption = dockyard_quantity }
+
+	multiply_variable = { nuclear_reactor_electricity_consumption = nuclear_reactor_quantity }
+	multiply_variable = { nuclear_reactor_chromium_consumption = nuclear_reactor_quantity }
+	
+	multiply_variable = { nuclear_power_consumption = nuclear_powerplant_quantity }
+	
+	multiply_variable = { steel_factory_electricity_consumption = steel_factory_quantity }
+	multiply_variable = { steel_factory_oil_consumption = steel_factory_quantity }
+	
+	multiply_variable = { synthetic_refinery_electricity_consumption = synthetic_refinery_quantity }
+	multiply_variable = { tungsten_factory_electricity_consumption = tungsten_factory_quantity }
+	
+	#Actual Tabulated Consumption
+	set_variable = { oil_consumption = 0 }
+	set_variable = { steel_consumption = 0 }
+	set_variable = { aluminium_consumption = 0 }
+	set_variable = { rare_earth_consumption = 0 }
+	set_variable = { nuclear_consumption = 0 }
+	set_variable = { electricity_consumption = 0 }
+	
+	add_to_variable = { oil_consumption = industrial_complex_oil_consumption }
+	add_to_variable = { oil_consumption = office_park_oil_consumption }
+	add_to_variable = { oil_consumption = fossil_fuel_plant_oil_consumption }
+	add_to_variable = { oil_consumption = steel_factory_oil_consumption }
+
+	add_to_variable = { steel_consumption = industrial_complex_steel_consumption }
+	
+	add_to_variable = { aluminium_consumption = office_park_aluminium_consumption }
+	
+	add_to_variable = { nuclear_consumption = nuclear_reactor_chromium_consumption }
+	add_to_variable = { nuclear_consumption = nuclear_power_consumption }
+	
+	add_to_variable = { electricity_consumption = industrial_complex_electricity_consumption }
+	add_to_variable = { electricity_consumption = nuclear_reactor_electricity_consumption }
+	add_to_variable = { electricity_consumption = dockyard_consumption }
+	add_to_variable = { electricity_consumption = office_park_electricity_consumption }
+	add_to_variable = { electricity_consumption = steel_factory_electricity_consumption }
+	
+	#round_variable = oil_consumption
+	#round_variable = steel_consumption
+	
+	#Food Comparison Old
+	# add_to_variable = { FoodProdTotal = food_bonus }
+	# add_to_variable = { FoodProdTotal = resource_imported@rubber }
+
+	# initial calculations - production, bonus and consumption
+	add_to_variable = { FoodProdTotal = agri_industrial_complex_quantity }
+	add_to_variable = { foodProduction = agri_industrial_complex_quantity }
+	round_variable = food_bonus
+	add_to_variable = { FoodProdTotal = food_bonus }
+	add_to_variable = { FoodBalance = food_bonus }
+	set_variable = {
+		agri_consume_modifier = modifier@food_consumption_need
+	}
+	add_to_variable = {
+		agri_consume_modifier = 1
+	}
+	multiply_variable = {
+		food_consumption = agri_consume_modifier
+	}	
+	round_variable = food_consumption
+	subtract_from_variable = { FoodBalance = food_consumption }
+	set_variable = { modFoodBalance = FoodBalance } # used for dynamic modifier
+	#if = { limit = { tag = AST } log = "AST: agri: [?FoodProdTotal] - rubber: [?resource@rubber] - bonus: [?food_bonus]" }		
+
+	#Bonus added to capital
+	multiply_variable = { previousFoodBalance = -1 }
+	random_owned_state = {
+		limit = { is_capital = yes }
+		if = { limit = { NOT = { has_variable = PREV.CapitalState } }
+			set_temp_variable = { prevCapitalState = THIS } # no capital was set before - 1st pulse - startup or new country
+		}
+		else = {
+			if = { 	limit = { check_variable =  { PREV.CapitalState = THIS } } # same capital
+				set_temp_variable = { prevCapitalState = THIS }
+			}
+			else = {
+				set_temp_variable = { prevCapitalState = PREV.CapitalState } # capital changed
+			}
+		}
+		set_variable = { PREV.CapitalState = THIS } # Store Capital for next pulse
+	}
+	if = { limit = { has_variable = previousFoodBalance } 
+		var:prevCapitalState = {
+			owner = {
+				add_resource = {
+					type = rubber
+					amount = var:previousFoodBalance # remove previous bonus
+					state = var:prevCapitalState
+				}
+			}
+		}
+	}
+	ROOT = {
+		add_resource = {
+			type = rubber
+			amount = var:FoodBalance # add new to capital
+			state = var:CapitalState
+		}
+		#if = { limit = { tag = AST } log = "	[ROOT.GetTag]: removed [?previousFoodBalance] and added [?FoodBalance] Food to Capital" }
+	}
+	# End of Capital bonus
+
+	# account for negative resources in capital
+	if = { limit = { has_dynamic_modifier = { modifier = food_negative_in_capital } }
+		remove_dynamic_modifier = { modifier = food_negative_in_capital }
+	}
+	if = { limit = { check_variable = { FoodBalance < 0 } } # in case of negative resources in capital
+		add_dynamic_modifier = { modifier = food_negative_in_capital }
+		#if = { limit = { tag = AST } log = "	[ROOT.GetTag]: added dynamic modifier: [?modFoodBalance]" }
+	}
+
+	# Imports/Exports and Balance
+	add_to_variable = { FoodImported = resource_imported@rubber }
+	add_to_variable = { FoodExported = resource_exported@rubber }
+	round_variable = FoodExported
+	add_to_variable = { FoodProdTotal = FoodImported }
+	add_to_variable = { FoodBalanceTotal = FoodProdTotal }
+	round_variable = food_consumption
+	add_to_variable = { ConsumptionTotal = food_consumption }
+	add_to_variable = { ConsumptionTotal = FoodExported }
+	subtract_from_variable = { FoodBalanceTotal = ConsumptionTotal }
+	round_variable = FoodBalanceTotal
+	
+	#puppets (this also accounts for unexpected discrepancies)
+	if = {
+		limit = { NOT = { has_dynamic_modifier = { modifier = food_negative_in_capital } } } # if negative on capital, this won't work - WIP
+		add_to_variable = { FoodFromPuppets = resource@rubber }
+		round_variable = FoodFromPuppets
+		#subtract_from_variable = { FoodFromPuppets = FoodBalanceTotal } ### error
+		subtract_from_variable = { FoodFromPuppets = agri_industrial_complex_quantity }
+		add_to_variable = { FoodBalanceTotal = FoodFromPuppets }
+	}
+
+	# Final check for negative balance
+	if = {
+		limit = { check_variable = { FoodBalanceTotal < 0 } }
+		# because the resource_exported@rubber hasn't been updated yet (needs 1 day), reflecting the food_negative_in_capital modifier
+		add_to_variable = { FoodBalanceTotal = FoodExported }
+		set_variable = { FoodExported = 0 }
+	}
+	# if = { limit = { tag = AST } # for testing purposes
+	# 	log = "	[ROOT.GetTag]: Production: [?foodProduction] / Puppets: [?FoodFromPuppets] / Bonus: [?food_bonus] / Imported: [?FoodImported]"
+	# 	log = "	[ROOT.GetTag]: Consumed: [?food_consumption] / Exported: [?FoodExported] ||| Balance: [?FoodBalanceTotal]"
+	# }
+
+	#Food Comparison for famine
+	set_variable = { food_penalty = 0 }
+	set_variable = { food_penalty_construction = 0 }
+	set_variable = { food_penalty_production = 0 }
+	if = { limit = { check_variable = { FoodProdTotal < ConsumptionTotal } }
+		set_temp_variable = { food_comp_calc = foodConsumptionComp }
+        multiply_variable = { food_comp_calc = foodConsumptionComp }
+        multiply_variable = { food_comp_calc = 7.4 }
+        add_to_variable = { food_penalty = food_comp_calc }
+        set_temp_variable = { food_comp_calc = foodConsumptionComp }
+        multiply_variable = { food_comp_calc = 0.667 }
+        add_to_variable = { food_penalty = food_comp_calc }
+        add_to_variable = { food_penalty = -0.067 }
+
+		
+		set_variable = { food_penalty_production = modifier@production_factory_max_efficiency_factor }
+		multiply_variable = { food_penalty_production = food_penalty }
+		
+		set_variable = { food_penalty_construction = modifier@production_speed_buildings_factor }
+		multiply_variable = { food_penalty_construction = food_penalty }
+	}
+	clr_country_flag = food_famine_extreme
+	clr_country_flag = food_famine
+	clr_country_flag = food_shortages
+	clr_country_flag = food_highprices
+	if = { limit = { check_variable = { food_penalty > 3 } }
+		set_country_flag = food_famine_extreme
+	}
+	else_if = { limit = { check_variable = { food_penalty > 0.8 } }
+		set_country_flag = food_famine
+	}
+	else_if = { limit = { check_variable = { food_penalty > 0.2 } }
+		set_country_flag = food_shortages
+	}
+	else_if = { limit = { check_variable = { food_penalty > 0 } }
+		set_country_flag = food_highprices
+	}
+	# to force refresh famine warning display
+	if = { limit = { check_variable = { food_penalty > 0 } }
+		set_temp_variable = { show = 1 }
+		subtract_from_temp_variable = { show = show_food_main }
+		set_variable = { show_food_main = show }
+	}
+
+	country_event = { id = food_pulse.1 days = 1 } # call recalc in 1 day (because of added capital bonus which only reflects after daily tick)
+}
