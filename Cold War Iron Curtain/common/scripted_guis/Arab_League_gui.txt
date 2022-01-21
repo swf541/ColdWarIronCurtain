@@ -310,10 +310,6 @@ scripted_gui = {
 					#set map mode to voting
 					set_variable = { UNS.main_screen = 1 }
 					
-					#trigger voting decisions
-					THIS = {
-						activate_mission = ARAB_LEAGUE_influence_calc
-					}
 					
 					#target nation set
 					set_variable = { UNS.arab_league_nation_influence_target = root.arab_league_nation_influence_target }
@@ -326,7 +322,12 @@ scripted_gui = {
 					##appease government
 					if = {
 						limit = {
-							check_variable = { UNS.arab_league_influence_action_set = 0 }
+							AND = {
+								check_variable = { UNS.arab_league_influence_action_set = 0 }
+								ROOT = {
+									has_political_power > 100
+								}
+							}
 						}
 						var:root.arab_league_nation_influence_target = {
 										
@@ -349,13 +350,21 @@ scripted_gui = {
 						}
 						ROOT = {
 							add_political_power = -100
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					##denounce as anti arab state
 					if = {
 						limit = {
-							check_variable = { UNS.arab_league_influence_action_set = 1 }
+							AND = {
+								check_variable = { UNS.arab_league_influence_action_set = 1 }
+								ROOT = {
+									has_political_power > 50
+								}
+							}
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
@@ -387,7 +396,10 @@ scripted_gui = {
 						}
 						ROOT = {
 							add_political_power = -50
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#Boost national influence
@@ -396,7 +408,10 @@ scripted_gui = {
 							AND = { 
 								check_variable = { UNS.arab_league_influence_action_set = 2 }
 								ROOT = {
-									has_intelligence_agency = yes
+									AND = {
+										has_intelligence_agency = yes
+										has_political_power > 100
+									}
 								}
 							}
 						}
@@ -441,7 +456,10 @@ scripted_gui = {
 						}
 						ROOT = {
 							add_political_power = -100
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#send economic aid
@@ -462,13 +480,21 @@ scripted_gui = {
 						}
 						ROOT = {
 							add_timed_idea = { idea = idea_arab_league_civs_negative  days = 100 }
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#send insult
 					if = {
 						limit = {
-							check_variable = { UNS.arab_league_influence_action_set = 4 }
+							AND = {
+								check_variable = { UNS.arab_league_influence_action_set = 4 }
+								ROOT = {
+									has_political_power > 10
+								}
+							}
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
@@ -485,13 +511,21 @@ scripted_gui = {
 						}
 						ROOT = {
 							add_political_power = -10
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#threaten sanctions
 					if = {
 						limit = {
-							check_variable = { UNS.arab_league_influence_action_set = 5 }
+							AND = {
+								check_variable = { UNS.arab_league_influence_action_set = 5 }
+								ROOT = {
+									has_political_power > 100
+								}
+							}
 						}
 						var:root.arab_league_nation_influence_target = {
 							country_event = {
@@ -500,7 +534,10 @@ scripted_gui = {
 						}
 						ROOT = {
 							add_political_power = -100
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#disparage internationally
@@ -517,12 +554,22 @@ scripted_gui = {
 							}
 							subtract_from_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
+						ROOT = {
+							activate_mission = ARAB_LEAGUE_influence_calc
+						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#strengthen diplomatic ties
 					if = {
 						limit = {
-							check_variable = { UNS.arab_league_influence_action_set = 7 }
+							AND = {
+								check_variable = { UNS.arab_league_influence_action_set = 7 }
+								ROOT = {
+									has_political_power > 50
+								}
+							}
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
@@ -543,7 +590,10 @@ scripted_gui = {
 						}
 						ROOT = {
 							add_political_power = -50
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#send tanks
@@ -560,11 +610,16 @@ scripted_gui = {
 							}
 							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
-						send_equipment = {
-							target = var:root.arab_league_nation_influence_target
-							type = mbt_equipment
-							amount = 50
+						ROOT = {
+							send_equipment = {
+								target = var:root.arab_league_nation_influence_target
+								type = mbt_equipment
+								amount = 50
+							}
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#send aircraft
@@ -581,11 +636,16 @@ scripted_gui = {
 							}
 							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
-						send_equipment = {
-							target = var:root.arab_league_nation_influence_target
-							type = fighter_equipment
-							amount = 10
+						ROOT = {
+							send_equipment = {
+								target = var:root.arab_league_nation_influence_target
+								type = fighter_equipment
+								amount = 10
+							}
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#send naval craft
@@ -605,13 +665,21 @@ scripted_gui = {
 						}
 						ROOT = {
 							add_timed_idea = { idea = idea_arab_league_docks_negative  days = 100 }
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#sign defensive treaty
 					if = {
 						limit = {
-							check_variable = { UNS.arab_league_influence_action_set = 11 }
+							AND = {
+								check_variable = { UNS.arab_league_influence_action_set = 11 }
+								ROOT = {
+									has_political_power > 500
+								}
+							}
 						}
 						var:root.arab_league_nation_influence_target = {
 							randomize_variable = {
@@ -627,7 +695,10 @@ scripted_gui = {
 						}
 						ROOT = {
 							add_political_power = -500
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#make religious gestures
@@ -644,6 +715,11 @@ scripted_gui = {
 							}
 							add_to_variable = {randomised_acceptance = UNS.randomised_acceptance_var}
 						}
+						ROOT = {
+							activate_mission = ARAB_LEAGUE_influence_calc
+						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
 
 					#bribe senior officials  (10 billion)
@@ -677,9 +753,12 @@ scripted_gui = {
 						}
 						ROOT = {
 							subtract_from_variable = { currentMoney = 10 }
+							activate_mission = ARAB_LEAGUE_influence_calc
 						}
+						set_variable = { influence_confirmed = 1 }
+						set_variable = { influence_countdown=1 }
 					}
-
+					
 					##reset array
 					ARAB_LEAGUE_array_reset = yes
 
@@ -692,8 +771,6 @@ scripted_gui = {
 						ARAB_LEAGUE_ai_influence_vote = yes
 					}
 					add_to_variable = { refresh_arab_league= 1 }
-					set_variable = { influence_confirmed = 1 }
-					set_variable = { influence_countdown=1 }
 				}
 			}
 			arab_league_influence_action_target_entry_button_click = { 
