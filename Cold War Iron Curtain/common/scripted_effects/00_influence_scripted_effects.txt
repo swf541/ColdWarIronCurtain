@@ -9807,3 +9807,35 @@ establish_new_influencer = {
 		recalculate_influence = yes	
 	}
 }
+
+
+generic_grant_5_percent_influence_of_EU = {
+	set_temp_variable = { influence_gain = influence_total }
+	multiply_temp_variable = { influence_gain = 0.05 } #4%
+	multiply_temp_variable = {
+		var = influence_gain
+		value = AND.influence_multiplier
+	} #from global rank idea
+	add_to_temp_variable = { influence_gain = 10 } #10 Debugging value to prevent additions by 0
+	for_loop_effect = {
+		end = influence_array^num
+		value = v
+		if = {
+			limit = {
+				check_variable = { influence_array^v = AND }
+			}
+			add_to_variable = { influence_array_val^v = influence_gain }
+			set_country_flag = found
+		}
+	}
+	if = {
+		limit = { NOT = { has_country_flag = found } }
+		add_to_array = { influence_array = AND.id }
+		add_to_array = { influence_array_val = influence_gain }
+	}
+	clr_country_flag = found
+	delete_influencer_check = yes
+	recalculate_influence = yes
+	custom_effect_tooltip = improve_AND_influence_5_percent_TT
+
+}
