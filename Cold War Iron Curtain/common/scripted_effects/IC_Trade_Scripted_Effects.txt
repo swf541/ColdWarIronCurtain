@@ -30,6 +30,16 @@ export_script_for_pool = {
 		subtract_from_variable = {
 			oilExport = oil_consumption
 		}
+		if = {
+			limit = {
+				check_variable = {
+					oilExport < 2
+				}
+			}
+			set_variable = {
+				oilExport = 0
+			}
+		}
 		round_variable = oilExport
 		add_to_array = {
 			oil_produced_prior = oilExport
@@ -55,6 +65,16 @@ export_script_for_pool = {
 		}
 		multiply_variable = {
 			foodExport = foodExportRate
+		}
+		if = {
+			limit = {
+				check_variable = {
+					foodExport < 2
+				}
+			}
+			set_variable = {
+				foodExport = 0
+			}
 		}	
 		round_variable = foodExport
 		add_to_array = {
@@ -69,6 +89,16 @@ export_script_for_pool = {
 		}
 		subtract_from_variable = {
 			steelExport = steel_consumption
+		}
+		if = {
+			limit = {
+				check_variable = {
+					steelExport < 2
+				}
+			}
+			set_variable = {
+				steelExport = 0
+			}
 		}
 		round_variable = steelExport
 		add_to_array = {
@@ -99,6 +129,16 @@ export_script_for_pool = {
 		multiply_variable = {
 			chromiumExport = chromiumExportRa1e
 		}	
+		if = {
+			limit = {
+				check_variable = {
+					chromiumExport < 2
+				}
+			}
+			set_variable = {
+				chromiumExport = 0
+			}
+		}
 		round_variable = chromiumExport
 		add_to_array = {
 			chromium_export_prior = chromiumExport
@@ -111,8 +151,21 @@ export_script_for_pool = {
 		every_controlled_state = {
 			add_to_variable = { PREV.aluminiumExport = resource@aluminium }
 		}
+		set_variable = {
+			aluminium_test = aluminiumExport
+		}
 		subtract_from_variable = {
 			aluminiumExport = aluminium_consumption
+		}
+		if = {
+			limit = {
+				check_variable = {
+					aluminiumExport < 2
+				}
+			}
+			set_variable = {
+				aluminiumExport = 0
+			}
 		}
 		round_variable = aluminiumExport
 		add_to_array = {
@@ -142,6 +195,16 @@ export_script_for_pool = {
 		multiply_variable = {
 			rareEarthExport = rareEarthExportRate
 		}	
+		if = {
+			limit = {
+				check_variable = {
+					rareEarthExport < 2
+				}
+			}
+			set_variable = {
+				rareEarthExport = 0
+			}
+		}
 		round_variable = rareEarthExport
 		add_to_array = {
 			rareEarth_export_prior = rareEarthExport
@@ -447,14 +510,36 @@ generate_available_chromium_import_array = {
 buy_nuclear_material = {
 
 	var:currentPurchaser = {
-		add_to_array = {
-			array = ROOT.Nuclear_Import_List
-			value = THIS.id
+		for_loop_effect = {
+			end = ROOT.Nuclear_Import_List
+			value = v
+			if = {
+				limit = {
+					check_variable = { Nuclear_Import_List^v = THIS }
+				}
+				set_country_flag = found
+			}
 		}
-		add_to_array = {
-			array = Nuclear_Export_List
-			value = ROOT.id
+		if = {
+			limit = { NOT = { has_country_flag = found } }
+			add_to_array = { ROOT.Nuclear_Import_List = THIS.id }
 		}
+		clr_country_flag = found
+		for_loop_effect = {
+			end = Nuclear_Export_List
+			value = v
+			if = {
+				limit = {
+					check_variable = { Nuclear_Export_List^v = ROOT.id }
+				}
+				set_country_flag = found
+			}
+		}
+		if = {
+			limit = { NOT = { has_country_flag = found } }
+			add_to_array = { Nuclear_Export_List = ROOT.id }
+		}
+		clr_country_flag = found
 		subtract_from_variable = {
 			ROOT.purchase_amount = ROOT.purchase_amount_prior
 		}
@@ -865,14 +950,36 @@ chromium_import_ai = {
 				multiply_variable = {
 					nuclear_need = -1
 				}
-				add_to_array = {
-					array = ROOT.Nuclear_Import_List
-					value = THIS.id
+				for_loop_effect = {
+					end = ROOT.Nuclear_Import_List
+					value = v
+					if = {
+						limit = {
+							check_variable = { Nuclear_Import_List^v = THIS }
+						}
+						set_country_flag = found
+					}
 				}
-				add_to_array = {
-					array = Nuclear_Export_List
-					value = ROOT.id
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+					add_to_array = { ROOT.Nuclear_Import_List = THIS.id }
 				}
+				clr_country_flag = found
+				for_loop_effect = {
+					end = Nuclear_Export_List
+					value = v
+					if = {
+						limit = {
+							check_variable = { Nuclear_Export_List^v = ROOT.id }
+						}
+						set_country_flag = found
+					}
+				}
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+					add_to_array = { Nuclear_Export_List = ROOT.id }
+				}
+				clr_country_flag = found
                 if = {
                     limit = {
                         check_variable = {
@@ -1232,14 +1339,36 @@ buy_food = {
 		add_to_variable = {
 			ROOT.foodImportTargetMonthly^THIS = price_of_goods
 		}
-		add_to_array = {
-			array = ROOT.Food_Import_List
-			value = THIS.id
+		for_loop_effect = {
+			end = ROOT.Food_Import_List
+			value = v
+			if = {
+				limit = {
+					check_variable = { Food_Import_List^v = THIS }
+				}
+				set_country_flag = found
+			}
 		}
-		add_to_array = {
-			array = Food_Export_List
-			value = ROOT.id
+		if = {
+			limit = { NOT = { has_country_flag = found } }
+			add_to_array = { ROOT.Food_Import_List = THIS.id }
 		}
+		clr_country_flag = found
+		for_loop_effect = {
+			end = Food_Export_List
+			value = v
+			if = {
+				limit = {
+					check_variable = { Food_Export_List^v = ROOT.id }
+				}
+				set_country_flag = found
+			}
+		}
+		if = {
+			limit = { NOT = { has_country_flag = found } }
+			add_to_array = { Food_Export_List = ROOT.id }
+		}
+		clr_country_flag = found
 		set_variable = {
 			ROOT.foodImportTarget^THIS = THIS.id
 		}
@@ -1533,14 +1662,36 @@ food_import_ai = {
 				multiply_variable = {
 					food_need = -1
 				}
-				add_to_array = {
-					array = ROOT.Food_Import_List
-					value = THIS.id
+				for_loop_effect = {
+					end = ROOT.Food_Import_List
+					value = v
+					if = {
+						limit = {
+							check_variable = { Food_Import_List^v = THIS }
+						}
+						set_country_flag = found
+					}
 				}
-				add_to_array = {
-					array = Food_Export_List
-					value = ROOT.id
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+					add_to_array = { ROOT.Food_Import_List = THIS.id }
 				}
+				clr_country_flag = found
+				for_loop_effect = {
+					end = Food_Export_List
+					value = v
+					if = {
+						limit = {
+							check_variable = { Food_Export_List^v = ROOT.id }
+						}
+						set_country_flag = found
+					}
+				}
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+					add_to_array = { Food_Export_List = ROOT.id }
+				}
+				clr_country_flag = found
                 if = {
                     limit = {
                         check_variable = {
@@ -1858,14 +2009,36 @@ generate_available_oil_import_array = {
 buy_oil = {
 
 	var:currentPurchaser = {
-		add_to_array = {
-			array = ROOT.Oil_Import_List
-			value = THIS.id
+		for_loop_effect = {
+			end = ROOT.Oil_Import_List
+			value = v
+			if = {
+				limit = {
+					check_variable = { Oil_Import_List^v = THIS }
+				}
+				set_country_flag = found
+			}
 		}
-		add_to_array = {
-			array = Oil_Export_List
-			value = ROOT.id
+		if = {
+			limit = { NOT = { has_country_flag = found } }
+			add_to_array = { ROOT.Oil_Import_List = THIS.id }
 		}
+		clr_country_flag = found
+		for_loop_effect = {
+			end = Oil_Export_List
+			value = v
+			if = {
+				limit = {
+					check_variable = { Oil_Export_List^v = ROOT.id }
+				}
+				set_country_flag = found
+			}
+		}
+		if = {
+			limit = { NOT = { has_country_flag = found } }
+			add_to_array = { Oil_Export_List = ROOT.id }
+		}
+		clr_country_flag = found
 		subtract_from_variable = {
 			ROOT.purchase_amount = ROOT.purchase_amount_prior
 		}
@@ -2193,14 +2366,36 @@ oil_import_ai = {
 				multiply_variable = {
 					oil_need = -1
 				}
-				add_to_array = {
-					array = ROOT.Oil_Import_List
-					value = THIS.id
+				for_loop_effect = {
+					end = ROOT.Oil_Import_List
+					value = v
+					if = {
+						limit = {
+							check_variable = { Oil_Import_List^v = THIS }
+						}
+						set_country_flag = found
+					}
 				}
-				add_to_array = {
-					array = Oil_Export_List
-					value = ROOT.id
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+					add_to_array = { ROOT.Oil_Import_List = THIS.id }
 				}
+				clr_country_flag = found
+				for_loop_effect = {
+					end = Oil_Export_List
+					value = v
+					if = {
+						limit = {
+							check_variable = { Oil_Export_List^v = ROOT.id }
+						}
+						set_country_flag = found
+					}
+				}
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+					add_to_array = { Oil_Export_List = ROOT.id }
+				}
+				clr_country_flag = found
                 if = {
                     limit = {
                         check_variable = {
@@ -2375,14 +2570,36 @@ steel_import_ai = {
 				multiply_variable = {
 					steel_need = -1
 				}
-				add_to_array = {
-					array = ROOT.Steel_Import_List
-					value = THIS.id
+				for_loop_effect = {
+					end = ROOT.Steel_Import_List
+					value = v
+					if = {
+						limit = {
+							check_variable = { Steel_Import_List^v = THIS }
+						}
+						set_country_flag = found
+					}
 				}
-				add_to_array = {
-					array = Steel_Export_List
-					value = ROOT.id
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+					add_to_array = { ROOT.Steel_Import_List = THIS.id }
 				}
+				clr_country_flag = found
+				for_loop_effect = {
+					end = Steel_Export_List
+					value = v
+					if = {
+						limit = {
+							check_variable = { Steel_Export_List^v = ROOT.id }
+						}
+						set_country_flag = found
+					}
+				}
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+					add_to_array = { Steel_Export_List = ROOT.id }
+				}
+				clr_country_flag = found
                 if = {
                     limit = {
                         check_variable = {
@@ -2709,14 +2926,35 @@ generate_available_steel_import_array = {
 buy_steel = {
 
 	var:currentPurchaser = {
-		add_to_array = {
-			array = ROOT.Steel_Import_List
-			value = THIS.id
-		}
-		add_to_array = {
-			array = Steel_Export_List
-			value = ROOT.id
-		}
+			for_loop_effect = {
+				end = ROOT.Steel_Import_List
+				value = v
+				if = {
+					limit = {
+						check_variable = { Steel_Import_List^v = THIS }
+					}
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+				add_to_array = { ROOT.Steel_Import_List = THIS.id }
+			}
+			clr_country_flag = found
+			for_loop_effect = {
+				end = Steel_Export_List
+				value = v
+				if = {
+					limit = {
+						check_variable = { Steel_Export_List^v = ROOT.id }
+					}
+					set_country_flag = found
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+				add_to_array = { Steel_Export_List = ROOT.id }
+			}
 		subtract_from_variable = {
 			ROOT.purchase_amount = ROOT.purchase_amount_prior
 		}
@@ -3185,14 +3423,37 @@ generate_available_aluminium_import_array = {
 buy_aluminium = {
 
 	var:currentPurchaser = {
-		add_to_array = {
-			array = ROOT.Aluminium_Import_List
-			value = THIS.id
+		for_loop_effect = {
+			end = ROOT.Aluminium_Import_List
+			value = v
+			if = {
+				limit = {
+					check_variable = { Aluminium_Import_List^v = THIS }
+				}
+				set_country_flag = found
+			}
 		}
-		add_to_array = {
-			array = Aluminium_Export_List
-			value = ROOT.id
+		if = {
+			limit = { NOT = { has_country_flag = found } }
+			add_to_array = { ROOT.Aluminium_Import_List = THIS.id }
 		}
+		clr_country_flag = found
+		for_loop_effect = {
+			end = Aluminium_Export_List
+			value = v
+			if = {
+				limit = {
+					check_variable = { Aluminium_Export_List^v = ROOT.id }
+				}
+				set_country_flag = found
+			}
+		}
+		if = {
+			limit = { NOT = { has_country_flag = found } }
+			add_to_array = { Aluminium_Export_List = ROOT.id }
+		}
+		clr_country_flag = found
+
 		subtract_from_variable = {
 			ROOT.purchase_amount = ROOT.purchase_amount_prior
 		}
@@ -3457,14 +3718,37 @@ generate_available_rareEarth_import_array = {
 buy_rareEarth = {
 
 	var:currentPurchaser = {
-		add_to_array = {
-			array = ROOT.RareEarth_Import_List
-			value = THIS.id
+		for_loop_effect = {
+			end = ROOT.RareEarth_Import_List
+			value = v
+			if = {
+				limit = {
+					check_variable = { RareEarth_Import_List^v = THIS }
+				}
+				set_country_flag = found
+			}
 		}
-		add_to_array = {
-			array = RareEarth_Export_List
-			value = ROOT.id
+		if = {
+			limit = { NOT = { has_country_flag = found } }
+			add_to_array = { ROOT.RareEarth_Import_List = THIS.id }
 		}
+		clr_country_flag = found
+		for_loop_effect = {
+			end = RareEarth_Export_List
+			value = v
+			if = {
+				limit = {
+					check_variable = { RareEarth_Export_List^v = ROOT.id }
+				}
+				set_country_flag = found
+			}
+		}
+		if = {
+			limit = { NOT = { has_country_flag = found } }
+			add_to_array = { RareEarth_Export_List = ROOT.id }
+		}
+		clr_country_flag = found
+
 		subtract_from_variable = {
 			ROOT.purchase_amount = ROOT.purchase_amount_prior
 		}
@@ -3792,14 +4076,37 @@ rareEarth_import_ai = {
 				multiply_variable = {
 					rareEarth_need = -1
 				}
-				add_to_array = {
-					array = ROOT.RareEarth_Import_List
-					value = THIS.id
+				for_loop_effect = {
+					end = ROOT.RareEarth_Import_List
+					value = v
+					if = {
+						limit = {
+							check_variable = { RareEarth_Import_List^v = THIS }
+						}
+						set_country_flag = found
+					}
 				}
-				add_to_array = {
-					array = RareEarth_Export_List
-					value = ROOT.id
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+					add_to_array = { ROOT.RareEarth_Import_List = THIS.id }
 				}
+				clr_country_flag = found
+				for_loop_effect = {
+					end = RareEarth_Export_List
+					value = v
+					if = {
+						limit = {
+							check_variable = { RareEarth_Export_List^v = ROOT.id }
+						}
+						set_country_flag = found
+					}
+				}
+				if = {
+					limit = { NOT = { has_country_flag = found } }
+					add_to_array = { RareEarth_Export_List = ROOT.id }
+				}
+				clr_country_flag = found
+
                 if = {
                     limit = {
                         check_variable = {
@@ -4098,14 +4405,37 @@ aluminium_import_ai = {
 				multiply_variable = {
 					aluminium_need = -1
 				}
-				add_to_array = {
-					array = ROOT.Aluminium_Import_List
-					value = THIS.id
+			for_loop_effect = {
+				end = ROOT.Aluminium_Import_List
+				value = v
+				if = {
+					limit = {
+						check_variable = { Aluminium_Import_List^v = THIS }
+					}
+					set_country_flag = found
 				}
-				add_to_array = {
-					array = Aluminium_Export_List
-					value = ROOT.id
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+				add_to_array = { ROOT.Aluminium_Import_List = THIS.id }
+			}
+			clr_country_flag = found
+			for_loop_effect = {
+				end = Aluminium_Export_List
+				value = v
+				if = {
+					limit = {
+						check_variable = { Aluminium_Export_List^v = ROOT.id }
+					}
+					set_country_flag = found
 				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = found } }
+				add_to_array = { Aluminium_Export_List = ROOT.id }
+			}
+			clr_country_flag = found
+
                 if = {
                     limit = {
                         check_variable = {
