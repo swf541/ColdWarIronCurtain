@@ -897,9 +897,8 @@ military_expenditure = {
 	set_variable = { af_expend_subsidy = af_expend }
 	multiply_variable = { af_expend_subsidy = 0.25 }
 	set_variable = { af_expend_subsidy_tot = 0 }
-
-	every_country = {
-		limit = { is_in_array = { array = ROOT.military_subsidies value = PREV } }
+    for_each_scope_loop = {
+        array = ROOT.military_subsidies
 		meta_effect = {
 			text = {
 				add_to_variable = { mil_expend_subsidy_tot = [ROOTTAG].mil_expend_subsidy }
@@ -1689,7 +1688,7 @@ tax_rate = {
 	multiply_variable = {
 		industrial_base = industrial_base_modifier
 	}
-	standard_deviation_for_industrial_base = yes
+	#standard_deviation_for_industrial_base = yes
 	set_variable = { austerityCheck = grossdomesticproduct }
 	multiply_variable = { austerityCheck = austerity_multiplier }
 	set_variable = { defaultCheck = grossdomesticproduct }
@@ -2616,7 +2615,19 @@ state_population_category_check = { #Directory for optimization
 		state_population_category_dev4 = yes
 	}
 }
-
+#test_country_list = {
+#	set_variable = {
+#		num_of_countries = countries^num
+#	}
+#	set_variable = {
+#		num_of_2countries = global.countries^num
+#	}
+#	every_country = {
+#		add_to_variable = {
+#			ROOT.num_of_3countries = 1
+#		}
+#	}
+#}
 standard_deviation_for_industrial_base = {
 	UNS = {
 		set_variable = { country_total = 0 }
@@ -2634,17 +2645,8 @@ standard_deviation_for_industrial_base = {
 			add_to_variable = {
 				UNS.global_industrial_base_mean = industrial_base
 			}
-		}
-		divide_variable = {
-			UNS.global_industrial_base_mean = country_total
-		}
-		every_country = {
-			limit = {
-				NOT = { tag = USA }
-				NOT = { tag = SOV }
-				NOT = { tag = VTC }
-				NOT = { tag = UNS }
-				NOT = { tag = ENG }
+			divide_variable = {
+				UNS.global_industrial_base_mean = country_total
 			}
 			set_variable = {
 				industrial_base_mean = industrial_base
@@ -2658,46 +2660,38 @@ standard_deviation_for_industrial_base = {
 			add_to_variable = {
 				UNS.global_industrial_base_mean_squared = industrial_base_mean
 			}    
-		}
-		divide_variable = {
-			UNS.global_industrial_base_mean_squared = country_total
-		}
-		if = {
-			limit = {
-				check_variable = { UNS.global_industrial_base_mean_squared < 0.001 }
+		
+			divide_variable = {
+				UNS.global_industrial_base_mean_squared = country_total
 			}
-			set_variable = { UNS.global_industrial_base_mean_deviation = 0 }
-		}
-		else = {
-			# overflow at 2147483.647
-			# therefore, highest possible square root * 2 is ~2931
-			set_temp_variable = { x = 2931 }
-
-			set_temp_variable = { y = 1 }
-			set_temp_variable = { e = 0.001 } # precision - game can't go any lower than this
-			while_loop_effect = {
+			if = {
 				limit = {
-					set_temp_variable = { t_x = x }
-					subtract_from_temp_variable = { t_x = y }
-					check_variable = { t_x > e }
+					check_variable = { UNS.global_industrial_base_mean_squared < 0.001 }
 				}
-				add_to_temp_variable = { x = y }
-				divide_temp_variable = { x = 2 }
-				set_temp_variable = { y = UNS.global_industrial_base_mean_squared }
-				divide_temp_variable = { y = x }
+				set_variable = { UNS.global_industrial_base_mean_deviation = 0 }
 			}
-			set_variable = { UNS.global_industrial_base_mean_deviation = x }
-		}
-		#log = "Global Industrial Base Mean Deviation: [?global_industrial_base_mean_deviation]"
-		#log = "Global Industrial Base Mean: [?global_industrial_base_mean]"
-		every_country = {
-			limit = {
-				NOT = { tag = USA }
-				NOT = { tag = SOV }
-				NOT = { tag = VTC }
-				NOT = { tag = UNS }
-				NOT = { tag = ENG }
+			else = {
+				# overflow at 2147483.647
+				# therefore, highest possible square root * 2 is ~2931
+				set_temp_variable = { x = 2931 }
+
+				set_temp_variable = { y = 1 }
+				set_temp_variable = { e = 0.001 } # precision - game can't go any lower than this
+				while_loop_effect = {
+					limit = {
+						set_temp_variable = { t_x = x }
+						subtract_from_temp_variable = { t_x = y }
+						check_variable = { t_x > e }
+					}
+					add_to_temp_variable = { x = y }
+					divide_temp_variable = { x = 2 }
+					set_temp_variable = { y = UNS.global_industrial_base_mean_squared }
+					divide_temp_variable = { y = x }
+				}
+				set_variable = { UNS.global_industrial_base_mean_deviation = x }
 			}
+			#log = "Global Industrial Base Mean Deviation: [?global_industrial_base_mean_deviation]"
+			#log = "Global Industrial Base Mean: [?global_industrial_base_mean]"
 			set_variable = {
 				industrial_base_z_score = industrial_base
 			}
