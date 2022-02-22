@@ -417,38 +417,52 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 		array = Nuclear_Export_List
 		if = {
 			limit = {
-				NOT = { 
-					check_variable = { chromium_export_check = 1 } 
+				NOT = {
+					is_in_array = {
+						array = ROOT.Export_List
+						value = THIS.id
+					}
 				}
 			}
+			add_to_array = { ROOT.Export_List = THIS.id } 
 			set_temp_variable = { chromium_export_check = 1 } 
 			add_to_variable = { ROOT.chromium_exports = ROOT.chromiumExportTargetMonthly^THIS }
 		}	
 	}
+	clear_array = ROOT.Export_List
 	for_each_scope_loop = {
 		array = Food_Export_List
 		if = {
 			limit = {
-				NOT = { 
-					check_variable = { food_export_check = 1 } 
+				NOT = {
+					is_in_array = {
+						array = ROOT.Export_List
+						value = THIS.id
+					}
 				}
 			}
-			set_temp_variable = { food_export_check = 1 } 
+			add_to_array = { ROOT.Export_List = THIS.id } 
 			add_to_variable = { ROOT.rubber_exports = ROOT.foodExportTargetMonthly^THIS }
 		}
 	}
+	clear_array = ROOT.Export_List
 	for_each_scope_loop = {
 		array = Oil_Export_List
 		if = {
 			limit = {
-				NOT = { 
-					check_variable = { oil_export_check = 1 } 
+				NOT = {
+					is_in_array = {
+						array = ROOT.Export_List
+						value = THIS.id
+					}
 				}
 			}
-			set_temp_variable = { oil_export_check = 1 } 
+			add_to_array = { ROOT.Export_List = THIS.id } 
 			add_to_variable = { ROOT.oil_exports = ROOT.oilExportTargetMonthly^THIS }
 		}		
-	}
+	} 
+	clear_array = ROOT.Export_List
+
 	for_each_scope_loop = {
 		array = Steel_Export_List
 		if = {
@@ -461,30 +475,39 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 			add_to_variable = { ROOT.steel_exports = ROOT.steelExportTargetMonthly^THIS }
 		}	
 	}	
+	clear_array = ROOT.Export_List
 	for_each_scope_loop = {
 		array = Aluminium_Export_List
 		if = {
 			limit = {
-				NOT = { 
-					check_variable = { aluminium_export_check = 1 } 
+				NOT = {
+					is_in_array = {
+						array = ROOT.Export_List
+						value = THIS.id
+					}
 				}
 			}
-			set_temp_variable = { aluminium_export_check = 1 } 
+			add_to_array = { ROOT.Export_List = THIS.id } 
 			add_to_variable = { ROOT.aluminium_exports = ROOT.aluminiumExportTargetMonthly^THIS }
 		}
-	}		
+	}	
+	clear_array = ROOT.Export_List	
 	for_each_scope_loop = {
 		array = RareEarth_Export_List
 		if = {
 			limit = {
-				NOT = { 
-					check_variable = { tungsten_export_check = 1 } 
+				NOT = {
+					is_in_array = {
+						array = ROOT.Export_List
+						value = THIS.id
+					}
 				}
 			}
-			set_temp_variable = { tungsten_export_check = 1 } 
+			add_to_array = { ROOT.Export_List = THIS.id } 
 			add_to_variable = { ROOT.tungsten_exports = ROOT.rareEarthExportTargetMonthly^THIS }
 		}
-	}		
+	}	
+	clear_array = ROOT.Export_List	
 	add_to_variable = { resource_income = oil_exports }
 	add_to_variable = { resource_income = aluminium_exports }
 	add_to_variable = { resource_income = rubber_exports }
@@ -2859,6 +2882,23 @@ standard_deviation_for_industrial_base = {
 				}   
 			}
 			process_credit_rating = yes
+			set_variable = {
+				Interest_Rate_Display = Interest_Rate
+			}
+			set_variable = {
+				Domestic_Interest_Rate = Interest_Rate
+			}
+			multiply_variable = {
+				Domestic_Interest_Rate = 0.75
+			}
+			multiply_variable = {
+				Favorable_Interest_Rate = 0.65
+			}
+			set_variable = { austerityCheck = grossdomesticproduct }
+			multiply_variable = { austerityCheck = austerity_multiplier }
+			set_variable = { defaultCheck = grossdomesticproduct }
+			multiply_variable = { defaultCheck = default_multiplier }
+
 		}
 		if = {
 			limit = {
@@ -3461,14 +3501,14 @@ set_interest_rates = {
 		limit = {
 			check_variable = { Credit_Rating = 10 }
 		}
-		set_variable = {Interest_Rate = 0.0005}
+		set_variable = {Interest_Rate = 1.0005}
 		
 	}
 	else_if = {
 		limit = {
 			check_variable = { Credit_Rating = 9 }
 		}
-		set_variable = {Interest_Rate = 0.01}
+		set_variable = {Interest_Rate = 1.01}
 		set_variable = { default_multiplier = 15 }
 		set_variable = { austerity_multiplier = 8 }
 	}
@@ -3476,7 +3516,7 @@ set_interest_rates = {
 		limit = {
 			check_variable = { Credit_Rating = 8 }
 		}
-		set_variable = {Interest_Rate = 0.02}
+		set_variable = {Interest_Rate = 1.02}
 		set_variable = { default_multiplier = 12 }
 		set_variable = { austerity_multiplier = 6 }
 	}
@@ -3484,7 +3524,7 @@ set_interest_rates = {
 		limit = {
 			check_variable = {Credit_Rating = 7}
 		}
-		set_variable = {Interest_Rate = 0.05}
+		set_variable = {Interest_Rate = 1.05}
 		set_variable = { default_multiplier = 10 }
 		set_variable = { austerity_multiplier = 5 }
 	}
@@ -3492,7 +3532,7 @@ set_interest_rates = {
 		limit = {
 			check_variable = {Credit_Rating = 6}
 		}
-		set_variable = {Interest_Rate = 0.1}
+		set_variable = {Interest_Rate = 1.1}
 		set_variable = { default_multiplier = 8 }
 		set_variable = { austerity_multiplier = 4 }
 	}
@@ -3500,7 +3540,7 @@ set_interest_rates = {
 		limit = {
 			check_variable = {Credit_Rating = 5}
 		}
-		set_variable = {Interest_Rate = 0.15}
+		set_variable = {Interest_Rate = 1.15}
 		set_variable = { default_multiplier = 6 }
 		set_variable = { austerity_multiplier = 3 }
 	}
@@ -3508,7 +3548,7 @@ set_interest_rates = {
 		limit = {
 			check_variable = {Credit_Rating = 4}
 		}
-		set_variable = {Interest_Rate = 0.2}
+		set_variable = {Interest_Rate = 1.2}
 		set_variable = { default_multiplier = 4 }
 		set_variable = { austerity_multiplier = 2 }
 	}
@@ -3516,7 +3556,7 @@ set_interest_rates = {
 		limit = {
 			check_variable = {Credit_Rating = 3}
 		}
-		set_variable = {Interest_Rate = 0.25}
+		set_variable = {Interest_Rate = 1.25}
 		set_variable = { default_multiplier = 3 }
 		set_variable = { austerity_multiplier = 1 }
 	}
@@ -3524,7 +3564,7 @@ set_interest_rates = {
 		limit = {
 			check_variable = {Credit_Rating = 2}
 		}
-		set_variable = {Interest_Rate = 0.40}
+		set_variable = {Interest_Rate = 1.40}
 		set_variable = { default_multiplier = 2 }
 		set_variable = { austerity_multiplier = 0.75 }
 	}
@@ -3532,30 +3572,11 @@ set_interest_rates = {
 		limit = {
 			check_variable = { Credit_Rating = 1 }
 		}
-		set_variable = {Interest_Rate = 0.50}
+		set_variable = {Interest_Rate = 1.50}
 		set_variable = { default_multiplier = 1 }
 		set_variable = { austerity_multiplier = 0.5 }
 	}
-	else = { }
-	set_variable = {
-		Interest_Rate_Display = Interest_Rate
+	else = {
 	}
-	add_to_variable = {
-		Interest_Rate = 1
-	}
-	set_variable = {
-		Domestic_Interest_Rate = Interest_Rate
-	}
-	multiply_variable = {
-		Domestic_Interest_Rate = 0.75
-	}
-	multiply_variable = {
-		Favorable_Interest_Rate = 0.65
-	}
-	set_variable = { austerityCheck = grossdomesticproduct }
-	multiply_variable = { austerityCheck = austerity_multiplier }
-	set_variable = { defaultCheck = grossdomesticproduct }
-	multiply_variable = { defaultCheck = default_multiplier }
-
 }
 
