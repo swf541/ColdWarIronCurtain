@@ -1,0 +1,57 @@
+oilDeliveryCuts = {
+    while_loop_effect = {
+        limit = {
+            check_variable = {
+                currentAvailableoilExport < 0
+            }    
+        }
+        for_each_scope_loop = {
+            array = Oil_Export_List
+            if = {
+                limit = {
+                    check_variable = { ROOT.currentAvailableoilExport < 0 }
+                    check_variable = { ROOT.oilExportTargetAmount^THIS > 0 }
+                }
+				ROOT = {
+					add_political_power = 100
+				}
+                subtract_from_variable = {
+                    ROOT.currentExportedoil = 1
+                }                
+                set_variable = {
+                    priorExportTotal = ROOT.oilExportTargetMonthly^THIS
+                }
+                set_variable = {
+                    priorExportCash = ROOT.oilExportTargetAmount^THIS
+                }
+                divide_variable = {
+                    priorExportTotal = priorExportCash
+                }
+                add_to_variable = {
+                    ROOT.currentAvailableoilExport = 1
+                }
+                add_to_variable = {
+                    trade_infrastructure_total_available = 1
+                }
+                subtract_from_variable = {
+                    trade_infrastructure_total_used = 1
+                }
+                subtract_from_variable = { oilImports = 1 }
+                subtract_from_variable = {
+                    ROOT.oilExportTargetAmount^THIS = 1
+                }
+                add_to_variable = {
+                    oilImportTargetAmount^ROOT = -1
+                }
+
+                ###NEED CALCS
+                subtract_from_variable = {
+                    ROOT.oilExportTargetMonthly^THIS = priorExportTotal
+                }
+                subtract_from_variable = {
+                    oilImportTargetMonthly^ROOT = priorExportTotal
+                }
+            }
+        }
+    }
+}
