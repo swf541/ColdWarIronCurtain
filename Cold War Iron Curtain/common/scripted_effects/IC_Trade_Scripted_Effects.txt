@@ -212,11 +212,11 @@ export_script_for_pool = {
 
 		#Current Export Rate Calcs
 		set_variable = {
-			currentAvailableOilExport = oilExport
+			currentAvailableoilExport = oilExport
 		}
-		round_variable = currentAvailableOilExport
+		round_variable = currentAvailableoilExport
 		subtract_from_variable = {
-			currentAvailableOilExport = currentExportedOil
+			currentAvailableoilExport = currentExportedOil
 		}
 		country_event = trade.2
 		
@@ -865,63 +865,33 @@ chromium_import_ai = {
         for_each_scope_loop = {
             array = ROOT.chromiumExporters
             #index = i
-            #break = cheapest_brk
+            break = cheapest_brk
 
             #Checks if the country's goods are cheaper & shipping is affordabole 
             #TODO - Shipping cost
             if = {
                 limit = {
-                    check_variable = { currentAvailableChromiumExport > 0 }
+                    check_variable = { currentAvailablechromiumExport > 0 }
                     OR = {
                         NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
                         NOT = { check_variable = { ROOT.nuclear_total > -1 } }
                     }
                 }
                 set_variable = {
-                    nuclear_need = ROOT.nuclear_total
+                    chromium_need = ROOT.nuclear_total
                 }
 				multiply_variable = {
-					nuclear_need = -1
+					chromium_need = -1
 				}
-				for_loop_effect = {
-					end = ROOT.Nuclear_Import_List
-					value = v
-					if = {
-						limit = {
-							check_variable = { Nuclear_Import_List^v = THIS }
-						}
-						set_country_flag = found
-					}
-				}
-				if = {
-					limit = { NOT = { has_country_flag = found } }
-					add_to_array = { ROOT.Nuclear_Import_List = THIS.id }
-				}
-				clr_country_flag = found
-				for_loop_effect = {
-					end = Nuclear_Export_List
-					value = v
-					if = {
-						limit = {
-							check_variable = { Nuclear_Export_List^v = ROOT.id }
-						}
-						set_country_flag = found
-					}
-				}
-				if = {
-					limit = { NOT = { has_country_flag = found } }
-					add_to_array = { Nuclear_Export_List = ROOT.id }
-				}
-				clr_country_flag = found
                 if = {
                     limit = {
                         check_variable = {
-                            currentAvailableChromiumExport > nuclear_need
+                            currentAvailablechromiumExport > chromium_need
                         }
                     }
 
                     set_variable = {
-                        ROOT.purchase_amount = nuclear_need
+                        ROOT.purchase_amount = chromium_need
                     }
                     add_to_variable = {
                         ROOT.nuclear_total = ROOT.purchase_amount
@@ -931,7 +901,7 @@ chromium_import_ai = {
                         ROOT.purchase_amount = ROOT.purchase_amount_prior
                     }
                     subtract_from_variable = {
-                        currentAvailableChromiumExport = ROOT.purchase_amount
+                        currentAvailablechromiumExport = ROOT.purchase_amount
                     }
                     add_to_variable = {
                         ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
@@ -940,10 +910,10 @@ chromium_import_ai = {
                         ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
                     }
                     add_to_variable = {
-                        currentExportedChromium = ROOT.purchase_amount
+                        currentExportedchromium = ROOT.purchase_amount
                     }
                     add_to_variable = {
-                        ROOT.nuclearImports = ROOT.purchase_amount
+                        ROOT.chromiumImports = ROOT.purchase_amount
                     }
                     set_variable = {
                         chromiumExportTarget^ROOT = ROOT.id
@@ -975,13 +945,51 @@ chromium_import_ai = {
                     set_variable = {
                         ROOT.purchase_amount = 0
                     }
+					for_loop_effect = {
+						end = ROOT.Nuclear_Import_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Nuclear_Import_List^v = THIS }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { ROOT.Nuclear_Import_List = THIS.id }
+					}
+					clr_country_flag = found
+					for_loop_effect = {
+						end = Nuclear_Export_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Nuclear_Export_List^v = ROOT.id }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { Nuclear_Export_List = ROOT.id }
+					}
+					clr_country_flag = found
+					if = {
+						limit = {
+							check_variable = {
+								currentAvailablechromiumExport < 0
+							}
+						}
+						country_event = trade.6
+					}
                 }
                 else = {
                     set_variable = {
-                        nuclear_need = currentAvailableChromiumExport
+                        chromium_need = currentAvailablechromiumExport
                     }			
                     set_variable = {
-                        ROOT.purchase_amount = nuclear_need
+                        ROOT.purchase_amount = chromium_need
                     }
                     add_to_variable = {
                         ROOT.nuclear_total = ROOT.purchase_amount
@@ -990,7 +998,7 @@ chromium_import_ai = {
                         ROOT.purchase_amount = ROOT.purchase_amount_prior
                     }
                     subtract_from_variable = {
-                        currentAvailableChromiumExport = ROOT.purchase_amount
+                        currentAvailablechromiumExport = ROOT.purchase_amount
                     }
                     add_to_variable = {
                         ROOT.trade_infrastructure_total_used = ROOT.purchase_amount
@@ -999,10 +1007,10 @@ chromium_import_ai = {
                         ROOT.trade_infrastructure_total_available = ROOT.purchase_amount
                     }
                     add_to_variable = {
-                        currentExportedChromium = ROOT.purchase_amount
+                        currentExportedchromium = ROOT.purchase_amount
                     }
                     add_to_variable = {
-                        ROOT.nuclearImports = ROOT.purchase_amount
+                        ROOT.chromiumImports = ROOT.purchase_amount
                     }
                     set_variable = {
                         chromiumExportTarget^ROOT = ROOT.id
@@ -1034,9 +1042,47 @@ chromium_import_ai = {
                     set_variable = {
                         ROOT.purchase_amount = 0
                     }
+					for_loop_effect = {
+						end = ROOT.Nuclear_Import_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Nuclear_Import_List^v = THIS }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { ROOT.Nuclear_Import_List = THIS.id }
+					}
+					clr_country_flag = found
+					for_loop_effect = {
+						end = Nuclear_Export_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Nuclear_Export_List^v = ROOT.id }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { Nuclear_Export_List = ROOT.id }
+					}
+					clr_country_flag = found
+					if = {
+						limit = {
+							check_variable = {
+								currentAvailablechromiumExport < 0
+							}
+						}
+						country_event = trade.6
+					}
                 }
             }
-            else_if = {
+           if = {
                 limit = {
                     OR = {
                         NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
@@ -1047,7 +1093,8 @@ chromium_import_ai = {
             }
         }
 	}
-}##Food Section
+}
+##Food Section
 
 
 generate_available_food_import_array = {
@@ -1513,11 +1560,11 @@ food_import_ai = {
 		generate_available_food_import_array = yes
         sort_price_number_food = yes
 
-        #Loops thru cheapest countries to buy From
+        #Loops thru cheapest countries to buy from
         for_each_scope_loop = {
             array = ROOT.foodExporters
             #index = i
-            ##break = cheapest_brk
+            break = cheapest_brk
 
             #Checks if the country's goods are cheaper & shipping is affordabole 
             #TODO - Shipping cost
@@ -1535,36 +1582,6 @@ food_import_ai = {
 				multiply_variable = {
 					food_need = -1
 				}
-				for_loop_effect = {
-					end = ROOT.Food_Import_List
-					value = v
-					if = {
-						limit = {
-							check_variable = { Food_Import_List^v = THIS }
-						}
-						set_country_flag = found
-					}
-				}
-				if = {
-					limit = { NOT = { has_country_flag = found } }
-					add_to_array = { ROOT.Food_Import_List = THIS.id }
-				}
-				clr_country_flag = found
-				for_loop_effect = {
-					end = Food_Export_List
-					value = v
-					if = {
-						limit = {
-							check_variable = { Food_Export_List^v = ROOT.id }
-						}
-						set_country_flag = found
-					}
-				}
-				if = {
-					limit = { NOT = { has_country_flag = found } }
-					add_to_array = { Food_Export_List = ROOT.id }
-				}
-				clr_country_flag = found
                 if = {
                     limit = {
                         check_variable = {
@@ -1578,7 +1595,7 @@ food_import_ai = {
                     add_to_variable = {
                         ROOT.food_total = ROOT.purchase_amount
                     }
-                    #log = "[GetDateText]:Buyer [Root.GetTag] Seller [THIS.GetTag]: fin_pulse buy food ammount [ROOT.purchase_amount]"
+
                     subtract_from_variable = {
                         ROOT.purchase_amount = ROOT.purchase_amount_prior
                     }
@@ -1627,6 +1644,44 @@ food_import_ai = {
                     set_variable = {
                         ROOT.purchase_amount = 0
                     }
+					for_loop_effect = {
+						end = ROOT.Food_Import_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Food_Import_List^v = THIS }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { ROOT.Food_Import_List = THIS.id }
+					}
+					clr_country_flag = found
+					for_loop_effect = {
+						end = Food_Export_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Food_Export_List^v = ROOT.id }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { Food_Export_List = ROOT.id }
+					}
+					clr_country_flag = found
+					if = {
+						limit = {
+							check_variable = {
+								currentAvailablefoodExport < 0
+							}
+						}
+						country_event = trade.7
+					}
                 }
                 else = {
                     set_variable = {
@@ -1686,9 +1741,47 @@ food_import_ai = {
                     set_variable = {
                         ROOT.purchase_amount = 0
                     }
+					for_loop_effect = {
+						end = ROOT.Food_Import_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Food_Import_List^v = THIS }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { ROOT.Food_Import_List = THIS.id }
+					}
+					clr_country_flag = found
+					for_loop_effect = {
+						end = Food_Export_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Food_Export_List^v = ROOT.id }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { Food_Export_List = ROOT.id }
+					}
+					clr_country_flag = found
+					if = {
+						limit = {
+							check_variable = {
+								currentAvailablefoodExport < 0
+							}
+						}
+						country_event = trade.7
+					}
                 }
             }
-            else_if = {
+           if = {
                 limit = {
                     OR = {
                         NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
@@ -1963,7 +2056,7 @@ buy_oil = {
 		if = {
 			limit = {
 				check_variable = {
-					currentAvailableOilExport < 0
+					currentAvailableoilExport < 0
 				}
 			}
 			country_event = trade.2
@@ -2282,7 +2375,7 @@ oil_import_ai = {
 					if = {
 						limit = {
 							check_variable = {
-								currentAvailableOilExport < 0
+								currentAvailableoilExport < 0
 							}
 						}
 						country_event = trade.2
@@ -2379,7 +2472,7 @@ oil_import_ai = {
 					if = {
 						limit = {
 							check_variable = {
-								currentAvailableOilExport < 0
+								currentAvailableoilExport < 0
 							}
 						}
 						country_event = trade.2
@@ -2414,12 +2507,11 @@ steel_import_ai = {
 		}
 		generate_available_steel_import_array = yes
         sort_price_number_steel = yes
-
         #Loops thru cheapest countries to buy from
         for_each_scope_loop = {
             array = ROOT.steelExporters
             #index = i
-            #break = cheapest_brk
+            break = cheapest_brk
 
             #Checks if the country's goods are cheaper & shipping is affordabole 
             #TODO - Shipping cost
@@ -2437,36 +2529,6 @@ steel_import_ai = {
 				multiply_variable = {
 					steel_need = -1
 				}
-				for_loop_effect = {
-					end = ROOT.Steel_Import_List
-					value = v
-					if = {
-						limit = {
-							check_variable = { Steel_Import_List^v = THIS }
-						}
-						set_country_flag = found
-					}
-				}
-				if = {
-					limit = { NOT = { has_country_flag = found } }
-					add_to_array = { ROOT.Steel_Import_List = THIS.id }
-				}
-				clr_country_flag = found
-				for_loop_effect = {
-					end = Steel_Export_List
-					value = v
-					if = {
-						limit = {
-							check_variable = { Steel_Export_List^v = ROOT.id }
-						}
-						set_country_flag = found
-					}
-				}
-				if = {
-					limit = { NOT = { has_country_flag = found } }
-					add_to_array = { Steel_Export_List = ROOT.id }
-				}
-				clr_country_flag = found
                 if = {
                     limit = {
                         check_variable = {
@@ -2529,6 +2591,44 @@ steel_import_ai = {
                     set_variable = {
                         ROOT.purchase_amount = 0
                     }
+					for_loop_effect = {
+						end = ROOT.Steel_Import_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Steel_Import_List^v = THIS }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { ROOT.Steel_Import_List = THIS.id }
+					}
+					clr_country_flag = found
+					for_loop_effect = {
+						end = Steel_Export_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Steel_Export_List^v = ROOT.id }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { Steel_Export_List = ROOT.id }
+					}
+					clr_country_flag = found
+					if = {
+						limit = {
+							check_variable = {
+								currentAvailablesteelExport < 0
+							}
+						}
+						country_event = trade.3
+					}
                 }
                 else = {
                     set_variable = {
@@ -2588,9 +2688,47 @@ steel_import_ai = {
                     set_variable = {
                         ROOT.purchase_amount = 0
                     }
+					for_loop_effect = {
+						end = ROOT.Steel_Import_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Steel_Import_List^v = THIS }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { ROOT.Steel_Import_List = THIS.id }
+					}
+					clr_country_flag = found
+					for_loop_effect = {
+						end = Steel_Export_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Steel_Export_List^v = ROOT.id }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { Steel_Export_List = ROOT.id }
+					}
+					clr_country_flag = found
+					if = {
+						limit = {
+							check_variable = {
+								currentAvailablesteelExport < 0
+							}
+						}
+						country_event = trade.3
+					}
                 }
             }
-            else_if = {
+           if = {
                 limit = {
                     OR = {
                         NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
@@ -3805,7 +3943,7 @@ rareEarth_import_ai = {
         for_each_scope_loop = {
             array = ROOT.rareEarthExporters
             #index = i
-            #break = cheapest_brk
+            break = cheapest_brk
 
             #Checks if the country's goods are cheaper & shipping is affordabole 
             #TODO - Shipping cost
@@ -3823,37 +3961,6 @@ rareEarth_import_ai = {
 				multiply_variable = {
 					rareEarth_need = -1
 				}
-				for_loop_effect = {
-					end = ROOT.RareEarth_Import_List
-					value = v
-					if = {
-						limit = {
-							check_variable = { RareEarth_Import_List^v = THIS }
-						}
-						set_country_flag = found
-					}
-				}
-				if = {
-					limit = { NOT = { has_country_flag = found } }
-					add_to_array = { ROOT.RareEarth_Import_List = THIS.id }
-				}
-				clr_country_flag = found
-				for_loop_effect = {
-					end = RareEarth_Export_List
-					value = v
-					if = {
-						limit = {
-							check_variable = { RareEarth_Export_List^v = ROOT.id }
-						}
-						set_country_flag = found
-					}
-				}
-				if = {
-					limit = { NOT = { has_country_flag = found } }
-					add_to_array = { RareEarth_Export_List = ROOT.id }
-				}
-				clr_country_flag = found
-
                 if = {
                     limit = {
                         check_variable = {
@@ -3916,6 +4023,44 @@ rareEarth_import_ai = {
                     set_variable = {
                         ROOT.purchase_amount = 0
                     }
+					for_loop_effect = {
+						end = ROOT.RareEarth_Import_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { RareEarth_Import_List^v = THIS }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { ROOT.RareEarth_Import_List = THIS.id }
+					}
+					clr_country_flag = found
+					for_loop_effect = {
+						end = RareEarth_Export_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { RareEarth_Export_List^v = ROOT.id }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { RareEarth_Export_List = ROOT.id }
+					}
+					clr_country_flag = found
+					if = {
+						limit = {
+							check_variable = {
+								currentAvailablerareEarthExport < 0
+							}
+						}
+						country_event = trade.4
+					}
                 }
                 else = {
                     set_variable = {
@@ -3975,9 +4120,47 @@ rareEarth_import_ai = {
                     set_variable = {
                         ROOT.purchase_amount = 0
                     }
+					for_loop_effect = {
+						end = ROOT.RareEarth_Import_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { RareEarth_Import_List^v = THIS }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { ROOT.RareEarth_Import_List = THIS.id }
+					}
+					clr_country_flag = found
+					for_loop_effect = {
+						end = RareEarth_Export_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { RareEarth_Export_List^v = ROOT.id }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { RareEarth_Export_List = ROOT.id }
+					}
+					clr_country_flag = found
+					if = {
+						limit = {
+							check_variable = {
+								currentAvailablerareEarthExport < 0
+							}
+						}
+						country_event = trade.4
+					}
                 }
             }
-            else_if = {
+           if = {
                 limit = {
                     OR = {
                         NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
@@ -3989,7 +4172,6 @@ rareEarth_import_ai = {
         }
 	}
 }
-
 #aluminiumExporterPrice
 
 sort_resource_number_aluminium = {
@@ -4074,7 +4256,7 @@ aluminium_import_ai = {
         for_each_scope_loop = {
             array = ROOT.aluminiumExporters
             #index = i
-            #break = cheapest_brk
+            break = cheapest_brk
 
             #Checks if the country's goods are cheaper & shipping is affordabole 
             #TODO - Shipping cost
@@ -4092,37 +4274,6 @@ aluminium_import_ai = {
 				multiply_variable = {
 					aluminium_need = -1
 				}
-			for_loop_effect = {
-				end = ROOT.Aluminium_Import_List
-				value = v
-				if = {
-					limit = {
-						check_variable = { Aluminium_Import_List^v = THIS }
-					}
-					set_country_flag = found
-				}
-			}
-			if = {
-				limit = { NOT = { has_country_flag = found } }
-				add_to_array = { ROOT.Aluminium_Import_List = THIS.id }
-			}
-			clr_country_flag = found
-			for_loop_effect = {
-				end = Aluminium_Export_List
-				value = v
-				if = {
-					limit = {
-						check_variable = { Aluminium_Export_List^v = ROOT.id }
-					}
-					set_country_flag = found
-				}
-			}
-			if = {
-				limit = { NOT = { has_country_flag = found } }
-				add_to_array = { Aluminium_Export_List = ROOT.id }
-			}
-			clr_country_flag = found
-
                 if = {
                     limit = {
                         check_variable = {
@@ -4185,6 +4336,44 @@ aluminium_import_ai = {
                     set_variable = {
                         ROOT.purchase_amount = 0
                     }
+					for_loop_effect = {
+						end = ROOT.Aluminium_Import_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Aluminium_Import_List^v = THIS }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { ROOT.Aluminium_Import_List = THIS.id }
+					}
+					clr_country_flag = found
+					for_loop_effect = {
+						end = Aluminium_Export_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Aluminium_Export_List^v = ROOT.id }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { Aluminium_Export_List = ROOT.id }
+					}
+					clr_country_flag = found
+					if = {
+						limit = {
+							check_variable = {
+								currentAvailablealuminiumExport < 0
+							}
+						}
+						country_event = trade.5
+					}
                 }
                 else = {
                     set_variable = {
@@ -4244,9 +4433,47 @@ aluminium_import_ai = {
                     set_variable = {
                         ROOT.purchase_amount = 0
                     }
+					for_loop_effect = {
+						end = ROOT.Aluminium_Import_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Aluminium_Import_List^v = THIS }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { ROOT.Aluminium_Import_List = THIS.id }
+					}
+					clr_country_flag = found
+					for_loop_effect = {
+						end = Aluminium_Export_List
+						value = v
+						if = {
+							limit = {
+								check_variable = { Aluminium_Export_List^v = ROOT.id }
+							}
+							set_country_flag = found
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = found } }
+						add_to_array = { Aluminium_Export_List = ROOT.id }
+					}
+					clr_country_flag = found
+					if = {
+						limit = {
+							check_variable = {
+								currentAvailablealuminiumExport < 0
+							}
+						}
+						country_event = trade.5
+					}
                 }
             }
-            else_if = {
+           if = {
                 limit = {
                     OR = {
                         NOT = { check_variable = { ROOT.trade_infrastructure_total_available < 1 } }
@@ -4258,7 +4485,6 @@ aluminium_import_ai = {
         }
 	}
 }
-
 trade_check = {
 	food_import_ai = yes
     oil_import_ai = yes
@@ -4285,7 +4511,7 @@ reset_all_orders = {
 	subtract_from_variable = {
 		trade_infrastructure_total_used = oilImports
 	}
-	set_variable = { currentAvailableOilExport = oilExport}
+	set_variable = { currentAvailableoilExport = oilExport}
 	set_variable = { oilImports = 0 }
 	set_variable = { currentExportedOil = 0 }
 	clear_array = oilImportTargetAmount
