@@ -1,3 +1,91 @@
+wmd_nuclear_range_test_calc_redux = {
+	add_political_power = 100
+	every_enemy_country = {
+		every_controlled_state = {
+			if = {
+				limit = {
+					OR = {
+						# all strike levels
+						is_capital = yes
+						# strike level 2
+						AND = {
+							check_variable = { ROOT.strike_level_tier2_selected = 1 }
+							OR = {
+								state_population_k > 5000
+								nuclear_reactor > 0
+								controller = {
+									divisions_in_state = {
+										size > 6
+										state = PREV
+									}
+								}
+							}
+						}
+						# strike level 3 / both cubamc
+						AND = {
+							OR = {
+								check_variable = { ROOT.strike_level_tier3_selected = 1 }
+								check_variable = { ROOT.strike_level_sov_cubamc_selected = 1 }
+								check_variable = { ROOT.strike_level_usa_cubamc_selected = 1 }
+							}
+							OR = {
+								state_population_k > 1000
+								controller = {
+									divisions_in_state = {
+										size > 2
+										state = PREV
+									}
+								}
+								nuclear_reactor > 0
+							}
+						}
+					}
+				}
+				add_to_array = {
+					ROOT.enemy_state_list = THIS.id
+				}
+			}
+		}
+	}
+	for_each_scope_loop = {
+		array = ROOT.enemy_state_list 
+		
+		for_each_scope_loop = {
+			array = ROOT.wmd_air_base_list
+			add_to_array = {
+				PREV.distance_wmd = distance_to@PREV      
+			} 
+		}
+		find_lowest_in_array = {
+			array = distance_wmd
+			value = lowest_distance
+		}
+		add_to_array = {
+			ROOT.wmd_air_base_distance = lowest_distance
+		}
+		clear_array = distance_wmd
+	}
+	for_each_scope_loop = {
+		array = ROOT.enemy_state_list 
+		
+		for_each_scope_loop = {
+			array = ROOT.wmd_rocket_site_list
+			add_to_array = {
+				PREV.distance_wmd = distance_to@PREV      
+			} 
+		}
+		find_lowest_in_array = {
+			array = distance_wmd
+			value = lowest_distance
+		}
+		add_to_array = {
+			ROOT.wmd_rocket_site_distance = lowest_distance
+		}
+		clear_array = distance_wmd
+	}
+
+}
+
 wmd_nuclear_range_calculation = {
 	set_variable = { ICBM_Distance = 0 }
 	set_variable = { IRBM_Distance = 0 }
@@ -42,15 +130,15 @@ wmd_nuclear_range_calculation = {
 	else_if = { limit = { has_tech = slbm1 } set_variable = { SLBM_Distance = 1000 } }
 	else = { set_variable = { SLBM_Distance = 0 } }
 	#strat bomber range
-	# if = { limit = { has_tech = stealth_strategic_bomber2 } set_variable = { Strat_Distance = 12000 } }
-	# else_if = { limit = { has_tech = stealth_strategic_bomber1 } set_variable = { Strat_Distance = 11000 } }
-	# else_if = { limit = { has_tech = jet_strategic_bomber5 } set_variable = { Strat_Distance = 10000 } }
-	# else_if = { limit = { has_tech = jet_strategic_bomber4 } set_variable = { Strat_Distance = 9000 } }
-	# else_if = { limit = { has_tech = jet_strategic_bomber3 } set_variable = { Strat_Distance = 8000 } }
-	# else_if = { limit = { has_tech = jet_strategic_bomber2 } set_variable = { Strat_Distance = 7000 } }
-	# else_if = { limit = { has_tech = jet_strategic_bomber1 } set_variable = { Strat_Distance = 6000 } }
-	# else_if = { limit = { has_tech = strategic_bomber3 } set_variable = { Strat_Distance = 5000 } }
-	# else = { set_variable = { Strat_Distance = 0 } }
+	if = { limit = { has_tech = stealth_strategic_bomber2 } set_variable = { Strat_Distance = 12000 } }
+	else_if = { limit = { has_tech = stealth_strategic_bomber1 } set_variable = { Strat_Distance = 11000 } }
+	else_if = { limit = { has_tech = jet_strategic_bomber5 } set_variable = { Strat_Distance = 10000 } }
+	else_if = { limit = { has_tech = jet_strategic_bomber4 } set_variable = { Strat_Distance = 9000 } }
+	else_if = { limit = { has_tech = jet_strategic_bomber3 } set_variable = { Strat_Distance = 8000 } }
+	else_if = { limit = { has_tech = jet_strategic_bomber2 } set_variable = { Strat_Distance = 7000 } }
+	else_if = { limit = { has_tech = jet_strategic_bomber1 } set_variable = { Strat_Distance = 6000 } }
+	else_if = { limit = { has_tech = strategic_bomber3 } set_variable = { Strat_Distance = 5000 } }
+	else = { set_variable = { Strat_Distance = 0 } }
 
 	set_variable = { WMD_Strike_Distance = 0 }
 	if = { limit = { check_variable = { ICBM_Distance > WMD_Strike_Distance } } set_variable = { WMD_Strike_Distance = ICBM_Distance } }
@@ -140,29 +228,19 @@ wmd_distance_calculator = {
 				}
 			}
 			# and is in range of an allied airbase
-			OR = {
-				#in range of one of our airbases
-				ROOT = {
-					any_owned_state = {
-						air_base > 0
-						check_variable = { THIS.distance_to@PREV.PREV < ROOT.WMD_Strike_Distance}	#MAP_SCALE_PIXEL_TO_KM = 7.114
-					}
-				}
-				#in range of one of our subject's airbases
-				any_country = {
-					is_subject_of = ROOT
-					any_owned_state = {
-						air_base > 0
-						check_variable = { THIS.distance_to@PREV.PREV < ROOT.WMD_Strike_Distance}	#MAP_SCALE_PIXEL_TO_KM = 7.114
-					}
-				}
-				#in range of one of our allies' airbases
-				any_country = {
+
+			any_country = {
+				OR = {
+					tag = ROOT
 					is_in_faction_with = ROOT
-					any_owned_state = {
+					is_subject_of = ROOT
+				}
+				any_owned_state = {
+					OR = {
+						rocket_site > 0
 						air_base > 0
-						check_variable = { THIS.distance_to@PREV.PREV < ROOT.WMD_Strike_Distance}	#MAP_SCALE_PIXEL_TO_KM = 7.114
 					}
+					check_variable = { THIS.distance_to@PREV.PREV < ROOT.WMD_Strike_Distance}	#MAP_SCALE_PIXEL_TO_KM = 7.114
 				}
 			}
 		}
@@ -263,26 +341,18 @@ distance_calculator_chemical_stateview = {
 				controls_state = PREV
 				has_war_with = ROOT
 			}
-			OR = {
-				ROOT = {
-					any_owned_state = {
-						air_base > 0
-						check_variable = { THIS.distance_to@PREV.PREV < 200 }	#MAP_SCALE_PIXEL_TO_KM = 7.114
-					}
-				}
-				any_country = {
-					is_subject_of = ROOT
-					any_owned_state = {
-						air_base > 0
-						check_variable = { THIS.distance_to@PREV.PREV < 200 }	#MAP_SCALE_PIXEL_TO_KM = 7.114
-					}
-				}
-				any_country = {
+			any_country = {
+				OR = {
+					tag = ROOT
 					is_in_faction_with = ROOT
-					any_owned_state = {
+					is_subject_of = ROOT
+				}
+				any_owned_state = {
+					OR = {
+						rocket_site > 0
 						air_base > 0
-						check_variable = { THIS.distance_to@PREV.PREV < 200 }	#MAP_SCALE_PIXEL_TO_KM = 7.114
 					}
+					check_variable = { THIS.distance_to@PREV.PREV < 200}	#MAP_SCALE_PIXEL_TO_KM = 7.114
 				}
 			}
 		}
