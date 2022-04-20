@@ -1,4 +1,5 @@
 scripted_diplomatic_actions = {
+
 	opt_embargo_action  = {
 		allowed = {}
 		visible = { 
@@ -35,7 +36,66 @@ scripted_diplomatic_actions = {
 		receive_description = embargo_target_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
-			base = 0
+			
+						base = -45
+			
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value < -100 } }
+				add = 25
+			}
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value < -150 } }
+				add = 25
+			}			
+			modifier = {
+				has_war_with = ROOT
+				add = 100
+			}
+			modifier = {
+				ROOT = { any_allied_country = { has_war_with = FROM } }
+				add = 25
+			}	
+			modifier = {
+											check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = -25
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = -25
+			}		
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_weaken@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_antagonize@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = 50
+			}
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			}	
+
 		}
 	}
 	opt_lift_embargo_action = {
@@ -73,8 +133,67 @@ scripted_diplomatic_actions = {
 		can_be_accepted = { always = no } # accept button will be disabled if no
 		receive_description = embargo_lifted_target_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 		# ai_will_do to decide if AI should send this action or not
-		ai_desire = {
-			base = 0
+		ai_desire = {			
+						base = -45
+			
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 100 } }
+				add = 25
+			}
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 150 } }
+				add = 25
+			}			
+			modifier = {
+				is_ally_with = ROOT
+				add = 100
+			}			
+			modifier = {
+				is_guaranteed_by = ROOT
+				has_guaranteed = ROOT
+				add = 50
+			}		
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+										} 
+						
+				add = 50
+			}		
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_weaken@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = -25
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_antagonize@THIS
+												value = 1
+												compare = equals
+										} 
+						
+				add = -25
+			}
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			}
+			
 		}
 	}
 # Influence Nation
@@ -168,7 +287,79 @@ scripted_diplomatic_actions = {
 		receive_description = influence_target_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
-			base = 0
+						base = -45
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_antagonize@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_wants_weaken@THIS
+											value = 1
+											compare = equals
+										}
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_is_threatened@THIS
+											value = 1
+											compare = equals
+										} 
+				add = 50
+			}
+			modifier = {
+				ROOT = { has_political_power < 900 }
+				add = -1000
+			}
+			modifier = {
+				ROOT = { has_political_power > 1900 }
+				add = 100
+			}
+			modifier = {
+				is_neighbor_of = ROOT
+				add = 40
+			}
+			modifier = {
+				is_neighbor_of = ROOT
+				ROOT = { has_political_power > 1900 }
+				add = 500
+			}
+			modifier = {
+				check_variable = { influence_array^0 = ROOT }
+				check_variable = { influence_array_calc^0 > 0.01 }
+				check_variable = { influence_array_calc^0 < 0.55 }
+				add = 40
+			}
+			modifier = {
+				check_variable = { influence_array^0 = ROOT }
+				check_variable = { influence_array_calc^0 > 0.91 }
+				add = -1000
+			}
+			
 		}
 	}
 
@@ -206,6 +397,15 @@ scripted_diplomatic_actions = {
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
 			base = 0
+			modifier = {
+				ROOT = { has_political_power < 150 }
+				add = 200
+			}
+			modifier = {
+				check_variable = { influence_array^0 = ROOT }
+				check_variable = { influence_array_calc^0 > 0.91 }
+				add = 200
+			}
 		}
 	}
 
@@ -306,8 +506,73 @@ scripted_diplomatic_actions = {
 		receive_description = start_subsidy_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 
 		# ai_will_do to decide if AI should send this action or not
-		ai_desire = {
-			base = 0
+		ai_desire = {			
+						base = -45
+			
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 100 } }
+				add = 25
+			}
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 150 } }
+				add = 25
+			}			
+			modifier = {
+				is_ally_with = ROOT
+				add = 100
+			}			
+			modifier = {
+				is_guaranteed_by = ROOT
+				has_guaranteed = ROOT
+				add = 50
+			}		
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_wants_antagonize@THIS
+											value = 1
+											compare = equals
+										} 
+					
+				add = -25
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_wants_weaken@THIS
+											value = 1
+											compare = equals
+										}
+				add = -25
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_is_threatened@THIS
+											value = 1
+											compare = equals
+										} 
+				add = -50
+			}
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			}
 		}
 	}
 
@@ -365,7 +630,66 @@ scripted_diplomatic_actions = {
 		receive_description = stop_subsidy_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
-			base = 0
+			
+						base = -45
+			
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value < -100 } }
+				add = 25
+			}
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value < -150 } }
+				add = 25
+			}			
+			modifier = {
+				has_war_with = ROOT
+				add = 100
+			}
+			modifier = {
+				ROOT = { any_allied_country = { has_war_with = FROM } }
+				add = 25
+			}	
+			modifier = {
+											check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = -25
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = -25
+			}		
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_weaken@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = 25
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_antagonize@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = 25
+			}
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			}	
+
 		}
 	}
 
@@ -461,7 +785,16 @@ scripted_diplomatic_actions = {
 		receive_description = economic_exploitation_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
-			base = 0
+			base = 1000	
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_weaken@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 25
+			}
 		}
 	}
 
@@ -620,8 +953,69 @@ scripted_diplomatic_actions = {
 		can_be_accepted = { always = no } # accept button will be disabled if no
 		receive_description = pay_off_debt_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 		# ai_will_do to decide if AI should send this action or not
-		ai_desire = {
-			base = 0
+		ai_desire = {			
+						base = -45
+			
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 100 } }
+				add = 25
+			}
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 150 } }
+				add = 25
+			}			
+			modifier = {
+				is_ally_with = ROOT
+				add = 100
+			}			
+			modifier = {
+				is_guaranteed_by = ROOT
+				has_guaranteed = ROOT
+				add = 50
+			}		
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_wants_antagonize@THIS
+											value = 1
+											compare = equals
+										} 
+					
+				add = -25
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_wants_weaken@THIS
+											value = 1
+											compare = equals
+										}
+				add = -25
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_is_threatened@THIS
+											value = 1
+											compare = equals
+										} 
+				add = -25
+			}
 		}
 	}
 
@@ -691,8 +1085,74 @@ scripted_diplomatic_actions = {
 		receive_description = economic_aid_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 
 		# ai_will_do to decide if AI should send this action or not
-		ai_desire = {
-			base = 0
+		ai_desire = {			
+						base = -45
+			
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 100 } }
+				add = 25
+			}
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 150 } }
+				add = 25
+			}			
+			modifier = {
+				is_ally_with = ROOT
+				add = 100
+			}			
+			modifier = {
+				is_guaranteed_by = ROOT
+				has_guaranteed = ROOT
+				add = 50
+			}	
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_wants_antagonize@THIS
+											value = 1
+											compare = equals
+										
+					}
+				add = -25
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_wants_weaken@THIS
+											value = 1
+											compare = equals
+										}
+				add = -25
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_is_threatened@THIS
+											value = 1
+											compare = equals
+										} 
+				add = -25
+			}
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			}
+			
 		}
 	}
 
@@ -711,9 +1171,14 @@ scripted_diplomatic_actions = {
 				tooltip = Influence_action_cooldown
 				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
 			}
+			has_government = ROOT
 			NOT = { has_war_with = ROOT }
 			is_subject = no
 			has_war = no
+			has_opinion = {
+					target = ROOT
+					value > 150
+				}
 			custom_trigger_tooltip = {
 				tooltip = Influence_Action_PUPPET_TT_2
 				check_variable = { influence_array^0 = ROOT }
@@ -729,7 +1194,7 @@ scripted_diplomatic_actions = {
 			}
 		}
 		requires_acceptance = no
-		cost = 500
+		cost = 100
 		command_power = 0
 		show_acceptance_on_action_button = no
 		icon = 1
@@ -776,7 +1241,16 @@ scripted_diplomatic_actions = {
 		receive_description = puppet_influence_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
-			base = 0
+			base = 1000	
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 25
+			}
 		}
 	}
 
@@ -811,25 +1285,25 @@ scripted_diplomatic_actions = {
 		complete_effect = {
 			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
 			add_to_variable = { ROOT.foreignPowerProjection = -2 }
-			if = { limit = { ROOT = { has_government = conservative } } add_popularity = { ideology = conservative popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = Liberal_Conservatism } } add_popularity = { ideology = Liberal_Conservatism popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = Christian_Democratic } } add_popularity = { ideology = Christian_Democratic popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = socialist } } add_popularity = { ideology = socialist popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = Social_Democratic } } add_popularity = { ideology = Social_Democratic popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = Social_Liberalism } } add_popularity = { ideology = Social_Liberalism popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = democratic } } add_popularity = { ideology = democratic popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = centrist } } add_popularity = { ideology = centrist popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = liberal } } add_popularity = { ideology = liberal popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = communism } } add_popularity = { ideology = communism popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = trotskyism } } add_popularity = { ideology = trotskyism popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = maoism } } add_popularity = { ideology = maoism popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = fascism } } add_popularity = { ideology = fascism popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = nationalist } } add_popularity = { ideology = nationalist popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = monarchism } }add_popularity = { ideology = monarchism popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = neutrality } } add_popularity = { ideology = neutrality popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = islamism } } add_popularity = { ideology = islamism popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = radical_shiaism } } add_popularity = { ideology = radical_shiaism popularity = 0.02 } }
-			if = { limit = { ROOT = { has_government = Salafism } } add_popularity = { ideology = Salafism popularity = 0.02 } }
+			if = { limit = { ROOT = { has_government = conservative } } add_popularity = { ideology = conservative popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = Liberal_Conservatism } } add_popularity = { ideology = Liberal_Conservatism popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = Christian_Democratic } } add_popularity = { ideology = Christian_Democratic popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = socialist } } add_popularity = { ideology = socialist popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = Social_Democratic } } add_popularity = { ideology = Social_Democratic popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = Social_Liberalism } } add_popularity = { ideology = Social_Liberalism popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = democratic } } add_popularity = { ideology = democratic popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = centrist } } add_popularity = { ideology = centrist popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = liberal } } add_popularity = { ideology = liberal popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = communism } } add_popularity = { ideology = communism popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = trotskyism } } add_popularity = { ideology = trotskyism popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = maoism } } add_popularity = { ideology = maoism popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = fascism } } add_popularity = { ideology = fascism popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = nationalist } } add_popularity = { ideology = nationalist popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = monarchism } }add_popularity = { ideology = monarchism popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = neutrality } } add_popularity = { ideology = neutrality popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = islamism } } add_popularity = { ideology = islamism popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = radical_shiaism } } add_popularity = { ideology = radical_shiaism popularity = 0.05} }
+			if = { limit = { ROOT = { has_government = Salafism } } add_popularity = { ideology = Salafism popularity = 0.05} }
 			# opinions
 			add_opinion_modifier = {
 				target = ROOT
@@ -845,6 +1319,73 @@ scripted_diplomatic_actions = {
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
 			base = 0
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 25
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_antagonize@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 25
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_wants_weaken@THIS
+											value = 1
+											compare = equals
+										}
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+											var = ROOT.ai_attitude_is_threatened@THIS
+											value = 1
+											compare = equals
+										} 
+				add = 50
+			}
+			modifier = { has_government = ROOT
+				add = -50
+			}
+			modifier = {
+						check_variable = {
+													var = ROOT.current_party_ideology_group
+													value = THIS.highest_party_ideology 
+													compare = equals
+												} 
+						check_variable = {
+													var = THIS.highest_party_popularity 
+													value = 0.6
+													compare = greater_than
+												} 
+				add = -200
+			}
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			}
 		}
 	}
 
@@ -934,7 +1475,11 @@ scripted_diplomatic_actions = {
 		receive_description = trade_agreement_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
-			base = 0
+			base = 10
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			}
 		}
 	}
 
@@ -1084,10 +1629,146 @@ scripted_diplomatic_actions = {
 		reset_receive_effect = {}
 		can_be_accepted = { always = yes } # accept button will be disabled if no
 		receive_description = trade_agreement_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		ai_acceptance = { 
+							base_reluctance = { base = -45 }
+							
+							good_relations = { 
+							base = 0
+							modifier = {
+								THIS = { has_opinion = { target = ROOT value > 100 } }
+								add = 25
+							}
+							modifier = {
+								THIS = { has_opinion = { target = ROOT value > 150 } }
+								add = 25
+							}
+							}
+							alliance = { 
+							base = 0
+							modifier = {
+								is_ally_with = ROOT
+								add = 100
+							}			
+							modifier = {
+								is_guaranteed_by = ROOT
+								has_guaranteed = ROOT
+								add = 50
+							}		
+							}
+							wants_alliance = { 
+							base = 0
+							modifier = {
+								check_variable = {
+															var = THIS.ai_attitude_wants_ally@ROOT
+															value = 1
+															compare = equals
+														} 
+									
+								add = 25
+							}
+							modifier = {
+								check_variable = {
+															var = THIS.ai_attitude_wants_protect@ROOT
+															value = 1
+															compare = equals
+														} 
+									
+								add = 25
+							}
+							}
+							hostile = { base = 0
+							modifier = {
+								check_variable = {
+															var = THIS.ai_attitude_wants_antagonize@ROOT
+															value = 1
+															compare = equals
+														 
+									}
+								add = -25
+							}
+							modifier = {
+								check_variable = {
+															var = THIS.ai_attitude_wants_weaken@ROOT
+															value = 1
+															compare = equals
+														}
+								add = -25
+							}
+							modifier = {
+								check_variable = {
+															var = THIS.ai_attitude_is_threatened@ROOT
+															value = 1
+															compare = equals
+														} 
+								add = -25
+							}
+							}
+							
+		}
 
 		# ai_will_do to decide if AI should send this action or not
-		ai_desire = {
-			base = 0
+		ai_desire = {			
+						base = -45
+			
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 100 } }
+				add = 25
+			}
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 150 } }
+				add = 25
+			}			
+			modifier = {
+				is_ally_with = ROOT
+				add = 100
+			}			
+			modifier = {
+				is_guaranteed_by = ROOT
+				has_guaranteed = ROOT
+				add = 50
+			}	
+			modifier = {
+											check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}		
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_weaken@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = -25
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_antagonize@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = -25
+			}
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			} 
+						
+				
 		}
 	}
 
@@ -1151,7 +1832,66 @@ scripted_diplomatic_actions = {
 		receive_description = trade_agreement_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
-			base = 0
+			
+						base = -45
+			
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value < -100 } }
+				add = 25
+			}
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value < -150 } }
+				add = 25
+			}			
+			modifier = {
+				has_war_with = ROOT
+				add = 100
+			}
+			modifier = {
+				ROOT = { any_allied_country = { has_war_with = FROM } }
+				add = 25
+			}	
+			modifier = {
+											check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = -50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = -50
+			}		
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_weaken@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_antagonize@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = 50
+			}
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			}	
+
 		}
 	}
 
@@ -1262,8 +2002,66 @@ scripted_diplomatic_actions = {
 		can_be_accepted = { always = no } # accept button will be disabled if no
 		receive_description = mutual_defense_treaty_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
 		# ai_will_do to decide if AI should send this action or not
-		ai_desire = {
-			base = 0
+		ai_desire = {			
+						base = -45
+			
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 100 } }
+				add = 25
+			}
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value > 150 } }
+				add = 25
+			}			
+			modifier = {
+				is_ally_with = ROOT
+				add = -100
+			}			
+			modifier = {
+				is_guaranteed_by = ROOT
+				has_guaranteed = ROOT
+				add = 50
+			}	
+			modifier = {
+											check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = 50
+			}		
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_weaken@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = -25
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_antagonize@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = -25
+			}
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			}	
 		}
 	}
 
@@ -1372,7 +2170,111 @@ scripted_diplomatic_actions = {
 		# AI
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
-			base = 0
+			
+						base = -45
+			
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value < -100 } }
+				add = 25
+			}
+			modifier = {
+				ROOT = { has_opinion = { target = PREV value < -150 } }
+				add = 25
+			}			
+			modifier = {
+				has_war_with = ROOT
+				add = 100
+			}
+			modifier = {
+				ROOT = { any_allied_country = { has_war_with = FROM } }
+				add = 25
+			}	
+			modifier = {
+											check_variable = {
+												var = ROOT.ai_attitude_wants_ally@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = -50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_protect@THIS
+												value = 1
+												compare = equals
+											} 
+											
+				add = -50
+			}		
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_weaken@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = 50
+			}
+			modifier = {
+				check_variable = {
+												var = ROOT.ai_attitude_wants_antagonize@THIS
+												value = 1
+												compare = equals
+								} 
+						
+				add = 50
+			}
+			modifier = {
+				ROOT = { has_political_power < 600 }
+				add = -100
+			}	
+
 		}
 	}
+	
+	
+	##Yard1's Recall Volunteers mod integrated :D - stolen from Millenium Dawn
+	recall_volunteers = {
+		allowed = {
+			has_global_flag = allowed_recall_volunteers
+			ROOT = { is_ai = no }
+		}
+
+		selectable = {
+			# doing this for nicer tooltips
+			if = {
+				limit = {
+					NOT = { has_volunteers_amount_from = { tag = ROOT count > 0 } }
+				}
+				custom_trigger_tooltip = {
+					tooltip = RECALL_VOLUNTEERS_TOOLTIP
+					always = no
+				}
+			}
+			else = {
+				custom_trigger_tooltip = {
+					tooltip = RECALL_VOLUNTEERS_TOOLTIP_G
+					always = yes
+				}
+			}
+		}
+
+		cost = 50
+		command_power = 15
+
+		requires_acceptance = no
+		show_acceptance_on_action_button = no
+
+		icon = 1
+
+		send_description = RECALL_VOLUNTEERS_SEND_DESC
+
+		complete_effect = {
+			ROOT = { recall_volunteers_from = PREV }
+		}
+	}
+	
 }
+
+
