@@ -1,4 +1,52 @@
 scripted_diplomatic_actions = {
+	opt_add_to_sphere = {
+		allowed = {}
+		visible = { 
+			NOT = { 
+				is_in_array = {
+					array = ROOT.sphere_tag_list
+					value = THIS
+				}				
+			} 
+			NOT = {
+				has_country_flag = Is_In_Sphere
+			}
+		}
+		selectable = {
+			NOT = { has_war_with = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = majority_influencer_TT
+				check_variable = { influence_array^0 = ROOT }
+				check_variable = { influence_array_val^0 > 50 }	
+			}
+		}
+		requires_acceptance = no
+		cost = 50
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			add_to_array = {
+				ROOT.sphere_tag_list = THIS.id
+			}
+			set_country_flag = Is_In_Sphere
+			custom_effect_tooltip = Add_to_Sphere_TT
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = influence_added_to_sphere # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = influence_added_to_sphere_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 1
+		}
+	}
+	
+
 # Influence Nation
 	opt_influence_action = {
 		allowed = {}
@@ -157,7 +205,7 @@ scripted_diplomatic_actions = {
 			}
 			custom_trigger_tooltip = {
 				tooltip = Influence_Action_40_CHECK_TT
-				check_variable = { influence_array_calc^0 > 0.40 }
+				check_variable = { influence_array_val^0 > 40 }
 			}
 			custom_trigger_tooltip = {
 				tooltip = Influence_Action_MIL_SUBSIDY_MONEY_CHECK_TT
@@ -415,7 +463,7 @@ scripted_diplomatic_actions = {
 				any_of = {
 					array = influence_array
 					check_variable = { influence_array^i = ROOT }
-					check_variable = { influence_array_calc^i > 0.01 }
+					check_variable = { influence_array_val^i > 1 }
 				}
 			}
 			NOT = { is_puppet_of = ROOT }
@@ -567,7 +615,7 @@ scripted_diplomatic_actions = {
 			custom_trigger_tooltip = {
 				tooltip = influence_MAJORITY_TT
 				check_variable = { influence_array^0 = ROOT }
-				check_variable = { influence_array_calc^0 > 0.50 }
+				check_variable = { influence_array_val^0 > 50 }
 			}
 			custom_trigger_tooltip = {
 				tooltip = influence_FPP_5_TT
