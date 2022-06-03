@@ -1,4 +1,56 @@
 scripted_diplomatic_actions = {
+	opt_remove_from_sphere = {
+		allowed = {}
+		visible = { 
+			NOT = { 
+				is_in_array = {
+					array = ROOT.sphere_tag_list
+					value = THIS
+				}				
+			} 
+			has_country_flag = Is_In_Sphere
+		}
+		selectable = {
+			NOT = { has_war_with = ROOT }
+			OR = {
+				AND = {
+					check_variable = { influence_array^0 = Sphere_Leader }
+					check_variable = { influence_array_val^0 < 50 }	
+				}
+				NOT = { check_variable = { influence_array^0 = Sphere_Leader } }
+			}
+		}
+		requires_acceptance = no
+		cost = 50
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			var:Sphere_Leader = {
+				remove_from_array = {
+					sphere_tag_list = PREV.id
+				}
+			}
+			clr_country_flag = Is_In_Sphere
+			set_variable = {
+				Sphere_Leader = 0
+			}
+			custom_effect_tooltip = Remove_From_Sphere_TT
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = influence_removed_from_sphere # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = influence_removed_from_sphere_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 1
+		}
+	}
+
 	opt_add_to_sphere = {
 		allowed = {}
 		visible = { 
@@ -587,7 +639,6 @@ scripted_diplomatic_actions = {
 		}
 	}
     #opt_add_to_sphere
-    #opt_remove_from_sphere
     #opt_influence_foriegn_investment
     #opt_influence_lease_state (Specific Resource or Entire Production)
     #opt_influence_trade_exclusivity
