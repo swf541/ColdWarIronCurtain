@@ -1,0 +1,613 @@
+scripted_gui = {
+	space_race_main = {
+		context_type = player_context
+		window_name = "space_race_main_container"
+		dirty = refresh_space_race_main
+
+		visible = {
+			check_variable = { show_space_race_main > 0 }
+			is_ai = no
+		}
+
+		ai_enabled = {
+			always = no
+		}
+		triggers = {
+			reset_button_click_enabled = {
+				check_variable = { prepared_mission_locked = 0 }
+			}
+			confirm_button_click_enabled = {
+				check_variable = { spacecraft_type_blocked = 1 }
+				check_variable = { launchvehicle_blocked = 1 }
+				check_variable = { mission_blocked = 1 }
+				check_variable = { calculated_mission = 1 }
+				check_variable = { prepared_mission_locked = 0 }
+			}
+			calculate_button_click_enabled = {
+				check_variable = { spacecraft_type_blocked = 1 }
+				check_variable = { launchvehicle_blocked = 1 }
+				check_variable = { mission_blocked = 1 }
+				check_variable = { prepared_mission_locked = 0 }
+			}
+			spacecraft_type_button_click_enabled = {
+				check_variable = { spacecraft_type_blocked = 0 }
+			}
+			launch_type_button_click_enabled = {
+				check_variable = { launchvehicle_blocked = 0 }
+			}
+			preparation_time_button_click_enabled = {
+				check_variable = { mission_blocked = 0 }
+			}
+			decrease_budget_button_shift_click_enabled = {
+				check_variable = { ROOT.currentbudget > 10 }
+			}
+			decrease_budget_button_click_enabled = {
+				check_variable = { ROOT.currentbudget > 0 }
+				check_variable = { prepared_mission_locked = 0 }
+			}
+			decrease_budget_button_control_click_enabled = {
+				check_variable = { ROOT.currentbudget > 100 }
+			}
+			increase_budget_button_shift_click_enabled = {
+				check_variable = { ROOT.currentbudget < 2990 }
+			}
+			increase_budget_button_click_enabled = {
+				check_variable = { ROOT.currentbudget < 3000 }
+				check_variable = { prepared_mission_locked = 0 }
+			}
+			increase_budget_button_control_click_enabled = {
+				check_variable = { ROOT.currentbudget < 2900 }
+			}
+			launch_mission_button_click_enabled = {
+				check_variable = { prepared_mission_locked = 1 }
+				NOT = {
+					OR = { 
+						has_country_flag = space_mission_ongoing_part1
+						has_country_flag = space_mission_ongoing_part2
+						has_country_flag = space_mission_ongoing_part3
+					}
+				}
+			}
+		}
+	
+		effects = {
+			launch_mission_button_click = {
+				set_variable = { prepared_mission_locked = 0 }
+				set_variable = { calculated_mission = 0 }
+				set_variable = { root.confirmed_money = root.calculated_cost }
+				calculate_risk = yes
+				calculate_breakthrough = yes
+				calculate_mission_time = yes
+				activate_mission = SPACE_MISSION_part1
+				set_country_flag = space_mission_ongoing_part1
+				refresh_space_gui = yes
+				clear_spacecraft = yes
+				clear_launchvehicle = yes
+				clear_mission = yes
+				reset_choices = yes
+				clear_calculated = yes
+			}
+			confirm_button_click = {
+				set_variable = { prepared_mission_locked = 1 }
+				refresh_space_gui = yes
+			}
+			reset_button_click = {
+				reset_choices = yes
+				clear_calculated = yes
+				refresh_space_gui = yes
+			}
+			calculate_button_click = {
+				calculate_space_effect = yes
+				refresh_space_gui = yes
+				set_variable = { calculated_mission = 1 }
+			}
+			exit_button_click = {
+				set_variable = { show_space_race_launchvehicle = 0 }
+				set_variable = { show_space_race_spacecraft = 0 }
+				set_variable = { show_space_race_mission = 0 }
+				set_variable = { show_space_race_main = 0 }
+				clear_spacecraft = yes
+				clear_launchvehicle = yes
+				clear_mission = yes
+			}
+			spacecraft_type_button_click = {
+				set_temp_variable = { show = 1 }
+				subtract_from_temp_variable = { show = show_space_race_spacecraft }
+				set_variable = { show_space_race_spacecraft = show }
+				clear_spacecraft = yes
+				clear_launchvehicle = yes
+				clear_mission = yes
+				if = {
+					limit = {
+						check_variable = { show_space_race_launchvehicle > 0 }
+					}
+					set_variable = { show_space_race_launchvehicle = 0 }
+				}
+				if = {
+					limit = {
+						check_variable = { show_space_race_mission > 0 }
+					}
+					set_variable = { show_space_race_mission = 0 }
+				}
+			}
+			launch_type_button_click = {
+				set_temp_variable = { show = 1 }
+				subtract_from_temp_variable = { show = show_space_race_launchvehicle }
+				set_variable = { show_space_race_launchvehicle = show }
+				clear_spacecraft = yes
+				clear_launchvehicle = yes
+				clear_mission = yes
+				if = {
+					limit = {
+						check_variable = { show_space_race_spacecraft > 0 }
+					}
+					set_variable = { show_space_race_spacecraft = 0 }
+				}
+				if = {
+					limit = {
+						check_variable = { show_space_race_mission > 0 }
+					}
+					set_variable = { show_space_race_mission = 0 }
+				}
+			}
+			preparation_time_button_click = {
+				set_temp_variable = { show = 1 }
+				subtract_from_temp_variable = { show = show_space_race_mission }
+				set_variable = { show_space_race_mission = show }
+				clear_spacecraft = yes
+				clear_launchvehicle = yes
+				clear_mission = yes
+				if = {
+					limit = {
+						check_variable = { show_space_race_spacecraft > 0 }
+					}
+					set_variable = { show_space_race_spacecraft = 0 }
+				}
+				if = {
+					limit = {
+						check_variable = { show_space_race_launchvehicle > 0 }
+					}
+					set_variable = { show_space_race_launchvehicle = 0 }
+				}
+			}
+			#######
+			decrease_budget_button_click = {
+				add_to_variable = { ROOT.currentbudget = -1 }
+				add_to_variable = { ROOT.mil_expend = -1 }
+				clamp_variable = {
+					var = ROOT.currentbudget
+					min = 0
+					max = 3000
+				}
+				
+				refresh_space_gui = yes
+			}
+			increase_budget_button_click = {
+				add_to_variable = { ROOT.currentbudget = 1 }
+				add_to_variable = { ROOT.mil_expend = 1 }
+				clamp_variable = {
+					var = ROOT.currentbudget
+					min = 0
+					max = 3000
+				}
+				
+				refresh_space_gui = yes
+			}
+			decrease_budget_button_shift_click = {
+				add_to_variable = { ROOT.currentbudget = -10 }
+				add_to_variable = { ROOT.mil_expend = -10 }
+				clamp_variable = {
+					var = ROOT.currentbudget
+					min = 0
+					max = 3000
+				}
+				refresh_space_gui = yes
+			}
+			increase_budget_button_shift_click = {
+				add_to_variable = { ROOT.currentbudget = 10 }
+				add_to_variable = { ROOT.mil_expend = 10 }
+				clamp_variable = {
+					var = ROOT.currentbudget
+					min = 0
+					max = 3000
+				}
+				refresh_space_gui = yes
+			}
+			decrease_budget_button_control_click = {
+				add_to_variable = { ROOT.currentbudget = -100 }
+				add_to_variable = { ROOT.mil_expend = -100 }
+				clamp_variable = {
+					var = ROOT.currentbudget
+					min = 0
+					max = 3000
+				}
+				refresh_space_gui = yes
+			}
+			increase_budget_button_control_click = {
+				add_to_variable = { ROOT.currentbudget = 100 }
+				add_to_variable = { ROOT.mil_expend = 100 }
+				clamp_variable = {
+					var = ROOT.currentbudget
+					min = 0
+					max = 3000
+				}
+				refresh_space_gui = yes
+			}
+			# button_ask_the_special_power_click = {
+				# set_variable = { ROOT.remove_from_x = 2 }
+				# set_variable = { ROOT.current_x = ROOT.geopolitical_alignment }
+				# subtract_from_variable = { ROOT.current_x = ROOT.remove_from_x }
+				# set_variable = { ROOT.geopolitical_alignment = ROOT.current_x }
+				# clamp_variable = {
+					# var = ROOT.geopolitical_alignment
+					# min = 15
+					# max = 540
+				# }
+				# if = {
+					# limit = {
+						# check_variable = { ROOT.refresh_show_french_gui = 1 }
+					# }
+					# set_variable = { ROOT.refresh_show_french_gui = 0 }
+				# }
+				# else = {
+					# set_variable = { ROOT.refresh_show_french_gui = 1 }
+				# }
+			# }
+		}
+		properties = {
+			# my_icon = {
+				# image = "[get_my_icon_texture]"
+			# }
+			# my_icon_2 = {
+				# image = "[get_my_icon_texture_2]"
+			# }
+			# progressbar_parliamentary_support = { 
+				# frame = ROOT.parliamentary_support
+			# }
+			# progressbar_geopolitical_alignment = { 
+				# x = ROOT.geopolitical_alignment
+			# }
+			# progressbar_government_strength = { 
+				# frame = ROOT.government_strength
+			# }
+		}
+	}
+	space_race_spacecraft = {
+		context_type = player_context
+		window_name = "space_race_spacecraft_container"
+		dirty = refresh_space_race_main
+        dynamic_lists = {
+            spacecraft_gridbox = {
+                array = root.spacecraft_list
+				entry_container = spacecraft_grid_list_entry
+				# change_scope = yes
+            }
+        }
+		visible = {
+			check_variable = { show_space_race_spacecraft > 0 }
+			is_ai = no
+		}
+
+		ai_enabled = {
+			always = no
+		}
+		triggers = {
+			validate_choice_click_enabled = {
+				check_variable = { spacecraft_tex > 0 }
+			}
+		}
+	
+		effects = {
+			exit_button_click = {
+				set_variable = { show_space_race_spacecraft = 0 }
+				clear_spacecraft = yes
+			}
+			spacecraft_list_click = {
+				if = {
+					limit = {
+						check_variable = { ROOT.spacecraft_list^i = 1 }
+					}
+					set_variable = { spacecraft_tex = 1 }
+					set_variable = { spacecraft_risk = 0.5 }
+					set_variable = { spacecraft_cost = 15 }
+					set_variable = { spacecraft_time = 50 }
+					set_variable = { spacecraft_breakthrough_chance = 0.01 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.spacecraft_list^i = 2 }
+					}
+					set_variable = { spacecraft_tex = 2 }
+					set_variable = { spacecraft_risk = 0.4 }
+					set_variable = { spacecraft_cost = 20 }
+					set_variable = { spacecraft_time = 70 }
+					set_variable = { spacecraft_breakthrough_chance = 0.02 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.spacecraft_list^i = 3 }
+					}
+					set_variable = { spacecraft_tex = 3 }
+					set_variable = { spacecraft_risk = 0.7 }
+					set_variable = { spacecraft_cost = 25 }
+					set_variable = { spacecraft_time = 80 }
+					set_variable = { spacecraft_breakthrough_chance = 0.05 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.spacecraft_list^i = 4 }
+					}
+					set_variable = { spacecraft_tex = 4 }
+					set_variable = { spacecraft_risk = 0.7 }
+					set_variable = { spacecraft_cost = 30 }
+					set_variable = { spacecraft_time = 80 }
+					set_variable = { spacecraft_breakthrough_chance = 0.07 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.spacecraft_list^i = 5 }
+					}
+					set_variable = { spacecraft_tex = 5 }
+					set_variable = { spacecraft_risk = 0.8 }
+					set_variable = { spacecraft_cost = 35 }
+					set_variable = { spacecraft_time = 90 }
+					set_variable = { spacecraft_breakthrough_chance = 0.09 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.spacecraft_list^i = 6 }
+					}
+					set_variable = { spacecraft_tex = 6 }
+					set_variable = { spacecraft_risk = 0.6 }
+					set_variable = { spacecraft_cost = 50 }
+					set_variable = { spacecraft_time = 150 }
+					set_variable = { spacecraft_breakthrough_chance = 0.11 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.spacecraft_list^i = 7 }
+					}
+					set_variable = { spacecraft_tex = 7 }
+					set_variable = { spacecraft_risk = 0.1 }
+					set_variable = { spacecraft_cost = 100 }
+					set_variable = { spacecraft_time = 350 }
+					set_variable = { spacecraft_breakthrough_chance = 0.3 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.spacecraft_list^i = 8 }
+					}
+					set_variable = { spacecraft_tex = 8 }
+					set_variable = { spacecraft_risk = 0.1 }
+					set_variable = { spacecraft_cost = 120 }
+					set_variable = { spacecraft_time = 100 }
+					set_variable = { spacecraft_breakthrough_chance = 0.00 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.spacecraft_list^i = 9 }
+					}
+					set_variable = { spacecraft_tex = 9 }
+					set_variable = { spacecraft_risk = 0.8 }
+					set_variable = { spacecraft_cost = 150 }
+					set_variable = { spacecraft_time = 700 }
+					set_variable = { spacecraft_breakthrough_chance = 0.3 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.spacecraft_list^i = 10 }
+					}
+					set_variable = { spacecraft_tex = 10 }
+					set_variable = { spacecraft_risk = 0.9 }
+					set_variable = { spacecraft_cost = 210 }
+					set_variable = { spacecraft_time = 1200 }
+					set_variable = { spacecraft_breakthrough_chance = 0.6 }
+				}
+				refresh_space_gui = yes
+			}
+			validate_choice_click = {
+				set_variable = { show_space_race_spacecraft = 0 }
+				set_variable = { spacecraft_type_blocked = 1 }
+				set_variable = { selected_spacecraft = spacecraft_tex }
+				set_variable = { chosen_space_craft_r = spacecraft_risk }
+				set_variable = { chosen_space_craft_c = spacecraft_cost }
+				set_variable = { chosen_space_craft_t = spacecraft_time }
+				set_variable = { chosen_space_craft_b = spacecraft_breakthrough_chance }
+				clear_spacecraft = yes
+				refresh_space_gui = yes
+			}
+		}
+		properties = {
+			spacecraft_type_picture = {
+				image = "[get_spacecraft_type_texture]"
+			}
+		}
+	}
+	space_race_launchvehicle = {
+		context_type = player_context
+		window_name = "space_race_launchvehicle_container"
+		dirty = refresh_space_race_main
+        dynamic_lists = {
+            launchvehicle_gridbox = {
+                array = root.launchvehicle_list
+				entry_container = launchvehicle_grid_list_entry
+				# change_scope = yes
+            }
+        }
+		visible = {
+			check_variable = { show_space_race_launchvehicle > 0 }
+			is_ai = no
+		}
+
+		ai_enabled = {
+			always = no
+		}
+		triggers = {
+			validate_choice_click_enabled = {
+				check_variable = { launchvehicle_tex > 0 }
+			}
+		}
+	
+		effects = {
+			exit_button_click = {
+				set_variable = { show_space_race_launchvehicle = 0 }
+				clear_launchvehicle = yes
+			}
+			launchvehicle_list_click = {
+				if = {
+					limit = {
+						check_variable = { ROOT.launchvehicle_list^i = 1 }
+					}
+					set_variable = { launchvehicle_tex = 1 }
+					set_variable = { launchvehicle_risk = 0.4 }
+					set_variable = { launchvehicle_cost = 50 }
+					set_variable = { launchvehicle_time = 40 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.launchvehicle_list^i = 2 }
+					}
+					set_variable = { launchvehicle_tex = 2 }
+					set_variable = { launchvehicle_risk = 0.6 }
+					set_variable = { launchvehicle_cost = 80 }
+					set_variable = { launchvehicle_time = 70 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.launchvehicle_list^i = 3 }
+					}
+					set_variable = { launchvehicle_tex = 3 }
+					set_variable = { launchvehicle_risk = 0.7 }
+					set_variable = { launchvehicle_cost = 100 }
+					set_variable = { launchvehicle_time = 100 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.launchvehicle_list^i = 4 }
+					}
+					set_variable = { launchvehicle_tex = 4 }
+					set_variable = { launchvehicle_risk = 0.8 }
+					set_variable = { launchvehicle_cost = 120 }
+					set_variable = { launchvehicle_time = 130 }
+				}
+				refresh_space_gui = yes
+			}
+			validate_choice_click = {
+				set_variable = { show_space_race_launchvehicle = 0 }
+				set_variable = { launchvehicle_blocked = 1 }
+				set_variable = { selected_launchvehicle = launchvehicle_tex }
+				set_variable = { chosen_launchvehicle_r = launchvehicle_risk }
+				set_variable = { chosen_launchvehicle_c = launchvehicle_cost }
+				set_variable = { chosen_launchvehicle_t = launchvehicle_time }
+				clear_launchvehicle = yes
+				refresh_space_gui = yes
+			}
+		}
+		properties = {
+			launchvehicle_picture = {
+				image = "[get_launchvehicle_texture]"
+			}
+		}
+	}
+	space_race_mission = {
+		context_type = player_context
+		window_name = "space_race_mission_container"
+		dirty = refresh_space_race_main
+        dynamic_lists = {
+            mission_gridbox = {
+                array = root.mission_list
+				entry_container = mission_grid_list_entry
+				# change_scope = yes
+            }
+        }
+		visible = {
+			check_variable = { show_space_race_mission > 0 }
+			is_ai = no
+		}
+
+		ai_enabled = {
+			always = no
+		}
+		triggers = {
+			validate_choice_click_enabled = {
+				check_variable = { mission_tex > 0 }
+			}
+		}
+	
+		effects = {
+			exit_button_click = {
+				set_variable = { show_space_race_mission = 0 }
+				clear_mission = yes
+			}
+			mission_list_click = {
+				if = {
+					limit = {
+						check_variable = { ROOT.mission_list^i = 1 }
+					}
+					set_variable = { mission_tex = 1 }
+					set_variable = { mission_risk = 0.1 }
+					set_variable = { mission_cost = 20 }
+					set_variable = { mission_time = 30 }
+					set_variable = { mission_breakthrough_chance = 0.01 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.mission_list^i = 2 }
+					}
+					set_variable = { mission_tex = 2 }
+					set_variable = { mission_risk = 0.3 }
+					set_variable = { mission_cost = 40 }
+					set_variable = { mission_time = 60 }
+					set_variable = { mission_breakthrough_chance = 0.03 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.mission_list^i = 3 }
+					}
+					set_variable = { mission_tex = 3 }
+					set_variable = { mission_risk = 0.5 }
+					set_variable = { mission_cost = 60 }
+					set_variable = { mission_time = 90 }
+					set_variable = { mission_breakthrough_chance = 0.06 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.mission_list^i = 4 }
+					}
+					set_variable = { mission_tex = 4 }
+					set_variable = { mission_risk = 0.8 }
+					set_variable = { mission_cost = 90 }
+					set_variable = { mission_time = 110 }
+					set_variable = { mission_breakthrough_chance = 0.09 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.mission_list^i = 5 }
+					}
+					set_variable = { mission_tex = 5 }
+					set_variable = { mission_risk = 0.9 }
+					set_variable = { mission_cost = 110 }
+					set_variable = { mission_time = 140 }
+					set_variable = { mission_breakthrough_chance = 0.11 }
+				}
+				refresh_space_gui = yes
+			}
+			validate_choice_click = {
+				set_variable = { show_space_race_mission = 0 }
+				set_variable = { mission_blocked = 1 }
+				set_variable = { selected_mission = mission_tex }
+				set_variable = { chosen_mission_r = mission_risk }
+				set_variable = { chosen_mission_c = mission_cost }
+				set_variable = { chosen_mission_t = mission_time }
+				set_variable = { chosen_mission_b = mission_breakthrough_chance }
+				clear_mission = yes
+				refresh_space_gui = yes
+			}
+		}
+		properties = {
+			mission_picture = {
+				image = "[get_mission_texture]"
+			}
+		}
+	}
+}
