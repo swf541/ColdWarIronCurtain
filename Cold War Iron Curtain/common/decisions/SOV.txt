@@ -1,3 +1,55 @@
+sov_kaganovich_decisions = {
+	SOV_Decrease_military_numbers = {
+		priority = 10
+		icon = generic_ignite_civil_war
+        days_mission_timeout = 1825
+		fire_only_once = no
+		activation = {
+			has_country_flag = reduce_army_goal
+		}
+		available = {
+			check_variable = { num_armies < army_goal }
+			has_country_flag = reduce_army_goal
+		}
+		is_good = yes
+		complete_effect = {
+			activate_mission = SOV_Keep_numbers_decreased
+			set_country_flag = SOV_KAG_decrease_goal
+			clr_country_flag = reduce_army_goal
+		}
+		timeout_effect = {
+			set_country_flag =SOV_KAG_Military_decreased_failure
+			add_stability = -0.5
+			add_war_support = -0.5
+			clr_country_flag = reduce_army_goal
+		}
+	}
+	SOV_Keep_numbers_decreased = {
+		priority = 10
+		icon = generic_ignite_civil_war
+        days_mission_timeout = 3650
+		fire_only_once = no
+		activation = {
+			has_country_flag = SOV_KAG_decrease_goal
+		}
+		available = {
+			check_variable = { num_armies > army_goal }
+			has_country_flag = SOV_KAG_decrease_goal
+		}
+		is_good = no
+		complete_effect = {
+			set_country_flag = SOV_KAG_Military_decreased_failure
+			add_stability = -0.5
+			add_war_support = -0.5
+		}
+		timeout_effect = {
+			set_country_flag = SOV_KAG_Military_decreased_successfully
+			add_stability = 0.1
+			add_war_support = 0.1
+		}
+	}
+}
+
 
 communist_International_aid_category = {
     send_tanks_to_vietnam = {
@@ -554,7 +606,7 @@ communist_International_aid_category = {
 ##Soviet Economy Labor Shortages and explanations##
 
 soviet_economy_category = {
-
+	
     sov_labour_shortage = {
 
 		priority = 10
@@ -571,7 +623,18 @@ soviet_economy_category = {
 
 		activation = {
 			tag = SOV
-
+			NOT = {
+				OR = {
+					has_country_leader = {
+						name = "Lazar Kaganovich"
+						ruling_only = yes
+					}
+					has_country_leader = {
+						name = "Joseph Stalin"
+						ruling_only = yes
+					}
+				}
+			}
             NOT = {
                 check_variable = {Labor_Shortage_Efficiency > 0.3}
             }
@@ -590,7 +653,7 @@ soviet_economy_category = {
 			}
 		}
 	}
-    soviet_international_detente_category = {
+soviet_international_detente_category = {
         american_tour_here = {
 
             available = {
