@@ -1,9 +1,859 @@
 on_actions = {
 	# ROOT is capitulated country, FROM is winner
-
 	on_capitulation = {
 		effect = {
+			if = {
+				limit = {
+						tag = TUR
+							FROM = {
+								tag = SOV
+							}
+				}
+				SOV = {
+					add_to_faction = SRT
+					SOV = { set_autonomy = { target = SRT autonomy_state = autonomy_easternbloc } }
+				}
+				SRT = {
+					annex_country = {
+						target = TUR
+						transfer_troops = yes
+					}
+						add_state_core = 793
+						add_state_core = 347
+						add_state_core = 356
+						add_state_core = 355
+						add_state_core = 349
+						add_state_core = 1081
+						add_state_core = 49
+						add_state_core = 340
+						add_state_core = 343
+						add_state_core = 346
+						add_state_core = 348
+						add_state_core = 1168
+						add_state_core = 344
+						add_state_core = 345
+						add_state_core = 342
+						add_state_core = 931
+						on_independence_run = yes
+						country_event = resource.1250
+				}
+				ALW = {
+					set_politics = {
+						ruling_party = communism
+					}
+					add_popularity = {
+						ideology = communism
+						popularity = 0.75
+					}
+					add_popularity = {
+						ideology = nationalist
+						popularity = 0.25
+					}
+					set_cosmetic_tag = ALW_SOV
+					transfer_state = 905
+					on_independence_run = yes
+					country_event = resource.1250
+					create_country_leader = {
+						name = "Khalid Bakdash"
+						picture = "Khalid_Bakdash.dds"
+						ideology = stalinism
+					}
+
+				}
+				news_event = TUR_SOV.2
+
+			}
+			if = {
+				limit = {
+					OR = {
+						FROM = { tag = GRE }
+						FROM = { tag = TUR }
+						FROM = { tag = PDG }
+					}
+					OR = {
+						ROOT = { tag = GRE }
+						ROOT = { tag = TUR }
+						ROOT = { tag = PDG }
+					}
+					has_global_flag = Third_Balkan_War
+				}
+				news_event = THIRD_BALKAN_WAR.75
+				TUR = {
+					remove_mission = THIRD_BALKAN_WAR_TIMER
+				}
+				
+				clr_global_flag = Third_Balkan_War
+			}
+			if = {
+				limit = {
+					FROM = { tag = DOM }
+					ROOT = { tag = CUB }
+				}
+				CUB = {
+					white_peace = DOM
+				}
+				DOM = {
+					white_peace = CUB
+					news_event = DOM_Cuba.35
+					puppet = CUB
+				}
+
+				CUB = {
+					set_politics = {
+						ruling_party = neutrality
+						elections_allowed = no
+					}
+					
+					create_country_leader = {
+						name = "Osvaldo Ramirez"
+						picture = "Osvaldo_Ramirez.dds"
+						ideology = military_junta
+					}
+				}
+			}
+			if = {
+				limit = {
+					FROM = { tag = DOC }
+					ROOT = { tag = KAG }
+				}
+				country_event = congo.11
+			}
+			if = {
+				limit = {
+					FROM = { tag = COG }
+					ROOT = { tag = KAG }
+				}
+				country_event = congo.11
+			}
+			if = {
+				limit = {
+					FROM = { tag = COG }
+					ROOT = { tag = DOC }
+				}
+				country_event = congo.12
+			}
+			#Burma Insurgents
+			if = {
+				limit = {
+					FROM = { tag = BCP }
+					ROOT = { tag = BRM }
+				}
+				set_variable = {
+					BCP.Communist_Conflict_Strength_Old = BCP.Communist_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Communist_Conflict_Strength_Old = BRM.Communist_Conflict_Strength
+				}
+				BCP = {
+					count_inflicted_casualties_on_current_enemies = yes
+				}
+				BRM = {
+					count_inflicted_casualties_on_current_enemies = yes
+				}
+				set_variable = {
+					Burmese_Casualties_Communist_Conflict = BCP.current_inflicted_casualties_on_@BRM
+				}
+				set_variable = {
+					Communist_Casualties_Communist_Conflict = BRM.current_inflicted_casualties_on_@BCP
+				}
+				set_variable = {
+					Communist_Conflict_Strength_Bonus = Burmese_Casualties_Communist_Conflict
+				}
+				set_variable = {
+					Burma_Communist_Conflict_Strength_Bonus = Communist_Casualties_Communist_Conflict
+				}
+				set_variable = {
+					BRM.Burmese_Casualties_Communist_Conflict_Display = Burmese_Casualties_Communist_Conflict
+				}
+				set_variable = {
+					BRM.Communist_Casualties_Communist_Conflict_Display = Communist_Casualties_Communist_Conflict
+				}
+				multiply_variable = {
+					BRM.Burmese_Casualties_Communist_Conflict_Display = 1000
+				}
+				multiply_variable = {
+					BRM.Communist_Casualties_Communist_Conflict_Display = 1000
+				}
+				add_to_variable = {
+					UNS.Communist_Conflcit_Communist_Casualities_Total = BRM.Communist_Casualties_Communist_Conflict_Display
+				}
+				add_to_variable = {
+					UNS.Communist_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Communist_Conflict_Display
+				}
+				if = {
+					limit = {
+						check_variable = {
+							Burma_Communist_Conflict_Strength_Bonus > Communist_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Burma_Communist_Conflict_Strength_Bonus = Communist_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Burma_Communist_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						BRM.Communist_Conflict_Strength = Burma_Communist_Conflict_Strength_Bonus
+					}
+					round_variable = BMR.Communist_Conflict_Strength
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							Communist_Conflict_Strength_Bonus > Burma_Communist_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Communist_Conflict_Strength_Bonus = Burma_Communist_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Communist_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						BCP.Communist_Conflict_Strength = Communist_Conflict_Strength_Bonus
+					}
+					round_variable = BCP.Communist_Conflict_Strength
+				}
+				else = { }
+				add_to_variable = {
+					BCP.Communist_Conflict_Strength = 300
+				}
+
+				BCP = { diplomatic_relation = { country = BRM relation = war_relation active = no } }
+				BRM = { diplomatic_relation = { country = BCP relation = war_relation active = no } }
+				set_variable = {
+					BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength
+				}
+				subtract_from_variable = {
+					BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength_Old
+				}
+				subtract_from_variable = {
+					BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength_Old
+				}
+				set_variable = {
+					BCP.communist_check = 1
+				}
+				set_variable = {
+					BRM.communist_check = 1
+				}
+				BRM = {
+					remove_mission = BRM_Campaign_Against_Communist_Jungle_Strongholds
+				}
+				BCP = {
+					remove_mission = BCP_Campaign_in_the_Northern_Mountains
+					remove_mission = BCP_Campaign_in_the_Bamar_Heartlands
+					remove_mission = BCP_Campaign_into_Arakan
+				}
+			}
+			if = {
+				limit = {
+					FROM = { tag = KAY }
+					ROOT = { tag = BRM }
+					KAY = {
+						has_idea = unrecognized_state
+					}
+				}
+				set_variable = {
+					KAY.Karen_Conflict_Strength_Old = KAY.Karen_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Karen_Conflict_Strength_Old = BRM.Karen_Conflict_Strength
+				}
+				KAY = { count_inflicted_casualties_on_current_enemies = yes }
+				BRM = {
+					count_inflicted_casualties_on_current_enemies = yes
+				}
+				set_variable = {
+					Burmese_Casualties_Karen_Conflict = KAY.current_inflicted_casualties_on_@BRM
+				}
+				set_variable = {
+					Karen_Casualties_Karen_Conflict = BRM.current_inflicted_casualties_on_@KAY
+				}
+				set_variable = {
+					Karen_Conflict_Strength_Bonus = Burmese_Casualties_Karen_Conflict
+				}
+				set_variable = {
+					Burma_Karen_Conflict_Strength_Bonus = Karen_Casualties_Karen_Conflict
+				}
+				set_variable = {
+					BRM.Burmese_Casualties_Karen_Conflict_Display = Burmese_Casualties_Karen_Conflict
+				}
+				set_variable = {
+					BRM.Karen_Casualties_Karen_Conflict_Display = Karen_Casualties_Karen_Conflict
+				}
+				multiply_variable = {
+					BRM.Burmese_Casualties_Karen_Conflict_Display = 1000
+				}
+				multiply_variable = {
+					BRM.Karen_Casualties_Karen_Conflict_Display = 1000
+				}
+				add_to_variable = {
+					UNS.Karen_Conflcit_Karen_Casualities_Total = BRM.Karen_Casualties_Karen_Conflict_Display
+				}
+				add_to_variable = {
+					UNS.Karen_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Karen_Conflict_Display
+				}
+				if = {
+					limit = {
+						check_variable = {
+							Burma_Karen_Conflict_Strength_Bonus > Karen_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Burma_Karen_Conflict_Strength_Bonus = Karen_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Burma_Karen_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						BRM.Karen_Conflict_Strength = Burma_Karen_Conflict_Strength_Bonus
+					}
+					round_variable = BRM.Karen_Conflict_Strength
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							Karen_Conflict_Strength_Bonus > Burma_Karen_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Karen_Conflict_Strength_Bonus = Burma_Karen_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Karen_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						KAY.Karen_Conflict_Strength = Karen_Conflict_Strength_Bonus
+					}
+					round_variable = KAY.Karen_Conflict_Strength
+				}
+				else = { }
+				add_to_variable = {
+					KAY.Karen_Conflict_Strength = 300
+				}
+				KAY = { diplomatic_relation = { country = BRM relation = war_relation active = no } }
+				BRM = { diplomatic_relation = { country = KAY relation = war_relation active = no } }
+				set_variable = {
+					KAY.Karen_Conflict_Strength_Current = KAY.Karen_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Karen_Conflict_Strength_Current = BRM.Karen_Conflict_Strength
+				}
+
+				subtract_from_variable = {
+					KAY.Karen_Conflict_Strength_Current = KAY.Karen_Conflict_Strength_Old
+				}
+				subtract_from_variable = {
+					BRM.Karen_Conflict_Strength_Current = BRM.Karen_Conflict_Strength_Old
+				}
+				set_variable = {
+					KAY.karen_check = 1
+				}
+				set_variable = {
+					BRM.karen_check = 1
+				}
+
+				BRM = {
+					remove_mission = BRM_Campaign_against_the_Karen_Insurgents
+				}
+				KAY = {
+					remove_mission = KAY_Campaign_against_the_Burmese_Government_Tenasserim_Hills
+					remove_mission = KAY_Campaign_against_the_Burmese_Government_Irrawaddy_Delta
+				}
+			}
+			if = {
+				limit = {
+					FROM = { tag = MNL }
+					ROOT = { tag = BRM }
+					MNL = {
+						has_idea = unrecognized_state
+					}
+				}
+				set_variable = {
+					MNL.Mon_Conflict_Strength_Old = MNL.Mon_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Mon_Conflict_Strength_Old = BRM.Mon_Conflict_Strength
+				}
+				MNL = {
+					count_inflicted_casualties_on_current_enemies = yes
+				}
+				BRM = {
+					count_inflicted_casualties_on_current_enemies = yes
+				}
+				set_variable = {
+					Burmese_Casualties_Mon_Conflict = MNL.current_inflicted_casualties_on_@BRM
+				}
+				set_variable = {
+					Mon_Casualties_Mon_Conflict = BRM.current_inflicted_casualties_on_@MNL
+				}
+				set_variable = {
+					Mon_Conflict_Strength_Bonus = Burmese_Casualties_Mon_Conflict
+				}
+				set_variable = {
+					Burma_Mon_Conflict_Strength_Bonus = Mon_Casualties_Mon_Conflict
+				}
+				set_variable = {
+					BRM.Burmese_Casualties_Mon_Conflict_Display = Burmese_Casualties_Mon_Conflict
+				}
+				set_variable = {
+					BRM.Mon_Casualties_Mon_Conflict_Display = Mon_Casualties_Mon_Conflict
+				}
+				multiply_variable = {
+					BRM.Burmese_Casualties_Mon_Conflict_Display = 1000
+				}
+				multiply_variable = {
+					BRM.Mon_Casualties_Mon_Conflict_Display = 1000
+				}
+				add_to_variable = {
+					UNS.Mon_Conflcit_Mon_Casualities_Total = BRM.Mon_Casualties_Mon_Conflict_Display
+				}
+				add_to_variable = {
+					UNS.Mon_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Mon_Conflict_Display
+				}
+				if = {
+					limit = {
+						check_variable = {
+							Burma_Mon_Conflict_Strength_Bonus > Mon_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Burma_Mon_Conflict_Strength_Bonus = Mon_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Burma_Mon_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						BRM.Mon_Conflict_Strength = Burma_Mon_Conflict_Strength_Bonus
+					}
+					round_variable = BMR.Mon_Conflict_Strength
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							Mon_Conflict_Strength_Bonus > Burma_Mon_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Mon_Conflict_Strength_Bonus = Burma_Mon_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Mon_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						Mon_Conflict_Strength = Mon_Conflict_Strength_Bonus
+					}
+					round_variable = MNL.Mon_Conflict_Strength
+				}
+				else = { }
+				add_to_variable = {
+					MNL.Mon_Conflict_Strength = 350
+				}
+
+				MNL = { diplomatic_relation = { country = BRM relation = war_relation active = no } }
+				BRM = { diplomatic_relation = { country = MNL relation = war_relation active = no } }
+				set_variable = {
+					MNL.Mon_Conflict_Strength_Current = MNL.Mon_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Mon_Conflict_Strength_Current = BRM.Mon_Conflict_Strength
+				}
+
+				subtract_from_variable = {
+					MNL.Mon_Conflict_Strength_Current = MNL.Mon_Conflict_Strength_Old
+				}
+				subtract_from_variable = {
+					BRM.Mon_Conflict_Strength_Current = BRM.Mon_Conflict_Strength_Old
+				}
+				set_variable = {
+					MNL.mon_check = 1
+				}
+				set_variable = {
+					BRM.mon_check = 1
+				}
+				MNL = {
+					remove_mission = MNL_Campaign_against_the_Burmese_Government_Tenasserim_Hills
+					remove_mission = MNL_Campaign_against_the_Burmese_Government_Irrawaddy_Delta
+				}
+				BRM = {
+					remove_mission = BRM_Campaign_against_the_Mon_Insurgents
+				}
+			}
+			#Burma Government
+			if = {
+				limit = {
+					FROM = { tag = BRM }
+					ROOT = { tag = BCP }
+				}
+				set_variable = {
+					BCP.Communist_Conflict_Strength_Old = BCP.Communist_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Communist_Conflict_Strength_Old = BRM.Communist_Conflict_Strength
+				}
+				BCP = {
+					count_inflicted_casualties_on_current_enemies = yes
+				}
+				BRM = {
+					count_inflicted_casualties_on_current_enemies = yes
+				}
+				set_variable = {
+					Burmese_Casualties_Communist_Conflict = BCP.current_inflicted_casualties_on_@BRM
+				}
+				set_variable = {
+					Communist_Casualties_Communist_Conflict = BRM.current_inflicted_casualties_on_@BCP
+				}
+				set_variable = {
+					Communist_Conflict_Strength_Bonus = Burmese_Casualties_Communist_Conflict
+				}
+				set_variable = {
+					Burma_Communist_Conflict_Strength_Bonus = Communist_Casualties_Communist_Conflict
+				}
+				set_variable = {
+					BRM.Burmese_Casualties_Communist_Conflict_Display = Burmese_Casualties_Communist_Conflict
+				}
+				set_variable = {
+					BRM.Communist_Casualties_Communist_Conflict_Display = Communist_Casualties_Communist_Conflict
+				}
+				multiply_variable = {
+					BRM.Burmese_Casualties_Communist_Conflict_Display = 1000
+				}
+				multiply_variable = {
+					BRM.Communist_Casualties_Communist_Conflict_Display = 1000
+				}
+				add_to_variable = {
+					UNS.Communist_Conflcit_Communist_Casualities_Total = BRM.Communist_Casualties_Communist_Conflict_Display
+				}
+				add_to_variable = {
+					UNS.Communist_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Communist_Conflict_Display
+				}
+				if = {
+					limit = {
+						check_variable = {
+							Burma_Communist_Conflict_Strength_Bonus > Communist_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Burma_Communist_Conflict_Strength_Bonus = Communist_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Burma_Communist_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						BRM.Communist_Conflict_Strength = Burma_Communist_Conflict_Strength_Bonus
+					}
+					round_variable = BMR.Communist_Conflict_Strength
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							Communist_Conflict_Strength_Bonus > Burma_Communist_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Communist_Conflict_Strength_Bonus = Burma_Communist_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Communist_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						BCP.Communist_Conflict_Strength = Communist_Conflict_Strength_Bonus
+					}
+					round_variable = BCP.Communist_Conflict_Strength
+				}
+				else = { }
+				add_to_variable = {
+					BMR.Communist_Conflict_Strength = 50
+				}
+
+				BCP = { diplomatic_relation = { country = BRM relation = war_relation active = no } }
+				BRM = { diplomatic_relation = { country = BCP relation = war_relation active = no } }
+				set_variable = {
+					BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength
+				}
+				subtract_from_variable = {
+					BCP.Communist_Conflict_Strength_Current = BCP.Communist_Conflict_Strength_Old
+				}
+				subtract_from_variable = {
+					BRM.Communist_Conflict_Strength_Current = BRM.Communist_Conflict_Strength_Old
+				}
+				set_variable = {
+					BCP.communist_check = 1
+				}
+				set_variable = {
+					BRM.communist_check = 1
+				}
+				BRM = {
+					remove_mission = BRM_Campaign_Against_Communist_Jungle_Strongholds
+				}
+				BCP = {
+					remove_mission = BCP_Campaign_in_the_Northern_Mountains
+					remove_mission = BCP_Campaign_in_the_Bamar_Heartlands
+					remove_mission = BCP_Campaign_into_Arakan
+				}
+			}
+			if = {
+				limit = {
+					FROM = { tag = BRM }
+					ROOT = { tag = KAY }
+					KAY = {
+						has_idea = unrecognized_state
+					}
+				}
+				set_variable = {
+					KAY.Karen_Conflict_Strength_Old = KAY.Karen_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Karen_Conflict_Strength_Old = BRM.Karen_Conflict_Strength
+				}
+				KAY = { count_inflicted_casualties_on_current_enemies = yes }
+				BRM = {
+					count_inflicted_casualties_on_current_enemies = yes
+				}
+				set_variable = {
+					Burmese_Casualties_Karen_Conflict = KAY.current_inflicted_casualties_on_@BRM
+				}
+				set_variable = {
+					Karen_Casualties_Karen_Conflict = BRM.current_inflicted_casualties_on_@KAY
+				}
+				set_variable = {
+					Karen_Conflict_Strength_Bonus = Burmese_Casualties_Karen_Conflict
+				}
+				set_variable = {
+					Burma_Karen_Conflict_Strength_Bonus = Karen_Casualties_Karen_Conflict
+				}
+				set_variable = {
+					BRM.Burmese_Casualties_Karen_Conflict_Display = Burmese_Casualties_Karen_Conflict
+				}
+				set_variable = {
+					BRM.Karen_Casualties_Karen_Conflict_Display = Karen_Casualties_Karen_Conflict
+				}
+				multiply_variable = {
+					BRM.Burmese_Casualties_Karen_Conflict_Display = 1000
+				}
+				multiply_variable = {
+					BRM.Karen_Casualties_Karen_Conflict_Display = 1000
+				}
+				add_to_variable = {
+					UNS.Karen_Conflcit_Karen_Casualities_Total = BRM.Karen_Casualties_Karen_Conflict_Display
+				}
+				add_to_variable = {
+					UNS.Karen_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Karen_Conflict_Display
+				}
+				if = {
+					limit = {
+						check_variable = {
+							Burma_Karen_Conflict_Strength_Bonus > Karen_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Burma_Karen_Conflict_Strength_Bonus = Karen_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Burma_Karen_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						BRM.Karen_Conflict_Strength = Burma_Karen_Conflict_Strength_Bonus
+					}
+					round_variable = BRM.Karen_Conflict_Strength
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							Karen_Conflict_Strength_Bonus > Burma_Karen_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Karen_Conflict_Strength_Bonus = Burma_Karen_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Karen_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						KAY.Karen_Conflict_Strength = Karen_Conflict_Strength_Bonus
+					}
+					round_variable = KAY.Karen_Conflict_Strength
+				}
+				else = { }
+				add_to_variable = {
+					BRM.Karen_Conflict_Strength = 50
+				}
+				KAY = { diplomatic_relation = { country = BRM relation = war_relation active = no } }
+				BRM = { diplomatic_relation = { country = KAY relation = war_relation active = no } }
+				set_variable = {
+					KAY.Karen_Conflict_Strength_Current = KAY.Karen_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Karen_Conflict_Strength_Current = BRM.Karen_Conflict_Strength
+				}
+
+				subtract_from_variable = {
+					KAY.Karen_Conflict_Strength_Current = KAY.Karen_Conflict_Strength_Old
+				}
+				subtract_from_variable = {
+					BRM.Karen_Conflict_Strength_Current = BRM.Karen_Conflict_Strength_Old
+				}
+				set_variable = {
+					KAY.karen_check = 1
+				}
+				set_variable = {
+					BRM.karen_check = 1
+				}
+
+				BRM = {
+					remove_mission = BRM_Campaign_against_the_Karen_Insurgents
+				}
+				KAY = {
+					remove_mission = KAY_Campaign_against_the_Burmese_Government_Tenasserim_Hills
+					remove_mission = KAY_Campaign_against_the_Burmese_Government_Irrawaddy_Delta
+				}
+			}
+			if = {
+				limit = {
+					FROM = { tag = BRM }
+					ROOT = { tag = MNL }
+					MNL = {
+						has_idea = unrecognized_state
+					}
+				}
+				set_variable = {
+					MNL.Mon_Conflict_Strength_Old = MNL.Mon_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Mon_Conflict_Strength_Old = BRM.Mon_Conflict_Strength
+				}
+				MNL = {
+					count_inflicted_casualties_on_current_enemies = yes
+				}
+				BRM = {
+					count_inflicted_casualties_on_current_enemies = yes
+				}
+				set_variable = {
+					Burmese_Casualties_Mon_Conflict = MNL.current_inflicted_casualties_on_@BRM
+				}
+				set_variable = {
+					Mon_Casualties_Mon_Conflict = BRM.current_inflicted_casualties_on_@MNL
+				}
+				set_variable = {
+					Mon_Conflict_Strength_Bonus = Burmese_Casualties_Mon_Conflict
+				}
+				set_variable = {
+					Burma_Mon_Conflict_Strength_Bonus = Mon_Casualties_Mon_Conflict
+				}
+				set_variable = {
+					BRM.Burmese_Casualties_Mon_Conflict_Display = Burmese_Casualties_Mon_Conflict
+				}
+				set_variable = {
+					BRM.Mon_Casualties_Mon_Conflict_Display = Mon_Casualties_Mon_Conflict
+				}
+				multiply_variable = {
+					BRM.Burmese_Casualties_Mon_Conflict_Display = 1000
+				}
+				multiply_variable = {
+					BRM.Mon_Casualties_Mon_Conflict_Display = 1000
+				}
+				add_to_variable = {
+					UNS.Mon_Conflcit_Mon_Casualities_Total = BRM.Mon_Casualties_Mon_Conflict_Display
+				}
+				add_to_variable = {
+					UNS.Mon_Conflcit_Burmese_Casualities_Total = BRM.Burmese_Casualties_Mon_Conflict_Display
+				}
+				if = {
+					limit = {
+						check_variable = {
+							Burma_Mon_Conflict_Strength_Bonus > Mon_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Burma_Mon_Conflict_Strength_Bonus = Mon_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Burma_Mon_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						BRM.Mon_Conflict_Strength = Burma_Mon_Conflict_Strength_Bonus
+					}
+					round_variable = BMR.Mon_Conflict_Strength
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							Mon_Conflict_Strength_Bonus > Burma_Mon_Conflict_Strength_Bonus
+						}
+					}
+					subtract_from_variable = {
+						Mon_Conflict_Strength_Bonus = Burma_Mon_Conflict_Strength_Bonus
+					}
+					multiply_variable = {
+						Mon_Conflict_Strength_Bonus = 10
+					}
+					add_to_variable = {
+						Mon_Conflict_Strength = Mon_Conflict_Strength_Bonus
+					}
+					round_variable = MNL.Mon_Conflict_Strength
+				}
+				else = { }
+				add_to_variable = {
+					BRM.Mon_Conflict_Strength = 50
+				}
+
+				MNL = { diplomatic_relation = { country = BRM relation = war_relation active = no } }
+				BRM = { diplomatic_relation = { country = MNL relation = war_relation active = no } }
+				set_variable = {
+					MNL.Mon_Conflict_Strength_Current = MNL.Mon_Conflict_Strength
+				}
+				set_variable = {
+					BRM.Mon_Conflict_Strength_Current = BRM.Mon_Conflict_Strength
+				}
+
+				subtract_from_variable = {
+					MNL.Mon_Conflict_Strength_Current = MNL.Mon_Conflict_Strength_Old
+				}
+				subtract_from_variable = {
+					BRM.Mon_Conflict_Strength_Current = BRM.Mon_Conflict_Strength_Old
+				}
+				set_variable = {
+					MNL.mon_check = 1
+				}
+				set_variable = {
+					BRM.mon_check = 1
+				}
+				MNL = {
+					remove_mission = MNL_Campaign_against_the_Burmese_Government_Tenasserim_Hills
+					remove_mission = MNL_Campaign_against_the_Burmese_Government_Irrawaddy_Delta
+				}
+				BRM = {
+					remove_mission = BRM_Campaign_against_the_Mon_Insurgents
+				}
+
+			}
+			###UN Interventions
+			if = {
+				limit = {
+					FROM = { has_global_flag = UN_Coalition_War }
+					ROOT = { has_country_flag = UN_Coalition_Target }
+				}
+				log = "  [GetDateText]: [ROOT.GetTag]: On Action Capitulation: [FROM.GetTag] victory against [ROOT.GetTag]"
+				clr_country_flag = UN_Coalition_Target
+				clr_global_flag = UN_Coalition_War
+				every_enemy_country = {
+					white_peace = ROOT
+				}
+				remove_mission = UN_Intervention_Coalition
+				UNS = {
+					dismantle_faction = yes
+					news_event = UN_RESOLUTION.31
+				}
+				balkanise_country = yes
+			}
 			###Biafra
+
 			if = {
 				limit = {
 					FROM = { TAG = NGA has_country_flag = biafra_war }
@@ -296,6 +1146,12 @@ on_actions = {
 							has_global_flag = roc_rebound_shanghai
 							date < 1951.6.1
 						}
+						NOT = {
+							has_focus_tree = PRC_SOV_50s
+						}
+						NOT = {
+							has_focus_tree = PRC_SOV_60s
+						}
 					}
 					FROM = {
 						OR = {
@@ -343,28 +1199,6 @@ on_actions = {
 				log = "  [GetDateText]: [ROOT.GetTag]: On Action Capitulation: [FROM.GetTag] victory against [ROOT.GetTag]"
                 news_event = PRC_TIBETAN.7
                 annex_country = { target = TIB transfer_troops = no }
-			}
-
-			if = {
-				limit = {
-					ROOT = {
-						tag = VIN
-					}
-					FROM = {
-						OR = {
-							tag = FRA
-							tag = VIE
-							tag = USA
-						}
-					}
-				}
-				log = "  [GetDateText]: [ROOT.GetTag]: On Action Capitulation: [FROM.GetTag] victory against [ROOT.GetTag]"
-				VIE = {
-					annex_country = {
-						target = VIN
-						transfer_troops = no
-					}
-				}
 			}
 			if = {
 				limit = {
@@ -672,7 +1506,370 @@ on_actions = {
 				}
 			}
 
-
+#Asian Liberation War
+			if = {
+				limit = {
+					has_global_flag = asian_liberation_war
+						tag = CHI
+							FROM = {
+								tag = PRC
+							}
+				}
+				news_event = PRC_SOV.36
+				YAN = {
+					transfer_state = 788
+					788 = { add_core_of = YAN }
+					on_independence_run = yes
+					add_ideas = disorganized_military
+					add_ideas = logistical_challenges
+					add_ideas = incompetent_officer_corps
+				}
+				CHI = {
+					set_autonomy = {
+						target = TIB
+						autonomy_state = autonomy_free
+					}
+					clr_global_flag = asian_liberation_war
+					set_country_flag = Retreat_to_Taiwan
+					load_focus_tree = ROC_50s
+					add_ideas = GRE_war_devastation_harsh
+					white_peace = KPA
+					white_peace = MON
+					white_peace = PRC
+					white_peace = SIK
+					white_peace = YUN
+					white_peace = GXC
+					white_peace = XSM
+					}
+				PRC = {
+					set_global_flag = PRC_asian_liberation_war
+					give_guarantee = XSM
+					give_guarantee = YUN
+					give_guarantee = GXC
+					add_ideas = GRE_war_devastation_harsh
+					add_ideas = administration_integration_3
+					transfer_state = 614
+					transfer_state = 615
+					transfer_state = 283
+					transfer_state = 597
+					transfer_state = 607
+					transfer_state = 598
+					transfer_state = 606
+					transfer_state = 1006
+					transfer_state = 1579
+					transfer_state = 1571
+					transfer_state = 1580
+					transfer_state = 1572
+					transfer_state = 1573
+					transfer_state = 1576
+					transfer_state = 1577
+					transfer_state = 1578
+					transfer_state = 622
+					transfer_state = 616
+					transfer_state = 613
+					transfer_state = 620
+					transfer_state = 596
+					transfer_state = 1574
+					transfer_state = 1575
+					set_autonomy = {
+						target = GXC
+						autonomy_state = autonomy_collaboration_government
+					}
+					set_autonomy = {
+						target = YUN
+						autonomy_state = autonomy_collaboration_government
+					}
+					set_autonomy = {
+						target = XSM
+						autonomy_state = autonomy_collaboration_government
+					}
+				}
+				XSM = {
+					add_ideas = martial_law
+					retire_country_leader = yes
+					create_country_leader = {
+						name = "Lin Biao"
+						picture = "Lin_Biao.dds"
+						ideology = stalinism
+					}
+					set_cosmetic_tag = XSM_Occupation
+					transfer_state = 604
+					every_owned_state = {
+						add_core_of = XSM
+					}
+					add_popularity = {
+						ideology = communism
+						popularity = 1
+					}
+				}
+				YUN = {
+					add_ideas = martial_law
+					retire_country_leader = yes
+					create_country_leader = {
+						name = "Luo Ruiqing"
+						picture = "Luo_Ruiqing.dds"
+						ideology = stalinism
+					}
+					set_cosmetic_tag = YUN_Occupation
+					transfer_state = 1557
+					transfer_state = 605
+					transfer_state = 603
+					transfer_state = 601
+					transfer_state = 325
+					every_owned_state = {
+						add_core_of = YUN
+					}
+					add_popularity = {
+						ideology = communism
+						popularity = 1
+					}
+				}
+				GXC = {
+					add_ideas = martial_law
+					set_cosmetic_tag = GXC_Occupation
+					transfer_state = 592
+					transfer_state = 594
+					transfer_state = 600
+					transfer_state = 602
+					transfer_state = 595
+					transfer_state = 1569
+					every_owned_state = {
+						add_core_of = GXC
+					}
+					add_popularity = {
+						ideology = communism
+						popularity = 1
+					}
+				}
+			
+			}
+			if = {
+				limit = {
+					has_global_flag = asian_liberation_war
+						tag = YUN
+							FROM = {
+								tag = CHI
+							}
+				}
+				CHI = {
+					white_peace = YUN
+					annex_country = {
+						target = YUN 
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = asian_liberation_war
+						tag = GXC
+							FROM = {
+								tag = CHI
+							}
+				}
+				CHI = {
+					white_peace = GXC
+					annex_country = {
+						target = GXC
+					}
+				}
+			}
+			if = {
+				limit = {
+						tag = SIA
+							FROM = {
+								tag = TTM
+							}
+				}
+				TTM = {
+					white_peace = SIA
+					annex_country = {
+						target = SIA
+					}
+				}
+			}
+			if = {
+				limit = {
+						tag = LOS
+							FROM = {
+								tag = LAO
+							}
+				}
+				LAO = {
+					white_peace = LOS
+					annex_country = {
+						target = LOS
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = asian_liberation_war
+						tag = XSM
+							FROM = {
+								tag = CHI
+							}
+				}
+				CHI = {
+					white_peace = XSM
+					annex_country = {
+						target = XSM
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = asian_liberation_war
+						tag = SIK
+							FROM = {
+								tag = CHI
+							}
+				}
+				news_event = PRC_SOV.38
+				SIK = {
+					set_cosmetic_tag = SIK_KMT
+					load_focus_tree = generic_focus
+				}
+				CHI = {
+					white_peace = SIK
+					set_autonomy = {
+						target = SIK
+						autonomy_state = autonomy_integrated_puppet
+					}
+				}
+				SIK = {
+					set_politics = {
+						ruling_party = neutrality
+					}
+					add_popularity = {
+						ideology = neutrality
+						popularity = 1
+					}
+				}
+				KAZ = {
+					add_state_core = 618
+				}
+				SOV = {
+					add_state_core = 618
+					transfer_state = 618
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = asian_liberation_war
+						tag = MON
+							FROM = {
+								tag = CHI
+							}
+				}
+				news_event = PRC_SOV.37
+				MEN = {
+					set_cosmetic_tag = MEN_KMT
+					transfer_state = 612
+					transfer_state = 621
+					transfer_state = 611
+				}
+				CHI = {
+					white_peace = MON
+						set_autonomy = {
+							target = MEN
+							autonomous_state = autonomy_integrated_puppet
+						}
+				}
+				MEN = {
+					declare_war_on = {
+						target = MON
+						type = annex_everything
+					}
+					load_oob = "generic_insurgency"
+					capital_scope = {
+						create_unit = {
+							division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+							owner = MEN
+						}
+						create_unit = {
+							division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+							owner = MEN
+						}
+						create_unit = {
+							division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+							owner = MEN
+						}
+					}
+					random_owned_state = {
+						create_unit = {
+							division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+							owner = MEN
+						}
+						create_unit = {
+							division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+							owner = MEN
+						}
+						create_unit = {
+							division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+							owner = MEN
+						}
+					}
+					random_owned_state = {
+						create_unit = {
+							division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+							owner = MEN
+						}
+						create_unit = {
+							division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+							owner = MEN
+						}
+						create_unit = {
+							division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+							owner = MEN
+						}
+					}
+					set_politics = {
+						ruling_party = neutrality
+					}
+					add_popularity = {
+						ideology = neutrality
+						popularity = 1
+					}
+				}
+				MON = {
+					set_country_flag = CHI_MON_Capitulate
+					leave_faction = yes
+					add_popularity = {
+						ideology = communism
+						popularity = 0.5
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = asian_liberation_war
+					tag = PRC
+							FROM = {
+								tag = CHI
+							}
+				}
+				news_event = PRC_SOV.39
+				PRC = {
+					dismantle_faction = yes
+				}
+				CHI = {
+					white_peace = KPA
+					annex_country = {
+						target = PRC
+					}	
+				}
+				SOV = {
+					transfer_state = 714
+					add_state_core = 714
+				}
+				KPA = {
+					leave_faction = yes
+					transfer_state = 1326
+					transfer_state = 1325
+					add_state_core = 1326
+					add_state_core = 1325
+				}
+			}
 		}
 	}
 }

@@ -70,9 +70,76 @@ FRA_ignore_Swiss = {
 
 
 }
+FRA_ignore_Germany = {
+	allowed = { OR = { tag = FRA tag = ENG } }
+	enable = {
+		NOT = { 
+			has_war_with = WGR
+		}
+	}
+	abort = {
+		has_war_with = WGR
+	}
+	
+	ai_strategy = {
+		type = force_defend_ally_borders
+		id = "WGR"			
+		value = 100
+	}
+}
+FRA_ignore_USA = {
+	allowed = { OR = { tag = FRA tag = ENG } }
+	enable = {
+		NOT = { 
+			has_war_with = USA
+		}
+	}
+	abort = {
+		has_war_with = USA
+	}
+	
+	ai_strategy = {
+		type = ignore
+		id = "USA"			
+		value = 1000
+	}
+}
+FRA_Protect_Hanoi = {
+	allowed = {
+		tag = FRA
+	}
+	enable = {
+		has_war_with = VIN
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		state = 786		
+		value = 100
+	}
+}
+FRA_Protect_vietnam = {
+	allowed = {
+		tag = FRA
+	}
+	enable = {
+		has_war_with = VIN
+	}
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = theatre_distribution_demand_increase
+		id = 786
+		value = 10
+	}
+}
 FRA_unit_buffer_for_Indochina = {
 	allowed = {
 		tag = FRA
+	}
+	enable = {
+		has_war_with = VIN
 	}
 	
 	abort_when_not_enabled = yes
@@ -85,34 +152,38 @@ FRA_unit_buffer_for_Indochina = {
 		# Near Hanoi
 		states = { 
 			786
+			1281
 		}
 		
-		ratio = 0.1
+		ratio = 0.2
 		area = asia
 		
-		subtract_invasions_from_need = no
+		subtract_invasions_from_need = yes
 	}
-}	
-FRA_unit_buffer_for_Algeria = {
-	allowed = {
+}
+
+indochina_area_priority = {
+	allowed = { tag = FRA }
+	enable = {
 		tag = FRA
 	}
-	
-	abort_when_not_enabled = yes
-	
+
 	ai_strategy = {
-		type = put_unit_buffers
-		
-		order_id = 2
-		
-		# Near Alger
-		states = { 
-			1152
-		}
-		
-		ratio = 0.1
-		area = africa
-		
-		subtract_invasions_from_need = no
+		type = area_priority
+		id = indochina_conflict
+		value = 100
 	}
-}	
+}
+LOS_build_wartime_army = {
+	allowed = { tag = LOS }
+	enable = { 
+		date > 1949.1.1
+		has_war = yes
+		has_army_manpower = { size < 1000000 }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = build_army id = motorized value = 500 }
+	ai_strategy = { type = build_army id = infantry value = 400 }
+	ai_strategy = { type = force_build_armies value = 300 }
+}

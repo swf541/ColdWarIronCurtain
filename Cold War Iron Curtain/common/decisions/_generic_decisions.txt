@@ -1,4 +1,32 @@
 variables_calculation_category = {
+	UN_Intervention_Coalition = {
+		allowed = {
+		
+		}
+		available = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 10
+		}
+		fixed_random_seed = no
+		selectable_mission = no
+		days_mission_timeout = 730
+		fire_only_once = no
+		activation = {
+			always = no
+
+		}
+		timeout_effect = {
+			clr_country_flag = UN_Coalition_Target
+			clr_global_flag = UN_Coalition_War
+			every_enemy_country = {
+				white_peace = ROOT
+			}
+			news_event = UN_RESOLUTION.32
+		}
+
+	}
 	Send_Troops_to_Vietnam = {
 
 		icon = generic_civil_support
@@ -39,77 +67,6 @@ variables_calculation_category = {
                 country_event = Dem_Ayub65.4
             }
         }
-	}
-	victory_in_the_asian_liberation_war = {
-		icon = generic
-		allowed = {
-			tag = PRC
-		}
-		available = {
-			always = no
-		}
-		ai_will_do = {
-			factor = 10
-		}
-		fixed_random_seed = no
-		selectable_mission = no
-		days_mission_timeout = 30
-		fire_only_once = yes
-		activation = {
-			has_global_flag = asian_liberation_war
-			CHI = {
-				has_capitulated = yes
-			}
-			VIE = {
-				has_capitulated = yes
-			}
-			OR = {
-				KOR = {
-					exists = no
-				}
-				KOR = {
-					has_capitulated = yes
-				}
-			}
-
-		}
-		timeout_effect = {
-			news_event = GALW.5
-			every_country = {
-				limit = {
-					is_in_faction_with = PRC
-				}
-				white_peace = CHI
-				white_peace = VIE
-				white_peace = KOR
-				white_peace = PHI
-				white_peace = LOS
-				white_peace = USA
-			}
-			PRC = {
-				annex_country = {
-					target = CHI
-					transfer_troops = yes
-				}
-			}
-			VIN = {
-				annex_country = {
-					target = VIE
-					transfer_troops = yes
-				}
-			}
-			if = {
-				limit = {
-					country_exists = LAO
-				}
-				LAO = {
-					annex_country = {
-						target = LOS
-						transfer_troops = yes
-					}
-				}
-			}
-		}
 	}
 	Modernization = {
 
@@ -739,7 +696,13 @@ variables_calculation_category = {
 
 		complete_effect = {
 			log = "[GetDateText]: [Root.GetTag]: ic_pulse"
+			#EUROPEAN UNION#
+			set_variable = { global.federation_european_union_entrance = 0 }
+			set_variable = { global.federation_european_union_count = 0 }
 			every_country = {
+				#EUROPEAN UNION#
+				clr_country_flag = federation_member #Reset federation member status, will be readded if found
+				clr_country_flag = common_market_member #Reset common market member status, will be readded if found
 				ic_pulse = yes
 			}
 			mercenary_calc_global = yes
@@ -764,6 +727,7 @@ variables_calculation_category = {
 		
 		timeout_effect = {
 			export_script_for_pool = yes
+			standard_deviation_for_industrial_base = yes
 			every_country = {
 				if = {
 					limit = {
@@ -799,6 +763,13 @@ variables_calculation_category = {
 		
 		timeout_effect = {
 			hidden_effect = {
+				country_event = trade.2
+				country_event = trade.3
+				country_event = trade.4
+				country_event = trade.5
+				country_event = trade.6
+				country_event = trade.7
+
 				log = "[GetDateText]: [Root.GetTag]: ic_Financial pulse"
 				#log = "[GetDateText]: [Root.GetTag]: gdp calc effect"
 				gdp_calculation = yes
@@ -1454,47 +1425,32 @@ operations = {
 		}
 	}
 
-The_Chinese_Civil_war = {
-	icon = generic_prepare_civil_war
-	allowed = {
-		major_countries = yes
-	}
-	available = {
-		always = no
-	}
-	fire_only_once = yes
-	days_mission_timeout = 740
-	cancel_trigger = {
-		has_global_flag = chinese_civil_war_over
-	}
-	timeout_effect = {
-		if = {
-			limit = {
-				tag = PRC
+	The_Chinese_Civil_war = {
+		icon = generic_prepare_civil_war
+		allowed = {
+			major_countries = yes
+		}
+		available = {
+			always = no
+		}
+		fire_only_once = yes
+		days_mission_timeout = 740
+		cancel_trigger = {
+			OR = {
+				has_global_flag = chinese_civil_war_over
+				PRC = {
+					NOT = {
+						has_war_with = CHI
+					}
+				}
 			}
+			
+		}
+		timeout_effect = {
 			if = {
 				limit = {
-					PRC = {
-						surrender_progress > 0.79
-					}
+					tag = PRC
 				}
-				PRC_Lose_CCW = yes
-			}
-			else_if = {
-				limit = {
-					PRC = {
-						has_global_flag = roc_rebound_shanghai
-						surrender_progress > 0.59
-					}
-				}
-				PRC_Lose_CCW = yes
-			}
-			else = {
-				ROC_lose_CCW = yes
-			}
-		}
-		else = {
-			effect_tooltip = {
 				if = {
 					limit = {
 						PRC = {
@@ -1516,10 +1472,247 @@ The_Chinese_Civil_war = {
 					ROC_lose_CCW = yes
 				}
 			}
+			else = {
+				effect_tooltip = {
+					if = {
+						limit = {
+							PRC = {
+								surrender_progress > 0.79
+							}
+						}
+						PRC_Lose_CCW = yes
+					}
+					else_if = {
+						limit = {
+							PRC = {
+								has_global_flag = roc_rebound_shanghai
+								surrender_progress > 0.59
+							}
+						}
+						PRC_Lose_CCW = yes
+					}
+					else = {
+						ROC_lose_CCW = yes
+					}
+				}
+			}
 		}
 	}
-}
+	THIRD_BALKAN_WAR_TIMER = {
+		icon = generic_prepare_civil_war
+		allowed = {
+            tag = TUR
+		}
+		activation = {
+			always = no
+		}
+		available = {
+			always = no
+		}
+		fire_only_once = yes
+		days_mission_timeout = 95
 
+		timeout_effect = {
+            news_event = THIRD_BALKAN_WAR.75
+			
+		}
+	}
+
+    DOM_Invasion_of_Cuba = {
+		icon = generic_prepare_civil_war
+		allowed = {
+            OR = {
+                tag = CUB
+                tag = DOM
+            }
+		}
+		available = {
+			always = no
+		}
+		fire_only_once = yes
+		days_mission_timeout = 730
+		cancel_trigger = {
+			OR = {
+                CUB = {
+                    NOT = {
+                        has_war_with = DOM
+                    }
+                }
+            }
+			
+		}
+		timeout_effect = {
+            if = {
+                limit = {
+                    tag = DOM
+                }
+                news_event = DOM_Cuba.34
+                white_peace = CUB
+            }
+		}
+	}
+	
+	Invasion_of_Nepal = {
+		icon = generic_prepare_civil_war
+		allowed = {
+            OR = {
+                tag = RAJ
+                tag = NEP
+            }
+		}
+		available = {
+			always = no
+		}
+		fire_only_once = yes
+		days_mission_timeout = 243
+		cancel_trigger = {
+			OR = {
+                NOT = {
+                    country_exists = NEP
+                }
+                RAJ = {
+                    NOT = {
+                        has_war_with = NEP
+                    }
+                }
+            }
+			
+		}
+		timeout_effect = {
+            if = {
+                limit = {
+                    tag = RAJ
+                }
+                news_event = INDIA_COM_NEP.7
+                white_peace = NEP
+                white_peace = ENG
+                white_peace = USA
+            }
+		}
+	}
+	
+    Invasion_of_Sri_Lanka = {
+		icon = generic_prepare_civil_war
+		allowed = {
+            OR = {
+                tag = RAJ
+                tag = NEP
+            }
+		}
+		available = {
+			always = no
+		}
+		fire_only_once = yes
+		days_mission_timeout = 243
+		cancel_trigger = {
+			OR = {
+                NOT = {
+                    country_exists = SRL
+                }
+                RAJ = {
+                    NOT = {
+                        has_war_with = SRL
+                    }
+                }
+            }
+			
+		}
+		timeout_effect = {
+            if = {
+                limit = {
+                    tag = RAJ
+                }
+                news_event = CPI_71.8
+                white_peace = SRL
+                white_peace = ENG
+                white_peace = USA
+            }
+		}
+	}
+	Invasion_of_Yugoslavia = {
+		icon = generic_prepare_civil_war
+		allowed = {
+            OR = {
+                tag = SOV
+                tag = YUG
+            }
+		}
+		available = {
+			always = no
+		}
+		fire_only_once = yes
+		days_mission_timeout = 243
+		cancel_trigger = {
+			OR = {
+                NOT = {
+                    country_exists = YUG
+                }
+                SOV = {
+                    NOT = {
+                        has_war_with = YUG
+                    }
+                }
+            }
+			
+		}
+		timeout_effect = {
+            if = {
+                limit = {
+                    tag = SOV
+                }
+                news_event = YUG_SOV_WAR.2
+                white_peace = YUG
+                every_country = {
+                    limit = {
+                        is_in_faction_with = SOV
+                    }
+                    white_peace = YUG
+                }
+            }
+		}
+	}
+	Invasion_of_Turkey = {
+		icon = generic_prepare_civil_war
+		allowed = {
+            OR = {
+                tag = SOV
+                tag = TUR
+            }
+		}
+		available = {
+			always = no
+		}
+		fire_only_once = yes
+		days_mission_timeout = 243
+		cancel_trigger = {
+			OR = {
+                NOT = {
+                    country_exists = TUR
+                }
+                SOV = {
+                    NOT = {
+                        has_war_with = TUR
+                    }
+                }
+            }
+			
+		}
+		timeout_effect = {
+            if = {
+                limit = {
+                    tag = SOV
+                }
+                news_event = TUR_SOV_WAR.2
+                white_peace = YUG
+                every_country = {
+                    limit = {
+                        is_in_faction_with = SOV
+                    }
+                    white_peace = TUR
+                }
+            }
+		}
+	}
 	Intervention_into_Syria = {
 
 		icon = generic_prepare_civil_war
@@ -1669,6 +1862,19 @@ The_Chinese_Civil_war = {
 			else = {
 				news_event = Shanghai_Campaign.2 
 				set_global_flag = roc_rebound_shanghai
+				if = {
+					limit = {
+						CHI = {
+							is_ai = no
+						}
+					}
+					PRC = {
+						add_days_mission_timeout = {
+							mission = The_Chinese_Civil_war
+							days = 1095
+						}						
+					}
+				}
 			}
 		}
 
@@ -1696,7 +1902,7 @@ The_Chinese_Civil_war = {
 		days_mission_timeout = 30
 		cancel_trigger = {
 			NOT = {
-				PRC {
+				PRC = {
 					has_war_with = RAJ
 				}
 			}
@@ -1734,7 +1940,7 @@ The_Chinese_Civil_war = {
 		days_mission_timeout = 30
 		cancel_trigger = {
 			NOT = {
-				PRC {
+				PRC = {
 					has_war_with = RAJ
 				}
 			}
@@ -1770,7 +1976,7 @@ The_Chinese_Civil_war = {
 		days_mission_timeout = 50
 		cancel_trigger = {
 			NOT = {
-				PRC {
+				PRC = {
 					has_war_with = RAJ
 				}
 			}
@@ -1999,9 +2205,6 @@ The_Chinese_Civil_war = {
 						controls_state = 607
 						controls_state = 615
 						controls_state = 622		
-					}
-					NOT = {
-						has_global_flag = asian_liberation_war
 					}
 				}
 				PRC_Lose_CCW = yes
@@ -2785,6 +2988,84 @@ war_measures = {
 				BAH = { country_event = Suez_Crisis_Gulf.50 }
 				QAT = { country_event = QAT_Suez_Crisis.1 }
 			}
+		}
+   }
+
+   can_build_railway_test = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			can_build_railway = {
+				start_province = 9671 ##use start_state instead if you want to check between states instead of provinces
+				target_province = 9814 ##ditto, target_state
+			}
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+		}
+   }
+   form_indochina_faction = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+				country_event = CPSU20.1
+				hidden_effect = {
+					load_focus_tree = SOV_Kaganovich
+					complete_national_focus = SOV_Kaganovichs_Union
+					create_country_leader = {
+						name = "Lazar Kaganovich"
+						picture = "Lazar_Kaganovich.dds"
+						desc = ""
+						ideology = marxism_leninism
+					}
+				}
+		}
+   }
+
+   has_railway_test = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			has_railway_connection = {
+				start_province = 9671
+				target_province = 9814
+			}
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
 		}
    }
 }
