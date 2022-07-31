@@ -14,20 +14,30 @@ add_namespace = INDIA_KAS60s
 
 country_event = {
 	id = INDIA_KAS60s.0
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = INDIA_KAS60s.0"}	#(should launch around December 28 1963)
 	title = "Religious Theft in Kashmir"
 	desc = INDIA_KAS60s.0.d
 	picture = GFX_INDIA_KAS60s_0
 
 	is_triggered_only = yes
-
+	immediate = {
+		RAJ = {
+			log = "[GetDateText]: [Root.GetTag]: id = INDIA_KAS60s.0"
+			complete_national_focus = IND_60s_Kashmir_Protests
+		}
+		PAK = {
+			complete_national_focus = PAK_Kashmir_Unrest
+		}
+		
+	}
 	option = {
 		name = "Support Full Investigation"	#(focus IND_Support_Full_Investigation and that line of the tree becomes available, historical)
 		set_country_flag = kashmir_unrest_ind_60s_route_a
+		complete_national_focus = IND_60s_Support_Full_Investigation
 	}
 	option = {
 		name = "Deploy troops to restore order"	#(foucs IND_Deploy_Troops_To_Restore_Order and that line of the tree becomes available)
 		set_country_flag = kashmir_unrest_ind_60s_route_b
+		complete_national_focus = IND_60s_Deploy_Troops_To_Restore_Order
 	}
 }
 country_event = {
@@ -448,7 +458,7 @@ news_event = {
 country_event = {
 	id = india.1 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = india.1"}
-	title = india.1.t
+	title = "The End of the Dominion"
 	desc = india.1.d
 
 	is_triggered_only = yes
@@ -459,13 +469,6 @@ country_event = {
 		set_global_flag = republic_of_india
 		drop_cosmetic_tag = yes
 		ENG = { set_autonomy = { target = ROOT autonomy_state = autonomy_free } }
-		if = {
-			limit = {
-				KAS = { is_subject_of = ROOT }
-			}
-			annex_country = { target = KAS transfer_troops = yes }
-			KAS = { drop_cosmetic_tag = yes }
-		}
 		#news_event = india.2
 	}
 }
@@ -1711,6 +1714,7 @@ country_event = {
 			set_province_controller = 12754
 			set_province_controller = 13959
 			set_province_controller = 13963
+			set_global_flag = east_pakistan_theatre_quiet
 			every_owned_state = {
 				limit = {
 					is_core_of = BAN
@@ -1820,6 +1824,7 @@ country_event = {
 			BAN = {
 				set_cosmetic_tag = EAST_PAK_WAR
 			}
+			set_global_flag = east_pakistan_theatre_quiet
 			country_event = Pak_India_War_65.18
 		}
 		#country_event = Pak_India_War_65.19
@@ -1882,6 +1887,7 @@ country_event = {
 		name = "Move to battle positions"
 		news_event = Pak_India_War_65.21
 		annex_country = { target = BAN transfer_troops = yes }
+		clr_global_flag = east_pakistan_theatre_quiet
 	}
 }
 country_event = {
@@ -1902,6 +1908,7 @@ country_event = {
 		name = "Move to battle positions"
 		news_event = Pak_India_War_65.21
 		PAK = { annex_country = { target = BAN transfer_troops = yes } }
+		clr_global_flag = east_pakistan_theatre_quiet
 	}
 }
 
@@ -2307,6 +2314,10 @@ news_event = {
 	is_triggered_only = yes
 	major = yes
 	immediate = {
+		if = { 	limit = { has_global_flag = east_pakistan_theatre_quiet }
+			PAK = { annex_country = { target = BAN transfer_troops = yes } }
+			clr_global_flag = east_pakistan_theatre_quiet
+		}
 		hidden_effect = {
 			if = {
 				limit = {
@@ -3272,13 +3283,10 @@ country_event = {
 	picture = GFX_Treaty_Delhi_11
 
 	is_triggered_only = yes
-
+	
 	option = {
 		name = "Order the withdrawal"
-		country_event = Treaty_Delhi.12
-		RAJ = {
-			country_event = Treaty_Delhi.13
-		}
+		country_event = Treaty_Delhi.12`
 		news_event = {
 			id = Treaty_Delhi.14
 			days = 2
@@ -3287,8 +3295,9 @@ country_event = {
 			limit = {
 				is_core_of = KAS
 			}
-			PAK = {
+			RAJ = {
 				transfer_state = PREV
+				country_event = Treaty_Delhi.13
 			}
 		}
 	}

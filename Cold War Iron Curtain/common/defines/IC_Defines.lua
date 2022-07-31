@@ -112,9 +112,10 @@ NDefines.NNavy.SUBMARINE_HIDE_TIMEOUT = 4 -- Amount of in-game-hours that takes 
 NDefines.NNavy.SUBMARINE_REVEAL_BASE_CHANCE = 0.002 -- Base chance for submarine detection. It's modified by the difference of a spootter's submarines detection vs submarine visibility. Use this variable for game balancing.
 NDefines.NNavy.SUBMARINE_REVEALED_TIMEOUT = 8 -- Amount of in-game-hours that makes the submarine visible if it is on the defender side.
 NDefines.NNavy.SHORE_BOMBARDMENT_CAP = 0.15 -- Maximum shore bombardment
+NDefines.NNavy.LIGHT_GUN_ATTACK_TO_SHORE_BOMBARDMENT = 0.15 --heavy gun attack value is divided by this value * 100 and added to shore bombardment modifier --changed from vanilla (0.05) to reflect gun/missile dichotomy
+NDefines.NNavy.HEAVY_GUN_ATTACK_TO_SHORE_BOMBARDMENT = 0.05 -- light gun attack value is divided by this value * 100 and added to shore bombardment modifier --changed from vanilla (0.1) to reflect gun/missile dichotomy
 NDefines.NNavy.NAVAL_INVASION_PREPARE_HOURS = 72 -- base hours needed to prepare an invasion
 NDefines.NNavy.SEA_AIR_COMBAT_MAX_WINGS_ON_STACK = 75 -- max planes that can enter naval combat
-
 NDefines.NTechnology.BASE_RESEARCH_POINTS_SAVED = 50.0 -- Base amount of research points a country can save per slot.
 NDefines.NTechnology.BASE_YEAR_AHEAD_PENALTY_FACTOR = 1 -- Base year ahead penalty
 NDefines.NTechnology.MAX_TECH_SHARING_BONUS = 0.15 -- Max technology sharing bonus that can be applied instantly

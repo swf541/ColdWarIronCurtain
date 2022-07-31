@@ -1,4 +1,5 @@
 add_namespace = SIX_DAYS_WAR
+#Egyptian communications prep
 country_event = {
 	id = SIX_DAYS_WAR.100 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.100"}
@@ -23,6 +24,8 @@ country_event = {
 		set_country_flag = UAR_Upgraded_Communications
 	}
 }
+
+#Israeli prompt to launch (trigger in common/scripted_effects/IC_scripted_effects.txt)
 country_event = {
 	id = SIX_DAYS_WAR.0 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.0"}
@@ -42,12 +45,12 @@ country_event = {
 				limit = {
 					EGY = { has_country_flag = UAR_Upgraded_Communications }
 				}
-				EGY = { country_event = SIX_DAYS_WAR.17 }
+				EGY = { country_event = SIX_DAYS_WAR.17 }#initial Israeli attack fails
 				news_event = SIX_DAYS_WAR.31
 			}
 			else = {
-				ISR = { country_event = SIX_DAYS_WAR.1 }
-				EGY = { country_event = SIX_DAYS_WAR.2 }
+				ISR = { country_event = SIX_DAYS_WAR.1 } #Egypt attacked unprepared (Israeli perspective)
+				EGY = { country_event = SIX_DAYS_WAR.2 } #Egypt calls Syria and Jordan for help
 				news_event = SIX_DAYS_WAR.30
 			}
 		}
@@ -55,10 +58,12 @@ country_event = {
 	option = {
 		name = "This would only inflame tensions"
 		hidden_effect = {
-			EGY = { country_event = SIX_DAYS_WAR.25 }
+			EGY = { country_event = SIX_DAYS_WAR.25 } #Egypt launches attack
 		}
 	}
 }
+
+#Egypt attacked unprepared (Israeli perspective)
 country_event = {
 	id = SIX_DAYS_WAR.1 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.1"}
@@ -71,13 +76,14 @@ country_event = {
 
 	option = {
 		name = "This will cripple Egypt"
+		EGY = { complete_national_focus = UAR_The_Six_Days_War }
 		start_border_war = {
 			change_state_after_war = no
 			attacker = {
 				state = 1296
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.28
-				on_lose = SIX_DAYS_WAR.27
+				on_win = SIX_DAYS_WAR.28 #Israel Seizes the Sinai and Gaza (Israel Perspective) - ends event chain
+				on_lose = SIX_DAYS_WAR.27 #Failed initial Israeli Offensive in the Sinai (Israel Perspective) - ends event chain
 				on_cancel = Indochina_War.4
 			}
 
@@ -97,6 +103,8 @@ country_event = {
 
 	}
 }
+
+#Egypt calls Syria and Jordan for help
 country_event = {
 	id = SIX_DAYS_WAR.2 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.2"}
@@ -109,8 +117,66 @@ country_event = {
 
 	option = {
 		name = "We must ensure Jordan and Syria strike...."	#Lie
-		JOR = {
-			country_event = SIX_DAYS_WAR.3
+		if = {
+			limit = {
+				EGY = { owns_state = 759 } #golan heights
+				ISR = { owns_state = 994 }
+			}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 759
+					num_provinces = 4
+					on_win = SIX_DAYS_WAR.35
+					on_lose = Indochina_War.4
+					on_cancel = Indochina_War.4
+				}
+
+				defender = {
+					state = 994
+					num_provinces = 4
+					on_win = SIX_DAYS_WAR.4 #Israeli Perspective Counter-Attacking Syria
+					on_lose = Indochina_War.4
+					on_cancel = Indochina_War.4
+				}
+			}
+			set_border_war_data = {
+				attacker = 759
+				defender = 994
+				attacker_modifier = -0.30
+			}
+		}
+		if = {
+			limit = {
+				EGY = { owns_state = 781 } #west bank``
+				ISR = { owns_state = 921 }
+			}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 781
+					num_provinces = 4
+					on_win = SIX_DAYS_WAR.5 #Arab victory - Jordan annexes Jezreel - event chain ends
+					on_lose = Indochina_War.4
+					on_cancel = Indochina_War.4
+				}
+
+				defender = {
+					state = 921
+					num_provinces = 4
+					on_win = SIX_DAYS_WAR.41 #Israeli Perspective Counter-Attacking Jordan
+					on_lose = Indochina_War.4
+					on_cancel = Indochina_War.4
+				}
+			}
+			set_border_war_data = {
+				attacker = 781
+				defender = 921
+				attacker_modifier = -0.30
+			}
+		}
+		JOR = { 
+			country_event = SIX_DAYS_WAR.3 #Syria and Jordan counterattack after Egypt lies
 		}
 		SYR = {
 			country_event = SIX_DAYS_WAR.3
@@ -119,15 +185,76 @@ country_event = {
 	}
 	option = {
 		name = "Admit the truth"	#Admit the Truth
-		JOR = {
-			country_event = SIX_DAYS_WAR.8
+		JOR = { 
+			country_event = SIX_DAYS_WAR.8 #Syria and Jordan have the choice to counterattack or end their participation
 		}
 		SYR = {
 			country_event = SIX_DAYS_WAR.8
 			complete_national_focus = SYR_sixdaywar
 		}
+		if = {
+			limit = {
+				EGY = { owns_state = 759 } #golan heights
+				ISR = { owns_state = 994 }
+			}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 759
+					num_provinces = 4
+					on_win = SIX_DAYS_WAR.35
+					on_lose = Indochina_War.4
+					on_cancel = Indochina_War.4
+				}
+
+				defender = {
+					state = 994
+					num_provinces = 4
+					on_win = SIX_DAYS_WAR.4 #Israeli Perspective Counter-Attacking Syria
+					on_lose = Indochina_War.4
+					on_cancel = Indochina_War.4
+				}
+			}
+			set_border_war_data = {
+				attacker = 759
+				defender = 994
+				attacker_modifier = -0.30
+			}
+		}
+		if = {
+			limit = {
+				EGY = { owns_state = 781 } #west bank``
+				ISR = { owns_state = 921 }
+			}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 781
+					num_provinces = 4
+					on_win = SIX_DAYS_WAR.5 #Arab victory - Jordan annexes Jezreel - event chain ends
+					on_lose = Indochina_War.4
+					on_cancel = Indochina_War.4
+				}
+
+				defender = {
+					state = 921
+					num_provinces = 4
+					on_win = SIX_DAYS_WAR.41 #Israeli Perspective Counter-Attacking Jordan
+					on_lose = Indochina_War.4
+					on_cancel = Indochina_War.4
+				}
+			}
+			set_border_war_data = {
+				attacker = 781
+				defender = 921
+				attacker_modifier = -0.30
+			}
+		}
 	}
+		
 }
+
+#Syria and Jordan counterattack after Egypt lies
 country_event = {
 	id = SIX_DAYS_WAR.3 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.3"}
@@ -143,28 +270,29 @@ country_event = {
 		if = {
 			limit = {
 				tag = SYR
+				SYR = { owns_state = 759 }
 			}
 			start_border_war = {
 				change_state_after_war = no
 				attacker = {
 					state = 759
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.5
+					on_win = SIX_DAYS_WAR.35 #Arab victory - Jordan annexes Jezreel - event chain ends
 					on_lose = Indochina_War.4
 					on_cancel = Indochina_War.4
 				}
 
 				defender = {
-					state = 805
+					state = 994
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.4
+					on_win = SIX_DAYS_WAR.4 #Israeli Perspective Counter-Attacking Syria
 					on_lose = Indochina_War.4
 					on_cancel = Indochina_War.4
 				}
 			}
 			set_border_war_data = {
 				attacker = 759
-				defender = 805
+				defender = 994
 				attacker_modifier = -0.30
 			}
 		}
@@ -177,7 +305,7 @@ country_event = {
 				attacker = {
 					state = 781
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.5
+					on_win = SIX_DAYS_WAR.5 #Arab victory - Jordan annexes Jezreel - event chain ends
 					on_lose = Indochina_War.4
 					on_cancel = Indochina_War.4
 				}
@@ -185,7 +313,7 @@ country_event = {
 				defender = {
 					state = 921
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.41
+					on_win = SIX_DAYS_WAR.41 #Israeli Perspective Counter-Attacking Jordan
 					on_lose = Indochina_War.4
 					on_cancel = Indochina_War.4
 				}
@@ -198,6 +326,8 @@ country_event = {
 		}
 	}
 }
+
+#Israeli Perspective Counter-Attacking Syria
 country_event = {
 	id = SIX_DAYS_WAR.4 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.4"}
@@ -215,7 +345,7 @@ country_event = {
 			attacker = {
 				state = 994
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.151
+				on_win = SIX_DAYS_WAR.151 #Israeli Perspective Seizes Golan Heights - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -223,7 +353,7 @@ country_event = {
 			defender = {
 				state = 759
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.6
+				on_win = SIX_DAYS_WAR.6 #Failed Counter-Attack (Israeli Perspective) - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -235,6 +365,8 @@ country_event = {
 		}
 	}
 }
+
+#Israeli Perspective Counter-Attacking Jordan
 country_event = {
 	id = SIX_DAYS_WAR.41 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.41"}
@@ -252,7 +384,7 @@ country_event = {
 			attacker = {
 				state = 921
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.15
+				on_win = SIX_DAYS_WAR.15 #Israeli Perspective Seizes the West Bank - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -260,7 +392,7 @@ country_event = {
 			defender = {
 				state = 781
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.6
+				on_win = SIX_DAYS_WAR.6 #Failed Counter-Attack (Israeli Perspective) - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -272,6 +404,8 @@ country_event = {
 		}
 	}
 }
+
+#Arab victory - Jordan annexes Jezreel - event chain ends
 country_event = {
 	id = SIX_DAYS_WAR.5 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.5"}
@@ -286,20 +420,15 @@ country_event = {
 		name = "Victory at Last"
 		if = {
 			limit = {
-				tag = SYR
+				 owns_state = 781 
 			}
-			news_event = SIX_DAYS_WAR.35
-			complete_national_focus = SYR_arabvictory
-		}
-		if = {
-			limit = {
-				tag = JOR
-			}
-			transfer_state = 1297
+			transfer_state = 1297 #Jordan annexes Jezreel
 			news_event = SIX_DAYS_WAR.36
 		}
 	}
 }
+
+#Failed Counter-Attack (Israeli Perspective) - ends event chain
 country_event = {
 	id = SIX_DAYS_WAR.6 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.6"}
@@ -315,6 +444,8 @@ country_event = {
 
 	}
 }
+
+#Israel Perspective Launch Offensives Against Syria/Israel (Jordan and Syria did not attack first)
 country_event = {
 	id = SIX_DAYS_WAR.7 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.7"}
@@ -332,7 +463,7 @@ country_event = {
 			attacker = {
 				state = 921
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.15
+				on_win = SIX_DAYS_WAR.15 #Israeli Perspective Seizes the West Bank - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -340,7 +471,7 @@ country_event = {
 			defender = {
 				state = 781
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.14
+				on_win = SIX_DAYS_WAR.14 #Syria and Jordan counterattack
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -350,7 +481,7 @@ country_event = {
 			attacker = {
 				state = 994
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.151
+				on_win = SIX_DAYS_WAR.151 #Israeli Perspective Seizes Golan Heights - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -358,7 +489,7 @@ country_event = {
 			defender = {
 				state = 759
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.14
+				on_win = SIX_DAYS_WAR.14 #Syria and Jordan counterattack
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -366,10 +497,12 @@ country_event = {
 	}
 	option = {
 		name = "Hold Off"	#Hold Off
-		SYR = { country_event = SIX_DAYS_WAR.8 }
+		SYR = { country_event = SIX_DAYS_WAR.8 } #Syria and Jordan have the choice to counterattack or end their participation
 		JOR = { country_event = SIX_DAYS_WAR.8 }
 	}
 }
+
+#Syria and Jordan have the choice to counterattack or end their participation
 country_event = {
 	id = SIX_DAYS_WAR.8 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.8"}
@@ -384,13 +517,14 @@ country_event = {
 		name = "We must liberate Palestine"
 		trigger = {
 			tag = JOR
+			owns_state = 781
 		}
 			start_border_war = {
 				change_state_after_war = no
 				attacker = {
 					state = 781
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.5
+					on_win = SIX_DAYS_WAR.5 #Arab victory - Jordan annexes Jezreel - event chain ends
 					on_lose = Indochina_War.4
 					on_cancel = Indochina_War.4
 				}
@@ -398,7 +532,7 @@ country_event = {
 				defender = {
 					state = 921
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.111
+					on_win = SIX_DAYS_WAR.111 #Israeli Perspective Counter-Attacking Jordan
 					on_lose = Indochina_War.4
 					on_cancel = Indochina_War.4
 				}
@@ -414,13 +548,14 @@ country_event = {
 		name = "Onwards to Victory"
 		trigger = {
 			tag = SYR
+			owns_state = 759
 		}
 			start_border_war = {
 				change_state_after_war = no
 				attacker = {
 					state = 759
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.5
+					on_win = SIX_DAYS_WAR.35 #Arab victory
 					on_lose = Indochina_War.4
 					on_cancel = Indochina_War.4
 				}
@@ -428,7 +563,7 @@ country_event = {
 				defender = {
 					state = 994
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.11
+					on_win = SIX_DAYS_WAR.11 #Israeli Perspective Counter-Attacking Syria
 					on_lose = Indochina_War.4
 					on_cancel = Indochina_War.4
 				}
@@ -441,11 +576,13 @@ country_event = {
 		}
 	}
 }
+
+#Failed Counter-Attack (Syrian/Jordanian Perspective) - ends event chain
 country_event = {
 	id = SIX_DAYS_WAR.9 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.9"}
 	title = "Failed Anti-Israeli Counter Offensive"
-	desc = SIX_DAYS_WAR.6.d
+	desc = SIX_DAYS_WAR.6.d #this is a description written from an Israeli perspective even though it is an event received by Arab nations
 	#picture = GFX_Failed_Anti-Israeli_Counter_Offensive
 
 	is_triggered_only = yes
@@ -457,6 +594,7 @@ country_event = {
 	}
 }
 
+#Israeli Perspective Counter-Attacking Syria
 country_event = {
 	id = SIX_DAYS_WAR.11 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.11"}
@@ -474,7 +612,7 @@ country_event = {
 			attacker = {
 				state = 994
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.151
+				on_win = SIX_DAYS_WAR.151 #Israeli Perspective Seizes Golan Heights - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -482,7 +620,7 @@ country_event = {
 			defender = {
 				state = 759
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.6
+				on_win = SIX_DAYS_WAR.6 #Failed Counter-Attack (Israeli Perspective) - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -490,6 +628,8 @@ country_event = {
 
 	}
 }
+
+#Israeli Perspective Counter-Attacking Jordan
 country_event = {
 	id = SIX_DAYS_WAR.111 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.111"}
@@ -507,7 +647,7 @@ country_event = {
 			attacker = {
 				state = 921
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.15
+				on_win = SIX_DAYS_WAR.15 #Israeli Perspective Seizes the West Bank - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -515,7 +655,7 @@ country_event = {
 			defender = {
 				state = 781
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.6
+				on_win = SIX_DAYS_WAR.6 #Failed Counter-Attack (Israeli Perspective) - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -523,11 +663,13 @@ country_event = {
 
 	}
 }
+
+#Syria and Jordan counterattack
 country_event = {
 	id = SIX_DAYS_WAR.14 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.14"}
 	title = "Launch Offensive into Israel"
-	desc = SIX_DAYS_WAR.8.d
+	desc = SIX_DAYS_WAR.3.d
 	#picture =
 
 	is_triggered_only = yes
@@ -538,14 +680,15 @@ country_event = {
 		if = {
 			limit = {
 				tag = SYR
+				owns_state = 759
 			}
 			start_border_war = {
 				change_state_after_war = no
 				attacker = {
 					state = 759
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.5
-					on_lose = SIX_DAYS_WAR.9
+					on_win = SIX_DAYS_WAR.35 #Arab victory
+					on_lose = SIX_DAYS_WAR.9 #Failed Counter-Attack (Syrian/Jordanian Perspective) - ends event chain
 					on_cancel = Indochina_War.4
 				}
 
@@ -562,14 +705,15 @@ country_event = {
 		if = {
 			limit = {
 				tag = JOR
+				owns_state = 781
 			}
 			start_border_war = {
 				change_state_after_war = no
 				attacker = {
 					state = 781
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.5
-					on_lose = SIX_DAYS_WAR.9
+					on_win = SIX_DAYS_WAR.5 #Arab victory - Jordan annexes Jezreel - event chain ends
+					on_lose = SIX_DAYS_WAR.9 #Failed Counter-Attack (Syrian/Jordanian Perspective) - ends event chain
 					on_cancel = Indochina_War.4
 				}
 
@@ -585,6 +729,8 @@ country_event = {
 		}
 	}
 }
+
+#Israeli Perspective Seizes the West Bank - ends event chain
 country_event = {
 	id = SIX_DAYS_WAR.15 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.15"}
@@ -604,6 +750,8 @@ country_event = {
 		}
 	}
 }
+
+#Israeli Perspective Seizes Golan Heights - ends event chain
 country_event = {
 	id = SIX_DAYS_WAR.151 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.151"}
@@ -626,6 +774,7 @@ country_event = {
 	}
 }
 
+#initial Israeli attack fails
 country_event = {
 	id = SIX_DAYS_WAR.17 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.17"}
@@ -638,10 +787,11 @@ country_event = {
 
 	option = {
 		name = "Onwards to Glory"
+		EGY = { complete_national_focus = UAR_The_Six_Days_War }
 		SYR = {
-			country_event = SIX_DAYS_WAR.18
+			country_event = SIX_DAYS_WAR.18 #Jordan and Syria counterattack
 		}
-		JOR = {
+		JOR =  { 
 			country_event = SIX_DAYS_WAR.18
 		}
 		if = {
@@ -654,7 +804,7 @@ country_event = {
 				attacker = {
 					state = 805
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.21
+					on_win = SIX_DAYS_WAR.21 #Egypt seizes Eilat
 					on_lose = Indochina_War.4
 					on_cancel = Indochina_War.4
 				}
@@ -662,14 +812,64 @@ country_event = {
 				defender = {
 					state = 1296
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.19
+					on_win = SIX_DAYS_WAR.19 #Israeli Perspective Counter-Attacking Syria (OP Focus Failed)
 					on_lose = Indochina_War.4
+					on_cancel = Indochina_War.4
+				}
+			}
+		}
+		if = {
+			limit = {
+				EGY = { owns_state = 781 }
+				ISR = { owns_state = 921 }
+			}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 781
+					num_provinces = 4
+					on_win = SIX_DAYS_WAR.5 #Arab victory - Jordan annexes Jezreel - event chain ends
+					on_lose = Indochina_War.4
+					on_cancel = Indochina_War.4
+				}
+
+				defender = {
+					state = 921
+					num_provinces = 4
+					on_win = Indochina_War.4
+					on_lose = SIX_DAYS_WAR.191 #Israeli Perspective Counter-Attacking Jordan (OP Focus Failed)
+					on_cancel = Indochina_War.4
+				}
+			}
+		}
+		if = {
+			limit = {
+				EGY = { owns_state = 759 }
+				ISR = { owns_state = 994 }
+			}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 759
+					num_provinces = 4
+					on_win = SIX_DAYS_WAR.35
+					on_lose = Indochina_War.4
+					on_cancel = Indochina_War.4
+				}
+
+				defender = {
+					state = 994
+					num_provinces = 4
+					on_win = Indochina_War.4
+					on_lose = SIX_DAYS_WAR.19 #Israeli Perspective Counter-Attacking Syria (OP Focus Failed)
 					on_cancel = Indochina_War.4
 				}
 			}
 		}
 	}
 }
+
+#Jordan and Syria counterattack
 country_event = {
 	id = SIX_DAYS_WAR.18 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.18"}
@@ -695,7 +895,7 @@ country_event = {
 				attacker = {
 					state = 781
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.5
+					on_win = SIX_DAYS_WAR.5 #Arab victory - Jordan annexes Jezreel - event chain ends
 					on_lose = Indochina_War.4
 					on_cancel = Indochina_War.4
 				}
@@ -704,7 +904,7 @@ country_event = {
 					state = 921
 					num_provinces = 4
 					on_win = Indochina_War.4
-					on_lose = SIX_DAYS_WAR.191
+					on_lose = SIX_DAYS_WAR.191 #Israeli Perspective Counter-Attacking Jordan (OP Focus Failed)
 					on_cancel = Indochina_War.4
 				}
 			}
@@ -715,7 +915,7 @@ country_event = {
 		trigger = {
 			tag = JOR
 		}
-		country_event = SIX_DAYS_WAR.9
+		country_event = SIX_DAYS_WAR.9 #Failed Counter-Attack (Syrian/Jordanian Perspective) - ends event chain
 	}
 	option = {
 		name = "Begin the Offensive"
@@ -732,7 +932,7 @@ country_event = {
 				attacker = {
 					state = 759
 					num_provinces = 4
-					on_win = SIX_DAYS_WAR.5
+					on_win = SIX_DAYS_WAR.35 #Arab victory
 					on_lose = Indochina_War.4
 					on_cancel = Indochina_War.4
 				}
@@ -741,7 +941,7 @@ country_event = {
 					state = 994
 					num_provinces = 4
 					on_win = Indochina_War.4
-					on_lose = SIX_DAYS_WAR.19
+					on_lose = SIX_DAYS_WAR.19 #Israeli Perspective Counter-Attacking Syria (OP Focus Failed)
 					on_cancel = Indochina_War.4
 				}
 			}
@@ -752,7 +952,7 @@ country_event = {
 		trigger = {
 			tag = SYR
 		}
-		country_event = SIX_DAYS_WAR.9
+		country_event = SIX_DAYS_WAR.9 #Failed Counter-Attack (Syrian/Jordanian Perspective) - ends event chain
 	}
 }
 country_event = {
@@ -772,7 +972,7 @@ country_event = {
 			attacker = {
 				state = 994
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.151
+				on_win = SIX_DAYS_WAR.151 #Israeli Perspective Seizes Golan Heights - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -780,7 +980,7 @@ country_event = {
 			defender = {
 				state = 759
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.6
+				on_win = SIX_DAYS_WAR.6 #Failed Counter-Attack (Israeli Perspective) - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -792,6 +992,8 @@ country_event = {
 		}
 	}
 }
+
+#Israeli Perspective Counter-Attacking Jordan (OP Focus Failed)
 country_event = {
 	id = SIX_DAYS_WAR.191 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.191"}
@@ -809,7 +1011,7 @@ country_event = {
 			attacker = {
 				state = 921
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.15
+				on_win = SIX_DAYS_WAR.15 #Israeli Perspective Seizes the West Bank - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -817,7 +1019,7 @@ country_event = {
 			defender = {
 				state = 781
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.6
+				on_win = SIX_DAYS_WAR.6 #Failed Counter-Attack (Israeli Perspective) - ends event chain
 				on_lose = Indochina_War.4
 				on_cancel = Indochina_War.4
 			}
@@ -829,6 +1031,8 @@ country_event = {
 		}
 	}
 }
+
+#Israeli Perspective Counter-Attack into Sinai #How is this triggered???
 country_event = {
 	id = SIX_DAYS_WAR.192 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.192"}
@@ -846,8 +1050,8 @@ country_event = {
 			attacker = {
 				state = 1296
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.28
-				on_lose = SIX_DAYS_WAR.27
+				on_win = SIX_DAYS_WAR.28 #Israel Seizes the Sinai and Gaza (Israel Perspective) - ends event chain
+				on_lose = SIX_DAYS_WAR.27 #Failed initial Israeli Offensive in the Sinai (Israel Perspective) - ends event chain
 				on_cancel = Indochina_War.4
 			}
 
@@ -868,6 +1072,7 @@ country_event = {
 	}
 }
 
+#Egypt seizes Eilat
 country_event = {
 	id = SIX_DAYS_WAR.21 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.21"}
@@ -884,9 +1089,11 @@ country_event = {
 			transfer_state = 1296
 			transfer_state = 755
 		}
-		ISR = { country_event = SIX_DAYS_WAR.22 }
+		ISR = { country_event = SIX_DAYS_WAR.22 } #Launch Counter-Attack to Retake Eilat after initial Israeli loss (Israeli Perspective)
 	}
 }
+
+#Launch Counter-Attack to Retake Eilat after initial Israeli loss (Israeli Perspective)
 country_event = {
 	id = SIX_DAYS_WAR.22 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.22"}
@@ -904,8 +1111,8 @@ country_event = {
 			attacker = {
 				state = 803
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.23
-				on_lose = SIX_DAYS_WAR.24
+				on_win = SIX_DAYS_WAR.23 # Eilat Retaken (Israeli Perspective) - ends event chain
+				on_lose = SIX_DAYS_WAR.24 # Eilat Counter-Offensive Fails - ends event chain
 				on_cancel = Indochina_War.4
 			}
 
@@ -925,6 +1132,8 @@ country_event = {
 
 	}
 }
+
+# Eilat Retaken (Israeli Perspective) - ends event chain
 country_event = {
 	id = SIX_DAYS_WAR.23 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.23"}
@@ -937,12 +1146,15 @@ country_event = {
 
 	option = {
 		name = "Disaster Averted"
+		EGY = { complete_national_focus = UAR_an_Naksah }
 		ISR = {
 			transfer_state = 755
 		}
 		news_event = SIX_DAYS_WAR.37
 	}
 }
+
+# Eilat Counter-Offensive Fails - ends event chain
 country_event = {
 	id = SIX_DAYS_WAR.24 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.24"}
@@ -955,9 +1167,12 @@ country_event = {
 
 	option = {
 		name = "Unfortunate"
+		EGY = { complete_national_focus = UAR_The_Partial_Liberation_of_Palestine }
 		news_event = SIX_DAYS_WAR.38
 	}
 }
+
+#Egypt launches attack
 country_event = {
 	id = SIX_DAYS_WAR.25 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.25"}
@@ -983,13 +1198,15 @@ country_event = {
 			defender = {
 				state = 1296
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.26
-				on_lose = SIX_DAYS_WAR.22
+				on_win = SIX_DAYS_WAR.26 #Israeli Counter-Offensive into the Sinai after initial Israeli victory (Israel Perspective)
+				on_lose = SIX_DAYS_WAR.21 #Egypt seizes Eilat
 				on_cancel = Indochina_War.4
 			}
 		}
 	}
 }
+
+#Israeli Counter-Offensive into the Sinai after initial Israeli victory (Israel Perspective)
 country_event = {
 	id = SIX_DAYS_WAR.26 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.26"}
@@ -1007,8 +1224,8 @@ country_event = {
 			attacker = {
 				state = 1296
 				num_provinces = 4
-				on_win = SIX_DAYS_WAR.28
-				on_lose = SIX_DAYS_WAR.27
+				on_win = SIX_DAYS_WAR.28 #Israel Seizes the Sinai and Gaza (Israel Perspective) - ends event chain
+				on_lose = SIX_DAYS_WAR.27 #Failed initial Israeli Offensive in the Sinai (Israel Perspective) - ends event chain
 				on_cancel = Indochina_War.4
 			}
 
@@ -1022,6 +1239,8 @@ country_event = {
 		}
 	}
 }
+
+#Failed initial Israeli Offensive in the Sinai (Israel Perspective) - ends event chain
 country_event = {
 	id = SIX_DAYS_WAR.27 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.27"}
@@ -1034,9 +1253,12 @@ country_event = {
 
 	option = {
 		name = "Unfortunate"
+		EGY = { complete_national_focus = UAR_an_Naksah }
 
 	}
 }
+
+#Israel Seizes the Sinai and Gaza (Israel Perspective) - event chain ends.
 country_event = {
 	id = SIX_DAYS_WAR.28 
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = SIX_DAYS_WAR.28"}
@@ -1056,6 +1278,7 @@ country_event = {
 			transfer_state = 1279
 			news_event = SIX_DAYS_WAR.39
 		}
+		EGY = { complete_national_focus = UAR_an_Naksah }
 	}
 }
 news_event = {
@@ -1103,6 +1326,7 @@ news_event = {
 
 	option = {
 		name = "All of this for water rights?"
+			SYR = { complete_national_focus = SYR_arabvictory }
 
 	}
 }

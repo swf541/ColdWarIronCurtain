@@ -193,6 +193,12 @@ UN_VOTE_FORCE_END = {
                     create_faction = "The United Nations"
                     add_to_faction = var:UNS.coalition_tag
                 }
+                set_global_flag = UN_Coalition_War
+                var:UNS.un_nation_target = {
+                    set_country_flag = UN_Coalition_Target
+                    activate_mission = UN_Intervention_Coalition
+                    save_global_event_target_as = UN_Coalition_Target
+                }
                 every_country = {
                     limit = {
                         NOT = {
@@ -293,4 +299,34 @@ UN_VOTE_FORCE_END = {
         clr_country_flag = UN_ABSTAIN_ONGOING
         clr_country_flag = UN_NO_ONGOING
     }
+}
+balkanise_country = {
+    every_owned_state = {
+        for_each_loop = {
+            array = core_countries
+            value = country_temp
+            if = {
+                limit = {
+                    NOT = { country_exists = var:country_temp }
+                }
+                add_to_array = {
+        array = PREV.releasable_tags_array
+        value = country_temp
+                }
+            }
+        }
+    }
+    for_each_loop = {
+        array = releasable_tags_array
+        value = country_temp
+        every_owned_state = {
+            if = {
+                limit = { 
+                    is_core_of = var:country_temp
+                }
+                transfer_state_to = var:country_temp
+            }
+        }
+    }
+    clear_array = releasable_tags_array
 }
