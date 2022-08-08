@@ -1,6 +1,133 @@
 #Written by Killerrabbit and SWF541
 #Optimized and Reworked by Angriest Bird
 #for not oversizing the array for having both 2000 and 2017 values
+
+##Mid Investment Boost
+short_length_investment_influence_boost = {
+	set_variable = {
+		industry_total_ind = officeparknumber 
+	}
+	multiply_variable = {
+		industry_total_ind = 2
+	}
+	add_to_variable = {
+		industry_total_ind = num_of_civilian_factories
+	}
+	add_to_variable = {
+		industry_total_ind = num_of_naval_factories
+	}
+	add_to_variable = {
+		industry_total_ind = num_of_military_factories 
+	}
+	add_to_variable = {
+		industry_total_ind = farmnumber
+	}
+	set_variable = {
+		influence_modifier = 10
+	}
+	divide_variable = {
+		influence_modifier = industry_total_ind
+	}
+	clamp_variable = {
+		var = influence_modifier
+		min = 0.2
+		max = 1
+	}
+	set_variable = {
+		influence_change = 8
+	}
+	multiply_variable = {
+		influence_change = influence_modifier
+	}
+	set_temp_variable = { percent_change = influence_change }
+    set_temp_variable = { tag_index = ROOT.id }
+    set_temp_variable = { influence_target = THIS.id }
+    change_influence_percentage = yes
+}
+
+medium_length_investment_influence_boost = {
+	set_variable = {
+		industry_total_ind = officeparknumber 
+	}
+	multiply_variable = {
+		industry_total_ind = 2
+	}
+	add_to_variable = {
+		industry_total_ind = num_of_civilian_factories
+	}
+	add_to_variable = {
+		industry_total_ind = num_of_naval_factories
+	}
+	add_to_variable = {
+		industry_total_ind = num_of_military_factories 
+	}
+	add_to_variable = {
+		industry_total_ind = farmnumber
+	}
+	set_variable = {
+		influence_modifier = 10
+	}
+	divide_variable = {
+		influence_modifier = industry_total_ind
+	}
+	clamp_variable = {
+		var = influence_modifier
+		min = 0.2
+		max = 1
+	}
+	set_variable = {
+		influence_change = 5
+	}
+	multiply_variable = {
+		influence_change = influence_modifier
+	}
+	set_temp_variable = { percent_change = influence_change }
+    set_temp_variable = { tag_index = ROOT.id }
+    set_temp_variable = { influence_target = THIS.id }
+    change_influence_percentage = yes
+}
+long_length_investment_influence_boost = {
+	set_variable = {
+		industry_total_ind = officeparknumber 
+	}
+	multiply_variable = {
+		industry_total_ind = 2
+	}
+	add_to_variable = {
+		industry_total_ind = num_of_civilian_factories
+	}
+	add_to_variable = {
+		industry_total_ind = num_of_naval_factories
+	}
+	add_to_variable = {
+		industry_total_ind = num_of_military_factories 
+	}
+	add_to_variable = {
+		industry_total_ind = farmnumber
+	}
+	set_variable = {
+		influence_modifier = 10
+	}
+	divide_variable = {
+		influence_modifier = industry_total_ind
+	}
+	clamp_variable = {
+		var = influence_modifier
+		min = 0.2
+		max = 1
+	}
+	set_variable = {
+		influence_change = 8
+	}
+	multiply_variable = {
+		influence_change = influence_modifier
+	}
+	set_temp_variable = { percent_change = influence_change }
+    set_temp_variable = { tag_index = ROOT.id }
+    set_temp_variable = { influence_target = THIS.id }
+    change_influence_percentage = yes
+}
+
 ###COMPENDIUM
 #Tag Specific are near the bottom of the generic functions. Relevant information
 init_influence = {
@@ -1798,6 +1925,9 @@ change_current_influencer_index_percentage = {
 # set_temp_variable = { influence_target = SCOPE }
 # Supported Scope: FROM, ROOT, PREV, TAG
 change_influence_percentage = {
+	log = "[GetDateText]: [ROOT.GetName]: Change Influence Percentage [??var:tag_index.GetName] influence action in [?var:influence_target.GetName]"
+
+	set_temp_variable = { percent_change_temp = percent_change }
 	var:influence_target = {
 		for_loop_effect = {
 			end = influence_array^num
@@ -1826,15 +1956,30 @@ change_influence_percentage = {
 			}
 		}
 
-		var:tag_index = {
-			set_temp_variable = { influence_change = influence_multiplier }
+		# Apply multiplier in positive interaction
+		# You shouldn't lose more because you are a bigger power
+		if = { limit = { check_variable = { percent_change > 0 } }
+
+			var:tag_index = {
+				set_temp_variable = { influence_change = modifier@foreign_influence_modifier }
+			}
+
+			set_temp_variable = { influence_defense_change = modifier@foreign_influence_defense_modifier }
+			subtract_from_temp_variable = { influence_change = influence_defense_change }
+
+			add_to_temp_variable = { influence_change = 1 }
+			multiply_temp_variable = { percent_change = influence_change }
 		}
 
-		multiply_temp_variable = { percent_change = influence_change }
 
 		if = {
 			limit = {
 				check_variable = { influence_array_val^6 > 0 }
+				NOT = { check_variable = { influence_array^0 = var:tag_index } }
+				NOT = { check_variable = { influence_array^1 = var:tag_index } }
+				NOT = { check_variable = { influence_array^2 = var:tag_index } }
+				NOT = { check_variable = { influence_array^3 = var:tag_index } }
+				NOT = { check_variable = { influence_array^5 = var:tag_index } }
 				NOT = { check_variable = { influence_array^6 = var:tag_index } }
 			}
 			if = {
@@ -1958,11 +2103,11 @@ change_influence_percentage = {
 					multiply_variable = { influence_array_val^i = temp_total }
 				}
 			}
-			
 			recalculate_influence = yes
+			custom_effect_tooltip = change_influencer_tt
 		}
-
 	}
+	set_temp_variable = { percent_change = percent_change_temp }
 }
 ##Boost Domestic Influence
 boost_domestic_influence_1_percent = {
@@ -3109,3 +3254,4 @@ generic_grant_5_percent_influence_of_EU = {
 	custom_effect_tooltip = improve_AND_influence_5_percent_TT
 
 }
+
