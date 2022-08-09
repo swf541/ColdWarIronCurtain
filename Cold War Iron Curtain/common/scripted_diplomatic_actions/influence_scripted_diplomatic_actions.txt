@@ -157,21 +157,14 @@ scripted_diplomatic_actions = {
 		complete_effect = {
 			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
 			add_to_variable = { ROOT.foreignPowerProjection = -1 }
-			set_temp_variable = { influence_gain = 50 }
+			set_temp_variable = { influence_gain = 5 }
 			multiply_variable = { influence_gain = decryptTotal }
-			for_loop_effect = {
-				end = influence_array^num
-				value = v
-				if = { limit = { check_variable = { influence_array^v = ROOT } }
-					add_to_variable = { influence_array_val^v = influence_gain }
-					set_country_flag = found
-				}
-			}
-			if = { limit = { NOT = { has_country_flag = found } }
-				add_to_array = { influence_array = ROOT.id }
-				add_to_array = { influence_array_val = influence_gain }
-			}
-			clr_country_flag = found
+
+			set_temp_variable = { percent_change = influence_gain }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes
+
 			set_variable = { influenced_by = ROOT }
 
 			ROOT = {
@@ -180,7 +173,7 @@ scripted_diplomatic_actions = {
 				#add_ideas = idea_influencing_daily # to be added if pdx fixes an issue with removing it
 				set_variable = { show_start_influencing = 1 }
 			}
-			recalculate_influence = yes
+			change_influence_percentage = yes
 		}
 		reject_effect = {} # runs when the action is properly sent and rejected
 		can_be_sent = {} # send button will be disabled if no
@@ -296,24 +289,12 @@ scripted_diplomatic_actions = {
 			}
 			set_variable = { mil_subsidy_id = ROOT.id } # used for income generator
 			add_to_variable = { ROOT.foreignPowerProjection = -5 }
-			set_temp_variable = { influence_gain = 200 } #Make Dynamic Later
-			for_loop_effect = {
-				end = influence_array^num
-				value = v
-				if = {
-					limit = {
-						check_variable = { influence_array^v = ROOT }
-					}
-					add_to_variable = { influence_array_val^v = influence_gain }
-					set_country_flag = found
-				}
-			}
-			if = {
-				limit = { NOT = { has_country_flag = found } }
-					add_to_array = { influence_array = ROOT.id }
-					add_to_array = { influence_array_val = influence_gain }
-			}
-			recalculate_influence = yes
+			set_temp_variable = { influence_gain = 20 }
+
+			set_temp_variable = { percent_change = influence_gain }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes
 			# opinions
 			add_opinion_modifier = {
 				target = ROOT
@@ -428,24 +409,12 @@ scripted_diplomatic_actions = {
 		# runs when the action is properly sent and accepted
 		complete_effect = {
 			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
-			set_temp_variable = { influence_gain = currentDebt } #from global rank idea
-			add_to_temp_variable = { influence_gain = 25 } 
-			for_loop_effect = {
-				end = influence_array^num
-				value = v
-				if = {
-					limit = {
-						check_variable = { influence_array^v = ROOT }
-					}
-					add_to_variable = { influence_array_val^v = influence_gain }
-					set_country_flag = found
-				}
-			}
-			if = {
-				limit = { NOT = { has_country_flag = found } }
-					add_to_array = { influence_array = ROOT.id }
-					add_to_array = { influence_array_val = influence_gain }
-			}
+			set_temp_variable = { influence_gain = 33 } 
+			set_temp_variable = { percent_change = influence_gain }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes
+
 			set_temp_variable = { tempDebt = currentDebt }
 			subtract_from_variable = { ROOT.currentMoney = currentDebt }
 			for_each_loop = {
