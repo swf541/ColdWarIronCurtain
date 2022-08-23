@@ -1225,61 +1225,84 @@ FRA_misc_category = {
 	}
 }
 FRA_Indochina_War_category = {
-	The_Geneva_Accords = {
-		
-		
-		visible = {
+	Proclaim_Victory_in_Vietnam = {
+		icon = generic_prepare_civil_war
+		allowed = {
 			tag = FRA
 		}
 		available = {
-			always = no
+			NOT = {
+				country_exists = VIN
+			}
 		}
-		cancel_trigger = {
-			NOT = { country_exists = VIN }
-		}
-		activation = {
-			date < 1955.01.01
-			tag = FRA
-		}
-		#is_good = yes
-
-		selectable_mission = no
-		days_mission_timeout = 1853 
 		fire_only_once = yes
-		
-		timeout_effect = {
+		complete_effect = {
+			# news_event = Geneva_conference.1 #News event for everyone about france winning the indochina war
+			VIE = {
+				transfer_state = 838
+				transfer_state = 786
+				transfer_state = 671
+				transfer_state = 881
+				transfer_state = 1280
+				transfer_state = 1281
+				annex_country = {
+					target = NLF
+				}
+				annex_country = {
+					target = VIN
+				}
+			}
 			if = {
 				limit = {
-					NOT = {
-						LOS = {
-							controls_state = 670
-						}
-					}
+					country_exists = LAO
 				}
-				LAO = {
+				LOS = {
 					annex_country = {
-						target = LOS
+						target = LAO
 					}
 				}
 			}
-			FRA = {
-				white_peace = VIN
-				white_peace = NLF
-				white_peace = LAO
-				set_autonomy = { target = CAM autonomy_state = autonomy_free }
-				set_autonomy = { target = VIE autonomy_state = autonomy_free }
-				set_autonomy = { target = LOS autonomy_state = autonomy_free }
+			USA = {
+				complete_national_focus = USA_50s_The_Fall_of_the_Viet_Minh
 			}
-			LOS = {
-				drop_cosmetic_tag = yes
-				white_peace = VIN
-				white_peace = LAO
-				white_peace = NLF
-				leave_faction = yes
+			if = {
+				limit = {
+					is_core_of = VIN
+				}
+				clr_state_flag = VIN_unplanned_offensive_flag
+				remove_dynamic_modifier = { modifier = unplanned_offensive }
 			}
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}
+	The_Geneva_Accords = {
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = FRA
+		}
+		available = {
+			date > 1954.7.1
+			AND = {
+				country_exists = VIN
+				VIE = {
+					controls_state = 286
+				}
+			}
+		}
+		fire_only_once = yes
+		complete_effect = {
+			news_event = Geneva_conference.1 #News event for everyone about geneva conference starting and the matter of korean and indochina war
 			NLF = {
 				drop_cosmetic_tag = yes
 			}
+			white_peace = VIN
+			white_peace = NLF
+			white_peace = LAO
+			set_autonomy = { target = CAM autonomy_state = autonomy_free }
+			set_autonomy = { target = VIE autonomy_state = autonomy_free }
+			set_autonomy = { target = LOS autonomy_state = autonomy_free }
 			VIE = {
 				white_peace = VIN
 				white_peace = LAO
@@ -1294,6 +1317,20 @@ FRA_Indochina_War_category = {
 				transfer_state = 983
 				leave_faction = yes
 			}
+			CAM = {
+				drop_cosmetic_tag = yes
+				white_peace = VIN
+				white_peace = LAO
+				white_peace = NLF
+				leave_faction = yes
+			}
+			LOS = {
+				drop_cosmetic_tag = yes
+				white_peace = VIN
+				white_peace = LAO
+				white_peace = NLF
+				leave_faction = yes
+			}
 			VIN = {
 				transfer_state = 838
 				transfer_state = 786
@@ -1304,12 +1341,21 @@ FRA_Indochina_War_category = {
 				set_capital = { state = 786 }
 				dismantle_faction = yes
 				drop_cosmetic_tag = yes
-				complete_national_focus = VIN_Ratification_of_the_Geneva_Accords
+				# complete_national_focus = VIN_Ratification_of_the_Geneva_Accords
 			}
-			CAM = {
-				drop_cosmetic_tag = yes
-				white_peace = VIN
-				leave_faction = yes
+			if = {
+				limit = {
+					NOT = {
+						LOS = {
+							controls_state = 670
+						}
+					}
+				}
+				LAO = {
+					annex_country = {
+						target = LOS
+					}
+				}
 			}
 			USA = {
 				complete_national_focus = USA_50s_The_Geneva_Conferece
@@ -1322,7 +1368,174 @@ FRA_Indochina_War_category = {
 				remove_dynamic_modifier = { modifier = unplanned_offensive }
 			}
 		}
+		ai_will_do = {
+			factor = 1
+		}
 	}
-		#The Elimination of the Vietnamese Communists
-		#The Geneva Accords vie.5
+	Proclaim_Victory_in_the_liberation_war = {
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = VIN
+		}
+		available = {
+			NOT = {
+				VIE = {
+					controls_state = 286
+				}
+			}
+			NOT = {
+				USA = {
+					has_completed_focus = USA_50s_Operation_Vulture
+				}
+			}
+		}
+		# fire_only_once = yes
+		complete_effect = {
+			# news_event = Geneva_conference.1 #News event for everyone about vietnam winning its independence war
+			VIN = {
+				drop_cosmetic_tag = yes
+				transfer_state = 671
+				transfer_state = 786
+				transfer_state = 1281
+				transfer_state = 1280
+				annex_country = {
+					target = VIE
+				}
+				annex_country = {
+					target = NLF
+				}
+				set_capital = { state = 786 }
+				dismantle_faction = yes
+				# complete_national_focus = VIN_Ratification_of_the_Geneva_Accords
+			}
+			FRA = {
+				set_autonomy = { target = CAM autonomy_state = autonomy_free }
+				set_autonomy = { target = LOS autonomy_state = autonomy_free }
+				white_peace = VIN
+				white_peace = LAO
+				white_peace = NLF
+			}
+			if = {
+				limit = {
+					country_exists = LOS
+				}
+				if = {
+					limit = {
+						country_exists = LAO
+					}
+					if = {
+						limit = {
+							NOT = {
+								LOS = {
+									controls_state = 670
+								}
+							}
+						}
+						release_autonomy = {
+							target = LAO
+							autonomy_state = autonomy_easternbloc
+						}
+						LAO = {
+							annex_country = {
+								target = LOS
+							}
+						}
+					}
+					else = {
+						LOS = {
+							drop_cosmetic_tag = yes
+							white_peace = VIN
+							white_peace = LAO
+							white_peace = NLF
+							leave_faction = yes
+						}
+					}
+				}
+				else = {
+					if = {
+						limit = {
+							NOT = {
+								LOS = {
+									controls_state = 670
+								}
+							}
+						}
+						LAO = {
+							add_state_core = 1295
+							add_state_core = 841
+							add_state_core = 670
+							add_state_core = 1196
+							add_state_core = 1198
+							add_state_core = 1191
+							add_state_core = 1187
+							set_capital = { state = 1295 }
+						}
+						VIN = {
+							annex_country = {
+								target = LOS
+							}
+							release_autonomy = {
+								target = LAO
+								autonomy_state = autonomy_easternbloc
+							}
+						}
+					}
+					else = {
+						LOS = {
+							drop_cosmetic_tag = yes
+							white_peace = VIN
+							white_peace = LAO
+							white_peace = NLF
+							leave_faction = yes
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = CAM
+				}
+				if = {
+					limit = {
+						NOT = {
+							CAM = {
+								controls_state = 741
+							}
+						}
+					}
+					VIN = {
+						annex_country = {
+							target = CAM
+						}
+						release_autonomy = {
+							target = CAM
+							autonomy_state = autonomy_easternbloc
+						}
+					}
+					CAM = {
+						drop_cosmetic_tag = yes
+					}
+				}
+				else = {
+					CAM = {
+						drop_cosmetic_tag = yes
+						white_peace = VIN
+						white_peace = LAO
+						white_peace = NLF
+						leave_faction = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					is_core_of = VIN
+				}
+				clr_state_flag = VIN_unplanned_offensive_flag
+				remove_dynamic_modifier = { modifier = unplanned_offensive }
+			}
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}
 }
