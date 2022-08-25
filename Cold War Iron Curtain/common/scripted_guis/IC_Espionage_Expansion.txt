@@ -194,6 +194,8 @@ scripted_gui = {
                 set_variable = { german_first_name_number = 39 }
                 set_variable = { german_surname_number = 27 }
 
+                set_variable = { european_portrait_max = 23 }
+
                 set_variable = {
                    paramilitary_recruit_toggle = 1
                }
@@ -212,6 +214,16 @@ scripted_gui = {
                             max = italian_first_name_number
                         }
                         round_variable = randomized_first_name
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 1
+                            max = european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
                         add_to_array = {
                             ROOT.first_name = randomized_first_name
                         } 
@@ -241,6 +253,16 @@ scripted_gui = {
                             ROOT.first_name = randomized_first_name
                         } 
                         randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 1
+                            max = european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
                             var = randomized_surname
                             distribution = uniform
                             min = 1
@@ -264,6 +286,16 @@ scripted_gui = {
                         round_variable = randomized_first_name
                         add_to_array = {
                             ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 1
+                            max = european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
                         } 
                         randomize_variable = {
                             var = randomized_surname
@@ -291,6 +323,11 @@ scripted_gui = {
                 array = espionage_paramilitary_operative_type
                 change_scope = no
 				entry_container = special_operations_recruitment_target_list_entry
+            }
+        }
+        properties = {
+            operative_portrait = {
+                image = "[RecruitmentPortraits]"
             }
         }
         triggers = {
@@ -349,6 +386,7 @@ scripted_gui = {
                 clear_array = temp_build_espionage_paramilitary_operative_name_type
                 clear_array = temp_build_first_name
                 clear_array = temp_build_surname
+                clear_array = temp_build_portrait
                 for_each_loop = {
                     array = espionage_paramilitary_operative_type
                     set_variable = {
@@ -393,7 +431,10 @@ scripted_gui = {
                 set_variable = { paramilitary_group_name_char30^num_espionage_paramilitary_squads = chars^29 }
                 set_variable = { paramilitary_group_name_char31^num_espionage_paramilitary_squads = chars^30 }
                 set_variable = { paramilitary_group_name_char32^num_espionage_paramilitary_squads = chars^31 }
-                #Squad Leader    
+                #Squad Leader 
+                set_variable = {
+                    paramilitary_operative_squad_leader_level^num_espionage_paramilitary_squads = 1
+                }   
                 set_variable = {
                     paramilitary_operative_squad_leader_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^0
                 }
@@ -407,18 +448,19 @@ scripted_gui = {
                 set_variable = {
                    paramilitary_operative_squad_leader_surname^num_espionage_paramilitary_squads = temp_build_surname^0
                 }       
-
+                set_variable = {
+                    paramilitary_operative_squad_leader_portrait^num_espionage_paramilitary_squads = temp_build_portrait^0 
+                }
                 set_variable = {
                     current_page = num_espionage_paramilitary_squads
                 }
                 add_to_variable = {
                     ROOT.operative_number = 1
-                }
+                } 
                 meta_effect = { 
                     text = {
                         generate_character = { #create + recruit
                             token_base = [TAG]_Operative_[OPERATIVE] 
-                            #name = "[NAME]" 
                         }   
                         add_to_array = {
                             array = paramilitary_operative_squad_leader
@@ -428,11 +470,20 @@ scripted_gui = {
                             array = operative_tokens
                             value = token:[TAG]_Operative_[OPERATIVE] 
                         }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_traits
+                            value = temp_build_espionage_paramilitary_operative_type^0
+                        }
                     }
                     TAG = "[?ROOT.GetTag]"
                     OPERATIVE = "[?operative_number]"
+                    ARRAY_NUMBER = "[?ROOT.num_espionage_paramilitary_squads]"
                 }    
+                add_to_array = { operative_portrait_tokens = temp_build_portrait^0 }
                 #Member 2
+                set_variable = {
+                    paramilitary_operative_squad_unit_2_level^num_espionage_paramilitary_squads = 1
+                }   
                 set_variable = {
                     paramilitary_operative_squad_unit_2_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^1
                 }
@@ -445,6 +496,9 @@ scripted_gui = {
                 set_variable = {
                    paramilitary_operative_squad_unit_2_surname^num_espionage_paramilitary_squads = temp_build_surname^1
                 }      
+                set_variable = {
+                    paramilitary_operative_squad_unit_2_portrait^num_espionage_paramilitary_squads = temp_build_portrait^1 
+                }
                 add_to_variable = {
                     ROOT.operative_number = 1
                 }
@@ -452,7 +506,6 @@ scripted_gui = {
                     text = {
                         generate_character = { #create + recruit
                             token_base = [TAG]_Operative_[OPERATIVE] 
-                            #name = "[NAME]" 
                         }   
                         add_to_array = {
                             array = paramilitary_operative_squad_unit_2
@@ -462,11 +515,20 @@ scripted_gui = {
                             array = operative_tokens
                             value = token:[TAG]_Operative_[OPERATIVE] 
                         }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_traits
+                            value = temp_build_espionage_paramilitary_operative_type^1
+                        }
                     }
                     TAG = "[?ROOT.GetTag]"
                     OPERATIVE = "[?operative_number]"
+                    ARRAY_NUMBER = "[?ROOT.num_espionage_paramilitary_squads]"
                 }    
+                add_to_array = { operative_portrait_tokens = temp_build_portrait^1 }
                 #Member 3
+                set_variable = {
+                    paramilitary_operative_squad_unit_3_level^num_espionage_paramilitary_squads = 1
+                }   
                 set_variable = {
                     paramilitary_operative_squad_unit_3_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^2
                 }
@@ -479,11 +541,16 @@ scripted_gui = {
                 set_variable = {
                    paramilitary_operative_squad_unit_3_surname^num_espionage_paramilitary_squads = temp_build_surname^2
                 }      
+                set_variable = {
+                    paramilitary_operative_squad_unit_3_portrait^num_espionage_paramilitary_squads = temp_build_portrait^2 
+                }
+                add_to_variable = {
+                    ROOT.operative_number = 1
+                }
                 meta_effect = { 
                     text = {
                         generate_character = { #create + recruit
                             token_base = [TAG]_Operative_[OPERATIVE] 
-                            #name = "[NAME]" 
                         }   
                         add_to_array = {
                             array = paramilitary_operative_squad_unit_3
@@ -493,11 +560,20 @@ scripted_gui = {
                             array = operative_tokens
                             value = token:[TAG]_Operative_[OPERATIVE] 
                         }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_traits
+                            value = temp_build_espionage_paramilitary_operative_type^2
+                        }
                     }
                     TAG = "[?ROOT.GetTag]"
                     OPERATIVE = "[?operative_number]"
+                    ARRAY_NUMBER = "[?ROOT.num_espionage_paramilitary_squads]"
                 }    
+                add_to_array = { operative_portrait_tokens = temp_build_portrait^2 }
                 #Member 4
+                set_variable = {
+                    paramilitary_operative_squad_unit_4_level^num_espionage_paramilitary_squads = 1
+                }   
                 set_variable = {
                     paramilitary_operative_squad_unit_4_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^3
                 }
@@ -509,12 +585,17 @@ scripted_gui = {
                 }
                 set_variable = {
                    paramilitary_operative_squad_unit_4_surname^num_espionage_paramilitary_squads = temp_build_surname^3
-                }      
+                }     
+                set_variable = {
+                    paramilitary_operative_squad_unit_4_portrait^num_espionage_paramilitary_squads = temp_build_portrait^3 
+                } 
+                add_to_variable = {
+                    ROOT.operative_number = 1
+                }
                 meta_effect = { 
                     text = {
                         generate_character = { #create + recruit
                             token_base = [TAG]_Operative_[OPERATIVE] 
-                            #name = "[NAME]" 
                         }   
                         add_to_array = {
                             array = paramilitary_operative_squad_unit_4
@@ -524,11 +605,20 @@ scripted_gui = {
                             array = operative_tokens
                             value = token:[TAG]_Operative_[OPERATIVE] 
                         }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_traits
+                            value = temp_build_espionage_paramilitary_operative_type^3
+                        }
                     }
                     TAG = "[?ROOT.GetTag]"
                     OPERATIVE = "[?operative_number]"
+                    ARRAY_NUMBER = "[?ROOT.num_espionage_paramilitary_squads]"
                 }    
+                add_to_array = { operative_portrait_tokens = temp_build_portrait^3 }
                 #Member 5
+                set_variable = {
+                    paramilitary_operative_squad_unit_5_level^num_espionage_paramilitary_squads = 1
+                }   
                 set_variable = {
                     paramilitary_operative_squad_unit_5_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^4
                 }
@@ -542,16 +632,21 @@ scripted_gui = {
                    paramilitary_operative_squad_unit_5_surname^num_espionage_paramilitary_squads = temp_build_surname^4
                 }      
                 set_variable = {
+                    paramilitary_operative_squad_unit_5_portrait^num_espionage_paramilitary_squads = temp_build_portrait^4 
+                }
+                set_variable = {
                     paramilitary_recruit_toggle = 0
                 }
                 set_variable = {
                     operative_number_step = 0
                 }
+                add_to_variable = {
+                    ROOT.operative_number = 1
+                }
                 meta_effect = { 
                     text = {
                         generate_character = { #create + recruit
                             token_base = [TAG]_Operative_[OPERATIVE] 
-                            #name = "[NAME]" 
                         }   
                         add_to_array = {
                             array = paramilitary_operative_squad_unit_5
@@ -561,10 +656,16 @@ scripted_gui = {
                             array = operative_tokens
                             value = token:[TAG]_Operative_[OPERATIVE] 
                         }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_traits
+                            value = temp_build_espionage_paramilitary_operative_type^4
+                        }
                     }
                     TAG = "[?ROOT.GetTag]"
                     OPERATIVE = "[?operative_number]"
+                    ARRAY_NUMBER = "[?ROOT.num_espionage_paramilitary_squads]"
                 }    
+                add_to_array = { operative_portrait_tokens = temp_build_portrait^4 }
                 #CREATE TEAM
 
                 #CLEARING OLD DATA
@@ -597,6 +698,9 @@ scripted_gui = {
                 add_to_array = {
                   temp_build_surname = temp_build_surname_1
                 }
+                add_to_array = {
+                  temp_build_portrait = temp_build_portrait_1
+                }
                 set_variable = {
                    selected = 0
                 }
@@ -623,6 +727,9 @@ scripted_gui = {
                 }
                 set_variable = {
                   temp_build_surname_1 = surname^i
+                }
+                set_variable = {
+                    temp_build_portrait_1 = portrait^i
                 }
             }
             name_toggle_unconfirm_click = {
