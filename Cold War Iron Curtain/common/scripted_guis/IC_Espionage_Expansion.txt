@@ -5,6 +5,17 @@ scripted_gui = {
 		ai_enabled = {
 			always = no
 		}
+        properties = {
+            black_ops_phase_title_1_picture = {
+                image = "[Phase1Picture]"
+            }
+            black_ops_phase_title_2_picture = {
+                image = "[Phase2Picture]"
+            }
+            black_ops_phase_title_3_picture = {
+                image = "[Phase3Picture]"
+            }
+        }
 		window_name = "operation_overview_window_black_ops"
 		visible = {
 			check_variable = {
@@ -386,6 +397,7 @@ scripted_gui = {
                 set_variable = {
                     paramilitary_operative_squad_leader_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^0
                 }
+
                 set_variable = {
                     paramilitary_operative_squad_leader_name_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_name_type^0
                 }
@@ -394,7 +406,40 @@ scripted_gui = {
                 }
                 set_variable = {
                    paramilitary_operative_squad_leader_surname^num_espionage_paramilitary_squads = temp_build_surname^0
-                }              
+                }       
+
+                set_variable = {
+                    current_page = num_espionage_paramilitary_squads
+                }
+                add_to_variable = {
+                    ROOT.operative_number = 1
+                }
+                meta_effect = { # The actual meta-effect. This can go anywhere you need it: in a decision, in a scripted effect, in a scripted GUI click effect, etc...
+                    text = {
+                        generate_character = { #create + recruit
+                            token_base = [TAG]_Operative_[OPERATIVE] 
+                            name = "[NAME]" 
+                            corps_commander={
+                                skill = 1
+                                attack_skill = 1
+                                defense_skill = 1
+                                planning_skill = 1
+                                logistics_skill = 1
+                            }
+                        }   
+                        add_to_array = {
+                            array = paramilitary_operative_squad_leader
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                        add_to_array = {
+                            array = operative_tokens
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                    }
+                    TAG = "[?ROOT.GetTag]"
+                    OPERATIVE = "[?operative_number]"
+                    NAME = "[USA_NAME]"
+                }    
                 #Member 2
                 set_variable = {
                     paramilitary_operative_squad_unit_2_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^1
