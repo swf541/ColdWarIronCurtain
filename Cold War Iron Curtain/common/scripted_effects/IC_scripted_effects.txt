@@ -20,7 +20,133 @@ ic_pulse = {
 		}
 		set_variable = { global.eco_health = 0 }
 	}
-
+	if = {
+		limit = {
+			tag = FRA
+			check_variable = { root.parliamentary_support < 50 }
+			check_variable = { root.government_strength > 0 }
+		}
+		subtract_from_variable = { root.government_strength = 1 }
+		clamp_variable = {
+			var = ROOT.government_strength
+			min = 0
+			max = 100
+		}
+	}
+	if = {
+		limit = {
+			tag = FRA
+			check_variable = { root.parliamentary_support > 50 }
+			check_variable = { root.government_strength < 100 }
+		}
+		add_to_variable = { root.government_strength = 1 }
+		clamp_variable = {
+			var = ROOT.government_strength
+			min = 0
+			max = 100
+		}
+	}
+	if = {
+		limit = {
+			tag = FRA
+			check_variable = { supporting_parties > 4 }
+		}
+		add_to_variable = { root.parliamentary_support = 1 }
+		clamp_variable = {
+			var = ROOT.parliamentary_support
+			min = 0
+			max = 100
+		}
+	}
+	if = {
+		limit = {
+			tag = FRA
+			check_variable = { supporting_parties < 4 }
+		}
+		subtract_from_variable = { root.parliamentary_support = 1 }
+		clamp_variable = {
+			var = ROOT.parliamentary_support
+			min = 0
+			max = 100
+		}
+	}
+	if = {
+		limit = {
+			tag = FRA
+			check_variable = { root.government_strength = 0 }
+		}
+		country_event = French_PMFall.1
+	}
+	if = {
+		limit = {
+			tag = FRA
+			OR = {
+				has_country_flag = communist_PM
+				has_country_flag = pcf_support_government
+			}
+		}
+		add_to_variable = { ROOT.geopolitical_alignment = 1 }
+		clamp_variable = {
+			var = ROOT.geopolitical_alignment
+			min = 15
+			max = 540
+		}
+	}
+	if = {
+		limit = {
+			tag = FRA
+			OR = {
+				has_country_flag = pro_us_PM
+				has_country_flag = mrp_support_governemnt
+			}
+		}
+		subtract_from_variable = { ROOT.geopolitical_alignment = 1 }
+		clamp_variable = {
+			var = ROOT.geopolitical_alignment
+			min = 15
+			max = 540
+		}
+	}
+	if = {
+		limit = {
+			tag = FRA
+			NOT = {
+				OR = {
+					has_country_flag = pro_us_PM
+					has_country_flag = mrp_support_governemnt
+					has_country_flag = communist_PM
+					has_country_flag = pcf_support_government
+				}
+			}
+			check_variable = { root.geopolitical_alignment < 186 }
+		}
+		add_to_variable = { ROOT.geopolitical_alignment = 1 }
+		clamp_variable = {
+			var = ROOT.geopolitical_alignment
+			min = 186
+			max = 370
+		}
+	}
+	if = {
+		limit = {
+			tag = FRA
+			NOT = {
+				OR = {
+					has_country_flag = pro_us_PM
+					has_country_flag = mrp_support_governemnt
+					has_country_flag = communist_PM
+					has_country_flag = pcf_support_government
+				}
+			}
+			check_variable = { root.geopolitical_alignment > 370 }
+		}
+		subtract_from_variable = { ROOT.geopolitical_alignment = 1 }
+		clamp_variable = {
+			var = ROOT.geopolitical_alignment
+			min = 186
+			max = 370
+		}
+	}
 	set_variable = { global.eco_output_factor = 1 }
 	set_variable = { ecoalpha = global.eco_health }
 	multiply_variable = { ecoalpha = 10 }
@@ -1277,6 +1403,22 @@ ic_pulse = {
 			date < 1965.12.01
 		}
 		country_event = fin.39
+	}
+	if = {
+		limit = {
+			tag = FIN
+			date > 1961.01.01
+			date < 1961.03.01
+		}
+		country_event = fin.40
+	}
+	if = {
+		limit = {
+			tag = FIN
+			date > 1962.08.01
+			date < 1962.09.01
+		}
+		country_event = fin.41
 	}
 	if = {
 		limit = {
@@ -3301,6 +3443,7 @@ ic_pulse = {
 			NOT = { tag = NGA }
 			NOT = { tag = RAJ }
 			NOT = { tag = PAK }
+			NOT = { tag = FIN }
 		}
 		load_focus_tree = generic_focus_60
 		set_country_flag = focus_tree_60_reset
@@ -3359,6 +3502,7 @@ ic_pulse = {
 				tag = EGY
 				tag = SOM
 				tag = FRA
+				tag = FIN
 			}
 		}
 		set_country_flag = focus_tree_60_reset
@@ -3584,6 +3728,12 @@ ic_pulse = {
 				tag = PER
 			}
 			load_focus_tree = IRAN_1960s
+		}
+		if = {
+			limit = {
+				tag = FIN
+			}
+			load_focus_tree = 60s_FIN
 		}
 		if = {
 			limit = {
@@ -5459,15 +5609,6 @@ ic_pulse = {
 			NOT = { has_global_flag = tri_war }
 		}
 		country_event = tri.5
-	}
-	if = {
-		limit = {
-			tag = SOV
-			date > 1955.05.01	#14
-			date < 1955.08.20
-			has_country_leader = { name = "Nikita Khrushchev" ruling_only = yes }
-		}
-		country_event = { id = swf.7 days = 10 }
 	}
 	if = {
 		limit = {
