@@ -1,5 +1,34 @@
 scripted_gui = {
-	intelligence_bulletin_slot_one = {
+    intelligence_button_overlay = {
+        context_type = player_context
+        window_name = "intelligence_button_overlay"
+        parent_window_name = country_menu_window
+        properties = {
+            Espionage_Button_Overlay = {
+                frame = paramilitary_toggle
+            }
+        }
+        effects = {
+            Espionage_Button_Overlay_click = {
+                if = {
+                    limit = {
+                        check_variable = {
+                            paramilitary_toggle = 2
+                        }
+                    }
+                    set_variable = {
+                        paramilitary_toggle = 0
+                    }
+                }
+                else = {
+                    set_variable = {
+                        paramilitary_toggle = 2
+                    }
+                }
+            }
+        }
+    }
+    intelligence_bulletin_slot_one = {
         context_type = player_context
         window_name = "intelligence_bulletin_slot_one"
 		visible = {
@@ -7,6 +36,11 @@ scripted_gui = {
 				paramilitary_slot_one_bulletin = 1 
 			}
 		}
+        effects = {
+            event_option_background_click = {
+                paramilitary_slot_one_bulletin = 0
+            }
+        }
     }
 	country_special_operations_selection_list = {
         context_type = player_context
@@ -20,7 +54,7 @@ scripted_gui = {
         }
         properties = {
             operative_squad_portrait = {
-                image = "[SelectionPortraits]"
+                image = "[RecruitmentPortraits]"
             }
         }
         triggers = {
@@ -125,6 +159,11 @@ scripted_gui = {
                 set_variable = {
                     paramilitary_selection_toggle = 1
                 }
+                clear_array = ROOT.portrait
+                for_each_loop = {
+                    array = operative_leader_portrait_tokens
+                    add_to_array = { portrait = operative_leader_portrait_tokens^i }
+                }
             }
             black_ops_btn_collect_click = {
                 set_variable = {
@@ -161,7 +200,7 @@ scripted_gui = {
 		window_name = "paramilitary_tab_menu_window"
 		visible = {
 			check_variable = {
-				paramilitary_toggle = 1 
+				paramilitary_toggle = 2 
 			}
 		}
         effects = {
@@ -216,6 +255,9 @@ scripted_gui = {
             entry_button_click = {
                 set_variable = {
                     show_espionage_details_menu = 1
+                }
+                set_variable = {
+                    current_page = 0
                 }
                 set_variable = {
                     selected_operation_index_target = local_possible_operations_target^i
@@ -338,6 +380,22 @@ scripted_gui = {
             unit_leader_5 = {
                 image = "[OperativeSquadPortrait5]"
             }
+            leader_exp_fg_mid = {
+                frame = operative_1_current_experience^current_page
+            }
+            operative_exp_fg_2_mid = {
+                frame = operative_2_current_experience^current_page
+            }
+            operative_exp_fg_3_mid = {
+                frame = operative_3_current_experience^current_page
+            }
+            operative_exp_fg_4_mid = {
+                frame = operative_4_current_experience^current_page
+            }
+            operative_exp_fg_5_mid = {
+                frame = operative_5_current_experience^current_page
+            }
+
         }
 		visible = {
 			check_variable = {
@@ -486,6 +544,7 @@ scripted_gui = {
                }
                clear_array = ROOT.first_name
                clear_array = ROOT.surname
+               clear_array = ROOT.portrait
                 for_each_loop = {
                     array = espionage_paramilitary_operative_name_type
                     if = {
@@ -683,6 +742,7 @@ scripted_gui = {
             }
             create_group_click = {
                 add_to_variable = { num_espionage_paramilitary_squads = 1 }
+                add_to_variable = { Black_Ops_Maintenance_Monthly = 2 }
                 #SET NAME ARRAY
                 set_variable = { paramilitary_group_name_char1^num_espionage_paramilitary_squads = chars^0 }
                 set_variable = { paramilitary_group_name_char2^num_espionage_paramilitary_squads = chars^1 }
