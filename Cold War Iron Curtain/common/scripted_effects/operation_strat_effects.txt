@@ -1,0 +1,226 @@
+
+
+update_operation_ai = {
+	# old target is no longer relevant
+	if = {
+		limit = {
+			NOT = { check_variable = { generic_operation_target = 0 } }
+			var:generic_operation_target = {
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = PREV
+				}
+			}
+		}
+		set_variable = { generic_operation_target = 0 }
+	}
+
+
+	# pick an operation target
+	get_highest_scored_country = {
+		scorer = ai_generic_operation_target_scorer
+		var = generic_operation_target
+	}
+	
+	# this variable will be our limiting factor for actually doing operations
+	
+	# check if we have any operatives that are captured
+	# find the captor so they can be rescued
+	set_temp_variable = { captor = 0 }
+	
+	every_operative = {
+		limit = { is_operative_captured = yes }
+		add_to_temp_variable = { min_needed_operative_for_operations = 1 }
+		if = {
+			limit = { check_variable = { captor = 0 } }
+			set_temp_variable = { captor = operative_captor }
+		}
+	}
+	set_variable = { rescue_operative_from = 0 }
+	if = {
+		limit = { NOT = { check_variable = { captor = 0 } } }
+		set_variable = { rescue_operative_from = captor } # used in ai strat generic_operation_ai_rescue
+		add_to_temp_variable = { min_needed_operative_for_operations = 2 }
+	}
+	
+	
+	# if we have too few of operatives clear operative target
+	set_temp_variable = { t = min_needed_operative_for_operations }
+	subtract_from_temp_variable = { t = 2 }
+	if = {
+		limit = { num_of_operatives < t }
+		set_variable = { generic_operation_target = 0 }
+	}
+	
+	if = {
+		# if found a target pick an operation
+		limit = { 
+			NOT = { check_variable = { generic_operation_target = 0 } }
+			# if we are already preparing for current one no need to recalc
+			OR = {
+				check_variable = { generic_operation_type_to_run = 0 }
+				NOT = { 
+					is_preparing_operation = {
+						target = var:generic_operation_target
+						operation = var:generic_operation_type_to_run
+					}
+				}
+			}
+		}
+		
+		if = {
+			limit = { 
+				num_of_operatives > min_needed_operative_for_operations
+			}
+			
+			# these two arrays are filled with operation tokens and corresponding score
+			clear_temp_array = operation_types
+			clear_temp_array = operation_types_scores
+			
+			# civilian infiltration
+			set_temp_variable = { score = 100 }
+			add_to_temp_array = { operation_types = token:operation_infiltrate_civilian }
+			add_to_temp_array = { operation_types_scores = score }
+			
+			# army infiltration
+			set_temp_variable = { score = 50 }
+			add_to_temp_variable = { score = num_armies }
+			clamp_temp_variable = { var = score max = 180 }
+			add_to_temp_array = { operation_types = token:operation_infiltrate_armed_forces_army }
+			add_to_temp_array = { operation_types_scores = score }
+			
+			# air infiltration
+			set_temp_variable = { score = 50 }
+			add_to_temp_variable = { t = num_deployed_planes }
+			divide_temp_variable = { t = 10 }
+			add_to_temp_variable = { score = t }
+			clamp_temp_variable = { var = score max = 180 }
+			add_to_temp_array = { operation_types = token:operation_infiltrate_armed_forces_airforce }
+			add_to_temp_array = { operation_types_scores = score }
+			
+			# navy infiltration
+			var:generic_operation_target = {
+				if = {
+					limit = { 
+						has_navy_size = { size > 0 } 
+						PREV = {
+							has_navy_size = { size > 0 } 
+						}
+					}
+					set_temp_variable = { score = num_ships }
+					
+					set_temp_variable = { t = num_ships_with_type@carrier }
+					multiply_temp_variable = { t = 20 }
+					add_to_temp_variable = { score = t }
+					
+					set_temp_variable = { t = num_ships_with_type@capital }
+					multiply_temp_variable = { t = 10 }
+					add_to_temp_variable = { score = t }
+					
+					clamp_temp_variable = { var = score max = 180 }
+					
+					add_to_temp_array = { operation_types = token:operation_infiltrate_armed_forces_navy }
+					add_to_temp_array = { operation_types_scores = score }
+				}
+			}
+			
+			# get token for boost resistance
+			var:generic_operation_target = {
+				# only do on fascist
+				if = {
+					limit = { 
+						PREV = {
+							NOT = { tag = ENG } # ENG already does it against GER
+							NOT = { has_government = fascism } 
+							NOT = {
+								has_operation_token = {
+									tag = var:generic_operation_target
+									token = token_resistance_contacts
+								}
+							}
+						}
+						has_government = fascism
+						check_variable = { occupied_countries^num > 0 }
+						has_added_tension_amount > 20
+					}
+					
+					# ~number of occupied_states
+					set_temp_variable = { t = 1 }
+					add_to_temp_variable = { t = num_controlled_states }
+					subtract_from_temp_variable = { t = num_owned_states }
+					clamp_temp_variable = { var = t min = 1 }
+					
+					set_temp_variable = { score = t }
+					multiply_temp_variable = { score = 15 }
+					add_to_temp_variable = { score = 50 }
+					clamp_temp_variable = { var = score max = 200 }
+					
+					add_to_temp_array = { operation_types = token:operation_make_resistance_contacts }
+					add_to_temp_array = { operation_types_scores = score }
+				}
+			}
+			# boost resistance
+			if = {
+				limit = { 
+					has_operation_token = {
+						tag = var:generic_operation_target
+						token = token_resistance_contacts
+					}
+				}
+			
+				add_to_temp_array = { operation_types = token:operation_boost_resistance }
+				add_to_temp_array = { operation_types_scores = 1000 }
+			}
+			
+			for_each_loop = {
+				array = operation_types
+				
+				# randomization by half
+				set_temp_variable = { t = random }
+				multiply_temp_variable = { t = 0.5 }
+				add_to_temp_variable = { t = 0.5 }
+				multiply_temp_variable = { operation_types_scores^i = t }
+				
+				if = {
+					limit = {
+						num_finished_operations = {
+							target = var:generic_operation_target
+							operation = var:v
+							value > 0
+						}
+						
+						# lower score if we have a finished operation
+						multiply_temp_variable = { operation_types_scores^i = 0.5 }
+								
+						# cancel if more than 1 is executed
+						if = {
+							limit = {
+								num_finished_operations = {
+									target = var:generic_operation_target
+									operation = var:v
+									value > 1
+								}
+								
+								set_temp_variable = { operation_types_scores^i = -1 }
+							}
+						}
+					}
+				}
+			}
+			
+			# highest score will be selected
+			find_highest_in_array = {
+				array = operation_types_scores
+			}
+			if = {
+				limit = { check_variable = { v > 0 } }
+				set_variable = { generic_operation_type_to_run = operation_types^i } # used in ai strat generic_operation_ai
+			}
+		}
+		else =
+		{
+			set_variable = { generic_operation_type_to_run = 0 }
+		}
+	}
+}
