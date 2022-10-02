@@ -20,15 +20,16 @@ ic_pulse = {
 		}
 		set_variable = { global.eco_health = 0 }
 	}
-	if = {
+	if = { 
 		limit = {
 			tag = FRA
-			check_variable = { root.parliamentary_support < 50 }
-			check_variable = { root.government_strength > 0 }
+			check_variable = { parliamentary_support < 50 } #If parliamentary support is under 50
+			check_variable = { government_strength > 0 } #and If government strength is superior to 0
+			NOT = { has_country_flag = no_more_pm }
 		}
-		subtract_from_variable = { root.government_strength = 1 }
+		subtract_from_variable = { government_strength = 5 } #decrease government strength until 0
 		clamp_variable = {
-			var = ROOT.government_strength
+			var = government_strength
 			min = 0
 			max = 100
 		}
@@ -36,12 +37,13 @@ ic_pulse = {
 	if = {
 		limit = {
 			tag = FRA
-			check_variable = { root.parliamentary_support > 50 }
-			check_variable = { root.government_strength < 100 }
+			check_variable = { parliamentary_support > 50 } #If Parliamentary support is above 50
+			check_variable = { government_strength < 100 } #and If government strength is under 100
+			NOT = { has_country_flag = no_more_pm }
 		}
-		add_to_variable = { root.government_strength = 1 }
+		add_to_variable = { government_strength = 5 } #increase government strength until 100
 		clamp_variable = {
-			var = ROOT.government_strength
+			var = government_strength
 			min = 0
 			max = 100
 		}
@@ -49,11 +51,12 @@ ic_pulse = {
 	if = {
 		limit = {
 			tag = FRA
-			check_variable = { supporting_parties > 4 }
+			check_variable = { supporting_parties > 3 } #If has more than 3 parties supporting the current government
+			NOT = { has_country_flag = no_more_pm }
 		}
-		add_to_variable = { root.parliamentary_support = 1 }
+		add_to_variable = { parliamentary_support = 5 } #increase parliamentary support
 		clamp_variable = {
-			var = ROOT.parliamentary_support
+			var = parliamentary_support
 			min = 0
 			max = 100
 		}
@@ -61,11 +64,12 @@ ic_pulse = {
 	if = {
 		limit = {
 			tag = FRA
-			check_variable = { supporting_parties < 4 }
+			check_variable = { supporting_parties < 4 }#If has less than 4 parties supporting the current government
+			NOT = { has_country_flag = no_more_pm }
 		}
-		subtract_from_variable = { root.parliamentary_support = 1 }
+		subtract_from_variable = { parliamentary_support = 5 } #decrease parliamentary upport
 		clamp_variable = {
-			var = ROOT.parliamentary_support
+			var = parliamentary_support
 			min = 0
 			max = 100
 		}
@@ -73,21 +77,29 @@ ic_pulse = {
 	if = {
 		limit = {
 			tag = FRA
-			check_variable = { root.government_strength = 0 }
+			check_variable = { government_strength = 0 } #if government strength reach 0
+			NOT = { has_country_flag = recently_changed_PM }
+			NOT = { has_country_flag = no_more_pm }
 		}
-		country_event = French_PMFall.1
+		country_event = French_PMFall.1 #Fall of the french PM
+		set_country_flag = {	
+			flag = recently_changed_PM
+			days = 93
+			value = 1
+		}
 	}
 	if = {
 		limit = {
 			tag = FRA
 			OR = {
-				has_country_flag = communist_PM
-				has_country_flag = pcf_support_government
+				has_country_flag = communist_PM #if communist is PM
+				has_country_flag = pcf_support_government #or if the pcf support the government
 			}
+			NOT = { has_country_flag = no_more_pm }
 		}
-		add_to_variable = { ROOT.geopolitical_alignment = 1 }
+		add_to_variable = { geopolitical_alignment = 5 } #drift geopolitical alignment toward USSR
 		clamp_variable = {
-			var = ROOT.geopolitical_alignment
+			var = geopolitical_alignment
 			min = 15
 			max = 540
 		}
@@ -95,14 +107,15 @@ ic_pulse = {
 	if = {
 		limit = {
 			tag = FRA
+			NOT = { has_country_flag = no_more_pm }
 			OR = {
-				has_country_flag = pro_us_PM
-				has_country_flag = mrp_support_governemnt
+				has_country_flag = pro_us_PM #if pro us is PM
+				has_country_flag = mrp_support_governemnt #or if the MRP support the government
 			}
 		}
-		subtract_from_variable = { ROOT.geopolitical_alignment = 1 }
+		subtract_from_variable = { geopolitical_alignment = 5 } #drift geopolitical alignment toward USA
 		clamp_variable = {
-			var = ROOT.geopolitical_alignment
+			var = geopolitical_alignment
 			min = 15
 			max = 540
 		}
@@ -110,6 +123,7 @@ ic_pulse = {
 	if = {
 		limit = {
 			tag = FRA
+			NOT = { has_country_flag = no_more_pm }
 			NOT = {
 				OR = {
 					has_country_flag = pro_us_PM
@@ -118,9 +132,9 @@ ic_pulse = {
 					has_country_flag = pcf_support_government
 				}
 			}
-			check_variable = { root.geopolitical_alignment < 186 }
+			check_variable = { geopolitical_alignment < 186 }
 		}
-		add_to_variable = { ROOT.geopolitical_alignment = 1 }
+		add_to_variable = { geopolitical_alignment = 5 }
 		clamp_variable = {
 			var = ROOT.geopolitical_alignment
 			min = 186
@@ -130,6 +144,7 @@ ic_pulse = {
 	if = {
 		limit = {
 			tag = FRA
+			NOT = { has_country_flag = no_more_pm }
 			NOT = {
 				OR = {
 					has_country_flag = pro_us_PM
@@ -138,11 +153,11 @@ ic_pulse = {
 					has_country_flag = pcf_support_government
 				}
 			}
-			check_variable = { root.geopolitical_alignment > 370 }
+			check_variable = { geopolitical_alignment > 370 }
 		}
-		subtract_from_variable = { ROOT.geopolitical_alignment = 1 }
+		subtract_from_variable = { geopolitical_alignment = 5 }
 		clamp_variable = {
-			var = ROOT.geopolitical_alignment
+			var = geopolitical_alignment
 			min = 186
 			max = 370
 		}
@@ -3964,6 +3979,14 @@ ic_pulse = {
 	}
 	if = {
 		limit = {
+			tag = FIN
+			date > 1965.07.01
+			date < 1965.08.15
+		}
+		country_event = fin.47
+	}
+	if = {
+		limit = {
 			tag = USA
 			date > 1961.06.01
 			date < 1961.08.01
@@ -5610,15 +5633,6 @@ ic_pulse = {
 			NOT = { has_global_flag = tri_war }
 		}
 		country_event = tri.5
-	}
-	if = {
-		limit = {
-			tag = SOV
-			date > 1955.05.01	#14
-			date < 1955.08.20
-			has_country_leader = { name = "Nikita Khrushchev" ruling_only = yes }
-		}
-		country_event = { id = swf.7 days = 10 }
 	}
 	if = {
 		limit = {
