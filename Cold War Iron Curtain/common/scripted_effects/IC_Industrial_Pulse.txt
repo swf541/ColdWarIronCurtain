@@ -631,34 +631,35 @@ industrial_pulse = {
 	random_owned_state = {
 		limit = { is_capital = yes }
 		if = { limit = { NOT = { has_variable = PREV.CapitalState } }
-			set_temp_variable = { prevCapitalState = THIS } # no capital was set before - 1st pulse - startup or new country
+			set_temp_variable = { PREV.prevCapitalState = THIS } # no capital was set before - 1st pulse - startup or new country
 		}
 		else = {
 			if = { 	limit = { check_variable =  { PREV.CapitalState = THIS } } # same capital
-				set_temp_variable = { prevCapitalState = THIS }
+				set_temp_variable = { PREV.prevCapitalState = THIS }
 			}
 			else = {
-				set_temp_variable = { prevCapitalState = PREV.CapitalState } # capital changed
+				set_temp_variable = { PREV.prevCapitalState = PREV.CapitalState } # capital changed
 			}
 		}
 		set_variable = { PREV.CapitalState = THIS } # Store Capital for next pulse
 	}
-	if = { limit = { has_variable = previousFoodBalance } 
+	if = { 
+		limit = { 
+			has_variable = previousFoodBalance 
+		} 
 		var:prevCapitalState = {
-			owner = {
-				add_resource = {
-					type = rubber
-					amount = var:previousFoodBalance # remove previous bonus
-					state = var:prevCapitalState
-				}
+			add_resource = {
+				type = rubber
+				amount = var:OWNER.previousFoodBalance # remove previous bonus
 			}
 		}
 	}
 	ROOT = {
-		add_resource = {
-			type = rubber
-			amount = var:FoodBalance # add new to capital
-			state = var:CapitalState
+		capital_scope = {
+			add_resource = {
+				type = rubber
+				amount = var:FoodBalance # add new to capital
+			}
 		}
 		#if = { limit = { tag = AST } log = "	[ROOT.GetTag]: removed [?previousFoodBalance] and added [?FoodBalance] Food to Capital" }
 	}

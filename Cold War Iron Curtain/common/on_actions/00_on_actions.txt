@@ -178,7 +178,6 @@ on_actions = {
 			#100 = ace_died.1
 		}
 	}
-
 	# During justifying wargoals
 	# triggered daily, so make sure there is a sink somewhere not firing events
 	# country, FROM = target nation
@@ -209,32 +208,11 @@ on_actions = {
 			17000 = 0
 		}
 	}
-
 	on_wargoal_expire = {
 		random_events = {
 			100 = war_justification.301
 		}
 	}
-
-	# country random events
-	on_bi_yearly_pulse = {
-		effect = {
-		}
-	}
-
-	#on_five_year_pulse = {
-	#
-	#}
-
-	on_border_war_lost = {
-		# effect = {
-		# 	owner = {
-		# 		country_event = goa.14 
-		# 		country_event = goa.16
-		# 	}
-		# }	
-	}
-	
 	on_leave_faction = {
 		effect = {
 			FROM = {
@@ -258,19 +236,6 @@ on_actions = {
 				}
 				remove_ideas = nato_member
 			}
-		}
-	}
-
-	#FROM is the one that joins the faction
-	on_create_faction = {
-		effect = {
-		}
-	}
-
-	#FROM is country getting invited.
-	on_offer_join_faction = {
-		effect = {
-	
 		}
 	}
 
@@ -348,15 +313,6 @@ on_actions = {
 			}
 		}
 	}
-
-	# ROOT is attacker, FROM is defender
-	on_war_relation_added = {
-		effect = {
-			# WIP Harain
-			# Remove Influence modifiers if any
-			# FROM = { country_event = influence.10 }
-		}
-	}
 	
 	# When a new faction is formed
 	on_faction_formed = {
@@ -364,382 +320,488 @@ on_actions = {
 			news_event = news.159
 		}
 	}
-	
-	# ROOT is capitulated country, FROM is winner
-	on_capitulation = {
-		# moved to 11_usa_on_actions.txt - add new ones there
-	}
-
-	# ROOT is previously capitulated country
-	on_uncapitulation = {
+	#ROOT is new controller #FROM is old controller #FROM.FROM is state ID
+	on_state_control_changed = {
 		effect = {
-		}
-	}
-
-	on_government_change = {
-		effect = {			
-			#Make sure Soviet can always create factions
 			if = {
 				limit = {
-					original_tag = SOV
-					NOT = { has_government = communism }
+					FROM.FROM = {
+						state = 905
+					}
+					tag = EGY
+					NOT = {
+						has_global_flag = Fall_of_Hatay
+					}
+					has_global_flag = Third_Balkan_War	
 				}
-				set_rule = { can_create_factions = yes }
+				set_global_flag = Fall_of_Hatay
+				news_event = THIRD_BALKAN_WAR.63
 			}
 			if = {
-				limit = { has_government = democratic }
-				if = {
-					limit = { has_idea = democratic_opposition_voicing_protests }
-					remove_ideas = democratic_opposition_voicing_protests
-				}
-				if = {
-					limit = { has_idea = democratic_revolutionaries }
-					remove_ideas = democratic_revolutionaries
-				}
-				if = {
-					limit = { has_idea = reign_of_terror }
-					remove_ideas = reign_of_terror
-				}
-			}
-			if = {
-				limit = { has_government = communism }
-				if = {
-					limit = { TAG = SAF }
-					set_cosmetic_tag = SAF_COM
-				}
-				if = {
-					limit = { has_idea = communist_partisans_recruiting }
-					remove_ideas = communist_partisans_recruiting
-				}
-				if = {
-					limit = { has_idea = communist_revolutionaries }
-					remove_ideas = communist_revolutionaries
-				}
-				if = {
-					limit = { has_idea = communism_defeated }
-					remove_ideas = communism_defeated
-				}
-
-				#Remove anti_soviet_pact
-				if = {
-					limit = { has_idea = anti_soviet_pact }
-					remove_ideas = anti_soviet_pact
-				}
-			}
-			if = {
-				limit = { has_government = fascism }
-				if = {
-					limit = { has_idea = fascist_assault_divisions }
-					remove_ideas = fascist_assault_divisions
-				}
-				if = {
-					limit = { has_idea = fascist_revolutionaries }
-					remove_ideas = fascist_revolutionaries
-				}
-				if = {
-					limit = { has_idea = fascism_defeated }
-					remove_ideas = fascism_defeated
-				}
-				if = {
-					limit = { has_idea = anti_nazi_coup }
-					remove_ideas = anti_nazi_coup
-				}
-				if = {
-					limit = { tag = WGR }
-					set_cosmetic_tag = WGR_fascist
-				}
-				if = {
-					limit = { tag = DDR }
-					set_cosmetic_tag = DDR_fascist
-				}
-			}
-			#Replace the following two with events for SOV if they are not communist.
-			#if = {
-			#	limit = { 
-			#		OR = {
-			#			has_idea = trotskyite_plot 
-			#			has_idea = trotskyite_plot_purged
-			#		}
-			#		NOT = {
-			#			has_civil_war = yes
-			#		}
-			#	}
-			#	country_event = { id = soviet.54 }
-			#}
-		}
-	}
-
-	on_coup_succeeded = {
-		effect = {
-			#Turn elections on for democracies created from coup
-			random_other_country = {
 				limit = {
-					has_government = democratic
-					original_tag = ROOT
+					FROM.FROM = {
+						state = 47
+					}
+					tag = TUR
+					NOT = {
+						has_global_flag = Fall_of_Athens
+					}
+					has_global_flag = Third_Balkan_War	
 				}
-				set_politics = {
-					ruling_party = democratic
-					elections_allowed = yes
+				set_global_flag = Fall_of_Athens
+				news_event = THIRD_BALKAN_WAR.59
+			}
+			if = {
+				limit = {
+					FROM.FROM = {
+						state = 341
+					}
+					OR = {
+						tag = GRE
+						tag = PDG
+					}
+					NOT = {
+						has_global_flag = Fall_of_Istanbul
+					}
+					has_global_flag = Third_Balkan_War	
+				}
+				set_global_flag = Fall_of_Istanbul
+				news_event = THIRD_BALKAN_WAR.60
+			}
+			if = {
+				limit = {
+					FROM.FROM = {
+						state = 937
+					}
+					OR = {
+						tag = GRE
+						tag = PDG
+					}
+					NOT = {
+						has_global_flag = Fall_of_Edirine
+					}
+					has_global_flag = Third_Balkan_War	
+				}
+				set_global_flag = Fall_of_Edirine
+				news_event = THIRD_BALKAN_WAR.67
+			}		
+			if = {
+				limit = {
+					FROM.FROM = {
+						state = 340
+					}
+					OR = {
+						tag = GRE
+						tag = PDG
+					}
+					NOT = {
+						has_global_flag = Fall_of_Bursa
+					}
+					has_global_flag = Third_Balkan_War	
+				}
+				set_global_flag = Fall_of_Bursa
+				news_event = THIRD_BALKAN_WAR.68
+			}		
+			if = {
+				limit = {
+					FROM.FROM = {
+						state = 339
+					}
+					OR = {
+						tag = GRE
+						tag = PDG
+					}
+					NOT = {
+						has_global_flag = Fall_of_Izmir
+					}
+					has_global_flag = Third_Balkan_War	
+				}
+				set_global_flag = Fall_of_Izmir
+				news_event = THIRD_BALKAN_WAR.69
+			}	
+			if = {
+				limit = {
+					FROM.FROM = {
+						state = 339
+					}
+					OR = {
+						tag = GRE
+						tag = PDG
+					}
+					NOT = {
+						has_global_flag = Fall_of_Ankara
+					}
+					has_global_flag = Third_Balkan_War	
+				}
+				set_global_flag = Fall_of_Ankara
+				news_event = THIRD_BALKAN_WAR.70
+			}	
+			if = {
+				limit = {
+					FROM.FROM = {
+						state = 184
+					}
+					tag = TUR
+					NOT = {
+						has_global_flag = Fall_of_Kavala
+					}
+					has_global_flag = Third_Balkan_War	
+				}
+				set_global_flag = Fall_of_Kavala
+				news_event = THIRD_BALKAN_WAR.71
+			}
+			if = {
+				limit = {
+					FROM.FROM = {
+						state = 977
+					}
+					tag = TUR
+					NOT = {
+						has_global_flag = Fall_of_Thessaloniki
+					}
+					has_global_flag = Third_Balkan_War	
+				}
+				set_global_flag = Fall_of_Thessaloniki
+				news_event = THIRD_BALKAN_WAR.72
+			}
+			if = {
+				limit = {
+					FROM.FROM = {
+						state = 164
+					}
+					tag = TUR
+					NOT = {
+						has_global_flag = Fall_of_Rhodes
+					}
+					has_global_flag = Third_Balkan_War	
+				}
+				set_global_flag = Fall_of_Rhodes
+				news_event = THIRD_BALKAN_WAR.73
+			}
+			if = {
+				limit = {
+					FROM.FROM = {
+						state = 185
+					}
+					tag = TUR
+					NOT = {
+						has_global_flag = Fall_of_Ioannina
+					}
+					has_global_flag = Third_Balkan_War	
+				}
+				set_global_flag = Fall_of_Ioannina
+				news_event = THIRD_BALKAN_WAR.74
+			}
+			if = {
+				limit = {
+					FROM.FROM = {
+						OR = {
+							state = 912
+							state = 915
+							state = 183
+						}
+					}
+					tag = TUR
+					controls_state = 912
+					controls_state = 915
+					controls_state = 183
+					NOT = {
+						has_global_flag = Fall_of_Cyprus_TUR
+					}
+					has_global_flag = Third_Balkan_War	
+				}
+				set_global_flag = Fall_of_Cyprus_TUR
+				news_event = THIRD_BALKAN_WAR.61
+			}
+			if = {
+				limit = {
+					FROM.FROM = {
+						OR = {
+							state = 912
+							state = 915
+							state = 183
+						}
+					}
+					OR = {
+						tag = GRE
+						tag = PDG
+					}
+					controls_state = 912
+					controls_state = 915
+					controls_state = 183
+					NOT = {
+						has_global_flag = Fall_of_Cyprus_GRE
+					}
+					has_global_flag = Third_Balkan_War	
+				}
+				set_global_flag = Fall_of_Cyprus_GRE
+				news_event = THIRD_BALKAN_WAR.62
+			}
+
+
+
+			if = {
+				limit = {
+					tag = ISR
+					has_country_flag = suezcrisis 
+					NOT = { has_country_flag = going_it_alone }
+					453 = {
+						is_controlled_by = ISR
+						is_owned_by = EGY
+					}
+					ISR = { has_war_with = EGY }
+				}
+				country_event = operationkadesh.3 
+				
+			}
+
+			if = {
+				limit = {
+					tag = ISR
+					has_country_flag = suezcrisis 
+					NOT = { has_country_flag = going_it_alone }
+					801 = {
+						is_controlled_by = ISR
+						is_owned_by = EGY
+					}
+					ISR = { has_war_with = EGY }
+				}
+				country_event = operationkadesh.4
+			}
+			
+			if = {
+				limit = {
+					tag = ISR
+					has_country_flag = suezcrisis 
+					NOT = { has_country_flag = going_it_alone }
+					453 = {
+						is_controlled_by = ISR
+						is_owned_by = EGY
+					}
+					ISR = { has_war_with = EGY }
+				}
+				country_event = operationkadesh.5
+			}
+
+			if = {
+				limit = {
+					tag = ISR
+					has_country_flag = suezcrisis 
+					has_country_flag = going_it_alone 
+					801 = {
+						is_controlled_by = ISR
+						is_owned_by = EGY
+					}
+					805 = {
+						is_controlled_by = ISR
+						is_owned_by = EGY
+					}
+					453 = {
+						is_controlled_by = ISR
+						is_owned_by = EGY
+					}
+					ISR = { has_war_with = EGY }
+				}
+				country_event = operationkadesh.6
+			}
+			
+			if = {
+				limit = {
+					tag = EGY
+					has_country_flag = suezcrisisegy
+					1296 = {
+						is_controlled_by = EGY
+						is_owned_by = ISR
+					}
+					ISR = { has_war_with = EGY }
+				}
+				country_event = suez.30 
+				
+			}
+			
+			if = {
+				limit = {
+					tag = EGY
+					has_country_flag = suezcrisisegy
+					755 = {
+						is_controlled_by = EGY
+						is_owned_by = ISR
+					}
+					ISR = { has_war_with = EGY }
+				}
+				country_event = suez.30 
+				
+			}
+			
+			if = {
+				limit = {
+					tag = EGY
+					has_country_flag = suezcrisisegy
+					803 = {
+						is_controlled_by = EGY
+						is_owned_by = ISR
+					}
+					ISR = { has_war_with = EGY }
+				}
+				country_event = suez.30 
+				
+			}
+
+			if = {
+				limit = {
+					tag = SOV
+					NOT = { has_global_flag = conquest_helsinki_ussr }
+					111 = { 
+						is_controlled_by = SOV 
+						is_owned_by = FIN 
+					}
+					SOV = { has_war_with = FIN }
+				}
+				news_event = conquest.1
+			}
+			if = {
+				limit = {
+					tag = SOV
+					OR = {
+						owns_state = 78
+					}
+				}
+				1235 = {
+					add_core_of = SOV
+				}
+				78 = {
+					add_core_of = SOV
+				}
+			}
+			if = {
+				limit = {
+					tag = SOV
+					OR = {
+						owns_state = 949
+					}
+				}
+				949 = {
+					add_core_of = SOV
+				}
+			}
+			if = {
+				limit = {
+					tag = SOV
+					OR = {
+						owns_state = 230
+					}
+				}
+				230 = {
+					add_core_of = SOV
+				}
+			}
+			if = {
+				limit = {
+					tag = SOV
+					OR = {
+						owns_state = 231
+					}
+				}
+				231 = {
+					add_core_of = SOV
+				}
+				934 = {
+					add_core_of = SOV
+				}
+				933 = {
+					add_core_of = SOV
+				}
+			}
+			if = {
+				limit = {
+					tag = SOV
+					OR = {
+						owns_state = 229
+					}
+				}
+				229 = {
+					add_core_of = SOV
+				}
+				799 = {
+					add_core_of = SOV
+				}
+				935 = {
+					add_core_of = SOV
+				}
+				798 = {
+					add_core_of = SOV
+				}
+				419 = {
+					add_core_of = SOV
 				}
 			}
 		}
 	}
 
-	#ROOT is winner #FROM gets annexed - This will also fire on_annex
-	on_civil_war_end = {
+	#FROM is the state nuked
+	on_nuke_drop = {
 		effect = {
+			if = { limit = { NOT = { has_global_flag = wmd_first_nuke } } #First Nuke
+				set_global_flag = wmd_first_nuke
+				news_event = nuke_dropped.1
+			}
+			if = { limit = { FROM = { state = 529 } NOT = { has_global_flag = hiroshima_nuked } } news_event = nuke_dropped.2 } #Hiroshima
+			else_if = { limit = { FROM = { state = 528 } NOT = { has_global_flag = nagasaki_nuked } } news_event = nuke_dropped.3 } #Nagasaki
+			else_if = { limit = { FROM = { state = 742 } NOT = { has_global_flag = berlin_nuked } } news_event = nuke_dropped.4 } #West Berlin
+			else_if = { limit = { FROM = { state = 744 } NOT = { has_global_flag = berlin_nuked } } news_event = nuke_dropped.4 } #East Berlin
+			else_if = { limit = { FROM = { state = 126 } NOT = { has_global_flag = london_nuked } } news_event = nuke_dropped.5 } #London
+			else_if = { limit = { FROM = { state = 531 } NOT = { has_global_flag = kyoto_nuked } } news_event = nuke_dropped.6 } #Kyoto
+			else_if = { limit = { FROM = { state = 282 } NOT = { has_global_flag = tokyo_nuked } } news_event = nuke_dropped.7 } #Tokyo
+			else_if = { limit = { FROM = { state = 1200 } NOT = { has_global_flag = washington_nuked } } news_event = nuke_dropped.8 } #Washington
+			else_if = { limit = { FROM = { state = 2 } NOT = { has_global_flag = rome_nuked } } news_event = nuke_dropped.9 } #Rome
+			else_if = { limit = { FROM = { state = 16 } NOT = { has_global_flag = paris_nuked } } news_event = nuke_dropped.10 } #Paris
+			else_if = { limit = { FROM = { state = 219 } NOT = { has_global_flag = moscow_nuked } } news_event = nuke_dropped.11 } #Moscow
+			else_if = { limit = { FROM = { state = 37 } NOT = { has_global_flag = copenhagen_nuked } } news_event = nuke_dropped.12 } #Copenhagen
+			else_if = { limit = { FROM = { state = 141 } NOT = { has_global_flag = stockholm_nuked } } news_event = nuke_dropped.13 } #Stockholm
+			wmd_damage_loop_effect = yes
+		}
+
+		random_events = {
+			# 100 = nuke_dropped.0
+			# 10000 = nuke_dropped.100
 		}
 	}
 
+	#ROOT is winner, FROM gets annexed
+	on_annex = {
+		effect = {
+			
+			if = {
+				limit = {
+					tag = DDR
+					FROM = {
+						tag = WGR
+					}
+				}
+				East_German_Reunification = yes
+			}
+			if = {
+				limit = {
+					tag = KPA
+					FROM = {
+						tag = KOR
+					}
+				}
+				korean_war_north_victory_super_event = yes
+			}
+			if = {
+				limit = {
+					date < 1959.12.31
+					FROM = { TAG = GRE }
+					ROOT = { TAG = PDG }				
+				}
+				PDG = { set_capital = { state = 47 } }
+			}
+		}
+	}
 	#Not run on a specific country.
 	on_startup = {
 		effect = {
-
-		    every_country = {
-				starting_policies = yes
-			    if = { limit = { has_tech = jet_interceptor1 } add_ideas = interceptor_cost_1_idea }
-				if = { limit = { has_tech = jet_interceptor2 } add_ideas = interceptor_cost_2_idea }
-			    if = { limit = { has_tech = jet_interceptor3 } add_ideas = interceptor_cost_3_idea }
-				if = { limit = { has_tech = jet_interceptor4 } add_ideas = interceptor_cost_4_idea }	
-                if = { limit = { has_tech = jet_multirole1 } add_ideas = multirole_cost_1_idea }
-				if = { limit = { has_tech = jet_multirole2 } add_ideas = multirole_cost_2_idea }
-				if = { limit = { has_tech = jet_multirole3 } add_ideas = multirole_cost_3_idea }
-				if = { limit = { has_tech = jet_multirole4 } add_ideas = multirole_cost_4_idea }
-				if = { limit = { has_tech = cv_jet_multirole1 } add_ideas = cvmultirole_cost_1_idea }
-				if = { limit = { has_tech = cv_jet_multirole2 } add_ideas = cvmultirole_cost_2_idea }
-				if = { limit = { has_tech = cv_jet_multirole3 } add_ideas = cvmultirole_cost_3_idea }
-				if = { limit = { has_tech = cv_jet_multirole4 } add_ideas = cvmultirole_cost_4_idea }
-				if = { limit = { has_tech = jet_CAS1 } add_ideas = casjet_cost_1_idea }
-				if = { limit = { has_tech = jet_CAS2 } add_ideas = casjet_cost_2_idea }
-				if = { limit = { has_tech = jet_CAS3 } add_ideas = casjet_cost_3_idea }
-				if = { limit = { has_tech = jet_CAS4 } add_ideas = casjet_cost_4_idea }
-				if = { limit = { has_tech = cv_jet_CAS1 } add_ideas = cvcasjet_cost_1_idea }
-				if = { limit = { has_tech = cv_jet_CAS2 } add_ideas = cvcasjet_cost_2_idea }
-				if = { limit = { has_tech = cv_jet_CAS3 } add_ideas = cvcasjet_cost_3_idea }
-				if = { limit = { has_tech = cv_jet_CAS4 } add_ideas = cvcasjet_cost_4_idea }
-				if = { limit = { has_tech = transport1 } add_ideas = transportplane_cost_1_idea }
-				if = { limit = { has_tech = transport2 } add_ideas = transportplane_cost_2_idea }
-				if = { limit = { has_tech = transport3 } add_ideas = transportplane_cost_3_idea }
-				if = { limit = { has_tech = transport4 } add_ideas = transportplane_cost_4_idea }
-				if = { limit = { has_tech = naval_bomber1 } add_ideas = navalbomber_cost_1_idea }
-				if = { limit = { has_tech = naval_bomber2 } add_ideas = navalbomber_cost_2_idea }
-				if = { limit = { has_tech = naval_bomber3 } add_ideas = navalbomber_cost_3_idea }
-				if = { limit = { has_tech = naval_bomber4 } add_ideas = navalbomber_cost_4_idea }
-				if = { limit = { has_tech = jet_tactical_bomber1 } add_ideas = jettacbomber_cost_1_idea }
-				if = { limit = { has_tech = jet_tactical_bomber2 } add_ideas = jettacbomber_cost_2_idea }
-				if = { limit = { has_tech = jet_tactical_bomber3 } add_ideas = jettacbomber_cost_3_idea }
-				if = { limit = { has_tech = jet_tactical_bomber4 } add_ideas = jettacbomber_cost_4_idea }
-				if = { limit = { has_tech = jet_strategic_bomber1 } add_ideas = jetstratbomber_cost_1_idea }
-				if = { limit = { has_tech = jet_strategic_bomber2 } add_ideas = jetstratbomber_cost_2_idea }
-				if = { limit = { has_tech = jet_strategic_bomber3 } add_ideas = jetstratbomber_cost_3_idea }
-				if = { limit = { has_tech = jet_strategic_bomber4 } add_ideas = jetstratbomber_cost_4_idea }
-            }
-			SOV = {set_variable = { current_country_state_decision = 91.id } }
-			FRA = {
-				activate_mission = Government_fall
-				add_days_mission_timeout = {
-					mission = Government_fall
-					days = 158
-				}
-			}
-			SAF = {
-				set_variable = { total_pop_k_prior = 0 }
-				every_owned_state = { add_to_variable = { SAF.total_pop_k_prior = state_population_k } }
-				set_variable = { quarterly_white_immigration_k = 15 }
-				set_variable = { quarterly_white_immigration = 15000 } 
-				set_variable = { saf_white_growth = 0.13 }
-				set_variable = { saf_colored_growth = 0.12 } 
-				set_variable = { saf_asian_growth = 0.04 } 
-				set_variable = { saf_bantu_growth = 0.71 }
-
-				set_variable = { white_percentage = 0.21 }
-				set_variable = { colored_percentage = 0.09 }
-				set_variable = { asian_percentage = 0.03 }
-				set_variable = { bantu_percentage = 0.67 }
-
-				set_variable = { white_population = 0.21 }
-				set_variable = { colored_population = 0.09 }   
-				set_variable = { asian_population = 0.03 }    
-				set_variable = { bantu_population = 0.67 } 
-
-				set_variable = { white_population_prior = total_pop_k_prior }
-				set_variable = { colored_population_prior = total_pop_k_prior }
-				set_variable = { asian_population_prior = total_pop_k_prior }
-				set_variable = { bantu_population_prior = total_pop_k_prior }
-
-				multiply_variable = { white_population_prior = white_percentage }
-				round_variable = white_population_prior
-
-				multiply_variable = { colored_population_prior = colored_percentage }
-				round_variable = colored_population_prior
-
-				multiply_variable = { asian_population_prior = asian_percentage }
-				round_variable = asian_population_prior
-
-				multiply_variable = { bantu_population_prior = bantu_percentage }
-				round_variable = bantu_population_prior
-				create_pie_chart_south_africa = yes				
-			}
-			#Flag Building History Initialization#
-			#This runs a cleanup in the history files to make modding states easier. All previous coms from seperate startdates are added and to prevent errors and duplicate flags this script cleans up all inferior flags
-			every_state = {
-				state_on_startup_initialization = yes
-				
-				if = {
-					limit = {
-						date < 1950.1.1
-					}
-					initialize_1949_setup = yes
-				}
-				else_if = {
-					limit = {
-						date < 1961.1.1
-						date > 1959.1.1
-					}
-					initialize_1960_setup = yes
-				}
-				else_if = {
-					limit = {
-						date < 1974.1.1
-						date > 1972.1.1
-					}
-					initialize_1973_setup = yes
-				}
-				else_if = {
-					limit = {
-						date < 1981.1.1
-						date > 1979.1.1
-					}
-					initialize_1980_setup = yes
-				}
-				else_if = {
-					limit = {
-						date < 1992.1.1
-						date > 1990.1.1
-					}
-					initialize_1991_setup = yes
-				}
-				else_if = {
-					limit = {
-						date < 2001.1.1
-						date > 1999.1.1
-					}
-					initialize_2000_setup = yes
-				}
-			}
-			every_country = {
-				set_variable = { policy_legislation = 1 }
-				add_to_array = {
-					country_politics_list = 1	#Normal Policies
-				}
-				add_to_array = {
-					country_politics_list = 2	#Social Policies
-				}
-				add_to_array = {
-					country_politics_list = 3	#Fiscal Overview
-				}
-				#add_to_array = {
-				#	country_politics_list = 4	#Detailed Income Info
-				#}
-				#add_to_array = {
-				#	country_politics_list = 5	#Detailed Expense Info
-				#}
-				#add_to_array = {
-				#	country_politics_list = 6	#Demographic Info
-				#}
-				if = {
-					limit = {
-						tag = USA
-					}
-					add_to_array = {
-						country_politics_list = 50	#US CONGRESS
-					}
-				}
-				if = {
-					limit = {
-						tag = PRC
-					}
-					add_to_array = {
-						country_politics_list = 51	#CPC
-					}
-				}
-				if = {
-					limit = {
-						tag = FRA
-					}
-					add_to_array = {
-						country_politics_list = 75	#STATE OF FRANCE
-					}
-				}
-				if = {
-					limit = {
-						has_country_flag = arab_league_member
-					}
-					add_to_array = {
-						country_politics_list = 25	#ARAB LEAGUE
-					}
-				}
-				every_owned_state = {
-					add_to_array = {
-						PREV.acceptedculturelist = culture^0
-					}
-					add_to_array = {
-						PREV.acceptedculturelist = culture^1
-					}
-					add_to_array = {
-						PREV.acceptedculturelist = culture^2
-					}
-					add_to_array = {
-						PREV.acceptedculturelist = culture^3
-					}
-				}
-				if = {
-					limit = {
-						NOT = {
-							#Christian#
-							has_country_flag = PR_ChristianityCatholic 
-							has_country_flag = PR_ChristianityProtestant 
-							has_country_flag = PR_ChristianityOrthodox 
-							has_country_flag = PR_ChristianityOriental 
-							#Judaic#
-							has_country_flag = PR_Judaism 
-							#Islamic#
-							has_country_flag = PR_IslamSunni 
-							has_country_flag = PR_IslamShia 
-							has_country_flag = PR_IslamIbadi 
-							#Buddhism#
-							has_country_flag = PR_BuddhismVajrayana 
-							has_country_flag = PR_BuddhismMahayana 
-							has_country_flag = PR_BuddhismThereveda 
-							#Eastern#
-							has_country_flag = PR_Shinto 
-							has_country_flag = PR_TraditionalEastern 
-							has_country_flag = PR_Confucian 
-							#Indo-Iranian#
-							has_country_flag = PR_Hindu 
-							has_country_flag = PR_Sikh 
-							has_country_flag = PR_Navayana 
-							has_country_flag = PR_TraditionalIranian 
-							#Irreligious#
-							has_country_flag = PR_Irreligious 
-							has_country_flag = PR_Atheist 
-							#Minor/Esoteric#
-							has_country_flag = PR_ZionistChristian 
-							has_country_flag = PR_Statist 
-							has_country_flag = PR_CultistSafe 
-							has_country_flag = PR_CultistFatal
-							has_country_flag = PR_TraditionalAfrican
-							has_country_flag = PR_TraditionalAmerican
-							has_country_flag = PR_TraditionalOceanic
-							has_country_flag = PR_Nautralist
-							has_country_flag = PR_Messianic 
-							has_country_flag = PR_Other 
-						}
-					}
-					major_religion_placeholder = yes
-				}
-			}
-			
 ######################################################################
 #####################CWIC DEFINES, DO NOT TOUCH#######################
 			#defines version
@@ -1288,8 +1350,386 @@ on_actions = {
 			multiply_variable = { MercMobileManpowerPrice = MercManpowerPrice }
 			multiply_variable = { MercProManpowerPrice = MercManpowerPrice }
 ########################END OF CALCULATIONS##########################
+			#####ARMS SALES TECH STARTING LEVELS#####
+			set_global_flag = WP_CAP_tech_2
+			set_global_flag = WP_CAP_tech_1
+			
+			set_global_flag = WP_CUM_tech_2
+			set_global_flag = WP_CUM_tech_1
+			
+			set_global_flag = WP_MAO_tech_1
+			
+			set_global_flag = WP_IND_tech_1
+					
 
+
+########################END OF CWIC DEFINES###########################
+######################################################################
+
+			#### SPACE RACE ####
+			clear_array = global.space_race_array_country
+			clear_array = global.space_race_array_num_decisions
+			clear_array = global.top_space_race_array_country
+			clear_array = global.top_space_race_array_num_decisions
+		    every_country = {
+				starting_policies = yes
+				set_variable = { num_space_race_decisions = 0}
+				ic_pulse = yes
+				startup_influence = yes
+				add_to_variable = { decryptTotal = 1 }
+				add_to_variable = { encryptTotal = 1 }
+				set_country_flag = bonds.25
+				army_experience = 50
+				navy_experience = 50
+				set_variable = { policy_legislation = 1 }
+				if = {
+					limit = {
+						NOT = {
+							#Christian#
+							has_country_flag = PR_ChristianityCatholic 
+							has_country_flag = PR_ChristianityProtestant 
+							has_country_flag = PR_ChristianityOrthodox 
+							has_country_flag = PR_ChristianityOriental 
+							#Judaic#
+							has_country_flag = PR_Judaism 
+							#Islamic#
+							has_country_flag = PR_IslamSunni 
+							has_country_flag = PR_IslamShia 
+							has_country_flag = PR_IslamIbadi 
+							#Buddhism#
+							has_country_flag = PR_BuddhismVajrayana 
+							has_country_flag = PR_BuddhismMahayana 
+							has_country_flag = PR_BuddhismThereveda 
+							#Eastern#
+							has_country_flag = PR_Shinto 
+							has_country_flag = PR_TraditionalEastern 
+							has_country_flag = PR_Confucian 
+							#Indo-Iranian#
+							has_country_flag = PR_Hindu 
+							has_country_flag = PR_Sikh 
+							has_country_flag = PR_Navayana 
+							has_country_flag = PR_TraditionalIranian 
+							#Irreligious#
+							has_country_flag = PR_Irreligious 
+							has_country_flag = PR_Atheist 
+							#Minor/Esoteric#
+							has_country_flag = PR_ZionistChristian 
+							has_country_flag = PR_Statist 
+							has_country_flag = PR_CultistSafe 
+							has_country_flag = PR_CultistFatal
+							has_country_flag = PR_TraditionalAfrican
+							has_country_flag = PR_TraditionalAmerican
+							has_country_flag = PR_TraditionalOceanic
+							has_country_flag = PR_Nautralist
+							has_country_flag = PR_Messianic 
+							has_country_flag = PR_Other 
+						}
+					}
+					major_religion_placeholder = yes
+				}
+				add_to_array = {
+					country_politics_list = 1	#Normal Policies
+				}
+				add_to_array = {
+					country_politics_list = 2	#Social Policies
+				}
+				add_to_array = {
+					country_politics_list = 3	#Fiscal Overview
+				}
+				#add_to_array = {
+				#	country_politics_list = 4	#Detailed Income Info
+				#}
+				#add_to_array = {
+				#	country_politics_list = 5	#Detailed Expense Info
+				#}
+				#add_to_array = {
+				#	country_politics_list = 6	#Demographic Info
+				#}
+				if = {
+					limit = {
+						tag = USA
+					}
+					add_to_array = {
+						country_politics_list = 50	#US CONGRESS
+					}
+				}
+				if = {
+					limit = {
+						tag = PRC
+					}
+					add_to_array = {
+						country_politics_list = 51	#CPC
+					}
+				}
+				if = {
+					limit = {
+						tag = FRA
+					}
+					add_to_array = {
+						country_politics_list = 75	#STATE OF FRANCE
+					}
+				}
+				if = {
+					limit = {
+						has_country_flag = arab_league_member
+					}
+					add_to_array = {
+						country_politics_list = 25	#ARAB LEAGUE
+					}
+				}
+			    if = { limit = { has_tech = jet_interceptor1 } add_ideas = interceptor_cost_1_idea }
+				if = { limit = { has_tech = jet_interceptor2 } add_ideas = interceptor_cost_2_idea }
+			    if = { limit = { has_tech = jet_interceptor3 } add_ideas = interceptor_cost_3_idea }
+				if = { limit = { has_tech = jet_interceptor4 } add_ideas = interceptor_cost_4_idea }	
+                if = { limit = { has_tech = jet_multirole1 } add_ideas = multirole_cost_1_idea }
+				if = { limit = { has_tech = jet_multirole2 } add_ideas = multirole_cost_2_idea }
+				if = { limit = { has_tech = jet_multirole3 } add_ideas = multirole_cost_3_idea }
+				if = { limit = { has_tech = jet_multirole4 } add_ideas = multirole_cost_4_idea }
+				if = { limit = { has_tech = cv_jet_multirole1 } add_ideas = cvmultirole_cost_1_idea }
+				if = { limit = { has_tech = cv_jet_multirole2 } add_ideas = cvmultirole_cost_2_idea }
+				if = { limit = { has_tech = cv_jet_multirole3 } add_ideas = cvmultirole_cost_3_idea }
+				if = { limit = { has_tech = cv_jet_multirole4 } add_ideas = cvmultirole_cost_4_idea }
+				if = { limit = { has_tech = jet_CAS1 } add_ideas = casjet_cost_1_idea }
+				if = { limit = { has_tech = jet_CAS2 } add_ideas = casjet_cost_2_idea }
+				if = { limit = { has_tech = jet_CAS3 } add_ideas = casjet_cost_3_idea }
+				if = { limit = { has_tech = jet_CAS4 } add_ideas = casjet_cost_4_idea }
+				if = { limit = { has_tech = cv_jet_CAS1 } add_ideas = cvcasjet_cost_1_idea }
+				if = { limit = { has_tech = cv_jet_CAS2 } add_ideas = cvcasjet_cost_2_idea }
+				if = { limit = { has_tech = cv_jet_CAS3 } add_ideas = cvcasjet_cost_3_idea }
+				if = { limit = { has_tech = cv_jet_CAS4 } add_ideas = cvcasjet_cost_4_idea }
+				if = { limit = { has_tech = transport1 } add_ideas = transportplane_cost_1_idea }
+				if = { limit = { has_tech = transport2 } add_ideas = transportplane_cost_2_idea }
+				if = { limit = { has_tech = transport3 } add_ideas = transportplane_cost_3_idea }
+				if = { limit = { has_tech = transport4 } add_ideas = transportplane_cost_4_idea }
+				if = { limit = { has_tech = naval_bomber1 } add_ideas = navalbomber_cost_1_idea }
+				if = { limit = { has_tech = naval_bomber2 } add_ideas = navalbomber_cost_2_idea }
+				if = { limit = { has_tech = naval_bomber3 } add_ideas = navalbomber_cost_3_idea }
+				if = { limit = { has_tech = naval_bomber4 } add_ideas = navalbomber_cost_4_idea }
+				if = { limit = { has_tech = jet_tactical_bomber1 } add_ideas = jettacbomber_cost_1_idea }
+				if = { limit = { has_tech = jet_tactical_bomber2 } add_ideas = jettacbomber_cost_2_idea }
+				if = { limit = { has_tech = jet_tactical_bomber3 } add_ideas = jettacbomber_cost_3_idea }
+				if = { limit = { has_tech = jet_tactical_bomber4 } add_ideas = jettacbomber_cost_4_idea }
+				if = { limit = { has_tech = jet_strategic_bomber1 } add_ideas = jetstratbomber_cost_1_idea }
+				if = { limit = { has_tech = jet_strategic_bomber2 } add_ideas = jetstratbomber_cost_2_idea }
+				if = { limit = { has_tech = jet_strategic_bomber3 } add_ideas = jetstratbomber_cost_3_idea }
+				if = { limit = { has_tech = jet_strategic_bomber4 } add_ideas = jetstratbomber_cost_4_idea }
+            }
+			SOV = {set_variable = { current_country_state_decision = 91.id } }
+			SAF = {
+				set_variable = { total_pop_k_prior = 0 }
+				every_owned_state = { add_to_variable = { SAF.total_pop_k_prior = state_population_k } }
+				set_variable = { quarterly_white_immigration_k = 15 }
+				set_variable = { quarterly_white_immigration = 15000 } 
+				set_variable = { saf_white_growth = 0.13 }
+				set_variable = { saf_colored_growth = 0.12 } 
+				set_variable = { saf_asian_growth = 0.04 } 
+				set_variable = { saf_bantu_growth = 0.71 }
+
+				set_variable = { white_percentage = 0.21 }
+				set_variable = { colored_percentage = 0.09 }
+				set_variable = { asian_percentage = 0.03 }
+				set_variable = { bantu_percentage = 0.67 }
+
+				set_variable = { white_population = 0.21 }
+				set_variable = { colored_population = 0.09 }   
+				set_variable = { asian_population = 0.03 }    
+				set_variable = { bantu_population = 0.67 } 
+
+				set_variable = { white_population_prior = total_pop_k_prior }
+				set_variable = { colored_population_prior = total_pop_k_prior }
+				set_variable = { asian_population_prior = total_pop_k_prior }
+				set_variable = { bantu_population_prior = total_pop_k_prior }
+
+				multiply_variable = { white_population_prior = white_percentage }
+				round_variable = white_population_prior
+
+				multiply_variable = { colored_population_prior = colored_percentage }
+				round_variable = colored_population_prior
+
+				multiply_variable = { asian_population_prior = asian_percentage }
+				round_variable = asian_population_prior
+
+				multiply_variable = { bantu_population_prior = bantu_percentage }
+				round_variable = bantu_population_prior
+				create_pie_chart_south_africa = yes				
+			}
+			#Flag Building History Initialization#
+			#This runs a cleanup in the history files to make modding states easier. All previous coms from seperate startdates are added and to prevent errors and duplicate flags this script cleans up all inferior flags
+			every_state = {
+				state_on_startup_initialization = yes
+				add_to_array = {
+					OWNER.acceptedculturelist = culture^0
+				}
+				add_to_array = {
+					OWNER.acceptedculturelist = culture^1
+				}
+				add_to_array = {
+					OWNER.acceptedculturelist = culture^2
+				}
+				add_to_array = {
+					OWNER.acceptedculturelist = culture^3
+				}
+				if = {
+					limit = {
+						date < 1950.1.1
+					}
+					initialize_1949_setup = yes
+				}
+				else_if = {
+					limit = {
+						date < 1961.1.1
+						date > 1959.1.1
+					}
+					initialize_1960_setup = yes
+				}
+				else_if = {
+					limit = {
+						date < 1974.1.1
+						date > 1972.1.1
+					}
+					initialize_1973_setup = yes
+				}
+				else_if = {
+					limit = {
+						date < 1981.1.1
+						date > 1979.1.1
+					}
+					initialize_1980_setup = yes
+				}
+				else_if = {
+					limit = {
+						date < 1992.1.1
+						date > 1990.1.1
+					}
+					initialize_1991_setup = yes
+				}
+				else_if = {
+					limit = {
+						date < 2001.1.1
+						date > 1999.1.1
+					}
+					initialize_2000_setup = yes
+				}
+			}
+            #Various
+			YUG = {
+				if = {
+					limit = {
+						has_start_date < 1950.01.01
+					}
+					country_event = CRO_insurgency_options.0
+				}
+			}			
+			CHI = {
+				if = {
+					limit = {
+						has_start_date < 1950.01.01
+					}
+					activate_mission = The_Shanghai_Campaign
+				}
+			}	
+			
+			AFG = {
+				army_experience = 250
+				navy_experience = 250
+			}
+			VTC = {
+				army_experience = 666666
+				navy_experience = 666666
+				air_experience = 666666
+				country_event = TUTOR.666
+			}
+			HOK = {
+				army_experience = 250
+				navy_experience = 250
+			}
+			ISR = {
+				if = {
+					limit = {
+						has_start_date < 1950.01.01
+					}
+					country_event = israel.10
+					country_event = { id = israel.9999 days = 1 }
+				}
+                for_loop_effect = {
+                    end = acceptedculturelist^num
+                    value = v
+                    if = {
+                        limit = {
+							check_variable = { acceptedculturelist^v = 205 }
+                        }
+                        set_variable = {
+							acceptedculturelist^v = 0
+						}
+                    }
+                }
+			}
+			USA = {
+				army_experience = 100
+				navy_experience = 100
+                for_loop_effect = {
+                    end = acceptedculturelist^num
+                    value = v
+                    if = {
+                        limit = {
+                            OR = {
+								check_variable = { acceptedculturelist^v = 7 }
+								check_variable = { acceptedculturelist^v = 8 }
+								check_variable = { acceptedculturelist^v = 9 }
+							}
+                        }
+                        set_variable = {
+							acceptedculturelist^v = 0
+						}
+                    }
+                }
+			}
+			SOV = {
+				army_experience = 100
+				navy_experience = 100
+			}
+			PRC = {
+				army_experience = 50
+			}
+			RCG = {
+				army_experience = 50
+			}
+			RAJ = {
+				army_experience = 50
+			}
+			PAK = {
+				army_experience = 50
+			}
+			KPA = {
+				army_experience = 50
+				navy_experience = 50
+			}
+			KOR = {
+				army_experience = 50
+				navy_experience = 50
+			}
+			ENG = {
+				army_experience = 50
+				navy_experience = 200
+			}
+			YUG = {
+				army_experience = 50
+			}
+			ITA = {
+				army_experience = 50
+			}
+			SPR = {
+				army_experience = 50
+			}
+			XSM = {
+				army_experience = 50
+			}
+			ISR = {
+				army_experience = 50
+			}
+            #UN Setup+Trade+AL
 			UNS = {
+				export_script_for_pool = yes
 				activate_mission = ic_trade
 				add_to_array = { UNS.un_option_list = 0 }
 				add_to_array = { UNS.un_option_list = 1 }
@@ -1433,270 +1873,34 @@ on_actions = {
 			PAK = { add_ideas = un_member }
 			YEM = { add_ideas = un_member }
 			#BEM = { add_ideas = un_member }
-	
-			#####ARMS SALES TECH STARTING LEVELS#####
-			set_global_flag = WP_CAP_tech_2
-			set_global_flag = WP_CAP_tech_1
-			
-			set_global_flag = WP_CUM_tech_2
-			set_global_flag = WP_CUM_tech_1
-			
-			set_global_flag = WP_MAO_tech_1
-			
-			set_global_flag = WP_IND_tech_1
-					
-			#### SPACE RACE ####
-			clear_array = global.space_race_array_country
-			clear_array = global.space_race_array_num_decisions
-			clear_array = global.top_space_race_array_country
-			clear_array = global.top_space_race_array_num_decisions
 
-			###ECONOMICS###
-			every_country = {
-				set_variable = { num_space_race_decisions = 0}
-				ic_pulse = yes
-				startup_influence = yes
-				add_to_variable = { decryptTotal = 1 }
-				add_to_variable = { encryptTotal = 1 }
-				set_country_flag = bonds.25
+            #Pulse Set
+            random_other_country = {
+				limit = { is_ai = no }
+				close_all_windows = yes
+				news_event = tutorial.1000
+				country_event = { id = tutorial.2000 hours = 1 }
+				#country_event = tutorial.1
 			}
-########################END OF CWIC DEFINES###########################
-######################################################################
-			YUG = {
-				if = {
-					limit = {
-						has_start_date < 1950.01.01
-					}
-					country_event = CRO_insurgency_options.0
-				}
-			}			
-			CHI = {
-				if = {
-					limit = {
-						has_start_date < 1950.01.01
-					}
-					activate_mission = The_Shanghai_Campaign
-				}
-			}	
-			
-
-			ISR = {
-				if = {
-					limit = {
-						has_start_date < 1950.01.01
-					}
-					country_event = israel.10
-					country_event = { id = israel.9999 days = 1 }
-				}
+			UNS = {
+				standard_deviation_for_industrial_base = yes
 			}
-			every_country = {
-				army_experience = 50
-				navy_experience = 50
-			}
-			random_country = {
-				add_to_array = { global.sd_array = 1 }
-				add_to_array = { global.sd_array = 2 }
-				add_to_array = { global.sd_array = 3 }
+			COL = {
+				country_event = COL_pol.1
 			}
 
-			#every_country = {
-			#	if = {
-			#		limit = {
-			#			is_ai = yes
-			#			NOT = { has_template = "Infantry Division" }
-			#		}
-			#		load_oob = "_ai_templates"
-			#	}
-			#}
-			AFG = {
-				army_experience = 250
-				navy_experience = 250
-			}
-			VTC = {
-				army_experience = 666666
-				navy_experience = 666666
-				air_experience = 666666
-				country_event = TUTOR.666
-			}
-			HOK = {
-				army_experience = 250
-				navy_experience = 250
-			}
-			ISR = {
-                for_loop_effect = {
-                    end = acceptedculturelist^num
-                    value = v
-                    if = {
-                        limit = {
-							check_variable = { acceptedculturelist^v = 205 }
-                        }
-                        set_variable = {
-							acceptedculturelist^v = 0
-						}
-                    }
-                }
-			}
-			USA = {
-				army_experience = 100
-				navy_experience = 100
-                for_loop_effect = {
-                    end = acceptedculturelist^num
-                    value = v
-                    if = {
-                        limit = {
-                            OR = {
-								check_variable = { acceptedculturelist^v = 7 }
-								check_variable = { acceptedculturelist^v = 8 }
-								check_variable = { acceptedculturelist^v = 9 }
-							}
-                        }
-                        set_variable = {
-							acceptedculturelist^v = 0
-						}
-                    }
-                }
-			}
-			SOV = {
-				army_experience = 100
-				navy_experience = 100
-			}
-			PRC = {
-				army_experience = 50
-			}
-			RCG = {
-				army_experience = 50
-			}
-			RAJ = {
-				army_experience = 50
-			}
-			PAK = {
-				army_experience = 50
-			}
-			KPA = {
-				army_experience = 50
-				navy_experience = 50
-			}
-			KOR = {
-				army_experience = 50
-				navy_experience = 50
-			}
-			ENG = {
-				army_experience = 50
-				navy_experience = 200
-			}
-			YUG = {
-				army_experience = 50
-			}
-			ITA = {
-				army_experience = 50
-			}
-			SPR = {
-				army_experience = 50
-			}
-			XSM = {
-				army_experience = 50
-			}
-			ISR = {
-				army_experience = 50
-			}
-
+            #Additional Other
 			USA = {
 				country_event = focus_check.1
 			}
 			SOV = {
 				country_event = sov.1001
 			}
-			#PHI = {
-			#	country_event = hukbalahap.1001
-			#}
-			#SPR = {
-			#	country_event = Maquis.1001
-			#}
-			SEN = {
-				french_influence_col_idea_add = yes
-			}
-			MOR = {
-				french_influence_col_idea_add = yes
-			}
-			RCG = {
-				french_influence_col_idea_add = yes
-			}
-			DJI = {
-				french_influence_col_idea_add = yes
-			}
-			TUN = {
-				french_influence_col_idea_add = yes
-			}
-			SAR = {
-				french_influence_col_idea_add = yes
-			}
-			AND = {
-				french_influence_col_idea_add = yes
-			}
-			LOS = {
-				french_influence_col_idea_add = yes
-			}
-			CAM = {
-				french_influence_col_idea_add = yes
-			}
-			VIE = {
-				french_influence_col_idea_add = yes
-			}
-			CMR = {
-				french_influence_col_idea_add = yes
-			}
-			MAD = {
-				french_influence_col_idea_add = yes
-			}
-			#every_country = {
-			#	limit = {
-			#		check_variable = { domestic_influence_amount > 0 }
-			#	}
-			#	recalculate_influence = yes
-			#}
 			VTC = {
 				set_country_flag = ic_pulse_one_flag
 			}	
 			FRA = {
 				set_division_template_lock = { division_template = "Légion Étrangère Française" is_locked = yes }	
-			}
-			SOV = {
-				if = {
-					limit = {
-						is_historical_focus_on = no
-					}
-					random_list = {
-						25 = {
-						}
-						25 = {
-							set_country_flag = SOV_random_ahistorical
-							set_country_flag = SOV_random_go_beria
-						}
-						25 = {
-							set_country_flag = SOV_random_ahistorical
-							set_country_flag = SOV_random_go_stalin
-						}
-						25 = {
-							set_country_flag = SOV_random_ahistorical
-							set_country_flag = SOV_random_go_malenkov
-						}
-					}
-					random_list = {
-						50 = {
-						}
-						50 = {
-							set_country_flag = SOV_random_aggressive
-						}
-					}
-				}
-			}
-			FRA = {
-				if = {
-					limit = {
-						has_start_date < 1950.01.01
-					}
-					country_event = { id = French_PM.1 days = 157 }
-				}
 			}
 			BUL = {
 				if = {
@@ -1713,534 +1917,7 @@ on_actions = {
 					}		
 				}
 			}
-			
-			random_other_country = {
-				limit = { is_ai = no }
-				close_all_windows = yes
-				news_event = tutorial.1000
-				country_event = { id = tutorial.2000 hours = 1 }
-				#country_event = tutorial.1
-			}
-			UNS = {
-				standard_deviation_for_industrial_base = yes
-			}
-			every_country = {
-				limit = {
-					date < 1950.1.1
-					OR = {
-						is_subject_of = ENG
-						is_puppet_of = ENG
-					}
-				}
-				add_to_war = {
-					targeted_alliance = MAL
-					enemy = MLA
-				}
-			}
+        }
 
-			every_country = {
-				limit = {
-					date < 1950.1.1
-					OR = {
-						is_subject_of = RAJ
-						is_puppet_of = RAJ
-					}
-				}
-				add_to_war = {
-					targeted_alliance = MAL
-					enemy = MLA
-				}
-			}
-			COL = {
-				country_event = COL_pol.1
-			}
-			every_country = {
-				country_event = TUTOR.0
-			}
-		}
-	}
-
-	#ROOT is new controller #FROM is old controller #FROM.FROM is state ID
-	on_state_control_changed = {
-		effect = {
-			if = {
-				limit = {
-					FROM.FROM = {
-						state = 905
-					}
-					tag = EGY
-					NOT = {
-						has_global_flag = Fall_of_Hatay
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Hatay
-				news_event = THIRD_BALKAN_WAR.63
-			}
-			if = {
-				limit = {
-					FROM.FROM = {
-						state = 47
-					}
-					tag = TUR
-					NOT = {
-						has_global_flag = Fall_of_Athens
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Athens
-				news_event = THIRD_BALKAN_WAR.59
-			}
-			if = {
-				limit = {
-					FROM.FROM = {
-						state = 341
-					}
-					OR = {
-						tag = GRE
-						tag = PDG
-					}
-					NOT = {
-						has_global_flag = Fall_of_Istanbul
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Istanbul
-				news_event = THIRD_BALKAN_WAR.60
-			}
-			if = {
-				limit = {
-					FROM.FROM = {
-						state = 937
-					}
-					OR = {
-						tag = GRE
-						tag = PDG
-					}
-					NOT = {
-						has_global_flag = Fall_of_Edirine
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Edirine
-				news_event = THIRD_BALKAN_WAR.67
-			}		
-			if = {
-				limit = {
-					FROM.FROM = {
-						state = 340
-					}
-					OR = {
-						tag = GRE
-						tag = PDG
-					}
-					NOT = {
-						has_global_flag = Fall_of_Bursa
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Bursa
-				news_event = THIRD_BALKAN_WAR.68
-			}		
-			if = {
-				limit = {
-					FROM.FROM = {
-						state = 339
-					}
-					OR = {
-						tag = GRE
-						tag = PDG
-					}
-					NOT = {
-						has_global_flag = Fall_of_Izmir
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Izmir
-				news_event = THIRD_BALKAN_WAR.69
-			}	
-			if = {
-				limit = {
-					FROM.FROM = {
-						state = 339
-					}
-					OR = {
-						tag = GRE
-						tag = PDG
-					}
-					NOT = {
-						has_global_flag = Fall_of_Ankara
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Ankara
-				news_event = THIRD_BALKAN_WAR.70
-			}	
-			if = {
-				limit = {
-					FROM.FROM = {
-						state = 184
-					}
-					tag = TUR
-					NOT = {
-						has_global_flag = Fall_of_Kavala
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Kavala
-				news_event = THIRD_BALKAN_WAR.71
-			}
-			if = {
-				limit = {
-					FROM.FROM = {
-						state = 977
-					}
-					tag = TUR
-					NOT = {
-						has_global_flag = Fall_of_Thessaloniki
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Thessaloniki
-				news_event = THIRD_BALKAN_WAR.72
-			}
-			if = {
-				limit = {
-					FROM.FROM = {
-						state = 164
-					}
-					tag = TUR
-					NOT = {
-						has_global_flag = Fall_of_Rhodes
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Rhodes
-				news_event = THIRD_BALKAN_WAR.73
-			}
-			if = {
-				limit = {
-					FROM.FROM = {
-						state = 185
-					}
-					tag = TUR
-					NOT = {
-						has_global_flag = Fall_of_Ioannina
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Ioannina
-				news_event = THIRD_BALKAN_WAR.74
-			}
-			if = {
-				limit = {
-					FROM.FROM = {
-						OR = {
-							state = 912
-							state = 915
-							state = 183
-						}
-					}
-					tag = TUR
-					controls_state = 912
-					controls_state = 915
-					controls_state = 183
-					NOT = {
-						has_global_flag = Fall_of_Cyprus_TUR
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Cyprus_TUR
-				news_event = THIRD_BALKAN_WAR.61
-			}
-			if = {
-				limit = {
-					FROM.FROM = {
-						OR = {
-							state = 912
-							state = 915
-							state = 183
-						}
-					}
-					OR = {
-						tag = GRE
-						tag = PDG
-					}
-					controls_state = 912
-					controls_state = 915
-					controls_state = 183
-					NOT = {
-						has_global_flag = Fall_of_Cyprus_GRE
-					}
-					has_global_flag = Third_Balkan_War	
-				}
-				set_global_flag = Fall_of_Cyprus_GRE
-				news_event = THIRD_BALKAN_WAR.62
-			}
-
-
-
-			if = {
-				limit = {
-					tag = ISR
-					has_country_flag = suezcrisis 
-					NOT = { has_country_flag = going_it_alone }
-					453 = {
-						is_controlled_by = ISR
-						is_owned_by = EGY
-					}
-					ISR = { has_war_with = EGY }
-				}
-				country_event = operationkadesh.3 
-				
-			}
-
-			if = {
-				limit = {
-					tag = ISR
-					has_country_flag = suezcrisis 
-					NOT = { has_country_flag = going_it_alone }
-					801 = {
-						is_controlled_by = ISR
-						is_owned_by = EGY
-					}
-					ISR = { has_war_with = EGY }
-				}
-				country_event = operationkadesh.4
-			}
-			
-			if = {
-				limit = {
-					tag = ISR
-					has_country_flag = suezcrisis 
-					NOT = { has_country_flag = going_it_alone }
-					453 = {
-						is_controlled_by = ISR
-						is_owned_by = EGY
-					}
-					ISR = { has_war_with = EGY }
-				}
-				country_event = operationkadesh.5
-			}
-
-			if = {
-				limit = {
-					tag = ISR
-					has_country_flag = suezcrisis 
-					has_country_flag = going_it_alone 
-					801 = {
-						is_controlled_by = ISR
-						is_owned_by = EGY
-					}
-					805 = {
-						is_controlled_by = ISR
-						is_owned_by = EGY
-					}
-					453 = {
-						is_controlled_by = ISR
-						is_owned_by = EGY
-					}
-					ISR = { has_war_with = EGY }
-				}
-				country_event = operationkadesh.6
-			}
-			
-			if = {
-				limit = {
-					tag = EGY
-					has_country_flag = suezcrisisegy
-					1296 = {
-						is_controlled_by = EGY
-						is_owned_by = ISR
-					}
-					ISR = { has_war_with = EGY }
-				}
-				country_event = suez.30 
-				
-			}
-			
-			if = {
-				limit = {
-					tag = EGY
-					has_country_flag = suezcrisisegy
-					755 = {
-						is_controlled_by = EGY
-						is_owned_by = ISR
-					}
-					ISR = { has_war_with = EGY }
-				}
-				country_event = suez.30 
-				
-			}
-			
-			if = {
-				limit = {
-					tag = EGY
-					has_country_flag = suezcrisisegy
-					803 = {
-						is_controlled_by = EGY
-						is_owned_by = ISR
-					}
-					ISR = { has_war_with = EGY }
-				}
-				country_event = suez.30 
-				
-			}
-
-			if = {
-				limit = {
-					tag = SOV
-					NOT = { has_global_flag = conquest_helsinki_ussr }
-					111 = { 
-						is_controlled_by = SOV 
-						is_owned_by = FIN 
-					}
-					SOV = { has_war_with = FIN }
-				}
-				news_event = conquest.1
-			}
-			if = {
-				limit = {
-					tag = SOV
-					OR = {
-						owns_state = 78
-					}
-				}
-				1235 = {
-					add_core_of = SOV
-				}
-				78 = {
-					add_core_of = SOV
-				}
-			}
-			if = {
-				limit = {
-					tag = SOV
-					OR = {
-						owns_state = 949
-					}
-				}
-				949 = {
-					add_core_of = SOV
-				}
-			}
-			if = {
-				limit = {
-					tag = SOV
-					OR = {
-						owns_state = 230
-					}
-				}
-				230 = {
-					add_core_of = SOV
-				}
-			}
-			if = {
-				limit = {
-					tag = SOV
-					OR = {
-						owns_state = 231
-					}
-				}
-				231 = {
-					add_core_of = SOV
-				}
-				934 = {
-					add_core_of = SOV
-				}
-				933 = {
-					add_core_of = SOV
-				}
-			}
-			if = {
-				limit = {
-					tag = SOV
-					OR = {
-						owns_state = 229
-					}
-				}
-				229 = {
-					add_core_of = SOV
-				}
-				799 = {
-					add_core_of = SOV
-				}
-				935 = {
-					add_core_of = SOV
-				}
-				798 = {
-					add_core_of = SOV
-				}
-				419 = {
-					add_core_of = SOV
-				}
-			}
-		}
-	}
-
-	#FROM is the state nuked
-	on_nuke_drop = {
-		effect = {
-			if = { limit = { NOT = { has_global_flag = wmd_first_nuke } } #First Nuke
-				set_global_flag = wmd_first_nuke
-				news_event = nuke_dropped.1
-			}
-			if = { limit = { FROM = { state = 529 } NOT = { has_global_flag = hiroshima_nuked } } news_event = nuke_dropped.2 } #Hiroshima
-			else_if = { limit = { FROM = { state = 528 } NOT = { has_global_flag = nagasaki_nuked } } news_event = nuke_dropped.3 } #Nagasaki
-			else_if = { limit = { FROM = { state = 742 } NOT = { has_global_flag = berlin_nuked } } news_event = nuke_dropped.4 } #West Berlin
-			else_if = { limit = { FROM = { state = 744 } NOT = { has_global_flag = berlin_nuked } } news_event = nuke_dropped.4 } #East Berlin
-			else_if = { limit = { FROM = { state = 126 } NOT = { has_global_flag = london_nuked } } news_event = nuke_dropped.5 } #London
-			else_if = { limit = { FROM = { state = 531 } NOT = { has_global_flag = kyoto_nuked } } news_event = nuke_dropped.6 } #Kyoto
-			else_if = { limit = { FROM = { state = 282 } NOT = { has_global_flag = tokyo_nuked } } news_event = nuke_dropped.7 } #Tokyo
-			else_if = { limit = { FROM = { state = 1200 } NOT = { has_global_flag = washington_nuked } } news_event = nuke_dropped.8 } #Washington
-			else_if = { limit = { FROM = { state = 2 } NOT = { has_global_flag = rome_nuked } } news_event = nuke_dropped.9 } #Rome
-			else_if = { limit = { FROM = { state = 16 } NOT = { has_global_flag = paris_nuked } } news_event = nuke_dropped.10 } #Paris
-			else_if = { limit = { FROM = { state = 219 } NOT = { has_global_flag = moscow_nuked } } news_event = nuke_dropped.11 } #Moscow
-			else_if = { limit = { FROM = { state = 37 } NOT = { has_global_flag = copenhagen_nuked } } news_event = nuke_dropped.12 } #Copenhagen
-			else_if = { limit = { FROM = { state = 141 } NOT = { has_global_flag = stockholm_nuked } } news_event = nuke_dropped.13 } #Stockholm
-			wmd_damage_loop_effect = yes
-		}
-
-		random_events = {
-			# 100 = nuke_dropped.0
-			# 10000 = nuke_dropped.100
-		}
-	}
-
-	#ROOT is winner, FROM gets annexed
-	on_annex = {
-		effect = {
-			
-			if = {
-				limit = {
-					tag = DDR
-					FROM = {
-						tag = WGR
-					}
-				}
-				East_German_Reunification = yes
-			}
-			if = {
-				limit = {
-					tag = KPA
-					FROM = {
-						tag = KOR
-					}
-				}
-				korean_war_north_victory_super_event = yes
-			}
-			if = {
-				limit = {
-					date < 1959.12.31
-					FROM = { TAG = GRE }
-					ROOT = { TAG = PDG }				
-				}
-				PDG = { set_capital = { state = 47 } }
-			}
-			# hidden_effect = {
-			# 	# Remove Influence modifiers if any
-			# 	FROM = { country_event = influence.11 }
-			# }
-		}
-	}
+    }
 }
