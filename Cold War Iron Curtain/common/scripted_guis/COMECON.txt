@@ -1,4 +1,221 @@
 scripted_gui = {
+	COMECON_FACTORY_RENTAL = {
+
+		context_type = player_context
+		window_name = "COMECON_FACTORY_RENTAL"
+
+		visible = { 
+            check_variable = { COMECON_FACTORY_PROMPT = 1 } 
+		}
+		properties = {
+			country_flag_for_trade_screen = {
+				image = "[COMECON_TARGET.GetFlag]"
+			}	
+			root_flag_for_trade_screen = {
+				image = "[CUM.GetFlag]"
+			}	
+		}
+		triggers = {
+			decrease_rental_click_enabled = {
+				NOT = {
+					check_variable = {
+						purchase_amount_comecon = 0
+					}
+				}
+			}
+			increase_rental_click_enabled = {
+				var:currentPurchaser = {
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon > COMECON_TARGET.num_of_available_civilian_factories
+						}
+					}
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon = COMECON_TARGET.num_of_available_civilian_factories
+						}
+					}
+				}
+			}
+			confirm_chromium_purchase_click_enabled = {
+				NOT = { #Must be Valid Offer
+                    check_variable = {
+                        purchase_amount_comecon = 0
+                    }
+                }
+			}
+		}
+        effects = {
+            increase_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = 1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1
+				}
+				
+            }
+            decrease_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = -1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1
+				}
+            }
+			confirm_chromium_purchase_click = {
+				set_variable = {
+					COMECON_FACTORY_PROMPT = 0
+				}
+                var:SOV.COMECON1 = {
+                    if = {
+                        limit = {
+                            is_subject_of = SOV
+                        }
+                        set_country_flag = COMECON_FACTORY_SEIZED_PROMPT
+                        set_country_flag = {
+                            flag = Seized_Factory
+                            days = 180
+                            value = 1
+                        }
+                        add_to_variable = {
+                            comecon_stolen_factories = SOV.purchase_amount_comecon
+                        }
+                        add_to_variable = {
+                            SOV.Seized_Factories = SOV.purchase_amount_comecon
+                        }
+                        add_offsite_building = { type = industrial_complex level = SOV.purchase_amount_comecon }
+                    }
+                }
+			}
+			cancel_button_click = {
+				set_variable = {
+					COMECON_FACTORY_PROMPT = 0
+				}
+				set_variable = {
+					purchase_desc_comecon = 0
+				}
+				set_variable = {
+					purchase_amount_comecon = 0
+				}
+			}
+        } 
+    }
+	COMECON_ARMS_RENTAL = {
+
+		context_type = player_context
+		window_name = "COMECON_ARMS_RENTAL"
+
+		visible = { 
+            check_variable = { COMECON_ARMS_PROMPT = 1 } 
+		}
+		properties = {
+			country_flag_for_trade_screen = {
+				image = "[COMECON_TARGET.GetFlag]"
+			}	
+			root_flag_for_trade_screen = {
+				image = "[CUM.GetFlag]"
+			}	
+		}
+		triggers = {
+			decrease_rental_click_enabled = {
+				NOT = {
+					check_variable = {
+						purchase_amount_comecon = 0
+					}
+				}
+			}
+			increase_rental_click_enabled = {
+				var:currentPurchaser = {
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon > COMECON_TARGET.num_of_available_military_factories
+						}
+					}
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon = COMECON_TARGET.num_of_available_military_factories
+						}
+					}
+				}
+			}
+			confirm_chromium_purchase_click_enabled = {
+				NOT = { #Must be Valid Offer
+                    check_variable = {
+                        purchase_amount_comecon = 0
+                    }
+                }
+			}
+		}
+        effects = {
+            increase_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = 1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1.2
+				}
+				
+            }
+            decrease_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = -1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1.2
+				}
+            }
+			confirm_chromium_purchase_click = {
+				set_variable = {
+					COMECON_ARMS_PROMPT = 0
+				}
+                var:SOV.COMECON1 = {
+                    if = {
+                        limit = {
+                            is_subject_of = SOV
+                        }
+                        set_country_flag = COMECON_ARMS_SEIZED_PROMPT
+                        set_country_flag = {
+                            flag = Seized_Arms_Factory
+                            days = 180
+                            value = 1
+                        }
+                        add_to_variable = {
+                            comecon_stolen_arms_factories = SOV.purchase_amount_comecon
+                        }
+                        add_to_variable = {
+                            SOV.Seized_Arms_Factories = SOV.purchase_amount_comecon
+                        }
+                        add_offsite_building = { type = arms_factory level = SOV.purchase_amount_comecon }
+                    }
+                }
+			}
+			cancel_button_click = {
+				set_variable = {
+					COMECON_ARMS_PROMPT = 0
+				}
+				set_variable = {
+					purchase_desc_comecon = 0
+				}
+				set_variable = {
+					purchase_amount_comecon = 0
+				}
+			}
+        } 
+    }
+
 	comecon_menu = {
 		context_type = player_context
 		
@@ -103,8 +320,13 @@ scripted_gui = {
             }
             Seize_Arms_click_enabled = {
                 var:SOV.COMECON1 = {
-                    num_of_available_military_factories > 0 
-                    NOT = { has_country_flag = Seized_Arms_Factory }
+                    OR = {
+                        AND = {
+                            num_of_available_military_factories > 0 
+                            NOT = { has_country_flag = Seized_Arms_Factory }
+                        }
+                        check_variable = { comecon_stolen_arms_factories > 0 }
+                    }
                 }                   
             }
             Emp_Develop_Arms_click_enabled = {
@@ -138,9 +360,14 @@ scripted_gui = {
             }
             Seize_Factory_click_enabled = {
                 var:SOV.COMECON1 = {
-                    num_of_available_civilian_factories > 0 
-                    NOT = { has_country_flag = Seized_Factory }
-                }             
+                    OR = {
+                        AND = {
+                            num_of_available_civilian_factories > 0 
+                            NOT = { has_country_flag = Seized_Arms_Factory }
+                        }
+                        check_variable = { comecon_stolen_factories > 0 }
+                    }
+                }                    
             }
             Emp_Develop_Factory_click_enabled = {
                 NOT = {
@@ -174,9 +401,12 @@ scripted_gui = {
             }
             Seize_Dockyard_click_enabled = {
                 var:SOV.COMECON1 = {
-                    num_of_available_naval_factories > 0 
+                    OR = {
+                        num_of_available_naval_factories > 0 
+                        check_variable = { comecon_stolen_dockyards > 0 }
+                    }
                     NOT = { has_country_flag = Seized_Dockyard }
-                }           
+                }          
             }
             Emp_Develop_Dockyard_click_enabled = {
                 NOT = {
@@ -509,21 +739,11 @@ scripted_gui = {
                 }
             }
             Seize_Arms_click = {
-                var:SOV.COMECON1 = {
-                    comecon_influence_steal_effect = yes
-                    set_country_flag = COMECON_ARMS_SEIZED_PROMPT
-                    set_country_flag = {
-                        flag = Seized_Arms_Factory
-                        days = 180
-                        value = 1
-                    }
-                    add_to_variable = {
-                        comecon_stolen_arms_factories = 1
-                    }
-                    add_to_variable = {
-                        SOV.Seized_Arms_Factories = 1
-                    }
-                    add_offsite_building = { type = arms_factory level = -1 }
+                set_variable = {
+                    COMECON_ARMS_PROMPT = 1
+                }
+                set_variable = {
+                    purchase_amount_comecon = COMECON_TARGET.comecon_stolen_arms_factories
                 }
             }
             Emp_Develop_Arms_click = {
@@ -566,22 +786,7 @@ scripted_gui = {
                 }
             }
             Seize_Factory_click = {
-                var:SOV.COMECON1 = {
-                    comecon_influence_steal_effect = yes
-                    set_country_flag = COMECON_FACTORY_SEIZED_PROMPT
-                    set_country_flag = {
-                        flag = Seized_Factory
-                        days = 180
-                        value = 1
-                    }
-                    add_to_variable = {
-                        SOV.Seized_Factories = 1
-                    }
-                    add_to_variable = {
-                        comecon_stolen_factories = 1
-                    }
-                    add_offsite_building = { type = industrial_complex level = -1 }
-                }
+                set_variable = { COMECON_FACTORY_PROMPT = 1 }
             }
             Emp_Develop_Factory_click = {
                 var:SOV.COMECON1 = {
