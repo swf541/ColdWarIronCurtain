@@ -1,5 +1,82 @@
 scripted_gui = {
+	country_target_investment_menu_panel = { 
+		context_type = decision_category
+		window_name = "country_investment_target_menu"		# "kna_country_state_target_menu"
+		ai_enabled = {
+			always = no
+		}
+		dynamic_lists = {
+			country_investment_menu_selection_grid = {
+				array = root.investment_potential_list
+				change_scope = yes
+				entry_container = investment_potential_list_entry
+			}
+			state_investment_menu_selection_grid = {
+				array = root.state_investment_potential_list
+				change_scope = yes
+				entry_container = state_investment_potential_list_entry
+			}
+		}
+		effects = {
+			investment_potential_list_button_click = { 
+				set_variable = { root.current_investment_scope = THIS.id }
+				clear_array = ROOT.state_investment_potential_list
+				every_owned_state = {
+					add_to_array = { ROOT.state_investment_potential_list = THIS.id }
+				}
+				set_variable = { root.current_investment_state_scope = 0 }
+			}
+			investment_potential_list_state_button_click = { 
+				set_variable = {root.current_investment_state_scope = THIS.id }
+
+				set_variable = { building_renewable_qualifier = building_level@renewable_powerplant }
+
+				set_variable = { building_state_infra_qualifier = building_level@state_infrastructure }
+				set_variable = { building_infra_qualifier = building_level@infrastructure }
+				set_variable = { building_water_infra_qualifier = building_level@water_infrastructure }
+
+				set_variable = { infrastructure_percentage_discount = 100 }
+				set_variable = { total_infra = building_state_infra_qualifier }
+				add_to_variable = { total_infra = building_infra_qualifier }
+				add_to_variable = { total_infra = building_water_infra_qualifier }
+				multiply_variable = { total_infra = 3.33 }
+				subtract_from_variable = { infrastructure_percentage_discount = total_infra }
+				divide_variable = { infrastructure_percentage_discount = 100 }
+
+				save_global_event_target_as = Investment_State
+				
+				set_variable = { short_length_construction = 60 }
+				multiply_variable = { short_length_construction = infrastructure_percentage_discount }
+				set_variable = { medium_length_construction = 180 }
+				multiply_variable = { medium_length_construction = infrastructure_percentage_discount }
+				set_variable = { long_length_construction = 360 }
+				multiply_variable = { long_length_construction = infrastructure_percentage_discount }
+				round_variable = short_length_construction
+				round_variable = medium_length_construction
+				round_variable = long_length_construction
+
+				if = { limit = { development_level_zero_check = yes } set_variable = { development_level_increase = 1 } }
+				if = { limit = { development_level_one_check = yes }  set_variable = { development_level_increase = 1.25 } }
+				if = { limit = { development_level_two_check = yes }  set_variable = { development_level_increase = 1.50 } }
+				if = { limit = { development_level_three_check = yes }set_variable = { development_level_increase = 1.75 } }
+				if = { limit = { development_level_four_check = yes } set_variable = { development_level_increase = 2 } }
+				if = { limit = { development_level_five_check = yes } set_variable = { development_level_increase = 2.25 } }
+			}
+		}
+	}
 	domestic_influence_diplo = {
+		context_type = selected_country_context
+		parent_window_token = selected_country_view_diplomacy
+		
+		window_name = "domestic_influence_diplo"
+		
+		visible = {
+		  #always = yes
+		}
+		
+		effects = { }
+	}
+	fpp_influence_diplo = {
 		context_type = selected_country_context
 		parent_window_token = selected_country_view_diplomacy
 		
@@ -11,7 +88,7 @@ scripted_gui = {
 		
 		effects = { }
 	}
-
+	
 	position_1_diplo = {
 		context_type = selected_country_context
 		parent_window_token = selected_country_view_diplomacy
@@ -20,6 +97,13 @@ scripted_gui = {
 		
 		visible = {
 		  #always = yes
+		}
+		triggers = {
+			position_1_var_text_visible = {
+				check_variable = {
+					influence_array_val^0 > 0.49
+				}
+			}
 		}
 		
 		effects = { }
@@ -33,7 +117,13 @@ scripted_gui = {
 		visible = {
 		  #always = yes
 		}
-		
+		triggers = {
+			position_2_var_text_visible = {
+				check_variable = {
+					influence_array_val^1 > 0.49
+				}
+			}
+		}		
 		effects = { }
 	}
 	position_3_diplo = {
@@ -45,7 +135,13 @@ scripted_gui = {
 		visible = {
 		  #always = yes
 		}
-		
+		triggers = {
+			position_3_var_text_visible = {
+				check_variable = {
+					influence_array_val^2 > 0.49
+				}
+			}
+		}
 		effects = { }
 	}
 	position_4_diplo = {
@@ -57,7 +153,13 @@ scripted_gui = {
 		visible = {
 		  #always = yes
 		}
-		
+		triggers = {
+			position_4_var_text_visible = {
+				check_variable = {
+					influence_array_val^3 > 0.49
+				}
+			}
+		}
 		effects = { }
 	}
 	position_5_diplo = {
@@ -69,7 +171,13 @@ scripted_gui = {
 		visible = {
 		  #always = yes
 		}
-		
+		triggers = {
+			position_5_var_text_visible = {
+				check_variable = {
+					influence_array_val^4 > 0.49
+				}
+			}
+		}	
 		effects = { }
 	}
 	position_6_diplo = {
@@ -81,7 +189,13 @@ scripted_gui = {
 		visible = {
 		  #always = yes
 		}
-		
+		triggers = {
+			position_6_var_text_visible = {
+				check_variable = {
+					influence_array_val^5 > 0.49
+				}
+			}
+		}
 		effects = { }
 	}
 	position_7_diplo = {
@@ -93,7 +207,13 @@ scripted_gui = {
 		visible = {
 		  #always = yes
 		}
-		
+		triggers = {
+			position_7_var_text_visible = {
+				check_variable = {
+					influence_array_val^6 > 0.49
+				}
+			}
+		}
 		effects = { }
 	}
 	position_8_debt = {
