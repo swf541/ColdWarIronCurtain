@@ -1,4 +1,141 @@
 scripted_gui = {
+	COMECON_DOCKYARD_RENTAL = {
+        
+		context_type = player_context
+		window_name = "COMECON_DOCKYARD_RENTAL"
+
+		visible = { 
+            check_variable = { COMECON_DOCKYARD_PROMPT = 1 } 
+		}
+		properties = {
+			country_flag_for_trade_screen = {
+				image = "[COMECON_TARGET.GetFlag]"
+			}	
+			root_flag_for_trade_screen = {
+				image = "[CUM.GetFlag]"
+			}	
+		}
+		triggers = {
+			decrease_rental_click_enabled = {
+				NOT = {
+					check_variable = {
+						purchase_amount_comecon = 0
+					}
+				}
+			}
+			increase_rental_click_enabled = {
+				var:currentPurchaser = {
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon > COMECON_TARGET.num_of_available_naval_factories
+						}
+					}
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon = COMECON_TARGET.num_of_available_naval_factories
+						}
+					}
+				}
+			}
+			confirm_chromium_purchase_click_enabled = {
+				NOT = { #Must be Valid Offer
+                    check_variable = {
+                        purchase_amount_comecon = 0
+                    }
+                }
+			}
+		}
+        effects = {
+            increase_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = 1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1
+				}
+				
+            }
+            decrease_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = -1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1.2
+				}
+            }
+			confirm_chromium_purchase_click = {
+				set_variable = {
+					COMECON_DOCKYARD_PROMPT = 0
+				}
+                var:SOV.COMECON1 = {
+                    if = {
+                        limit = {
+                            is_subject_of = SOV
+                        }
+                        set_country_flag = COMECON_DOCKYARD_SEIZED_PROMPT
+                        set_country_flag = {
+                            flag = Seized_Dockyard
+                            days = 180
+                            value = 1
+                        }
+                        subtract_from_variable = {
+                            SOV.purchase_amount_comecon = comecon_stolen_dockyards
+                        }
+                        subtract_from_variable = {
+                            SOV.purchase_desc_comecon = current_comecon_stolen_dockyards_cost
+                        }
+                        add_to_variable = {
+                            current_comecon_stolen_dockyards_cost = SOV.purchase_desc_comecon
+                        }
+                        add_to_variable = {
+                            comecon_stolen_dockyards = SOV.purchase_amount_comecon
+                        }
+                        add_to_variable = {
+                            SOV.Seized_Dockyards = SOV.purchase_amount_comecon
+                        }
+                        set_variable = {
+                            comecon_stolen_dockyards_cost = comecon_stolen_dockyards
+                        }
+                        multiply_variable = {
+                            comecon_stolen_dockyards_cost = -1
+                        }
+                    }
+                    else = {
+                        set_country_flag = COMECON_DOCKYARD_SEIZED_PROMPT_OFFER
+                        set_country_flag = {    #Disable Prompt for 180 Days
+                            flag = Seized_Dockyard
+                            days = 180
+                            value = 1
+                        }  
+                        subtract_from_variable = {
+                            SOV.purchase_amount_comecon = comecon_stolen_dockyards
+                        }
+                        set_variable = {
+                            purchase_amount_comecon_offer = SOV.purchase_amount_comecon
+                        }
+                        
+                    }
+                }
+			}
+			cancel_button_click = {
+				set_variable = {
+					COMECON_DOCKYARD_PROMPT = 0
+				}
+				set_variable = {
+					purchase_desc_comecon = 0
+				}
+				set_variable = {
+					purchase_amount_comecon = 0
+				}
+			}
+        } 
+    }
 	COMECON_FACTORY_RENTAL = {
 
 		context_type = player_context
@@ -83,6 +220,9 @@ scripted_gui = {
                             flag = Seized_Factory
                             days = 180
                             value = 1
+                        }
+                        subtract_from_variable = {
+                            SOV.purchase_amount_comecon = comecon_stolen_factories
                         }
                         add_to_variable = {
                             comecon_stolen_factories = SOV.purchase_amount_comecon
@@ -191,6 +331,9 @@ scripted_gui = {
                             flag = Seized_Arms_Factory
                             days = 180
                             value = 1
+                        }
+                        subtract_from_variable = {
+                            SOV.purchase_amount_comecon = comecon_stolen_arms_factories
                         }
                         add_to_variable = {
                             comecon_stolen_arms_factories = SOV.purchase_amount_comecon
@@ -405,7 +548,7 @@ scripted_gui = {
                         num_of_available_naval_factories > 0 
                         check_variable = { comecon_stolen_dockyards > 0 }
                     }
-                    NOT = { has_country_flag = Seized_Dockyard }
+                   # NOT = { has_country_flag = Seized_Dockyard }
                 }          
             }
             Emp_Develop_Dockyard_click_enabled = {
@@ -424,7 +567,14 @@ scripted_gui = {
                         has_idea = COMECON_Political_Support
                     }
                 }   
-            }                
+            }   
+            COMECON_Subsidize_Expenses_click_visible = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_country_flag = Soviet_Subsidies
+                    }
+                }   
+            }             
             COMECON_Subsidize_Expenses_click_enabled = {
                 NOT = {
                     var:SOV.COMECON1 = {
@@ -828,21 +978,12 @@ scripted_gui = {
                 }
             }
             Seize_Dockyard_click = {
-                var:SOV.COMECON1 = {
-                    comecon_influence_steal_effect = yes
-                    set_country_flag = COMECON_FACTORY_SEIZED_PROMPT
-                    set_country_flag = {
-                        flag = Seized_Dockyard
-                        days = 180
-                        value = 1
-                    }
-                    add_to_variable = {
-                        SOV.Seized_Dockyards = 1
-                    }
-                    add_to_variable = {
-                        comecon_stolen_dockyards = 1
-                    }
-                    add_offsite_building = { type = dockyard level = -1 }
+                set_variable = { COMECON_DOCKYARD_PROMPT = 1 }
+                set_variable = {
+                    purchase_amount_comecon = COMECON_TARGET.comecon_stolen_dockyards
+                }
+                set_variable = {
+                    purchase_desc_comecon = COMECON_TARGET.current_comecon_stolen_dockyards_cost
                 }
             }
             Emp_Develop_Dockyard_click = {
