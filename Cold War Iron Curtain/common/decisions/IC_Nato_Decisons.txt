@@ -119,7 +119,7 @@ NATO_decisions_category = {
 				NOT = { check_variable = { NATO_votes_negative > 0 } }
 			}
 
-			hidden_trigger = { tag = NATO }
+			hidden_trigger = { tag = NAT }
 		}
 
 		is_good = no
@@ -129,7 +129,7 @@ NATO_decisions_category = {
 
 			if = {  
 				limit = { 
-					tag = NATO 
+					tag = NAT 
 				} 
 				meta_effect = {
 					text = {
@@ -145,7 +145,7 @@ NATO_decisions_category = {
 						text = {
 							NATO_issue_[NATO_ACTIVE_ISSUE_TOKEN]_effect = yes 
 						}
-						NATO_ACTIVE`_ISSUE_TOKEN = "[?NAT.NATO_issue_id]"
+						NATO_ACTIVE_ISSUE_TOKEN = "[?NAT.NATO_issue_id]"
 					}
 				}
 				#custom_effect_tooltip = "show to non NATO countries "
@@ -161,7 +161,7 @@ NATO_decisions_category = {
 			hidden_effect = {
 				if = {
 					limit = { 
-						TAG = NATO
+						tag = NAT
 					}
 
 					add_to_variable = { NAT.NATO_political_cooperation = -5 }
@@ -334,4 +334,63 @@ NATO_decisions_category = {
 	#		NATO_initialize_voting = yes 
 	#	}
 	#}
+
+	NATO_Greek_Civil_War_Intervention = {
+		allowed = {
+			
+		}
+		visible = {
+			NOT = {
+				has_global_flag = NATO_Greek_Intervention_Proposed
+			}
+			is_in_faction_with = NAT
+			GRE = {
+				has_war_with = PDG
+				surrender_progress > 0.75
+			}
+		}
+		available = {
+			GRE = {
+				has_war_with = PDG
+				surrender_progress > 0.75
+			}
+		}
+		complete_effect = {
+			set_global_flag = NATO_Greek_Intervention_Proposed
+			set_variable = { NAT.NATO_issue_id = 10 }
+			every_country = {
+				limit = {
+					is_in_faction_with = NAT
+				}
+				if = {
+					limit = {
+						tag = ROOT
+					}
+					set_variable = { NATO_vote_intention = 10 }
+				}
+				else_if = {
+					limit = {
+						tag = ENG
+					}
+					set_variable = { NATO_vote_intention = 10 }
+				}
+				else_if = {
+					limit = {
+						tag = USA
+					}
+					set_variable = { NATO_vote_intention = 10 }
+				}
+				else = {
+					randomize_variable = {
+						var = NATO_vote_intention
+						distribution = uniform
+						min = -10
+						max = 10
+					}
+				}
+			}
+			custom_effect_tooltip = "NATO_GREECE_MOTION_START"
+			NATO_initialize_voting = yes
+		}
+	} 
 }
