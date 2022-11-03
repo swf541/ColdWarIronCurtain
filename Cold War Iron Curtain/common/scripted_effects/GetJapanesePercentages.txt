@@ -356,3 +356,185 @@ create_japanese_approval_pie_chart = {
 	clear_variable = ROOT.last_idx
 	add_to_variable = { pie_chart_dirty = 1 }
 }
+
+GetJapanesePartyFactionPercentages = {
+    set_variable = { JapaneseSeatTotal = 0 } 
+	#
+    add_to_variable = {	JapaneseSeatTotal = JAP_party_faction_blue }
+    add_to_variable = {	JapaneseSeatTotal = JAP_party_faction_green }
+    add_to_variable = {	JapaneseSeatTotal = JAP_party_faction_white }
+    add_to_variable = {	JapaneseSeatTotal = JAP_party_faction_yellow }
+    add_to_variable = {	JapaneseSeatTotal = JAP_party_faction_red }
+    add_to_variable = {	JapaneseSeatTotal = JAP_party_faction_orange }
+
+    set_variable = { JapanesePartyFaction1 = JAP_party_faction_blue }
+    set_variable = { JapanesePartyFaction2 = JAP_party_faction_green }
+    set_variable = { JapanesePartyFaction3 = JAP_party_faction_white }
+    set_variable = { JapanesePartyFaction4 = JAP_party_faction_yellow }
+    set_variable = { JapanesePartyFaction5 = JAP_party_faction_red }
+    set_variable = { JapanesePartyFaction6 = JAP_party_faction_orange }
+
+	divide_variable = { JapanesePartyFaction1 = JapaneseSeatTotal }
+    divide_variable = { JapanesePartyFaction2 = JapaneseSeatTotal }
+	divide_variable = { JapanesePartyFaction3 = JapaneseSeatTotal }
+    divide_variable = { JapanesePartyFaction4 = JapaneseSeatTotal }
+	divide_variable = { JapanesePartyFaction5 = JapaneseSeatTotal }
+	divide_variable = { JapanesePartyFaction6 = JapaneseSeatTotal }
+
+    clear_array = japanese_party_faction_percentage
+    
+	multiply_variable = { JapanesePartyFaction1 = 100 }
+	round_variable = JapanesePartyFaction1
+	add_to_array = { japanese_party_faction_percentage = JapanesePartyFaction1 }
+    
+	multiply_variable = { JapanesePartyFaction2 = 100 }
+	round_variable = JapanesePartyFaction2
+	add_to_array = { japanese_party_faction_percentage = JapanesePartyFaction2 }
+    
+	multiply_variable = { JapanesePartyFaction3 = 100 }
+	round_variable = JapanesePartyFaction3
+	add_to_array = { japanese_party_faction_percentage = JapanesePartyFaction3 }
+    
+	multiply_variable = { JapanesePartyFaction4 = 100 }
+	round_variable = JapanesePartyFaction4
+	add_to_array = { japanese_party_faction_percentage = JapanesePartyFaction4 }
+    
+	multiply_variable = { JapanesePartyFaction5 = 100 }
+	round_variable = JapanesePartyFaction5
+	add_to_array = { japanese_party_faction_percentage = JapanesePartyFaction5 }
+    
+	multiply_variable = { JapanesePartyFaction6 = 100 }
+	round_variable = JapanesePartyFaction6
+	add_to_array = { japanese_party_faction_percentage = JapanesePartyFaction6 }
+    
+    clear_array = faction_id 
+
+    add_to_array = { faction_id = 1 }
+    add_to_array = { faction_id = 2 }
+    add_to_array = { faction_id = 3 }
+    add_to_array = { faction_id = 4 }
+    add_to_array = { faction_id = 5 }
+    add_to_array = { faction_id = 6 }
+
+	set_temp_variable = { length_temp = japanese_party_faction_percentage^num }
+	for_loop_effect = {
+		start = 0
+		end = length_temp
+		add = 1
+		value = v
+		break = b
+		
+		find_highest_in_array = {
+			array = japanese_party_faction_percentage
+			value = v
+			index = ii
+		}
+		remove_from_array = {
+			array = japanese_party_faction_percentage
+			index = ii
+		}
+		add_to_temp_array = { 
+			array = japanese_party_faction_percentage_temp
+			value = v
+		}
+		set_temp_variable = { faction_id_temp_var = faction_id^ii }
+		remove_from_array = {
+			array = faction_id
+			index = ii
+		}
+		add_to_temp_array = { 
+			array = faction_id_temp
+			value = faction_id_temp_var  
+		}
+	}
+	for_loop_effect = {
+		start = 0
+		end = length_temp
+		add = 1
+		value = v
+		break = b
+		
+		add_to_array = { 
+			array = japanese_party_faction_percentage
+			value = japanese_party_faction_percentage_temp^v
+		}
+		add_to_array = { 
+			array = faction_id
+			value = faction_id_temp^v 
+		}
+	}
+	create_japanese_faction_pie_chart = yes
+ }
+
+# Scripted GUI Pie Chart example by Yard1
+# Feel free to use in your mods, but give credits to Yard1 (both in code, with comments; and on your download page)
+
+# this creates a pie chart of popularities - can be easily adapted to show anything that adds up to 100%
+create_japanese_faction_pie_chart = {
+	clear_array = jap3_pie_chart
+	resize_array = {
+		array = jap3_pie_chart
+		value = 1 # 1 is value for neutrality frame, so we don't have to make a loop for it
+		size = 100 # 100 pieces, each percent is one piece
+	}
+	set_temp_variable = { JapanesePartyFaction1_pop = JapanesePartyFaction1 }
+	#multiply_temp_variable = { JapanesePartyFaction1_pop = 100 }
+	round_temp_variable = JapanesePartyFaction1_pop
+
+	set_temp_variable = { JapanesePartyFaction2_pop = JapanesePartyFaction2 }
+	#multiply_temp_variable = { JapanesePartyFaction2_pop = 100 }
+	round_temp_variable = JapanesePartyFaction2_pop 
+	set_variable = { ROOT.last_idx = JapanesePartyFaction1_pop }
+	add_to_temp_variable = { JapanesePartyFaction2_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = JapanesePartyFaction2_pop
+		set_variable = { jap3_pie_chart^v = 2 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+
+	set_temp_variable = { JapanesePartyFaction3_pop = JapanesePartyFaction3 }
+	#multiply_temp_variable = { JapanesePartyFaction3_pop = 100 }
+	round_temp_variable = JapanesePartyFaction3_pop
+	add_to_temp_variable = { JapanesePartyFaction3_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = JapanesePartyFaction3_pop
+		set_variable = { jap3_pie_chart^v = 3 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+
+	set_temp_variable = { JapanesePartyFaction4_pop = JapanesePartyFaction4 }
+	#multiply_temp_variable = { JapanesePartyFaction4_pop = 100 }
+	round_temp_variable = JapanesePartyFaction4_pop 
+	add_to_temp_variable = { JapanesePartyFaction4_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = JapanesePartyFaction4_pop
+		set_variable = { jap3_pie_chart^v = 4 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+	set_temp_variable = { JapanesePartyFaction5_pop = JapanesePartyFaction5 }
+	#multiply_temp_variable = { JapanesePartyFaction5_pop = 100 }
+	round_temp_variable = JapanesePartyFaction5_pop 
+	add_to_temp_variable = { JapanesePartyFaction5_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = JapanesePartyFaction5_pop
+		set_variable = { jap3_pie_chart^v = 5 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+	set_temp_variable = { JapanesePartyFaction6_pop = JapanesePartyFaction6 }
+	#multiply_temp_variable = { JapanesePartyFaction6_pop = 100 }
+	round_temp_variable = JapanesePartyFaction6_pop 
+	add_to_temp_variable = { JapanesePartyFaction6_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = JapanesePartyFaction6_pop
+		set_variable = { jap3_pie_chart^v = 6 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+
+	clear_variable = ROOT.last_idx
+	add_to_variable = { pie_chart_dirty = 1 }
+}
