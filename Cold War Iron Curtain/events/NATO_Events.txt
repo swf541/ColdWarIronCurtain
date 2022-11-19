@@ -1,0 +1,1106 @@
+﻿#########################################################################
+# TWR Events : NATO
+#########################################################################
+add_namespace = twrta
+add_namespace = twrTAnew
+
+country_event = {
+	id = twrta.1001
+	title = twrta.1001.t
+	desc = twrta.1001.d
+	picture = GFX_report_event_summit
+
+	is_triggered_only = yes
+	fire_only_once = no
+	
+
+	option = {
+		name = twrta.1001.a #Accept the whipping
+
+		custom_effect_tooltip = NATO_accept_whipping 
+		clr_country_flag = NATO_has_been_whipped_recently
+
+		set_variable = { NATO_vote_value = 1 }
+		set_variable = { NATO_vote_intention = 5 }
+		add_political_power = 25 
+		add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+
+
+		hidden_effect = {
+
+			FROM = {
+				country_event = { #country has accepted the whipping :)
+					id = twrta.1002
+					days = 1 
+				}
+			}
+		}
+
+		ai_chance = {
+			base = 100
+		}
+	}
+
+	option = {
+		name = twrta.1001.b #Reject the whipping 
+
+		clr_country_flag = NATO_has_been_whipped_recently
+		add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+
+		hidden_effect = {
+			FROM = {
+				country_event = {
+					id = twrta.1003 # country has rejected the whipping :( 
+					days = 1 
+				}
+			}
+		}
+
+		ai_chance = {
+			base = 0 
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1002
+	title = twrta.1002.t
+	desc = twrta.1002.d
+	picture = GFX_report_event_summit
+
+	is_triggered_only = yes
+	fire_only_once = no
+	
+
+	option = {
+		name = twrta.1002.a #Excellent
+
+		ai_chance = {
+			base = 100
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1003
+	title = twrta.1003.t
+	desc = twrta.1003.d
+	picture = GFX_report_event_summit
+
+	is_triggered_only = yes
+	fire_only_once = no
+	
+
+	option = {
+		name = twrta.1003.a #Damnit (well at least we get some pp back!)
+
+		ai_chance = {
+			base = 100
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1004
+	title = twrta.1004.t
+	desc = twrta.1004.d
+	picture = GFX_report_event_summit
+
+	is_triggered_only = yes
+	fire_only_once = no
+	
+
+	option = {
+		name = twrta.1004.a #Accept the whipping
+
+		custom_effect_tooltip = NATO_reject_whipping 
+		clr_country_flag = NATO_has_been_whipped_recently
+
+		set_variable = { NATO_vote_value = -1 }
+		set_variable = { NATO_vote_intention = -5 }
+		add_political_power = 25 
+		add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+
+		hidden_effect = {
+
+			FROM = {
+				country_event = { #country has accepted the whipping :)
+					id = twrta.1002
+					days = 1 
+				}
+			}
+		}
+
+		ai_chance = {
+			base = 100
+		}
+	}
+
+	option = {
+		name = twrta.1004.b #Reject the whipping 
+
+		clr_country_flag = NATO_has_been_whipped_recently
+		add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+
+		hidden_effect = {
+			FROM = {
+				country_event = {
+					id = twrta.1003 # country has rejected the whipping :( 
+					days = 1 
+				}
+			}
+		}
+
+		ai_chance = {
+			base = 0 
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1005
+	title = twrta.1005.t
+	desc = twrta.1005.d
+	picture = GFX_report_event_summit
+	hidden = yes 
+
+	is_triggered_only = yes
+	fire_only_once = no
+	
+	immediate = {
+		log = "six-monthly cycle for TWR exercise mechanic fired, current target is [NAT.GETTAG]"
+
+		NAT =  {
+			country_event = {
+				id = twrta.1005
+				days = 182
+			}
+			if = {
+				limit = { 
+					check_variable = { NAT.NATO_military_cooperation > 49.999 }
+					NOT = {
+						has_war = yes 
+					} 
+				}
+				country_event = {
+					id = twrta.1006
+					random_days = 10
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1006
+	title = twrta.1006.t
+	desc = twrta.1006.d
+	picture = GFX_report_event_NATO_meeting
+
+	is_triggered_only = yes
+	fire_only_once = no
+
+	immediate = {
+		clear_variable = NAT.NATO_total_exercise_involvement
+		clear_variable = NAT.NATO_exercise_responses 
+		clr_country_flag = NATO_army_exercise
+		clr_country_flag = NATO_navy_exercise
+		clr_country_flag = NATO_airforce_exercise
+		clr_country_flag = NATO_combinedarms_exercise
+	}
+	
+
+	option = {
+		name = twrta.1006.a #Army exercise 
+
+		custom_effect_tooltip = NATO_military_exercise_tt
+
+		hidden_effect = {
+			set_country_flag = NATO_army_exercise 
+			for_each_scope_loop = {
+				array = NAT.NATO_member_countries
+
+				country_event = {
+					id = twrta.1007 # army exercise event 
+					days = 5
+					random_days = 5
+				}
+			}
+		}
+		
+
+		ai_chance = {
+			base = 25
+		}
+	}
+
+	option = {
+		name = twrta.1006.b #Navy exercise 
+
+		custom_effect_tooltip = NATO_military_exercise_tt
+
+		hidden_effect = {
+			set_country_flag = NATO_navy_exercise 
+			for_each_scope_loop = {
+				array = NAT.NATO_member_countries
+
+				country_event = {
+					id = twrta.1008 # navy exercise event 
+					days = 5
+					random_days = 5
+				}
+			}
+		}	
+
+		ai_chance = {
+			base = 25
+		}
+	}
+
+	option = { 
+		name = twrta.1006.c #Air force exercise 
+
+		custom_effect_tooltip = NATO_military_exercise_tt
+
+		hidden_effect = {
+			set_country_flag = NATO_airforce_exercise 
+			for_each_scope_loop = {
+				array = NAT.NATO_member_countries
+
+				country_event = {
+					id = twrta.1009 # airforce exercise event 
+					days = 5
+					random_days = 5
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 25
+		}
+	}
+
+	option = { 
+		name = twrta.1006.e #combined arms exercise 
+
+		custom_effect_tooltip = NATO_military_exercise_tt
+
+		hidden_effect = {
+			set_country_flag = NATO_combinedarms_exercise 
+			for_each_scope_loop = {
+				array = NAT.NATO_member_countries
+
+				country_event = {
+					id = twrta.1010 # combinedarms exercise event 
+					days = 5
+					random_days = 5
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 25
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1007 #Army exercise
+	title = twrta.1007.t
+	desc = twrta.1007.d
+	picture = GFX_report_event_NATO_army
+
+	is_triggered_only = yes
+	fire_only_once = no
+
+
+	option = {
+		name = twrta.1007.a #Token force 
+
+		custom_effect_tooltip = NATO_token_force_tt
+
+		army_experience = 2.5
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 0.5 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_political_power = -5 
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 15
+		}
+	}
+
+	option = {
+		name = twrta.1007.b #Minor force 
+
+		custom_effect_tooltip = NATO_minor_force_tt
+
+		army_experience = 10
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 1.5 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_command_power = -15
+
+		trigger = {
+			command_power > 15 
+		}
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 25
+		}
+	}
+
+	option = {
+		name = twrta.1007.c #Major force 
+
+		custom_effect_tooltip = NATO_major_force_tt
+
+		army_experience = 20
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 3 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_command_power = -25 
+
+		trigger = {
+			command_power > 25 
+		}
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 60
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1008 #Navy exercise
+	title = twrta.1008.t
+	desc = twrta.1008.d
+	picture = GFX_report_event_NATO_naval
+
+	is_triggered_only = yes
+	fire_only_once = no
+
+
+	option = {
+		name = twrta.1008.a #Token force 
+
+		custom_effect_tooltip = NATO_token_force_tt
+
+		navy_experience = 2.5 
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 0.5 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_political_power = -5 
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 15
+		}
+	}
+
+	option = {
+		name = twrta.1008.b #Minor force 
+
+		custom_effect_tooltip = NATO_minor_force_tt
+
+		navy_experience = 10
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 1.5 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_command_power = -15
+
+		trigger = {
+			command_power > 15 
+		}
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 25
+		}
+	}
+
+	option = {
+		name = twrta.1008.c #Major force 
+
+		custom_effect_tooltip = NATO_major_force_tt
+
+		navy_experience = 20
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 3 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_command_power = -25 
+
+		trigger = {
+			command_power > 25 
+		}
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 60
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1009 #Air force exercise
+	title = twrta.1009.t
+	desc = twrta.1009.d
+	picture = GFX_report_event_NATO_air
+
+	is_triggered_only = yes
+	fire_only_once = no
+
+
+	option = {
+		name = twrta.1009.a #Token force 
+
+		custom_effect_tooltip = NATO_token_force_tt
+
+		air_experience = 2.5
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 0.5 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_political_power = -5 
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 15
+		}
+	}
+
+	option = {
+		name = twrta.1009.b #Minor force 
+
+		custom_effect_tooltip = NATO_minor_force_tt
+
+		air_experience = 10
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 1.5 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_command_power = -15
+
+		trigger = {
+			command_power > 15 
+		}
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		ai_chance = {
+			base = 25
+		}
+	}
+
+	option = {
+		name = twrta.1009.c #Major force 
+
+		custom_effect_tooltip = NATO_major_force_tt
+
+		air_experience = 20
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 3 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_command_power = -25 
+
+		trigger = {
+			command_power > 25 
+		}
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 60
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1010 #Combined arms
+	title = twrta.1010.t
+	desc = twrta.1010.d
+	picture = GFX_report_event_NATO_combined_arms
+
+	is_triggered_only = yes
+	fire_only_once = no
+
+
+	option = {
+		name = twrta.1010.a #Token force 
+
+		custom_effect_tooltip = NATO_token_force_tt
+
+		army_experience = 1
+		navy_experience = 1
+		air_experience = 1 
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 0.5 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_political_power = -5  
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 15
+		}
+	}
+
+	option = {
+		name = twrta.1010.b #Minor force 
+
+		custom_effect_tooltip = NATO_minor_force_tt
+
+		army_experience = 2.5
+		navy_experience = 2.5
+		air_experience = 2.5
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 1.5 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_command_power = -15
+
+		trigger = {
+			command_power > 15 
+		}
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 25
+		}
+	}
+
+	option = {
+		name = twrta.1010.c #Major force 
+
+		custom_effect_tooltip = NATO_major_force_tt
+
+		army_experience = 5
+		navy_experience = 5
+		air_experience = 5 
+
+		add_to_variable = { NAT.NATO_total_exercise_involvement = 3 }
+		add_to_variable = { NAT.NATO_exercise_responses = 1 }
+
+		add_command_power = -25 
+
+		trigger = {
+			command_power > 25 
+		}
+
+		hidden_effect = {
+			NAT =  {
+				if = {
+					limit = {
+						check_variable = { NAT.NATO_exercise_responses = NAT.NATO_member_countries^num }
+					}
+					country_event = {
+						id = twrta.1011
+						random_days = 5 
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 60
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1011
+	title = twrta.1011.t
+	desc = twrta.1011.d
+	picture = GFX_report_event_summit
+	hidden = yes 
+
+	is_triggered_only = yes
+	fire_only_once = no
+	
+	immediate = {
+		log = "calculations for NATO cycling exercises"
+
+		NAT =  {
+
+			set_variable = { NATO_exercise_engagement = NATO_total_exercise_involvement }
+			divide_variable = { NATO_exercise_engagement = NAT.NATO_member_countries^num }
+
+			if = {
+				limit = {
+					check_variable = { NATO_exercise_engagement > 1 }
+				}
+
+				if = {
+					limit = {
+						check_variable = { NATO_exercise_engagement > 2 }
+					}
+					add_to_variable = { NAT.NATO_military_cooperation = 1 }
+				}
+				else = {
+					add_to_variable = { NAT.NATO_military_cooperation = 0.5 }
+				}
+
+				for_each_scope_loop = {
+					array = NAT.NATO_member_countries
+	
+					country_event = {
+						id = twrta.1012 # exercise concluded successfully
+						random_days = 5 
+					}
+				}
+			}
+			else = {
+				for_each_scope_loop = {
+					array = NAT.NATO_member_countries
+	
+					country_event = {
+						id = twrta.1013 # exercise concluded, but not enough participation
+						random_days = 5 
+					}
+				}
+
+				add_to_variable = { NAT.NATO_military_cooperation = -2 }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1012 # exercise completed successfully
+	title = twrta.1012.t
+	desc = twrta.1012.d
+	picture = GFX_report_event_NATO_training_completed
+
+	is_triggered_only = yes
+	fire_only_once = no
+
+
+	option = {
+		name = twrta.1012.a #Excellent
+
+		custom_effect_tooltip = NATO_exercise_complete_tt
+
+		if = { 
+			limit = { 
+				FROM = { 
+					has_country_flag = NATO_army_exercise
+					check_variable = { NATO_exercise_engagement > 2 } 
+				}
+			} 
+
+			add_doctrine_cost_reduction = {
+				name = NATO_army_exercise_bonus
+				cost_reduction = 0.2
+				uses = 1
+				category = land_doctrine 
+			}
+		}
+		else_if = { 
+			limit = { 
+				FROM = { 
+					has_country_flag = NATO_army_exercise
+					check_variable = { NATO_exercise_engagement > 1 } 
+				}
+			} 
+
+			add_doctrine_cost_reduction = {
+				name = NATO_army_exercise_bonus
+				cost_reduction = 0.1
+				uses = 1
+				category = land_doctrine 
+			}
+		}
+		else_if = { 
+			limit = { 
+				FROM = { 
+					has_country_flag = NATO_navy_exercise
+					check_variable = { NATO_exercise_engagement > 2 } 
+				}
+			} 
+
+			add_doctrine_cost_reduction = {
+				name = NATO_navy_exercise_bonus
+				cost_reduction = 0.2
+				uses = 1
+				category = naval_doctrine 
+			}
+		}
+		else_if = { 
+			limit = { 
+				FROM = { 
+					has_country_flag = NATO_navy_exercise
+					check_variable = { NATO_exercise_engagement > 1 } 
+				}
+			} 
+
+			add_doctrine_cost_reduction = {
+				name = NATO_navy_exercise_bonus
+				cost_reduction = 0.1
+				uses = 1
+				category = naval_doctrine 
+			}
+		}
+		else_if = { 
+			limit = { 
+				FROM = { 
+					has_country_flag = NATO_airforce_exercise
+					check_variable = { NATO_exercise_engagement > 2 } 
+				}
+			} 
+
+			add_doctrine_cost_reduction = {
+				name = NATO_airforce_exercise_bonus
+				cost_reduction = 0.2
+				uses = 1
+				category = air_doctrine 
+			}
+		}
+		else_if = { 
+			limit = { 
+				FROM = { 
+					has_country_flag = NATO_airforce_exercise
+					check_variable = { NATO_exercise_engagement > 1 } 
+				}
+			} 
+
+			add_doctrine_cost_reduction = {
+				name = NATO_airforce_exercise_bonus
+				cost_reduction = 0.1
+				uses = 1
+				category = air_doctrine 
+			}
+		}
+		else_if = { 
+			limit = { 
+				FROM = { 
+					has_country_flag = NATO_combinedarms_exercise
+					check_variable = { NATO_exercise_engagement > 2 } 
+				}
+			} 
+
+			add_doctrine_cost_reduction = {
+				name = NATO_combinedarms_exercise_bonus
+				cost_reduction = 0.1
+				uses = 1
+				category = air_doctrine 
+			}
+			add_doctrine_cost_reduction = {
+				name = NATO_combinedarms_exercise_bonus
+				cost_reduction = 0.1
+				uses = 1
+				category = land_doctrine 
+			}
+			add_doctrine_cost_reduction = {
+				name = NATO_combinedarms_exercise_bonus
+				cost_reduction = 0.1
+				uses = 1
+				category = naval_doctrine 
+			}
+		}
+		else_if = { 
+			limit = { 
+				FROM = { 
+					has_country_flag = NATO_combinedarms_exercise
+					check_variable = { NATO_exercise_engagement > 1 } 
+				}
+			} 
+
+			add_doctrine_cost_reduction = {
+				name = NATO_combinedarms_exercise_bonus
+				cost_reduction = 0.5
+				uses = 1
+				category = air_doctrine 
+			}
+			add_doctrine_cost_reduction = {
+				name = NATO_combinedarms_exercise_bonus
+				cost_reduction = 0.5
+				uses = 1
+				category = land_doctrine 
+			}
+			add_doctrine_cost_reduction = {
+				name = NATO_combinedarms_exercise_bonus
+				cost_reduction = 0.5
+				uses = 1
+				category = naval_doctrine 
+			}
+		}
+
+		if = {
+			limit = { 
+				FROM = {
+					check_variable = { NATO_exercise_engagement > 2 }
+				}
+			}
+			effect_tooltip = {
+				add_to_variable = {
+					NAT.NATO_military_cooperation = 1 
+					tooltip = NATO_military_cooperation_change_tt
+				}
+			}
+		}
+		else_if = {
+			limit = { 
+				FROM = {
+					check_variable = { NATO_exercise_engagement > 1 }
+				}
+			}
+
+			effect_tooltip = {
+				add_to_variable = {
+					NAT.NATO_military_cooperation = 0.5  
+					tooltip = NATO_military_cooperation_change_tt
+				}
+			}
+	
+		}
+	}
+}
+
+country_event = {
+	id = twrta.1013 # exercise completed with low participation
+	title = twrta.1013.t
+	desc = twrta.1013.d
+	picture = GFX_report_event_NATO_training_completed
+
+	is_triggered_only = yes
+	fire_only_once = no
+
+	option = {
+		name = twrta.1013.a
+
+		effect_tooltip = {
+			subtract_from_variable = {
+				NAT.NATO_military_cooperation = -2 
+				tooltip = NATO_military_cooperation_change_tt
+			}
+		}
+
+	}
+}
+
+country_event = {
+	id = twrta.1014 # voting open
+	title = twrta.1014.t
+	desc = twrta.1014.d
+	picture = GFX_report_event_NATO_meeting
+
+	is_triggered_only = yes
+	fire_only_once = no
+
+	option = {
+		name = twrta.1014.a
+	}
+}
+
+
+
+country_event = { #Application Accepted
+	id = twrta.3001
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event twrta.3001"
+	}
+
+	title = twrta.3001.t
+	desc = twrta.3001.d
+	picture = GFX_report_event_TA_flag
+
+	is_triggered_only = yes
+	fire_only_once = no
+	
+
+	option = {
+		name = twrta.3001.a
+		NATO_join = yes
+		add_political_power = 50
+		news_event = twrta.3002
+	}
+}
+
+news_event = { #Joins TA
+	id = twrta.3002
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event twrta.3002"
+	}
+
+	title = twrta.3670.t
+	desc = twrta.3002.d
+	picture = GFX_news_event_toronto_accord
+
+	is_triggered_only = yes
+	fire_only_once = no
+	major = yes
+	
+
+	option = {
+		name = twrta.3002.a
+	}
+}
+
+country_event = { #Application Denied
+	id = twrta.3003
+	immediate = {
+		log = "[GetDateText]: [Root.GetName]: event twrta.3003"
+	}
+
+	title = twrta.3003.t
+	desc = twrta.3003.d
+	picture = GFX_report_event_TA_flag
+
+	is_triggered_only = yes
+	fire_only_once = no
+	
+
+	option = {
+		name = twrta.3003.a
+	}
+}
