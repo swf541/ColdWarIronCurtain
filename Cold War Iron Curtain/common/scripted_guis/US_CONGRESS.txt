@@ -1,4 +1,90 @@
 scripted_gui = {
+    Dem_Primary_Negotiation_Window = {
+		context_type = player_context
+		window_name = "Dem_Primary_Negotiations"   
+		visible = {
+			check_variable = {
+                show_state_negotiatons = 1
+            }
+		}  
+        effects = {
+            close_button_click = {
+                set_variable = {
+                    show_state_negotiatons = 0
+                }
+            }
+        } 
+    }
+	dem_primary_ad_target_list = {
+		context_type = player_context
+		window_name = "dem_primary_negotiations_list"
+		parent_window_name = "Dem_Primary_Negotiations"
+
+		
+		dynamic_lists = {
+			dem_primary_negotiations_listing_grid = {
+				array = dem_state_leader_issues
+				change_scope = no
+				entry_container = dem_primary_negotiations_list_entry
+			}
+		}
+	}
+    
+    Dem_Primary_Ad_Purchase_Prompt = {
+		context_type = player_context
+		window_name = "US_ELECTION_DEM_PRIMARY_ADS"   
+		visible = {
+			check_variable = {
+                show_dem_primary_ad_prompt = 1
+            }
+		}  
+        effects = {
+            close_button_click = {
+                set_variable = {
+                    show_dem_primary_ad_prompt = 0
+                }
+            }
+        } 
+    }
+	dem_primary_ad_type_list = {
+		context_type = player_context
+		window_name = "DEM_PRIMARY_AD_TYPE"
+		parent_window_name = "US_ELECTION_DEM_PRIMARY_ADS"
+
+		visible = {
+			check_variable = {
+                show_dem_primary_ad_prompt = 1
+            }
+		} 
+		
+		dynamic_lists = {
+			dem_primary_ad_type_listing_grid = {
+				array = USA.dem_primary_ad_types
+				change_scope = no
+				entry_container = dem_primary_ad_type_list_entry
+			}
+		}
+	}
+	dem_primary_ad_target_list = {
+		context_type = player_context
+		window_name = "DEM_PRIMARY_AD_TARGET"
+		parent_window_name = "US_ELECTION_DEM_PRIMARY_ADS"
+
+		visible = {
+			check_variable = {
+                show_dem_primary_ad_prompt = 1
+            }
+		} 
+
+		
+		dynamic_lists = {
+			dem_primary_ad_target_listing_grid = {
+				array = USA.dem_primary_ad_targets
+				change_scope = no
+				entry_container = dem_primary_ad_target_list_entry
+			}
+		}
+	}
 
 
 	US_CONGRESS = {
@@ -81,7 +167,190 @@ scripted_gui = {
 				frame = 73      #gop_leading_ev
 			}   
         }
+        triggers = {
+            state_action_fundraise_click_enabled = {
+                check_variable = {
+                    Dem_Activity_Points^Playing_As_Display > 0.999
+                }
+            }
+            state_dem_campaign_click_enabled = {
+                var:USA_SEN_POL_DETAILS = {
+                    OR = {
+                        check_variable = {
+                            Contest_Type = 1
+                        }
+                        check_variable = {
+                            Contest_Type = 2
+                        }
+                    }
+                }
+                check_variable = {
+                    Dem_Activity_Points^Playing_As_Display > 0.999
+                }
+            }
+            state_dem_invest_in_local_campaign_click_enabled = {
+                NOT = {
+                    check_variable = {
+                        USA_SEN_POL_DETAILS = 0
+                    }
+                }
+                var:USA_SEN_POL_DETAILS = { 
+                    check_variable = { 
+                        USA.Dem_Campaign_Funds^USA.Playing_As_Display > Investment_Cost
+                    }
+                    #Timed Bit
+                    NOT = {
+                        meta_trigger = {
+                            text = {									
+                                has_state_flag = Recent_Investment_By_Dem_Candidate_[PLAYING_AS]
+                            }
+                            PLAYING_AS = "[?ROOT.Playing_As_Display]"
+                        }
+                    }
+                }
+            }
+        }
 		effects = {
+            state_party_negotiate_click = {
+                clear_array = USA.dem_state_leader_issues
+                set_variable = {
+                    show_state_negotiatons = 1
+                }
+                var:USA_SEN_POL_DETAILS = {
+                    save_global_event_target_as = USA_DEM_PRIMARY_NEGOTIATE_TARGET
+                    for_each_loop = {
+                        array = dem_state_leader_issues
+                        add_to_array = { USA.dem_state_leader_issues = dem_state_leader_issues^i }
+                    }
+                }          
+
+                #meta_effect = { 
+                #    text = {
+                #        for_each_loop = {
+                #            array = black_ops_group_[ARRAY_NUMBER]_traits
+                #            add_to_array = { blacks_ops_team_current_traits = black_ops_group_[ARRAY_NUMBER]_traits^i }
+                #        }
+                #        for_each_loop = {
+                #            array = black_ops_group_[ARRAY_NUMBER]_history
+                #            add_to_array = { black_ops_team_history_dates = black_ops_group_[ARRAY_NUMBER]_history^i }
+                #        }
+                #        for_each_loop = {
+                #            array = black_ops_group_[ARRAY_NUMBER]_history_entry
+                #            add_to_array = { black_ops_team_history_entries = black_ops_group_[ARRAY_NUMBER]_history_entry^i }
+                #        }
+                #        for_each_loop = {
+                #            array = black_ops_group_[ARRAY_NUMBER]_history_entry_flag
+                #            add_to_array = { black_ops_team_history_entries_flags = black_ops_group_[ARRAY_NUMBER]_history_entry_flag^i }
+                #        }
+                #        
+                #    }
+                #    TAG = "[?ROOT.GetTag]"
+                #    OPERATIVE = "[?operative_number]"
+                #    ARRAY_NUMBER = "[?current_page]"
+                #}    
+
+            }
+            state_dem_launch_television_ads_click = {
+
+                set_variable = {
+                    show_dem_primary_ad_prompt = 1
+                }
+                set_variable = {
+                    media_type = 3
+                }
+                clear_array = dem_primary_ad_types
+                clear_array = dem_primary_ad_targets
+
+                var:USA_SEN_POL_DETAILS = {
+                    save_global_event_target_as = USA_DEM_PRIMARY_MEDIA_TARGET
+                }
+                add_to_array = {
+                    dem_primary_ad_types = 1  #Positive Piece
+                }
+                set_variable = {
+                    potential_ad_buy_cost = 5  #10k
+                }
+                multiply_variable = {
+                    potential_ad_buy_cost = USA_DEM_PRIMARY_MEDIA_TARGET.media_market_area_factor    #Rough Number of Relevant Media Markets
+                }
+                multiply_variable = {
+                    potential_ad_buy_cost = USA_DEM_PRIMARY_MEDIA_TARGET.media_cost_factor    #Cost Adjuster, State Specific, Set in American_Primary_Effects.txt
+                }
+                add_to_array = {
+                    dem_primary_ad_types = 2  #Negative Piece
+                }
+                add_to_array = {
+                    dem_primary_ad_targets = 0  #Notice of Order
+                }
+            }
+            state_dem_invest_in_local_campaign_click = {
+                var:USA_SEN_POL_DETAILS = {
+                    subtract_from_variable = { 
+                        Dem_Campaign_Funds^ROOT.Playing_As_Display = Investment_Cost
+                    }
+                    #Popularity Change
+                    randomize_variable = {
+                        var = Campaigning_Addition
+                        distribution = uniform
+                        min = 1
+                        max = 3
+                    }
+                    add_to_variable = { 
+                        Canidate_Support^ROOT.Playing_As_Position = Campaigning_Addition 
+                    }
+                    #Timed Bit
+                    meta_effect = {
+                        text = {									
+                            set_state_flag = {
+                                flag = Recent_Investment_By_Dem_Candidate_[PLAYING_AS]
+                                days = 28
+                                value = 1
+                            }
+                        }
+                        PLAYING_AS = "[?ROOT.Playing_As_Display]"
+                    }
+                }
+                generate_campaign_map_numbers_dem = yes
+            }
+            state_action_fundraise_click = {
+                add_to_variable = {
+                    Dem_Activity_Points^Playing_As_Display = -1
+                }
+                randomize_variable = {
+                    var = Fundraising_Addition
+                    distribution = uniform
+                    min = 5
+                    max = 20
+                }
+                multiply_variable = {
+                    Fundraising_Addition = Dem_Fundraising_Score^Playing_As_Display
+                }
+                #Regional Bit Note to Add for General Election, Weight by PVI Maybe?
+                add_to_variable = { 
+                    Dem_Campaign_Funds^Playing_As_Display = Fundraising_Addition 
+                }
+            }
+            state_dem_campaign_click = {
+                add_to_variable = {
+                    Dem_Activity_Points^Playing_As_Display = -1
+                }
+                var:USA_SEN_POL_DETAILS = {
+                    randomize_variable = {
+                        var = Campaigning_Addition
+                        distribution = uniform
+                        min = 0.3
+                        max = 0.6
+                    }
+                    multiply_variable = {
+                        Campaigning_Addition = ROOT.Dem_Charsima_Score^ROOT.Playing_As_Display
+                    }
+                    #Regional Bit Note to Add for General Election, Weight by PVI Maybe?
+                    add_to_variable = { 
+                        Canidate_Support^ROOT.Playing_As_Position = Campaigning_Addition 
+                    }
+                }
+                generate_campaign_map_numbers_dem = yes
+            }
             closebutton_click = {
 				set_variable = { show_usa_congress = 0 }
                 375 = {
@@ -2543,7 +2812,24 @@ scripted_gui = {
             }
         } 
     }
+    #The Negotiator
+    
     #Primary Prompts
+	Dem_Primary_Negotiations = {
+
+		context_type = player_context
+		window_name = "Dem_Primary_Negotiations"
+		dirty = party_check
+ 
+		visible = { 
+            has_country_flag = Dem_Negotiations
+		}
+        effects = {
+            okay_button_click = {
+                clr_country_flag = Dem_Negotiations
+            }
+        } 
+    }
 	Dem_Primary_New_Hampshire_Prompt = {
 
 		context_type = player_context
