@@ -542,7 +542,76 @@ CONGRESS_US = {
             }
 
             #Advert Effects Here
+            #dem_primary_ad_cycle_buyer = Playing_As                      #Buyer
+            #dem_primary_ad_cycle_type = selected_dem_topic               #Topic
+            #dem_primary_ad_cycle_target = dem_primary_ad_target_selected #Target
+            #dem_primary_ad_cycle_state = USA_DEM_PRIMARY_MEDIA_DETAILS   #State
+            #dem_primary_ad_cycle_status = 2                              #When Ads Conclude (2 Media Cycles Away)
+            #dem_primary_ad_cycle_format = media_type                     #Newspaper, Radio, TV
+            #dem_primary_ad_cycle_target_position                         #Target Position
 
+            for_each_loop = {
+                array = dem_primary_ad_cycle_buyer
+                if = {
+                    limit = {
+                        check_variable = {
+                            dem_primary_ad_cycle_status = 2
+                        }
+                    }
+                    add_to_variable = {
+                        dem_primary_ad_cycle_status = -1
+                    }
+                    custom_effect_tooltip = AD_LAUNCH_START_TT
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            dem_primary_ad_cycle_status^i = 1
+                        }
+                    }
+                    add_to_variable = {
+                        dem_primary_ad_cycle_status^i = -1
+                    }
+                    custom_effect_tooltip = AD_CAMPAIGN_CONCLUDE_TT
+
+                    Democratic_Ad_Position_Finder = yes #Get Position of Target
+                    if = {
+                        limit = {
+                            check_variable = { 
+                                dem_primary_ad_cycle_type^i = 1
+                            }
+                        }
+                        set_variable = {
+                            support_modifier = 1
+                        }
+                    }
+                    if = {
+                        limit = {
+                            check_variable = {
+                                dem_primary_ad_cycle_type^i = 2
+                            }
+                        }
+                        set_variable = {
+                            support_modifier = -1
+                        }
+                    }
+                    else = {
+                        set_variable = {
+                            support_modifier = 1
+                        }                      
+                    }
+                    var:dem_primary_ad_cycle_state^i = {
+                        randomize_variable = {
+                            var = Support_Change
+                            distribution = uniform
+                            min = 1
+                            max = 5
+                        }
+                    }
+                }
+                else = {
+                }
+            }
 
             #Refresh Map Here
 
