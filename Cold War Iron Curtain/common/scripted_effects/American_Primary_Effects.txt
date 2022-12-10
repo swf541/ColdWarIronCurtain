@@ -1,3 +1,79 @@
+Democratic_Ad_Calc_Test = {
+    for_each_loop = {
+        array = dem_primary_ad_cycle_buyer
+        if = {
+            limit = {
+                check_variable = {
+                    dem_primary_ad_cycle_status = 2
+                }
+            }
+            add_to_variable = {
+                dem_primary_ad_cycle_status = -1
+            }
+            custom_effect_tooltip = AD_LAUNCH_START_TT
+        }
+        else_if = {
+            limit = {
+                check_variable = {
+                    dem_primary_ad_cycle_status^i = 1
+                }
+            }
+            add_to_variable = {
+                dem_primary_ad_cycle_status^i = -1
+            }
+            custom_effect_tooltip = AD_CAMPAIGN_CONCLUDE_TT
+
+            Democratic_Ad_Position_Finder = yes #Get Position of Target
+            if = {
+                limit = {
+                    check_variable = { 
+                        dem_primary_ad_cycle_type^i = 1
+                    }
+                }
+                set_variable = {
+                    support_modifier = 1
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = {
+                        dem_primary_ad_cycle_type^i = 2
+                    }
+                }
+                set_variable = {
+                    support_modifier = -1
+                }
+            }
+            else = {
+                set_variable = {
+                    support_modifier = 1
+                }                      
+            }
+            randomize_variable = {
+                var = Support_Change
+                distribution = uniform
+                min = 0.5
+                max = 2
+            }
+            multiply_variable = {
+                Support_Change = dem_primary_ad_cycle_format^i
+            }
+            multiply_variable = {
+                Support_Change = support_modifier
+            }
+            var:dem_primary_ad_cycle_state^i = {
+                add_to_variable = {
+                    Canidate_Support^USA.dem_primary_ad_cycle_target_position = Support_Change
+                }
+            }
+        }
+        else = {
+        }
+    }
+    #Refresh Map Here
+    generate_campaign_map_numbers_dem = yes
+}
+
 Democratic_Ad_Position_Finder = {
     if = {
         limit = {
