@@ -1,0 +1,273 @@
+in_war_with_ta = {
+	is_in_faction_with = USA
+	OR = {
+		has_war_with = event_target:ta_defeated_by
+		AND = {
+			is_subject = yes
+			overlord = {
+				has_war_with = event_target:ta_defeated_by
+			}
+		}
+	}
+}
+
+NATO_total_votes = {
+
+	clear_temp_array = temp_voting_for_array
+	clear_temp_array = temp_voting_against_array
+	clear_temp_array = temp_voting_neutral_array
+
+	all_of_scopes = {
+		array = NAT.NATO_member_countries
+
+		if = {
+			limit = {
+				check_variable = { NATO_vote_value = 1 }
+			}
+			add_to_temp_array = { temp_voting_for_array = THIS } 
+		}
+		else_if = {
+			limit = {
+				check_variable = { NATO_vote_value = -1 }
+			}
+			add_to_temp_array = { temp_voting_against_array = THIS }
+		}
+		else_if  = {
+			limit = {
+				AND = {
+					has_variable = NATO_vote_value
+					check_variable = { NATO_vote_value = 0 }
+				}
+			}
+			add_to_temp_array = { temp_voting_neutral_array = THIS }
+		}
+		
+	}
+
+	set_temp_variable = { NATO_votes_neutral = temp_voting_neutral_array^num }
+	set_temp_variable = { NATO_votes_negative = temp_voting_against_array^num }
+	set_temp_variable = { NATO_votes_positive = temp_voting_for_array^num }
+
+	set_temp_variable = { NATO_votes_majority_needed = NAT.NATO_member_countries^num }
+	divide_temp_variable = { NATO_votes_majority_needed = 2 }
+	round_temp_variable = NATO_votes_majority_needed
+	#add_to_temp_variable = { NATO_votes_majority_needed = 1 }
+}
+
+NATO_whip_positive_allowed = {
+	custom_trigger_tooltip = {
+		tooltip = NATO_whip_has_voted_tt
+		has_variable = NATO_whippee:NATO_vote_value
+	}
+	NOT = { 
+		custom_trigger_tooltip = {
+			tooltip = NATO_whip_positive_vote_tt
+			check_variable = { NATO_whippee:NATO_vote_value = 1 }
+		}
+	}
+	custom_trigger_tooltip = {
+		tooltip = NATO_whip_accepting_whipping
+		check_variable = { NATO_whippee:NATO_vote_intention > -20 }
+	}
+
+
+	custom_trigger_tooltip = {
+		tooltip = NATO_has_been_whipped_recently
+		var:NATO_whippee = { NOT = { has_country_flag = NATO_has_been_whipped_recently } }
+	}
+	
+	hidden_trigger = { 
+		NATO_calculate_positive_whip_cost = yes
+	}
+	hidden_trigger = {
+		ROOT = {
+			has_political_power > NATO_whip_cost
+		}
+	}
+}
+
+NATO_whip_negative_allowed = {
+	custom_trigger_tooltip = {
+		tooltip = NATO_whip_has_voted_tt
+		has_variable = NATO_whippee:NATO_vote_value
+	}
+	NOT = { 
+		custom_trigger_tooltip = {
+			tooltip = NATO_whip_negative_vote_tt
+			check_variable = { NATO_whippee:NATO_vote_value = -1 }
+		}
+	}
+
+	custom_trigger_tooltip = {
+		tooltip = NATO_whip_accepting_whipping
+		check_variable = { NATO_whippee:NATO_vote_intention < 20 }
+	}
+	 
+
+	custom_trigger_tooltip = {
+		tooltip = NATO_has_been_whipped_recently
+		var:NATO_whippee = { NOT = { has_country_flag = NATO_has_been_whipped_recently } }
+	}
+	hidden_trigger = { 
+		NATO_calculate_negative_whip_cost = yes
+	}
+	hidden_trigger = {
+		ROOT = {
+			has_political_power > NATO_whip_cost
+		}
+	}
+}
+
+NATO_calculate_positive_whip_cost = {
+
+	NATO_calculate_whip_cost = yes 
+
+	if = { #if voting intention is negative 
+		limit = {
+			check_variable = { NATO_vote_intention < 0 }
+		}
+
+		set_temp_variable = { NATO_vote_intention_effect_display = NATO_vote_intention }
+
+		multiply_temp_variable = { NATO_vote_intention_effect_display = -1 }
+		divide_temp_variable = { NATO_vote_intention_effect_display = 5 }
+		set_temp_variable = { NATO_vote_intention_effect = NATO_vote_intention_effect_display }
+		add_to_temp_variable = { NATO_vote_intention_effect = 1 }
+		multiply_temp_variable = { NATO_whip_cost = NATO_vote_intention_effect }
+	}
+
+	else = {
+		set_temp_variable = { NATO_vote_intention_effect_display = 0 }
+	}
+}
+
+NATO_calculate_negative_whip_cost = {
+
+	NATO_calculate_whip_cost = yes 
+
+	if = { #if voting intention is negative 
+		limit = {
+			check_variable = { NATO_vote_intention > 0 }
+		}
+
+		set_temp_variable = { NATO_vote_intention_effect_display = NATO_vote_intention }
+
+		divide_temp_variable = { NATO_vote_intention_effect_display = 5 }
+		set_temp_variable = { NATO_vote_intention_effect = NATO_vote_intention_effect_display }
+		add_to_temp_variable = { NATO_vote_intention_effect = 1 }
+		multiply_temp_variable = { NATO_whip_cost = NATO_vote_intention_effect }
+	}
+
+	else = {
+		set_temp_variable = { NATO_vote_intention_effect_display = 0 }
+	}
+}
+
+
+NATO_calculate_whip_cost = {
+
+	set_temp_variable = { NATO_total_factories = 0 }
+
+	NAT =  {
+		all_of_scopes = {
+			array = NATO_member_countries
+
+			add_to_temp_variable = { NATO_total_factories = num_of_factories }
+		}
+	}
+
+	set_temp_variable = { NATO_faction_leader_bonus = 0.2 }
+	set_temp_variable = { NATO_major_bonus = 0.175 }
+	set_temp_variable = { NATO_major_flag_bonus = 0.15 }
+
+	multiply_temp_variable = { NATO_faction_leader_bonus = NATO_total_factories }
+	multiply_temp_variable = { NATO_major_bonus = NATO_total_factories }
+	multiply_temp_variable = { NATO_major_flag_bonus = NATO_total_factories }
+ 
+	var:NATO_whippee = {
+		set_temp_variable = { NATO_this_absolute_power = num_of_factories }
+
+		if = {
+			limit = {
+				is_faction_leader = yes 
+			}
+
+			add_to_temp_variable = { NATO_this_absolute_power = NATO_faction_leader_bonus }
+		}
+		else_if = {
+			limit = {
+				is_major = yes 
+			}
+
+			add_to_temp_variable = { NATO_this_absolute_power = NATO_major_bonus }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = NATO_major_member
+			}
+
+			add_to_temp_variable = { NATO_this_absolute_power = NATO_major_flag_bonus }
+		}
+	}
+
+	var:NATO_whipper = {
+
+		set_temp_variable = { NATO_whipper_absolute_power = num_of_factories }
+		if = {
+			limit = {
+				is_faction_leader = yes 
+			}
+	
+			add_to_temp_variable = { NATO_whipper_absolute_power = NATO_faction_leader_bonus }
+		}
+		else_if = {
+			limit = {
+				is_major = yes 
+			}
+	
+			add_to_temp_variable = { NATO_whipper_absolute_power = NATO_major_bonus }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = NATO_major_member
+			}
+	
+			add_to_temp_variable = { NATO_whipper_absolute_power = NATO_major_flag_bonus }
+		}
+	}
+
+	set_temp_variable = { NATO_this_relative_power = NATO_this_absolute_power }
+	multiply_temp_variable = { NATO_this_relative_power = 10 }
+	divide_temp_variable = { NATO_this_relative_power = NATO_total_factories }
+
+	clamp_temp_variable = {
+		var = NATO_this_relative_power
+		min = 1
+		max = 10 
+	}
+
+	set_temp_variable = { NATO_whipper_relative_power = NATO_whipper_absolute_power }
+	multiply_temp_variable = { NATO_whipper_relative_power = 10 }
+	divide_temp_variable = { NATO_whipper_relative_power = NATO_total_factories }
+
+	clamp_temp_variable = {
+		var = NATO_whipper_relative_power
+		min = 1
+		max = 10 
+	}
+
+	set_temp_variable = { NATO_whip_coefficient = NATO_this_relative_power }
+	divide_temp_variable = { NATO_whip_coefficient = NATO_whipper_relative_power }
+
+	set_temp_variable = { NATO_whip_cost = 25 }
+	multiply_temp_variable = { NATO_whip_cost = NATO_whip_coefficient }
+
+	set_temp_variable = { NATO_whip_coefficient_display = NATO_whip_coefficient }
+	subtract_from_temp_variable = { NATO_whip_coefficient_display = 1 }
+
+	clamp_temp_variable = {
+		var = NATO_whip_cost
+		min = 5
+		max = 100
+	}
+}
