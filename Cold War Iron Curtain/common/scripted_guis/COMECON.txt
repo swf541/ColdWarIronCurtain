@@ -1,55 +1,1089 @@
 scripted_gui = {
+	COMECON_DOCKYARD_RENTAL = {
+        
+		context_type = player_context
+		window_name = "COMECON_DOCKYARD_RENTAL"
+
+		visible = { 
+            check_variable = { COMECON_DOCKYARD_PROMPT = 1 } 
+		}
+		properties = {
+			country_flag_for_trade_screen = {
+				image = "[COMECON_TARGET.GetFlag]"
+			}	
+			root_flag_for_trade_screen = {
+				image = "[CUM.GetFlag]"
+			}	
+		}
+		triggers = {
+			decrease_rental_click_enabled = {
+				NOT = {
+					check_variable = {
+						purchase_amount_comecon = 0
+					}
+				}
+			}
+			increase_rental_click_enabled = {
+				var:currentPurchaser = {
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon > COMECON_TARGET.num_of_available_naval_factories
+						}
+					}
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon = COMECON_TARGET.num_of_available_naval_factories
+						}
+					}
+				}
+			}
+			confirm_chromium_purchase_click_enabled = {
+				NOT = { #Must be Valid Offer
+                    check_variable = {
+                        purchase_amount_comecon = 0
+                    }
+                }
+			}
+		}
+        effects = {
+            increase_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = 1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1
+				}
+				
+            }
+            decrease_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = -1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1.2
+				}
+            }
+			confirm_chromium_purchase_click = {
+				set_variable = {
+					COMECON_DOCKYARD_PROMPT = 0
+				}
+                var:SOV.COMECON1 = {
+                    if = {
+                        limit = {
+                            is_subject_of = SOV
+                        }
+                        set_country_flag = COMECON_DOCKYARD_SEIZED_PROMPT
+                        set_country_flag = {
+                            flag = Seized_Dockyard
+                            days = 180
+                            value = 1
+                        }
+                        subtract_from_variable = {
+                            SOV.purchase_amount_comecon = comecon_stolen_dockyards
+                        }
+                        subtract_from_variable = {
+                            SOV.purchase_desc_comecon = current_comecon_stolen_dockyards_cost
+                        }
+                        add_to_variable = {
+                            current_comecon_stolen_dockyards_cost = SOV.purchase_desc_comecon
+                        }
+                        add_to_variable = {
+                            comecon_stolen_dockyards = SOV.purchase_amount_comecon
+                        }
+                        add_to_variable = {
+                            SOV.Seized_Dockyards = SOV.purchase_amount_comecon
+                        }
+                        set_variable = {
+                            comecon_stolen_dockyards_cost = comecon_stolen_dockyards
+                        }
+                        multiply_variable = {
+                            comecon_stolen_dockyards_cost = -1
+                        }
+                    }
+                    else = {
+                        set_country_flag = COMECON_DOCKYARD_SEIZED_PROMPT_OFFER
+                        set_country_flag = {    #Disable Prompt for 180 Days
+                            flag = Seized_Dockyard
+                            days = 180
+                            value = 1
+                        }  
+                        subtract_from_variable = {
+                            SOV.purchase_amount_comecon = comecon_stolen_dockyards
+                        }
+                        set_variable = {
+                            purchase_amount_comecon_offer = SOV.purchase_amount_comecon
+                        }
+                        
+                    }
+                }
+			}
+			cancel_button_click = {
+				set_variable = {
+					COMECON_DOCKYARD_PROMPT = 0
+				}
+				set_variable = {
+					purchase_desc_comecon = 0
+				}
+				set_variable = {
+					purchase_amount_comecon = 0
+				}
+			}
+        } 
+    }
+	COMECON_FACTORY_RENTAL = {
+
+		context_type = player_context
+		window_name = "COMECON_FACTORY_RENTAL"
+
+		visible = { 
+            check_variable = { COMECON_FACTORY_PROMPT = 1 } 
+		}
+		properties = {
+			country_flag_for_trade_screen = {
+				image = "[COMECON_TARGET.GetFlag]"
+			}	
+			root_flag_for_trade_screen = {
+				image = "[CUM.GetFlag]"
+			}	
+		}
+		triggers = {
+			decrease_rental_click_enabled = {
+				NOT = {
+					check_variable = {
+						purchase_amount_comecon = 0
+					}
+				}
+			}
+			increase_rental_click_enabled = {
+				var:currentPurchaser = {
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon > COMECON_TARGET.num_of_available_civilian_factories
+						}
+					}
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon = COMECON_TARGET.num_of_available_civilian_factories
+						}
+					}
+				}
+			}
+			confirm_chromium_purchase_click_enabled = {
+				NOT = { #Must be Valid Offer
+                    check_variable = {
+                        purchase_amount_comecon = 0
+                    }
+                }
+			}
+		}
+        effects = {
+            increase_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = 1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1
+				}
+				
+            }
+            decrease_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = -1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1
+				}
+            }
+			confirm_chromium_purchase_click = {
+				set_variable = {
+					COMECON_FACTORY_PROMPT = 0
+				}
+                var:SOV.COMECON1 = {
+                    if = {
+                        limit = {
+                            is_subject_of = SOV
+                        }
+                        set_country_flag = COMECON_FACTORY_SEIZED_PROMPT
+                        set_country_flag = {
+                            flag = Seized_Factory
+                            days = 180
+                            value = 1
+                        }
+                        subtract_from_variable = {
+                            SOV.purchase_amount_comecon = comecon_stolen_factories
+                        }
+                        add_to_variable = {
+                            comecon_stolen_factories = SOV.purchase_amount_comecon
+                        }
+                        add_to_variable = {
+                            SOV.Seized_Factories = SOV.purchase_amount_comecon
+                        }
+                        add_offsite_building = { type = industrial_complex level = SOV.purchase_amount_comecon }
+                    }
+                }
+			}
+			cancel_button_click = {
+				set_variable = {
+					COMECON_FACTORY_PROMPT = 0
+				}
+				set_variable = {
+					purchase_desc_comecon = 0
+				}
+				set_variable = {
+					purchase_amount_comecon = 0
+				}
+			}
+        } 
+    }
+	COMECON_ARMS_RENTAL = {
+
+		context_type = player_context
+		window_name = "COMECON_ARMS_RENTAL"
+
+		visible = { 
+            check_variable = { COMECON_ARMS_PROMPT = 1 } 
+		}
+		properties = {
+			country_flag_for_trade_screen = {
+				image = "[COMECON_TARGET.GetFlag]"
+			}	
+			root_flag_for_trade_screen = {
+				image = "[CUM.GetFlag]"
+			}	
+		}
+		triggers = {
+			decrease_rental_click_enabled = {
+				NOT = {
+					check_variable = {
+						purchase_amount_comecon = 0
+					}
+				}
+			}
+			increase_rental_click_enabled = {
+				var:currentPurchaser = {
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon > COMECON_TARGET.num_of_available_military_factories
+						}
+					}
+					NOT = {
+						check_variable = {
+							ROOT.purchase_amount_comecon = COMECON_TARGET.num_of_available_military_factories
+						}
+					}
+				}
+			}
+			confirm_chromium_purchase_click_enabled = {
+				NOT = { #Must be Valid Offer
+                    check_variable = {
+                        purchase_amount_comecon = 0
+                    }
+                }
+			}
+		}
+        effects = {
+            increase_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = 1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1.2
+				}
+				
+            }
+            decrease_rental_click = {
+				add_to_variable = {
+					purchase_amount_comecon = -1
+				}
+				set_variable = {
+					purchase_desc_comecon = purchase_amount_comecon
+				}
+				multiply_variable = {
+					purchase_desc_comecon = 1.2
+				}
+            }
+			confirm_chromium_purchase_click = {
+				set_variable = {
+					COMECON_ARMS_PROMPT = 0
+				}
+                var:SOV.COMECON1 = {
+                    if = {
+                        limit = {
+                            is_subject_of = SOV
+                        }
+                        set_country_flag = COMECON_ARMS_SEIZED_PROMPT
+                        set_country_flag = {
+                            flag = Seized_Arms_Factory
+                            days = 180
+                            value = 1
+                        }
+                        subtract_from_variable = {
+                            SOV.purchase_amount_comecon = comecon_stolen_arms_factories
+                        }
+                        add_to_variable = {
+                            comecon_stolen_arms_factories = SOV.purchase_amount_comecon
+                        }
+                        add_to_variable = {
+                            SOV.Seized_Arms_Factories = SOV.purchase_amount_comecon
+                        }
+                        add_offsite_building = { type = arms_factory level = SOV.purchase_amount_comecon }
+                    }
+                }
+			}
+			cancel_button_click = {
+				set_variable = {
+					COMECON_ARMS_PROMPT = 0
+				}
+				set_variable = {
+					purchase_desc_comecon = 0
+				}
+				set_variable = {
+					purchase_amount_comecon = 0
+				}
+			}
+        } 
+    }
+
 	comecon_menu = {
 		context_type = player_context
 		
 		window_name = "COMECON_Redux_Window"
-        dirty = comecon_redux_variable
+        #dirty = comecon_redux_variable
 
 		visible = {
-			check_variable = { comecon_main_show > 0 }
+			check_variable = { SOV.comecon_main_show > 0 }
 		}
+
 		triggers = {
-			COMECON_Screen_Main_Line_1_visible = {
-                check_variable = { comecon_main_show = 1 }
+            #HUN
+            Comecon_Imre_Nagy_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Imre Nagy" ruling_only = yes } }  }
+            Comecon_Matyas_Rakosi_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Mátyás Rákosi" ruling_only = yes } }  }
+            Comecon_Erno_Gero_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Ernő Gerő" ruling_only = yes } }  }
+            Comecon_Janos_Kadar_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "János Kádár" ruling_only = yes } }  }
+            #Portraits CZE
+            Comecon_Klement_Gottwald_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Klement Gottwald" ruling_only = yes } }  }
+            Comecon_Antonin_Novotny_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Antonin Novotny" ruling_only = yes } }  }
+            Comecon_Gustav_Husak_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Gustav Husak" ruling_only = yes } }  }
+            Comecon_Milos_Jakes_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Milos Jakes" ruling_only = yes } }  }
+            Comecon_Rufolf_Slansky_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Rudolf Slansky" ruling_only = yes } } }
+            Comecon_Antonin_Zapotocky_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Antonín Zapotocky" ruling_only = yes } } }
+            Comecon_Alexander_Dubcek_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Alexander Dubcek" ruling_only = yes } } }
+            #MEX
+            Comecon_Luis_Echeverría_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Luis Echeverría" ruling_only = yes } } }
+            Comecon_José_López_Portillo_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "José López Portillo" ruling_only = yes } } }
+            #KRD
+            Comecon_Vasily_Chuikov_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Vasily Chuikov" ruling_only = yes } } }
+            Comecon_Sedigh_Kamangar_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Sedigh Kamangar" ruling_only = yes } } }
+            Comecon_Mustafa_Barzani_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Mustafa Barzani" ruling_only = yes } } }
+            Comecon_Dara_Tawfiq_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Dara Tawfiq" ruling_only = yes } } }
+            Comecon_Collective_Leadership_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Collective_Leadership" ruling_only = yes } } }
+            Comecon_Ahmed_Tofiq_visible = { var:SOV.COMECON1 = { has_country_leader = { name = "Ahmed Tofiq" ruling_only = yes } } }
+            #End Portraits
+            COMECON_Kick_From_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        is_in_faction_with = SOV
+                    }
+                }  
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        is_subject_of = SOV
+                    }
+                }         
             }
-			COMECON_Screen_Main_Line_2_visible = {
-                check_variable = { comecon_main_show = 1 }
+            Build_Farm_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_country_flag = Soviet_building_Farms
+                    }
+                }   
+                var:SOV.COMECON1 = {
+                    any_owned_state = {
+                        free_building_slots = {
+                            building = agri_industrial_complex
+                            size > 0
+                            include_locked = yes
+                        }
+                    }
+                }
+                SOV = {
+                    num_of_available_civilian_factories > 5
+                }                    
             }
-			COMECON_Screen_Main_Line_3_visible = {
-                check_variable = { comecon_main_show = 1 }
+            Seize_Farm_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_country_flag = Soviet_Food_Reallocation
+                    }
+                }                  
             }
-			COMECON_Screen_Main_Line_4_visible = {
-                check_variable = { comecon_main_show = 1 }
+            Emp_Develop_Farm_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_idea = Farm_COMECON_Emphasis
+                        has_idea = COMECON_ARMS_Emphasis
+                        has_idea = Factory_COMECON_Emphasis
+                        has_idea = Dockyard_COMECON_Emphasis
+                    }
+                }                        
             }
-			COMECON_Screen_Main_Line_5_visible = {
-                check_variable = { comecon_main_show = 1 }
+            Build_Arms_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_country_flag = Soviet_Building_Arms_Factory
+                    }
+                }   
+                var:SOV.COMECON1 = {
+                    any_owned_state = {
+                        free_building_slots = {
+                            building = arms_factory
+                            size > 0
+                            include_locked = yes
+                        }
+                    }
+                }
+                SOV = {
+                    num_of_available_civilian_factories > 5
+                }                   
             }
-			COMECON_Screen_Main_Line_6_visible = {
-                check_variable = { comecon_main_show = 1 }
+            Seize_Arms_click_enabled = {
+                var:SOV.COMECON1 = {
+                    OR = {
+                        AND = {
+                            num_of_available_military_factories > 0 
+                            NOT = { has_country_flag = Seized_Arms_Factory }
+                        }
+                        check_variable = { comecon_stolen_arms_factories > 0 }
+                    }
+                }                   
             }
-			COMECON_Screen_Main_Line_7_visible = {
-                check_variable = { comecon_main_show = 1 }
+            Emp_Develop_Arms_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_idea = Farm_COMECON_Emphasis
+                        has_idea = COMECON_ARMS_Emphasis
+                        has_idea = Factory_COMECON_Emphasis
+                        has_idea = Dockyard_COMECON_Emphasis
+                    }
+                }  
             }
-			COMECON_Screen_Main_Line_8_visible = {
-                check_variable = { comecon_main_show = 1 }
+            Build_Factory_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_country_flag = Soviet_Building_Factory
+                    }
+                }   
+                var:SOV.COMECON1 = {
+                    any_owned_state = {
+                        free_building_slots = {
+                            building = industrial_complex
+                            size > 0
+                            include_locked = yes
+                        }
+                    }
+                }
+                SOV = {
+                    num_of_available_civilian_factories > 5
+                }                
             }
-			COMECON_Screen_Main_Line_9_visible = {
-                check_variable = { comecon_main_show = 1 }
+            Seize_Factory_click_enabled = {
+                var:SOV.COMECON1 = {
+                    OR = {
+                        AND = {
+                            num_of_available_civilian_factories > 0 
+                            NOT = { has_country_flag = Seized_Arms_Factory }
+                        }
+                        check_variable = { comecon_stolen_factories > 0 }
+                    }
+                }                    
             }
-			COMECON_Screen_Main_Line_10_visible = {
-                check_variable = { comecon_main_show = 1 }
+            Emp_Develop_Factory_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_idea = Farm_COMECON_Emphasis
+                        has_idea = COMECON_ARMS_Emphasis
+                        has_idea = Factory_COMECON_Emphasis
+                        has_idea = Dockyard_COMECON_Emphasis
+                    }
+                }  
             }
+            Build_Dockyard_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_country_flag = Soviet_Building_Dockyard
+                    }
+                }   
+                var:SOV.COMECON1 = {
+                    any_owned_state = {
+                        is_coastal = yes
+                        free_building_slots = {
+                            building = dockyard
+                            size > 0
+                            include_locked = yes
+                        }
+                    }
+                }
+                SOV = {
+                    num_of_available_civilian_factories > 5
+                }                    
+            }
+            Seize_Dockyard_click_enabled = {
+                var:SOV.COMECON1 = {
+                    OR = {
+                        num_of_available_naval_factories > 0 
+                        check_variable = { comecon_stolen_dockyards > 0 }
+                    }
+                   # NOT = { has_country_flag = Seized_Dockyard }
+                }          
+            }
+            Emp_Develop_Dockyard_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_idea = Farm_COMECON_Emphasis
+                        has_idea = COMECON_ARMS_Emphasis
+                        has_idea = Factory_COMECON_Emphasis
+                        has_idea = Dockyard_COMECON_Emphasis
+                    }
+                }  
+            }
+            COMECON_Promote_Friendly_Parties_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_idea = COMECON_Political_Support
+                    }
+                }   
+            }   
+            COMECON_Subsidize_Expenses_click_visible = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_country_flag = Soviet_Subsidies
+                    }
+                }   
+            }             
+            COMECON_Subsidize_Expenses_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        has_country_flag = Soviet_Subsidies
+                    }
+                }   
+            }
+            COMECON_Demand_Military_Access_click_enabled = {
+                NOT = {
+                    var:SOV.COMECON1 = {
+                        is_in_faction_with = SOV
+                    }
+                }
+                NOT = {
+                    has_country_flag = COMECON_ACCESS
+                }
+                NOT = {
+                    has_country_flag = Rejected_Soviet_Request
+                }
+            }
+
+            Economic_Support_0_visible = { SOV = { check_variable = { COMECON_TARGET.ECO_COMECON_RATE = 0 } } }
+            Economic_Support_1_visible = { SOV = { check_variable = { COMECON_TARGET.ECO_COMECON_RATE = 1 } } }
+            Economic_Support_2_visible = { SOV = { check_variable = { COMECON_TARGET.ECO_COMECON_RATE = 2 } } }
+            Economic_Support_3_visible = { SOV = { check_variable = { COMECON_TARGET.ECO_COMECON_RATE = 3 } } }
+            Economic_Support_4_visible = { SOV = { check_variable = { COMECON_TARGET.ECO_COMECON_RATE = 4 } } }
+            Economic_Support_5_visible = { SOV = { check_variable = { COMECON_TARGET.ECO_COMECON_RATE = 5 } } }
+            Economic_Support_6_visible = { SOV = { check_variable = { COMECON_TARGET.ECO_COMECON_RATE = 6 } } }
+
+            Military_Support_0_visible = { SOV = { check_variable = { COMECON_TARGET.MIL_COMECON_RATE = 0 } } }
+            Military_Support_1_visible = { SOV = { check_variable = { COMECON_TARGET.MIL_COMECON_RATE = 1 } } }
+            Military_Support_2_visible = { SOV = { check_variable = { COMECON_TARGET.MIL_COMECON_RATE = 2 } } }
+            Military_Support_3_visible = { SOV = { check_variable = { COMECON_TARGET.MIL_COMECON_RATE = 3 } } }
+            Military_Support_4_visible = { SOV = { check_variable = { COMECON_TARGET.MIL_COMECON_RATE = 4 } } }
+            Military_Support_5_visible = { SOV = { check_variable = { COMECON_TARGET.MIL_COMECON_RATE = 5 } } }
+            Military_Support_6_visible = { SOV = { check_variable = { COMECON_TARGET.MIL_COMECON_RATE = 6 } } }
+
+            Construction_Support_0_visible = { SOV = { check_variable = { COMECON_TARGET.CON_COMECON_RATE = 0 } } }
+            Construction_Support_1_visible = { SOV = { check_variable = { COMECON_TARGET.CON_COMECON_RATE = 1 } } }
+            Construction_Support_2_visible = { SOV = { check_variable = { COMECON_TARGET.CON_COMECON_RATE = 2 } } }
+            Construction_Support_3_visible = { SOV = { check_variable = { COMECON_TARGET.CON_COMECON_RATE = 3 } } }
+            Construction_Support_4_visible = { SOV = { check_variable = { COMECON_TARGET.CON_COMECON_RATE = 4 } } }
+            Construction_Support_5_visible = { SOV = { check_variable = { COMECON_TARGET.CON_COMECON_RATE = 5 } } }
+            Construction_Support_6_visible = { SOV = { check_variable = { COMECON_TARGET.CON_COMECON_RATE = 6 } } }
+
+            Production_Support_0_visible = { SOV = { check_variable = { COMECON_TARGET.PRO_COMECON_RATE = 0 } } }
+            Production_Support_1_visible = { SOV = { check_variable = { COMECON_TARGET.PRO_COMECON_RATE = 1 } } }
+            Production_Support_2_visible = { SOV = { check_variable = { COMECON_TARGET.PRO_COMECON_RATE = 2 } } }
+            Production_Support_3_visible = { SOV = { check_variable = { COMECON_TARGET.PRO_COMECON_RATE = 3 } } }
+            Production_Support_4_visible = { SOV = { check_variable = { COMECON_TARGET.PRO_COMECON_RATE = 4 } } }
+            Production_Support_5_visible = { SOV = { check_variable = { COMECON_TARGET.PRO_COMECON_RATE = 5 } } }
+            Production_Support_6_visible = { SOV = { check_variable = { COMECON_TARGET.PRO_COMECON_RATE = 6 } } }
+
+            Trade_Cooperation_0_visible = { SOV = { check_variable = { COMECON_TARGET.TRADE_COMECON_RATE = 0 } } }
+            Trade_Cooperation_1_visible = { SOV = { check_variable = { COMECON_TARGET.TRADE_COMECON_RATE = 1 } } }
+            Trade_Cooperation_2_visible = { SOV = { check_variable = { COMECON_TARGET.TRADE_COMECON_RATE = 2 } } }
+            Trade_Cooperation_3_visible = { SOV = { check_variable = { COMECON_TARGET.TRADE_COMECON_RATE = 3 } } }
+            Trade_Cooperation_4_visible = { SOV = { check_variable = { COMECON_TARGET.TRADE_COMECON_RATE = 4 } } }
+            Trade_Cooperation_5_visible = { SOV = { check_variable = { COMECON_TARGET.TRADE_COMECON_RATE = 5 } } }
+            Trade_Cooperation_6_visible = { SOV = { check_variable = { COMECON_TARGET.TRADE_COMECON_RATE = 6 } } }
+
+            Research_Cooperation_0_visible = { SOV = { check_variable = { COMECON_TARGET.RES_COMECON_RATE = 0 } } }
+            Research_Cooperation_1_visible = { SOV = { check_variable = { COMECON_TARGET.RES_COMECON_RATE = 1 } } }
+            Research_Cooperation_2_visible = { SOV = { check_variable = { COMECON_TARGET.RES_COMECON_RATE = 2 } } }
+            Research_Cooperation_3_visible = { SOV = { check_variable = { COMECON_TARGET.RES_COMECON_RATE = 3 } } }
+            Research_Cooperation_4_visible = { SOV = { check_variable = { COMECON_TARGET.RES_COMECON_RATE = 4 } } }
+            Research_Cooperation_5_visible = { SOV = { check_variable = { COMECON_TARGET.RES_COMECON_RATE = 5 } } }
+            Research_Cooperation_6_visible = { SOV = { check_variable = { COMECON_TARGET.RES_COMECON_RATE = 6 } } }
+            
+            Research_Cooperation_Plus_click_enabled = { SOV = { check_variable = { COMECON_TARGET.RES_COMECON_RATE < 6 } } }
+            Research_Cooperation_Down_click_enabled = { SOV = { check_variable = { COMECON_TARGET.RES_COMECON_RATE > 0 } } }
+
+            Construction_Support_Plus_click_enabled = { SOV = { check_variable = { COMECON_TARGET.CON_COMECON_RATE < 6 } } }
+            Construction_Support_Down_click_enabled = { SOV = { check_variable = { COMECON_TARGET.CON_COMECON_RATE > 0 } } }
+
+            Production_Support_Plus_click_enabled = { SOV = { check_variable = { COMECON_TARGET.PRO_COMECON_RATE < 6 } } }
+            Production_Support_Down_click_enabled = { SOV = { check_variable = { COMECON_TARGET.PRO_COMECON_RATE > 0 } } }
+
+            Economic_Support_Plus_click_enabled = { SOV = { check_variable = { COMECON_TARGET.ECO_COMECON_RATE < 6 } } }
+            Economic_Support_Down_click_enabled = { SOV = { check_variable = { COMECON_TARGET.ECO_COMECON_RATE > 0 } } }
+
+            Trade_Cooperation_Plus_click_enabled = { SOV = { check_variable = { COMECON_TARGET.TRADE_COMECON_RATE < 6 } } }
+            Trade_Cooperation_Down_click_enabled = { SOV = { check_variable = { COMECON_TARGET.TRADE_COMECON_RATE > 0 } } }
+
+            Military_Support_Plus_click_enabled = { SOV = { check_variable = { COMECON_TARGET.MIL_COMECON_RATE < 6 } } }
+            Military_Support_Down_click_enabled = { SOV = { check_variable = { COMECON_TARGET.MIL_COMECON_RATE > 0 } } }
+
+            eco_bg_visible = { 
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.ECO_COMECON_RATE < 6
+                    }
+                }
+            }
+            eco_bg_full_visible = {
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.ECO_COMECON_RATE = 6
+                    }
+                }
+            }
+
+            con_bg_visible = {
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.CON_COMECON_RATE < 6
+                    }
+                }
+            }
+            con_bg_full_visible = {
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.CON_COMECON_RATE = 6
+                    }
+                }
+            }
+
+            mil_bg_visible = {
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.MIL_COMECON_RATE < 6
+                    }
+                }
+            }
+            mil_bg_full_visible = {
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.MIL_COMECON_RATE = 6
+                    }
+                }
+            }
+
+            pro_bg_visible = {
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.PRO_COMECON_RATE < 6
+                    }
+                }
+            }
+            pro_bg_full_visible = {
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.PRO_COMECON_RATE = 6
+                    }
+                }
+            }
+
+            Research_Cooperation_bg_visible = {
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.RES_COMECON_RATE < 6
+                    }
+                }
+            }
+            Research_Cooperation_bg_full_visible = {
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.RES_COMECON_RATE = 6
+                    }
+                }
+            }
+
+            trade_bg_visible = {
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.TRADE_COMECON_RATE < 6
+                    }
+                }
+            }
+            trade_bg_full_visible = {
+                SOV = {
+                    check_variable = {
+                        COMECON_TARGET.TRADE_COMECON_RATE = 6
+                    }
+                }
+            }
+
+            #out of 7
             COMECON_Emblem_visible = {
                 check_variable = { comecon_main_show = 1 }
             }
-			COMECON_Base_Map_visible = {
-                check_variable = { comecon_main_show = 1 }
+            Political_Stability_Yes_visible = {
+                var:SOV.COMECON1 = {
+                    has_stability < 0.26
+                }
+            }
+            Political_Stability_No_visible = {
+                var:SOV.COMECON1 = {
+                    has_stability > 0.25
+                }
+            }
+            VERY_HIGH_POPULARITY_STATUS_visible = {
+                var:SOV.COMECON1 = {
+                    communism > 0.84
+                }
+
+            }
+            HIGH_POPULARITY_STATUS_visible = {
+                var:SOV.COMECON1 = {
+                    communism > 0.60 
+                    communism < 0.85
+                }
+            }
+            MODERATE_POPULARITY_STATUS_visible = {
+                var:SOV.COMECON1 = {
+                    communism > 0.40 
+                    communism < 0.61
+                }
+            }
+            LOW_POPULARITY_STATUS_visible = {
+                var:SOV.COMECON1 = {
+                    communism > 0.15 
+                    communism < 0.41
+                }
+            }
+            VERY_LOW_POPULARITY_STATUS_visible = {
+                var:SOV.COMECON1 = {
+                    communism < 0.16
+                }
+            }
+            Food_Shortages_visible = {
+                var:SOV.COMECON1 = {
+                    OR = {
+                        has_country_flag = food_famine_extreme
+                        has_country_flag = food_famine
+                        has_country_flag = food_shortages
+                        has_country_flag = food_highprices   
+                    }    
+                }
+            }
+            No_Food_Shortages_visible = {
+                var:SOV.COMECON1 = {
+                    NOT = { has_country_flag = food_famine_extreme }
+                    NOT = { has_country_flag = food_famine }
+                    NOT = { has_country_flag = food_shortages }
+                    NOT = { has_country_flag = food_highprices }
+                }
             }
         }
-		triggers = {
-			COMECON_SIDEBAR_visible = {
-                check_variable = { comecon_main_show = 2 }
+        effects = {
+            Build_Farm_click = {
+                SOV = {
+                    add_to_variable = {
+                        COMECON_INVESTMENT_CONSUMER_GOODS = 5
+                    }
+                    add_to_variable = {
+                        currentMoney = -12
+                    }
+                }
+                var:SOV.COMECON1 = {
+                    comecon_influence_invest_effect = yes
+                    set_variable = {
+                        COMECON_FARM_Investment_Duration = COMECON_TARGET.ECO_COMECON_RATE
+                    }
+                    multiply_variable = {
+                        COMECON_FARM_Investment_Duration = 0.1
+                    }
+                    subtract_from_variable = {
+                        COMECON_FARM_Investment_Duration = 1
+                    }
+                    multiply_variable = {
+                        COMECON_FARM_Investment_Duration = -1
+                    }
+                    multiply_variable = {
+                        COMECON_FARM_Investment_Duration = 280
+                    }
+                    set_country_flag = Soviet_Building_Farms
+                    activate_mission = COMECON_FARM_Investment
+                }
             }
+            Seize_Farm_click = {
+
+            }
+            Emp_Develop_Farm_click = {
+                var:SOV.COMECON1 = {
+                    add_timed_idea = {
+                        idea = Farm_COMECON_Emphasis
+                        days = 1825
+                    }
+                    set_country_flag = COMECON_FARM_EMPHASIS_PROMPT
+                }
+            }
+            Build_Arms_click = {
+                SOV = {
+                    add_to_variable = {
+                        COMECON_INVESTMENT_CONSUMER_GOODS = 5
+                    }
+                    add_to_variable = {
+                        currentMoney = -18
+                    }
+                }
+                var:SOV.COMECON1 = {
+                    comecon_influence_invest_effect = yes
+                    set_variable = {
+                        COMECON_ARMS_Investment_Duration = COMECON_TARGET.ECO_COMECON_RATE
+                    }
+                    multiply_variable = {
+                        COMECON_ARMS_Investment_Duration = 0.1
+                    }
+                    subtract_from_variable = {
+                        COMECON_ARMS_Investment_Duration = 1
+                    }
+                    multiply_variable = {
+                        COMECON_ARMS_Investment_Duration = -1
+                    }
+                    multiply_variable = {
+                        COMECON_ARMS_Investment_Duration = 360
+                    }
+                    set_country_flag = Soviet_Building_Arms_Factory
+                    set_country_flag = COMECON_ARMS_PROMPT
+                    activate_mission = COMECON_ARMS_Investment
+                }
+            }
+            Seize_Arms_click = {
+                set_variable = {
+                    COMECON_ARMS_PROMPT = 1
+                }
+                set_variable = {
+                    purchase_amount_comecon = COMECON_TARGET.comecon_stolen_arms_factories
+                }
+            }
+            Emp_Develop_Arms_click = {
+                var:SOV.COMECON1 = {
+                    add_timed_idea = {
+                        idea = COMECON_ARMS_Emphasis
+                        days = 1825
+                    }
+                    set_country_flag = COMECON_ARMS_EMPHASIS_PROMPT
+                }
+            }
+            Build_Factory_click = {
+                SOV = {
+                    add_to_variable = {
+                        COMECON_INVESTMENT_CONSUMER_GOODS = 5
+                    }
+                    add_to_variable = {
+                        currentMoney = -15
+                    }
+                }
+                var:SOV.COMECON1 = {
+                    comecon_influence_invest_effect = yes
+                    set_variable = {
+                        COMECON_FACTORY_Investment_Duration = COMECON_TARGET.ECO_COMECON_RATE
+                    }
+                    multiply_variable = {
+                        COMECON_FACTORY_Investment_Duration = 0.1
+                    }
+                    subtract_from_variable = {
+                        COMECON_FACTORY_Investment_Duration = 1
+                    }
+                    multiply_variable = {
+                        COMECON_FACTORY_Investment_Duration = -1
+                    }
+                    multiply_variable = {
+                        COMECON_FACTORY_Investment_Duration = 360
+                    }
+                    set_country_flag = Soviet_Building_Factory
+                    activate_mission = COMECON_FACTORY_Investment
+                }
+            }
+            Seize_Factory_click = {
+                set_variable = { COMECON_FACTORY_PROMPT = 1 }
+            }
+            Emp_Develop_Factory_click = {
+                var:SOV.COMECON1 = {
+                    add_timed_idea = {
+                        idea = Factory_COMECON_Emphasis
+                        days = 1825
+                    }
+                    set_country_flag = COMECON_FACTORY_EMPHASIS_PROMPT
+                }
+            }
+            Build_Dockyard_click = {
+                SOV = {
+                    add_to_variable = {
+                        COMECON_INVESTMENT_CONSUMER_GOODS = 5
+                    }
+                    add_to_variable = {
+                        currentMoney = -15
+                    }
+                }
+                var:SOV.COMECON1 = {
+                    comecon_influence_invest_effect = yes
+                    set_variable = {
+                        COMECON_DOCKYARD_Investment_Duration = COMECON_TARGET.ECO_COMECON_RATE
+                    }
+                    multiply_variable = {
+                        COMECON_DOCKYARD_Investment_Duration = 0.1
+                    }
+                    subtract_from_variable = {
+                        COMECON_DOCKYARD_Investment_Duration = 1
+                    }
+                    multiply_variable = {
+                        COMECON_DOCKYARD_Investment_Duration = -1
+                    }
+                    multiply_variable = {
+                        COMECON_DOCKYARD_Investment_Duration = 360
+                    }
+                    set_country_flag = Soviet_Building_Dockyard
+                    activate_mission = COMECON_DOCKYARD_Investment
+                }
+            }
+            Seize_Dockyard_click = {
+                set_variable = { COMECON_DOCKYARD_PROMPT = 1 }
+                set_variable = {
+                    purchase_amount_comecon = COMECON_TARGET.comecon_stolen_dockyards
+                }
+                set_variable = {
+                    purchase_desc_comecon = COMECON_TARGET.current_comecon_stolen_dockyards_cost
+                }
+            }
+            Emp_Develop_Dockyard_click = {
+                var:SOV.COMECON1 = {
+                    add_timed_idea = {
+                        idea = Dockyard_COMECON_Emphasis
+                        days = 1825
+                    }
+                    set_country_flag = COMECON_DOCKYARD_EMPHASIS_PROMPT
+                }
+            }
+
+            COMECON_Promote_Friendly_Parties_click = {
+                var:SOV.COMECON1 = {
+                    add_timed_idea = {
+                        idea = COMECON_Political_Support
+                        days = 365
+                    }
+                }
+                add_political_power = -100
+                add_to_variable = {
+                    currentMoney = -2
+                }
+            }
+            COMECON_Subsidize_Expenses_click = {
+                var:SOV.COMECON1 = {
+                    if = {
+                        limit = {
+                            is_ai = no
+                        }
+                        set_country_flag = COMECON_SUBSIDY_PROMPT
+                    }    
+                    set_country_flag = Soviet_Subsidies
+                    #Add Influence Bit    
+                }        
+            }
+            COMECON_Demand_Military_Access_click = {
+                var:SOV.COMECON1 = {
+                    if = {
+                        limit = {
+                            is_ai = no
+                        }
+                        set_country_flag = COMECON_ACCESS
+                        set_country_flag = COMECON_ACCESS_PROMPT
+                    }
+                    else = {
+                        random_list = {
+                            50 = {
+                                give_military_access = SOV
+                                diplomatic_relation = {
+                                    country = SOV
+                                    relation = docking_rights
+                                    active = yes
+                                }
+                                SOV = {
+                                    set_country_flag = COMECON_ACCESS_PROMPT_RESPONSE_YES
+                                }
+                            }
+                            50 = {
+                                SOV = {
+                                    set_country_flag = COMECON_ACCESS_PROMPT_RESPONSE_NO
+                                }
+                                set_country_flag = {
+                                    flag = Rejected_Soviet_Request
+                                    days = 180
+                                    value = 1
+                                }
+                            }
+                        }
+                    }
+                }                   
+            }
+            COMECON_Kick_From_click = {
+                SOV = {
+                    remove_from_array = { COMECON_MEMBERSHIP = COMECON_TARGET.id } 
+                }
+                set_country_flag = COMECON_KICKED_PROMPT
+                var:SOV.COMECON1 = {
+                    remove_ideas = comecon_member
+                }
+            }
+            COMECON_Close_click = {
+                set_variable = {
+                    SOV.comecon_main_show = 0
+                }
+            }
+            Research_Cooperation_Plus_click = { SOV = { add_to_variable = { COMECON_TARGET.RES_COMECON_RATE = 1 } } }
+            Research_Cooperation_Down_click = { SOV = { add_to_variable = { COMECON_TARGET.RES_COMECON_RATE = -1 } } }
+            Construction_Support_Plus_click = { SOV = { add_to_variable = { COMECON_TARGET.CON_COMECON_RATE = 1  } } }
+            Construction_Support_Down_click = { SOV = { add_to_variable = { COMECON_TARGET.CON_COMECON_RATE = -1 } } }
+            Production_Support_Plus_click = { SOV = { add_to_variable = { COMECON_TARGET.PRO_COMECON_RATE = 1  } } }
+            Production_Support_Down_click = { SOV = { add_to_variable = { COMECON_TARGET.PRO_COMECON_RATE = -1 } } }
+            Economic_Support_Plus_click = { SOV = { add_to_variable = { COMECON_TARGET.ECO_COMECON_RATE = 1  } } }
+            Economic_Support_Down_click = { SOV = { add_to_variable = { COMECON_TARGET.ECO_COMECON_RATE = -1 } } }
+            Trade_Cooperation_Plus_click = { SOV = { add_to_variable = { COMECON_TARGET.TRADE_COMECON_RATE = 1  } } }
+            Trade_Cooperation_Down_click = { SOV = { add_to_variable = { COMECON_TARGET.TRADE_COMECON_RATE = -1 } } }
+            Military_Support_Plus_click = { SOV = { add_to_variable = { COMECON_TARGET.MIL_COMECON_RATE = 1 } } }
+            Military_Support_Down_click = { SOV = { add_to_variable = { COMECON_TARGET.MIL_COMECON_RATE = -1 } } }
+        }
+		triggers = {
 			Bulgaria_Emblem_visible = {
                 check_variable = { comecon_main_show = 2 }
 				#check_variable = { comecon_selected_tag = BUL }
@@ -59,16 +1093,248 @@ scripted_gui = {
 				#check_variable = { comecon_selected_tag = BUL }
             }
         }
-
-		
 	}
+    comecon_inc_3pie_view = {
+       context_type = player_context
+        window_name = "exp_COMECON3pie_container"
+		parent_window_name = COMECON_Redux_Window
+        visible = {
+            NOT = {
+                check_variable = {
+                    SOV.COMECON1 = 0
+                }
+            }
+        }
+        properties = {
+            COMECON3pie0 = { frame = COMECON_TARGET.3pie_chart^0 }
+            COMECON3pie1 = { frame = COMECON_TARGET.3pie_chart^1 }
+            COMECON3pie2 = { frame = COMECON_TARGET.3pie_chart^2 }
+            COMECON3pie3 = { frame = COMECON_TARGET.3pie_chart^3 }
+            COMECON3pie4 = { frame = COMECON_TARGET.3pie_chart^4 }
+            COMECON3pie5 = { frame = COMECON_TARGET.3pie_chart^5 }
+            COMECON3pie6 = { frame = COMECON_TARGET.3pie_chart^6 }
+            COMECON3pie7 = { frame = COMECON_TARGET.3pie_chart^7 }
+            COMECON3pie8 = { frame = COMECON_TARGET.3pie_chart^8 }
+            COMECON3pie9 = { frame = COMECON_TARGET.3pie_chart^9 }
+            COMECON3pie10 = { frame = COMECON_TARGET.3pie_chart^10 }
+            COMECON3pie11 = { frame = COMECON_TARGET.3pie_chart^11 }
+            COMECON3pie12 = { frame = COMECON_TARGET.3pie_chart^12 }
+            COMECON3pie13 = { frame = COMECON_TARGET.3pie_chart^13 }
+            COMECON3pie14 = { frame = COMECON_TARGET.3pie_chart^14 }
+            COMECON3pie15 = { frame = COMECON_TARGET.3pie_chart^15 }
+            COMECON3pie16 = { frame = COMECON_TARGET.3pie_chart^16 }
+            COMECON3pie17 = { frame = COMECON_TARGET.3pie_chart^17 }
+            COMECON3pie18 = { frame = COMECON_TARGET.3pie_chart^18 }
+            COMECON3pie19 = { frame = COMECON_TARGET.3pie_chart^19 }
+            COMECON3pie20 = { frame = COMECON_TARGET.3pie_chart^20 }
+            COMECON3pie21 = { frame = COMECON_TARGET.3pie_chart^21 }
+            COMECON3pie22 = { frame = COMECON_TARGET.3pie_chart^22 }
+            COMECON3pie23 = { frame = COMECON_TARGET.3pie_chart^23 }
+            COMECON3pie24 = { frame = COMECON_TARGET.3pie_chart^24 }
+            COMECON3pie25 = { frame = COMECON_TARGET.3pie_chart^25 }
+            COMECON3pie26 = { frame = COMECON_TARGET.3pie_chart^26 }
+            COMECON3pie27 = { frame = COMECON_TARGET.3pie_chart^27 }
+            COMECON3pie28 = { frame = COMECON_TARGET.3pie_chart^28 }
+            COMECON3pie29 = { frame = COMECON_TARGET.3pie_chart^29 }
+            COMECON3pie30 = { frame = COMECON_TARGET.3pie_chart^30 }
+            COMECON3pie31 = { frame = COMECON_TARGET.3pie_chart^31 }
+            COMECON3pie32 = { frame = COMECON_TARGET.3pie_chart^32 }
+            COMECON3pie33 = { frame = COMECON_TARGET.3pie_chart^33 }
+            COMECON3pie34 = { frame = COMECON_TARGET.3pie_chart^34 }
+            COMECON3pie35 = { frame = COMECON_TARGET.3pie_chart^35 }
+            COMECON3pie36 = { frame = COMECON_TARGET.3pie_chart^36 }
+            COMECON3pie37 = { frame = COMECON_TARGET.3pie_chart^37 }
+            COMECON3pie38 = { frame = COMECON_TARGET.3pie_chart^38 }
+            COMECON3pie39 = { frame = COMECON_TARGET.3pie_chart^39 }
+            COMECON3pie40 = { frame = COMECON_TARGET.3pie_chart^40 }
+            COMECON3pie41 = { frame = COMECON_TARGET.3pie_chart^41 }
+            COMECON3pie42 = { frame = COMECON_TARGET.3pie_chart^42 }
+            COMECON3pie43 = { frame = COMECON_TARGET.3pie_chart^43 }
+            COMECON3pie44 = { frame = COMECON_TARGET.3pie_chart^44 }
+            COMECON3pie45 = { frame = COMECON_TARGET.3pie_chart^45 }
+            COMECON3pie46 = { frame = COMECON_TARGET.3pie_chart^46 }
+            COMECON3pie47 = { frame = COMECON_TARGET.3pie_chart^47 }
+            COMECON3pie48 = { frame = COMECON_TARGET.3pie_chart^48 }
+            COMECON3pie49 = { frame = COMECON_TARGET.3pie_chart^49 }
+            COMECON3pie50 = { frame = COMECON_TARGET.3pie_chart^50 }
+            COMECON3pie51 = { frame = COMECON_TARGET.3pie_chart^51 }
+            COMECON3pie52 = { frame = COMECON_TARGET.3pie_chart^52 }
+            COMECON3pie53 = { frame = COMECON_TARGET.3pie_chart^53 }
+            COMECON3pie54 = { frame = COMECON_TARGET.3pie_chart^54 }
+            COMECON3pie55 = { frame = COMECON_TARGET.3pie_chart^55 }
+            COMECON3pie56 = { frame = COMECON_TARGET.3pie_chart^56 }
+            COMECON3pie57 = { frame = COMECON_TARGET.3pie_chart^57 }
+            COMECON3pie58 = { frame = COMECON_TARGET.3pie_chart^58 }
+            COMECON3pie59 = { frame = COMECON_TARGET.3pie_chart^59 }
+            COMECON3pie60 = { frame = COMECON_TARGET.3pie_chart^60 }
+            COMECON3pie61 = { frame = COMECON_TARGET.3pie_chart^61 }
+            COMECON3pie62 = { frame = COMECON_TARGET.3pie_chart^62 }
+            COMECON3pie63 = { frame = COMECON_TARGET.3pie_chart^63 }
+            COMECON3pie64 = { frame = COMECON_TARGET.3pie_chart^64 }
+            COMECON3pie65 = { frame = COMECON_TARGET.3pie_chart^65 }
+            COMECON3pie66 = { frame = COMECON_TARGET.3pie_chart^66 }
+            COMECON3pie67 = { frame = COMECON_TARGET.3pie_chart^67 }
+            COMECON3pie68 = { frame = COMECON_TARGET.3pie_chart^68 }
+            COMECON3pie69 = { frame = COMECON_TARGET.3pie_chart^69 }
+            COMECON3pie70 = { frame = COMECON_TARGET.3pie_chart^70 }
+            COMECON3pie71 = { frame = COMECON_TARGET.3pie_chart^71 }
+            COMECON3pie72 = { frame = COMECON_TARGET.3pie_chart^72 }
+            COMECON3pie73 = { frame = COMECON_TARGET.3pie_chart^73 }
+            COMECON3pie74 = { frame = COMECON_TARGET.3pie_chart^74 }
+            COMECON3pie75 = { frame = COMECON_TARGET.3pie_chart^75 }
+            COMECON3pie76 = { frame = COMECON_TARGET.3pie_chart^76 }
+            COMECON3pie77 = { frame = COMECON_TARGET.3pie_chart^77 }
+            COMECON3pie78 = { frame = COMECON_TARGET.3pie_chart^78 }
+            COMECON3pie79 = { frame = COMECON_TARGET.3pie_chart^79 }
+            COMECON3pie80 = { frame = COMECON_TARGET.3pie_chart^80 }
+            COMECON3pie81 = { frame = COMECON_TARGET.3pie_chart^81 }
+            COMECON3pie82 = { frame = COMECON_TARGET.3pie_chart^82 }
+            COMECON3pie83 = { frame = COMECON_TARGET.3pie_chart^83 }
+            COMECON3pie84 = { frame = COMECON_TARGET.3pie_chart^84 }
+            COMECON3pie85 = { frame = COMECON_TARGET.3pie_chart^85 }
+            COMECON3pie86 = { frame = COMECON_TARGET.3pie_chart^86 }
+            COMECON3pie87 = { frame = COMECON_TARGET.3pie_chart^87 }
+            COMECON3pie88 = { frame = COMECON_TARGET.3pie_chart^88 }
+            COMECON3pie89 = { frame = COMECON_TARGET.3pie_chart^89 }
+            COMECON3pie90 = { frame = COMECON_TARGET.3pie_chart^90 }
+            COMECON3pie91 = { frame = COMECON_TARGET.3pie_chart^91 }
+            COMECON3pie92 = { frame = COMECON_TARGET.3pie_chart^92 }
+            COMECON3pie93 = { frame = COMECON_TARGET.3pie_chart^93 }
+            COMECON3pie94 = { frame = COMECON_TARGET.3pie_chart^94 }
+            COMECON3pie95 = { frame = COMECON_TARGET.3pie_chart^95 }
+            COMECON3pie96 = { frame = COMECON_TARGET.3pie_chart^96 }
+            COMECON3pie97 = { frame = COMECON_TARGET.3pie_chart^97 }
+            COMECON3pie98 = { frame = COMECON_TARGET.3pie_chart^98 }
+            COMECON3pie99 = { frame = COMECON_TARGET.3pie_chart^99 }
+
+        }
+    }
+    comecon_inc_pie_view = {
+       context_type = player_context
+        window_name = "comecon_inc_pie_container"
+		parent_window_name = COMECON_Redux_Window
+        visible = {
+            NOT = {
+                check_variable = {
+                    SOV.COMECON1 = 0
+                }
+            }
+        }
+        properties = {
+            COMECONpie0 = { frame = COMECON_TARGET.pie_chart^0 }
+            COMECONpie1 = { frame = COMECON_TARGET.pie_chart^1 }
+            COMECONpie2 = { frame = COMECON_TARGET.pie_chart^2 }
+            COMECONpie3 = { frame = COMECON_TARGET.pie_chart^3 }
+            COMECONpie4 = { frame = COMECON_TARGET.pie_chart^4 }
+            COMECONpie5 = { frame = COMECON_TARGET.pie_chart^5 }
+            COMECONpie6 = { frame = COMECON_TARGET.pie_chart^6 }
+            COMECONpie7 = { frame = COMECON_TARGET.pie_chart^7 }
+            COMECONpie8 = { frame = COMECON_TARGET.pie_chart^8 }
+            COMECONpie9 = { frame = COMECON_TARGET.pie_chart^9 }
+            COMECONpie10 = { frame = COMECON_TARGET.pie_chart^10 }
+            COMECONpie11 = { frame = COMECON_TARGET.pie_chart^11 }
+            COMECONpie12 = { frame = COMECON_TARGET.pie_chart^12 }
+            COMECONpie13 = { frame = COMECON_TARGET.pie_chart^13 }
+            COMECONpie14 = { frame = COMECON_TARGET.pie_chart^14 }
+            COMECONpie15 = { frame = COMECON_TARGET.pie_chart^15 }
+            COMECONpie16 = { frame = COMECON_TARGET.pie_chart^16 }
+            COMECONpie17 = { frame = COMECON_TARGET.pie_chart^17 }
+            COMECONpie18 = { frame = COMECON_TARGET.pie_chart^18 }
+            COMECONpie19 = { frame = COMECON_TARGET.pie_chart^19 }
+            COMECONpie20 = { frame = COMECON_TARGET.pie_chart^20 }
+            COMECONpie21 = { frame = COMECON_TARGET.pie_chart^21 }
+            COMECONpie22 = { frame = COMECON_TARGET.pie_chart^22 }
+            COMECONpie23 = { frame = COMECON_TARGET.pie_chart^23 }
+            COMECONpie24 = { frame = COMECON_TARGET.pie_chart^24 }
+            COMECONpie25 = { frame = COMECON_TARGET.pie_chart^25 }
+            COMECONpie26 = { frame = COMECON_TARGET.pie_chart^26 }
+            COMECONpie27 = { frame = COMECON_TARGET.pie_chart^27 }
+            COMECONpie28 = { frame = COMECON_TARGET.pie_chart^28 }
+            COMECONpie29 = { frame = COMECON_TARGET.pie_chart^29 }
+            COMECONpie30 = { frame = COMECON_TARGET.pie_chart^30 }
+            COMECONpie31 = { frame = COMECON_TARGET.pie_chart^31 }
+            COMECONpie32 = { frame = COMECON_TARGET.pie_chart^32 }
+            COMECONpie33 = { frame = COMECON_TARGET.pie_chart^33 }
+            COMECONpie34 = { frame = COMECON_TARGET.pie_chart^34 }
+            COMECONpie35 = { frame = COMECON_TARGET.pie_chart^35 }
+            COMECONpie36 = { frame = COMECON_TARGET.pie_chart^36 }
+            COMECONpie37 = { frame = COMECON_TARGET.pie_chart^37 }
+            COMECONpie38 = { frame = COMECON_TARGET.pie_chart^38 }
+            COMECONpie39 = { frame = COMECON_TARGET.pie_chart^39 }
+            COMECONpie40 = { frame = COMECON_TARGET.pie_chart^40 }
+            COMECONpie41 = { frame = COMECON_TARGET.pie_chart^41 }
+            COMECONpie42 = { frame = COMECON_TARGET.pie_chart^42 }
+            COMECONpie43 = { frame = COMECON_TARGET.pie_chart^43 }
+            COMECONpie44 = { frame = COMECON_TARGET.pie_chart^44 }
+            COMECONpie45 = { frame = COMECON_TARGET.pie_chart^45 }
+            COMECONpie46 = { frame = COMECON_TARGET.pie_chart^46 }
+            COMECONpie47 = { frame = COMECON_TARGET.pie_chart^47 }
+            COMECONpie48 = { frame = COMECON_TARGET.pie_chart^48 }
+            COMECONpie49 = { frame = COMECON_TARGET.pie_chart^49 }
+            COMECONpie50 = { frame = COMECON_TARGET.pie_chart^50 }
+            COMECONpie51 = { frame = COMECON_TARGET.pie_chart^51 }
+            COMECONpie52 = { frame = COMECON_TARGET.pie_chart^52 }
+            COMECONpie53 = { frame = COMECON_TARGET.pie_chart^53 }
+            COMECONpie54 = { frame = COMECON_TARGET.pie_chart^54 }
+            COMECONpie55 = { frame = COMECON_TARGET.pie_chart^55 }
+            COMECONpie56 = { frame = COMECON_TARGET.pie_chart^56 }
+            COMECONpie57 = { frame = COMECON_TARGET.pie_chart^57 }
+            COMECONpie58 = { frame = COMECON_TARGET.pie_chart^58 }
+            COMECONpie59 = { frame = COMECON_TARGET.pie_chart^59 }
+            COMECONpie60 = { frame = COMECON_TARGET.pie_chart^60 }
+            COMECONpie61 = { frame = COMECON_TARGET.pie_chart^61 }
+            COMECONpie62 = { frame = COMECON_TARGET.pie_chart^62 }
+            COMECONpie63 = { frame = COMECON_TARGET.pie_chart^63 }
+            COMECONpie64 = { frame = COMECON_TARGET.pie_chart^64 }
+            COMECONpie65 = { frame = COMECON_TARGET.pie_chart^65 }
+            COMECONpie66 = { frame = COMECON_TARGET.pie_chart^66 }
+            COMECONpie67 = { frame = COMECON_TARGET.pie_chart^67 }
+            COMECONpie68 = { frame = COMECON_TARGET.pie_chart^68 }
+            COMECONpie69 = { frame = COMECON_TARGET.pie_chart^69 }
+            COMECONpie70 = { frame = COMECON_TARGET.pie_chart^70 }
+            COMECONpie71 = { frame = COMECON_TARGET.pie_chart^71 }
+            COMECONpie72 = { frame = COMECON_TARGET.pie_chart^72 }
+            COMECONpie73 = { frame = COMECON_TARGET.pie_chart^73 }
+            COMECONpie74 = { frame = COMECON_TARGET.pie_chart^74 }
+            COMECONpie75 = { frame = COMECON_TARGET.pie_chart^75 }
+            COMECONpie76 = { frame = COMECON_TARGET.pie_chart^76 }
+            COMECONpie77 = { frame = COMECON_TARGET.pie_chart^77 }
+            COMECONpie78 = { frame = COMECON_TARGET.pie_chart^78 }
+            COMECONpie79 = { frame = COMECON_TARGET.pie_chart^79 }
+            COMECONpie80 = { frame = COMECON_TARGET.pie_chart^80 }
+            COMECONpie81 = { frame = COMECON_TARGET.pie_chart^81 }
+            COMECONpie82 = { frame = COMECON_TARGET.pie_chart^82 }
+            COMECONpie83 = { frame = COMECON_TARGET.pie_chart^83 }
+            COMECONpie84 = { frame = COMECON_TARGET.pie_chart^84 }
+            COMECONpie85 = { frame = COMECON_TARGET.pie_chart^85 }
+            COMECONpie86 = { frame = COMECON_TARGET.pie_chart^86 }
+            COMECONpie87 = { frame = COMECON_TARGET.pie_chart^87 }
+            COMECONpie88 = { frame = COMECON_TARGET.pie_chart^88 }
+            COMECONpie89 = { frame = COMECON_TARGET.pie_chart^89 }
+            COMECONpie90 = { frame = COMECON_TARGET.pie_chart^90 }
+            COMECONpie91 = { frame = COMECON_TARGET.pie_chart^91 }
+            COMECONpie92 = { frame = COMECON_TARGET.pie_chart^92 }
+            COMECONpie93 = { frame = COMECON_TARGET.pie_chart^93 }
+            COMECONpie94 = { frame = COMECON_TARGET.pie_chart^94 }
+            COMECONpie95 = { frame = COMECON_TARGET.pie_chart^95 }
+            COMECONpie96 = { frame = COMECON_TARGET.pie_chart^96 }
+            COMECONpie97 = { frame = COMECON_TARGET.pie_chart^97 }
+            COMECONpie98 = { frame = COMECON_TARGET.pie_chart^98 }
+            COMECONpie99 = { frame = COMECON_TARGET.pie_chart^99 }
+        }
+    }
 	comecon_nation_target_list_menu_view = {
        context_type = player_context
         window_name = "comecon_nation_target_list_menu_main"
 		parent_window_name = COMECON_Redux_Window
 		visible = {
-			check_variable = { comecon_main_show = 1 }
+			check_variable = { comecon_main_show > 0 }
 		}
+        properties = {
+            nation_flag_entry = {
+                image = "[This.GetFlag]"
+            }
+        }
         dynamic_lists = {
             comecon_nation_target_list_menu_grid = {
                 array = SOV.COMECON_MEMBERSHIP
@@ -76,9 +1342,114 @@ scripted_gui = {
 				entry_container = comecon_nation_target_list_entry
             }
         }
+        triggers = {
+            comecon_nation_target_list_entry_button2_visible = {
+                check_variable = { SOV.COMECON1 = v }
+            }
+            comecon_nation_target_list_entry_button_visible = {
+                NOT = { check_variable = { SOV.COMECON1 = v } }
+            }
+        }
 		effects = {
+            comecon_nation_target_list_entry_button2_click = { 
+				set_variable = { SOV.comecon_main_show = 2 }
+
+                save_global_event_target_as = COMECON_TARGET
+                
+                var:SOV.COMECON1 = {
+                    set_variable = { totalexp = 0 }
+                    add_to_variable = { totalexp = mil_expend }
+                    add_to_variable = { totalexp = welfare_cost }
+                    #add_to_variable = { totalexp = cpi_cost }
+                    add_to_variable = { totalexp = domestic_cost }
+                    add_to_variable = { totalexp = edu_cost }
+                    add_to_variable = { totalexp = health_cost }
+                    add_to_variable = { totalexp = pub_cost }
+                    create_pie_chart = yes
+                }
+                set_variable = {
+                    SOV.COMECON1 = THIS.id
+                }
+                set_variable = {
+                    consumer_goods_factories = num_of_owned_factories
+                }
+                multiply_variable = {
+                    consumer_goods_factories = modifier@consumer_goods_factor
+                }
+                set_variable = {
+                    research_speed = 1
+                }
+                add_to_variable = {
+                    research_speed = modifier@research_speed_factor
+                }
+                set_variable = {
+                    construction_speed = modifier@production_speed_buildings_factor
+                }
+                add_to_variable = {
+                    construction_speed = 1
+                }
+                round_variable = consumer_goods_factories
+                set_variable = {
+                    product_eff_cap = 0.50
+                }
+                add_to_variable = {
+                    product_eff_cap = modifier@production_factory_max_efficiency_factor
+                }
+                set_variable = {
+                    weekly_pp_gain = political_power_daily
+                }
+                multiply_variable = {
+                    weekly_pp_gain = 7
+                }
+			}
 			comecon_nation_target_list_entry_button_click = { 
 				set_variable = { SOV.comecon_main_show = 2 }
+                save_global_event_target_as = COMECON_TARGET
+                set_variable = {
+                    SOV.COMECON1 = THIS.id
+                }
+                var:SOV.COMECON1 = {
+                    set_variable = { totalexp = 0 }
+                    add_to_variable = { totalexp = mil_expend }
+                    add_to_variable = { totalexp = welfare_cost }
+                    #add_to_variable = { totalexp = cpi_cost }
+                    add_to_variable = { totalexp = domestic_cost }
+                    add_to_variable = { totalexp = edu_cost }
+                    add_to_variable = { totalexp = health_cost }
+                    add_to_variable = { totalexp = pub_cost }
+                    create_pie_chart = yes
+                }
+                set_variable = {
+                    consumer_goods_factories = num_of_owned_factories
+                }
+                multiply_variable = {
+                    consumer_goods_factories = modifier@consumer_goods_factor
+                }
+                set_variable = {
+                    research_speed = 1
+                }
+                add_to_variable = {
+                    research_speed = modifier@research_speed_factor
+                }
+                set_variable = {
+                    construction_speed = modifier@production_speed_buildings_factor
+                }
+                add_to_variable = {
+                    construction_speed = 1
+                }
+                round_variable = consumer_goods_factories
+                set_variable = {
+                    product_eff_cap = 0.50
+                }
+                add_to_variable = {
+                    product_eff_cap = modifier@production_factory_max_efficiency_factor
+                }
+                set_variable = {
+                    weekly_pp_gain = political_power_daily
+                }
+                multiply_variable = {
+                    weekly_pp_gain = 7
+                }
 			}
 		}
 	}
