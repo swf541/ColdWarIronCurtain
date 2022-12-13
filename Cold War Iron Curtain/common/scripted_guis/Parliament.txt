@@ -1,4 +1,52 @@
 scripted_gui = {
+	national_ideas_menu = {
+		window_name = "show_national_ideas"
+
+		context_type = player_context
+		visible = {
+			check_variable = {
+				show_national_ideas = 1
+			}
+		}		
+	}
+	national_ideas_list = {
+        context_type = player_context
+        window_name = "national_ideas_list"
+		parent_window_name = show_national_ideas
+        dynamic_lists = {
+            national_ideas_list_grid = {
+                array = ROOT.current_idea_list
+				entry_container = national_ideas_list_entry
+            }
+        }
+		effects = {
+			national_ideas_list_entry_right_click = { 
+				meta_effect = { text = { show_ideas_tooltip = [IDEA_TOKEN] } IDEA_TOKEN = "[?v.GetTokenKey]" }
+				if = {
+					limit = { has_variable = THIS.idea_date_@var:v }
+					
+					set_temp_variable = { idea_expiry = THIS.idea_date_@var:v } # Start at the start num_days of the timed idea
+					add_to_temp_variable = { idea_expiry = THIS.idea_len_@var:v } # Find the end num_days of the timed idea
+					set_temp_variable = { temp_days = idea_expiry }
+					subtract_from_temp_variable = { temp_days = global.num_days } # Subtract today's num_days to find how many days are left
+					
+					# This isn't for catching expired timed ideas, those would not show up in the array on account of having expired, 
+					# it's actually in case an idea is added as timed and then later re-added as permanent. Stupid edge case which will probably never happen!
+					
+					if = {
+						limit = { NOT = { check_variable = { temp_days < 0 } } } 
+						
+						custom_effect_tooltip = timed_idea_expiry_tip
+					} 
+					else_if = {
+						limit = { NOT = { check_variable = { idea_expiry < last_refresh_date } } }
+						
+						custom_effect_tooltip = timed_idea_just_expired_tip
+					}
+				}
+			}
+		}
+	}
 	japan_diet_window = {
 		window_name = "parliament_window_jap_container"
  
@@ -105,16 +153,12 @@ scripted_gui = {
 					subtract_from_temp_variable = { show = show_national_ideas }
 					close_all_windows = yes
 					set_variable = { show_national_ideas = show }
-					set_variable = {
-						check_test = 0
-					}
 					clear_array = current_idea_list
 					set_variable = {
 						last_refresh_date = global.num_days
 					}
 					for_each_loop = {
 						array = global.all_idea_tokens
-
 						if = {
 							limit = {
 								meta_trigger = {
@@ -124,10 +168,6 @@ scripted_gui = {
 									IDEA_TOKEN = "[?global.all_idea_tokens^i.GetTokenKey]"
 								}
 							}
-							
-							add_to_variable = {
-								check_test = 1
-							}
 							meta_effect = {
 								text = {
 									add_to_array = {
@@ -135,7 +175,7 @@ scripted_gui = {
 										value = [IDEA_TOKEN]
 									}
 								}
-								IDEA_TOKEN = "[?v]"`
+								IDEA_TOKEN = "[?v]"
 							}
 						}
 					}
