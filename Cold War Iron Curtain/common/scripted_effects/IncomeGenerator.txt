@@ -658,6 +658,21 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 
 	set_variable = { SubsidiyCheck = IncomeTotal } # this IncomeTotal is the sum of all Income minus Corruption, Imports cost, Insurgency Funding Costs and Policy Costs
 	multiply_variable = { SubsidiyCheck = 0.25 }
+    if = {
+        limit = {
+            has_country_flag = Soviet_Subsidies
+        }
+        set_variable = { subsidiy_base = 0 }
+        add_to_variable = { subsidiy_base = mil_expend }
+        add_to_variable = { subsidiy_base = welfare_cost }
+        add_to_variable = { subsidiy_base = cpi_cost }
+        add_to_variable = { subsidiy_base = edu_cost }
+        add_to_variable = { subsidiy_base = health_cost }
+        add_to_variable = { subsidiy_base = pub_cost }
+        multiply_variable = { subsidiy_base = 0.25 }
+        subtract_from_variable = { SOV.currentMoney = subsidiy_base }
+        add_to_variable = {IncomeTotal = subsidiy_base }
+    }
 
 	add_to_variable = { currentMoney = IncomeTotal } # add income to money
 	set_variable = { IncomeCheck = IncomeTotal }
@@ -724,10 +739,10 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 			Interest_Rate = 1.04
 		}
 	}
-	if ={ limit = { check_variable = { currentMoney < 0 } }
-		set_variable = { pulse_deficit = currentMoney }
+	if ={ limit = { check_variable = { 		set_variable = { pulse_deficit = currentMoney }
 		multiply_variable = { pulse_deficit = -1 }
 		add_to_variable = { currentMoney = pulse_deficit }
+currentMoney < 0 } }
 		if = { 
 			limit = { 
 				check_variable = { defaultCheck < currentDebt }
@@ -1321,6 +1336,9 @@ public_expenditure = {
 
 	add_to_variable = { pub_cost = pub_cost_cor_penalty }
 	add_to_variable = { pub_cost_display = pub_cost_cor_penalty }
+
+	add_to_variable = { pub_cost = comecon_spending_total }
+	add_to_variable = { pub_cost_display = comecon_spending_total }
 	subtract_from_variable = { IncomeCheck = pub_cost }
 }
 

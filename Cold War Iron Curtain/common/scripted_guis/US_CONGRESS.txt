@@ -1,4 +1,431 @@
 scripted_gui = {
+    Campaign_News_Prompt = {
+		context_type = player_context
+		window_name = "campaign_bulletin"   
+		visible = {
+            check_variable = {
+                show_campaign_news_prompt > 0
+            }
+		}  
+        effects = {
+            event_option_background_click = {
+                set_variable = {
+                    show_campaign_news_prompt = 0
+                }
+            }
+        }
+    }
+    Dem_Primary_Negotiation_Window_Response = {
+		context_type = player_context
+		window_name = "Dem_Primary_Negotiation_Window_Response"   
+		visible = {
+            check_variable = {
+                show_dem_neg_response > 0
+            }
+		}  
+        triggers = {
+            title_visible = {
+                check_variable = {
+                    show_dem_neg_response = 1
+                }
+            }  
+            title_alt_visible = {
+                check_variable = {
+                    show_dem_neg_response = 2
+                }
+            }  
+            description_visible = {
+                check_variable = {
+                    show_dem_neg_response = 1
+                }
+            }  
+            description_alt_visible = {
+                check_variable = {
+                    show_dem_neg_response = 2
+                }
+            }  
+        }
+        properties = {
+            flag_for_primary_screen_flag = { 
+                image = "[GetFlagNegotiationType]"
+			}    
+            flag_for_primary_screen_2_flag = { 
+                image = "[GetFlagNegotiationType]"
+			}    
+        }    
+        effects = {
+            close_button_click = {
+                set_variable = {
+                    show_dem_neg_response = 0
+                }
+            }
+        }
+    }
+    Dem_Primary_Negotiation_Window = {
+		context_type = player_context
+		window_name = "Dem_Primary_Negotiations"   
+		visible = {
+			check_variable = {
+                show_state_negotiatons = 1
+            }
+		}  
+        properties = {
+            flag_for_primary_screen_flag = { 
+                image = "[GetFlagNegotiationType]"
+			}    
+            flag_for_primary_screen_2_flag = { 
+                image = "[GetFlagNegotiationType]"
+			}    
+        }    
+        triggers = {
+            okay_button_click_enabled = {
+                check_variable = {
+                    negotiation_offers > 0
+                }     
+                #check_variable = {
+                #    Dem_Activity_Points^Playing_As_Display > 0.999
+                #}
+            }
+        } 
+        effects = {
+            close_button_click = {
+                set_variable = {
+                    show_state_negotiatons = 0
+                }
+            }
+            okay_button_click = {
+                add_to_variable = {
+                    Dem_Activity_Points^Playing_As_Display = -1
+                }
+                if = {
+                    limit = {
+                        check_variable = {
+                            negotiation_offers = 1
+                        }
+                    }
+                    set_variable = {
+                        accept_rate = 55
+                    }
+                    set_variable = {
+                        reject_rate = 45
+                    }
+                }
+                else = {
+                    set_variable = {
+                        accept_rate = 90
+                    }
+                    set_variable = {
+                        reject_rate = 10
+                    }
+                }
+                random_list = {
+                    var:accept_rate = {
+                        set_variable = {
+                            show_dem_neg_response = 1
+                        }
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    negotiation_toggle^0 = 1
+                                }
+                                NOT = {
+                                    meta_trigger = { 
+                                        text = {
+                                            is_in_array = { 
+                                                dem_campaign_[ARRAY_NUMBER]_promises = dem_state_leader_issues^0 
+                                            }
+                                        }
+                                        ARRAY_NUMBER = "[?Playing_As_Display]"
+                                    }    
+                                }
+                            }
+                            meta_effect = { 
+                                text = {
+                                    add_to_array = { 
+                                        dem_campaign_[ARRAY_NUMBER]_promises = dem_state_leader_issues^0
+                                    }
+                                }
+                                ARRAY_NUMBER = "[?Playing_As_Display]"
+                            }    
+                        }
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    negotiation_toggle^1 = 1
+                                }
+                                NOT = {
+                                    meta_trigger = { 
+                                        text = {
+                                            is_in_array = { dem_campaign_[ARRAY_NUMBER]_promises = dem_state_leader_issues^1 }
+                                        }
+                                        ARRAY_NUMBER = "[?Playing_As_Display]"
+                                    }    
+                                }
+                            }
+                            meta_effect = { 
+                                text = {
+                                    add_to_array = { 
+                                        dem_campaign_[ARRAY_NUMBER]_promises = dem_state_leader_issues^1
+                                    }
+                                }
+                                ARRAY_NUMBER = "[?Playing_As_Display]"
+                            }    
+                        }
+                        set_variable = {
+                            show_state_negotiatons = 0
+                        }
+                        var:USA_DEM_NOM_NEG_TARGET = {
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        Contest_Type = 4
+                                    }
+                                }
+                                set_variable = {    
+                                    CurrentDemStateWinner = USA.Playing_As
+                                }
+                                add_to_variable = {
+                                    USA.Democratic_Delegates^USA.Playing_As_Display = Democratic_Delegates
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = USA.Playing_As_Position
+                                }
+                            }
+                            else = {
+                                set_variable = {
+                                    favorite_son_support_transfer = Canidate_Support^ROOT.Favorite_Son_Position
+                                }
+                                add_to_variable = { 
+                                    Canidate_Support^ROOT.Playing_As_Position = favorite_son_support_transfer 
+                                }    
+                                subtract_from_variable = {
+                                    Canidate_Support^ROOT.Favorite_Son_Position = favorite_son_support_transfer
+                                }                 
+                            }
+                            set_variable = {
+                                negotiated_dem_primary = 1
+                            }
+                        }
+                        generate_campaign_map_numbers_dem = yes
+                    }
+
+                    
+                    var:reject_rate = {
+                        set_variable = {
+                            show_dem_neg_response = 2
+                        }
+                    }
+                }
+            }
+        } 
+    }
+	dem_primary_neg_target_list = {
+		context_type = player_context
+		window_name = "dem_primary_negotiations_list"
+		parent_window_name = "Dem_Primary_Negotiations"
+
+		
+		dynamic_lists = {
+			dem_primary_negotiations_listing_grid = {
+				array = dem_state_leader_issues
+				change_scope = no
+				entry_container = dem_primary_negotiations_list_entry
+			}
+		}
+        triggers = {
+             negotiation_box_unchecked_visible = {
+                check_variable = {
+                    negotiation_toggle^i = 0
+                }
+             }
+             negotiation_box_checked_visible = {
+                check_variable = {
+                    negotiation_toggle^i = 1
+                }
+             }
+        }
+        effects = {
+            negotiation_box_unchecked_click = {
+                set_variable = {
+                    negotiation_toggle^i = 1 
+                }
+                add_to_variable = {
+                    negotiation_offers = 1
+                }
+            }
+            negotiation_box_checked_click = {
+                set_variable = {
+                    negotiation_toggle^i = 0
+                }
+                add_to_variable = {
+                    negotiation_offers = -1
+                }
+            }
+        }
+	}
+    
+    Dem_Primary_Ad_Purchase_Prompt = {
+		context_type = player_context
+		window_name = "US_ELECTION_DEM_PRIMARY_ADS"   
+		visible = {
+			check_variable = {
+                show_dem_primary_ad_prompt = 1
+            }
+		}  
+        triggers = {
+            media_newspaper_bg_visible = {
+                check_variable = {
+                    media_type = 1
+                }
+            }
+            media_radio_bg_visible = {
+                check_variable = {
+                    media_type = 2
+                }
+            }
+            media_bg_visible = {
+                check_variable = {
+                    media_type = 3
+                }
+            }
+            PURCHASE_AD_click_enabled = {
+                check_variable = {
+                    Dem_Campaign_Funds^ROOT.Playing_As_Display > potential_ad_buy_cost
+                }
+            }
+        }
+        effects = {
+            close_button_click = {
+                set_variable = {
+                    show_dem_primary_ad_prompt = 0
+                }
+            }
+            PURCHASE_AD_click = {
+                set_variable = {
+                    show_dem_primary_ad_prompt = 0
+                }
+                add_to_array = {
+                    dem_primary_ad_cycle_buyer = Playing_As                         #Buyer
+                }
+                add_to_array = {
+                    dem_primary_ad_cycle_type = selected_dem_topic                  #Topic
+                }
+                add_to_array = {
+                    dem_primary_ad_cycle_target = dem_primary_ad_target_selected    #Target
+                }
+                add_to_array = {
+                    dem_primary_ad_cycle_state = USA_DEM_PRIMARY_MEDIA_DETAILS      #State
+                }
+                add_to_array = {
+                    dem_primary_ad_cycle_status = 2                                 #When Ads Conclude (2 Media Cycles Away)
+                }
+                add_to_array = {
+                    dem_primary_ad_cycle_format = media_type    #Newspaper, Radio, TV
+                }
+                set_variable = { selected_dem_topic = 0 }
+                set_variable = { dem_primary_ad_target_selected = 0 }
+                set_variable = { USA_DEM_PRIMARY_MEDIA_DETAILS = 0 }
+                set_variable = { media_type = 0 }
+                subtract_from_variable = { 
+                    Dem_Campaign_Funds^ROOT.Playing_As_Display = potential_ad_buy_cost
+                }
+            }
+        } 
+    }
+	dem_primary_ad_target_list = {
+		context_type = player_context
+		window_name = "DEM_PRIMARY_AD_TARGET_SELECTION"
+		parent_window_name = "US_ELECTION_DEM_PRIMARY_ADS"
+
+		visible = {
+			check_variable = {
+                show_dem_primary_ad_prompt = 1
+            }
+		} 
+		dynamic_lists = {
+			dem_primary_ad_target_listing_grid = {
+				array = USA.dem_primary_ad_targets
+				change_scope = no
+				entry_container = dem_primary_ad_target_list_entry
+			}
+		}
+        effects = {
+           ad_target_select_click = {
+                set_variable = {
+                    USA.dem_primary_ad_target_selected = USA.dem_primary_ad_targets^i
+                }
+            }
+        }
+	}
+
+	dem_primary_ad_type_list = {
+		context_type = player_context
+		window_name = "DEM_PRIMARY_AD_TYPE"
+		parent_window_name = "US_ELECTION_DEM_PRIMARY_ADS"
+
+		visible = {
+			check_variable = {
+                show_dem_primary_ad_prompt = 1
+            }
+		} 
+		
+		dynamic_lists = {
+			dem_primary_ad_type_listing_grid = {
+				array = USA.dem_primary_ad_types
+				change_scope = no
+				entry_container = dem_primary_ad_type_list_entry
+			}
+		}
+        effects = {
+            PURCHASE_AD_click = {
+                clear_array = dem_primary_ad_targets
+                if = {
+                    limit = {
+                        check_variable = {
+                            dem_primary_ad_types^i = 1
+                        }
+                    }
+                    add_to_array = {
+                        dem_primary_ad_targets = Playing_As
+                    }
+                    set_variable = {
+                        selected_dem_topic = 1
+                    }
+                }
+                if = {
+                    limit = {
+                        check_variable = {
+                            dem_primary_ad_types^i = 2
+                        }
+                    }
+                    set_variable = {
+                        selected_dem_topic = 2
+                    }
+                    for_each_loop = {
+                        array = Dem_Canidates
+                        if = {
+                            limit = {
+                                NOT = {
+                                    check_variable = {
+                                        Dem_Canidates^i = Playing_As
+                                    }    
+                                }
+                                NOT = {
+                                    check_variable = {  #Favorite Son
+                                        Dem_Canidates^i = 29
+                                    }    
+                                }
+                            }
+                            add_to_array = {
+                                dem_primary_ad_targets = Dem_Canidates^i
+                            }
+                        }
+                    }
+                }
+            }
+        }
+	}
+
 
 
 	US_CONGRESS = {
@@ -81,9 +508,322 @@ scripted_gui = {
 				frame = 73      #gop_leading_ev
 			}   
         }
+        triggers = {
+            state_action_fundraise_click_enabled = {
+                check_variable = {
+                    Dem_Activity_Points^Playing_As_Display > 0.999
+                }
+            }
+            state_dem_campaign_click_enabled = {
+                var:USA_SEN_POL_DETAILS = {
+                    OR = {
+                        check_variable = {
+                            Contest_Type = 1
+                        }
+                        check_variable = {
+                            Contest_Type = 2
+                        }
+                    }
+                }
+                check_variable = {
+                    Dem_Activity_Points^Playing_As_Display > 0.999
+                }
+            }  
+            state_dem_launch_newspaper_ads_click_enabled = {
+                var:USA_SEN_POL_DETAILS = {  
+                    OR = {    
+                        check_variable = {    
+                            Contest_Type = 1
+                        }
+                        check_variable = { 
+                            Contest_Type = 2
+                        }
+                    }
+                }              
+            }
+            state_dem_launch_radio_ads_click_enabled = {
+                var:USA_SEN_POL_DETAILS = { 
+                    OR = {
+                        check_variable = { 
+                            Contest_Type = 1
+                        }
+                        check_variable = { 
+                            Contest_Type = 2
+                        }
+                    }
+                }  
+            }
+            state_dem_launch_television_ads_click_enabled = {
+                var:USA_SEN_POL_DETAILS = { 
+                    OR = {
+                        check_variable = { 
+                            Contest_Type = 1
+                        }
+                        check_variable = { 
+                            Contest_Type = 2
+                        }
+                    }
+                }  
+            }
+            state_dem_invest_in_local_campaign_click_enabled = {
+                NOT = {
+                    check_variable = {
+                        USA_SEN_POL_DETAILS = 0
+                    }
+                }
+                var:USA_SEN_POL_DETAILS = { 
+                    check_variable = { 
+                        USA.Dem_Campaign_Funds^USA.Playing_As_Display > Investment_Cost
+                    }
+                    #Timed Bit
+                    NOT = {
+                        meta_trigger = {
+                            text = {									
+                                has_state_flag = Recent_Investment_By_Dem_Candidate_[PLAYING_AS]
+                            }
+                            PLAYING_AS = "[?ROOT.Playing_As_Display]"
+                        }
+                    }
+                }
+            }
+        }
 		effects = {
+            state_party_negotiate_click = {
+                clear_array = USA.dem_state_leader_issues
+                set_variable = {
+                    show_state_negotiatons = 1
+                } 
+                set_variable = {
+                    USA_DEM_NOM_NEG_TARGET = USA_SEN_POL_DETAILS
+                }
+                var:USA_SEN_POL_DETAILS = {
+
+                    save_global_event_target_as = USA_DEM_PRIMARY_NEGOTIATE_TARGET
+                    for_each_loop = {
+                        array = dem_state_leader_issues
+                        add_to_array = { USA.dem_state_leader_issues = dem_state_leader_issues^i }
+                    }
+                }          
+
+                #meta_effect = { 
+                #    text = {
+                #        for_each_loop = {
+                #            array = black_ops_group_[ARRAY_NUMBER]_traits
+                #            add_to_array = { blacks_ops_team_current_traits = black_ops_group_[ARRAY_NUMBER]_traits^i }
+                #        }
+                #        for_each_loop = {
+                #            array = black_ops_group_[ARRAY_NUMBER]_history
+                #            add_to_array = { black_ops_team_history_dates = black_ops_group_[ARRAY_NUMBER]_history^i }
+                #        }
+                #        for_each_loop = {
+                #            array = black_ops_group_[ARRAY_NUMBER]_history_entry
+                #            add_to_array = { black_ops_team_history_entries = black_ops_group_[ARRAY_NUMBER]_history_entry^i }
+                #        }
+                #        for_each_loop = {
+                #            array = black_ops_group_[ARRAY_NUMBER]_history_entry_flag
+                #            add_to_array = { black_ops_team_history_entries_flags = black_ops_group_[ARRAY_NUMBER]_history_entry_flag^i }
+                #        }
+                #        
+                #    }
+                #    TAG = "[?ROOT.GetTag]"
+                #    OPERATIVE = "[?operative_number]"
+                #    ARRAY_NUMBER = "[?current_page]"
+                #}    
+
+            }
+            state_dem_launch_newspaper_ads_click = {
+
+                set_variable = {
+                    show_dem_primary_ad_prompt = 1
+                }
+                set_variable = {
+                    media_type = 1
+                }
+                clear_array = dem_primary_ad_types
+                clear_array = dem_primary_ad_targets
+
+                var:USA_SEN_POL_DETAILS = {
+                    save_global_event_target_as = USA_DEM_PRIMARY_MEDIA_TARGET
+                }
+                set_variable = {
+                    USA_DEM_PRIMARY_MEDIA_DETAILS = USA_SEN_POL_DETAILS
+                }
+                add_to_array = {
+                    dem_primary_ad_types = 1  #Positive Piece
+                }
+                set_variable = {
+                    potential_ad_buy_cost = 1  #10k
+                }
+                multiply_variable = {
+                    potential_ad_buy_cost = USA_DEM_PRIMARY_MEDIA_TARGET.media_market_area_factor    #Rough Number of Relevant Media Markets
+                }
+                multiply_variable = {
+                    potential_ad_buy_cost = USA_DEM_PRIMARY_MEDIA_TARGET.media_cost_factor    #Cost Adjuster, State Specific, Set in American_Primary_Effects.txt
+                }
+                add_to_array = {
+                    dem_primary_ad_types = 2  #Negative Piece
+                }
+                add_to_array = {
+                    dem_primary_ad_targets = 0  #Notice of Order
+                }
+            } 
+            state_dem_launch_radio_ads_click = {
+
+                set_variable = {
+                    show_dem_primary_ad_prompt = 1
+                }
+                set_variable = {
+                    media_type = 2
+                }
+                clear_array = dem_primary_ad_types
+                clear_array = dem_primary_ad_targets
+
+                var:USA_SEN_POL_DETAILS = {
+                    save_global_event_target_as = USA_DEM_PRIMARY_MEDIA_TARGET
+                }
+                set_variable = {
+                    USA_DEM_PRIMARY_MEDIA_DETAILS = USA_SEN_POL_DETAILS
+                }
+                add_to_array = {
+                    dem_primary_ad_types = 1  #Positive Piece
+                }
+                set_variable = {
+                    potential_ad_buy_cost = 2.5  #10k
+                }
+                multiply_variable = {
+                    potential_ad_buy_cost = USA_DEM_PRIMARY_MEDIA_TARGET.media_market_area_factor    #Rough Number of Relevant Media Markets
+                }
+                multiply_variable = {
+                    potential_ad_buy_cost = USA_DEM_PRIMARY_MEDIA_TARGET.media_cost_factor    #Cost Adjuster, State Specific, Set in American_Primary_Effects.txt
+                }
+                add_to_array = {
+                    dem_primary_ad_types = 2  #Negative Piece
+                }
+                add_to_array = {
+                    dem_primary_ad_targets = 0  #Notice of Order
+                }
+            } 
+            state_dem_launch_television_ads_click = {
+
+                set_variable = {
+                    show_dem_primary_ad_prompt = 1
+                }
+                set_variable = {
+                    media_type = 3
+                }
+                clear_array = dem_primary_ad_types
+                clear_array = dem_primary_ad_targets
+                set_variable = {
+                    USA_DEM_PRIMARY_MEDIA_DETAILS = USA_SEN_POL_DETAILS
+                }
+                var:USA_SEN_POL_DETAILS = {
+                    save_global_event_target_as = USA_DEM_PRIMARY_MEDIA_TARGET
+
+                }
+                add_to_array = {
+                    dem_primary_ad_types = 1  #Positive Piece
+                }
+                set_variable = {
+                    potential_ad_buy_cost = 5  #10k
+                }
+                multiply_variable = {
+                    potential_ad_buy_cost = USA_DEM_PRIMARY_MEDIA_TARGET.media_market_area_factor    #Rough Number of Relevant Media Markets
+                }
+                multiply_variable = {
+                    potential_ad_buy_cost = USA_DEM_PRIMARY_MEDIA_TARGET.media_cost_factor    #Cost Adjuster, State Specific, Set in American_Primary_Effects.txt
+                }
+                add_to_array = {
+                    dem_primary_ad_types = 2  #Negative Piece
+                }
+                add_to_array = {
+                    dem_primary_ad_targets = 0  #Notice of Order
+                }
+            } 
+            state_dem_invest_in_local_campaign_click = {
+                var:USA_SEN_POL_DETAILS = {
+                    subtract_from_variable = { 
+                        USA.Dem_Campaign_Funds^USA.Playing_As_Display = Investment_Cost
+                    }
+                    #Popularity Change
+                    randomize_variable = {
+                        var = Campaigning_Addition
+                        distribution = uniform
+                        min = 1
+                        max = 3
+                    }
+                    add_to_variable = { 
+                        Canidate_Support^ROOT.Playing_As_Position = Campaigning_Addition 
+                    }
+                    #Timed Bit
+                    meta_effect = {
+                        text = {									
+                            set_state_flag = {
+                                flag = Recent_Investment_By_Dem_Candidate_[PLAYING_AS]
+                                days = 28
+                                value = 1
+                            }
+                        }
+                        PLAYING_AS = "[?ROOT.Playing_As_Display]"
+                    }
+                }
+                generate_campaign_map_numbers_dem = yes
+            }
+            state_action_fundraise_click = {
+                add_to_variable = {
+                    Dem_Activity_Points^Playing_As_Display = -1
+                }
+                randomize_variable = {
+                    var = Fundraising_Addition
+                    distribution = uniform
+                    min = 5
+                    max = 20
+                }
+                multiply_variable = {
+                    Fundraising_Addition = Dem_Fundraising_Score^Playing_As_Display
+                }
+                #Regional Bit Note to Add for General Election, Weight by PVI Maybe?
+                add_to_variable = { 
+                    Dem_Campaign_Funds^Playing_As_Display = Fundraising_Addition 
+                }
+            }
+            state_dem_campaign_click = {
+                add_to_variable = {
+                    Dem_Activity_Points^Playing_As_Display = -1
+                }
+                var:USA_SEN_POL_DETAILS = {
+                    randomize_variable = {
+                        var = Campaigning_Addition
+                        distribution = uniform
+                        min = 0.3
+                        max = 0.6
+                    }
+                    multiply_variable = {
+                        Campaigning_Addition = ROOT.Dem_Charsima_Score^ROOT.Playing_As_Display
+                    }
+                    #Regional Bit Note to Add for General Election, Weight by PVI Maybe?
+                    add_to_variable = { 
+                        Canidate_Support^ROOT.Playing_As_Position = Campaigning_Addition 
+                    }
+                }
+                generate_campaign_map_numbers_dem = yes
+            }
+            closebutton_click = {
+				set_variable = { show_usa_congress = 0 }
+                375 = {
+                    set_state_name = "Hill Country"
+                }     
+                378 = {
+                    set_state_name = "San Franciso Bay"
+                }
+			}
 			exitbutton_click = {
 				set_variable = { show_usa_congress = 0 }
+                375 = {
+                    set_state_name = "Hill Country"
+                }     
+                378 = {
+                    set_state_name = "San Franciso Bay"
+                }
 			}
             
 			house_lobbying_click = {    #has_country_flag = law_passing
@@ -123,6 +863,7 @@ scripted_gui = {
             california_poli_details_click = {
 				set_variable = { USA_SEN_POL_DETAILS = 378.id }
                 378 = {
+                    set_state_name = "California"
                     ic_election_map_effect = yes            
                 } 
 			}	
@@ -147,6 +888,7 @@ scripted_gui = {
             texas_poli_details_click = {
 				set_variable = { USA_SEN_POL_DETAILS = 375.id }
                 375 = {
+                    set_state_name = "Texas"
                     ic_election_map_effect = yes            
                 } 
 			}	
@@ -448,6 +1190,125 @@ scripted_gui = {
             
 		}
 		triggers = { 
+            blank_portrait_overlay_visible = {
+                check_variable = { 
+                    USA.show_usa_congress_alt = 0 
+                }    
+            }
+            state_party_negotiate_visible = {
+                var:USA_SEN_POL_DETAILS = {
+                    check_variable = {
+                        CurrentDemStateLeader > 0
+                    }
+                    check_variable = {
+                        CurrentDemStateWinner = 0
+                    }
+                }                
+            }
+            exitbutton_visible = {
+                NOT = {
+                    check_variable = { 
+                        USA.show_usa_congress_alt = 2 
+                    }    
+                }
+            }
+            closebutton_visible = {
+                check_variable = { 
+                    USA.show_usa_congress_alt = 2 
+                }          
+
+            }
+            CURRENT_PRIMARY_POLLING_NO_CONTEST_visible = {
+                var:USA_SEN_POL_DETAILS = {
+                    check_variable = {
+                        Contest_Type = 4
+                    }
+                }             
+            }
+            state_primary_date_visible = { 
+                check_variable = { 
+                    USA.show_usa_congress_alt = 2 
+                } 
+                NOT = {
+                    var:USA_SEN_POL_DETAILS = {
+                        check_variable = {
+                            Contest_Type = 4
+                        }
+                    }
+                }
+            }
+            state_primary_type_visible = { 
+                check_variable = { 
+                    USA.show_usa_congress_alt = 2 
+                } 
+            }
+            state_party_leader_visible = { 
+                check_variable = { 
+                    USA.show_usa_congress_alt = 2 
+                } 
+                var:USA_SEN_POL_DETAILS = {
+                    check_variable = {
+                        Contest_Type = 4
+                    }
+                }
+            }
+            state_primary_delegate_allocation_visible = { 
+                check_variable = { 
+                    USA.show_usa_congress_alt = 2 
+                } 
+                NOT = {
+                    var:USA_SEN_POL_DETAILS = {
+                        check_variable = {
+                            Contest_Type = 4
+                        }
+                    }
+                }
+            }
+            state_primary_delegate_victory_title_visible = { 
+                check_variable = { 
+                    USA.show_usa_congress_alt = 2 
+                } 
+                var:USA_SEN_POL_DETAILS = {
+                    has_state_flag = Dem_Primary_Held
+                }
+                NOT = {
+                    var:USA_SEN_POL_DETAILS = {
+                        check_variable = {
+                            Contest_Type = 4
+                        }
+                    }
+                }
+            }
+            state_primary_delegate_supporting_title_visible = { 
+                check_variable = { 
+                    USA.show_usa_congress_alt = 2 
+                } 
+                var:USA_SEN_POL_DETAILS = {
+                    check_variable = {
+                        Contest_Type = 4
+                    }
+                }
+                var:USA_SEN_POL_DETAILS = {
+                    check_variable = {
+                        CurrentDemContestedSlateDesc = 0
+                    }
+                }
+            }
+            state_primary_delegate_supporting_contested_title_visible = { 
+                check_variable = { 
+                    USA.show_usa_congress_alt = 2 
+                } 
+                var:USA_SEN_POL_DETAILS = {
+                    check_variable = {
+                        Contest_Type = 4
+                    }
+                }
+                var:USA_SEN_POL_DETAILS = {
+                    check_variable = {
+                        CurrentDemContestedSlateDesc > 0
+                    }
+                }
+            }
             Checkbox_Slot_1_visible = { check_variable = { Dem_Canidates^num > 0 } check_variable = { USA.show_usa_congress_alt = 2 } }
             Slot_1_Title_visible = { check_variable = { Dem_Canidates^num > 0 } check_variable = { USA.show_usa_congress_alt = 2 } }
             Checkbox_Slot_2_visible = { check_variable = { Dem_Canidates^num > 1 } check_variable = { USA.show_usa_congress_alt = 2 } }
@@ -478,7 +1339,7 @@ scripted_gui = {
             Oregon_Primary_Pre_Election_visible = { check_variable = { USA.show_usa_congress_alt = 2 } }
             Utah_Primary_Pre_Election_visible = { check_variable = { USA.show_usa_congress_alt = 2 } }
             Washington_Primary_Pre_Election_visible = { check_variable = { USA.show_usa_congress_alt = 2 } }
-            Wyoming_Primary_Pre_Election _visible = { check_variable = { USA.show_usa_congress_alt = 2 } }
+            Wyoming_Primary_Pre_Election_visible = { check_variable = { USA.show_usa_congress_alt = 2 } }
             Texas_Primary_Pre_Election_visible = { check_variable = { USA.show_usa_congress_alt = 2 } }
             Oklahoma_Primary_Pre_Election_visible = { check_variable = { USA.show_usa_congress_alt = 2 } }
             Kansas_Primary_Pre_Election_visible = { check_variable = { USA.show_usa_congress_alt = 2 } }
@@ -519,6 +1380,79 @@ scripted_gui = {
             Hawaii_Primary_Pre_Election_visible = { check_variable = { USA.show_usa_congress_alt = 2 } }
             PR_Primary_Pre_Election_visible = { check_variable = { USA.show_usa_congress_alt = 2 } }
             DC_Primary_Pre_Election_visible = { check_variable = { USA.show_usa_congress_alt = 2 } }
+            Candidate_1_Dem_Icon_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^0 > 0 }
+            }
+            Candidate_1_Dem_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^0 > 0 }
+            }
+            Candidate_2_Dem_Icon_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^1 > 0 }
+            }
+            Candidate_2_Dem_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^1 > 0 }
+            }
+            Candidate_3_Dem_Icon_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^2 > 0 }
+            }
+            Candidate_3_Dem_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^2 > 0 }
+            }
+            Candidate_4_Dem_Icon_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^3 > 0 }
+            }
+            Candidate_4_Dem_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^3 > 0 }
+            }
+            Candidate_5_Dem_Icon_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^4 > 0 }
+            }
+            Candidate_5_Dem_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^4 > 0 }
+            }
+            Candidate_6_Dem_Icon_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^5 > 0 }
+            }
+            Candidate_6_Dem_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^5 > 0 }
+            }
+            Candidate_7_Dem_Icon_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^6 > 0 }
+            }
+            Candidate_7_Dem_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^6 > 0 }
+            }
+            Candidate_8_Dem_Icon_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^7 > 0 }
+            }
+            Candidate_8_Dem_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^7 > 0 }
+            }
+            Candidate_9_Dem_Icon_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^8 > 0 }
+            }
+            Candidate_9_Dem_visible = {
+                check_variable = { USA.show_usa_congress_alt = 2 }
+                check_variable = { Dem_Canidates^8 > 0 }
+            }
+            
             EV_TOSSUP_TITLE_visible = {
                 check_variable = { USA.show_usa_congress_alt = 3 }
             }
@@ -644,7 +1578,7 @@ scripted_gui = {
             }
             ###
             Democratic_Primary_1980_visible = {
-                check_variable = { USA.show_usa_congress_alt = 5 }
+                check_variable = { USA.show_usa_congress_alt = 2 }
             }
 
 			house_lobbying_click_enabled = {    #
@@ -1006,21 +1940,21 @@ scripted_gui = {
                 }
 			}
 		} 
-		#triggers = { 
-		#	GOP_Alabama_visible = {
-		#		367 = {
-        #            gop_leaning_state_conditions = yes
-        #
-        #        }
-		#	}
-		#} 
-        #triggers = {
-        #     SPLIT_Alabama_visible = {
-		#		367 = {
-        #            swing_state_conditions = yes
-        #        }
-		#	}
-		#} 
+		triggers = { 
+			GOP_Alabama_visible = {
+				367 = {
+                    gop_leaning_state_conditions = yes
+        
+                }
+			}
+		} 
+        triggers = {
+             SPLIT_Alabama_visible = {
+				367 = {
+                    swing_state_conditions = yes
+                }
+			}
+		} 
 
 
         #triggers = {
@@ -2334,7 +3268,43 @@ scripted_gui = {
             }
         } 
     }
+    #The Negotiator
+    
     #Primary Prompts
+	Dem_Primary_Negotiations = {
+
+		context_type = player_context
+		window_name = "Dem_Primary_Negotiations"
+		dirty = party_check
+ 
+		visible = { 
+            has_country_flag = Dem_Negotiations
+		}
+        effects = {
+            okay_button_click = {
+                clr_country_flag = Dem_Negotiations
+            }
+        } 
+    }
+	Dem_Primary_New_Hampshire_Prompt = {
+
+		context_type = player_context
+		window_name = "Dem_Primary_New_Hampshire_Prompt"
+		dirty = party_check
+ 
+		visible = { 
+            862 = {
+                has_state_flag = Dem_Primary_Prompt_Show
+            }
+		}
+        effects = {
+            okay_button_click = {
+                862 = {
+                    clr_state_flag = Dem_Primary_Prompt_Show
+                }
+            }
+        } 
+    }
 	Dem_Primary_South_Carolina_Prompt = {
 
 		context_type = player_context
@@ -2352,4 +3322,894 @@ scripted_gui = {
             }
         } 
     }
+	dem_primary_state_results_list = {
+		context_type = player_context
+		window_name = "dem_primary_state_list"
+		parent_window_name = "US_CONGRESS_UI"
+
+        visible = {
+            check_variable = {
+                USA.show_usa_congress_alt = 2 
+            }
+        }
+		
+		dynamic_lists = {
+			dem_primary_state_listing_grid = {
+				array =  USA_SEN_MAP_TARGET.canidate_listing_array_percentage
+				change_scope = no
+				entry_container = dem_primary_state_list_entry
+			}
+		}
+	}
+	campaign_issue_list = {
+		context_type = player_context
+		window_name = "campaign_issue_list"
+		parent_window_name = "US_CONGRESS_UI"
+
+        visible = {
+            check_variable = {
+                USA.show_usa_congress_alt = 2 
+            }
+        }
+		
+		dynamic_lists = {
+			campaign_issue_listing_grid = {
+				array =  USA_SEN_MAP_TARGET.KI_Issue_Topic
+				change_scope = no
+				entry_container = campaign_issue_list_entry
+			}
+		}
+        effects = {
+            campaign_issue_list_entry_button_click = {
+                set_variable = {
+                    Current_Key_Issue = v
+                }
+                every_owned_state = {
+                    set_variable = {
+                        State_Found = 0
+                    }
+                    for_each_loop = {
+                        array = KI_Issue_Topic
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue #Civil Rights
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 1 #Civil Rights
+                                }  
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 1
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 1
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 1
+                                }       
+                            } 
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 2
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 8
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 2
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 3
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 2
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 3
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 4
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 3
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 4
+                                }   
+                            }
+                            else = {
+                                set_variable = {
+                                    Dem_Primary_Frame = 10
+                                }                        
+                            }
+                        }
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 2 #Civil Rights
+                                }  
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 1
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 3
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 1
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 2
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 1
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 2
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 3
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 4
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 3
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 4
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 6
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 4
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 5
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 8
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 5
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 6
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 5
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 6
+                                }   
+                            }
+                            else = {
+                                set_variable = {
+                                    Dem_Primary_Frame = 10
+                                }                        
+                            }
+                        }
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 3 #Economics
+                                }  
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 1
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 1
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 1
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 2
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 8
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 2
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 3
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 4
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 3
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 4
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 3
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 4
+                                }   
+                            }
+                            else = {
+                                set_variable = {
+                                    Dem_Primary_Frame = 10
+                                }                        
+                            }
+                        }                
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 4 #Red Scare
+                                }  
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 1
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 8
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 1
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 2
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 2
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 2
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 3
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 3
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 3
+                                }   
+                            }
+                            else = {
+                                set_variable = {
+                                    Dem_Primary_Frame = 10
+                                }                        
+                            }
+                        } 
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 5 #Israel
+                                }  
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 1
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 9
+                                } 
+                                set_variable = {
+                                    Local_Current_KI_Rating = 1
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 2
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 8
+                                }
+
+                                set_variable = {
+                                    Local_Current_KI_Rating = 2
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 3
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 1
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 3
+                                }   
+                            }
+                            else = {
+                                set_variable = {
+                                    Dem_Primary_Frame = 10
+                                }                        
+                            }
+                        }   
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 6
+                                }  
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 1
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 2
+                                } 
+                                set_variable = {
+                                    Local_Current_KI_Rating = 1
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 2
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 6
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 2
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 3
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 5
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 3
+                                }   
+                            }
+                            else = {
+                                set_variable = {
+                                    Dem_Primary_Frame = 10
+                                }                        
+                            }
+                        }   
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 7 
+                                }  
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 1
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 1
+                                } 
+                                set_variable = {
+                                    Local_Current_KI_Rating = 1
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 2
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 8
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 2
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 3
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 2
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 3
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 4
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 3
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 4
+                                }   
+                            }
+                            else = {
+                                set_variable = {
+                                    Dem_Primary_Frame = 10
+                                }                        
+                            }
+                        }   
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 8 
+                                } 
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 1
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 5
+                                } 
+                                set_variable = {
+                                    Local_Current_KI_Rating = 1
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 2
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 6
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 2
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 3
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 3
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 3
+                                }   
+                            }
+                            else = {
+                                set_variable = {
+                                    Dem_Primary_Frame = 10
+                                }                        
+                            }
+                        }   
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 9 
+                                } 
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 1
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 1
+                                } 
+                                set_variable = {
+                                    Local_Current_KI_Rating = 1
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 2
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 8
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 2
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 3
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 4
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 3
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 4
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 2
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 4
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 5
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 3
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 5
+                                }   
+                            }
+                            else = {
+                                set_variable = {
+                                    Dem_Primary_Frame = 10
+                                }                        
+                            }
+                        }   
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 10
+                                } 
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 1
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 3
+                                } 
+                                set_variable = {
+                                    Local_Current_KI_Rating = 1
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 2
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 4
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 2
+                                }  
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 3
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 5
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 3
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 4
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 8
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 4
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 5
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 1
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 5
+                                }   
+                            }
+                            else = {
+                                set_variable = {
+                                    Dem_Primary_Frame = 10
+                                }                        
+                            }
+                        }   
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 11
+                                } 
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 1
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 3
+                                } 
+                                set_variable = {
+                                    Local_Current_KI_Rating = 1
+                                }   
+                            }
+                            else_if = {
+                                limit = {
+                                    check_variable = {
+                                        KI_Issue_Rating^i = 2
+                                    }
+                                }
+                                set_variable = {
+                                    Dem_Primary_Frame = 2
+                                }
+                                set_variable = {
+                                    Local_Current_KI_Rating = 2
+                                }   
+                            }
+                            else = {
+                                set_variable = {
+                                    Dem_Primary_Frame = 10
+                                }                        
+                            }
+                        }   
+                
+
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    KI_Issue_Topic^i = USA.Current_Key_Issue
+                                }
+                                check_variable = {
+                                    USA.Current_Key_Issue = 12 #Taft-Hartley
+                                }  
+                            }
+                            set_variable = {
+                                State_Found = 1
+                            }
+                            if = {
+                                limit = {
+                                    check_variable = {
+                                        USA.Current_Key_Issue = 12
+                                    } 
+                                }
+                                if = {
+                                    limit = {
+                                        check_variable = {
+                                            KI_Issue_Rating^i = 1
+                                        }
+                                    }
+                                    set_variable = {
+                                        Dem_Primary_Frame = 1
+                                    } 
+                                    set_variable = {
+                                        Local_Current_KI_Rating = 1
+                                    }   
+                                }
+                                else_if = {
+                                    limit = {
+                                        check_variable = {
+                                            KI_Issue_Rating^i = 2
+                                        }
+                                    }
+                                    set_variable = {
+                                        Dem_Primary_Frame = 8
+                                    }
+                                    set_variable = {
+                                        Local_Current_KI_Rating = 2
+                                    }   
+                                }
+                                else_if = {
+                                    limit = {
+                                        check_variable = {
+                                            KI_Issue_Rating^i = 3
+                                        }
+                                    }
+                                    set_variable = {
+                                        Dem_Primary_Frame = 2
+                                    }
+                                    set_variable = {
+                                        Local_Current_KI_Rating = 3
+                                    }   
+                                }
+                                else_if = {
+                                    limit = {
+                                        check_variable = {
+                                            KI_Issue_Rating^i = 4
+                                        }
+                                    }
+                                    set_variable = {
+                                        Dem_Primary_Frame = 3
+                                    }
+                                    set_variable = {
+                                        Local_Current_KI_Rating = 4
+                                    }   
+                                }
+                                else = {
+                                    set_variable = {
+                                        Dem_Primary_Frame = 10
+                                    }                        
+                                }
+                            }   
+                        }
+                        if = {
+                            limit = {
+                                check_variable = {
+                                    State_Found = 0
+                                }
+                            }
+                            set_variable = {
+                                Dem_Primary_Frame = 10
+                            }  
+                            set_variable = {
+                                Local_Current_KI_Rating = 10    #10 = N/A
+                            }   
+                        }
+                    }                   
+                }
+            }
+        }
+	}
 }
