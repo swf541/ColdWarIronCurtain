@@ -9,58 +9,43 @@ create_pie_chart = {
 		value = 1 # 1 is value for neutrality frame, so we don't have to make a loop for it
 		size = 100 # 100 pieces, each percent is one piece
 	}
+		#yellow_frame
+		#red_frame
+		#gura_chart_frame
 	set_temp_variable = { industrial_pop = IND_DISPLAY }
 	add_to_temp_variable = { industrial_pop = refinery_total }
 	add_to_temp_variable = { industrial_pop = DOCK_TOTAL }	
-
-	set_variable = {industry_gui_total = industrial_pop }
-
-	divide_temp_variable = {industrial_pop = display_income }
-	multiply_temp_variable = { industrial_pop = 100 }
-	round_temp_variable = industrial_pop
-
+	set_variable = { industry_gui_total = industrial_pop }	
+	
 	set_temp_variable = { agricultural_pop = FARM_DISPLAY }
-	divide_temp_variable = {agricultural_pop = display_income }
-	multiply_temp_variable = { agricultural_pop = 100 }
-	round_temp_variable = agricultural_pop 
-	set_variable = { ROOT.last_idx = industrial_pop }
-	add_to_temp_variable = { agricultural_pop = ROOT.last_idx }
-	for_loop_effect = {
-		start = ROOT.last_idx
-		end = agricultural_pop
-		set_variable = { pie_chart^v = 2 }
-		add_to_variable = { ROOT.last_idx = 1 }
-	}
-
-	set_temp_variable = { tax_pop = tax_display }
-	divide_temp_variable = {tax_pop = display_income }
-	multiply_temp_variable = { tax_pop = 100 }
-	round_temp_variable = tax_pop
-	add_to_temp_variable = { tax_pop = ROOT.last_idx }
-	for_loop_effect = {
-		start = ROOT.last_idx
-		end = tax_pop
-		set_variable = { pie_chart^v = 3 }
-		add_to_variable = { ROOT.last_idx = 1 }
-	}
-
+	
+	set_temp_variable = {tax_gui_total = tax_base }
+	
 	set_temp_variable = { services_pop = OP_Display }
 	add_to_temp_variable = { services_pop = tourism_infrastructure_total }
 	add_to_temp_variable = { services_pop = resource_income }
-	set_variable = {services_gui_total = services_pop }
-	divide_temp_variable = {services_pop = display_income }
-	multiply_temp_variable = { services_pop = 100 }
-	round_temp_variable = services_pop 
-	add_to_temp_variable = { services_pop = ROOT.last_idx }
-	for_loop_effect = {
-		start = ROOT.last_idx
-		end = services_pop
-		set_variable = { pie_chart^v = 4 }
-	}
-
-	clear_variable = ROOT.last_idx
-	add_to_variable = { pie_chart_dirty = 1 }
-
+	set_variable = { services_gui_total = services_pop }
+	
+	set_temp_variable = {total_pie_1 = tax_gui_total }
+	add_to_temp_variable = { total_pie_1 = agricultural_pop }
+	add_to_temp_variable = { total_pie_1 = industrial_pop }
+	add_to_temp_variable = { total_pie_1 = services_pop }
+	divide_temp_variable = { tax_gui_total = total_pie_1 }
+	divide_temp_variable = { agricultural_pop = total_pie_1 }
+	divide_temp_variable = { industrial_pop = total_pie_1 }
+	divide_temp_variable = { services_pop = total_pie_1 }
+	multiply_temp_variable = { agricultural_pop = 100 } 
+	multiply_temp_variable = { industrial_pop = 100 } 
+	multiply_temp_variable = { tax_gui_total = 100 } 
+	multiply_temp_variable = { services_pop = 100 } 
+	set_temp_variable = {final_pie = tax_gui_total }
+	set_variable = { green_frame = final_pie }
+	add_to_temp_variable = { final_pie = agricultural_pop }
+	set_variable = { red_frame = final_pie }
+	add_to_temp_variable = { final_pie = services_pop }
+	set_variable = { gura_chart_frame = final_pie }
+	add_to_temp_variable = { final_pie = industrial_pop }
+	set_variable = { yellow_frame = final_pie }
 
 	##military chart
 
@@ -170,4 +155,86 @@ create_pie_chart = {
 
 	clear_variable = ROOT.last_idx
 	add_to_variable = { 3pie_chart_dirty = 1 }
+}
+SAMPLE_add_random_point_to_line = {
+	clear_array = incomecheck_y_label
+	# Find the maximum and minimum inflation values for the graph
+	set_temp_variable = { min = Income_numbers^0 }
+	set_temp_variable = { max = Income_numbers^0 }
+	for_loop_effect = {
+		start = 0
+		end = Income_numbers^num
+		value = i
+
+		if = {
+			limit = { check_variable = { Income_numbers^i > max } }
+			set_temp_variable = { max = Income_numbers^i }
+		}
+		if = {
+			limit = { check_variable = { Income_numbers^i < min } }
+			set_temp_variable = { min = Income_numbers^i }
+		}
+	}
+
+	# Simplified version of the range-finding code from Brazil
+	# Feel free to move or modify
+	# Our range is (min value / 1.1) - (max value * 1.1)
+	multiply_temp_variable = { max = 1.1 }
+	divide_temp_variable = { min = 1.1 }
+
+	if = {
+		limit = { check_variable = { min = max } }
+		add_to_temp_variable = { max = 0.05 }
+		subtract_from_temp_variable = { min = 0.05 }
+	}
+	if = {
+		limit = { check_variable = { min = 0 } }
+		set_temp_variable = { to_sub = max }
+		multiply_temp_variable = { to_sub = 0.1 }
+		subtract_from_temp_variable = { min = to_sub }
+	}
+
+	set_temp_variable = { range = max }
+	subtract_from_temp_variable = { range = min }
+
+	# Divide the range into 5 equally sized chunks
+	set_temp_variable = { display_increment = range }
+	divide_temp_variable = { display_increment = 4 }
+	set_temp_variable = { inflation_band_display = min }
+	for_loop_effect = {
+		end = 5
+		add_to_array = { incomecheck_y_label = inflation_band_display index = 0 }
+		add_to_temp_variable = { inflation_band_display = display_increment }
+	}
+
+	divide_temp_variable = { range = 100 }
+
+	# Get all segments Progress Bar values
+	clear_array = SAMPLE_graph_offsets
+	for_loop_effect = {
+		start = 0
+		end = 20
+		value = i
+
+		set_temp_variable = { j = i }
+		add_to_temp_variable = { j = 1 }
+
+		set_temp_variable = { hi = Income_numbers^j }
+		set_temp_variable = { lo = Income_numbers^i }
+
+		
+		subtract_from_temp_variable = { hi = min }
+		subtract_from_temp_variable = { lo = min }
+		divide_temp_variable = { hi = range }
+		divide_temp_variable = { lo = range }
+
+		round_temp_variable = hi
+		round_temp_variable = lo
+
+		set_temp_variable = { endpoints = lo }
+		multiply_temp_variable = { endpoints = 1000 }
+		add_to_temp_variable = { endpoints = hi }
+		add_to_array = { SAMPLE_graph_offsets = endpoints }
+
+	}
 }
