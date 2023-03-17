@@ -1265,6 +1265,68 @@ scripted_gui = {
 
         }
     }
+    #Generic
+	black_ops_projects_generic_selection_menu = {
+        context_type = player_context
+        window_name = "black_ops_projects_generic_selection_menu"
+		parent_window_name = "paramilitary_tab_menu_window"
+        dynamic_lists = {
+            generic_selection_menu_listing_grid = {
+                array = generic_selection_menu_list #List of Countries
+                change_scope = yes
+				entry_container = generic_selection_menu_list_entry
+            }
+        }
+		ai_enabled = {
+			always = no
+		}
+        visible = {
+            check_variable = {
+                generic_operations_selected_target = 0
+            }
+            check_variable = {
+                show_generic_operations = 1
+            }
+        }
+        effects = { 
+            generic_selection_menu_list_entry_button_click = {
+                set_variable = {
+                    ROOT.generic_operations_selected_target = v
+                }
+                set_variable = {
+                    ci_strength_temp = THIS.modifier@drift_defence_factor
+                }
+                subtract_from_variable = {
+                    ci_strength_temp = 1
+                }
+                set_variable = {
+                    ROOT.national_ci_strength^v = ci_strength_temp
+                }
+            }
+        }
+    }
+	black_ops_projects_generic_selected_menu = {
+        context_type = player_context
+        window_name = "black_ops_projects_generic_selected_menu"
+		parent_window_name = "paramilitary_tab_menu_window"
+
+		ai_enabled = {
+			always = no
+		}
+        visible = {
+            NOT = {
+                check_variable = {
+                    generic_operations_selected_target = 0
+                }
+            }
+            check_variable = {
+                show_generic_operations = 1
+            }
+        }
+        effects = {
+
+        }
+    }
     #Projects
 	black_ops_projects_bay_of_pigs_menu = {
         context_type = player_context
@@ -1312,6 +1374,49 @@ scripted_gui = {
 		}
 		effects = {
 			black_ops_projects_entry_button_click = { 
+            clear_array = local_possible_operations
+            clear_array = local_possible_operations_risk_level
+            clear_array = local_possible_operations_operation_type
+            clear_array = local_possible_operations_money_cost
+            clear_array = local_possible_operations_repeatable_condition
+            clear_array = local_possible_operations_target
+            clear_array = local_possible_operations_id_token
+            clear_array = local_possible_operations_personnel_target
+            if = {
+                limit = {
+                    check_variable = { ROOT.black_ops_project_list^i = 100}
+                }
+                clear_array = generic_selection_menu_list
+                set_variable = {
+                    generic_operations_selected_target = 0
+                }
+                every_country = {
+                    limit = {
+                        NOT = {
+                            tag = ROOT
+                        }
+                    }
+                    add_to_array = {
+                        ROOT.generic_selection_menu_list = THIS
+                    }
+                }
+                set_variable = {
+                    show_generic_operations = 1
+                } 
+                #for_each_loop = {
+                #    array = EGY.army_leaders
+                #    add_to_array = { local_possible_operations = 3 }
+                #    add_to_array = { local_possible_operations_risk_level = 5 }
+                #    add_to_array = { local_possible_operations_operation_type = 7 }
+                #    add_to_array = { local_possible_operations_money_cost = 100 }
+                #    add_to_array = { local_possible_operations_repeatable_condition = 1 }
+                #
+                #    add_to_array = { USA.local_possible_operations_id_token = 100 }
+                #    add_to_array = { USA.local_possible_operations_personnel_target = v }
+                #    add_to_array = { USA.local_possible_operations_target = EGY.id }
+                #}
+                
+            }
             if = {                  
                 limit = {
                     tag = USA
