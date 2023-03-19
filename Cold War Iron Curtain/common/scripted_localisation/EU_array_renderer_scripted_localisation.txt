@@ -1,0 +1,182 @@
+### Entry Points, defined per-user, pass your array as `param_array` and various parameters:
+# param_infix: If you pass a token here, its localization will be used as the list infix instead of \n, for example: ", "
+# param_last_infix: If you pass a token here, its localization will be used as the list infix for the last element in the list, for example: ", and"
+# param_renderer: Pass one of the array_element_renderer_* ideas from common/ideas/EU_array_renderer.txt to use a special renderer. Defaults to just printing numeric values.
+# param_cutoff: The number of elements to render before cutting off recursion, defaults to 30 (the default value of `NGame.MAX_SCRIPTED_LOC_RECURSION`.)
+# param_cutoff_suffix: If you pass a token here, its localization will be used as the indicator for a list that has exceeded param_cutoff, instead of "..."
+defined_text = {
+	name = render_test_array
+	text = {
+		trigger = {
+			# Idiom to copy `test_array` into temp array `param_array`
+			clear_temp_array = param_array
+			all_of = { array = test_array value = val add_to_temp_array = { param_array = val } }
+      # Set options up for a comma-separated list of rounded integers
+      set_temp_variable = { param_infix = token:array_infix_comma }
+      if = { 
+        limit = { check_variable = { param_array^num = 2 } } 
+        set_temp_variable = { param_last_infix = token:array_last_infix_and_no_oxford } 
+      }
+      else = { 
+        set_temp_variable = { param_last_infix = token:array_last_infix_and_oxford } 
+      }
+      set_temp_variable = { param_renderer = token:array_element_renderer_int }
+      # Cutoff at 4 for testing
+      set_temp_variable = { param_cutoff = 4 }
+      # set_temp_variable = { param_cutoff_suffix = token:array_cutoff_suffix_none }
+		}
+		localization_key = "[render_array]"
+	}
+}
+
+### Internal scripted locs
+
+### Renders the temp array `param_array` based on the values of the optional temp variables `param_infix`, `param_last_infix`, and `param_renderer`.
+# The default behaviour, if none of the option parameters are present, is to render a newline-separated list of unformatted numbers.
+# Be sure to set the define `NGame.MAX_SCRIPTED_LOC_RECURSION` to a value greater than the maximum list length you will be rendering!
+# If you do change that define, be sure to change the default value for `param_cutoff` in here!
+defined_text = {
+	name = render_array
+	text = {
+		trigger = {
+			check_variable = { param_array^num > 0 }
+			# Our loop index is off-kilter, so it needs to be started at -1.
+			set_temp_variable = { i = -1 }
+			# Precalculate last_index for later.
+			set_temp_variable = { last_index = param_array^num }
+			subtract_from_temp_variable = { last_index = 1 }
+      # If we haven't got a valid param_cutoff, use a default value.
+      if = { 
+        limit = { check_variable = { param_cutoff?0 < 1 } }
+        set_temp_variable = { param_cutoff = 25 } # Set this to about 5 less than the value of `NGame.MAX_SCRIPTED_LOC_RECURSION`, for safety.
+      }
+      # If we haven't got a valid param_cutoff_suffix, use the default, which is array_cutoff_suffix_ellipsis ("...").
+      if = { limit = { check_variable = { param_cutoff_suffix?0 = 0 } } set_temp_variable = { param_cutoff_suffix = token:array_cutoff_suffix_ellipsis } }
+		}
+		localization_key = "[render_array_inner]"
+	}
+}
+
+### The meat of the array-rendering system: the recursive "loop" over `param_array`. 
+# Increments i, checks its bounds, and retrieves the appropriate value from param_array to call the renderer locs, then calls itself recursively.
+# Funnily enough, this is actually tail-recursive (the last "function" it calls before returning is itself),
+# which would make it subject to tail-call optimization (compiling down to an efficient loop) in a proper functional language.
+# Unfortunately, Clausewitz is... not such a language, to say the least lmao
+defined_text = {
+  name = render_array_inner
+	text = { # Loop case: increment i, then if it is within the array bounds, render the element at i and then call render_array_inner to continue.
+		trigger = {
+			add_to_temp_variable = { i = 1 } 
+			AND = { 
+        check_variable = { i < param_array^num }
+        check_variable = { i < param_cutoff }
+      }
+      set_temp_variable = { v = param_array^i }
+		} 
+		localization_key = "[render_array_infix][render_array_element][render_array_inner]" # Recurse!
+	}
+  text = { # Cutoff case: when we have exceeded param_cutoff without reaching the end of the array, render the cutoff suffix and stop recursing.
+    trigger = { check_variable = { i = param_cutoff } check_variable = { i < param_array^num }       log = "[?param_cutoff_suffix.GetTokenKey]"
+}
+    localization_key = "[?param_cutoff_suffix.GetTokenLocalizedKey]"
+  }
+  text = { # Base case: when we have reached the end of the array, stop recursing.
+    localization_key = ""
+  }
+}
+
+### Renders the infix (like a newline or a comma) going before each element, according to param_infix and param_last_infix.
+# param_infix is the infix for the body of the list, param_last_infix is an optional override for the last element in the list.
+defined_text = {
+	name = render_array_infix
+	text = { # No infix precedes the first element
+		trigger = { check_variable = { i = 0 } }
+		localization_key = ""
+	}
+	text = { # If we have a custom last-infix defined, for things like ", and", use it if this is the last index (num - 1)
+		trigger = {
+			has_variable = param_last_infix
+			check_variable = { i = last_index?-1 }
+		}
+		localization_key = "[?param_last_infix.GetTokenLocalizedKey]"
+	}
+	text = { # If we have a custom infix defined, use it
+		trigger = { has_variable = param_infix }
+		localization_key = "[?param_infix.GetTokenLocalizedKey]"
+	}
+	text = { # Otherwise, fall back to a newline-separated list
+		localization_key = array_infix_newline
+	}
+}
+
+### Renders each element of the array, potentially with user-defined custom rendering behaviour.
+# These can't be defined using GetTokenLocalizedKey, because the pasted text does not get expanded.
+# You can define your own custom renderer behaviours at the bottom, 
+# by adding cases checking for the relevant custom renderer ideas, defined in the appropriate part of `common/ideas/EU_array_renderer.txt`.
+defined_text = {
+	name = render_array_element
+  text = {
+    trigger = { check_variable = { param_renderer?0 = 0 } }
+		localization_key = "[?v]"
+	}
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_token } }
+		localization_key = "[?v.GetTokenLocalizedKey]"
+	}
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_token_raw } }
+		localization_key = "[?v.GetTokenKey]"
+	}
+	text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_get_name } }
+		localization_key = "[?v.GetName]"
+	}
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_get_name_def } }
+		localization_key = "[?v.GetNameDef]"
+	}
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_get_name_def_cap } }
+		localization_key = "[?v.GetNameDefCap]"
+	}
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_get_adjective } }
+		localization_key = "[?v.GetAdjective]"
+	}
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_get_adjective_cap } }
+		localization_key = "[?v.GetAdjectiveCap]"
+	}
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_get_name_with_flag } }
+		localization_key = "[?v.GetNameWithFlag]"
+	}
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_get_flag } }
+		localization_key = "[?v.GetFlag]"
+	}
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_get_tag } }
+		localization_key = "[?v.GetTag]"
+  }
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_get_id } }
+		localization_key = "[?v.GetID]"
+	}
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_int } }
+		localization_key = "[?v|0]"
+	}
+  text = {
+		trigger = { check_variable = { param_renderer = token:array_element_renderer_numeric } }
+		localization_key = "[?v]"
+	}
+  ############################################
+  ### DEFINE CUSTOM ELEMENT RENDERERS HERE ###
+
+  ####### END CUSTOM ELEMENT RENDERERS #######
+  ############################################
+	text = {
+		localization_key = "[?v]"
+	}
+}

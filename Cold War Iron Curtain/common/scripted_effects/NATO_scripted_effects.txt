@@ -1,0 +1,465 @@
+control_my_states = {
+	every_owned_state = {
+		PREV = {
+			transfer_state = PREV
+		}
+	}
+}
+
+NATO_initialize_voting = {
+	for_each_scope_loop = {
+		array = NAT.NATO_member_countries 
+
+		activate_targeted_decision = { target = THIS decision = NATO_vote_yes }
+		activate_targeted_decision = { target = THIS decision = NATO_vote_no }
+		activate_targeted_decision = { target = THIS decision = NATO_vote_neutral }
+
+		activate_mission = NATO_vote_mission
+
+		country_event = {
+			id = twrta.1014
+			days = 0 
+		}
+
+		for_each_scope_loop = {
+			array = NAT.NATO_member_countries
+
+			activate_targeted_decision = { target = PREV decision = NATO_ai_whip_positive }
+			#activate_targeted_decision = { target = PREV decision = NATO_ai_whip_negative } #deprecated
+		}
+
+		if = {
+			limit = {
+				NOT = { has_variable = NATO_vote_intention }
+			}
+			set_variable = { NATO_vote_intention = 0 }
+		}
+
+		if = {
+			limit = {
+				is_ai = no 
+			}
+			set_variable = { NATO_vote_intention = 0 }
+		}
+
+	}
+	
+	custom_effect_tooltip = NATO_begin_voting
+
+	add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+}
+
+NATO_cleanup_voting = {
+	for_each_scope_loop = {
+		array = NAT.NATO_member_countries 
+
+		clear_variable = NATO_vote_value
+		clear_variable = NATO_vote_intention
+		clr_country_flag = NATO_voted_on_issue
+
+		remove_mission = NATO_vote_mission
+		remove_targeted_decision = { target = THIS decision = NATO_vote_yes }
+		remove_targeted_decision = { target = THIS decision = NATO_vote_no }
+		remove_targeted_decision = { target = THIS decision = NATO_vote_neutral }
+		for_each_scope_loop = {
+			array = NAT.NATO_member_countries 
+
+			remove_targeted_decision = { target = PREV decision = NATO_ai_whip_positive }
+			#remove_targeted_decision = { target = PREV decision = NATO_ai_whip_negative } deprecated
+		}
+
+		NAT = { clear_variable = NATO_issue_id }
+	}
+	add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+	clear_global_event_target = NATO_toronto_accord_applicant
+}
+
+NATO_whip_positive = {
+	hidden_effect = {
+		if = { limit = { NATO_calculate_positive_whip_cost = yes } }
+		var:NATO_whipper = { 
+			var:NATO_whippee = {
+				country_event = {
+					id = twrta.1001
+					days = 1 
+				}
+				set_country_flag = { flag = has_been_whipped_by_@PREV days = 30 value = 1 }
+			}
+			set_temp_variable = { NATO_pp_spent = NATO_whip_cost }
+			multiply_temp_variable = { NATO_pp_spent = -1 }
+			add_political_power = NATO_pp_spent
+		}
+	}
+	set_country_flag = NATO_has_been_whipped_recently
+	custom_effect_tooltip = NATO_whip_positive_click_tt
+	add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+}
+
+NATO_whip_negative = {
+	hidden_effect = {
+		if = { limit = { NATO_calculate_negative_whip_cost = yes } }
+		var:NATO_whipper = { 
+			var:NATO_whippee  = {
+				country_event = {
+					id = twrta.1004
+					days = 1 
+				}
+				set_country_flag = { flag = has_been_whipped_by_@PREV days = 30 value = 1 }
+			}
+			set_temp_variable = { NATO_pp_spent = NATO_whip_cost }
+			multiply_temp_variable = { NATO_pp_spent = -1 }
+			add_political_power = NATO_pp_spent
+		}
+	}
+	set_country_flag = NATO_has_been_whipped_recently
+	custom_effect_tooltip = NATO_whip_negative_click_tt
+	add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+}
+
+NATO_sort_membership = {
+	NAT = {
+		get_sorted_scored_countries = {
+			scorer = NATO_ranking_scorer
+			array = NATO_member_countries 
+		}
+		add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+
+		for_each_scope_loop = { #target trigger doesn't work lel
+			array = NAT.faction_members 
+
+			if = {
+				limit = { is_subject = yes }
+				remove_from_array = { array = NAT.NATO_member_countries value = THIS } 
+			}
+		}
+	}
+}
+
+NATO_join = {
+	add_to_array = { NAT.NATO_member_countries = THIS }
+
+	custom_effect_tooltip = NATO_join_effect
+	add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+}
+
+NATO_leave = {
+	remove_from_array = { NAT.NATO_member_countries = THIS }
+
+	custom_effect_tooltip = NATO_leave_effect
+	add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+}
+
+NATO_become_major = {
+	set_country_flag = NATO_major_member
+
+	custom_effect_tooltip = NATO_become_major_effect
+	add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+}
+
+NATO_stop_major = {
+	clr_country_flag = NATO_major_member
+
+	custom_effect_tooltip = NATO_stop_major_effect
+	add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+}
+
+NATO_recalculate_member_effects = {
+	set_variable = { NAT.NATO_GATT_bonus = global.TWR_UN_array^num }
+	multiply_variable = { NAT.NATO_GATT_bonus = 0.002 }
+
+	if = {
+		limit = {
+			NOT = { check_variable = { NAT.NATO_prev_military_cooperation = NAT.NATO_military_cooperation } }
+		}
+		for_each_scope_loop = {
+			array = NAT.NATO_member_countries
+			
+			NATO_apply_military_effects = yes 
+		}
+		add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+	}
+	if = {
+		limit = {
+			NOT = { check_variable = { NAT.NATO_prev_political_integration = NAT.NATO_political_integration } }
+		}
+
+		for_each_scope_loop = { 
+			array = NAT.NATO_member_countries
+
+			NATO_apply_political_effects = yes 
+		}
+		add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+	}
+	set_variable = { NAT.NATO_prev_military_cooperation =  NAT.NATO_military_cooperation }
+	set_variable = { NAT.NATO_prev_political_integration = NAT.NATO_political_integration } 
+}
+
+NATO_apply_military_effects = {
+
+	if = {
+		limit = { 
+			check_variable = { NAT.NATO_military_cooperation < 20 } 
+		}
+		remove_ideas = NATO_military_1_idea 
+	}
+	else = {
+		add_ideas = NATO_military_1_idea 
+	}
+
+	if = {
+		limit = { 
+			check_variable = { NAT.NATO_military_cooperation < 40 } 
+		}
+		remove_ideas = NATO_military_2_idea 
+	}
+	else = {
+		add_ideas = NATO_military_2_idea 
+	}
+
+	#3 is controlled by a cycling event 
+
+	if = {
+		limit = { 
+			check_variable = { NAT.NATO_military_cooperation < 75 } 
+		}
+		remove_ideas = NATO_military_4_idea 
+	}
+	else = {
+		add_ideas = NATO_military_4_idea 
+	}
+
+	if = {
+		limit = { 
+			check_variable = { NAT.NATO_military_cooperation < 90 } 
+		}
+		remove_ideas = NATO_military_5_idea 
+	}
+	else = {
+		add_ideas = NATO_military_5_idea 
+	}
+}
+
+NATO_apply_political_effects = {
+	#1 is handled in on_actions
+
+	if = {
+		limit = { 
+			check_variable = { NAT.NATO_political_integration < 35 } 
+		}
+		remove_ideas = NATO_political_2_idea 
+	}
+	else = {
+		add_ideas = NATO_political_2_idea 
+	}
+
+	if = {
+		limit = { 
+			check_variable = { NAT.NATO_political_integration < 50 } 
+		}
+		remove_ideas = NATO_political_3_idea 
+	}
+	else = {
+		add_ideas = NATO_political_3_idea 
+	}
+
+	if = {
+		limit = { 
+			check_variable = { NAT.NATO_political_integration < 75 } 
+		}
+		remove_ideas = NATO_political_4_idea 
+	}
+	else = {
+		add_ideas = NATO_political_4_idea 
+	}
+
+	if = {
+		limit = { 
+			check_variable = { NAT.NATO_political_integration < 90 } 
+		}
+		remove_ideas = NATO_political_5_idea 
+	}
+	else = {
+		add_ideas = NATO_political_5_idea 
+	}
+}
+
+NATO_remove_all_effects = {
+	remove_ideas = {
+		NATO_military_1_idea
+		NATO_military_2_idea
+		NATO_military_4_idea
+		NATO_military_5_idea
+		NATO_political_2_idea
+		NATO_political_3_idea
+		NATO_political_4_idea
+		NATO_political_5_idea
+	}
+}
+
+NATO_issue_1_effect = {
+	#put the effects you want to do here!
+	custom_effect_tooltip = "NOR_INTERVENTION_BILL"
+	set_global_flag = TA_INTERVENING_IN_NOR
+	NOR = {
+	country_event = twrTAnew.1
+	}
+	every_country = {
+	limit = { is_ally_with = NATO }
+	reverse_add_opinion_modifier = {
+    target = NOR
+    modifier = medium_increase
+		}
+	add_opinion_modifier = {
+    target = NOR
+    modifier = medium_increase
+		}
+	}
+	ENG = {
+	add_equipment_to_stockpile = {
+	    type = anti_tank_equipment
+	    amount = -100
+		}
+	}
+	NAT = {
+	add_equipment_to_stockpile = {
+	    type = infantry_equipment
+	    amount = -500
+		}
+	}
+}
+
+NATO_issue_2_effect = {
+
+	hidden_effect = {
+		HSS = {
+			country_event = { 
+				id = twrta.2000
+			}
+		}
+		GER = {
+			country_event = { 
+				id = twrta.2000
+			}
+		}
+		HGR = {
+			country_event = { 
+				id = twrta.2000
+			}
+		}
+	}
+
+	custom_effect_tooltip = NATO_foretop_effect_tt
+
+	effect_tooltip = {
+		ROOT = {
+			add_timed_idea = {
+				idea = NATO_exercise_foretop
+				days = 180
+			}
+			set_variable = { THIS.idea_len_@token:NATO_exercise_foretop = 180 }
+			set_variable = { THIS.idea_date_@token:NATO_exercise_foretop = global.num_days }
+	
+	
+			navy_experience = 10
+			air_experience = 10 
+			army_experience = 2.5 
+		}
+	}
+
+	
+
+	add_to_variable = {
+		NATO_military_cooperation = 4
+		tooltip = NATO_military_cooperation_change_tt
+	}
+
+	for_each_scope_loop = {
+		array = NAT.NATO_member_countries 
+
+		add_timed_idea = {
+			idea = NATO_exercise_foretop
+			days = 180
+		}
+		set_variable = { THIS.idea_len_@token:NATO_exercise_foretop = 180 }
+		set_variable = { THIS.idea_date_@token:NATO_exercise_foretop = global.num_days }
+
+
+		navy_experience = 10
+		air_experience = 10 
+		army_experience = 2.5 
+
+		country_event = {
+			id = twrta.2001 
+			days = 5 
+		}
+
+	}
+}
+
+NATO_issue_3_effect = {
+	#put the effects you want to do here!
+	custom_effect_tooltip = "NATO_APPLICATION_BILL"
+
+	event_target:NATO_toronto_accord_applicant = {
+		add_ideas = nato_member
+		NATO_apply_military_effects = yes 
+		NATO_apply_political_effects = yes 
+		country_event = twrta.3001
+	}
+	clear_global_event_target = NATO_toronto_accord_applicant
+	add_to_variable = {
+		NATO_military_cooperation = -1
+		tooltip = NATO_military_cooperation_change_tt
+	}
+	add_to_variable = {
+		NATO_political_integration = -1
+		tooltip = NATO_civil_integration_change_tt
+	}
+}
+
+NATO_motion_to_join = {
+	set_variable = { NAT.NATO_issue_id = 3 }
+	custom_effect_tooltip = "TA_FORMAL_JOIN_MOTION_START"
+	ROOT = {
+	save_global_event_target_as = NATO_toronto_accord_applicant
+	}
+	if = {
+	limit = { event_target:NATO_toronto_accord_applicant = { tag = FRA } }
+		AST = { 
+			set_variable = { NATO_vote_intention = 5 }
+		}
+		ENG = { 
+			set_variable = { NATO_vote_intention = 5 } #countries with voting intentions 10 < or -10> will automatically whip
+		}
+		CAN = { 
+			set_variable = { NATO_vote_intention = 5 } 
+		}
+		USA = { 
+			set_variable = { NATO_vote_intention = 10 }
+		}
+	}
+	NATO_initialize_voting = yes 
+}
+
+
+#CWIC OPERATIONS
+NATO_issue_10_effect = {
+	hidden_effect = {
+		GRE = {
+			country_event = { 
+				id = NATO_INTERVENTION.10
+			}
+		}
+	}
+	effect_tooltip = {
+		GRE = {
+			country_event = { 
+				id = NATO_INTERVENTION.10
+			}
+		}
+	}
+	add_to_variable = {
+		NATO_military_cooperation = 2
+		tooltip = NATO_military_cooperation_change_tt
+	}
+}
