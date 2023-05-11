@@ -290,6 +290,10 @@ scripted_gui = {
                     selected_operation_index_target = local_possible_operations_target^i
                 }
                 set_variable = {
+                    selected_operation_personnel_target = local_possible_operations_personnel_target^i
+                }
+                
+                set_variable = {
                     selected_operation_index_id_token = local_possible_operations_id_token^i
                 }
                 set_variable = {
@@ -307,6 +311,7 @@ scripted_gui = {
                 set_variable = {
                     selected_operation_index_mission_duration = global.mission_type_length^selected_operation_index_mission_type
                 }
+
                 if = {
                     limit = {
                         check_variable = {
@@ -1298,7 +1303,7 @@ scripted_gui = {
         visible = {
             check_variable = {
                 generic_operations_selected_target = 0
-            }
+            } 
             check_variable = {
                 show_generic_operations = 1
             }
@@ -1328,7 +1333,10 @@ scripted_gui = {
                 }
                 if = {
                     limit = {
-                        ROOT.espionage_network_status^v = 0
+                        check_variable = {
+                            ROOT.espionage_network_status^v = 0
+                        }
+                        
                     }
                     add_to_array = { ROOT.local_generic_possible_operations_operation_type = 100 }
 
@@ -1339,6 +1347,37 @@ scripted_gui = {
                     add_to_array = { ROOT.local_possible_operations_repeatable_condition = 1 }
                     add_to_array = { ROOT.local_possible_operations_id_token = 1 }
                     add_to_array = { ROOT.local_possible_operations_target = v }
+                    add_to_array = { ROOT.local_possible_operations_personnel_target = 1 }  #Void
+                }
+                else = {    #If Established Mission to Expand Network
+                    add_to_array = { local_generic_possible_operations_operation_type = 12 }
+
+                    add_to_array = { ROOT.local_possible_operations = 2 }
+                    add_to_array = { ROOT.local_possible_operations_risk_level = 2 }
+                    add_to_array = { ROOT.local_possible_operations_operation_type = 19 }
+                    add_to_array = { ROOT.local_possible_operations_money_cost = 25 }
+                    add_to_array = { ROOT.local_possible_operations_repeatable_condition = 2 }
+                    add_to_array = { ROOT.local_possible_operations_id_token = 2 }
+                    add_to_array = { ROOT.local_possible_operations_target = history_target }
+                    add_to_array = { ROOT.local_possible_operations_personnel_target = 1 }  #Void
+
+                    #Assasinate Admirals
+                    #Sabotage Nuclear Programme
+                    #Sabotage Nuclear Site
+                    #Sabotage Airfield
+                    #Sabotage Military Industry
+                    #Sabotage Dockyard
+                    #Sabotage Port
+                    #Sabotage Civilian Industry
+                    #Blow Up Key Infrastructure
+                    #Perform Terrorist Attack
+                    #Prepare Local Uprising
+                    #Contact Resistance Group 
+                    #Train Local Resistance
+                    #Arm Local Resistance
+                    #Embed into Insurgency
+                    #Counter Espionage Embed
+                    #Steal Technology
                 }
             }
         }
@@ -1369,9 +1408,38 @@ scripted_gui = {
                 show_generic_operations = 1
             }
         }
+        triggers = {
+            name_toggle_unconfirm_visible = {
+                check_variable = {
+                    generic_operation_types_confirm^i = 0
+                }
+            }
+            name_toggle_confirm_visible = {
+                check_variable = {
+                    generic_operation_types_confirm^i = 1
+                }              
+            }          
+        }
 
-        effects = {
-
+        effects = {   
+            name_toggle_unconfirm_click = {
+                set_variable = {
+                    generic_operation_types_confirm^i = 1
+                }    
+                var:generic_operations_selected_target = {
+                    #add_tech_stealing_operations = yes
+                    #add_assassinate_generals_operations = yes
+                    #add_assassinate_admirals_operations = yes
+                    #add_terrorist_attack_operations = yes
+                    #add_local_uprising_operations = yes
+                    add_arms_factory_sabotage_operations = yes
+                }
+            }
+            name_toggle_confirm_click = {
+                set_variable = {
+                    generic_operation_types_confirm^i = 0
+                }              
+            }
         }
     }
     #Projects
