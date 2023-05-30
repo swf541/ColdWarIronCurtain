@@ -589,16 +589,100 @@ add_local_uprising_operations = {
 		}
 	}
 }
-
-                    #Contact Resistance Group 
-                    #Train Local Resistance
+add_resistance_contacts_operations = {
+	for_each_scope_loop = {
+		array = controlled_states
+		if = {
+			limit = {
+				has_active_resistance = yes
+				NOT = { is_in_array = { local_resistance_contacts = ROOT } }
+			}
+			add_to_array = { ROOT.local_possible_operations = 15 }
+			add_to_array = { ROOT.local_possible_operations_risk_level = 5 }
+			add_to_array = { ROOT.local_possible_operations_operation_type = 22 }
+			add_to_array = { ROOT.local_possible_operations_money_cost = 50 }
+			add_to_array = { ROOT.local_possible_operations_repeatable_condition = 2 }
+		
+			add_to_array = { ROOT.local_possible_operations_id_token = 15 }
+			add_to_array = { ROOT.local_possible_operations_personnel_target = THIS }
+			add_to_array = { ROOT.local_possible_operations_target = PREV.id }
+		}
+	}
+}
+add_train_resistance_operations = {
+	for_each_scope_loop = {
+		array = controlled_states
+		if = {
+			limit = {
+				has_active_resistance = yes
+				is_in_array = { local_resistance_contacts = ROOT } 
+				NOT = {
+					set_state_flag = {
+						flag = Recent_Resistance_Training_Mission
+						days = 30
+						value = 1
+					}
+				}
+				#NOT = {
+				#	has_dynamic_modifier = {
+				#		modifier = trained_resistance
+				#	}
+				#}
+			}
+			add_to_array = { ROOT.local_possible_operations = 16 }
+			add_to_array = { ROOT.local_possible_operations_risk_level = 3 }
+			add_to_array = { ROOT.local_possible_operations_operation_type = 18 }
+			add_to_array = { ROOT.local_possible_operations_money_cost = 50 }
+			add_to_array = { ROOT.local_possible_operations_repeatable_condition = 2 }
+		
+			add_to_array = { ROOT.local_possible_operations_id_token = 16 }
+			add_to_array = { ROOT.local_possible_operations_personnel_target = THIS }
+			add_to_array = { ROOT.local_possible_operations_target = PREV.id }
+		}
+	}
+}
                     #Arm Local Resistance
-                    #Embed into Insurgency
-                    #Counter Espionage Embed
 
-
-
-
+add_insurgency_embed_operations = {
+	for_each_scope_loop = {
+		array = active_insurgencies
+		if = {
+			limit = {
+				NOT = {
+					is_in_array = {
+						ROOT.insurgency_support = THIS
+					}
+				}
+			}
+			add_to_array = { ROOT.local_possible_operations = 18 }
+			add_to_array = { ROOT.local_possible_operations_risk_level = 5 }
+			add_to_array = { ROOT.local_possible_operations_operation_type = 1 }
+			add_to_array = { ROOT.local_possible_operations_money_cost = 50 }
+			add_to_array = { ROOT.local_possible_operations_repeatable_condition = 2 }
+		
+			add_to_array = { ROOT.local_possible_operations_id_token = 18 }
+			add_to_array = { ROOT.local_possible_operations_personnel_target = THIS }
+			add_to_array = { ROOT.local_possible_operations_target = PREV.id }
+		}
+	}
+}
+add_counter_insurgency_embed_operations = {
+	if = {
+		limit = {
+			NOT = { is_in_array = { PREV.counter_insurgency_embed = ROOT } }
+			has_active_resistance = yes
+		}
+		add_to_array = { ROOT.local_possible_operations = 19 }
+		add_to_array = { ROOT.local_possible_operations_risk_level = 3 }
+		add_to_array = { ROOT.local_possible_operations_operation_type = 25 }
+		add_to_array = { ROOT.local_possible_operations_money_cost = 50 }
+		add_to_array = { ROOT.local_possible_operations_repeatable_condition = 2 }
+	
+		add_to_array = { ROOT.local_possible_operations_id_token = 19 }
+		add_to_array = { ROOT.local_possible_operations_personnel_target = THIS }
+		add_to_array = { ROOT.local_possible_operations_target = PREV.id }
+	}
+}
 add_tech_stealing_operations = {
 	for_each_loop = {   
 		array = researched_techs
