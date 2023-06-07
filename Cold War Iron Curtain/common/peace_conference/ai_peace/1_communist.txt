@@ -1,0 +1,504 @@
+# Logic for Communist AI on how to deal in peace conferences
+# Should favor annexing other nations and taking their states
+# Written by Henrik "Groogy" Hansson
+
+#Adjustments
+#The generic communist AI will very strongly prefer establishing puppet states and liberation, annexing only if they have a valid war goal.
+#Communists will not expand overseas/into islands unless they have a core, preferring satellites instead.
+#Soviet Union should/will have its own AI.
+
+communist_peace = {
+	enable = {
+		has_government = communism
+	}
+
+	annex_randomness = 0 #200
+	liberate_randomness = 0 #100
+	puppet_randomness = 0 #400
+	take_states_randomness = 0 #200
+	force_government_randomness = 0 #100
+	
+	# ROOT = Taker, FROM = Giver
+	annex = {
+		factor = 500
+		
+		modifier = {
+			factor = 0
+			OR = {
+				NOT = {
+					has_annex_war_goal = FROM
+				}
+				NOT = {
+					is_owner_neighbor_of = FROM
+				}
+			}
+			FROM = {
+				any_owned_state = { 
+					NOT = {
+						OR = { 
+							is_claimed_by = ROOT
+							is_core_of = ROOT
+							has_claimed_state_in_peace_conference = ROOT
+						}
+					}
+				}
+			}
+		}
+		#modifier = {
+		#	factor = 0
+		#	is_puppet = yes
+		#}		
+	}
+
+	# ROOT = Taker, FROM = Liberated
+	liberate = { #Liberate might be buggy and might require country-specific workarounds...
+		factor = 200 
+
+		modifier = {
+			factor = 0
+
+			NOT = {
+				ai_liberate_desire = {
+					target = FROM
+					value > 0
+				}
+			}		
+			NOT = {
+				FROM = {
+					has_government = communism
+				}			
+			}
+		}
+		modifier = { 
+			factor = 0
+			OR = {
+				AND = {
+					#Is NOT a major
+					NOT = { num_of_factories > 100 }
+					NOT = { tag = GER }
+					NOT = { tag = ENG }
+					NOT = { tag = ITA }
+					NOT = { tag = FRA }
+					NOT = { tag = USA }
+					NOT = { tag = JAP }
+					NOT = { tag = SOV }
+				}
+				is_puppet = yes
+			}
+		}
+		#YALTA CONFERENCE
+		modifier = { #Release WGR if cores exist, let USSR have DDR
+			factor = 10
+			FROM = {
+				tag = DDR
+			}
+		}
+		modifier = { 
+			factor = 0
+			FROM = { tag = WGR }
+		}
+
+		modifier = { #Don't release fascist states in Europe
+			factor = 0
+			FROM = {
+				OR = {
+					tag = CRO
+					tag = SER
+					tag = SLO
+				}
+			}
+		}
+	}
+
+	# ROOT = Taker, FROM = Giver
+	puppet = {
+		factor = 800
+		modifier = {
+			factor = 0
+			NOT = { is_owner_neighbor_of = FROM }
+			NOT = {
+				FROM = {
+					any_neighbor_country = {
+						is_puppet_of = ROOT
+					}
+				}
+			}
+			NOT = {
+				FROM = {
+					any_owned_state = {
+						any_neighbor_state = {
+							OR = {
+								owner = { tag = ROOT }
+								owner = { is_puppet_of = ROOT }
+								has_claimed_state_in_peace_conference = ROOT
+							}
+						}
+					}
+				}
+			}
+			OR = {
+				FROM = { capital_scope = { is_on_continent = europe } }
+				NOT = {
+					FROM = {
+						any_owned_state = { 
+							OR = {
+								is_coastal = yes
+								is_island_state = yes
+							}
+						}
+					}
+				}
+				NOT = { any_owned_state = { OR = { is_coastal = yes is_island_state = yes } } }
+			}
+		}
+		modifier = {
+			factor = 0.5 #Strip colonies/liberate first - important vs GER and JAP
+			FROM = {
+				any_owned_state = { NOT = { is_core_of = FROM } }
+			}
+		}
+		modifier = { 
+			factor = 0
+			OR = {
+				AND = {
+					#Is NOT a major
+					NOT = { num_of_factories > 100 }
+					NOT = { tag = GER }
+					NOT = { tag = ENG }
+					NOT = { tag = ITA }
+					NOT = { tag = FRA }
+					NOT = { tag = USA }
+					NOT = { tag = JAP }
+					NOT = { tag = SOV }
+				}
+				is_puppet = yes
+			}
+		}
+		modifier = {
+			factor = 0
+			NOT = { is_owner_neighbor_of = FROM }
+			#Is NOT a major
+			NOT = { num_of_factories > 100 }
+			NOT = { tag = GER }
+			NOT = { tag = ENG }
+			NOT = { tag = ITA }
+			NOT = { tag = FRA }
+			NOT = { tag = USA }
+			NOT = { tag = JAP }
+			NOT = { tag = SOV }
+		}
+		modifier = { #Don't break up Czechoslovakia or Yugoslavia
+			factor = 0
+			YUG = { exists = yes }
+			FROM = {
+				OR = {
+					tag = CRO
+					tag = SER
+					tag = SLO
+				}
+			}
+		}
+		modifier = { #Don't puppet nations in civil war... this is too buggy.
+			factor = 0
+			FROM = { has_civil_war = yes }
+		}
+		#YALTA CONFERENCE
+		modifier = { #Release WGR if cores exist, let USSR have DDR
+			factor = 10
+			FROM = {
+				tag = DDR
+			}
+		}
+		modifier = { 
+			factor = 0
+			FROM = { tag = WGR }
+		}
+		#Don't puppet GER until WGR and DDR are fully released.
+		modifier = {
+			factor = 0
+			FROM = {
+				tag = GER
+				any_owned_state = {
+					OR = {
+						is_core_of = WGR
+						is_core_of = DDR
+					}
+				}
+			}
+		}
+		modifier = { #Do not release Sinkiang.
+			factor = 0
+			FROM = { tag = SIK }
+		}
+	}
+
+	# ROOT = Taker, FROM = State
+	take_states = {
+		factor = 200
+		modifier = {
+			factor = 20
+
+			FROM = {
+				OR = {
+					is_claimed_by = ROOT
+					is_core_of = ROOT
+				}
+			}
+		}
+		modifier = { # prefer not to take from humans in our own faction
+			factor = 0.5
+			NOT = { 
+				FROM = { 
+					OR = {
+						is_claimed_by = ROOT
+						is_core_of = ROOT
+					}
+				} 
+			}
+			FROM = {
+				controller = { 
+					is_ai = no 
+					has_capitulated = no 
+					is_puppet = no 
+					is_in_faction_with = ROOT
+				}
+			}
+		}
+		modifier = { #Don't steal claims and cores from faction members unless we also have a right to that clay unless they are puppets
+			factor = 0
+			NOT = { 
+				FROM = { 
+					OR = {
+						is_claimed_by = ROOT
+						is_core_of = ROOT
+					}
+				} 
+			}
+			any_country = {
+				is_in_faction_with = ROOT
+				is_puppet = no
+				FROM = {
+					OR = {
+						is_claimed_by = PREV
+						is_core_of = PREV
+					}
+				}
+			}
+		}
+		
+		modifier = {
+			factor = 1.25
+
+			capital_scope = {
+				distance_to = {
+					target = FROM
+					value < 100
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.25
+
+			capital_scope = {
+				distance_to = {
+					target = FROM
+					value < 200
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.25
+
+			capital_scope = {
+				distance_to = {
+					target = FROM
+					value < 300
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.25
+
+			capital_scope = {
+				distance_to = {
+					target = FROM
+					value < 400
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.5
+			FROM = {
+				OR = {
+					num_owned_neighbour_states = {
+						count > 1
+						owner = ROOT
+					}
+					num_claimed_peace_conference_neighbour_states = {
+						count > 1
+						owner = ROOT
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.5
+			FROM = {
+				OR = {
+					num_owned_neighbour_states = {
+						count > 2
+						owner = ROOT
+					}
+					num_claimed_peace_conference_neighbour_states = {
+						count > 2
+						owner = ROOT
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.5
+			FROM = {
+				OR = {
+					num_owned_neighbour_states = {
+						count > 3
+						owner = ROOT
+					}
+					num_claimed_peace_conference_neighbour_states = {
+						count > 3
+						owner = ROOT
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.5
+			FROM = {
+				OR = {
+					num_owned_neighbour_states = {
+						count > 4
+						owner = ROOT
+					}
+					num_claimed_peace_conference_neighbour_states = {
+						count > 4
+						owner = ROOT
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.5
+			FROM = {
+				OR = {
+					num_owned_neighbour_states = {
+						count > 5
+						owner = ROOT
+					}
+					num_claimed_peace_conference_neighbour_states = {
+						count > 5
+						owner = ROOT
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 0		
+			NOT = { 
+				FROM = { 
+					OR = {
+						is_claimed_by = ROOT
+						is_core_of = ROOT
+					}
+				} 
+			}
+			NOT = {
+				FROM = {
+					any_neighbor_state = {
+						OR = {
+							owner = { tag = ROOT }
+							has_claimed_state_in_peace_conference = ROOT
+						}
+					}
+				}
+			}
+			OR = {
+				NOT = {
+					FROM = { 
+						OR = {
+							is_island_state = yes
+							is_coastal = yes
+						}
+					}
+				}
+				NOT = { any_owned_state = { is_coastal = yes } }
+			}
+
+		}
+
+		modifier = { #Only take claims - and colonial states (ie unclaimed) as well if major.
+			factor = 0
+			NOT = { 
+				FROM = { 
+					OR = {
+						is_claimed_by = ROOT
+						is_core_of = ROOT
+					}
+				} 
+			}
+			OR = {
+				AND = {
+					#Is NOT a major
+					NOT = { num_of_factories > 100 }
+					NOT = { tag = GER }
+					NOT = { tag = ENG }
+					NOT = { tag = ITA }
+					NOT = { tag = FRA }
+					NOT = { tag = USA }
+					NOT = { tag = JAP }
+					NOT = { tag = SOV }
+				}
+				FROM = {
+					owner = {
+						FROM = { is_core_of = PREV }
+					}
+				}
+			}
+		}
+
+		modifier = { #Only take claimed/core land if a puppet.
+			factor = 0
+			is_puppet = yes
+			FROM = {
+				NOT = {
+					OR = { 
+						is_claimed_by = ROOT
+						is_core_of = ROOT
+					}
+				}
+			}
+		}
+		
+	}
+
+	# ROOT = Taker, FROM = Giver
+	force_government = {
+		factor = 50 #500 - prefer puppets instead.
+
+		modifier = {
+			factor = -1
+
+			FROM = {
+				has_government = communism
+			}
+		}
+	}
+}

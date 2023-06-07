@@ -1,0 +1,381 @@
+# Default Logic behaviour that the AI will fallback on if no other fits the bill
+# Should just be "good enough" to make sure the AI acts smart in the war
+# Written by Henrik "Groogy" Hansson
+
+#Adjustments
+#Default AI (ie neutral AI) will act like a mix between democratic and fascist, but in general way more conservative and mostly interested in obtaining cores and the status quo. If they have enough warscore, they will puppet/liberate neighbors as well.
+#Neutral AI in general do not directly annex other nations.
+#The plan is to eventually make individualized AI for every country in the game.
+
+default_peace = {
+	enable = {
+		always = yes
+	}
+
+	annex_randomness = 0 #350
+	liberate_randomness = 0 #100
+	puppet_randomness = 0 #200
+	take_states_randomness = 0 #150
+	force_government_randomness = 0 #50
+	
+	# ROOT = Taker, FROM = Giver
+	annex = {
+		factor = 500
+
+		modifier = {
+			factor = 0
+			NOT = {
+				has_annex_war_goal = FROM
+			}
+			FROM = {
+				any_owned_state = { 
+					NOT = {
+						OR = { 
+							is_claimed_by = ROOT
+							is_core_of = ROOT
+							has_claimed_state_in_peace_conference = ROOT
+						}
+					}
+				}
+			}
+			OR = {
+				NOT = {
+					has_annex_war_goal = FROM
+				}
+				NOT = {
+					is_owner_neighbor_of = FROM
+				}
+			}
+		}
+
+		#modifier = {
+		#	factor = 0
+		#	is_puppet = yes
+		#}
+	}
+
+	# ROOT = Taker, FROM = Liberated
+	liberate = {
+		factor = 0 #100
+		modifier = {
+			factor = 0
+	
+			NOT = {
+				ai_liberate_desire = {
+					target = FROM
+					value > 0
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			#Is NOT a major
+			NOT = { num_of_factories > 100 }
+			NOT = { tag = GER }
+			NOT = { tag = ENG }
+			NOT = { tag = ITA }
+			NOT = { tag = FRA }
+			NOT = { tag = USA }
+			NOT = { tag = JAP }
+			NOT = { tag = SOV }
+		}
+		#modifier = {
+		#	factor = 0
+		#	NOT = { is_owner_neighbor_of = FROM }
+		#}
+	}
+
+	# ROOT = Taker, FROM = Giver
+	puppet = {
+		factor = 0 #200
+		modifier = {
+			factor = 0
+			OR = {
+				NOT = { is_owner_neighbor_of = FROM }
+				AND = { 
+					FROM = {
+						OR = {
+							num_of_factories > 100
+							tag = GER
+							tag = ENG
+							tag = ITA
+							tag = FRA
+							tag = USA
+							tag = JAP
+							tag = SOV
+						}
+					}
+					#Is NOT a major
+					NOT = { num_of_factories > 100 }
+					NOT = { tag = GER }
+					NOT = { tag = ENG }
+					NOT = { tag = ITA }
+					NOT = { tag = FRA }
+					NOT = { tag = USA }
+					NOT = { tag = JAP }
+					NOT = { tag = SOV }
+				}
+			}
+		}
+		modifier = { #Don't puppet nations in civil war... this is too buggy.
+			factor = 0
+			FROM = { has_civil_war = yes }
+		}
+		modifier = { #Don't break up Czechoslovakia or Yugoslavia
+			factor = 0
+			YUG = { exists = yes }
+			FROM = {
+				OR = {
+					tag = CRO
+					tag = SER
+					tag = SLO
+				}
+			}
+		}
+		modifier = {
+			factor = 0.2 #Strip colonies/liberate first - important vs GER and JAP
+			FROM = {
+				any_owned_state = { NOT = { is_core_of = FROM } }
+			}
+		}
+		modifier = { #Not if we claim anything
+			factor = 0
+			FROM = {
+				any_owned_state = { 
+					is_claimed_by = ROOT
+					NOT = { has_claimed_state_in_peace_conference = ROOT }
+				}
+			}
+		}
+	}
+
+	# ROOT = Taker, FROM = State
+	take_states = {
+		factor = 50
+
+		modifier = {
+			factor = 20
+			FROM = {
+				OR = {
+					is_claimed_by = ROOT
+					is_core_of = ROOT
+				}
+			}
+		}
+		modifier = { #Do not take human held lands...
+			factor = 0
+			NOT = { 
+				FROM = { 
+					OR = {
+						is_claimed_by = ROOT
+						is_core_of = ROOT
+					}
+				} 
+			}
+			FROM = {
+				controller = { 
+					is_ai = no 
+					has_capitulated = no 
+					is_puppet = no 
+				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+
+			capital_scope = {
+				distance_to = {
+					target = FROM
+					value < 100
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.25
+
+			capital_scope = {
+				distance_to = {
+					target = FROM
+					value < 200
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.25
+
+			capital_scope = {
+				distance_to = {
+					target = FROM
+					value < 300
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.25
+
+			capital_scope = {
+				distance_to = {
+					target = FROM
+					value < 400
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.5
+			FROM = {
+				OR = {
+					num_owned_neighbour_states = {
+						count > 1
+						owner = ROOT
+					}
+					num_claimed_peace_conference_neighbour_states = {
+						count > 1
+						owner = ROOT
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.5
+			FROM = {
+				OR = {
+					num_owned_neighbour_states = {
+						count > 2
+						owner = ROOT
+					}
+					num_claimed_peace_conference_neighbour_states = {
+						count > 2
+						owner = ROOT
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.5
+			FROM = {
+				OR = {
+					num_owned_neighbour_states = {
+						count > 3
+						owner = ROOT
+					}
+					num_claimed_peace_conference_neighbour_states = {
+						count > 3
+						owner = ROOT
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.5
+			FROM = {
+				OR = {
+					num_owned_neighbour_states = {
+						count > 4
+						owner = ROOT
+					}
+					num_claimed_peace_conference_neighbour_states = {
+						count > 4
+						owner = ROOT
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.5
+			FROM = {
+				OR = {
+					num_owned_neighbour_states = {
+						count > 5
+						owner = ROOT
+					}
+					num_claimed_peace_conference_neighbour_states = {
+						count > 5
+						owner = ROOT
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 0		
+			NOT = { FROM = { is_claimed_by = ROOT } }
+			NOT = {
+				FROM = {
+					any_neighbor_state = {
+						OR = {
+							owner = { tag = ROOT }
+							has_claimed_state_in_peace_conference = ROOT
+						}
+					}
+				}
+			}
+			OR = {
+				NOT = {
+					FROM = { 
+						OR = {
+							is_island_state = yes
+							is_coastal = yes
+						}
+					}
+				}
+				NOT = { any_owned_state = { is_coastal = yes } }
+			}
+
+		}
+
+		modifier = { #Only take claims - may also take African colonies if already a colonial power or major European country.
+			factor = 0
+			NOT = { 
+				FROM = { 
+					OR = {
+						is_claimed_by = ROOT
+						is_core_of = ROOT
+					}
+				} 
+			}
+			OR = {
+				NOT = { FROM = { is_on_continent = africa } }
+				NOT = { capital_scope = { is_on_continent = europe } }
+				AND = {
+					#Is NOT a major
+					NOT = { num_of_factories > 100 }
+					NOT = { tag = GER }
+					NOT = { tag = ENG }
+					NOT = { tag = ITA }
+					NOT = { tag = FRA }
+					NOT = { tag = USA }
+					NOT = { tag = JAP }
+					NOT = { tag = SOV }
+					NOT = {
+						any_owned_state = { is_on_continent = africa }
+					}
+				}
+			}
+		}
+		modifier = { #Only take claimed/core land if a puppet.
+			factor = 0
+			is_puppet = yes
+			FROM = {
+				NOT = {
+					OR = { 
+						is_claimed_by = ROOT
+						is_core_of = ROOT
+					}
+				}
+			}
+		}
+	}
+
+	# ROOT = Taker, FROM = Giver
+	force_government = {
+		factor = 0 #10 - neutrals should never do this
+	}
+}
