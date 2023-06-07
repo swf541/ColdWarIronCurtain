@@ -792,12 +792,59 @@ operation_closeout_effect = {
         }
 	}
 
+add_tech_bonus = {
+    bonus = 0.5
+    uses = 1
+    category = radar_tech
+}
 		#Train Local Resistance Group
 		#Arm Local Resistance Group
 		#Insurgency Embed
 		#Counter-Espionage Emded
 		#Steal Tech
-		#Counter-Insurgency Operation
+	if = {	
+		limit = {
+			check_variable = {
+				current_token = 21 #Counter Insurgency Operation
+			}
+		}
+		set_variable_to_random = success_chance
+		if = {	#Success
+			limit = {
+				OR = {
+					check_variable = {
+						success_chance > current_actual_risk
+					}
+					check_variable = {
+						current_actual_risk = success_chance
+					}
+				}
+			}
+            slot_1_operation_success_shared_effect = yes
+
+            #Specific Effects
+			var:history_personnel_target = {
+				randomize_variable = {
+					var = resistance_change
+					distribution = uniform
+					min = 1
+					max = 5
+				}
+				add_to_variable = {
+					resistance_change = resistance_squad_bonus
+				}
+				multiply_variable = {
+					resistance_change = -1
+				}
+				add_resistance = resistance_change
+			}
+            #End
+            refresh_possible_mission_types = yes
+		}
+        else = {	#Failure
+            slot_1_operation_failure_effect = yes
+        }
+	}
 	if = {	
 		limit = {
 			check_variable = {
