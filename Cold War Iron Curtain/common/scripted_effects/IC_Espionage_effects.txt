@@ -792,16 +792,63 @@ operation_closeout_effect = {
         }
 	}
 
-add_tech_bonus = {
-    bonus = 0.5
-    uses = 1
-    category = radar_tech
-}
+
 		#Train Local Resistance Group
 		#Arm Local Resistance Group
 		#Insurgency Embed
 		#Counter-Espionage Emded
-		#Steal Tech
+	if = {	
+		limit = {
+			check_variable = {
+				current_token = 20 #Steal Tech
+			}
+		}
+		set_variable_to_random = success_chance
+		if = {	#Success
+			limit = {
+				OR = {
+					check_variable = {
+						success_chance > current_actual_risk
+					}
+					check_variable = {
+						current_actual_risk = success_chance
+					}
+				}
+			}
+            slot_1_operation_success_shared_effect = yes
+			#Specific Effects
+			if = {
+				limit = {
+					check_variable = {
+						success_chance > 0.95
+					}
+				}
+				set_technology = {
+					var:local_possible_operations_personnel_target = 1
+				}
+			}
+			else = {
+				var:history_target = {
+					randomize_variable = {
+						var = tech_bonus
+						distribution = uniform
+						min = 0.25
+						max = 0.75
+					}
+					add_tech_bonus = {
+						bonus = var:tech_bonus
+						uses = 1
+						technology = var:local_possible_operations_personnel_target
+					}
+				}
+			}
+            #End
+            refresh_possible_mission_types = yes
+		}
+        else = {	#Failure
+            slot_1_operation_failure_effect = yes
+        }
+	}
 	if = {	
 		limit = {
 			check_variable = {
