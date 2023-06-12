@@ -2,6 +2,11 @@ scripted_diplomatic_actions = {
 	opt_remove_from_sphere = {
 		allowed = {}
 		visible = { 
+			ROOT = {	#Is a Faction Leader
+				check_variable = {
+					Sphere_Leader = ROOT.id
+				}				
+			}
 			NOT = { 
 				is_in_array = {
 					array = ROOT.sphere_tag_list
@@ -12,6 +17,17 @@ scripted_diplomatic_actions = {
 		}
 		selectable = {
 			NOT = { has_war_with = ROOT }
+			NOT = { is_subject = no }
+			NOT = {
+				check_variable = {
+					Sphere_Leader = ROOT.id
+				}
+			}
+			NOT = {
+				check_variable = {
+					Sphere_Leader = THIS.id
+				}
+			}
 			OR = {
 				AND = {
 					check_variable = { influence_array^0 = Sphere_Leader }
@@ -160,8 +176,12 @@ scripted_diplomatic_actions = {
 		complete_effect = {
 			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
 			add_to_variable = { ROOT.foreignPowerProjection = -1 }
-			set_temp_variable = { influence_gain = 5 }
-			multiply_variable = { influence_gain = decryptTotal }
+
+			set_temp_variable = { influence_gain = 1 }
+			set_variable = { drift_modifier = modifier@drift_defence_factor }
+			add_to_variable = { drift_modifier = 0.001 }
+			divide_variable = { influence_gain = drift_modifier }
+
 
 			set_temp_variable = { percent_change = influence_gain }
 			set_temp_variable = { tag_index = ROOT.id }
@@ -172,11 +192,10 @@ scripted_diplomatic_actions = {
 
 			ROOT = {
 				set_country_flag = flag_influencing
-				set_variable = { influence_target = PREV }
+				set_variable = { influence_target_tag = PREV }
 				#add_ideas = idea_influencing_daily # to be added if pdx fixes an issue with removing it
 				set_variable = { show_start_influencing = 1 }
 			}
-			change_influence_percentage = yes
 		}
 		reject_effect = {} # runs when the action is properly sent and rejected
 		can_be_sent = {} # send button will be disabled if no
@@ -296,7 +315,7 @@ scripted_diplomatic_actions = {
 
 			set_temp_variable = { percent_change = influence_gain }
 			set_temp_variable = { tag_index = ROOT.id }
-			set_temp_variable = { influence_target = THIS.id }
+			set_temp_variable = { influence_target_tag = THIS.id }
 			change_influence_percentage = yes
 			# opinions
 			add_opinion_modifier = {
@@ -415,7 +434,7 @@ scripted_diplomatic_actions = {
 			set_temp_variable = { influence_gain = 33 } 
 			set_temp_variable = { percent_change = influence_gain }
 			set_temp_variable = { tag_index = ROOT.id }
-			set_temp_variable = { influence_target = THIS.id }
+			set_temp_variable = { influence_target_tag = THIS.id }
 			change_influence_percentage = yes
 
 			set_temp_variable = { tempDebt = currentDebt }
