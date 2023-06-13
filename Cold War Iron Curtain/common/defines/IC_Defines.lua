@@ -36,8 +36,8 @@ NDefines.NAir.STRATEGIC_BOMBER_NUKE_AIR_SUPERIORITY = 10.0 -- How much air super
 NDefines.NAir.NAVAL_COMBAT_EXTERNAL_PLANES_JOIN_RATIO = 0.02 -- Max planes that can join a combat comparing to the total strength of the ships
 NDefines.NAir.COMBAT_STACK_LIMIT = 3 -- The biggest allowed dogfight combination (1vs1 or 2vs1). Bigger value cause that amount of airplanes matters more then their stats. Only used in naval air combat, for land air combat see COMBAT_MULTIPLANE_CAP
 NDefines.NAir.NAVAL_STRIKE_DAMAGE_TO_STR = 2 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
-NDefines.NAir.MISSION_COMMAND_POWER_COSTS = {  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
-NDefines.NAir.MISSION_FUEL_COSTS = {  1.0, 0.5, 0.2, 1.3, 1.3, 20.0, 3.0, 1.0, 1.3, 2.0, 0.5, 2.0, 2.0, 1.0 }
+NDefines.NAir.MISSION_COMMAND_POWER_COSTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+NDefines.NAir.MISSION_FUEL_COSTS = { 1.0, 0.5, 0.2, 1.3, 1.3, 20.0, 3.0, 1.0, 1.3, 2.0, 0.5, 2.0, 2.0, 1.0, 1.0, 1.0 }
 NDefines.NAir.CAS_NIGHT_ATTACK_FACTOR = 0.5 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
 NDefines.NAir.AIR_WING_AVERAGE_SIZE = 50 						-- Eyeballed average amount of airplanes in wing. Used when calculating air volunteer.
 
