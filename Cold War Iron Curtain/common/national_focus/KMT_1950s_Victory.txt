@@ -1096,9 +1096,16 @@ focus_tree = {
 		id = KMT_seek_cooperation_with_Malaya
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetTag]: id = KMT_seek_cooperation_with_Malaya"
+			MAL = {country_event = KMT_50s_Mainland.4}
+			ROOT = {
+				add_opinion_modifier = {
+					target = MAL
+					modifier = medium_increase
+				}
+			}
 		}
 		#icon = 
-		cost = 2
+		cost = 3
 		x = 25
 		y = 14
 		prerequisite = {
@@ -1113,6 +1120,14 @@ focus_tree = {
 		id = KMT_give_malaya_guns
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetTag]: id = KMT_give_malaya_guns"
+			MAL = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_0
+					amount = 2000
+					producer = CHI
+				}
+				add_political_power = 50
+			}	
 		}
 		#icon = 
 		cost = 2
@@ -2660,27 +2675,6 @@ focus_tree = {
 		
 			
 			
-			hidden_effect ={
-				load_focus_tree = KMT_1960s_Chiang_kai_shek_Mainland
-				PRC = {load_focus_tree = PRC_SOV_60s}
-				add_ideas = CHI_kmt_corruption1
-				add_dynamic_modifier = { modifier = KMT_Rule_modifier }
-				set_variable = { KMT_Rule_var = -0.25}
-				set_variable = { KMT_Rule_pp_var = 0.25}
-				remove_ideas = fractured_legal_system_2
-				remove_ideas = fractured_legal_system_1
-				remove_dynamic_modifier = { modifier = soviet_repression }	
-				remove_dynamic_modifier = { modifier = Military_Disorganization_modifier }
-				remove_dynamic_modifier = { modifier = National_Crisis_modifier }
-				add_stability = 0.40
-				add_popularity = {
-					ideology = maoism
-					popularity = 0.03
-				}
-			
-			}
-			
-			custom_effect_tooltip = Load_60s_CKS_Tree_tt
 		}
 	}
 	
@@ -2864,6 +2858,8 @@ focus_tree = {
 		id = KMT_The_Tibetan_Reconcilation
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetTag]: id = KMT_The_Tibetan_Reconcilation"
+			add_threat = -1
+			TIB = {country_event = KMT_50s_Mainland.5}
 		}
 		#icon = GFX_BullishDiplomacy
 		cost = 4
@@ -2888,7 +2884,7 @@ focus_tree = {
 		#icon = GFX_TanksAcrosstheBorder
 		cost = 2
 		mutually_exclusive = {
-			focus = KMT_Demand_Tibetan_Submission
+			focus = KMT_The_Tibetan_Reconcilation
 		}
 		prerequisite = {
 			focus = KMT_The_Tibetan_Situation
@@ -2903,6 +2899,62 @@ focus_tree = {
 			}
 		}
 	}
+	
+	focus = {
+		id = KMT_Tibet_accepts_submission
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetTag]: id = KMT_Tibet_accepts_submission"
+		}
+		#icon = 
+		cost = 2
+		available = {
+		 always = no
+		} 
+		
+		prerequisite = {
+			focus = KMT_Demand_Tibetan_Submission
+		}	
+		mutually_exclusive = {
+			focus = KMT_Tibet_refuses_submission
+		}
+		
+		x = 39
+		y = 16
+		completion_reward = {
+		}
+	}
+	
+	focus = {
+		id = KMT_Tibet_refuses_submission
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetTag]: id = KMT_Tibet_refuses_submission"
+			CHI = {
+				remove_state_core = 867
+				remove_state_core = 322
+				remove_state_core = 1361
+				remove_state_core = 1548
+				remove_state_core = 1549
+			}
+		}
+		#icon = 
+		cost = 2
+		available = {
+		 always = no
+		} 
+		
+		prerequisite = {
+			focus = KMT_Demand_Tibetan_Submission
+		}	
+		
+		mutually_exclusive = {
+			focus = KMT_Tibet_accepts_submission
+		}
+		
+		x = 34
+		y = 16
+		
+	}
+	
 	focus = {
 		id = KMT_Outreach_to_the_Panchen_Lama
 		completion_reward = {
@@ -2910,11 +2962,14 @@ focus_tree = {
 		}
 		#icon = GFX_DeadlyDeal
 		cost = 3
+		
+			
+		
 		prerequisite = {
-			focus = KMT_Demand_Tibetan_Submission
+			focus = KMT_Tibet_refuses_submission
 		}
 		x = 32
-		y = 16
+		y = 17
 		completion_reward = {
 			TIB = {
 				country_event = TIBET_KMT.100
@@ -2928,13 +2983,16 @@ focus_tree = {
 		}
 		icon = GFX_Demolish_Buddhist_buildings
 		cost = 2
+		
+		
 		prerequisite = {
-			focus = KMT_Demand_Tibetan_Submission
+			focus = KMT_Tibet_refuses_submission
 		}
 		x = 36
-		y = 16
+		y = 17
 		completion_reward = {
 			news_event = TIBET_KMT.3
+			TIB = {add_stability = -0.03}
 		}
 	}
 	focus = {
@@ -2957,12 +3015,12 @@ focus_tree = {
 					is_subject_of = ROOT
 				}
 			}
-			CHI = {has_political_power = 400}
+			CHI = {has_political_power > 400}
 		}
 		
 		
 		x = 32
-		y = 17
+		y = 18
 		completion_reward = {
 			TIB = {
 				country_event = TIBET_KMT.20
@@ -2987,10 +3045,7 @@ focus_tree = {
 		prerequisite = {
 			focus = KMT_The_Tibetan_Reconcilation
 		}
-		mutually_exclusive = {
-			focus = KMT_Invade_Tibet
-			focus = KMT_Back_Coup_by_Panchen_Lama
-		}
+		
 		x = 28
 		y = 16
 		completion_reward = {
@@ -3038,7 +3093,7 @@ focus_tree = {
 		y = 17
 		completion_reward = {
 			news_event = TIBET_KMT.11
-			add_threat = -5
+			add_threat = -2
 			CHI = {
 				add_opinion_modifier = {
 					target = RAJ
@@ -3077,7 +3132,7 @@ focus_tree = {
 		
 		
 		x = 36
-		y = 17
+		y = 18
 		completion_reward = {
 			news_event = TIBET_KMT.15
 			declare_war_on = {
@@ -3097,6 +3152,10 @@ focus_tree = {
 		
 		available = {
 			has_completed_focus = KMT_support_the_western_allies
+			OR = {
+				NOT = {country_exists = TIB}
+				TIB = {is_puppet_of = CHI}
+			}
 		}
 		
 		mutually_exclusive = {
@@ -3109,22 +3168,63 @@ focus_tree = {
 		}
 		
 		x = 35
-		y = 18
+		y = 19
 		completion_reward = {
-			#news_event = TIBET_KMT.16
-			add_to_variable = {
-				kmt_strength_stability = 0.02
+			add_war_support = 0.02
+			add_popularity = {
+					ideology = monarchism
+					popularity = 0.02
 			}
-			add_to_variable = {
-				kmt_strength_pp = 0.05
-			}
-			custom_effect_tooltip = kmt_strength_increase_TT
+			add_political_power = -100	
 		}
 	}
 	focus = {
 		id = KMT_reforge_the_tip
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetTag]: id = KMT_reforge_the_tip"
+			If = {
+				limit = {
+					NOT = {country_exists = TIB}
+				}	
+				release_puppet = TIB
+				
+			}
+			hidden_effect = {
+				TIB = {
+					set_politics = {
+						ruling_party = monarchism
+						elections_allowed = no
+					}
+					
+					retire_character = TIB_Tenzin_gyatso
+					
+					add_country_leader_role = {
+						character = TIB_Choekyi_Gyaltsen
+						promote_leader = yes
+						country_leader = {
+						ideology = monarchist
+						expire = "1989.3.1.1"
+						}
+					}
+				}
+			}
+			TIB = {
+				set_party_name = {
+					ideology = Social_Democratic
+					name = "TIP"
+					long_name = "Tibet Improvement Party"
+				}
+				add_country_leader_role = {
+				  character = TIB_Choekyi_Gyaltsen
+				  promote_leader = yes
+				  country_leader = {
+					ideology = social_democrat
+					expire = "1973.1.1.1"
+					traits = {  }
+				  }
+				}
+			}
+			
 		}
 		#icon = GFX_CrushResistance
 		cost = 5.2
@@ -3135,6 +3235,10 @@ focus_tree = {
 		
 		available = {
 			has_completed_focus = KMT_anti_colonial_rhetoric
+			OR = {
+				NOT = {country_exists = TIB}
+				TIB = {is_puppet_of = CHI}
+			}
 		}
 		
 		
@@ -3145,7 +3249,7 @@ focus_tree = {
 		}
 		
 		x = 31
-		y = 18
+		y = 19
 
 	}
 	focus = {
@@ -3161,28 +3265,56 @@ focus_tree = {
 		}	
 		
 		x = 31
-		y = 19
+		y = 20  
 		completion_reward = {
-			#TIB = {
-			#	set_cosmetic_tag = PRC_TIB
-			#}
+			
+			hidden_effect = {TIB = {set_cosmetic_tag = TIB_ROC_Province}}
+			TIB = {
+				set_politics = {
+				   ruling_party = Social_Democratic
+				   elections_allowed = no
+			    }
+			}
+			
+			CHI = {
+				transfer_state = 1359
+			}	
+			
 			news_event = TIBET_KMT.105
+				
 		}
 	}
 	focus = {
 		id = KMT_Sinicization_of_Tibet
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetTag]: id = KMT_Sinicization_of_Tibet"
+			If = {
+				limit = {
+					country_exists = TIB
+				}
+				annex_country = {
+					target = TIB
+					transfer_troops = yes
+				}
+			}
+			CHI = {
+				add_state_core = 867
+				add_state_core = 322
+				add_state_core = 1361
+				add_state_core = 1548
+				add_state_core = 1549
+			}
+			add_political_power = -200
 		}
 		#icon = GFX_Tibetan_Pennant
-		cost = 2
+		cost = 14
 		
 		prerequisite = {
 			focus = KMT_Crush_the_Tibetan_Aristocracy
 		}	
 		
 		x = 35
-		y = 19
+		y = 20
 	
 	}
 	focus = {
