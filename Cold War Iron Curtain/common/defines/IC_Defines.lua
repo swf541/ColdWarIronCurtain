@@ -127,7 +127,7 @@ NDefines.NTrade.RELATION_TRADE_FACTOR = 5 -- Trade factor is modified by Opinion
 NDefines.NFocus.FOCUS_POINT_DAYS = 5 -- Each point takes a week
 NDefines.NFocus.MAX_SAVED_FOCUS_PROGRESS = 15 -- This much progress can be saved while not having a focus selected
 
-NDefines.NGame.LAG_DAYS_FOR_LOWER_SPEED = 100
+NDefines.NGame.LAG_DAYS_FOR_LOWER_SPEED = 30
 NDefines.NGame.LAG_DAYS_FOR_PAUSE = 50
 
 NDefines.NAI.DIPLOMACY_SCARED_MINOR_EXTRA_RELUCTANCE = -50 -- extra reluctance to join stuff as scared minor
@@ -167,6 +167,7 @@ NDefines.NMilitary.LAND_COMBAT_ORG_DAMAGE_MODIFIER = 0.025
 NDefines.NMilitary.LAND_AIR_COMBAT_STR_DAMAGE_MODIFIER = 0.08
 NDefines.NMilitary.LAND_AIR_COMBAT_ORG_DAMAGE_MODIFIER = 0.12
 NDefines.NMilitary.LAND_COMBAT_STR_ARMOR_ON_SOFT_DICE_SIZE = 6
-NDefines.NMilitary.LAND_COMBAT_COLLATERAL_FACTOR = 0.02
+NDefines.NMilitary.LAND_COMBAT_COLLATERAL_FORT_FACTOR = 0.005	-- Factor to scale collateral damage to forts with.
+NDefines.NMilitary.LAND_COMBAT_COLLATERAL_INFRA_FACTOR = 0.0022	-- Factor to scale collateral damage to infra with.
 
 NDefines.NPolitics.BASE_POLITICAL_POWER_INCREASE = 2
