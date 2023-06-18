@@ -219,7 +219,11 @@ PixelShader =
 		
 			//return float4( Input.uvv, 1.0);
 			//return float4(tex2D( MainScene, Input.uv ).rgb, 1);
-			
+			bool isNanGLCompat = (color.r <= 0.0 || 0.0 <= color.r) ? false : true;			
+			if( isNanGLCompat == true )
+			{
+			clip(-1);
+			}
 			return RestoreScene( saturate(color) );
 		}
 	]]
