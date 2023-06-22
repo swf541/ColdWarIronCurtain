@@ -16,10 +16,83 @@ scripted_gui = {
         }
 
         triggers = {
-
+            Current_Debts_Header_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+            Monthly_Pay_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+            Interest_Rate_Specific_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+            Total_Outstanding_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+            Current_Debts_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+            #Borrowing
+            Potential_Creditors_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Available_Creditors_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
         }
 		effects = {
-
+            Borrowing_Button_click = {
+                set_variable = { show_current_borrowing = 1 }
+                set_variable = { show_current_loans = 0 }
+            }
+            Debts_Button_click = {
+                clear_array = currentDebtTotalsArray
+                clear_array = currentDebtPaymentArray
+                clear_array = currentDebtOwnerArray
+                clear_array = currentDebtInterestArray
+                for_each_loop = {
+                    array = debtOwnerArray
+                    index = i
+                    if = {
+                        limit = {
+                            check_variable = {
+                                debtTotalsArray^i > 0
+                            }
+                        }
+                        add_to_array = { currentDebtTotalsArray = debtTotalsArray^i }
+                        add_to_array = { currentDebtPaymentArray = debtPaymentArray^i }
+                        add_to_array = { currentDebtOwnerArray = debtOwnerArray^i }
+                        set_variable = {
+                            interest_rate_array_adj = debtInterestArray^i
+                        }
+                        add_to_variable = {
+                            interest_rate_array_adj = -1
+                        }
+                        add_to_array = { currentDebtInterestArray = interest_rate_array_adj }
+                    }
+                }
+                set_variable = { show_current_loans = 1 }
+                set_variable = { show_current_borrowing = 0 }
+            }
+        }
+    }
+    Finance_Tab_Current_Loans_Section = {
+        context_type = player_context
+        parent_window_name = countryfinanceview
+        window_name = "current_loans_grid"
+		visible = {
+			check_variable = { show_current_loans = 1 }
+		}	
+		properties = {
+			country_flag_for_current_loans = {
+				image = "[THIS.GetFlag]"
+			}
+        }
+		dynamic_lists = { 
+			current_debts_listing_grid = {
+				array = currentDebtOwnerArray
+                change_scope = yes
+				entry_container = current_debts_listing_entry
+			}
         }
     }
 }
