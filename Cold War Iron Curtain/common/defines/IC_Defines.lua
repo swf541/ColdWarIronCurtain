@@ -90,7 +90,7 @@ NDefines.NDiplomacy.VOLUNTEERS_PER_COUNTRY_ARMY = 0.05 -- Each army unit owned b
 NDefines.NDiplomacy.VOLUNTEERS_PER_TARGET_PROVINCE = 0.05 -- Each province owned by the target country contributes this amount of volunteers to the limit.
 NDefines.NDiplomacy.ASSUME_FACTION_LEADERSHIP_PP_COST = 5000 -- Each province owned by the target country contributes this amount of volunteers to the limit.
 
-NDefines.NDiplomacy.VOLUNTEERS_TRANSFER_SPEED = 21
+NDefines.NDiplomacy.VOLUNTEERS_TRANSFER_SPEED = 7
 
 NDefines.NGame.END_DATE = "2050.5.23.12"
 NDefines.NGame.START_DATE = "1945.5.23.12"
