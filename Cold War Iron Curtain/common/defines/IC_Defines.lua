@@ -88,6 +88,7 @@ NDefines.NDiplomacy.TENSION_TIME_SCALE_START_DATE = "1999.1.1.12" -- Starting at
 NDefines.NDiplomacy.VOLUNTEERS_DIVISIONS_REQUIRED = 1 -- This many divisons are required for the country to be able to send volunteers.
 NDefines.NDiplomacy.VOLUNTEERS_PER_COUNTRY_ARMY = 0.05 -- Each army unit owned by the source country contributes this amount of volunteers to the limit.
 NDefines.NDiplomacy.VOLUNTEERS_PER_TARGET_PROVINCE = 0.05 -- Each province owned by the target country contributes this amount of volunteers to the limit.
+NDefines.NDiplomacy.ASSUME_FACTION_LEADERSHIP_PP_COST = 5000 -- Each province owned by the target country contributes this amount of volunteers to the limit.
 
 NDefines.NDiplomacy.VOLUNTEERS_TRANSFER_SPEED = 21
 
