@@ -38,3 +38,147 @@ SAMPLE_add_random_point_to_line = {
 	
 	add_to_array = { SAMPLE_numbers = SAMPLE_count }
 }
+
+SAMPLE_add_random_point_to_line = {
+	# Adds a random point to the line graph
+
+	# This count is displayed as an x-axis label, increment it
+	add_to_variable = { SAMPLE_count = 1 }
+
+	# We keep track of the last y position so we can calculate the slope
+	set_variable = { SAMPLE_last_y_position = SAMPLE_y_position }
+	
+	# Random new y position, 10-90
+	set_variable = { SAMPLE_y_position = random }
+	multiply_variable = { SAMPLE_y_position = 80 }
+	add_to_variable = { SAMPLE_y_position = 10 }
+	round_variable = SAMPLE_y_position
+
+	# Prune arrays so they hold at most 20 elements
+	if = {
+		limit = {
+			check_variable = { SAMPLE_count > 20 }
+		}
+		remove_from_array = { array = SAMPLE_graph_offsets index = 0 }
+		remove_from_array = { array = SAMPLE_graph_slopes index = 0 }
+		remove_from_array = { array = SAMPLE_numbers index = 0 }
+	}
+
+	# The y position offset is the inverse of the y position
+	set_temp_variable = { offset = SAMPLE_last_y_position }
+	multiply_temp_variable = { offset = -1 }
+	add_to_array = { SAMPLE_graph_offsets = offset }
+
+	# The 'slope' here is simply the difference between the current y value and the last one, divided by 2 plus 50
+	# These last two changes are needed for the shader
+	set_temp_variable = { diff = SAMPLE_y_position }
+	subtract_from_temp_variable = { diff = SAMPLE_last_y_position }
+	divide_temp_variable = { diff = 2 }
+	add_to_temp_variable = { diff = 50 }
+	add_to_array = { SAMPLE_graph_slopes = diff }
+	
+	add_to_array = { SAMPLE_numbers = SAMPLE_count }
+}
+GDP_Graph_Financial_Tab_Update = {
+	set_variable = {
+		GDP_count = 0
+	}
+	add_to_array = { GDP_base_numbers = grossdomesticproduct }
+	clear_array = GDP_graph_offsets
+	clear_array = GDP_graph_slopes
+	clear_array = current_GDP_numbers
+	clear_array = GDP_numbers
+	for_each_loop = {
+		array = GDP_base_numbers
+		add_to_array = { current_GDP_numbers = v }
+	}
+	find_highest_in_array = {
+		array = GDP_base_numbers
+		value = max
+		index = max_index
+	}
+	find_lowest_in_array = {
+		array = GDP_base_numbers
+		value = min
+		index = min_index
+	}
+	set_variable = {
+		max_gdp = max
+	}
+	set_variable = {
+		max_gdp_test = max
+	}
+	set_variable = {
+		min_gdp = min
+	}
+	set_variable = {
+		min_gdp_neg = min
+	}
+	multiply_variable = {
+		min_gdp_neg = -1
+	}
+	subtract_from_variable = {
+		max_gdp = min_gdp
+	}
+	clear_array = GDP_numbers
+	for_each_loop = {
+		array = current_GDP_numbers
+		set_variable = {
+			value_temp = v
+		}
+		add_to_variable = {
+			value_temp = min_gdp_neg
+		}
+		divide_variable = { value_temp = max }
+		multiply_variable = { value_temp = 80 }
+		add_to_variable = { value_temp = 10 }
+		round_variable = value_temp
+
+		add_to_array = {
+			value_check_gdp = value_temp
+		}
+
+
+		GDP_add_random_point_to_line = yes		
+	}
+
+}
+
+GDP_add_random_point_to_line = {
+	# Adds a random point to the line graph
+
+	# This count is displayed as an x-axis label, increment it
+	add_to_variable = { GDP_count = 1 }
+
+	# We keep track of the last y position so we can calculate the slope
+	set_variable = { GDP_last_y_position = GDP_y_position }
+	
+	# Random new y position, 10-90
+	set_variable = { GDP_y_position = value_temp }
+
+
+	# Prune arrays so they hold at most 20 elements
+	if = {
+		limit = {
+			check_variable = { GDP_count > 20 }
+		}
+		remove_from_array = { array = GDP_graph_offsets index = 0 }
+		remove_from_array = { array = GDP_graph_slopes index = 0 }
+		remove_from_array = { array = GDP_numbers index = 0 }
+	}
+
+	# The y position offset is the inverse of the y position
+	set_temp_variable = { offset = GDP_last_y_position }
+	multiply_temp_variable = { offset = -1 }
+	add_to_array = { GDP_graph_offsets = offset }
+
+	# The 'slope' here is simply the difference between the current y value and the last one, divided by 2 plus 50
+	# These last two changes are needed for the shader
+	set_temp_variable = { diff = GDP_y_position }
+	subtract_from_temp_variable = { diff = GDP_last_y_position }
+	divide_temp_variable = { diff = 2 }
+	add_to_temp_variable = { diff = 50 }
+	add_to_array = { GDP_graph_slopes = diff }
+	
+	add_to_array = { GDP_numbers = GDP_count }
+}
