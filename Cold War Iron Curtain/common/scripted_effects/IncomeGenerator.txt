@@ -749,10 +749,10 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 			Interest_Rate = 1.04
 		}
 	}
-	if ={ limit = { check_variable = { 		set_variable = { pulse_deficit = currentMoney }
-		multiply_variable = { pulse_deficit = -1 }
-		add_to_variable = { currentMoney = pulse_deficit }
-currentMoney < 0 } }
+	if ={ 
+		limit = { 
+			check_variable = { pulse_deficit > currentMoney }
+		}
 		if = { 
 			limit = { 
 				check_variable = { defaultCheck < currentDebt }
@@ -1833,7 +1833,30 @@ tax_rate = {
 	multiply_variable = {
 		industrial_base = industrial_base_modifier
 	}
-	#standard_deviation_for_industrial_base = yes
+	standard_deviation_for_industrial_base = yes
+	process_credit_rating = yes
+	set_interest_rates = yes
+	set_variable = {
+		Interest_Rate_Display = Interest_Rate
+	}
+	divide_variable = {
+		Interest_Rate_Display = 100
+	}
+	set_variable = {
+		Domestic_Interest_Rate = Interest_Rate
+	}
+	multiply_variable = {
+		Domestic_Interest_Rate = 0.75
+	}
+	multiply_variable = {
+		Favorable_Interest_Rate = 0.65
+	}
+	set_variable = { austerityCheck = grossdomesticproduct }
+	multiply_variable = { austerityCheck = austerity_multiplier }
+	set_variable = { defaultCheck = grossdomesticproduct }
+	multiply_variable = { defaultCheck = default_multiplier }
+
+
 	set_variable = { austerityCheck = grossdomesticproduct }
 	multiply_variable = { austerityCheck = austerity_multiplier }
 	set_variable = { defaultCheck = grossdomesticproduct }
@@ -2911,24 +2934,6 @@ standard_deviation_for_industrial_base = {
 					industrial_base_tier = 1
 				}   
 			}
-			process_credit_rating = yes
-			set_variable = {
-				Interest_Rate_Display = Interest_Rate
-			}
-			set_variable = {
-				Domestic_Interest_Rate = Interest_Rate
-			}
-			multiply_variable = {
-				Domestic_Interest_Rate = 0.75
-			}
-			multiply_variable = {
-				Favorable_Interest_Rate = 0.65
-			}
-			set_variable = { austerityCheck = grossdomesticproduct }
-			multiply_variable = { austerityCheck = austerity_multiplier }
-			set_variable = { defaultCheck = grossdomesticproduct }
-			multiply_variable = { defaultCheck = default_multiplier }
-
 		}
 		if = {
 			limit = {
@@ -3428,7 +3433,7 @@ process_credit_rating = {
 			}
 			lower_credit_rating = yes
 		}
-		set_interest_rates = yes
+		
 	}
 }
 raise_credit_rating = {
@@ -3531,14 +3536,14 @@ set_interest_rates = {
 		limit = {
 			check_variable = { Credit_Rating = 10 }
 		}
-		set_variable = {Interest_Rate = 1.0005}
+		set_variable = {Interest_Rate = 1.010}
 		
 	}
 	else_if = {
 		limit = {
 			check_variable = { Credit_Rating = 9 }
 		}
-		set_variable = {Interest_Rate = 1.01}
+		set_variable = {Interest_Rate = 1.015}
 		set_variable = { default_multiplier = 15 }
 		set_variable = { austerity_multiplier = 8 }
 	}
