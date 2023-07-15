@@ -16,151 +16,18 @@ ic_pulse = {
 	add_to_variable = { Exploit_Limit = Exploit_Limit_Adjustment }
 	if = {
 		limit = {
+			is_in_faction_with = USA
+			NOT = {
+				has_idea = nato_member
+			}
+		}
+		leave_faction = yes
+	}
+	if = {
+		limit = {
 			check_variable = { global.eco_health < 0 }
 		}
 		set_variable = { global.eco_health = 0 }
-	}
-	if = { 
-		limit = {
-			tag = FRA
-			check_variable = { parliamentary_support < 50 } #If parliamentary support is under 50
-			check_variable = { government_strength > 0 } #and If government strength is superior to 0
-			NOT = { has_country_flag = no_more_pm }
-		}
-		subtract_from_variable = { government_strength = 5 } #decrease government strength until 0
-		clamp_variable = {
-			var = government_strength
-			min = 0
-			max = 100
-		}
-	}
-	if = {
-		limit = {
-			tag = FRA
-			check_variable = { parliamentary_support > 50 } #If Parliamentary support is above 50
-			check_variable = { government_strength < 100 } #and If government strength is under 100
-			NOT = { has_country_flag = no_more_pm }
-		}
-		add_to_variable = { government_strength = 5 } #increase government strength until 100
-		clamp_variable = {
-			var = government_strength
-			min = 0
-			max = 100
-		}
-	}
-	if = {
-		limit = {
-			tag = FRA
-			check_variable = { supporting_parties > 3 } #If has more than 3 parties supporting the current government
-			NOT = { has_country_flag = no_more_pm }
-		}
-		add_to_variable = { parliamentary_support = 5 } #increase parliamentary support
-		clamp_variable = {
-			var = parliamentary_support
-			min = 0
-			max = 100
-		}
-	}
-	if = {
-		limit = {
-			tag = FRA
-			check_variable = { supporting_parties < 4 }#If has less than 4 parties supporting the current government
-			NOT = { has_country_flag = no_more_pm }
-		}
-		subtract_from_variable = { parliamentary_support = 5 } #decrease parliamentary upport
-		clamp_variable = {
-			var = parliamentary_support
-			min = 0
-			max = 100
-		}
-	}
-	if = {
-		limit = {
-			tag = FRA
-			check_variable = { government_strength = 0 } #if government strength reach 0
-			NOT = { has_country_flag = recently_changed_PM }
-			NOT = { has_country_flag = no_more_pm }
-		}
-		country_event = French_PMFall.1 #Fall of the french PM
-		set_country_flag = {	
-			flag = recently_changed_PM
-			days = 93
-			value = 1
-		}
-	}
-	if = {
-		limit = {
-			tag = FRA
-			OR = {
-				has_country_flag = communist_PM #if communist is PM
-				has_country_flag = pcf_support_government #or if the pcf support the government
-			}
-			NOT = { has_country_flag = no_more_pm }
-		}
-		add_to_variable = { geopolitical_alignment = 5 } #drift geopolitical alignment toward USSR
-		clamp_variable = {
-			var = geopolitical_alignment
-			min = 15
-			max = 540
-		}
-	}
-	if = {
-		limit = {
-			tag = FRA
-			NOT = { has_country_flag = no_more_pm }
-			OR = {
-				has_country_flag = pro_us_PM #if pro us is PM
-				has_country_flag = mrp_support_governemnt #or if the MRP support the government
-			}
-		}
-		subtract_from_variable = { geopolitical_alignment = 5 } #drift geopolitical alignment toward USA
-		clamp_variable = {
-			var = geopolitical_alignment
-			min = 15
-			max = 540
-		}
-	}
-	if = {
-		limit = {
-			tag = FRA
-			NOT = { has_country_flag = no_more_pm }
-			NOT = {
-				OR = {
-					has_country_flag = pro_us_PM
-					has_country_flag = mrp_support_governemnt
-					has_country_flag = communist_PM
-					has_country_flag = pcf_support_government
-				}
-			}
-			check_variable = { geopolitical_alignment < 186 }
-		}
-		add_to_variable = { geopolitical_alignment = 5 }
-		clamp_variable = {
-			var = ROOT.geopolitical_alignment
-			min = 186
-			max = 370
-		}
-	}
-	if = {
-		limit = {
-			tag = FRA
-			NOT = { has_country_flag = no_more_pm }
-			NOT = {
-				OR = {
-					has_country_flag = pro_us_PM
-					has_country_flag = mrp_support_governemnt
-					has_country_flag = communist_PM
-					has_country_flag = pcf_support_government
-				}
-			}
-			check_variable = { geopolitical_alignment > 370 }
-		}
-		subtract_from_variable = { geopolitical_alignment = 5 }
-		clamp_variable = {
-			var = geopolitical_alignment
-			min = 186
-			max = 370
-		}
 	}
 	set_variable = { global.eco_output_factor = 1 }
 	set_variable = { ecoalpha = global.eco_health }
@@ -185,6 +52,157 @@ ic_pulse = {
 	# every_owned_state = {
 		# state_infra_modifier_setup = yes
 	# }
+	if = {
+		limit = {
+			tag = SOV
+			has_idea = SOV_Discipline_strengthening_initiative
+			NOT = {
+				has_country_flag = disciplined_labor
+			}
+		}
+		set_country_flag = {
+			flag = disciplined_labor
+			days = 30
+			value = 1
+		}
+		add_to_variable = {
+			LaborDiscipline = 0.5
+		}
+	}
+	if = {
+		limit = {
+			tag = SOV
+			OR = {
+				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline
+				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline_Improved
+				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline_Improved_again
+			}
+			NOT = {
+				has_country_flag = disciplined_labor_strength
+			}
+		}
+		set_country_flag = {
+			flag = disciplined_labor_strength
+			days = 30
+			value = 1
+		}
+		add_to_variable = {
+			LaborDiscipline = 1
+		}
+	}
+	if = {
+		limit = {
+			tag = SOV
+			OR = {
+				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline
+				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline_Improved
+				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline_Improved
+			}
+			has_country_flag = Decree_No_745
+			NOT = {
+				has_country_flag = disciplined_labor_decree745
+			}
+		}
+		set_country_flag = {
+			flag = disciplined_labor_decree745
+			days = 30
+			value = 1
+		}
+		add_to_variable = {
+			LaborDiscipline = 0.5
+		}
+	}
+	if = {
+		limit = {
+			tag = SOV
+			OR = {
+				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline
+				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline_Improved
+				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline_Improved_again
+			}
+			has_country_flag = Decree_No_744
+			NOT = {
+				has_country_flag = disciplined_labor_decree744
+			}
+		}
+		set_country_flag = {
+			flag = disciplined_labor_decree744
+			days = 30
+			value = 1
+		}
+		add_to_variable = {
+			LaborDiscipline = 0.5
+		}
+	}
+	if = {
+		limit = {
+			tag = SOV
+			has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline_Improved_again
+			has_country_flag = Decree_No_744
+			NOT = {
+				has_country_flag = disciplined_labor_again
+			}
+		}
+		set_country_flag = {
+			flag = disciplined_labor_again
+			days = 30
+			value = 1
+		}
+		add_to_variable = {
+			LaborDiscipline = 1
+		}
+	}
+	if = {
+		limit = {
+			tag = SOV
+			has_idea = SOV_Anti_corruption_campaign_in_MVD
+			NOT = {
+				has_country_flag = corruption_lowered_MVD
+			}
+		}
+		set_country_flag = {
+			flag = corruption_lowered_MVD
+			days = 30
+			value = 1
+		}
+		add_to_variable = {
+			CorruptionLevel = -0.02
+		}
+	}
+	if = {
+		limit = {
+			tag = SOV
+			has_idea = SOV_Ongoing_mass_dismissals_in_the_Ministry_of_Internal_Affairs
+			NOT = {
+				has_country_flag = corruption_lowered_Internal_Affairs
+			}
+		}
+		set_country_flag = {
+			flag = corruption_lowered_Internal_Affairs
+			days = 30
+			value = 1
+		}
+		add_to_variable = {
+			CorruptionLevel = -0.02
+		}
+	}
+	if = {
+		limit = {
+			tag = SOV
+			has_idea = SOV_Mass_reshuffles_and_dismissals_in_the_party_and_administrative_apparatus
+			NOT = {
+				has_country_flag = mass_reshuffles
+			}
+		}
+		set_country_flag = {
+			flag = mass_reshuffles
+			days = 30
+			value = 1
+		}
+		add_to_variable = {
+			CorruptionLevel = -0.02
+		}
+	}
 	if = {
 		limit = {
 			tag = VIE
@@ -725,7 +743,8 @@ ic_pulse = {
 					owner = UNT
 				}
 			}
-			add_to_variable = { var = domestic_influence_amount value = 2000 }
+			set_temp_variable = { percent_change = 100 }
+			change_domestic_influence_percentage = yes
 			every_state = {
 				limit = { is_core_of = ANG }
 				add_core_of = UNT
@@ -1421,6 +1440,14 @@ ic_pulse = {
 	}
 	if = {
 		limit = {
+			tag = NIC
+			date > 1954.02.01
+			date < 1954.04.01
+		}
+		country_event = nic.6
+	}
+	if = {
+		limit = {
 			tag = FIN
 			date > 1961.01.01
 			date < 1961.03.01
@@ -2032,6 +2059,29 @@ ic_pulse = {
 	if = {
 		limit = {
 				tag = SOV
+				has_completed_focus = SOV_Introduce_the_Fifth_Five_Years_Plan
+				NOT = { 
+					has_completed_focus = SOV_Analyse_The_Results_Of_The_Fifth_Five_Years_Plan
+					has_completed_focus = SOV_Introduce_The_Sixth_Five_Years_Plan
+					has_idea = five_year_plan
+				}
+			}
+		complete_national_focus = SOV_Analyse_The_Results_Of_The_Fifth_Five_Years_Plan
+	}
+	if = {
+		limit = {
+				tag = SOV
+				has_completed_focus = SOV_Introduce_The_Sixth_Five_Years_Plan
+				NOT = { 
+					has_completed_focus = SOV_Analyse_the_results_of_the_Seventh_five_years_plan
+					has_idea = five_year_plan
+				}
+			}
+		complete_national_focus = SOV_Analyse_the_results_of_the_Seventh_five_years_plan
+	}
+	if = {
+		limit = {
+				tag = SOV
 				date > 1967.06.01
 				date < 1967.07.01
 				NOT = { has_country_flag = sov_glass }
@@ -2080,15 +2130,6 @@ ic_pulse = {
 		}
 		country_event = Uganda.61
 		set_country_flag = uga_elect_61
-	}
-	if = {
-		limit = {
-			tag = SOV
-			date > 1982.11.01
-			date < 1982.12.15
-			has_country_leader = { name = "Leonid Brezhnev" ruling_only = yes }
-		}
-		country_event = sov_death.1
 	}
 	if = {
 		limit = {
@@ -3459,6 +3500,7 @@ ic_pulse = {
 			NOT = { tag = RAJ }
 			NOT = { tag = PAK }
 			NOT = { tag = FIN }
+			NOT = { tag = DOM }
 		}
 		load_focus_tree = generic_focus_60
 		set_country_flag = focus_tree_60_reset
@@ -3518,9 +3560,16 @@ ic_pulse = {
 				tag = SOM
 				tag = FRA
 				tag = FIN
+				tag = DOM
 			}
 		}
 		set_country_flag = focus_tree_60_reset
+		if = {
+			limit = {
+				tag = DOM
+			}
+			load_focus_tree = DOM_60s
+		}
 		if = {
 			limit = {
 				tag = IRQ
@@ -3784,6 +3833,7 @@ ic_pulse = {
 			NOT = { tag = RAJ }
 			NOT = { tag = BAN }
 			NOT = { tag = PRC }
+			NOT = { tag = DOM }
 
 		}
 		load_focus_tree = generic_70s
@@ -3817,6 +3867,7 @@ ic_pulse = {
 		}
 		load_focus_tree = TTM_70s
 	}
+
 	if = {
 		limit = {
 			tag = PAK
@@ -3838,6 +3889,18 @@ ic_pulse = {
 		load_focus_tree = PAK_70s_70s_Bhutto_Start
 		set_country_flag = focus_tree_73_reset
 	}
+	if = {
+		limit = {
+			tag = DOM
+			date > 1972.12.31
+			date < 1973.01.31
+			#has_country_flag = Balaguer_70s
+			NOT = { has_country_flag = focus_tree_73_reset }
+		}
+		load_focus_tree = DOM_Balaguer
+		set_country_flag = focus_tree_73_reset
+	}
+	
 	if = {
 		limit = {
 			tag = RAJ
@@ -4512,6 +4575,15 @@ ic_pulse = {
 			has_country_leader = { name = "Nikita Khrushchev" ruling_only = yes }
 		}
 		country_event = soviet_leader_change.2
+	}
+	if = {
+		limit = {
+			tag = SOV
+			date > 1982.03.01
+			date < 1982.04.01
+			has_country_leader = { name = "Leonid Brezhnev" ruling_only = yes }
+		}
+		country_event = soviet_leader_change.3
 	}
 	if = {
 		limit = {
@@ -5862,9 +5934,17 @@ ic_pulse = {
 		limit = {
 			tag = FRA
 			date > 1958.01.01
-			date < 1959.02.01
+			date < 1958.02.01
 		}
 		country_event = fra_crisis.1
+	}
+	if = {
+		limit = {
+			tag = FRA
+			date > 1958.02.01
+			date < 1958.02.31
+		}
+		country_event = fra_crisis.2
 	}
 	if = {
 		limit = {
@@ -5874,6 +5954,15 @@ ic_pulse = {
 			NOT = { has_government = communism }
 		}
 		country_event = french_elections.15
+	}
+	if = {
+		limit = {
+			tag = FRA
+			date > 1953.12.01
+			date < 1954.01.01
+			NOT = { has_government = communism }
+		}
+		country_event = french_elections.11
 	}
 	if = {
 		limit = {
@@ -7446,6 +7535,14 @@ ic_pulse = {
 	}
 	if = {
 		limit = {
+			original_tag = NIC
+			date > 1959.06.01
+			date < 1959.08.01
+		}
+		country_event = nic.17
+	}
+	if = {
+		limit = {
 			original_tag = PAK
 			date > 1958.02.01
 			date < 1958.04.01
@@ -7476,6 +7573,9 @@ ic_pulse = {
 				value = 20
 			}
 		}
+		PAK = {
+			set_capital = { state = 440 }
+		}
 		set_global_flag = Islamabad_Opened
 		news_event = Islamabad.3
 	}
@@ -7505,6 +7605,7 @@ ic_pulse = {
 			date < 1966.01.01
 		}
 		country_event = PM_Shastri.1
+		set_country_flag = Shastri_Tashkent
 	}
 	if = {
 		limit = {
@@ -7561,19 +7662,6 @@ ic_pulse = {
 
 		}
 		country_event = chinese_civil_war.1
-	}
-	if = {
-		limit = {
-			original_tag = HOL
-			country_exists = INS
-			INS = { is_subject_of = HOL }
-			has_war_with = INO
-			OR = {
-				date > 1949.11.01
-				INS = { has_capitulated = yes }
-			}
-		}
-		country_event = indonesia.1
 	}
 	if = {
 		limit = {
@@ -9147,19 +9235,6 @@ ic_pulse = {
 			set_cosmetic_tag = ADR_UNIFIED
 		}
 	}
-	if = {
-		limit = {
-			OR = {
-				tag = HOL
-				tag = INO
-				tag = INS
-			}
-			owns_state = 668
-			date > 1950.4.1
-			date < 1950.5.1
-		}
-		country_event = smk.1
-	}
 
 
 #asian liberation war
@@ -9269,6 +9344,8 @@ ic_pulse = {
 				idea = VIN_peoples_army
 				days = 500
 			}
+			set_variable = { THIS.idea_len_@token:VIN_peoples_army = 500 }
+			set_variable = { THIS.idea_date_@token:VIN_peoples_army = global.num_days }
 		}
 	}
 	if = {
@@ -9411,6 +9488,8 @@ ic_pulse = {
 				idea = volunteer_corps_focus
 				days = 2500
 			}
+			set_variable = { THIS.idea_len_@token:volunteer_corps_focus = 2500 }
+			set_variable = { THIS.idea_date_@token:volunteer_corps_focus = global.num_days }
 			add_ai_strategy = {
 				type = send_volunteers_desire
 				id = CHI

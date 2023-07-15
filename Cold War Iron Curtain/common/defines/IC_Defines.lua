@@ -39,6 +39,7 @@ NDefines.NAir.NAVAL_STRIKE_DAMAGE_TO_STR = 2 -- Balancing value to convert damag
 NDefines.NAir.MISSION_COMMAND_POWER_COSTS = {  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
 NDefines.NAir.MISSION_FUEL_COSTS = {  1.0, 0.5, 0.2, 1.3, 1.3, 20.0, 3.0, 1.0, 1.3, 2.0, 0.5, 2.0, 2.0, 1.0 }
 NDefines.NAir.CAS_NIGHT_ATTACK_FACTOR = 0.5 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
+NDefines.NAir.AIR_WING_AVERAGE_SIZE = 50 						-- Eyeballed average amount of airplanes in wing. Used when calculating air volunteer.
 
 NDefines.NBuildings.AIRBASE_CAPACITY_MULT = 50 -- Each level of airbase building multiplied by this, gives capacity (max operational value). Value is int. 1 for each airplane.
 NDefines.NBuildings.ANTI_AIR_SUPERIORITY_MULT = 100.0 -- How much air superiority reduction to the enemy does our AA guns? Normally each building level = -1 reduction. With this multiplier.
@@ -156,7 +157,7 @@ NDefines.NAI.NUM_SILOS_PER_CIVILIAN_FACTORIES = 0.2
 
 NDefines.NOperatives.AGENCY_CREATION_DAYS = 200
 NDefines.NOperatives.AGENCY_UPGRADE_DAYS = 100
-NDefines.NOperatives.AGENCY_OPERATIVE_RECRUITMENT_TIME = 90
+NDefines.NOperatives.AGENCY_OPERATIVE_RECRUITMENT_TIME = 0
 NDefines.NOperatives.AGENCY_CREATION_FACTORIES = 15
 NDefines.NOperatives.AGENCY_UPGRADE_PER_OPERATIVE_SLOT = 24 -- lol that's all of them
 NDefines.NOperatives.MAX_RECRUITED_OPERATIVES = 25

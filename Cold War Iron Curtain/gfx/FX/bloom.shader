@@ -79,7 +79,6 @@ VertexShader =
 			VertexOut.uvBloom2_3 = float4( 
 					VertexOut.uvBloom + vAxisOffset * Offsets[3], 
 					VertexOut.uvBloom - vAxisOffset * Offsets[3] );
-		
 			return VertexOut;
 		}
 	]]
@@ -92,12 +91,17 @@ PixelShader =
 		float4 main( VS_OUTPUT_BLOOM Input ) : PDX_COLOR
 		{
 			float3 color = tex2Dlod0( BloomSource, Input.uvBloom ).rgb * Weight0;
-		
+			
 			color += Weights[0] * ( tex2Dlod0( BloomSource, Input.uvBloom2_0.xy ).rgb + tex2Dlod0( BloomSource, Input.uvBloom2_0.zw ).rgb );
 			color += Weights[1] * ( tex2Dlod0( BloomSource, Input.uvBloom2_1.xy ).rgb + tex2Dlod0( BloomSource, Input.uvBloom2_1.zw ).rgb );
 			color += Weights[2] * ( tex2Dlod0( BloomSource, Input.uvBloom2_2.xy ).rgb + tex2Dlod0( BloomSource, Input.uvBloom2_2.zw ).rgb );
 			color += Weights[3] * ( tex2Dlod0( BloomSource, Input.uvBloom2_3.xy ).rgb + tex2Dlod0( BloomSource, Input.uvBloom2_3.zw ).rgb );
 			
+			bool isNanGLCompat = (color.r <= 0.0 || 0.0 <= color.r) ? false : true;			
+			if( isNanGLCompat == true )
+			{
+			clip(-1);
+			}
 			return float4(color, 1.0);
 		}
 	]]
@@ -112,7 +116,6 @@ PixelShader =
 			value += Weights[1] * ( tex2Dlod0( BloomSource, Input.uvBloom2_1.xy ).a + tex2Dlod0( BloomSource, Input.uvBloom2_1.zw ).a );
 			value += Weights[2] * ( tex2Dlod0( BloomSource, Input.uvBloom2_2.xy ).a + tex2Dlod0( BloomSource, Input.uvBloom2_2.zw ).a );
 			value += Weights[3] * ( tex2Dlod0( BloomSource, Input.uvBloom2_3.xy ).a + tex2Dlod0( BloomSource, Input.uvBloom2_3.zw ).a );
-			
 			return float4(0.0, 0.0, 0.0, value);
 		}
 	]]

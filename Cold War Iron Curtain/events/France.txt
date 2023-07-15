@@ -320,7 +320,7 @@ country_event = { #FLN Announce execution of french soldiers
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = fra_crisis.6"}
 	is_triggered_only = yes
 	fire_only_once = yes
-	title = "Annoucing the execution of french soldiers" #FLN Announce execution of three french soldiers
+	title = "FL? Announce the execution of french soldiers" #FLN Announce execution of three french soldiers
 	desc = fra_crisis.6.motion_of_non_confidence_desc #It doesnt make things better
 	picture = GFX_fra_crisis_6
 	option = {
@@ -475,18 +475,41 @@ country_event = { #Pfimlin government resign
 	option = {
 		name = "The Assaembly Abandons" #Assembly abandon and agree to let de gaulle in power
 		country_event = {
-				id = fra_crisis.14
-				days = 2
+			id = fra_crisis.14
+			days = 2
 		}
 		ai_chance = {
-			factor = 50
+			factor = 10
+			modifier = {
+				OR = {
+					AND = {
+						has_game_rule = {
+							rule = FRA_1958_crisis
+							option = DEFAULT
+						}
+						is_historical_focus_on = yes
+					}
+					has_game_rule = {
+						rule = FRA_1958_crisis
+						option = FRA_ALGERIAN_COMPROMISE
+					}
+				}
+				factor = 0
+			}
 		}
 	}
 	option = {
 		name = "Assembly refuses" #Assembly refuse
 		country_event = fra_crisis.15
 		ai_chance = {
-			factor = 25
+			factor = 10
+			modifier = {
+				has_game_rule = {
+					rule = FRA_1958_crisis
+					option = FRA_GAULLE_RETURNS
+				}
+				factor = 0
+			}
 		}
 	}
 }
@@ -499,9 +522,13 @@ country_event = { #De gaulle is back
 	desc = fra_crisis.14.motion_of_non_confidence_desc #Coty Speech about calling back de gaulle
 	picture = GFX_fra_crisis_14
 	option = {
-		name = "Viv la France!" #Vive la France!
+		name = "Vive la France!" #Vive la France!
 		custom_effect_tooltip = FRAcrisis.tt.2
 		set_country_flag = Degaulle_called_back
+		set_politics = {
+			ruling_party = conservative
+			elections_allowed = no
+		}
 		create_country_leader = {
 			name = "Charles de Gaulle"
 			desc = "POLITICS_DE_GAULLE_DESC"
@@ -514,7 +541,7 @@ country_event = { #De gaulle is back
 				rassembleur_des_francais
 			}
 		}
-		complete_national_focus = FRA_Give_full_power_to_Degaulle_56
+		complete_national_focus = FRA_Callback_Degaulle
 		news_event = fra_crisis.141
 		ai_chance = {
 			factor = 1
@@ -602,7 +629,10 @@ country_event = { #France ask for increase of the MAP
 			}
 			custom_effect_tooltip = moderately_increase_mutual_assistance_funding
 			hidden_effect = {
-				generic_grant_5_percent_influence_of_USA = yes
+				set_temp_variable = { percent_change = 5 }
+					set_temp_variable = { tag_index = USA.id }
+					set_temp_variable = { influence_target = THIS.id }
+					change_influence_percentage = yes
 				decrease_domestic_influence_5_percent = yes
 			}
 		}
@@ -640,7 +670,10 @@ country_event = { #France commision for aircraft carrier
 		FRA = {
 			country_event = fra_army.4
 			hidden_effect = {
-				generic_grant_5_percent_influence_of_USA = yes
+				set_temp_variable = { percent_change = 5 }
+					set_temp_variable = { tag_index = USA.id }
+					set_temp_variable = { influence_target = THIS.id }
+					change_influence_percentage = yes
 				decrease_domestic_influence_5_percent = yes
 			}
 		}
@@ -700,7 +733,10 @@ country_event = { #France commision for destroyers
 		FRA = {
 			country_event = fra_army.6
 			hidden_effect = {
-				generic_grant_5_percent_influence_of_USA = yes
+				set_temp_variable = { percent_change = 5 }
+					set_temp_variable = { tag_index = USA.id }
+					set_temp_variable = { influence_target = THIS.id }
+					change_influence_percentage = yes
 				decrease_domestic_influence_5_percent = yes
 			}
 		}
@@ -1097,7 +1133,8 @@ country_event = {
 
 	#Send in Raoul Salan!
 	option = {
-		name = indochina_war.1.a			
+		name = indochina_war.1.a	
+		FRA_Jean_de_Lattre_de_Tassigny = { remove_unit_leader_role = yes }
 		add_field_marshal_role = {
 			Character = FRA_raoul_salan
 		}

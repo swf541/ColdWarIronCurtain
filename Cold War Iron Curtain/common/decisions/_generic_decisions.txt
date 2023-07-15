@@ -441,6 +441,8 @@ variables_calculation_category = {
 							idea = influence_increase_cost
 							days = 3650
 						}
+						set_variable = { THIS.idea_len_@token:influence_increase_cost = 3650 }
+						set_variable = { THIS.idea_date_@token:influence_increase_cost = global.num_days }
 					}
 				}
 				if = {
@@ -452,6 +454,8 @@ variables_calculation_category = {
 							idea = UN_national_asset_freeze
 							days = 3650
 						}
+						set_variable = { THIS.idea_len_@token:UN_national_asset_freeze = 3650 }
+						set_variable = { THIS.idea_date_@token:UN_national_asset_freeze = global.num_days }
 					}
 					news_event = UN_RESOLUTION.5
 				}
@@ -464,6 +468,8 @@ variables_calculation_category = {
 							idea = UN_officials_sanctioned
 							days = 3650
 						}
+						set_variable = { THIS.idea_len_@token:UN_officials_sanctioned = 3650 }
+						set_variable = { THIS.idea_date_@token:UN_officials_sanctioned = global.num_days }
 					}
 					news_event = UN_RESOLUTION.6
 				}
@@ -790,7 +796,47 @@ variables_calculation_category = {
 				#log = "[GetDateText]: [Root.GetTag]: industrial pulse effect"
 				industrial_pulse = yes
 
-
+				if = {
+					limit = {
+						check_variable = { quarterly_report = 4 }
+						is_ai = no
+					}
+					resize_array = {
+						array = income_array
+						value = IncomeCheck
+						size = 25
+					}
+					remove_from_array = { array = income_array index = 0 }
+					resize_array = {
+						array = food_array
+						value = FoodBalanceTotal
+						size = 25
+					}
+					remove_from_array = { array = food_array index = 0 }
+					resize_array = {
+						array = debt_array
+						value = currentDebt
+						size = 25
+					}
+					remove_from_array = { array = debt_array index = 0 }
+					resize_array = {
+						array = electricity_array
+						value = resource@electricity
+						size = 25
+					}
+					remove_from_array = { array = electricity_array index = 0 }
+					resize_array = {
+						array = milexp_array
+						value = mil_expend
+						size = 25
+					}
+					remove_from_array = { array = milexp_array index = 0 }
+					set_variable = { quarterly_report = 0 }
+				}
+				else = {
+					add_to_variable = { quarterly_report = 1 }
+				}
+				
 				activate_mission = ic_Financial
 
 				#log = "[GetDateText]: [Root.GetTag]: chemical weapon effect and removal calc"
@@ -946,6 +992,69 @@ variables_calculation_category = {
 				log = "[GetDateText]: [Root.GetTag]: industrial pulse effect"
 				industrial_pulse = yes
 				monthly_power_projection_gain = yes
+				if = {	
+					limit = {
+						# is_ai = no
+						exists = yes
+					}
+					for_loop_effect = {
+						start = 0
+						end = 25
+						value = i
+						set_temp_variable = { new_income = random }
+						multiply_temp_variable = { new_income = 80 }
+						add_to_temp_variable = { new_income = 10 }
+						round_temp_variable = new_income
+						set_temp_variable = { new_food = random }
+						multiply_temp_variable = { new_food = 80 }
+						add_to_temp_variable = { new_food = 10 }
+						round_temp_variable = new_food
+						set_temp_variable = { new_debt = random }
+						multiply_temp_variable = { new_debt = 80 }
+						add_to_temp_variable = { new_debt = 10 }
+						round_temp_variable = new_debt
+						set_temp_variable = { new_electricity = random }
+						multiply_temp_variable = { new_electricity = 80 }
+						add_to_temp_variable = { new_electricity = 10 }
+						round_temp_variable = new_electricity
+						set_temp_variable = { new_milexp = random }
+						multiply_temp_variable = { new_milexp = 80 }
+						add_to_temp_variable = { new_milexp = 10 }
+						round_temp_variable = new_milexp
+						resize_array = {
+							array = income_array
+							value = new_income
+							size = 25
+						}
+						remove_from_array = { array = income_array index = 0 }
+						resize_array = {
+							array = food_array
+							value = new_food
+							size = 25
+						}
+						remove_from_array = { array = food_array index = 0 }
+						resize_array = {
+							array = debt_array
+							value = new_debt
+							size = 25
+						}
+						remove_from_array = { array = debt_array index = 0 }
+						resize_array = {
+							array = electricity_array
+							value = new_electricity
+							size = 25
+						}
+						remove_from_array = { array = electricity_array index = 0 }
+						resize_array = {
+							array = milexp_array
+							value = new_milexp
+							size = 25
+						}
+						remove_from_array = { array = milexp_array index = 0 }
+					}
+					set_variable = { quarterly_report = 4 }
+					add_to_variable = { currentDebt = debt_array^23 }
+				}
 			}
 		}
 		ai_will_do = {
@@ -1167,10 +1276,6 @@ variables_calculation_category = {
 			launch_nuke = { 
 				state = 1326
 				province = 11823
-			}
-			launch_nuke = { 
-				state = 1326
-				province = 1326
 			}
 			launch_nuke = { 
 				state = 1325
@@ -1725,8 +1830,30 @@ operations = {
 			always = no
 		}
 		cancel_trigger = {
-			NOT = {
-				has_war_with = SYR
+			if = {
+				limit = {
+					EGY = {
+						owns_state = 554
+					}
+				}
+				NOT = {
+					has_war_with = EGY
+				}
+			}
+			else_if = {
+				limit = {
+					LEB = {
+						owns_state = 554
+					}
+				}
+				NOT = {
+					has_war_with = LEB
+				}
+			}
+			else = {
+				NOT = {
+					has_war_with = SYR
+				}
 			}
 		}
 		cost = 0
@@ -1740,6 +1867,8 @@ operations = {
 		timeout_effect = {
 			custom_effect_tooltip = IRQ_INTERVEITON_TT
 			white_peace = SYR
+			white_peace = LEB
+			white_peace = EGY
 			news_event = CIA_SYRIA.58
 		}
 
@@ -1759,8 +1888,30 @@ operations = {
 			always = no
 		}
 		cancel_trigger = {
-			NOT = {
-				has_war_with = SYR
+			if = {
+				limit = {
+					EGY = {
+						owns_state = 554
+					}
+				}
+				NOT = {
+					has_war_with = EGY
+				}
+			}
+			else_if = {
+				limit = {
+					LEB = {
+						owns_state = 554
+					}
+				}
+				NOT = {
+					has_war_with = LEB
+				}
+			}
+			else = {
+				NOT = {
+					has_war_with = SYR
+				}
 			}
 		}
 		cost = 0
@@ -1805,18 +1956,52 @@ operations = {
 			}
 			else_if = {
 				limit = {
-					SYR = {
-						controls_state = 905
+					OR = {
+						SYR = {
+							controls_state = 905
+						}
+						LEB = {
+							controls_state = 905
+						}
+						EGY = {
+							controls_state = 905
+						}
 					}
 				}
 				news_event = CIA_SYRIA.61
+				if = {
+					limit = {
+						EGY = {
+							controls_state = 905
+						}
+					}
+					EGY = {
+						transfer_state = 905
+					}
+				}
+				else_if = {
+					limit = {
+						LEB = {
+							controls_state = 905
+						}
+					}
+					LEB = {
+						transfer_state = 905
+					}
+				}
+				else = {
 				SYR = {
 					transfer_state = 905
 				}
+				}
 				white_peace = SYR
+				white_peace = LEB
+				white_peace = EGY
 			}
 			else = {
 				white_peace = SYR
+				white_peace = LEB
+				white_peace = EGY
 			}
 			
 			news_event = CIA_SYRIA.58
@@ -2965,6 +3150,171 @@ war_measures = {
 }
 
  foreign_politics = {
+    COMECON_DOCKYARD_Investment = {
+        icon = generic_operation
+
+        allowed = {
+        }
+
+        available = {
+            always = no
+        } 
+
+        days_mission_timeout = COMECON_DOCKYARD_Investment_Duration
+		days_remove = COMECON_DOCKYARD_Investment_Duration
+
+        fire_only_once = no
+
+        activation = {
+            always = no
+        }
+
+        timeout_effect = {
+            SOV = {
+                COMECON_INVESTMENT_CONSUMER_GOODS = -5
+            }
+			set_country_flag = COMECON_DOCKYARD_PROMPT
+            clr_country_flag = Soviet_Building_Dockyard
+            random_owned_controlled_state = {
+                limit = {
+                    is_coastal = yes
+                    free_building_slots = {
+                        building = dockyard
+                        size > 0
+                        include_locked = yes
+                    }
+                }
+                add_building_construction = {
+                    type = dockyard
+                    level = 1
+                    instant_build = yes
+                }
+            }
+        }
+    }
+    COMECON_FACTORY_Investment = {
+        icon = generic_operation
+
+        allowed = {
+        }
+
+        available = {
+            always = no
+        } 
+
+        days_mission_timeout = COMECON_FACTORY_Investment_Duration
+		days_remove = COMECON_FACTORY_Investment_Duration
+
+        fire_only_once = no
+
+        activation = {
+            always = no
+        }
+
+        timeout_effect = {
+            SOV = {
+                COMECON_INVESTMENT_CONSUMER_GOODS = -5
+            }
+			set_country_flag = COMECON_FACTORY_PROMPT
+            clr_country_flag = Soviet_Building_Factory
+            random_owned_controlled_state = {
+                limit = {
+                    free_building_slots = {
+                        building = industrial_complex
+                        size > 0
+                        include_locked = yes
+                    }
+                }
+                add_building_construction = {
+                    type = industrial_complex
+                    level = 1
+                    instant_build = yes
+                }
+            }
+        }
+    }
+    COMECON_FARM_Investment = {
+        icon = generic_operation
+
+        allowed = {
+        }
+
+        available = {
+            always = no
+        } 
+
+        days_mission_timeout = COMECON_FARM_Investment_Duration
+		days_remove = COMECON_FARM_Investment_Duration
+
+        fire_only_once = no
+
+        activation = {
+            always = no
+        }
+
+        timeout_effect = {
+            SOV = {
+                COMECON_INVESTMENT_CONSUMER_GOODS = -5
+            }
+			set_country_flag = COMECON_FARM_PROMPT
+            clr_country_flag = Soviet_Building_Farms
+            random_owned_controlled_state = {
+                limit = {
+                    free_building_slots = {
+                        building = agri_industrial_complex
+                        size > 0
+                        include_locked = yes
+                    }
+                }
+                add_building_construction = {
+                    type = agri_industrial_complex
+                    level = 1
+                    instant_build = yes
+                }
+            }
+        }
+    }
+    COMECON_ARMS_Investment = {
+        icon = generic_operation
+
+        allowed = {
+        }
+
+        available = {
+            always = no
+        } 
+
+        days_mission_timeout = COMECON_ARMS_Investment_Duration
+		days_remove = COMECON_ARMS_Investment_Duration
+
+        fire_only_once = no
+
+        activation = {
+            always = no
+        }
+
+        timeout_effect = {
+            SOV = {
+                COMECON_INVESTMENT_CONSUMER_GOODS = -5
+            }
+			set_country_flag = COMECON_ARMS_PROMPT
+            clr_country_flag = Soviet_Building_Arms_Factory
+            random_owned_controlled_state = {
+                limit = {
+                    free_building_slots = {
+                        building = arms_factory
+                        size > 0
+                        include_locked = yes
+                    }
+                }
+                add_building_construction = {
+                    type = arms_factory
+                    level = 1
+                    instant_build = yes
+                }
+            }
+        }
+    }
 	start_suez_debug = {
 		icon = generic_industry
 		allowed = {

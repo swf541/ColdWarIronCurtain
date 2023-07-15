@@ -1,0 +1,53 @@
+scripted_gui = {
+	line_graph_sample_scripted_gui = {
+		window_name = "line_graph_sample_gui"
+		context_type = player_context
+
+		visible = {
+			has_country_flag = open_line_gui
+		}
+
+		effects = {
+			close_button_click = {
+				clr_country_flag = open_line_gui
+			}
+			add_button_click = {
+				# Invoke scripted effect to add a random point to the line
+				# See scripted effect file
+
+				SAMPLE_add_random_point_to_line = yes
+			}
+		}
+
+		# Set up dynamic list to generate one line segment per point
+		dynamic_lists = {
+			line_segments = {
+				array = SAMPLE_graph_offsets
+				change_scope = no
+				entry_container = line_graph_line_segment
+				index = segment_idx
+			}
+		}
+
+		properties = {
+			segment = {
+				# Sets they position of the line segment to the graph offset
+				# Equal to -y1
+				y = SAMPLE_graph_offsets^segment_idx
+
+				# Tells the shader how steep to draw the line
+				# Must be equal to (y2 - y1) / 2 + 50
+				frame = SAMPLE_graph_slopes^segment_idx
+			}
+		}
+
+		triggers = {
+			# Optional. This hides every other x label, to give them some breathing room
+			label_visible = {
+				set_temp_variable = { si = segment_idx }
+				modulo_temp_variable = { si = 2 }
+				check_variable = { si = 0 }
+			}
+		}
+	}
+}

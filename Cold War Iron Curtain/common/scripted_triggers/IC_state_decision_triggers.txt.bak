@@ -1,0 +1,227 @@
+dem_leaning_state_conditions = {
+	OR = {
+		AND = {
+			check_variable = { USA.show_usa_congress_alt_3_way = 1 }
+			check_variable = { USA.show_usa_congress_alt = 1 }			
+
+			check_variable = { dem_support > gop_support_check }
+			check_variable = { dem_support > aip_support_check }
+		}
+		AND = {
+			check_variable = { USA.show_usa_congress_alt = 0 }
+			NOT = {
+				check_variable = {
+					senator^0 = 2
+				}
+			}
+			NOT = {
+				check_variable = {
+					senator^1 = 2
+				}
+			}
+			NOT = {
+				check_variable = {
+					senator^2 = 2
+				}
+			}
+		}
+		AND = {
+			check_variable = { USA.show_usa_congress_alt = 1 }
+			check_variable = { dem_support > 52}
+		}
+	}
+
+}
+gop_leaning_state_conditions = {
+	OR = {
+		AND = {
+			check_variable = { USA.show_usa_congress_alt_3_way = 1 }
+			check_variable = { USA.show_usa_congress_alt = 1 }			
+
+			check_variable = { gop_support > dem_support_check }
+			check_variable = { gop_support > aip_support_check }
+		}
+		AND = {
+			check_variable = { USA.show_usa_congress_alt = 0 }
+			NOT = {
+				check_variable = {
+					senator^0 = 1
+				}
+			}
+			NOT = {
+				check_variable = {
+					senator^1 = 1
+				}
+			}
+			NOT = {
+				check_variable = {
+					senator^2 = 1
+				}
+			}
+		}
+		AND = {
+			check_variable = { USA.show_usa_congress_alt = 1 }
+			check_variable = { gop_support > 52}
+		}
+	}
+}
+aip_leaning_state_conditions = {
+	check_variable = { USA.show_usa_congress_alt_3_way = 1 }
+	check_variable = { USA.show_usa_congress_alt = 1 }			
+
+	check_variable = { aip_support > dem_support_check }
+	check_variable = { aip_support > gop_support_check }
+}
+swing_state_conditions = {
+	OR = {
+		AND = {
+			check_variable = { USA.show_usa_congress_alt_3_way = 1 }
+			check_variable = { USA.show_usa_congress_alt = 1 }
+			NOT = {
+				gop_leaning_state_conditions = yes
+			}
+			NOT = {
+				aip_leaning_state_conditions = yes
+			}
+			NOT = {
+				dem_leaning_state_conditions = yes
+			}
+			OR = {
+				AND = {
+					check_variable = {
+						var = dem_support
+						value = gop_support_check
+						compare = less_than_or_equals
+					}
+					check_variable = {
+						var = dem_support
+						value = aip_support_check
+						compare = less_than_or_equals
+					}
+				}
+				AND = {
+					check_variable = {
+						var = gop_support
+						value = dem_support_check
+						compare = less_than_or_equals
+					}
+					check_variable = {
+						var = gop_support
+						value = aip_support_check
+						compare = less_than_or_equals
+					}
+				}
+				AND = {
+					check_variable = {
+						var = aip_support
+						value = dem_support_check
+						compare = less_than_or_equals
+					}
+					check_variable = {
+						var = aip_support
+						value = gop_support_check
+						compare = less_than_or_equals
+					}
+					
+				}
+			}
+		}
+		AND = {
+			check_variable = { USA.show_usa_congress_alt = 0 }
+			OR = {
+				check_variable = {
+					senator^0 = 1
+				}
+				check_variable = {
+					senator^1 = 1
+				}
+				check_variable = {
+					senator^2 = 1
+				}                        
+			}
+			OR = {
+				check_variable = {
+					senator^0 = 2
+				}
+				check_variable = {
+					senator^1 = 2
+				}
+				check_variable = {
+					senator^2 = 2
+				}                        
+			}
+		}
+		AND = {
+			check_variable = { USA.show_usa_congress_alt = 1 }
+			check_variable = { USA.show_usa_congress_alt_3_way = 0 }
+			OR = {
+				check_variable = { gop_support < 52}
+				check_variable = { gop_support = 52}
+			}
+			OR = {
+				check_variable = { dem_support < 52}
+				check_variable = { dem_support = 52}
+			}
+		}
+	}
+}
+sd_complete_check_conditions = {	
+	if = {
+		limit = {
+			check_variable = { v = 1 }	##Increase Development Level
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { v = 2 }	##Increase Irrigation Level
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { v = 3 }
+		}
+		has_state_flag = resource_exploit_cooldown 
+		check_variable = { exploiter_id = ROOT.id }
+	}
+	else = {
+		always = no
+	}
+}
+
+sd_available_conditions = {
+
+	if = {
+		limit = {
+			check_variable = { v = 1 }
+		}
+
+	}
+	else_if = {
+		limit = {
+			check_variable = { v = 2 }
+
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { v = 3 }
+		}
+		NOT = { has_state_flag = resource_exploit_cooldown }
+		NOT = { check_variable = { exploiter_id = ROOT.id } }
+		owner = {
+			controls_state = PREV
+			NOT = { tag = ROOT }
+		}
+		OR = {
+			owner = { is_subject_of = ROOT }
+			AND = {
+				owner = { check_variable = { influence_array_val^0 = ROOT.id } }
+				owner = { check_variable = { influence_array_calc^0 = 0.65 } }
+			}
+		}
+	}
+	else = {
+		always = no
+	}
+}
+

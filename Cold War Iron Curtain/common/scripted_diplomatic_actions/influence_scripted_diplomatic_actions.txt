@@ -1,0 +1,860 @@
+scripted_diplomatic_actions = {
+	opt_remove_from_sphere = {
+		allowed = {}
+		visible = { 
+			ROOT = {	#Is a Faction Leader
+				check_variable = {
+					Sphere_Leader = ROOT.id
+				}				
+			}
+			NOT = { 
+				is_in_array = {
+					array = ROOT.sphere_tag_list
+					value = THIS
+				}				
+			} 
+			has_country_flag = Is_In_Sphere
+		}
+		selectable = {
+			NOT = { has_war_with = ROOT }
+			NOT = { is_subject = no }
+			NOT = {
+				check_variable = {
+					Sphere_Leader = ROOT.id
+				}
+			}
+			NOT = {
+				check_variable = {
+					Sphere_Leader = THIS.id
+				}
+			}
+			OR = {
+				AND = {
+					check_variable = { influence_array^0 = Sphere_Leader }
+					check_variable = { influence_array_val^0 < 50 }	
+				}
+				NOT = { check_variable = { influence_array^0 = Sphere_Leader } }
+			}
+		}
+		requires_acceptance = no
+		cost = 50
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			var:Sphere_Leader = {
+				remove_from_array = {
+					sphere_tag_list = PREV.id
+				}
+			}
+			clr_country_flag = Is_In_Sphere
+			set_variable = {
+				Sphere_Leader = 0
+			}
+			custom_effect_tooltip = Remove_From_Sphere_TT
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = influence_removed_from_sphere # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = influence_removed_from_sphere_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 1
+		}
+	}
+
+	opt_add_to_sphere = {
+		allowed = {}
+		visible = { 
+			NOT = { 
+				is_in_array = {
+					array = ROOT.sphere_tag_list
+					value = THIS
+				}				
+			} 
+			NOT = {
+				has_country_flag = Is_In_Sphere
+			}
+		}
+		selectable = {
+			NOT = { has_war_with = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = majority_influencer_TT
+				check_variable = { influence_array^0 = ROOT }
+				check_variable = { influence_array_val^0 > 50 }	
+			}
+		}
+		requires_acceptance = no
+		cost = 50
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			add_to_array = {
+				ROOT.sphere_tag_list = THIS.id
+			}
+			set_country_flag = Is_In_Sphere
+				set_variable = {
+					Sphere_Leader = ROOT.id
+				}
+			custom_effect_tooltip = Add_to_Sphere_TT
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = influence_added_to_sphere # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = influence_added_to_sphere_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 1
+		}
+	}
+	
+
+# Influence Nation
+	opt_influence_action = {
+		allowed = {}
+		visible = { NOT = { check_variable = { influenced_by = ROOT } } }
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+			}
+			NOT = { has_war_with = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = influence_FPP_1_TT
+				check_variable = { ROOT.foreignPowerProjection > 1 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = influence_already_influencing_TT
+				ROOT = { NOT = { has_country_flag = flag_influencing } }
+			}
+			custom_trigger_tooltip = {
+				tooltip = influence_already_being_influenced_TT
+				NOT = { has_variable = influenced_by }
+			}
+			custom_trigger_tooltip = {
+				tooltip = Influence_Action_1_TT
+				OR = {
+					OR = {
+						check_variable = { influence_array^0 = ROOT }
+						check_variable = { influence_array^1 = ROOT }
+						check_variable = { influence_array^2 = ROOT }
+						check_variable = { influence_array^3 = ROOT }
+						check_variable = { influence_array^4 = ROOT }
+						check_variable = { influence_array^5 = ROOT }
+						check_variable = { influence_array^6 = ROOT }
+						check_variable = { influence_array^7 = ROOT }					
+					}
+					OR = {
+						AND = { NOT = { has_variable = influence_array^0 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^1 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^2 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^3 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^4 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^5 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^6 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+						AND = { NOT = { has_variable = influence_array^7 } check_variable = { ROOT.grossdomesticproduct > grossdomesticproduct  } }
+					}
+				}
+			}
+		}
+		requires_acceptance = no
+		cost = 50
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			add_to_variable = { ROOT.foreignPowerProjection = -1 }
+
+			set_temp_variable = { influence_gain = 1 }
+			set_variable = { drift_modifier = modifier@drift_defence_factor }
+			add_to_variable = { drift_modifier = 0.001 }
+			divide_variable = { influence_gain = drift_modifier }
+
+
+			set_temp_variable = { percent_change = influence_gain }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes
+
+			set_variable = { influenced_by = ROOT }
+
+			ROOT = {
+				set_country_flag = flag_influencing
+				set_variable = { influence_target_tag = PREV }
+				#add_ideas = idea_influencing_daily # to be added if pdx fixes an issue with removing it
+				set_variable = { show_start_influencing = 1 }
+			}
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = influence_target_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = influence_target_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+
+# Stop Influencing
+	opt_stop_influence_action = {
+		allowed = {}
+		visible = {
+			ROOT = { has_country_flag = flag_influencing }
+			check_variable = { influenced_by = ROOT }
+		}
+		selectable = {
+		}
+		requires_acceptance = no
+		cost = 0
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			clear_variable = influenced_by
+			ROOT = {
+				clr_country_flag = flag_influencing
+				#remove_ideas = idea_influencing_daily # to be added if pdx fixes an issue with removing it
+				set_variable = { show_stop_influencing = 1 }
+			}
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = influence_target_stop # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = influence_target_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+
+# Start Military Subsidies
+	opt_influence_start_military_subsidies = {
+		allowed = {}
+		visible = {
+			ROOT = {
+				NOT = {
+					is_in_array = {
+						array = military_subsidies
+						value = PREV
+					}
+				}
+			}
+		}
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+			}
+			NOT = { has_war_with = ROOT }
+			check_variable = { ROOT.foreignPowerProjection > 5 }
+			custom_trigger_tooltip = {
+				tooltip = Influence_Action_TOP_INFLUENCER_TT
+				check_variable = { influence_array^0 = ROOT }
+			}
+			custom_trigger_tooltip = {
+				tooltip = Influence_Action_40_CHECK_TT
+				check_variable = { influence_array_val^0 > 40 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = Influence_Action_MIL_SUBSIDY_MONEY_CHECK_TT
+				check_variable = { ROOT.SubsidiyCheck > mil_expend_subsidy }
+			}
+			custom_trigger_tooltip = {	#not twice
+				tooltip = Influence_Action_MIL_SUBSIDY_CHECK_TT
+				NOT = { has_country_flag = military_subsidized }
+				NOT = {
+					meta_trigger = {
+						debug = yes
+						text = {
+							has_country_flag = [CHECKTAG]_military_subsidizer
+						}
+						CHECKTAG = "[ROOT.GetTag]"
+					}
+				}
+			}
+		}
+		requires_acceptance = no
+		cost = 50
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			ROOT = { add_to_array = { military_subsidies = PREV.id } }
+			set_country_flag = military_subsidized
+			meta_effect = {
+				text = {
+					set_country_flag = [ROOTTAG]_military_subsidizer
+				}
+				ROOTTAG = "[ROOT.GetTag]"
+			}
+			set_variable = { mil_subsidy_id = ROOT.id } # used for income generator
+			add_to_variable = { ROOT.foreignPowerProjection = -5 }
+			set_temp_variable = { influence_gain = 20 }
+
+			set_temp_variable = { percent_change = influence_gain }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target_tag = THIS.id }
+			change_influence_percentage = yes
+			# opinions
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = subsidizer
+			}
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = start_subsidy_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = start_subsidy_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+
+# Stop Military Subsidies
+	opt_influence_stop_military_subsidies = {
+		allowed = {}
+		visible = {
+			ROOT = {
+				is_in_array = {
+					array = military_subsidies
+					value = PREV
+				}
+			}
+		}
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+			}
+			NOT = { has_war_with = ROOT }
+			ROOT = {
+				is_in_array = {
+					array = military_subsidies
+					value = PREV
+				}
+			}
+		}
+		requires_acceptance = no
+		cost = 250
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			ROOT = { remove_from_array = { military_subsidies = PREV } }
+			clr_country_flag = military_subsidized
+			meta_effect = {
+				text = { clr_country_flag = [ROOTTAG]_military_subsidizer }
+				ROOTTAG = "[ROOT.GetTag]"
+			}
+			clear_variable = mil_subsidy_id
+			# opinions
+			remove_opinion_modifier = {
+				target = ROOT
+				modifier = subsidizer
+			}
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = stop_subsidy_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = stop_subsidy_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+
+
+# Economic Exploitation
+
+# Stop Economic Exploitation
+
+# Pay Off Debt
+	opt_influence_pay_off_debt = {
+		allowed = {}
+		visible = {}
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+			}
+			NOT = { has_war_with = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = influencer_TT
+				is_influencer = yes
+			}
+			custom_trigger_tooltip = {
+				tooltip = influence_Debt_Ratio_TT
+				check_variable = { ROOT.currentMoney > currentDebt }
+			}
+			custom_trigger_tooltip = {
+				tooltip = influence_Debt_TT
+				check_variable = { currentDebt > 0 }
+			}
+		}
+		requires_acceptance = no
+		cost = 0
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			set_temp_variable = { influence_gain = 33 } 
+			set_temp_variable = { percent_change = influence_gain }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target_tag = THIS.id }
+			change_influence_percentage = yes
+
+			set_temp_variable = { tempDebt = currentDebt }
+			subtract_from_variable = { ROOT.currentMoney = currentDebt }
+			for_each_loop = {
+				array = debtPaymentArray
+				index = i
+				set_variable = { debtTotalsArray^i = 0 } 
+				set_variable = { debtPaymentArray^i = 0 } 	
+				set_variable = { debtOwnerArray^i = 0 }
+			}
+			set_variable = { currentDebtPayments = 0 }
+			set_variable = { currentDebt = 0 }
+			set_variable = { debtPayment = 0 }
+			# opinions
+			divide_temp_variable = { tempDebt = 10 }
+			round_temp_variable = tempDebt
+			if = { limit = { check_variable = { tempDebt > 40 } }
+				add_opinion_modifier = { target = ROOT modifier = paid_off_debt5 }
+			}
+			else_if = { limit = { check_variable = { tempDebt > 30 } }
+				add_opinion_modifier = { target = ROOT modifier = paid_off_debt4 }
+			}
+			else_if = { limit = { check_variable = { tempDebt > 20 } }
+				add_opinion_modifier = { target = ROOT modifier = paid_off_debt3 }
+			}
+			else_if = { limit = { check_variable = { tempDebt > 10 } }
+				add_opinion_modifier = { target = ROOT modifier = paid_off_debt2 }
+			}
+			else = {
+				add_opinion_modifier = { target = ROOT modifier = paid_off_debt1 }
+			}
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = pay_off_debt_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = pay_off_debt_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+
+# Economic Aid
+
+# Start Trade Agreement
+	opt_influence_trade_agreement_yes_action = {
+		allowed = {}
+		visible = {
+			meta_trigger = {
+				text = {
+					NOT = { has_country_flag = trade_treaty2_with_[ROOTTAG] }
+					ROOT = { NOT = { has_country_flag = trade_treaty2_with_[THISTAG] } }
+				}
+				ROOTTAG = "[ROOT.GetTag]"
+				THISTAG = "[THIS.GetTag]"
+			}
+		}
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+			}
+			NOT = { has_war_with = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = influence_LOW_TT
+				any_of = {
+					array = influence_array
+					check_variable = { influence_array^i = ROOT }
+					check_variable = { influence_array_val^i > 1 }
+				}
+			}
+			NOT = { is_puppet_of = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = influence_TRADE_AGREEMENT_TT
+				meta_trigger = {
+					text = {
+						NOT = { has_country_flag = trade_treaty1_with_[ROOTTAG] }
+						ROOT = { NOT = { has_country_flag = trade_treaty1_with_[THISTAG] } }
+					}
+					ROOTTAG = "[ROOT.GetTag]"
+					THISTAG = "[THIS.GetTag]"
+				}
+			}
+		}
+		requires_acceptance = yes
+		cost = 100
+		command_power = 0
+		show_acceptance_on_action_button = yes
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			meta_effect = {
+				text = {
+					add_ideas = trade_treaty_[ROOTTAG]
+					set_country_flag = trade_treaty2_with_[ROOTTAG]
+					ROOT = { add_ideas = trade_treaty_[THISTAG] }
+					ROOT = { set_country_flag = trade_treaty2_with_[THISTAG] }
+				}
+				ROOTTAG = "[ROOT.GetTag]"
+				THISTAG = "[THIS.GetTag]"
+			}
+			# opinions
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = has_trade_agreement
+			}
+			ROOT = {
+				add_opinion_modifier = {
+					target = FROM
+					modifier = has_trade_agreement
+				}
+			}
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = trade_agreement_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = yes } # accept button will be disabled if no
+		receive_description = trade_agreement_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+
+# Stop Trade Agreement
+	opt_influence_stop_trade_agreement_yes_action = {
+		allowed = {}
+		visible = {
+			meta_trigger = {
+				text = {
+					has_country_flag = trade_treaty2_with_[ROOTTAG]
+					ROOT = { has_country_flag = trade_treaty2_with_[THISTAG] }
+				}
+				ROOTTAG = "[ROOT.GetTag]"
+				THISTAG = "[THIS.GetTag]"
+			}
+		}
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+			}
+			NOT = { has_war_with = ROOT }
+			NOT = { is_puppet_of = ROOT }
+		}
+		requires_acceptance = yes
+		cost = 100
+		command_power = 0
+		show_acceptance_on_action_button = yes
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			meta_effect = {
+				text = {
+					remove_ideas = trade_treaty_[ROOTTAG]
+					clr_country_flag = trade_treaty2_with_[ROOTTAG]
+					ROOT = { remove_ideas = trade_treaty_[THISTAG] }
+					ROOT = { clr_country_flag = trade_treaty2_with_[THISTAG] }
+				}
+				ROOTTAG = "[ROOT.GetTag]"
+				THISTAG = "[THIS.GetTag]"
+			}
+			# opinions
+			remove_opinion_modifier = {
+				target = ROOT
+				modifier = has_trade_agreement
+			}
+			ROOT = {
+				remove_opinion_modifier = {
+					target = FROM
+					modifier = has_trade_agreement
+				}
+			}
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = trade_agreement_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = yes } # accept button will be disabled if no
+		receive_description = trade_agreement_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+    #opt_add_to_sphere
+    #opt_influence_foriegn_investment
+    #opt_influence_lease_state (Specific Resource or Entire Production)
+    #opt_influence_trade_exclusivity
+    #opt_influence_state_intervention_def_war
+    #opt_influence_stage_intervention_geopolitical
+    #opt_influence_adjust_trade_rates
+
+# Mutual Defense Agreement
+	opt_influence_mutual_defense_agreement = {
+		allowed = {}
+		visible = {
+			NOT = {
+				meta_trigger = {
+					text = { has_country_flag = [CHECKTAG]_mutual_defense_agreement }
+					CHECKTAG = "[ROOT.GetTag]"
+				}
+			}
+		}
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+			}
+			NOT = { has_war_with = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = influence_MAJORITY_TT
+				check_variable = { influence_array^0 = ROOT }
+				check_variable = { influence_array_val^0 > 50 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = influence_FPP_5_TT
+				check_variable = { ROOT.foreignPowerProjection > 4 }
+			}
+		}
+		requires_acceptance = no
+		cost = 200
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			meta_effect = {
+				text = { set_country_flag = [ROOTTAG]_mutual_defense_agreement }
+				ROOTTAG = "[ROOT.GetTag]"
+			}
+			ROOT = {
+				meta_effect = {
+					text = { set_country_flag = [TARGETTAG]_mutual_defense_agreement }
+					TARGETTAG = "[PREV.GetTag]"
+				}
+			}
+			ROOT = {
+				give_guarantee = PREV
+				diplomatic_relation = {
+					country = PREV
+					relation = military_access
+					active = yes
+				}
+				diplomatic_relation = {
+					country = PREV
+					relation = docking_rights
+					active = yes
+				}
+			}
+			give_guarantee = ROOT
+			diplomatic_relation = {
+				country = ROOT
+				relation = military_access
+				active = yes
+			}
+			diplomatic_relation = {
+				country = ROOT
+				relation = docking_rights
+				active = yes
+			}
+			add_to_variable = { ROOT.foreignPowerProjection = -5 }
+			# give influence (same as 1 day of Influencing)
+			set_temp_variable = { influence_gain = 50 }
+			for_loop_effect = {
+				end = influence_array^num
+				value = v
+				if = { limit = { check_variable = { influence_array^v = ROOT } }
+					add_to_variable = { influence_array_val^v = influence_gain }
+					set_country_flag = found
+				}
+			}
+			if = { limit = { NOT = { has_country_flag = found } }
+				add_to_array = { influence_array = ROOT.id }
+				add_to_array = { influence_array_val = influence_gain }
+			}
+			clr_country_flag = found
+			recalculate_influence = yes
+			# opinions
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = has_mdt
+			}
+			ROOT = {
+				add_opinion_modifier = {
+					target = FROM
+					modifier = has_mdt
+				}
+			}
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = mutual_defense_treaty_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = mutual_defense_treaty_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+
+# Break Mutual Defense Agreement
+	opt_influence_break_mutual_defense_agreement = {
+		allowed = {}
+		visible = {
+			meta_trigger = {
+				text = { has_country_flag = [CHECKTAG]_mutual_defense_agreement }
+				CHECKTAG = "[ROOT.GetTag]"
+			}
+		}
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+			}
+			NOT = { has_war_with = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = influencer_TT
+				is_influencer = yes
+			}
+			custom_trigger_tooltip = {
+				tooltip = influence_FPP_5_TT
+				check_variable = { ROOT.foreignPowerProjection > 4 }
+			}			
+		}
+		requires_acceptance = no
+		cost = 200
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			meta_effect = {
+				text = { clr_country_flag = [ROOTTAG]_mutual_defense_agreement }
+				ROOTTAG = "[ROOT.GetTag]"
+			}
+			ROOT = {
+				meta_effect = {
+					text = { clr_country_flag = [TARGETTAG]_mutual_defense_agreement }
+					TARGETTAG = "[PREV.GetTag]"
+				}
+			}
+			ROOT = {
+				diplomatic_relation = {
+					country = PREV
+					relation = guarantee
+					active = no
+				}
+				diplomatic_relation = {
+					country = PREV
+					relation = military_access
+					active = no
+				}
+				diplomatic_relation = {
+					country = PREV
+					relation = docking_rights
+					active = no
+				}
+			}
+			diplomatic_relation = {
+				country = ROOT
+				relation = guarantee
+				active = no
+			}
+			diplomatic_relation = {
+				country = ROOT
+				relation = military_access
+				active = no
+			}
+			diplomatic_relation = {
+				country = ROOT
+				relation = docking_rights
+				active = no
+			}
+			recalculate_influence = yes
+			# opinions
+			remove_opinion_modifier = {
+				target = ROOT
+				modifier = has_mdt
+			}
+			ROOT = {
+				remove_opinion_modifier = {
+					target = FROM
+					modifier = has_mdt
+				}
+			}
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		# SEND POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		# send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
+		can_be_sent = {} # send button will be disabled if no
+		send_description = break_mutual_defense_treaty_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# RECEIVE POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		# receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = mutual_defense_treaty_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# PLAYER FEEDBACK ON ACCEPT/REJECT
+		#can be overridden to customize accepted/rejected pop ups for the sender
+		# AI
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+
+}

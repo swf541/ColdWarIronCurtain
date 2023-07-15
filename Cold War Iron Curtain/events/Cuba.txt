@@ -9,6 +9,7 @@ add_namespace = CubaSterling
 add_namespace = CubaTourism
 add_namespace = Cuban_Revolution
 add_namespace = cuban_uprising
+add_namespace = CUB_Military_Rearmament
 
 # USA Cuban Protection Pact
 country_event = {
@@ -75,8 +76,7 @@ country_event = {
 		name = cuba.4.d
 		create_country_leader = {
 			name = "Fidel Castro"
-			picture = "gfx/leaders/CUB/fidel_castro.dds"
-			expire = "1999.1.1"
+			picture = "fidel_castro.dds"
 			ideology = marxism_leninism
 		}
 		add_popularity = { ideology = communism popularity = 0.65 }
@@ -581,10 +581,7 @@ country_event = {
 		#complete_national_focus = CUB_hevia
 		ai_chance = {
 			factor = 33
-			modifier = {
-				is_historical_focus_on = yes
-				factor = 0
-			}
+			
 		}
 	}
 }
@@ -1169,10 +1166,14 @@ country_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		hidden_effect = {
+			complete_national_focus = CUB_The_Elections_of_1958
+		}
+	}
 
 	option = {
 		name = "Prepare to Abandon the Country"
-		complete_national_focus = CUB_The_Elections_of_1958
 		complete_national_focus = CUB_The_Fall_of_the_Regime
 		complete_national_focus = CUB_The_Cuban_Revolution
 		add_corps_commander_role = { 
@@ -1248,16 +1249,29 @@ country_event = {
 			logistics_skill = 2
 		}  
 		ai_chance = {
-			factor = 100
+			factor = 10
 			modifier = {
-				add = 1000
+				factor = 1
 				is_historical_focus_on = yes
+			}
+			modifier = {
+				has_game_rule = {
+					rule = CUB_1958_elections
+					option = CUB_AGUERO_1958
+				}
+				factor = 0
+			}
+			modifier = {
+				has_game_rule = {
+					rule = CUB_1958_elections
+					option = CUB_STERLING_1958
+				}
+				factor = 0
 			}
 		}
 	}
 	option = {
 		name = "Elect Andres Aguero"
-		complete_national_focus = CUB_The_Elections_of_1958
 		complete_national_focus = CUB_President_Aguero
 		create_country_leader = {
 			name = "Andres Rivero Aguero"
@@ -1265,12 +1279,25 @@ country_event = {
 			ideology = despotism
 		}
 		ai_chance = {
-			factor = 0
+			factor = 10
+			modifier = {
+				has_game_rule = {
+					rule = CUB_1958_elections
+					option = CUB_REVOLUTION
+				}
+				factor = 0
+			}
+			modifier = {
+				has_game_rule = {
+					rule = CUB_1958_elections
+					option = CUB_STERLING_1958
+				}
+				factor = 0
+			}
 		}
 	}
 	option = {
 		name = "Elect Carlos Sterling"
-		complete_national_focus = CUB_The_Elections_of_1958
 		complete_national_focus = CUB_President_Sterling
 		set_politics = {
 			ruling_party = Social_Liberalism
@@ -1282,7 +1309,21 @@ country_event = {
 			ideology = social_liberal
 		}
 		ai_chance = {
-			factor = 0
+			factor = 10
+			modifier = {
+				has_game_rule = {
+					rule = CUB_1958_elections
+					option = CUB_AGUERO_1958
+				}
+				factor = 0
+			}
+			modifier = {
+				has_game_rule = {
+					rule = CUB_1958_elections
+					option = CUB_REVOLUTION
+				}
+				factor = 0
+			}
 		}
 	}
 }
@@ -1401,6 +1442,60 @@ news_event = {
 
 	option = {
 		name = "They never stood a chance"
+	}
+}
+country_event = {
+    id = CUB_Military_Rearmament.1
+immediate = {log = "[GetDateText]: [Root.GetTag]: id = CUB_Military_Rearmament.1"}
+    title = "Dominican Civil War Begins"
+    picture = GFX_CUB_Military_Rearmament.1
+    desc = CUB_Military_Rearmament.1.d
+
+    trigger = {
+        original_tag = CUB
+        has_government = marxism_leninism 
+    }
+    is_triggered_only = yes
+    fire_only_once = yes
+    option = {
+        name = "Socialism or Death!"
+        hidden_effect = {   
+			CUB = {
+				load_oob = CUB_1961		
+			}
+        }
+    }
+}
+
+country_event = {
+    id = cuban_uprising.2
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = cuban_uprising.2"}
+    title = "The Escambray Rebellion"
+    #picture = 
+    desc = "oh fugg randy orton just got batista bombed"
+
+    trigger = {
+		original_tag = CUB
+		has_government = marxism_leninism
+	}
+    is_triggered_only = yes
+    fire_only_once = yes
+    option = {
+        name = "WATCH OUT WATCH OUT WATCH OUT"
+		set_country_flag = anti_castro_insurgency
+		set_variable = { crusader_insurgency = 20 }
+		set_country_flag = crusader_insurgency
+		1769 = {
+			set_state_flag = batista_loyalist_hideout
+			set_state_flag = insurg_lvl1
+			add_province_modifier = {
+				static_modifiers = { insurgency_tier1 }
+				province = {
+					all_provinces = yes
+				}
+			}
+			add_state_modifier = { modifier = { local_factory_sabotage = 0.05 } }
+		}
 	}
 }
 

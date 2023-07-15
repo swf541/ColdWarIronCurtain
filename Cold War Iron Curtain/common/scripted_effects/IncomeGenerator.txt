@@ -229,24 +229,34 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	multiply_variable = { industrial_complex_tech = inc_productivity }
 	multiply_variable = { industrial_complex_total = industrial_complex_tech }
 	set_variable = { industrial_complex_tech_calc = industrial_complex_tech }
-	#add_to_variable = { industrial_complex_tech_calc = -1 }
+
+	set_variable = { milfactory_count = num_of_military_factories }
+
+	set_variable = { milfactory_count_total = milfactory_count }
+	multiply_variable = { milfactory_count_total = global.GlobalCredit } #DIVIDER
+	set_variable = { arms_factory_tech = 0.05 }
+
+	multiply_variable = { arms_factory_tech = inc_productivity }
+	multiply_variable = { milfactory_count_total = arms_factory_tech }
+	add_to_variable = { industrial_complex_total = milfactory_count_total }
+
 	add_to_variable = { IncomeTotal = industrial_complex_total }
 	set_variable = { IND_DISPLAY = industrial_complex_total }
 	#if = { limit = { is_ai = no } #log = "current income = [?IncomeTotal] / industrial_complex_total = [?industrial_complex_total]" }
 
-	set_variable = { milfactory_count = num_of_military_factories }
+
 
 #agri_industrial_complex
 	multiply_variable = { farm_total = global.GlobalCredit } #DIVIDER
-	set_variable = { farm_tech = 1 }
-	if = { limit = { has_tech = agriculture_I } add_to_variable = { farm_tech = 0.15 } }
-	if = { limit = { has_tech = agriculture_II } add_to_variable = { farm_tech = 0.15 } }
-	if = { limit = { has_tech = agriculture_III } add_to_variable = { farm_tech = 0.15 } }
-	if = { limit = { has_tech = agriculture_IV } add_to_variable = { farm_tech = 0.15 } }
-	if = { limit = { has_tech = agriculture_V } add_to_variable = { farm_tech = 0.15 } }
-	if = { limit = { has_tech = agriculture_VI } add_to_variable = { farm_tech = 0.15 } }
-	if = { limit = { has_tech = agriculture_VII } add_to_variable = { farm_tech = 0.15 } }
-	if = { limit = { has_tech = agriculture_VIII } add_to_variable = { farm_tech = 0.15 } }
+	set_variable = { farm_tech = 0.1 }
+	if = { limit = { has_tech = agriculture_I } add_to_variable = { farm_tech = 0.05 } }
+	if = { limit = { has_tech = agriculture_II } add_to_variable = { farm_tech = 0.05 } }
+	if = { limit = { has_tech = agriculture_III } add_to_variable = { farm_tech = 0.05 } }
+	if = { limit = { has_tech = agriculture_IV } add_to_variable = { farm_tech = 0.05 } }
+	if = { limit = { has_tech = agriculture_V } add_to_variable = { farm_tech = 0.05 } }
+	if = { limit = { has_tech = agriculture_VI } add_to_variable = { farm_tech = 0.05 } }
+	if = { limit = { has_tech = agriculture_VII } add_to_variable = { farm_tech = 0.05 } }
+	if = { limit = { has_tech = agriculture_VIII } add_to_variable = { farm_tech = 0.05 } }
 	add_to_variable = { farm_tech = farm_income_bonus }
 	add_to_variable = { farm_tech = agriculture_credit_factor_difference }
 	multiply_variable = { farm_tech = inc_productivity }
@@ -287,7 +297,7 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	#if = { limit = { is_ai = no } #log = "current income = [?IncomeTotal] / dockyard_total = [?dockyard_total]" }
 
 	#synthetic_refinery +15%
-	multiply_variable = { oil_refinery_total = 1.8 } #DIVIDER
+	multiply_variable = { oil_refinery_total = 1.25 } #DIVIDER
 	set_variable = { oil_refinery_tech = 1 }
 	if = { limit = { has_tech = ww_oil } add_to_variable = { oil_refinery_tech = 0.15 } }
 	if = { limit = { has_tech = plastics_I } add_to_variable = { oil_refinery_tech = 0.15 } }
@@ -306,7 +316,7 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	#if = { limit = { is_ai = no } #log = "current income = [?IncomeTotal] / oil_refinery_total = [?oil_refinery_total]" }
 
 	#steel_factory +15%			steel_works_total
-	multiply_variable = { steel_works_total = 1.8 } #DIVIDER
+	multiply_variable = { steel_works_total = 1 } #DIVIDER
 	set_variable = { steel_works_tech = 1 }
 	if = { limit = { has_tech = materials_I } add_to_variable = { steel_works_tech = 0.15 } }
 	if = { limit = { has_tech = materials_II } add_to_variable = { steel_works_tech = 0.15 } }
@@ -326,7 +336,7 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 	#if = { limit = { is_ai = no } #log = "current income = [?IncomeTotal] / steel_works_total = [?steel_works_total]" }
 
 	#tungsten_factory +15%		tungsten_factory_total
-	multiply_variable = { tungsten_factory_total = 1.8 } #DIVIDER
+	multiply_variable = { tungsten_factory_total = 1 } #DIVIDER
 	set_variable = { tungsten_factory_tech = 1 }
 	if = { limit = { has_tech = chemistry_I } add_to_variable = { tungsten_factory_tech = 0.15 } }
 	if = { limit = { has_tech = chemistry_II } add_to_variable = { tungsten_factory_tech = 0.15 } }
@@ -658,6 +668,21 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 
 	set_variable = { SubsidiyCheck = IncomeTotal } # this IncomeTotal is the sum of all Income minus Corruption, Imports cost, Insurgency Funding Costs and Policy Costs
 	multiply_variable = { SubsidiyCheck = 0.25 }
+    if = {
+        limit = {
+            has_country_flag = Soviet_Subsidies
+        }
+        set_variable = { subsidiy_base = 0 }
+        add_to_variable = { subsidiy_base = mil_expend }
+        add_to_variable = { subsidiy_base = welfare_cost }
+        add_to_variable = { subsidiy_base = cpi_cost }
+        add_to_variable = { subsidiy_base = edu_cost }
+        add_to_variable = { subsidiy_base = health_cost }
+        add_to_variable = { subsidiy_base = pub_cost }
+        multiply_variable = { subsidiy_base = 0.25 }
+        subtract_from_variable = { SOV.currentMoney = subsidiy_base }
+        add_to_variable = {IncomeTotal = subsidiy_base }
+    }
 
 	add_to_variable = { currentMoney = IncomeTotal } # add income to money
 	set_variable = { IncomeCheck = IncomeTotal }
@@ -724,10 +749,10 @@ income_effect = {		#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
 			Interest_Rate = 1.04
 		}
 	}
-	if ={ limit = { check_variable = { currentMoney < 0 } }
-		set_variable = { pulse_deficit = currentMoney }
-		multiply_variable = { pulse_deficit = -1 }
-		add_to_variable = { currentMoney = pulse_deficit }
+	if ={ 
+		limit = { 
+			check_variable = { pulse_deficit > currentMoney }
+		}
 		if = { 
 			limit = { 
 				check_variable = { defaultCheck < currentDebt }
@@ -1321,6 +1346,9 @@ public_expenditure = {
 
 	add_to_variable = { pub_cost = pub_cost_cor_penalty }
 	add_to_variable = { pub_cost_display = pub_cost_cor_penalty }
+
+	add_to_variable = { pub_cost = comecon_spending_total }
+	add_to_variable = { pub_cost_display = comecon_spending_total }
 	subtract_from_variable = { IncomeCheck = pub_cost }
 }
 
@@ -1572,7 +1600,6 @@ gdp_calculation = {
 	set_variable = { ROOT.steel_works_totalGDP = 0 }
 	set_variable = { ROOT.tungsten_factory_totalGDP = 0 }
 	set_variable = { ROOT.office_park_totalGDP = 0 }
-
 }
 
 tax_rate = {
@@ -1806,7 +1833,39 @@ tax_rate = {
 	multiply_variable = {
 		industrial_base = industrial_base_modifier
 	}
-	#standard_deviation_for_industrial_base = yes
+	standard_deviation_for_industrial_base = yes
+	process_credit_rating = yes
+	set_interest_rates = yes
+	set_variable = {
+		Interest_Rate_Display = Interest_Rate
+	}
+	divide_variable = {
+		Interest_Rate_Display = 100
+	}
+	set_variable = {
+		Domestic_Interest_Rate_Display = Interest_Rate
+	}
+	divide_variable = {
+		Domestic_Interest_Rate_Display = 100
+	}
+	multiply_variable = {
+		Domestic_Interest_Rate_Display = 0.75
+	}
+	set_variable = {
+		Domestic_Interest_Rate = Interest_Rate
+	}
+	multiply_variable = {
+		Domestic_Interest_Rate = 0.75
+	}
+	multiply_variable = {
+		Favorable_Interest_Rate = 0.65
+	}
+	set_variable = { austerityCheck = grossdomesticproduct }
+	multiply_variable = { austerityCheck = austerity_multiplier }
+	set_variable = { defaultCheck = grossdomesticproduct }
+	multiply_variable = { defaultCheck = default_multiplier }
+
+
 	set_variable = { austerityCheck = grossdomesticproduct }
 	multiply_variable = { austerityCheck = austerity_multiplier }
 	set_variable = { defaultCheck = grossdomesticproduct }
@@ -2884,24 +2943,6 @@ standard_deviation_for_industrial_base = {
 					industrial_base_tier = 1
 				}   
 			}
-			process_credit_rating = yes
-			set_variable = {
-				Interest_Rate_Display = Interest_Rate
-			}
-			set_variable = {
-				Domestic_Interest_Rate = Interest_Rate
-			}
-			multiply_variable = {
-				Domestic_Interest_Rate = 0.75
-			}
-			multiply_variable = {
-				Favorable_Interest_Rate = 0.65
-			}
-			set_variable = { austerityCheck = grossdomesticproduct }
-			multiply_variable = { austerityCheck = austerity_multiplier }
-			set_variable = { defaultCheck = grossdomesticproduct }
-			multiply_variable = { defaultCheck = default_multiplier }
-
 		}
 		if = {
 			limit = {
@@ -3401,7 +3442,7 @@ process_credit_rating = {
 			}
 			lower_credit_rating = yes
 		}
-		set_interest_rates = yes
+		
 	}
 }
 raise_credit_rating = {
@@ -3410,7 +3451,7 @@ raise_credit_rating = {
 lower_credit_rating = {
 	add_to_variable = { Credit_Rating = -1 }
 }
-set_starting_credit_ratings = {
+set_starting_credit_ratings = {	#Change to GDP-Debt Ratio
 	if = {
 		limit = {
 			OR = {
@@ -3504,14 +3545,14 @@ set_interest_rates = {
 		limit = {
 			check_variable = { Credit_Rating = 10 }
 		}
-		set_variable = {Interest_Rate = 1.0005}
+		set_variable = {Interest_Rate = 1.010}
 		
 	}
 	else_if = {
 		limit = {
 			check_variable = { Credit_Rating = 9 }
 		}
-		set_variable = {Interest_Rate = 1.01}
+		set_variable = {Interest_Rate = 1.015}
 		set_variable = { default_multiplier = 15 }
 		set_variable = { austerity_multiplier = 8 }
 	}
