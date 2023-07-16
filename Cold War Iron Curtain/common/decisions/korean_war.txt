@@ -103,7 +103,6 @@ korean_war_prc_category = {
 					idea = unprepared_defenses
 					days = 90
 				}
-				country_event = MacArthur_Dismissal.2
 			}
 			set_country_flag = KPA_INTERVENTION_1
 
@@ -247,19 +246,83 @@ korean_war_prc_category = {
 		allowed = {
 			always = no
 		}
+		
+		available = {
+			NOT = {
+				country_exists = KPA
+			}
+		}
+		activation = {
+			has_global_flag = korean_war
+		}
+		cancel_trigger = {
+			NOT = {
+				has_global_flag = korean_war
+			}
+		}
+		is_good = no
+
+		selectable_mission = no
+		days_mission_timeout = 1095
+
+		timeout_effect = {
+			CHI = {
+				white_peace = PRC
+				white_peace = KPA
+			}
+			USA = {
+				white_peace = PRC
+				white_peace = KPA
+				give_guarantee = KOR
+			}
+			SOV = { give_guarantee = KPA }
+			PRC = { give_guarantee = KPA }
+			KPA = {
+				# every_controlled_state = {
+					# remove_core_of = KOR
+					# transfer_state_to = KPA
+				# }
+				transfer_state = 525	
+				dismantle_faction = yes
+			}
+			KOR = {
+				# every_controlled_state = {
+					# remove_core_of = KPA
+					# transfer_state_to = KOR
+				# }
+				transfer_state = 866
+				white_peace = PRC
+				white_peace = KPA
+				country_event = korea.16
+				set_global_flag = KOREA_CEASEFIRE_UN
+			}
+			USA = {
+				remove_ideas = korean_war_un_usa
+			}
+		}
+		complete_effect = {
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Korean_War_Ceasefire_show = {
+		allowed = {
+			always = no
+		}
 		visible = {
-			tag = USA
+			OR = {
+				tag = SOV
+				tag = KPA
+				tag = KOR
+				tag = CHI
+				tag = PRC
+			}
 		}
 		available = {
 			always = no
 		}
 		activation = {
-			KPA = { 
-				has_war_with = KOR
-			}
-			PRC = {
-				has_war_with = KOR
-			}
 			NOT = { has_global_flag = KOREA_CEASEFIRE_UN }
 		}
 		cancel_trigger = {
@@ -278,214 +341,11 @@ korean_war_prc_category = {
 		days_mission_timeout = 1095
 
 		timeout_effect = {
-			if = {
-				limit = {
-					NOT = { has_global_flag = KOREA_CEASEFIRE_UN }
-					KOR = { has_war_with = KPA } 
-					NOT = { KPA = { has_capitulated = yes } }
-				}
-				KPA = {
-					country_event = korea.16
-					set_global_flag = KOREA_CEASEFIRE_UN
-					white_peace = KOR
-					white_peace = USA
-					white_peace = ENG
-					white_peace = AST
-					white_peace = NZL
-					white_peace = CAN
-					white_peace = SAF
-					white_peace = CHI
-					PRC = {
-						dismantle_faction = yes
-						white_peace = CHI
-					}
-					USA = {
-						white_peace = PRC
-						white_peace = SOV
-					}
-					KOR = {
-						dismantle_faction = yes
-						white_peace = PRC
-						white_peace = SOV
-						white_peace = KPA
-					}
-					CHI = {
-						dismantle_faction = yes
-						white_peace = PRC
-						white_peace = SOV
-						white_peace = KPA
-					}
-					KOR = { transfer_state = 866 }
-					SOV = { give_guarantee = KPA }
-					PRC = { give_guarantee = KPA }
-					USA = { give_guarantee = KOR }
-					dismantle_faction = yes
-					transfer_state = 525
-					white_peace = KOR
-				}
-			}
-			if = {
-				limit = {
-					NOT = { has_global_flag = KOREA_CEASEFIRE_UN }
-					KOR = { has_war_with = KPA } 
-					KPA = { has_capitulated = yes } 
-				}
-				USA = {
-					white_peace = PRC
-					dismantle_faction = yes
-				}
-				CHI = {
-					white_peace = PRC
-					dismantle_faction = yes
-				}
-				KPA = {
-					white_peace = KOR
-				}
-				KOR = {
-					white_peace = PRC
-					white_peace = KPA
-					dismantle_faction = yes
-					news_event = korea.12
-					annex_country = { target = KPA transfer_troops = yes }
-					set_global_flag = KOREA_CEASEFIRE_UN
-				}
-			}
 		}
 		complete_effect = {
-			if = {
-				limit = {
-					NOT = { has_global_flag = KOREA_CEASEFIRE_UN }
-					KOR = { has_war_with = KPA } 
-					NOT = { KPA = { has_capitulated = yes } }
-				}
-				KOR = {
-					country_event = korea.21 
-					set_global_flag = KOREA_CEASEFIRE_UN
-				}
-			}
-			if = {
-				limit = {
-					NOT = { has_global_flag = KOREA_CEASEFIRE_UN }
-					KOR = { has_war_with = KPA }
-					KPA = { has_capitulated = yes }
-				}
-				KOR = {
-					news_event = korea.27
-					annex_country = { target = KPA transfer_troops = yes }
-					set_global_flag = KOREA_CEASEFIRE_UN
-				}
-			}
 		}
 		ai_will_do = {
 			factor = 0
-		}
-	}
-}
-
-korean_war_kpa_category = {	
-	unify_korea = {
-		icon = generic_industry
-		allowed = {
-			tag = KPA
-		}
-		visible = {
-			original_tag = KPA
-			country_exists = KOR
-			OR = {
-				AND = {
-					OR = {
-						has_government = communism
-						has_government = maoism
-					}
-					has_country_flag = kor_war_clear
-					date > 1950.6.1
-					date < 1960.1.1					
-				}
-				AND = {
-					is_ai = yes
-					date > 1950.6.1
-					date < 1960.1.1							
-				}
-			}
-
-		}
-		fire_only_once = yes
-		cost = 0
-		complete_effect = {
-			korean_war_super_event = yes
-			KOR = {
-				every_owned_state = {
-					remove_core_of = KPA
-				}
-			}
-			USA = { activate_mission = Korean_War_Ceasefire }
-			every_owned_state = {
-				remove_core_of = KOR
-			}
-			add_named_threat = {
-				threat = 30
-				name = korean_War
-			}
-			country_event = korea.1
-			add_ideas = korean_war
-			add_ideas = kpa_korean_war
-			add_timed_idea = {
-				idea = take_the_south
-				days = 25
-			}
-			create_faction = "People's Defense Coalition"
-			set_global_flag = korean_war
-			hidden_effect = {
-				USA = { add_ideas = korean_war_un_usa }
-				add_manpower = 100000
-				every_country = {
-					if = {
-						limit = {
-							OR = {
-								tag = AST #does
-								tag = CAN #doesn't
-								tag = SAF #sends 
-								tag = COL #does
-								tag = SIA #sends
-								tag = ETH #sends 
-								tag = JAP #doesn't
-								tag = CHI #sends
-								tag = FRA #sends
-								tag = ENG #sends
-								tag = BEL #doesn't
-								tag = HOL #doesn't
-								tag = LUX #does
-								tag = GRE #doesn't
-								tag = TUR #doesn't
-								tag = SPR #does
-								tag = NZL
-								tag = "PHI"
-							}
-						}
-						add_ideas = korean_war_un
-						add_ai_strategy = {
-							type = send_volunteers_desire
-							id = "KOR"
-							value = 5000
-						}
-						add_ai_strategy = {
-							type = support
-							id = "KOR"
-							value = 5000
-						}
-						add_ai_strategy = {
-							type = befriend
-							id = "KOR"
-							value = 5000
-						}
-					}
-				}
-			}
-			KOR = { add_ideas = korean_war }
-		}
-		ai_will_do = {
-			factor = 1
-
 		}
 	}
 }
