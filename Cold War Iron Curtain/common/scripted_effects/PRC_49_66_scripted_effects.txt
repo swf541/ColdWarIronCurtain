@@ -14,7 +14,9 @@ PRC_Lose_CCW = {
 			remove_ideas = PRC_50s_Economic_ruin_caused_by_war
 			remove_ideas = PRC_50s_Imperialist_forces
 			remove_ideas = PRC_50s_Illiteracy_everywhere_1
-			remove_ideas = PRC_bandit
+			remove_ideas = PRC_bandit_1
+			remove_ideas = administration_integration_5
+			remove_ideas = administration_integration_4
 			remove_ideas = administration_integration_3
 			remove_ideas = administration_integration_2
 			remove_ideas = administration_integration_1
@@ -59,7 +61,10 @@ PRC_Lose_CCW = {
 			add_dynamic_modifier = { modifier = soviet_repression }	
 			add_dynamic_modifier = { modifier = Military_Disorganization_modifier }
 			add_dynamic_modifier = { modifier = National_Crisis_modifier }		
-			set_capital = { state = 613 }
+			set_capital = {
+                state = 598
+                remember_old_capital = no
+            }
 		}
 		SIK = {
 			complete_national_focus = ETR_Ehmetjan_Qasimi_Consolidates_Power
@@ -278,7 +283,24 @@ PRC_50s_Economic_ruin_caused_by_war_swap = {
         }
     } 
 }
-
+PRC_50s_Land_Reform_ideas_swap = {
+    if = {
+        limit = { has_idea = agrarian_bourgeoisie_1 }
+        swap_ideas = { remove_idea = agrarian_bourgeoisie_1 add_idea = agrarian_bourgeoisie_2 }
+    }
+    else_if = {
+        limit = { has_idea = agrarian_bourgeoisie_2 }
+        swap_ideas = { remove_idea = agrarian_bourgeoisie_2 add_idea = agrarian_bourgeoisie_3 }
+    }
+    else_if = {
+        limit = { has_idea = agrarian_bourgeoisie_3 }
+        swap_ideas = { remove_idea = agrarian_bourgeoisie_2 add_idea = agrarian_bourgeoisie_4 }
+    }
+    else_if = {
+        limit = { has_idea = agrarian_bourgeoisie_4 }
+        swap_ideas = { remove_idea = agrarian_bourgeoisie_2 add_idea = agrarian_bourgeoisie_5 }
+    }
+}
 PRC_50s_Imperialist_forces_swap = {
     if = {
         limit = { has_idea = PRC_50s_Imperialist_forces }
@@ -308,6 +330,14 @@ PRC_50s_Imperialist_forces_swap = {
 
 PRC_50s_administration_integration_in = {
     if = {
+        limit = { has_idea = administration_integration_5 }
+        swap_ideas = { remove_idea = administration_integration_3 add_idea = administration_integration_4 }
+    }
+    elseif = {
+        limit = { has_idea = administration_integration_4 }
+        swap_ideas = { remove_idea = administration_integration_3 add_idea = administration_integration_3 }
+    }
+    elseif = {
         limit = { has_idea = administration_integration_3 }
         swap_ideas = { remove_idea = administration_integration_3 add_idea = administration_integration_2 }
     }
@@ -334,17 +364,27 @@ PRC_50s_administration_integration_de = {
         swap_ideas = { remove_idea = administration_integration_2 add_idea = administration_integration_3 }
     }
     else_if = {
+        limit = { has_idea = administration_integration_3 }
+        swap_ideas = { remove_idea = administration_integration_2 add_idea = administration_integration_4 }
+    }
+    else_if = {
+        limit = { has_idea = administration_integration_4 }
+        swap_ideas = { remove_idea = administration_integration_2 add_idea = administration_integration_5 }
+    }
+    else_if = {
         limit = { 
             NOT = {
                 has_idea = administration_integration_1 
                 has_idea = administration_integration_2
                 has_idea = administration_integration_3
+                has_idea = administration_integration_4
+                has_idea = administration_integration_5
             }
         }
         add_ideas = administration_integration_1
     }
     else = {
-        add_stability = -0.05
+        add_stability = -0.025
     }
 }
 
@@ -1373,5 +1413,506 @@ PRC_50s_Economic_cooperation_among_Asian_countries_de = {
 PRC_launch_the_GLF = {
     set_country_flag = PRC_GLF_flag
     set_variable = { PRC_GLF_rash_advance_var = 60 }
-    set_variable = { PRC_GLF_control_var = 43 }
+    activate_mission = PRC_50s_Empower_Local_Governments_mission
+    add_dynamic_modifier = {
+        modifier = PRC_Great_Leap_Forward_dynamic_modifier
+    }
+    hidden_effect = {
+        every_owned_state = {
+            set_variable = { PRC_state_famine_var = 0 }
+        }
+    }
+}
+PRC_glf_exacerbate_famine_effect_1 = {
+    hidden_effect = {
+        every_owned_state = {
+            limit = {
+                OR = {
+                    state = 605
+                    state = 601
+                    state = 607
+                    state = 606
+                    state = 597
+                }
+            }
+            add_to_variable = { PRC_state_famine_var = 8 }
+            set_temp_variable = { prc_temp_var = 1 }
+        }
+        every_owned_state = {
+            limit = {
+                NOT = {
+                    has_variable = prc_temp_var
+                }
+                OR = {
+                    state = 283
+                    state = 598
+                    state = 603
+                    state = 594
+                    state = 283
+                }
+            }
+            add_to_variable = { PRC_state_famine_var = 6 }
+            set_temp_variable = { prc_temp_var = 1 }
+        }
+        every_owned_state = {
+            limit = {
+                NOT = {
+                    OR = {
+                        state = 608
+                        state = 603
+                        state = 613
+                    }
+                    has_variable = prc_temp_var
+                }
+                state_population_k > 36
+            }
+            add_to_variable = { PRC_state_famine_var = 3 }
+        }
+        every_owned_state = {
+            limit = {
+                OR = {
+                    state = 608
+                    state = 603
+                    state = 613
+                }
+            }
+            add_to_variable = { PRC_state_famine_var = 1 }
+        }
+    }
+}
+PRC_glf_exacerbate_famine_effect_2 = {
+    hidden_effect = {
+        every_owned_state = {
+            limit = {
+                OR = {
+                    state = 605
+                    state = 601
+                    state = 607
+                    state = 606
+                    state = 597
+                }
+            }
+            add_to_variable = { PRC_state_famine_var = 6 }
+            set_temp_variable = { prc_temp_var = 1 }
+        }
+        every_owned_state = {
+            limit = {
+                NOT = {
+                    has_variable = prc_temp_var
+                }
+                OR = {
+                    state = 283
+                    state = 598
+                    state = 603
+                    state = 594
+                    state = 283
+                }
+            }
+            add_to_variable = { PRC_state_famine_var = 4 }
+            set_temp_variable = { prc_temp_var = 1 }
+        }
+        every_owned_state = {
+            limit = {
+                NOT = {
+                    OR = {
+                        state = 608
+                        state = 603
+                        state = 613
+                    }
+                    has_variable = prc_temp_var
+                }
+                state_population_k > 36
+            }
+            add_to_variable = { PRC_state_famine_var = 2 }
+        }
+    }
+}
+PRC_glf_exacerbate_famine_effect_3 = {
+    hidden_effect = {
+        every_owned_state = {
+            limit = {
+                OR = {
+                    state = 605
+                    state = 601
+                    state = 607
+                    state = 606
+                    state = 597
+                }
+            }
+            add_to_variable = { PRC_state_famine_var = 4 }
+            set_temp_variable = { prc_temp_var = 1 }
+        }
+        every_owned_state = {
+            limit = {
+                NOT = {
+                    has_variable = prc_temp_var
+                }
+                OR = {
+                    state = 283
+                    state = 598
+                    state = 603
+                    state = 594
+                    state = 283
+                }
+            }
+            add_to_variable = { PRC_state_famine_var = 3 }
+            set_temp_variable = { prc_temp_var = 1 }
+        }
+        every_owned_state = {
+            limit = {
+                NOT = {
+                    OR = {
+                        state = 608
+                        state = 603
+                        state = 613
+                    }
+                    has_variable = prc_temp_var
+                }
+                state_population_k > 36
+            }
+            add_to_variable = { PRC_state_famine_var = 1 }
+        }
+    }
+}
+PRC_glf_mitigate_famine_effect = {
+    hidden_effect = {
+        every_owned_state = {
+            limit = {
+                OR = {
+                    state = 605
+                    state = 601
+                    state = 607
+                    state = 606
+                    state = 597
+                }
+            }
+            add_to_variable = { PRC_state_famine_var = -3 }
+            set_temp_variable = { prc_temp_var = 1 }
+        }
+        every_owned_state = {
+            limit = {
+                NOT = {
+                    has_variable = prc_temp_var
+                }
+                OR = {
+                    state = 283
+                    state = 598
+                    state = 603
+                    state = 594
+                    state = 283
+                }
+            }
+            add_to_variable = { PRC_state_famine_var = -2 }
+            set_temp_variable = { prc_temp_var = 1 }
+        }
+        every_owned_state = {
+            limit = {
+                NOT = {
+                    OR = {
+                        state = 608
+                        state = 603
+                        state = 613
+                    }
+                    has_variable = prc_temp_var
+                }
+                state_population_k > 36
+            }
+            add_to_variable = { PRC_state_famine_var = -0.8 }
+        }
+    }
+}
+PRC_GLF_focus_mission_effect = {
+    if = {
+        limit = {
+            NOT = { has_completed_focus = PRC_50s_Empower_Local_Governments }
+        }
+        activate_mission = PRC_50s_Empower_Local_Governments_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Empower_Local_Governments
+            NOT = { has_completed_focus = PRC_50s_Promote_The_Pilot_Field_System }
+        }
+        activate_mission = PRC_50s_Promote_The_Pilot_Field_System_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Promote_The_Pilot_Field_System
+            NOT = { has_completed_focus = PRC_50s_Strengthen_The_Household_System }
+        }
+        activate_mission = PRC_50s_Strengthen_The_Household_System_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Strengthen_The_Household_System
+            NOT = { has_completed_focus = PRC_50s_Launch_Local_Industry }
+        }
+        activate_mission = PRC_50s_Launch_Local_Industry_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Launch_Local_Industry
+            NOT = { has_completed_focus = PRC_50s_Anti-waste_And_Anti-conservative_Campaign }
+        }
+        activate_mission = PRC_50s_Anti-waste_And_Anti-conservative_Campaign_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Anti-waste_And_Anti-conservative_Campaign
+            NOT = { has_completed_focus = PRC_50s_Bust_Technical_Myths }
+        }
+        activate_mission = PRC_50s_Bust_Technical_Myths_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Bust_Technical_Myths
+            NOT = { has_completed_focus = PRC_50s_Harness_Nature }
+        }
+        activate_mission = PRC_50s_Harness_Nature_mission
+    }
+    else_if = {
+        limit = {
+            OR = {
+                has_completed_focus = PRC_50s_Dominate_Nature
+                has_completed_focus = PRC_50s_Harness_Nature
+            }
+            NOT = { has_completed_focus = PRC_50s_Launch_A_Catch-up_Campaign }
+        }
+        activate_mission = PRC_50s_Launch_A_Catch-up_Campaign_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Launch_A_Catch-up_Campaign
+            NOT = { has_completed_focus = PRC_50s_Emphasis_on_Class_Struggle }
+        }
+        activate_mission = PRC_50s_Emphasis_on_Class_Struggle_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Emphasis_on_Class_Struggle
+            NOT = { has_completed_focus = PRC_50s_Launch_The_Heart_to_Heart_Campaign }
+        }
+        activate_mission = PRC_50s_Launch_The_Heart_to_Heart_Campaign_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Launch_The_Heart_to_Heart_Campaign
+            NOT = { has_completed_focus = PRC_50s_Increase_Food_Procurement }
+        }
+        activate_mission = PRC_50s_Increase_Food_Procurement_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Increase_Food_Procurement
+            NOT = { has_completed_focus = PRC_50s_Set_Targets_for_Hyper-industrialisation }
+        }
+        activate_mission = PRC_50s_Set_Targets_for_Hyper-industrialisation_mission
+    }
+    else_if = {
+        limit = {
+            OR = {
+                has_completed_focus = PRC_50s_Agro-industrial_Double_Super_Campaign
+                has_completed_focus = PRC_50s_Set_Targets_for_Hyper-industrialisation
+            }
+            NOT = { has_completed_focus = PRC_50s_National_Electrification_Campaign }
+        }
+        activate_mission = PRC_50s_National_Electrification_Campaign_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_National_Electrification_Campaign
+            NOT = { has_completed_focus = PRC_50s_Sruggle_with_Guanchao_Faction }
+        }
+        activate_mission = PRC_50s_Sruggle_with_Guanchao_Faction_mission
+    }
+    else_if = {
+        limit = {
+            OR = {
+                has_completed_focus = PRC_50s_Sruggle_with_Guanchao_Faction
+                has_completed_focus = PRC_50s_Temporarily_Compress_Air
+            }
+            NOT = { has_completed_focus = PRC_50s_Control_Social_Corners }
+        }
+        activate_mission = PRC_50s_Control_Social_Corners_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Control_Social_Corners
+            NOT = { has_completed_focus = PRC_50s_Debate_with_The_Opposition }
+        }
+        activate_mission = PRC_50s_Debate_with_The_Opposition_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Debate_with_The_Opposition
+            NOT = { has_completed_focus = PRC_50s_The_Great_Leap_Forward }
+        }
+        activate_mission = PRC_50s_The_Great_Leap_Forward_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_The_Great_Leap_Forward
+            NOT = { has_completed_focus = PRC_50s_Reinforce_Party_Control_over_Government }
+        }
+        activate_mission = PRC_50s_Reinforce_Party_Control_over_Government_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Reinforce_Party_Control_over_Government
+            NOT = { has_completed_focus = PRC_50s_Streamline_The_Central_Ministries_And_Commissions }
+        }
+        activate_mission = PRC_50s_Streamline_The_Central_Ministries_And_Commissions_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Streamline_The_Central_Ministries_And_Commissions
+            NOT = { has_completed_focus = PRC_50s_Integrated_Use_of_Food }
+        }
+        activate_mission = PRC_50s_Integrated_Use_of_Food_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Integrated_Use_of_Food
+            NOT = { has_completed_focus = PRC_50s_Encourage_An_Increase_in_Production }
+        }
+        activate_mission = PRC_50s_Encourage_An_Increase_in_Production_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus =PRC_50s_Encourage_An_Increase_in_Production
+            NOT = { has_completed_focus = PRC_50s_Great_Steelmaking_Movement }
+        }
+        activate_mission = PRC_50s_Great_Steelmaking_Movement_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Great_Steelmaking_Movement
+            NOT = { has_completed_focus = PRC_50s_People_s_Commune_Movement }
+        }
+        activate_mission = PRC_50s_People_s_Commune_Movement_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_People_s_Commune_Movement
+            NOT = { has_completed_focus = PRC_50s_Break_Down_Individualism }
+        }
+        activate_mission = PRC_50s_Break_Down_Individualism_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Break_Down_Individualism
+            NOT = { has_completed_focus = PRC_50s_Free_Supply_System }
+        }
+        activate_mission = PRC_50s_Free_Supply_System_mission
+    }
+    else_if = {
+        limit = {
+            OR = {
+                has_completed_focus = PRC_50s_Half_Wage_And_Half_Supply_System
+                has_completed_focus = PRC_50s_Free_Supply_System
+            }
+            NOT = { has_completed_focus = PRC_50s_Raise_Expected_Targets }
+        }
+        activate_mission = PRC_50s_Raise_Expected_Targets_mission
+    }
+    else_if = {
+        limit = {
+            OR = {
+                has_completed_focus = PRC_50s_Raise_Expected_Targets
+                has_completed_focus = PRC_50s_Maintain_Original_Targets
+            }
+            NOT = { has_completed_focus = PRC_50s_Indigenous_Steelmaking }
+        }
+        activate_mission = PRC_50s_Indigenous_Steelmaking_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Indigenous_Steelmaking
+            NOT = { has_completed_focus = PRC_50s_Promote_The_Eight-character_Constitution }
+        }
+        activate_mission = PRC_50s_Promote_The_Eight-character_Constitution_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Promote_The_Eight-character_Constitution
+            NOT = { has_completed_focus = PRC_50s_Respond_to_Local_Dilemmas }
+        }
+        activate_mission = PRC_50s_Respond_to_Local_Dilemmas_mission_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Respond_to_Local_Dilemmas_mission
+            NOT = { has_completed_focus = PRC_50s_Protect_The_Spirit_of_Leap_Forward }
+        }
+        activate_mission = PRC_50s_Protect_The_Spirit_of_Leap_Forward_mission
+    }
+    else_if = {
+        limit = {
+            OR = {
+                has_completed_focus = PRC_50s_Lower_Targets
+                has_completed_focus = PRC_50s_Protect_The_Spirit_of_Leap_Forward
+            }
+            NOT = { has_completed_focus = PRC_50s_Liberate_The_Rural_Workforce }
+        }
+        activate_mission = PRC_50s_Liberate_The_Rural_Workforce_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Liberate_The_Rural_Workforce
+            NOT = { has_completed_focus = PRC_50s_Strengthen_The_Unified_Purchasing_And_Marketing }
+        }
+        activate_mission = PRC_50s_Strengthen_The_Unified_Purchasing_And_Marketing_mission
+    }
+    else_if = {
+        limit = {
+            OR = {
+                has_completed_focus = PRC_50s_Strengthen_The_Unified_Purchasing_And_Marketing
+                has_completed_focus = PRC_50s_Reduce_Agricultural_Scissor_Difference
+            }
+            NOT = { has_completed_focus = PRC_50s_Ensure_Food_Rations_for_Workers }
+        }
+        activate_mission = PRC_50s_Ensure_Food_Rations_for_Workers_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Ensure_Food_Rations_for_Workers
+            NOT = { has_completed_focus = PRC_50s_Set_up_Part-time_Schools }
+        }
+        activate_mission = PRC_50s_Set_up_Part-time_Schools_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Set_up_Part-time_Schools
+            NOT = { has_completed_focus = PRC_50s_Reduce_Production_Waste }
+        }
+        activate_mission = PRC_50s_Reduce_Production_Waste_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Reduce_Production_Waste
+            NOT = { has_completed_focus = PRC_50s_Prioritise_Urban_Food_Supply }
+        }
+        activate_mission = PRC_50s_Prioritise_Urban_Food_Supply_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Protect_The_Spirit_of_Leap_Forward
+            has_completed_focus = PRC_50s_Ensure_Food_Rations_for_Workers
+            has_completed_focus = PRC_50s_Strengthen_The_Unified_Purchasing_And_Marketing
+            OR = {
+                has_completed_focus = PRC_50s_Ensure_Rural_Food_Security
+                has_completed_focus = PRC_50s_Prioritise_Urban_Food_Supply
+            }
+            NOT = { has_completed_focus = PRC_50s_Campaign_to_Oppose_Share_out_in_Private_the_Harvests_They_Concealed }
+        }
+        activate_mission = PRC_50s_Campaign_to_Oppose_Share_out_in_Private_the_Harvests_They_Concealed_mission
+    }
+    else_if = {
+        limit = {
+            has_completed_focus = PRC_50s_Prioritise_Urban_Food_Supply
+            has_completed_focus = PRC_50s_Campaign_to_Oppose_Share_out_in_Private_the_Harvests_They_Concealed
+            NOT = { has_completed_focus = PRC_50s_Sudden_Acquisitions_of_Grain }
+        }
+        activate_mission = PRC_50s_Sudden_Acquisitions_of_Grain_mission
+    }
 }

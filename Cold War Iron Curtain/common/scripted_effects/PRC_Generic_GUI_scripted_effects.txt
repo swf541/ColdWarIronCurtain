@@ -1,18 +1,13 @@
 ##阶层系统
 
 #地主-Pop1
-#高干-Pop2
-#低级干部-Pop3
+#高干-Pop2#低级干部-Pop3
 #买办-Pop4
 #民资-Pop5
-#小资/半无-Pop6
-#知识分子-Pop7
-#贫农-Pop8
-#中农-Pop9
-#军官-Pop10
-#军人-Pop11
-#高级工人-Pop12
-#中下级工人-Pop13
+#小资/半无-Pop6#知识分子-Pop7
+#贫农-Pop8#中农-Pop9
+#军官-Pop10#军人-Pop11
+#高级工人-Pop12#中下级工人-Pop13
 #教士-Pop14
 #红色新贵-Pop15
 #企业家-Pop16
@@ -366,7 +361,7 @@ PRC_Pop_addition_effect = {
 				set_country_flag = PRC_Marginalized_Pop[PRC_Pop_temp_text]_flag
 			}
 		}
-		PRC_Pop_temp_text = "[?PRC_Pop_temp]"
+		PRC_Pop_temp_text = "[?PRC_Pop_n_temp]"
 	}	
 	custom_effect_tooltip = PRC_Pop_addition_tt
 	PRC_Pop_Update_effect = yes
@@ -379,7 +374,7 @@ PRC_Pop_removal_effect = {
 			clr_country_flag = PRC_Ordinary_Pop[PRC_Pop_temp_text]_flag
 			clr_country_flag = PRC_Marginalized_Pop[PRC_Pop_temp_text]_flag
 		}
-		PRC_Pop_temp_text = "[?PRC_Pop_temp]"
+		PRC_Pop_temp_text = "[?PRC_Pop_n_temp]"
 	}	
 	PRC_Pop_Update_effect = yes
 }
@@ -392,7 +387,7 @@ PRC_Pop_attitude_effect = {
 				value = PRC_Pop_a_temp
 			}
 		}
-		PRC_Pop_temp_text = "[?PRC_Pop_temp]"
+		PRC_Pop_temp_text = "[?PRC_Pop_n_temp]"
 	}	
 	PRC_Pop_Update_effect = yes
 }
@@ -480,7 +475,7 @@ PRC_Pop_influence_effect = {
 				set_country_flag = PRC_Ordinary_Pop[PRC_Pop_temp_text]_flag
 				clr_country_flag = PRC_Marginalized_Pop[PRC_Pop_temp_text]_flag
 				set_temp_variable = { PRC_Pop_group_temp = 2 }
-				custom_effect_tooltip = PRC_Pop_group_change_tt
+				
 			}
 			else_if = {
 				limit = {
@@ -497,555 +492,17 @@ PRC_Pop_influence_effect = {
 				set_temp_variable = { PRC_Pop_group_temp = 3 }
 				custom_effect_tooltip = PRC_Pop_group_change_tt
 			}
+
+			if = {
+				limit = {
+					NOT = {
+						check_variable = { PRC_Pop_group_temp1 = PRC_Pop_group_temp }
+					}
+				}
+				custom_effect_tooltip = PRC_Pop_group_change_tt
+			}
 		}
-		PRC_Pop_temp_text = "[?PRC_Pop_temp]"
+		PRC_Pop_temp_text = "[?PRC_Pop_n_temp]"
 	}
 	PRC_Pop_Update_effect = yes
-}   
-
-
-
-
-
-
-
-
-##经济系统
-offsite_building_monthly_effect = {
-	#
-	#clamp_variable = {
-	#	var = PRC.office_park_now
-	#	min = 0
-	#	max = 1000
-	#}
-	clamp_variable = {
-		var = PRC.civilian_factories_now
-		min = 0
-		max = 1000
-	}
-	clamp_variable = {
-		var = PRC.arms_factory_now
-		min = 0
-		max = 1000
-	}
-	#
-	multiply_temp_variable = { PRC.civilian_factories_prev = -1 }
-	multiply_temp_variable = { PRC.arms_factory_prev = -1 }
-	#multiply_temp_variable = { PRC.office_park_prev = -1 }
-	#
-	add_offsite_building = { type = industrial_complex level = PRC.civilian_factories_prev }
-	add_offsite_building = { type = arms_factory level = PRC.arms_factory_prev  }
-	#add_offsite_building = { type = office_park level = PRC.office_park_prev }
-	#
-	add_offsite_building = { type = industrial_complex level = PRC.civilian_factories_now }
-	add_offsite_building = { type = arms_factory level = PRC.arms_factory_now  }
-	#add_offsite_building = { type = office_park level = PRC.office_park_now }
-	#
-	set_variable = { PRC.civilian_factories_prev = PRC.civilian_factories_now }
-	set_variable = { PRC.arms_factory_prev = PRC.arms_factory_now }
-	#set_variable = { PRC.office_park_prev = PRC.office_park_now }
-	
-}
-prc_econ_gui_effect = {
-	if = {
-		limit = {
-			has_country_flag = PRC_civilian_factiory_flag
-		}
-		set_temp_variable = {
-			PRC.civilian_factories_now_temp = PRC.civilian_factories_now
-		}
-		add_to_temp_variable = {
-			PRC.civilian_factories_now_temp = PRC.arms_factories_now_temp
-		}
-		set_temp_variable = {
-			PRC_Total_Heavy_Industry_Unit_temp =  PRC_Total_Heavy_Industry_Unit
-		}
-		subtract_from_temp_variable = {
-			PRC_Total_Heavy_Industry_Unit_temp = PRC.civilian_factories_now_temp
-		}
-		set_variable = {
-			PRC_civilian_industry_judge = PRC_Total_Heavy_Industry_Unit_temp
-		}
-	}
-	if = {
-		limit = {
-			has_country_flag = PRC_consumer_goods_flag
-		}
-		set_temp_variable = {
-			PRC_Total_Light_Industry_Unit_temp = PRC_Total_Light_Industry_Unit
-		}
-		set_temp_variable = {
-			PRC_Now_Light_Industry_Unit_temp =  PRC_Now_Light_Industry_Unit
-		}
-		subtract_from_temp_variable = {
-			PRC_Total_Light_Industry_Unit_temp = PRC_Now_Light_Industry_Unit_temp
-		}
-		set_variable = {
-			PRC_light_industry_judge = PRC_Total_Light_Industry_Unit_temp
-		}
-	}
-	if = {
-		limit = {
-			has_country_flag =  PRC_military_factiory_flag
-		}
-		set_temp_variable = {
-			PRC.arms_factories_now_temp = PRC.civilian_factories_now
-		}
-		add_to_temp_variable = {
-			PRC.arms_factories_now_temp = PRC.arms_factories_now_temp
-		}
-		set_temp_variable = {
-			PRC_Total_Heavy_Industry_Unit_temp =  PRC_Total_Heavy_Industry_Unit
-		}
-		subtract_from_temp_variable = {
-			PRC_Total_Heavy_Industry_Unit_temp = PRC.arms_factories_now_temp
-		}
-		set_variable = {
-			PRC_armed_industry_judge = PRC_Total_Heavy_Industry_Unit_temp
-		}
-	}
-}
-Light_Industry_effect = {
-	PRC = {
-		#全国轻工业生产效率
-		set_variable = { PRC_Light_Industrial_PE = 1 }
-		if = { limit = { has_tech = production_efficiency_I } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = production_efficiency_II } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = production_efficiency_III } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = production_efficiency_IV } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = production_efficiency_V } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = production_efficiency_VI } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = production_efficiency_VII } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = production_efficiency_VIII } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = production_efficiency_IX } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = production_efficiency_X } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = industrial_robots_I } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = industrial_robots_II } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = industrial_robots_III } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = industrial_robots_IV } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = industrial_robots_V } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = factory_automation_I } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = factory_automation_II } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = factory_automation_III } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		if = { limit = { has_tech = factory_automation_IV } add_to_variable = { PRC_Light_Industrial_PE = 0.05 } }
-		add_to_variable = { PRC_Light_Industrial_PE = modifier@PRC_Other_Light_Industrial_PE }
-
-		set_variable = { PRC.PRC_Total_Light_Industry_Unit = 0 }
-		every_owned_state = {
-			#全国轻工业生产单位数量
-			add_to_variable = { PRC.PRC_Total_Light_Industry_Unit = THIS.PRC_State_Light_Industry_Unit }
-			#地方轻工业总产值
-			set_variable = { THIS.PRC_State_Light_Industry_PE = PREV.PRC_Light_Industrial_PE }
-            if = {
-				limit = {
-					OR = {
-						has_state_category = pop1
-						has_state_category = pop2
-						has_state_category = pop3
-						has_state_category = pop4
-						has_state_category = pop5
-						has_state_category = pop7
-						has_state_category = pop10
-						has_state_category = pop15
-						has_state_category = pop20
-					}
-				}
-				add_to_variable = { THIS.PRC_State_Light_Industry_PE = -0.1 }
-			}
-			if = {
-				limit = {
-					OR = {
-						has_state_category = pop1dev1
-						has_state_category = pop2dev1
-						has_state_category = pop3dev1
-						has_state_category = pop4dev1
-						has_state_category = pop5dev1
-						has_state_category = pop7dev1
-						has_state_category = pop10dev1
-						has_state_category = pop15dev1
-						has_state_category = pop20dev1
-					}
-				}
-				add_to_variable = { THIS.PRC_State_Light_Industry_PE = 0.05 }
-			}
-			if = {
-				limit = {
-					OR = {
-						has_state_category = pop1dev2
-						has_state_category = pop2dev2
-						has_state_category = pop3dev2
-						has_state_category = pop4dev2
-						has_state_category = pop5dev2
-						has_state_category = pop7dev2
-						has_state_category = pop10dev2
-						has_state_category = pop15dev2
-						has_state_category = pop20dev2
-					}
-				}
-				add_to_variable = { THIS.PRC_State_Light_Industry_PE = 0.2 }
-			}
-			if = {
-				limit = {
-					OR = {
-						has_state_category = pop1dev3
-						has_state_category = pop2dev3
-						has_state_category = pop3dev3
-						has_state_category = pop4dev3
-						has_state_category = pop5dev3
-						has_state_category = pop7dev3
-						has_state_category = pop10dev3
-						has_state_category = pop15dev3
-						has_state_category = pop20dev3
-					}
-				}
-				add_to_variable = { THIS.PRC_State_Light_Industry_PE = 0.35 }
-			}
-			if = {
-				limit = {
-					OR = {
-						has_state_category = pop1dev4
-						has_state_category = pop2dev4
-						has_state_category = pop3dev4
-						has_state_category = pop4dev4
-						has_state_category = pop5dev4
-						has_state_category = pop7dev4
-						has_state_category = pop10dev4
-						has_state_category = pop15dev4
-						has_state_category = pop20dev4
-					}
-				}
-				add_to_variable = { THIS.PRC_State_Light_Industry_PE = 0.5 }
-			}
-		}
-		set_variable = { PRC_Total_Light_Industry_Output_Value = PRC_Total_Light_Industry_Unit }
-		multiply_variable = { PRC_Total_Light_Industry_Output_Value = PRC_Light_Industry_Unit_Output_Value }
-		add_to_variable = { PRC_Light_Industrial_PE = PRC_Other_Light_Industrial_PE }
-		multiply_variable = { PRC_Light_Industrial_PE = PRC_Base_Light_Industrial_PE }
-		multiply_variable = { PRC_Total_Light_Industry_Output_Value = PRC_Light_Industrial_PE }		
-	}
-}
-Heavy_Industry_effect = {
-	set_variable = { PRC_Total_Heavy_Industry_Output_Value = PRC_Total_Heavy_Industry_Unit }
-	multiply_variable = { PRC_Total_Heavy_Industry_Output_Value = 1 }
-	set_variable = { PRC_Heavy_Industrial_PE = 1 }
-	if = { limit = { has_tech = production_efficiency_I } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = production_efficiency_II } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = production_efficiency_III } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = production_efficiency_IV } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = production_efficiency_V } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = production_efficiency_VI } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = production_efficiency_VII } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = production_efficiency_VIII } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = production_efficiency_IX } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = production_efficiency_X } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = industrial_robots_I } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = industrial_robots_II } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = industrial_robots_III } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = industrial_robots_IV } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = industrial_robots_V } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = factory_automation_I } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = factory_automation_II } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = factory_automation_III } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	if = { limit = { has_tech = factory_automation_IV } add_to_variable = { PRC_Heavy_Industrial_PE = 0.05 } }
-	add_to_variable = { PRC_Heavy_Industrial_PE = modifier@PRC_Other_Heavy_Industrial_PE }
-	#
-	set_variable = { PRC.PRC_Total_Heavy_Industry_Unit = 0 }
-	every_owned_state = {
-		#全国重工业生产单位数量
-		
-		add_to_variable = { PRC.PRC_Total_Heavy_Industry_Unit = THIS.PRC_State_Heavy_Industry_Unit }
-		#地方重工业总产值
-		set_variable = { THIS.PRC_State_Heavy_Industry_PE = PREV.PRC_Heavy_Industrial_PE }
-		if = {
-			limit = {
-				OR = {
-					has_state_category = pop1
-					has_state_category = pop2
-					has_state_category = pop3
-					has_state_category = pop4
-					has_state_category = pop5
-					has_state_category = pop7
-					has_state_category = pop10
-					has_state_category = pop15
-					has_state_category = pop20
-				}
-			}
-			add_to_variable = { THIS.PRC_State_Heavy_Industry_PE = -0.1 }
-			if = {
-				limit = {
-					OR = {
-						has_state_category = pop1dev1
-						has_state_category = pop2dev1
-						has_state_category = pop3dev1
-						has_state_category = pop4dev1
-						has_state_category = pop5dev1
-						has_state_category = pop7dev1
-						has_state_category = pop10dev1
-						has_state_category = pop15dev1
-						has_state_category = pop20dev1
-					}
-				}
-				add_to_variable = { THIS.PRC_State_Heavy_Industry_PE = 0.05 }
-			}
-			if = {
-				limit = {
-					OR = {
-						has_state_category = pop1dev2
-						has_state_category = pop2dev2
-						has_state_category = pop3dev2
-						has_state_category = pop4dev2
-						has_state_category = pop5dev2
-						has_state_category = pop7dev2
-						has_state_category = pop10dev2
-						has_state_category = pop15dev2
-						has_state_category = pop20dev2
-					}
-				}
-				add_to_variable = { THIS.PRC_State_Heavy_Industry_PE = 0.2 }
-			}
-			if = {
-				limit = {
-					OR = {
-						has_state_category = pop1dev3
-						has_state_category = pop2dev3
-						has_state_category = pop3dev3
-						has_state_category = pop4dev3
-						has_state_category = pop5dev3
-						has_state_category = pop7dev3
-						has_state_category = pop10dev3
-						has_state_category = pop15dev3
-						has_state_category = pop20dev3
-					}
-				}
-				add_to_variable = { THIS.PRC_State_Heavy_Industry_PE = 0.35 }
-			}
-			if = {
-				limit = {
-					OR = {
-						has_state_category = pop1dev4
-						has_state_category = pop2dev4
-						has_state_category = pop3dev4
-						has_state_category = pop4dev4
-						has_state_category = pop5dev4
-						has_state_category = pop7dev4
-						has_state_category = pop10dev4
-						has_state_category = pop15dev4
-						has_state_category = pop20dev4
-					}
-				}
-				add_to_variable = { THIS.PRC_State_Heavy_Industry_PE = 0.5 }
-			}
-		}
-	}
-	offsite_building_monthly_effect = yes
-}
-agriculture_food_prod_monthly = {
-	PRC = {
-		#全国农业生产效率
-        set_variable = { PRC_Agricultral_PE = 1 }
-		if = { limit = { has_tech = agriculture_I } add_to_variable = { PRC_Agricultral_PE = 0.05 } }
-	    if = { limit = { has_tech = agriculture_II } add_to_variable = { PRC_Agricultral_PE = 0.05 } }
-	    if = { limit = { has_tech = agriculture_III } add_to_variable = { PRC_Agricultral_PE = 0.05 } }
-	    if = { limit = { has_tech = agriculture_IV } add_to_variable = { PRC_Agricultral_PE = 0.05 } }
-	    if = { limit = { has_tech = agriculture_V } add_to_variable = { PRC_Agricultral_PE = 0.05 } }
-	    if = { limit = { has_tech = agriculture_VI } add_to_variable = { PRC_Agricultral_PE = 0.05 } }
-	    if = { limit = { has_tech = agriculture_VII } add_to_variable = { PRC_Agricultral_PE = 0.05 } }
-	    if = { limit = { has_tech = agriculture_VIII } add_to_variable = { PRC_Agricultral_PE = 0.05 } }
-		add_to_variable = { PRC_Agricultral_PE = PRC_Other_Agricultral_PE }
-	}
-	every_owned_state = {
-		set_variable = {
-			PRC.total_food_prod_num = 0 
-		}
-		#地块粮食计算
-		set_variable = { THIS.prc_State_Agricultral_PE = PRC.PRC_Agricultral_PE }
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 1 
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.05 }
-		}
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 2 
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.1 }
-		}
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 3
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.15 }
-		}
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 4 
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.25 }
-		}
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 5
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.3 }
-		}
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 6
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.35 }
-		}
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 7
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.4 }
-		}
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 8
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.45 }
-		}
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 9
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.55 }
-		}
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 10
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.6 }
-		}
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 11
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.65 }
-		}
-		if = {
-			limit = {
-				check_variable = { 
-					var = building_level@water_infrastructure
-					value = 12
-					compare = equals
-				}
-			}
-			add_to_variable = { THIS.prc_State_Agricultral_PE = 0.7 }
-		}
-		
-		set_variable = { THIS.state_food_prod_actual = THIS.state_food_prod }
-		multiply_variable = { THIS.state_food_prod_actual = THIS.prc_State_Agricultral_PE }
-		set_temp_variable = {
-			THIS.state_food_prod_temp = THIS.state_food_prod_actual
-		}
-		
-
-		set_variable = {
-			THIS.food_fake_num = THIS.state_food_prod_temp
-		}
-		multiply_variable = {#虚报
-			THIS.food_fake_num = PRC.food_fake_data
-		}
-		round_variable = THIS.food_fake_num
-		#
-		set_temp_variable = {
-			THIS.state_visual_prod_temp = THIS.state_food_prod_temp
-		}
-		add_to_temp_variable = {
-			THIS.state_visual_prod_temp = THIS.food_fake_num
-		}
-		multiply_temp_variable = {
-			THIS.state_visual_prod_temp = PRC.food_collection_per
-		}
-		
-		add_to_variable = {#粮食储备
-			PRC.total_food_reserve = THIS.state_food_prod_temp
-		}
-
-		add_to_variable = {
-			THIS.fake_data_total = PRC.food_fake_data_num
-		}
-		#
-		add_to_variable = {#粮食总产量
-			PRC.food_total_prod_num = THIS.state_food_prod_actual
-		}
-		add_to_variable = {#粮食总产量
-			PRC.food_total_prod_num = THIS.food_fake_num
-		}
-		#THIS.state_food_prod 当地基础产量
-		#THIS.state_food_prod_actual 当地产量
-		#PRC.food_fake_data 全局虚报产量比例，百分制（可调控）
-		#PRC.food_fake_data 当地虚报产量，百分制（可调控）
-		#THIS.fake_data_total 当地累计虚报量（可调控）
-		#PRC.total_food_reserve 全局战略储备粮食总数，个数（可调控）
-		#THIS.food_fake_num 当地虚报粮食数量，个数
-		#PRC.food_total_prod_num 全国粮食总产量
-		#PRC.food_sale_mothly 月度粮食投入市场的数量（可调控）
-		#PRC.food_on_market 本月市场上的粮食
-
-		subtract_from_variable = {
-			PRC.total_food_reserve = PRC.food_sale_mothly
-		}
-		set_variable = {
-			PRC.food_on_market = PRC.food_sale_mothly
-		}
-
-		set_temp_variable = {#建筑数量
-			PRC.farm_building_count_temp = PRC.food_on_market
-		}
-		multiply_temp_variable = {
-			PRC.farm_building_count_temp = 0.33
-		}
-		set_variable = {
-			PRC.farm_building_count = PRC.farm_building_count_temp
-		}
-		round_variable = PRC.farm_building_count
-	}
 }
