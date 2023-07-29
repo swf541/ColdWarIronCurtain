@@ -32,6 +32,9 @@ scripted_gui = {
 			SOV_country_flag = {
 				image = "[SOV.GetFlag]"
 			}
+			Space_Race_Side_Bar_BG = {
+				image = "[Space_Race_BG]"
+			}
 		}
 		visible = {
 			check_variable = { show_space_race_main > 0 }
@@ -235,23 +238,21 @@ scripted_gui = {
 			}
 			decrease_budget_button_shift_click_enabled = {
 				check_variable = { ROOT.currentbudget > 10 }
+				check_variable = { space_tech_being_researched_category = 0 }
 			}
 			decrease_budget_button_click_enabled = {
 				check_variable = { ROOT.currentbudget > 0 }
 				check_variable = { prepared_mission_locked = 0 }
-			}
-			decrease_budget_button_control_click_enabled = {
-				check_variable = { ROOT.currentbudget > 100 }
+				check_variable = { space_tech_being_researched_category = 0 }
 			}
 			increase_budget_button_shift_click_enabled = {
 				check_variable = { ROOT.currentbudget < space_budget_cap_shift }
+				check_variable = { space_tech_being_researched_category = 0 }
 			}
 			increase_budget_button_click_enabled = {
 				check_variable = { ROOT.currentbudget < space_budget_cap }
 				check_variable = { prepared_mission_locked = 0 }
-			}
-			increase_budget_button_control_click_enabled = {
-				check_variable = { ROOT.currentbudget < 2900 }
+				check_variable = { space_tech_being_researched_category = 0 }
 			}
 			launch_mission_button_click_enabled = {
 				check_variable = { prepared_mission_locked = 1 }
@@ -1091,6 +1092,7 @@ scripted_gui = {
 		visible = {
 			check_variable = { show_space_tech_categories > 0 }
 			check_variable = { show_space_tech_category_id = 0 }
+			check_variable = { space_tech_being_researched_category = 0 }
 		}
 
 		ai_enabled = {
@@ -1107,6 +1109,52 @@ scripted_gui = {
 				set_variable = {
 					show_space_tech_category_id = v
 				}
+				if = {
+					limit = {
+						check_variable = {
+							show_space_tech_category_id = 3
+						}
+					}
+					get_power_tech_research_estimates = yes
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							show_space_tech_category_id = 1
+						}
+					}
+					get_structural_tech_research_estimates = yes				
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							show_space_tech_category_id = 4
+						}
+					}
+					get_data_tech_research_estimates = yes				
+				}
+				else_if = {
+					limit = {
+						check_variable = { show_space_tech_category_id = 2 }
+						check_variable = { show_propulsion_category_id = 1 }
+					}
+					get_chemical_propulsion_tech_research_estimates = yes				
+				}				
+				else_if = {
+					limit = {
+						check_variable = { show_space_tech_category_id = 2 }
+						check_variable = { show_propulsion_category_id = 3 }
+					}
+					get_nuclear_propulsion_tech_research_estimates = yes				
+				}
+				else_if = {
+					limit = {
+						check_variable = { show_space_tech_category_id = 2 }
+						check_variable = { show_propulsion_category_id = 2 }
+					}
+					get_electricity_propulsion_tech_research_estimates = yes				
+				}
+				else = { }
 			}
 		}
 	}
