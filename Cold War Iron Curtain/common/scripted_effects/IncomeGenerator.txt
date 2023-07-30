@@ -1708,7 +1708,26 @@ tax_rate = {
 	multiply_variable = { modern_population_tax = global.ModernTaxCredit }
 	add_to_variable = { tax_base = modern_population_tax }
 
-	multiply_variable = { automated_population_census = 0.001 }
+	###Starting Credit Rate Bit###
+	set_variable = { starting_tax_credit_calc = 0 }
+	set_variable = { starting_tax_credit_pop_total = 0 }
+	add_to_variable = { starting_tax_credit_pop_total = developed_population_census }
+	add_to_variable = { starting_tax_credit_pop_total = industrial_population_census }
+	add_to_variable = { starting_tax_credit_pop_total = preindustrial_population_census }
+
+	set_variable = { starting_tax_credit_calc = developed_population_census }
+	divide_variable = { starting_tax_credit_calc = starting_tax_credit_pop_total }
+
+	set_variable = { starting_tax_credit_calc_industrial = industrial_population_census }
+	divide_variable = { starting_tax_credit_calc_industrial = 2 }
+	divide_variable = { starting_tax_credit_calc_industrial = starting_tax_credit_pop_total }
+
+	add_to_variable = { starting_tax_credit_calc = starting_tax_credit_calc_industrial }
+	log = "[THIS.GetName] Starting Development Rating: [?starting_tax_credit_calc]"
+
+	#End (ignore my typos)
+
+	multiply_variable = { automated_population_census = 0.001 }`
 	set_variable = { automated_population_tax = automated_population_census }
 	multiply_variable = { automated_population_tax = global.AutomatedTaxCredit }
 	add_to_variable = { tax_base = automated_population_tax }
@@ -1833,8 +1852,18 @@ tax_rate = {
 	multiply_variable = {
 		industrial_base = industrial_base_modifier
 	}
-	standard_deviation_for_industrial_base = yes
-	process_credit_rating = yes
+	#standard_deviation_for_industrial_base = yes
+	if = {
+		limit = {
+			NOT = {
+				has_country_flag = Startup_Credit_Rating_Assigned
+			}
+			check_variable = { starting_tax_credit_calc > 0 }
+		}
+		set_country_flag = Startup_Credit_Rating_Assigned
+		set_starting_credit_ratings = yes
+	}
+	#process_credit_rating = yes
 	set_interest_rates = yes
 	set_variable = {
 		Interest_Rate_Display = Interest_Rate
@@ -3471,7 +3500,7 @@ set_starting_credit_ratings = {	#Change to GDP-Debt Ratio
 		if = {
 			limit = {
 				check_variable = {
-					industrial_base_z_score > 3
+					starting_tax_credit_calc > 0.9
 				}
 			}
 			set_variable = {
@@ -3481,7 +3510,7 @@ set_starting_credit_ratings = {	#Change to GDP-Debt Ratio
 		else_if = {
 			limit = {
 				check_variable = {
-					industrial_base_z_score > 2
+					starting_tax_credit_calc > 0.8
 				}
 			}
 			set_variable = {
@@ -3491,7 +3520,7 @@ set_starting_credit_ratings = {	#Change to GDP-Debt Ratio
 		else_if = {
 			limit = {
 				check_variable = {
-					industrial_base_z_score > 1
+					starting_tax_credit_calc > 0.7
 				}
 			}
 			set_variable = {
@@ -3501,7 +3530,7 @@ set_starting_credit_ratings = {	#Change to GDP-Debt Ratio
 		else_if = {
 			limit = {
 				check_variable = {
-					industrial_base_z_score > 0.5
+					starting_tax_credit_calc > 0.6
 				}
 			}
 			set_variable = {
@@ -3511,7 +3540,7 @@ set_starting_credit_ratings = {	#Change to GDP-Debt Ratio
 		else_if = {
 			limit = {
 				check_variable = {
-					industrial_base_z_score > 0
+					starting_tax_credit_calc > 0.5
 				}
 			}
 			set_variable = {
@@ -3521,7 +3550,7 @@ set_starting_credit_ratings = {	#Change to GDP-Debt Ratio
 		else_if = {
 			limit = {
 				check_variable = {
-					industrial_base_z_score > -0.5
+					starting_tax_credit_calc > 0.4
 				}
 			}
 			set_variable = {
