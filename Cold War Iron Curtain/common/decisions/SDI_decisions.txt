@@ -1,0 +1,402 @@
+SDI_category = {
+	SDI_increase_funding = {
+		icon = generic_construction
+
+		visible = {
+			has_completed_focus = USA80MIL_Secure_Additional_Funding
+		}
+
+		available = {
+		}
+
+		custom_cost_trigger = {
+			check_variable = { var = currentMoney value = 200 compare = greater_than_or_equals }
+		}
+		custom_cost_text = decision_cost_money200
+
+		days_re_enable = 160
+
+		complete_effect = {
+			add_to_variable = {
+				currentMoney = -200
+			}
+			add_to_variable = {
+				sdiFunds = 200
+			}
+			custom_effect_tooltip = sdi_increase_funding_effect_tt
+		}
+
+		ai_will_do = {
+			factor = 0
+			modifier = {
+				if = {
+					check_variable = { var = currentMoney value = 200 compare = greater_than_or_equals }
+				}
+				add = 10
+			}
+		}
+	}
+	SDI_recruit_scientists = {
+		icon = generic_construction
+
+		visible = {
+			has_completed_focus = USA80MIL_Recruit_Additional_Scientists_and_Contractors
+		}
+
+		available = {
+		}
+
+		custom_cost_trigger = {
+			check_variable = { var = sdiFunds value = 50 compare = greater_than_or_equals }
+		}
+		custom_cost_text = sdiFunds_cost_50														
+		fire_only_once = yes
+		
+		complete_effect = {
+			add_to_variable = {
+				sdiFunds = -50
+			}
+			add_to_variable = {
+				sdiProgress = 3
+			}
+			custom_effect_tooltip = SDI_recruit_scientists_effect_tt
+		}
+	}
+}
+SDI_development_category = {
+	SDI_invest_funds = {
+		icon = generic_construction
+
+		visible = {
+			has_completed_focus = USA80MIL_Begin_Star_Wars_Development
+		}
+
+		available = {
+
+		}
+
+		custom_cost_trigger = {
+			check_variable = { var = sdiFunds value = 200 compare = greater_than_or_equals }
+		}
+		custom_cost_text = sdiFunds_cost_200
+
+		days_re_enable = 365 # i think if this decision needs to be balanced it would start here
+
+		complete_effect = {
+			add_to_variable = {
+				sdiFunds = -200
+			}
+			add_to_variable = {
+				sdiProgress = 6
+			}
+			custom_effect_tooltip = SDI_invest_funds_effect
+		}
+	}
+	SDI_develop_better_anti_missile_systems = {
+		icon = generic_construction
+
+		visible = {
+			has_completed_focus = USA80MIL_Develop_Warning_and_Missile_Defense_Systems
+		}
+
+		available = {}
+		
+		custom_cost_trigger = {
+			check_variable = { var = sdiFunds value = 200 compare = greater_than_or_equals }
+		}
+		custom_cost_text = sdiFunds_cost_200
+	
+		fires_only_once = yes
+
+		complete_effect = {
+			add_to_variable = {
+				sdiFunds = -200
+			}
+			add_tech_bonus = {
+				name = rocketry_aam
+				bonus = 0.5
+				use = 2
+				ahead_reduction = 0.25
+				category = rocketry_aam
+			}
+			add_tech_bonus = {
+				name = space_bonus
+				bonus = 0.25
+				use = 1
+				ahead_deduction = 0.25
+				category = space_research
+			}
+		}
+		}
+	}
+	SDI_redirect_funds_to_civilian_works = {
+		icon = generic_construction
+
+		visible = {
+			has_completed_focus = USA80MIL_Begin_Star_Wars_Development
+		}
+
+		available = {
+			NOT = { has_country_flag = active_redirection }
+		}
+
+		custom_cost_trigger = {
+			check_variable = { var = sdiFunds value = 50 compare = greater_than_or_equals }
+		}
+		custom_cost_text = sdiFunds_cost_50
+
+		days_re_enable = 160
+
+		complete_effect = {
+			add_to_variable = {
+				sdiFunds = -50
+			}
+			add_timed_idea = {
+				idea = SDI_redirected_to_civilian_works
+				days = 140
+			}
+			set_variable = { THIS.idea_len_@token:SDI_redirected_to_civilian_works = 140 }
+			set_variable = { THIS.idea_date_@token:SDI_redirected_to_civilian_works = global.num_days }
+
+			set_country_flag = active_redirection
+		}
+
+		remove_effect = {
+			clr_country_flag = active_redirection
+		}
+	}
+	SDI_redirect_funds_to_general_scientific_research = {
+		icon = generic_construction
+
+		visible = {
+			has_completed_focus = USA80MIL_Begin_Star_Wars_Development
+		}
+
+		available = {
+			NOT = { has_country_flag = active_redirection }
+		}
+
+		custom_cost_trigger = {
+			check_variable = { var = sdiFunds value = 50 compare = greater_than_or_equals }
+		}
+		custom_cost_text = sdiFunds_cost_50
+
+		days_re_enable = 365
+
+		complete_effect = {
+			add_to_variable = { sdiFunds = -50 }
+			set_country_flag = active_redirection
+
+			add_timed_idea = {
+				idea = SDI_redirected_to_research
+				days = 120
+			}
+			set_variable = { THIS.idea_len@token:SDI_redirected_to_research = 120 }
+			set_variable = { THIS.idea_date_@token:SDI_redirected_to_research = global.num_days }
+		}
+
+		remove_effect = {
+			clr_country_flag = active_redirection
+		}
+	}
+	SDI_redirect_funds_to_military_needs = {
+		icon = generic_construction
+		
+		visible = {
+			has_completed_focus = USA80MIL_begin_Star_Wars_Development
+		}
+
+		available = {
+			NOT = { has_country_flag = active_redirection }
+		}
+
+		custom_cost_trigger = {
+			check_variable = { var = sdiFunds value = 50 compare = greater_than_or_equals }
+		}
+		custom_cost_text = sdiFunds_cost_50
+
+		days_re_enable = 160
+
+		complete_effect = {
+			add_to_variable = { sdiFunds = -50 }
+			set_country_flag = active_redirection
+
+			add_timed_idea = {
+				idea = SDI_redirected_to_mil
+				days = 140
+			}
+			set_variable = { THIS.idea_len@token:SDI_redirected_to_mil = 140 }
+			set_variable = { THIS.idea_date_@token:SDI_redirected_to_mil = global.num_days }
+		}
+		remove_effect = {
+			clr_country_flag = active_redirection
+		}
+	} 
+	SDI_redirect_production = {
+		icon = generic_construction
+
+		visible = {
+			has_completed_focus = USA80MIL_begin_Star_Wars_Development
+		}
+
+		available = {
+			NOT = { has_country_flag = active_redirection }
+		}
+
+		days_re_enable = 160
+
+		complete_effect = {
+			add_to_variable = { sdiProgress = 3 }
+			custom_effect_tooltip = redirect_production_effect_tt
+			set_country_flag = active_redirection
+
+			add_timed_idea = {
+				idea = SDI_production_redirected
+				days = 120
+			}
+			set_variable = { THIS.idea_len@token:SDI_production_redirected = 120 }
+			set_variable = { THIS.idea_date_@token:SDI_production_redirected = global.num_days }
+		}
+		remove_effect = {
+			clr_country_flag = active_redirection
+		}
+	}
+	SDI_redirect_civilian_engineering = {
+		icon = generic_construction
+		
+		visible = {
+			has_completed_focus = {	USA80MIL_begin_Star_Wars_Development }
+		}
+
+		available = {
+			NOT = { has_country_flag = active_redirection }
+		}
+
+		days_re_enable = 160
+
+		complete_effect = {
+			add_to_variable = { sdiProgress = 3 }
+			custom_effect_tooltip = redirect_production_effect_tt
+			set_country_flag = active_redirection 
+
+			add_timed_idea = {
+				idea = SDI_civilian_engineering_redirected
+				days = 120
+			}
+			set_variable = { THIS.idea_len@token:SDI_civilian_engineering_redirected = 120 }
+			set_variable = { THIS.idea_len@token:SDI_civilian_engineering_redirected = 120 }
+		}
+		remove_effect = {
+			clr_country_flag = active_redirection
+		}
+	}
+}
+
+# rocketry rocketry_aam aam_long_range space_research energy production manufacturing
+# construction_tech materials synth_resources chemistry infrastructure renewables gas
+
+SDI_research_category = {
+	SDI_invest_in_rocketry = {
+		icon = generic_construction
+
+		visible = {
+			has_completed_focus = USA80MIL_Begin_Star_Wars_Development
+		}
+
+		available = {
+
+		}
+
+		custom_cost_trigger = {
+			check_variable = { var = sdiFunds value = 100 compare = greater_than_or_equals }
+		}
+		custom_cost_text = sdiFunds_cost_100
+
+		days_re_enable = 365
+
+		complete_effect = {
+			add_to_variable = {
+				sdiFunds = -100
+			}
+			add_tech_bonus = {
+				name = rocketry_bonus 
+				bonus = 0.25
+				use = 2
+				ahead_reduction = 0.25
+				category = rocketry
+			}
+		}
+	}
+	SDI_invest_in_manufacturing_and_production = {
+		icon = generic_construction
+
+		visible = {
+			has_completed_focus = USA80MIL_Begin_Star_Wars_Development
+		}
+
+		available = {}
+
+		custom_cost_trigger = {
+			check_variable = { var = sdiFunds value = 100 compare = greater_than_or_equals }
+		}
+		custom_cost_text = sdiFunds_cost_100
+
+		days_re_enable = 660
+
+		complete_effect = {
+			add_to_variable = {
+				sdiFunds = -100
+			}
+			add_tech_bonus = {
+				name = production_bonus
+				bonus = 0.25
+				ahead_reduction = 0.25
+				use = 1
+				category = production
+			}
+			add_tech_bonus = {
+				name = manufacturing_bonus
+				bonus = 0.25
+				ahead_reduction = 0.25
+				use = 1
+				category = manufacturing
+			}
+			add_tech_bonus = {
+				name = industry_bonus
+				bonus = 0.25
+				ahead_reduction = 0.25
+				use = 2
+				category = industry
+			}
+		}
+	}
+	SDI_invest_in_space = {
+		icon = generic_construction
+		
+		visible = {
+			has_completed_focus = USA80MIL_Develop_Warning_and_Missile_Defense_Systems
+		}
+
+		available = {}
+
+		custom_cost_trigger = {
+			check_variable = { var = sdiFunds value = 100 compare = greater_than_or_equals }
+		}
+		custom_cost_text = sdiFunds_cost_100
+
+		days_re_enable = 365
+
+		complete_effect = {
+			add_to_variable = {
+				sdiFunds = -100
+			}
+			add_tech_bonus = {
+				name = space_bonus
+				bonus = 0.25
+				ahead_reduction = 0.25
+				use = 3
+				category = space_research
+			}
+		}
+	}
+}
