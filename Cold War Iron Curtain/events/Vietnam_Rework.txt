@@ -1,8 +1,10 @@
 add_namespace = Elysee_Accords
 add_namespace = CuongDe
 add_namespace = CCC_Unification
+add_namespace = CCC_Unification_Choices
 add_namespace = Etat_du_Vietnam
 add_namespace = VIE_ECON
+add_namespace = Vebinh_Militias
 add_namespace = VIE_MIL
 
 country_event = {
@@ -12,6 +14,7 @@ country_event = {
 	desc = Elysee_Accords.1.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Slow but steady wins the race."
@@ -32,6 +35,7 @@ country_event = {
 	desc = CuongDe.1.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "He will be relegated to a footnote in history."
@@ -48,6 +52,7 @@ country_event = {
 	desc = CuongDe.2.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
@@ -61,9 +66,115 @@ country_event = {
 	desc = CuongDe.3.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
+	}
+}
+
+country_event = {
+	id = CCC_Unification_Choices.1
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CCC_Unification_Choices.1"}
+	title = "Cochinchina Choices 1"
+	desc = CCC_Unification_Choices.1.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	timeout_days = 10
+	
+	immediate = { 
+		hidden_effect = { country_event = { id = CCC_Unification_Choices.2 days = 12 } }
+	}
+	
+	option = {
+		name = "Choice 1"
+		set_country_flag = CCC_VIE_Unification_High
+		custom_effect_tooltip = CCC_VIE_Unification_High_tt
+		#Grants higher opinion of CCC at expense of VIE 
+	}
+	
+	option = {
+		name = "Choice 2"
+		set_country_flag = CCC_VIE_Unification_Mid
+		custom_effect_tooltip = CCC_VIE_Unification_Mid_tt
+		#Middle Ground
+	}
+	
+	option = {
+		name = "Choice 3"
+		set_country_flag = CCC_VIE_Unification_Low
+		custom_effect_tooltip = CCC_VIE_Unification_Low_tt
+		#Grants greater buff to VIE at expense of CCC opinion
+	}
+}
+
+country_event = {
+	id = CCC_Unification_Choices.2
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CCC_Unification_Choices.2"}
+	title = "Cochinchina Choices 2"
+	desc = CCC_Unification_Choices.2.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	timeout_days = 10
+	
+	option = {
+		name = "Choice 1"
+		if = {
+			limit = {
+				has_country_flag = CCC_VIE_Unification_High
+			}
+			set_country_flag = CCC_VIE_Complete_Unification
+			custom_effect_tooltip = CCC_VIE_Complete_Unification_tt
+		}
+		else_if = {
+			limit = {
+				has_country_flag = CCC_VIE_Unification_Mid
+			}
+			set_country_flag = CCC_VIE_Mixed
+			custom_effect_tooltip = CCC_VIE_Mixed_tt
+		}
+		else_if = {
+			limit = {
+				has_country_flag = CCC_VIE_Unification_Low
+			}
+			set_country_flag = CCC_VIE_Initial_Refusal
+			custom_effect_tooltip = CCC_VIE_Initial_Refusal_tt
+		}
+		#Grants higher opinion of CCC at expense of VIE 
+		#If Choice 1 was picked prior, will lead to instant unification
+		#If Choice 2 was picked prior, will have a 25% of instant unification, or 75% chance of initial refusal
+		#If Choice 3 was picked prior, will lead to initial refusal
+	}
+	
+	option = {
+		name = "Choice 2"
+		if = {
+			limit = {
+				has_country_flag = CCC_VIE_Unification_High
+			}
+			set_country_flag = CCC_VIE_Mixed
+			custom_effect_tooltip = CCC_VIE_Mixed_tt
+		}
+		else_if = {
+			limit = {
+				has_country_flag = CCC_VIE_Unification_Mid
+			}
+			set_country_flag = CCC_VIE_Mixed_Bad
+			custom_effect_tooltip = CCC_VIE_Mixed_Bad_tt
+		}
+		else_if = {
+			limit = {
+				has_country_flag = CCC_VIE_Unification_Low
+			}
+			set_country_flag = CCC_VIE_Total_Refusal
+			custom_effect_tooltip = CCC_VIE_Total_Refusal_tt
+		}
+		#Grants greater buff to VIE at expense of CCC opinion
+		#If Choice 1 was picked prior, will have a 25% of instant unification, or 75% chance of initial refusal
+		#If Choice 2 was picked prior, will have a 75% of initial refusal, 25% total refusal (war) 
+		#If Choice 3 was picked prior, will lead to total refusal (war)
 	}
 }
 
@@ -74,7 +185,8 @@ country_event = {
 	desc = CCC_Unification.1.d
 
 	is_triggered_only = yes
-
+	fire_only_once = yes
+	
 	option = {
 		name = "Interesting"
 		FRA = { country_event = CCC_Unification.2 }
@@ -88,6 +200,7 @@ country_event = {
 	desc = CCC_Unification.2.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
@@ -102,15 +215,46 @@ country_event = {
 	desc = CCC_Unification.3.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Okay"
 		VIE = { country_event = { id = CCC_Unification.4 days = 1 } }
 		ai_chance = {
-			factor = 30
 			modifier = {
-				is_historical_focus_on = yes
-				factor = 0
+				if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Complete_Unification }
+					}
+					factor = 100
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Mixed }
+					}
+					factor = 15
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Initial_Refusal }
+					}
+					factor = 0
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Mixed_Bad }
+					}
+					factor = 0
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Total_Refusal }
+					}
+					factor = 0
+				}
+				else = {
+					factor = 0
+				}
 			}
 		}
 	}
@@ -119,10 +263,40 @@ country_event = {
 		name = "Not Interested"
 		VIE = { country_event = { id = CCC_Unification.5 days = 1 } }
 		ai_chance = {
-			factor = 70
 			modifier = {
-				is_historical_focus_on = yes
-				factor = 100
+				if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Complete_Unification }
+					}
+					factor = 0
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Mixed }
+					}
+					factor = 85
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Initial_Refusal }
+					}
+					factor = 100
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Mixed_Bad }
+					}
+					factor = 100
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Total_Refusal }
+					}
+					factor = 100
+				}
+				else = {
+					factor = 0
+				}
 			}
 		}
 	}
@@ -135,6 +309,7 @@ country_event = {
 	desc = CCC_Unification.4.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
@@ -157,6 +332,7 @@ country_event = {
 	desc = CCC_Unification.5.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
@@ -173,6 +349,7 @@ country_event = {
 	desc = CCC_Unification.6.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
@@ -187,40 +364,79 @@ country_event = {
 	desc = CCC_Unification.7.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Accept"
 		VIE = { country_event = { id = CCC_Unification.8 days = 2 } }
+		ai_chance = {
+			modifier = {
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Mixed }
+					}
+					factor = 100
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Initial_Refusal }
+					}
+					factor = 100
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Mixed_Bad }
+					}
+					factor = 75
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Total_Refusal }
+					}
+					factor = 0
+				}
+				else = {
+					factor = 0
+				}
+			}
+		}
 	}
 	
-	#option = {
-	#	name = "Refuse"
-		#VIE = {
-		#	FRA = {
-		#		end_puppet = CCC
-		#	}
-		#	declare_war_on = {
-		#		target = CCC
-		#		type = annex_everything
-		#	}
-		#	hidden_effect = {
-		#		FRA = {
-		#			add_to_war = {
-		#				targeted_alliance = VIE
-		#				enemy = CCC
-		#				hostility_reason = asked_to_join
-		#			}
-		#		}
-		#		FUL = {
-		#			add_to_war = {
-		#				targeted_alliance = VIE
-		#				enemy = CCC
-		#				hostility_reason = asked_to_join
-		#			}
-		#		}
-		#	}
-		#}
-	#}
+	option = {
+		name = "Refuse"
+		VIE = { country_event = { id = CCC_Unification.9 days = 2 } }
+		ai_chance = {
+			modifier = {
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Mixed }
+					}
+					factor = 0
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Initial_Refusal }
+					}
+					factor = 0
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Mixed_Bad }
+					}
+					factor = 25
+				}
+				else_if = {
+					limit = {
+						VIE = { has_country_flag = CCC_VIE_Total_Refusal }
+					}
+					factor = 100
+				}
+				else = {
+					factor = 0
+				}
+			}
+		}
+	}
 }
 
 country_event = {
@@ -230,6 +446,7 @@ country_event = {
 	desc = CCC_Unification.8.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
@@ -245,10 +462,26 @@ country_event = {
 country_event = {
 	id = CCC_Unification.9
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CCC_Unification.9"}
-	title = "Bao-Dai takes over Cochinchina!"
+	title = "Cochinchina Refuses Again!"
 	desc = CCC_Unification.9.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		#Declare war
+	}
+}
+
+country_event = {
+	id = CCC_Unification.10
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CCC_Unification.10"}
+	title = "Bao-Dai takes over Cochinchina!"
+	desc = CCC_Unification.10.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
@@ -262,6 +495,7 @@ country_event = {
 	desc = Etat_du_Vietnam.1.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
@@ -277,6 +511,7 @@ country_event = {
 	desc = Etat_du_Vietnam.2.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Yes"
@@ -295,6 +530,7 @@ country_event = {
 	desc = Etat_du_Vietnam.3.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
@@ -306,7 +542,9 @@ news_event = { #NEWS EVENT: Title is self-explanatory
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Etat_du_Vietnam.0"}
 	title = "[GetNewspaperHeader]Bao-Dai Proclaims the 'Etat du Vietnam'"
 	desc = Etat_du_Vietnam.0.d
+	
 	is_triggered_only = yes
+	fire_only_once = yes
 	major = yes
 
 	option = {
@@ -328,7 +566,7 @@ country_event = { #South Vietnam event to France in which they ask for more econ
 }
 
 country_event = { #South Vietnam event to ROC asking to integrate the army *So far does nothing. Thoughts on what it should do?*
-	id = VIE_MIL.0
+	id = Vebinh_Militias.1
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = VIE_MIL.0"}
 	title = "Hard Decisions"
 	desc = VIE_MIL.0.d
