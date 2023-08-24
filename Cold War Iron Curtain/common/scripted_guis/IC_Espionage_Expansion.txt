@@ -3,6 +3,7 @@ scripted_gui = {
         context_type = player_context
         window_name = "intelligence_button_overlay"
         parent_window_name = country_menu_window
+
         properties = {
             Espionage_Button_Overlay = {
                 frame = paramilitary_toggle
@@ -46,6 +47,11 @@ scripted_gui = {
 				paramilitary_slot_one_bulletin = 1 
 			}
 		}
+        properties = {
+            Operative_Slot_One_News_Event_Pic = {
+                image = "[Slot_One_Espionage_News_Picture]"
+            }
+        }
         effects = {
             event_option_background_click = {
                 set_variable = {
@@ -495,6 +501,7 @@ scripted_gui = {
         effects = {
             display_projects_info_click = {
                 set_variable = { show_bay_of_pigs = 0 }
+                clear_array = ROOT.current_operations_potential_toggle
                 if = {
                     limit = {
                         check_variable = {
@@ -569,11 +576,15 @@ scripted_gui = {
                 set_variable = { german_first_name_number = 39 }
                 set_variable = { german_surname_number = 27 }
 
-                set_variable = { european_portrait_max = 23 }
+                set_variable = { european_portrait_max = 36 }
 
                 set_variable = {
                    paramilitary_recruit_toggle = 1
                }
+               set_variable = {
+                    name_verification = 0
+               }
+               clear_array = ROOT.chars
                clear_array = ROOT.first_name
                clear_array = ROOT.surname
                clear_array = ROOT.portrait
@@ -1312,6 +1323,9 @@ scripted_gui = {
                 set_variable = {
                     ROOT.generic_operations_selected_target = v
                 }
+                ROOT = {
+                    generate_espionage_toggles = yes
+                }
                 save_global_event_target_as = operations_selected_target
                 set_variable = {
                     ci_strength_temp = THIS.modifier@drift_defence_factor
@@ -1322,6 +1336,7 @@ scripted_gui = {
                 set_variable = {
                     ROOT.national_ci_strength^v = ci_strength_temp
                 }
+                
                 if = {
                     limit = {
                         insurgency_check = yes
@@ -1357,7 +1372,7 @@ scripted_gui = {
                     add_to_array = { ROOT.local_possible_operations_money_cost = 25 }
                     add_to_array = { ROOT.local_possible_operations_repeatable_condition = 2 }
                     add_to_array = { ROOT.local_possible_operations_id_token = 2 }
-                    add_to_array = { ROOT.local_possible_operations_target = history_target }
+                    add_to_array = { ROOT.local_possible_operations_target = v }
                     add_to_array = { ROOT.local_possible_operations_personnel_target = 1 }  #Void
 
                     #Assasinate Admirals
@@ -1378,9 +1393,12 @@ scripted_gui = {
                     #Counter Espionage Embed
                     #Steal Technology
                 }
+                
             }
         }
     }
+
+    
 	black_ops_projects_generic_selected_menu = {
         context_type = player_context
         window_name = "black_ops_projects_generic_selected_menu"
@@ -1519,22 +1537,7 @@ scripted_gui = {
                 }
                 set_variable = {
                     show_generic_operations = 1
-                } 
-
-
-                #for_each_loop = {
-                #    array = EGY.army_leaders
-                #    add_to_array = { local_possible_operations = 3 }
-                #    add_to_array = { local_possible_operations_risk_level = 5 }
-                #    add_to_array = { local_possible_operations_operation_type = 7 }
-                #    add_to_array = { local_possible_operations_money_cost = 100 }
-                #    add_to_array = { local_possible_operations_repeatable_condition = 1 }
-                #
-                #    add_to_array = { USA.local_possible_operations_id_token = 100 }
-                #    add_to_array = { USA.local_possible_operations_personnel_target = v }
-                #    add_to_array = { USA.local_possible_operations_target = EGY.id }
-                #}
-                
+                }                 
             }
             if = {                  
                 limit = {
@@ -1744,5 +1747,54 @@ scripted_gui = {
             }
         }
     }
+	black_ops_generic_project_toggles = { 
+        context_type = player_context
+        window_name = "black_ops_generic_project_toggles_menu"
+		parent_scripted_gui = "black_ops_projects_generic_selected_menu"
 
+		ai_enabled = {
+			always = no
+		}
+        visible = {
+            NOT = { 
+                check_variable = {
+                    generic_operations_selected_target = 0
+                }
+            }
+            check_variable = {
+                show_generic_operations = 1
+            }
+        }
+        triggers = {
+            mission_toggle_unconfirm_visible = {
+                check_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 0
+                }
+            }
+            mission_toggle_confirm_visible = {
+                check_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 1
+                }
+            }
+        }
+        effects = {
+             mission_toggle_unconfirm_click = {
+                set_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 1
+                }
+            }
+            mission_toggle_confirm_click = {
+                set_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 0
+                }
+            }           
+        }
+        dynamic_lists = {
+            blacks_ops_generic_mission_types_toggle_listing_grid = {
+                array = ROOT.current_operations_potential_toggle
+                change_scope = no
+				entry_container = blacks_ops_generic_mission_types_toggle_list
+            }
+        }
+    }
 }
