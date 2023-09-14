@@ -1,10 +1,11 @@
 add_namespace = VIE_hinh_coup_example
 #Political
 add_namespace = Elysee_Accords
-add_namespace = Initial_CuongDe
 add_namespace = CCC_Unification
 add_namespace = CCC_Unification_Choices
 add_namespace = Etat_du_Vietnam
+add_namespace = Initial_CuongDe
+add_namespace = BaoDai
 #Diplomacy
 add_namespace = VIE_JAP
 add_namespace = VIE_KOR
@@ -81,7 +82,7 @@ country_event = {
 country_event = {
 	id = Initial_CuongDe.2
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Initial_CuongDe.2"}
-	title = "Bao-Dai requests us to ignore Cuong-De's letters"
+	title = "Bao-Dai Requests Us to Ignore Cuong-De's Letters"
 	desc = Initial_CuongDe.2.d
 
 	is_triggered_only = yes
@@ -95,7 +96,7 @@ country_event = {
 country_event = {
 	id = Initial_CuongDe.3
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Initial_CuongDe.3"}
-	title = "Bao-Dai condemns us for hosting Cuong-De"
+	title = "Bao-Dai Condemns Us for Hosting Cuong-De"
 	desc = Initial_CuongDe.3.d
 
 	is_triggered_only = yes
@@ -294,8 +295,10 @@ country_event = {
 
 	option = {
 		name = "Okay"
-		VIE = { country_event = { id = CCC_Unification.4 days = 1 } }
-		set_country_flag = CCC_VIE_Accepted_First_Offer
+		VIE = {
+			country_event = { id = CCC_Unification.4 days = 1 }
+			set_country_flag = CCC_VIE_Accepted_First_Offer
+		}
 		ai_chance = {
 			base = 50
 			modifier = {
@@ -426,8 +429,10 @@ country_event = {
 
 	option = {
 		name = "Accept"
-		VIE = { country_event = { id = CCC_Unification.8 days = 2 } }
-		set_country_flag = CCC_VIE_Accepted_Ultimatum
+		VIE = {
+			country_event = { id = CCC_Unification.8 days = 2 }
+			set_country_flag = CCC_VIE_Accepted_Ultimatum
+		}
 		ai_chance = {
 			base = 50
 			modifier = {
@@ -455,8 +460,10 @@ country_event = {
 	
 	option = {
 		name = "Refuse"
-		VIE = { country_event = { id = CCC_Unification.9 days = 2 } }
-		set_country_flag = CCC_VIE_Refused_Ultimatum
+		VIE = {
+			country_event = { id = CCC_Unification.9 days = 2 }
+			set_country_flag = CCC_VIE_Refused_Ultimatum
+		}
 		ai_chance = {
 			base = 50
 			modifier = {
@@ -521,7 +528,7 @@ country_event = {
 country_event = {
 	id = CCC_Unification.10
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CCC_Unification.10"}
-	title = "Bao-Dai takes over Cochinchina!"
+	title = "Bao-Dai Takes Over Cochinchina!"
 	desc = CCC_Unification.10.d
 
 	is_triggered_only = yes
@@ -545,26 +552,27 @@ country_event = {
 		name = "Interesting"
 		add_stability = 0.05
 		set_capital	= { state = 286	}
+		hidden_effect = { country_event = { id = BaoDai.4 days = 3 random_days = 2 } }
 		
 		CCC = {
 			CCC_Nguyen_Van_Xuan = { set_nationality = VIE }
 			CCC_Tran_Quang_Vinh = { set_nationality = VIE }
 			CCC_Nguyen_Giac_Ngo = { set_nationality = VIE }
-			CCC_Ba_Cut = {
-				set_nationality = VIE
-				set_portraits = { army = { large = "gfx/leaders/VIE/GENERALS/Ba_Cut.dds" } }
-			}
 			hidden_effect = {
 				CCC_Lam_Thanh_Nguyen = { set_nationality = VIE remove_unit_leader_role = yes }
 				CCC_Tran_Van_Soai = { set_nationality = VIE remove_unit_leader_role = yes }
 				CCC_Trinh_Minh_The = { set_nationality = VIE remove_unit_leader_role = yes }
 				CCC_Nguyen_Van_Thanh = { set_nationality = VIE remove_unit_leader_role = yes }
 				CCC_Nguyen_Thanh_Phuong = { set_nationality = VIE remove_unit_leader_role = yes }
+				CCC_Ba_Cut = {
+					set_nationality = VIE
+					set_portraits = { army = { large = "gfx/leaders/VIE/GENERALS/Ba_Cut.dds" } }
+				}
 			}
 		}
-
 		set_cosmetic_tag = VIE_FRA_ETAT
 		load_focus_tree = VIE_Bao_Dai_50
+		
 		if = {
 			limit = {
 				OR = {
@@ -572,13 +580,19 @@ country_event = {
 					has_country_flag = CCC_VIE_Accepted_Ultimatum
 				}
 			}
-			country_event = { id = Etat_du_Vietnam.4 days = 1 }
-		}
-		else_if = {
-			limit = {
-				has_country_flag = CCC_VIE_Refused_Ultimatum
+			hidden_effect = { country_event = { id = Etat_du_Vietnam.4 days = 1 } }
+			else = {
+				limit = {
+					OR = {
+						has_country_flag = CCC_VIE_Refused_Ultimatum
+						NOT = {
+							has_country_flag = CCC_VIE_Accepted_First_Offer
+							has_country_flag = CCC_VIE_Accepted_Ultimatum
+						}
+					}
+				}
+				hidden_effect = { country_event = { id = Etat_du_Vietnam.5 days = 1 } }
 			}
-			country_event = { id = Etat_du_Vietnam.5 days = 1 }
 		}
 	}
 }
@@ -586,7 +600,7 @@ country_event = {
 country_event = {
 	id = Etat_du_Vietnam.2
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Etat_du_Vietnam.2"}
-	title = "Recognize Bao-Dai's new regime?"
+	title = "Recognize Bao-Dai's New Regime?"
 	desc = Etat_du_Vietnam.2.d
 
 	is_triggered_only = yes
@@ -605,7 +619,7 @@ country_event = {
 country_event = {
 	id = Etat_du_Vietnam.3
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Etat_du_Vietnam.3"}
-	title = "Bao-Dai declares us 'Demonic Communists'!"
+	title = "Bao-Dai Declares Us 'Demonic Communists'!"
 	desc = Etat_du_Vietnam.3.d
 
 	is_triggered_only = yes
@@ -619,7 +633,7 @@ country_event = {
 country_event = {
 	id = Etat_du_Vietnam.4
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Etat_du_Vietnam.4"}
-	title = "Nguyen-Van-Xuan is Elected First Prime Minister of the Etat du Vietnam"
+	title = "Nguyen-Van-Xuan is Elected First Prime Minister of Etat du Vietnam"
 	desc = Etat_du_Vietnam.4.d
 
 	is_triggered_only = yes
@@ -680,18 +694,6 @@ country_event = {
 			long_name = "Chanh-Quyen Bao-Dai"
 			name = "CQBD"
 		}
-		if = {
-			limit = {
-				has_country_leader = {
-					character = VIE_Bao_Dai
-					ruling_only = yes
-				}
-			}
-			set_country_leader_portrait	= {
-				ideology = neutrality
-				portrait = GFX_Bao_Dai_1950
-			}
-		}
 	}
 }
 
@@ -700,6 +702,320 @@ news_event = { #NEWS EVENT: Title is self-explanatory
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Etat_du_Vietnam.0"}
 	title = "[GetNewspaperHeader]Bao-Dai Proclaims the 'Etat du Vietnam'"
 	desc = Etat_du_Vietnam.0.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+country_event = {
+	id = BaoDai.1
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.1"}
+	title = "A Gift to Le-Van-Vien"
+	desc = BaoDai.1.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		add_stability = -0.05
+		#-1 Motorized Vehicle + 15M Franc
+		capital_scope = {
+			add_extra_state_shared_building_slots = 1
+			add_building_construction = {
+				type = office_park
+				level = 1
+				instant_build = yes
+			}
+		}
+	}
+}
+
+country_event = {
+	id = BaoDai.2
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.2"}
+	title = "Da-Lat, The Summer Capital"
+	desc = BaoDai.2.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		1757 = {
+			add_extra_state_shared_building_slots = 1
+			add_building_construction = {
+				type = office_park
+				level = 1
+				instant_build = yes
+			}
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+		}
+	}
+}
+
+country_event = {
+	id = BaoDai.3
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.3"}
+	title = "Saigon, Pearl of the Orient"
+	desc = BaoDai.3.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		capital_scope = {
+			add_extra_state_shared_building_slots = 1
+			add_building_construction = {
+				type = office_park
+				level = 1
+				instant_build = yes
+			}
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+		}
+	}
+}
+
+country_event = {
+	id = BaoDai.4
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.4"}
+	title = "Diem Declares His Own Socialist Revolution"
+	desc = BaoDai.4.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		add_stability = -0.05
+		add_political_power = -50
+		add_popularity = {
+			ideology = socialist 
+			popularity = 0.02
+		}
+		add_popularity = {
+			ideology = trotskyism 
+			popularity = 0.01
+		}
+		set_country_flag = VIE_Ambitious_Diem
+		custom_effect_tooltip = VIE_Diem_Warning_tt
+		hidden_effect = { add_ideas = VIE_Looming_Diem }
+		#activate deal with diem mission 
+		
+		trigger = {
+			tag = VIE
+		}
+	}
+	
+	option = {
+		name = "Interesting"
+		
+		trigger = {
+			NOT = { tag = VIE }
+		}
+	}
+}
+
+country_event = {
+	id = BaoDai.5
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.5"}
+	title = "Containing Diem's Ambitions"
+	desc = BaoDai.5.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "We must consider our options..."
+		country_event = { id = BaoDai.6 days = 1 }
+	}
+}
+
+country_event = {
+	id = BaoDai.6
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.6"}
+	title = "Dealing with Diem"
+	desc = BaoDai.6.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "We'll let the French deal with it."
+		complete_national_focus = VIE_Exile_Diem_Political_Opponents
+		set_country_flag = VIE_Diem_Not_Jailed
+	}
+	
+	option = {
+		name = "Imprisonment!"
+		unlock_national_focus = VIE_Exile_Diem_Political_Opponents
+	}
+	
+	option = {
+		name = "Imprison his brother!"
+		complete_national_focus = VIE_Exile_Diem_Political_Opponents
+		set_country_flag = VIE_Diem_Not_Jailed
+	}
+}
+
+country_event = {
+	id = BaoDai.7
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.7"}
+	title = "Nationalist Parties Support Bao-Dai"
+	desc = BaoDai.7.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		add_stability = 0.05
+		add_popularity = {
+			ideology = neutrality 
+			popularity = 0.05
+		}
+		random_owned_state = {
+			add_extra_state_shared_building_slots = 1
+			add_building_construction = {
+				type = industrial_complex
+				level = 1
+				instant_build = yes
+			}
+		}
+	}
+}
+
+country_event = {
+	id = BaoDai.8
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.8"}
+	title = "The 1955 Grand Election"
+	desc = BaoDai.8.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		drop_cosmetic_tag = yes
+		add_opinion_modifier = {
+			target = FRA
+			modifier = VIE_Diem_Succeeds
+		}
+		FRA = {
+			add_opinion_modifier = {
+				target = VIE
+				modifier = VIE_Diem_Succeeds
+			}
+		}
+		add_opinion_modifier = {
+			target = VIN
+			modifier = VIN_Diem_Succeeds
+		}
+		VIN = {
+			add_opinion_modifier = {
+				target = VIE
+				modifier = VIN_Diem_Succeeds
+			}
+		}
+		news_event = { id = BaoDai.100 hours = 3 random_hours = 6}
+	}
+}
+
+country_event = {
+	id = BaoDai.9
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.9"}
+	title = "What To Do with Captured Viet-Minh?"
+	desc = BaoDai.9.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Release Them"
+		add_stability = 0.05
+		every_owned_state = {
+			limit = {
+				is_core_of = VIN
+			}
+			add_resistance = -5
+		}
+	}
+	
+	option = {
+		name = "Execution"
+		add_stability = -0.15
+		every_owned_state = {
+			limit = {
+				is_core_of = VIN
+			}
+			add_resistance = 10
+		}
+	}
+}
+
+country_event = {
+	id = BaoDai.10
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.10"}
+	title = "Farewall Bao-Dai!"
+	desc = BaoDai.10.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		FRA = { country_event = { id = BaoDai.11 hours = 13 random_hours = 8 } }
+	}
+}
+
+country_event = {
+	id = BaoDai.11
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.11"}
+	title = "Bao-Dai's Exile"
+	desc = BaoDai.11.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+news_event = { #NEWS EVENT: Title is self-explanatory 
+	id = BaoDai.0
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.0"}
+	title = "[GetNewspaperHeader]Bao-Dai Censors the Saigon Journal Scene"
+	desc = BaoDai.0.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+news_event = { #NEWS EVENT: Title is self-explanatory 
+	id = BaoDai.100
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.100"}
+	title = "[GetNewspaperHeader]Bao-Dai Outed as Addict; Southern Vietnam Now Known as the 'Republic of Vietnam'"
+	desc = BaoDai.100.d
 	
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -775,7 +1091,7 @@ news_event = {
 country_event = {
 	id = Brevert_Lines.1
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Brevert_Lines.1"}
-	title = "Etat du Vietnam requests us to accept the Brevert Lines"
+	title = "Etat du Vietnam Requests Us to Accept the Brevert Lines"
 	desc = Brevert_Lines.1.d
 	
 	is_triggered_only = yes
@@ -923,7 +1239,7 @@ country_event = {
 	option = {
 		name = "Claim"
 		1295 = { add_claim_by = VIE }
-		1794 = {add_claim_by = VIE }
+		1794 = { add_claim_by = VIE }
 		add_opinion_modifier = {
 			target = LOS
 			modifier = VIE_Claimed_TranNinh
@@ -1079,7 +1395,7 @@ country_event = {
 country_event = {
 	id = Crown_Domains.1
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Crown_Domains.1"}
-	title = "Bao-dai requests control over Crown lands."
+	title = "Bao-dai Requests Control Over Crown lands."
 	desc = Crown_Domains.1.d
 	
 	is_triggered_only = yes
@@ -1107,50 +1423,29 @@ country_event = {
 	
 	option = {
 		name = "Okay"
-		create_corps_commander = {
-			name = "Vong A Sang"
-			picture = GFX_Vong_A_Sang
-			traits = { irregular_officer self_taught trait_mountaineer trickster guerilla_fighter quocGia_loyalist }
-			skill = 4
-			attack_skill = 4
-			defense_skill = 4
-			planning_skill = 3
-			logistics_skill = 4
+		NUN = {
+			NUN_Vong_A_Sang = {
+				set_nationality = VIE
+				remove_country_leader_role = {
+				    ideology = nationalist_ideology
+				}
+			}
 		}
-		create_corps_commander = {
-			name = "Deo Van Long"
-			picture = GFX_Deo_Van_Long
-			traits = { incompetent_officer self_taught trait_mountaineer trickster guerilla_fighter }
-			skill = 4
-			attack_skill = 4
-			defense_skill = 4
-			planning_skill = 4
-			logistics_skill = 3
+		TAI = {
+			TAI_Deo_Van_Long = {
+				set_nationality = VIE
+				remove_country_leader_role = {
+				    ideology = nationalist_ideology
+				}
+			}
 		}
-		#Annex ethnostates
-	}
-}
-
-country_event = {
-	id = Crown_Domains.3
-	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Crown_Domains.3"}
-	title = "The French Refuse!"
-	desc = Crown_Domains.3.d
-	
-	is_triggered_only = yes
-	fire_only_once = yes
-	
-	option = {
-		name = "Okay"
-		add_stability = -0.10
-		add_opinion_modifier = {
-			target = FRA
-			modifier = VIE_Crown_Domains_Declined
-		}
-		FRA = {
-			add_opinion_modifier = {
-				target = VIE
-				modifier = VIE_Crown_Domains_Declined
+		if = {
+			limit = {
+				country_exists = FUL
+			}
+			annex_country = {
+				target = FUL
+				transfer_troops = yes
 			}
 		}
 	}
@@ -1248,10 +1543,10 @@ country_event = {
 }
 
 country_event = { #South Vietnam event to France in which they ask for more economic self-determination
-	id = VIE_ECON.1
-	immediate = {log = "[GetDateText]: [Root.GetTag]: id = VIE_ECON.1"}
-	title = "Vietnam pleads for economic self-determination"
-	desc = VIE_ECON.1.d
+	id = VIE_Econ_SelfDem.1
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = VIE_Econ_SelfDem.1"}
+	title = "Vietnam Pleads for Economic Self-Determination"
+	desc = VIE_Econ_SelfDem.1.d
 
 	is_triggered_only = yes
 
@@ -1307,7 +1602,7 @@ country_event = {
 country_event = {
 	id = VIE_PQC_Mil.1
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = VIE_PQC_Mil.1"}
-	title = "Vietnam asks to integrate the Phu-Dai Army"
+	title = "Vietnam Asks to Integrate the Phu-Dai Army"
 	desc = VIE_PQC_Mil.1.d
 
 	is_triggered_only = yes
