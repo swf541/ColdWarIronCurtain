@@ -552,7 +552,10 @@ country_event = {
 		name = "Interesting"
 		add_stability = 0.05
 		set_capital	= { state = 286	}
-		hidden_effect = { country_event = { id = BaoDai.4 days = 3 random_days = 2 } }
+		hidden_effect = {
+			country_event = { id = BaoDai.4 days = 3 random_days = 2 }
+			VIN = country_event = { id = BaoDai.4 days = 5 }
+		}
 		
 		CCC = {
 			CCC_Nguyen_Van_Xuan = { set_nationality = VIE }
@@ -570,30 +573,9 @@ country_event = {
 				}
 			}
 		}
+		
 		set_cosmetic_tag = VIE_FRA_ETAT
 		load_focus_tree = VIE_Bao_Dai_50
-		
-		if = {
-			limit = {
-				OR = {
-					has_country_flag = CCC_VIE_Accepted_First_Offer
-					has_country_flag = CCC_VIE_Accepted_Ultimatum
-				}
-			}
-			hidden_effect = { country_event = { id = Etat_du_Vietnam.4 days = 1 } }
-			else = {
-				limit = {
-					OR = {
-						has_country_flag = CCC_VIE_Refused_Ultimatum
-						NOT = {
-							has_country_flag = CCC_VIE_Accepted_First_Offer
-							has_country_flag = CCC_VIE_Accepted_Ultimatum
-						}
-					}
-				}
-				hidden_effect = { country_event = { id = Etat_du_Vietnam.5 days = 1 } }
-			}
-		}
 	}
 }
 
@@ -633,7 +615,7 @@ country_event = {
 country_event = {
 	id = Etat_du_Vietnam.4
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Etat_du_Vietnam.4"}
-	title = "Nguyen-Van-Xuan is Elected First Prime Minister of Etat du Vietnam"
+	title = "Nguyen-Van-Xuan Is Elected Deputy Prime Minister of the Etat du Vietnam"
 	desc = Etat_du_Vietnam.4.d
 
 	is_triggered_only = yes
@@ -662,7 +644,7 @@ country_event = {
 country_event = {
 	id = Etat_du_Vietnam.5
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Etat_du_Vietnam.5"}
-	title = "Bao-Dai Remains as Sole Leader of Vietnam"
+	title = "Bao-Dai Remains as Sole Prime Minister of the Etat du Vietnam"
 	desc = Etat_du_Vietnam.5.d
 
 	is_triggered_only = yes
@@ -811,10 +793,11 @@ country_event = {
 			ideology = trotskyism 
 			popularity = 0.01
 		}
+		add_ideas = VIE_Looming_Diem
+		
 		set_country_flag = VIE_Ambitious_Diem
+		activate_mission = Dealing_With_Diem_Countdown #activate deal with diem mission 
 		custom_effect_tooltip = VIE_Diem_Warning_tt
-		hidden_effect = { add_ideas = VIE_Looming_Diem }
-		#activate deal with diem mission 
 		
 		trigger = {
 			tag = VIE
@@ -833,50 +816,75 @@ country_event = {
 country_event = {
 	id = BaoDai.5
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.5"}
-	title = "Containing Diem's Ambitions"
+	title = "Bao-Dai’s Inability in Dealing With Diem"
 	desc = BaoDai.5.d
 
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
-		name = "We must consider our options..."
-		country_event = { id = BaoDai.6 days = 1 }
+		name = "Interesting"
+		
+		#Heavily debuff SV as punishment
+		
+		VIE = {
+			remove_ideas = VIE_Looming_Diem
+			complete_national_focus = VIE_Exile_Diem_Political_Opponents
+			set_country_flag = VIE_Diem_Not_Jailed
+		}
 	}
 }
 
 country_event = {
 	id = BaoDai.6
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.6"}
-	title = "Dealing with Diem"
+	title = "Containing Diem's Ambitions"
 	desc = BaoDai.6.d
 
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
-		name = "We'll let the French deal with it."
-		complete_national_focus = VIE_Exile_Diem_Political_Opponents
-		set_country_flag = VIE_Diem_Not_Jailed
-	}
-	
-	option = {
-		name = "Imprisonment!"
-		unlock_national_focus = VIE_Exile_Diem_Political_Opponents
-	}
-	
-	option = {
-		name = "Imprison his brother!"
-		complete_national_focus = VIE_Exile_Diem_Political_Opponents
-		set_country_flag = VIE_Diem_Not_Jailed
+		name = "We must consider our options..."
+		country_event = { id = BaoDai.7 days = 1 }
 	}
 }
 
 country_event = {
 	id = BaoDai.7
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.7"}
-	title = "Nationalist Parties Support Bao-Dai"
+	title = "Dealing with Diem"
 	desc = BaoDai.7.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "We'll let the French deal with it."
+		remove_ideas = VIE_Looming_Diem
+		complete_national_focus = VIE_Exile_Diem_Political_Opponents
+		set_country_flag = VIE_Diem_Not_Jailed
+	}
+	
+	option = {
+		name = "Imprisonment!"
+		remove_ideas = VIE_Looming_Diem
+		unlock_national_focus = VIE_Exile_Diem_Political_Opponents
+	}
+	
+	option = {
+		name = "Imprison his brother!"
+		remove_ideas = VIE_Looming_Diem
+		complete_national_focus = VIE_Exile_Diem_Political_Opponents
+		set_country_flag = VIE_Diem_Not_Jailed
+	}
+}
+
+country_event = {
+	id = BaoDai.8
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.8"}
+	title = "Nationalist Parties Support Bao-Dai"
+	desc = BaoDai.8.d
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -900,10 +908,10 @@ country_event = {
 }
 
 country_event = {
-	id = BaoDai.8
-	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.8"}
+	id = BaoDai.9
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.9"}
 	title = "The 1955 Grand Election"
-	desc = BaoDai.8.d
+	desc = BaoDai.9.d
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -936,10 +944,10 @@ country_event = {
 }
 
 country_event = {
-	id = BaoDai.9
-	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.9"}
+	id = BaoDai.10
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.10"}
 	title = "What To Do with Captured Viet-Minh?"
-	desc = BaoDai.9.d
+	desc = BaoDai.10.d
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -968,25 +976,25 @@ country_event = {
 }
 
 country_event = {
-	id = BaoDai.10
-	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.10"}
+	id = BaoDai.11
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.11"}
 	title = "Farewall Bao-Dai!"
-	desc = BaoDai.10.d
+	desc = BaoDai.11.d
 
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
-		FRA = { country_event = { id = BaoDai.11 hours = 13 random_hours = 8 } }
+		FRA = { country_event = { id = BaoDai.12 hours = 13 random_hours = 8 } }
 	}
 }
 
 country_event = {
-	id = BaoDai.11
-	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.11"}
+	id = BaoDai.12
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.12"}
 	title = "Bao-Dai's Exile"
-	desc = BaoDai.11.d
+	desc = BaoDai.12.d
 
 	is_triggered_only = yes
 	fire_only_once = yes
