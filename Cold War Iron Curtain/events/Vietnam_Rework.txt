@@ -377,6 +377,8 @@ country_event = {
 		add_political_power = 150
 		add_stability = 0.05
 		complete_national_focus = VIE_Reincorporate_Cochinchina
+		clr_country_flag = CCC_VIE_Accepted_First_Offer
+		set_country_flag = VIE_CCC_Unification
 		if = {
 			limit = { 
 				original_tag = VIE
@@ -501,6 +503,8 @@ country_event = {
 
 	option = {
 		name = "Interesting"
+		clr_country_flag = CCC_VIE_Accepted_Ultimatum
+		set_country_flag = VIE_CCC_Unification
 		if = {
 			limit = { 
 				original_tag = VIE
@@ -521,6 +525,8 @@ country_event = {
 
 	option = {
 		name = "Interesting"
+		clr_country_flag = CCC_VIE_Refused_Ultimatum
+		set_country_flag = VIE_CCC_Failure
 		#Declare war
 	}
 }
@@ -543,7 +549,25 @@ country_event = {
 	id = Etat_du_Vietnam.1
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Etat_du_Vietnam.1"}
 	title = "A United South Vietnam"
-	desc = Etat_du_Vietnam.1.d
+	desc = {
+		Etat_du_Vietnam.1.d.a
+		
+		trigger = {
+			has_country_flag = VIE_CCC_Unification
+		}
+	}
+	desc = {
+		Etat_du_Vietnam.1.d.b
+		
+		trigger = {
+			OR = {
+				has_country_flag = VIE_CCC_Failure
+				NOT = {
+					has_country_flag = VIE_CCC_Unification
+				}
+			}
+		}
+	}
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -554,7 +578,7 @@ country_event = {
 		set_capital	= { state = 286	}
 		hidden_effect = {
 			country_event = { id = BaoDai.4 days = 3 random_days = 2 }
-			VIN = country_event = { id = BaoDai.4 days = 5 }
+			VIN = { country_event = { id = BaoDai.4 days = 5 } }
 		}
 		
 		CCC = {
@@ -573,9 +597,29 @@ country_event = {
 				}
 			}
 		}
+				
+		set_cosmetic_tag = VIE_FRA_ETAT
+		load_focus_tree = VIE_Bao_Dai_50
+		
+		trigger = {
+			has_country_flag = VIE_CCC_Unification
+		}
+	}
+	
+	option = {
+		name = "Interesting" #Failure to unify/war
 		
 		set_cosmetic_tag = VIE_FRA_ETAT
 		load_focus_tree = VIE_Bao_Dai_50
+		
+		trigger = {
+			OR = {
+				has_country_flag = VIE_CCC_Failure
+				NOT = {
+					has_country_flag = VIE_CCC_Unification
+				}
+			}
+		}
 	}
 }
 
@@ -615,13 +659,47 @@ country_event = {
 country_event = {
 	id = Etat_du_Vietnam.4
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Etat_du_Vietnam.4"}
-	title = "Nguyen-Van-Xuan Is Elected Deputy Prime Minister of the Etat du Vietnam"
-	desc = Etat_du_Vietnam.4.d
+	title = {
+		text = Etat_du_Vietnam.4.t.a
+		
+		trigger = {
+			has_country_flag = VIE_CCC_Unification
+		}
+	}
+	title = {
+		text = Etat_du_Vietnam.4.t.b
+		
+		trigger = {
+			OR = {
+				has_country_flag = VIE_CCC_Failure
+				NOT = {
+					has_country_flag = VIE_CCC_Unification
+				}
+			}
+		}
+	}
+	desc = {
+		text = Etat_du_Vietnam.4.d.a
+		
+		trigger = {
+			has_country_flag = VIE_CCC_Unification
+		}
+	}
+	desc = {
+		text = Etat_du_Vietnam.4.d.b
+		
+		trigger = {
+			OR = {
+				has_country_flag = VIE_CCC_Failure
+				NOT = {
+					has_country_flag = VIE_CCC_Unification
+				}
+			}
+		}
+	}
 
 	is_triggered_only = yes
 	fire_only_once = yes
-
-	immediate = { hidden_effect = { country_event = { id = Etat_du_Vietnam.6 days = 180 } } }
 
 	option = {
 		name = "Interesting"
@@ -638,31 +716,56 @@ country_event = {
 			long_name = "Chanh-Quyen Nguyen-Van-Xuan"
 			name = "CQNVX"
 		}
+		
+		set_country_flag = VIE_PM_Nguyen_Van_Xuan
+		set_country_flag = {
+			flag = VIE_PM_Open
+			value = 1
+		}
+		
+		trigger = {
+			has_country_flag = VIE_CCC_Unification
+		}
+	}
+	
+	option = {
+		name = "Interesting"
+
+		VIE_Bao_Dai = { set_portraits = { civilian = { large = GFX_Bao_Dai_1950 } } }
+		
+		set_country_flag = VIE_No_Initial_PM
+		set_country_flag = {
+			flag = VIE_PM_Open
+			value = 0
+		}
+		
+		trigger = {
+			OR = {
+				has_country_flag = VIE_CCC_Failure
+				NOT = {
+					has_country_flag = VIE_CCC_Unification
+				}
+			}
+		}
 	}
 }
 
 country_event = {
 	id = Etat_du_Vietnam.5
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Etat_du_Vietnam.5"}
-	title = "Bao-Dai Remains as Sole Prime Minister of the Etat du Vietnam"
+	title = "Nguyen-Van-Xuan Resigns as Prime Minister"
 	desc = Etat_du_Vietnam.5.d
 
-	is_triggered_only = yes
 	fire_only_once = yes
-
-	option = {
-		name = "Interesting"
+	
+	trigger = {
+		date > 1950.1.1
+		has_country_flag = VIE_PM_Nguyen_Van_Xuan
+		NOT = {
+			has_country_flag = VIE_PM_Nguyen_Van_Xuan_Retired
+			has_country_flag = VIE_No_Initial_PM
+		}
 	}
-}
-
-country_event = {
-	id = Etat_du_Vietnam.6
-	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Etat_du_Vietnam.6"}
-	title = "Nguyen-Van-Xuan Resigns as Prime Minister"
-	desc = Etat_du_Vietnam.6.d
-
-	is_triggered_only = yes
-	fire_only_once = yes
 
 	option = {
 		name = "Interesting"
@@ -675,6 +778,17 @@ country_event = {
 			ideology = neutrality
 			long_name = "Chanh-Quyen Bao-Dai"
 			name = "CQBD"
+		}
+		
+		set_country_flag = VIE_PM_Nguyen_Van_Xuan_Retired'
+		if = {
+			limit = {
+				has_country_flag = VIE_PM_Open
+			}
+			modify_country_flag = {
+				flag = VIE_PM_Open
+				value = 0
+			}
 		}
 	}
 }
@@ -1037,7 +1151,7 @@ news_event = { #NEWS EVENT: Title is self-explanatory
 country_event = {
 	id = VIE_JAP.1
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = VIE_JAP.1"}
-	title = "Bao-dai Requests Us to get rid of Cuong-de!"
+	title = "Bao-Dai Requests Us to Get Rid of Cuong-De!"
 	desc = VIE_JAP.1.d
 	
 	is_triggered_only = yes
@@ -1051,7 +1165,7 @@ country_event = {
 country_event = {
 	id = VIE_JAP.2
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = VIE_JAP.2"}
-	title = "Cuong-de Requests Economic aid"
+	title = "Cuong-De Requests Economic Aid"
 	desc = VIE_JAP.2.d
 	
 	is_triggered_only = yes
@@ -1069,7 +1183,7 @@ country_event = {
 news_event = {
 	id = VIE_JAP.0
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = VIE_JAP.0"}
-	title = "[GetNewspaperHeader]Cuong-de Requests Economic aid"
+	title = "[GetNewspaperHeader]Cuong-De’s Shift Towards Japan"
 	desc = VIE_JAP.0.d
 	
 	is_triggered_only = yes
@@ -1403,7 +1517,7 @@ country_event = {
 country_event = {
 	id = Crown_Domains.1
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Crown_Domains.1"}
-	title = "Bao-dai Requests Control Over Crown lands."
+	title = "Bao-Dai Requests Control Over the Crown Domains"
 	desc = Crown_Domains.1.d
 	
 	is_triggered_only = yes
@@ -1423,8 +1537,56 @@ country_event = {
 country_event = {
 	id = Crown_Domains.2
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Crown_Domains.2"}
-	title = "The French Accept!"
+	title = "The French Accept"
 	desc = Crown_Domains.2.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Okay"
+	}
+}
+
+country_event = {
+	id = Crown_Domains.3
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Crown_Domains.3"}
+	title = "The French Refuse"
+	desc = Crown_Domains.3.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Okay"
+	}
+}
+
+country_event = {
+	id = Crown_Domains.4
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Crown_Domains.4"}
+	title = "Bao-Dai Requests Total Annexation of the Crown Domains"
+	desc = Crown_Domains.4.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Okay"
+		VIE = { country_event = { id = Crown_Domains.5 days = 1 } }
+	}
+	
+	option = {
+		name = "Nah"
+		VIE = { country_event = { id = Crown_Domains.6 days = 1 } }
+	}
+}
+
+country_event = {
+	id = Crown_Domains.5
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Crown_Domains.5"}
+	title = "The French Accept!"
+	desc = Crown_Domains.5.d
 	
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -1460,10 +1622,10 @@ country_event = {
 }
 
 country_event = {
-	id = Crown_Domains.3
-	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Crown_Domains.3"}
+	id = Crown_Domains.6
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Crown_Domains.6"}
 	title = "The French Refuse!"
-	desc = Crown_Domains.3.d
+	desc = Crown_Domains.6.d
 	
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -1650,14 +1812,18 @@ country_event = {
 
 	option = {
 		name = "Alright"
-		VIE = { country_event = { id = VIE_PQC_Mil.4 days = 1 } }
-		VIE = { set_country_flag = VIE_PQC_Integrates }
+		VIE = {
+			country_event = { id = VIE_PQC_Mil.4 days = 1 }
+			set_country_flag = VIE_PQC_Submitted
+		}
 	}
 	
 	option = {
 		name = "We're good"
-		VIE = { country_event = { id = VIE_PQC_Mil.5 days = 1 } }
-		VIE = { set_country_flag = VIE_PQC_Refusal }
+		VIE = {
+			country_event = { id = VIE_PQC_Mil.5 days = 1 }
+			set_country_flag = VIE_PQC_Refuses
+		}
 	}
 }
 
@@ -1705,7 +1871,13 @@ country_event = {
 	is_triggered_only = yes
 
 	option = {
+		name = "War it is..."
+		set_country_flag = VIE_PQC_War
+	}
+
+	option = {
 		name = "A shame"
+		set_country_flag = VIE_PQC_Back_Down
 	}
 }
 
