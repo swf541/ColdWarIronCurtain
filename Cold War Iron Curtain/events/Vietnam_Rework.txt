@@ -6,6 +6,7 @@ add_namespace = CCC_Unification_Choices
 add_namespace = Etat_du_Vietnam
 add_namespace = Initial_CuongDe
 add_namespace = BaoDai
+add_namespace = NgoDinh_Brothers
 #Diplomacy
 add_namespace = VIE_JAP
 add_namespace = VIE_KOR
@@ -73,9 +74,23 @@ country_event = {
 
 	option = {
 		name = "He will be relegated to a footnote in history."
-		USA = { country_event = Initial_CuongDe.2 }
-		FRA = { country_event = Initial_CuongDe.2 }
-		JAP = { country_event = Initial_CuongDe.3 }
+		all_country = {
+			if = {
+				limit = {
+					OR = {
+						original_tag = USA
+						original_tag = FRA
+					}
+				}
+				country_event = Initial_CuongDe.2
+			}
+			else_if = {
+				limit = {
+					original_tag = JAP
+				}
+				country_event = Initial_CuongDe.2
+			}
+		}
 	}
 }
 
@@ -104,6 +119,21 @@ country_event = {
 
 	option = {
 		name = "Interesting"
+	}
+}
+
+country_event = {
+	id = Initial_CuongDe.4
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = Initial_CuongDe.4"}
+	title = "Cuong-De Announces His Return to Vietnam"
+	desc = Initial_CuongDe.4.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		add_stability = -0.05
 	}
 }
 
@@ -574,13 +604,12 @@ country_event = {
 
 	option = {
 		name = "Interesting"
-		add_stability = 0.05
-		set_capital	= { state = 286	}
 		hidden_effect = {
+			set_capital	= { state = 286	}
 			country_event = { id = BaoDai.4 days = 3 random_days = 2 }
 			VIN = { country_event = { id = BaoDai.4 days = 5 } }
 		}
-		
+		add_stability = 0.05
 		CCC = {
 			CCC_Nguyen_Van_Xuan = { set_nationality = VIE }
 			CCC_Tran_Quang_Vinh = { set_nationality = VIE }
@@ -597,7 +626,8 @@ country_event = {
 				}
 			}
 		}
-				
+		custom_effect_tooltip = VIE_Saigon_Capital_tt
+		
 		set_cosmetic_tag = VIE_FRA_ETAT
 		set_country_flag = VIE_unity_required
 		load_focus_tree = VIE_Bao_Dai_50
@@ -890,14 +920,14 @@ country_event = {
 country_event = {
 	id = BaoDai.4
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = BaoDai.4"}
-	title = "Diem Declares His Own Socialist Revolution"
+	title = "The Manifesto of Ngo-Dinh-Diem"
 	desc = BaoDai.4.d
 
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
-		name = "Interesting"
+		name = "Dissidence will not be tolerated."
 		add_stability = -0.05
 		add_political_power = -50
 		add_popularity = {
@@ -920,7 +950,7 @@ country_event = {
 	}
 	
 	option = {
-		name = "Interesting"
+		name = "A future opportunity?"
 		
 		trigger = {
 			NOT = { tag = VIE }
@@ -975,23 +1005,72 @@ country_event = {
 	fire_only_once = yes
 
 	option = {
-		name = "We'll let the French deal with it."
-		remove_ideas = VIE_Looming_Diem
-		complete_national_focus = VIE_Exile_Diem_Political_Opponents
-		set_country_flag = VIE_Diem_Not_Jailed
+		name = "Exile him to Japan."
+		country_event = { id = NgoDinh_Brothers.1 hours = 6 }
 	}
 	
 	option = {
 		name = "Imprisonment!"
-		remove_ideas = VIE_Looming_Diem
-		unlock_national_focus = VIE_Exile_Diem_Political_Opponents
+		country_event = { id = NgoDinh_Brothers.2 hours = 6 }
 	}
 	
 	option = {
 		name = "Imprison his brother!"
+		country_event = { id = NgoDinh_Brothers.3 hours = 6 }
+	}
+}
+
+country_event = {
+	id = NgoDinh_Brothers.1
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = NgoDinh_Brothers.1"}
+	title = "The Exile of Diem"
+	desc = NgoDinh_Brothers.1.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Someone is going to be fired for this!"
 		remove_ideas = VIE_Looming_Diem
 		complete_national_focus = VIE_Exile_Diem_Political_Opponents
 		set_country_flag = VIE_Diem_Not_Jailed
+		set_country_flag = VIE_Nhu_Not_Jailed
+	}
+}
+
+country_event = {
+	id = NgoDinh_Brothers.2
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = NgoDinh_Brothers.2"}
+	title = "The Arrest of Diem"
+	desc = NgoDinh_Brothers.2.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "He will be forgotten."
+		remove_ideas = VIE_Looming_Diem
+		unlock_national_focus = VIE_Exile_Diem_Political_Opponents
+		set_country_flag = VIE_Diem_Jailed
+		set_country_flag = VIE_Nhu_Not_Jailed
+	}
+}
+
+country_event = {
+	id = NgoDinh_Brothers.3
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = NgoDinh_Brothers.3"}
+	title = "The Arrest of Nhu"
+	desc = NgoDinh_Brothers.3.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "It will not amount to anything."
+		remove_ideas = VIE_Looming_Diem
+		complete_national_focus = VIE_Exile_Diem_Political_Opponents
+		set_country_flag = VIE_Diem_Not_Jailed
+		set_country_flag = VIE_Nhu_Jailed
 	}
 }
 
@@ -1363,34 +1442,21 @@ country_event = {
 		name = "Claim"
 		1295 = { add_claim_by = VIE }
 		1794 = { add_claim_by = VIE }
-		add_opinion_modifier = {
-			target = LOS
-			modifier = VIE_Claimed_TranNinh
-		}
-		add_opinion_modifier = {
-			target = CAM
-			modifier = VIE_Claimed_TranNinh
-		}
-		add_opinion_modifier = {
-			target = FRA
-			modifier = VIE_Claimed_TranNinh
-		}
-		LOS = {
+		every_country = {
+			limit = {
+				original_tag = LOS
+				original_tag = CAM
+				original_tag = FRA
+			}
 			add_opinion_modifier = {
-				target = VIE
+				target = PREV
 				modifier = VIE_Claimed_TranNinh
 			}
-		}
-		CAM = {
-			add_opinion_modifier = {
-				target = VIE
-				modifier = VIE_Claimed_TranNinh
-			}
-		}
-		FRA = {
-			add_opinion_modifier = {
-				target = VIE
-				modifier = VIE_Claimed_TranNinh
+			PREV = {
+				add_opinion_modifier = {
+					target = VIE
+					modifier = VIE_Claimed_TranNinh
+				}
 			}
 		}
 		complete_national_focus = VIE_Claim_TranNinh
@@ -1398,34 +1464,21 @@ country_event = {
 	
 	option = {
 		name = "Fine how it is"
-		add_opinion_modifier = {
-			target = LOS
-			modifier = VIE_Defacto_TranNinh
-		}
-		add_opinion_modifier = {
-			target = CAM
-			modifier = VIE_Defacto_TranNinh
-		}
-		add_opinion_modifier = {
-			target = FRA
-			modifier = VIE_Defacto_TranNinh
-		}
-		LOS = {
+		every_country = {
+			limit = {
+				original_tag = LOS
+				original_tag = CAM
+				original_tag = FRA
+			}
 			add_opinion_modifier = {
-				target = VIE
+				target = PREV
 				modifier = VIE_Defacto_TranNinh
 			}
-		}
-		CAM = {
-			add_opinion_modifier = {
-				target = VIE
-				modifier = VIE_Defacto_TranNinh
-			}
-		}
-		FRA = {
-			add_opinion_modifier = {
-				target = VIE
-				modifier = VIE_Defacto_TranNinh
+			PREV = {
+				add_opinion_modifier = {
+					target = VIE
+					modifier = VIE_Defacto_TranNinh
+				}
 			}
 		}
 		complete_national_focus = VIE_Accept_DeFacto
