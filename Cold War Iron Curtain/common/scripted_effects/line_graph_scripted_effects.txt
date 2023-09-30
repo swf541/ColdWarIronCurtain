@@ -607,3 +607,106 @@ Income_add_random_point_to_line = {
 	
 	add_to_array = { Income_numbers = Income_count }
 }
+
+Laffer_Graph_Financial_Tab_Update = {
+    gui_numbers_generate_laffer = yes
+ 
+	#Start
+	set_variable = {
+		Laffer_count = 0
+	}
+	clear_array = Laffer_graph_offsets
+	clear_array = Laffer_graph_slopes
+	clear_array = current_Laffer_numbers
+	clear_array = Laffer_numbers
+	for_each_loop = {
+		array = laffer_gui_segments
+		add_to_array = { current_Laffer_numbers = v }
+	}
+	find_highest_in_array = {
+		array = laffer_gui_segments
+		value = max
+		index = max_index
+	}
+	find_lowest_in_array = {
+		array = laffer_gui_segments
+		value = min
+		index = min_index
+	}
+	set_variable = {
+		max_laffer = max
+	}
+	set_variable = {
+		max_laffer_test = max
+	}
+	set_variable = {
+		min_laffer = min
+	}
+	set_variable = {
+		min_laffer_neg = min
+	}
+	multiply_variable = {
+		min_laffer_neg = -1
+	}
+	subtract_from_variable = {
+		max_laffer = min_laffer
+	}
+	clear_array = Laffer_numbers
+	for_each_loop = {
+		array = current_Laffer_numbers
+		set_variable = {
+			value_temp = v
+		}
+		add_to_variable = {
+			value_temp = min_laffer_neg
+		}
+		divide_variable = { value_temp = max }
+		multiply_variable = { value_temp = 80 }
+		add_to_variable = { value_temp = 10 }
+		round_variable = value_temp
+
+		add_to_array = {
+			value_check_laffer = value_temp
+		}
+
+		Laffer_add_random_point_to_line = yes		
+	}
+}
+Laffer_add_random_point_to_line = {
+	# Adds a random point to the line graph
+
+	# This count is displayed as an x-axis label, increment it
+	add_to_variable = { Laffer_count = 1 }
+
+	# We keep track of the last y position so we can calculate the slope
+	set_variable = { Laffer_last_y_position = Laffer_y_position }
+	
+	# Random new y position, 10-90
+	set_variable = { Laffer_y_position = value_temp }
+
+
+	# Prune arrays so they hold at most 20 elements
+	if = {
+		limit = {
+			check_variable = { Laffer_count > 20 }
+		}
+		remove_from_array = { array = Laffer_graph_offsets index = 0 }
+		remove_from_array = { array = Laffer_graph_slopes index = 0 }
+		remove_from_array = { array = Laffer_numbers index = 0 }
+	}
+
+	# The y position offset is the inverse of the y position
+	set_temp_variable = { offset = Laffer_last_y_position }
+	multiply_temp_variable = { offset = -1 }
+	add_to_array = { Laffer_graph_offsets = offset }
+
+	# The 'slope' here is simply the difference between the current y value and the last one, divided by 2 plus 50
+	# These last two changes are needed for the shader
+	set_temp_variable = { diff = Laffer_y_position }
+	subtract_from_temp_variable = { diff = Laffer_last_y_position }
+	divide_temp_variable = { diff = 2 }
+	add_to_temp_variable = { diff = 50 }
+	add_to_array = { Laffer_graph_slopes = diff }
+	
+	add_to_array = { Laffer_numbers = Laffer_count }
+}
