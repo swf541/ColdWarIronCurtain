@@ -359,31 +359,111 @@ country_event = {
 				elections_allowed = no
 			}
 
+			YEM = {
+				delete_unit = {
+					state = 293
+					disband = yes #will refund equipment and manpower
+				}
+				delete_unit = {
+					state = 1040
+					disband = yes #will refund equipment and manpower
+				}
+				delete_unit = {
+					state = 964
+					disband = yes #will refund equipment and manpower
+				}
+				delete_unit = {
+					state = 1241
+					disband = yes #will refund equipment and manpower
+				}
+			}
 			SOV = {
-				YEM = {
-					set_temp_variable = { percent_change = 25 }
-					set_temp_variable = { tag_index = PREV.id }
-					set_temp_variable = { influence_target = THIS.id }
-					change_influence_percentage = yes  
-
+				add_ai_strategy = {
+					type = send_volunteers_desire
+					id = YEM
+					value = 2000
+				}
+				add_ai_strategy = {
+					type = send_lend_lease_desire
+					id = YEM
+					value = 2000
 				}
 			}
 			EGY = {
-				YEM = {
-					set_temp_variable = { percent_change = 60 }
-					set_temp_variable = { tag_index = PREV.id }
-					set_temp_variable = { influence_target = THIS.id }
-					change_influence_percentage = yes  
+				add_ai_strategy = {
+					type = send_volunteers_desire
+					id = YEM
+					value = 2000
+				}
+				add_ai_strategy = {
+					type = send_lend_lease_desire
+					id = YEM
+					value = 2000
+				}
+			}
+			ENG = {
+				add_ai_strategy = {
+					type = send_volunteers_desire
+					id = CSA
+					value = 2000
+				}
+				add_ai_strategy = {
+					type = send_lend_lease_desire
+					id = CSA
+					value = 2000
+				}
+			}
+			ISR = {
+				add_ai_strategy = {
+					type = send_volunteers_desire
+					id = CSA
+					value = 2000
+				}
+				add_ai_strategy = {
+					type = send_lend_lease_desire
+					id = CSA
+					value = 2000
+				}
+			}
+			FRA = {
+				add_ai_strategy = {
+					type = send_volunteers_desire
+					id = CSA
+					value = 2000
+				}
+				add_ai_strategy = {
+					type = send_lend_lease_desire
+					id = CSA
+					value = 2000
 				}
 			}
 			every_owned_state = {
 				add_core_of = CSA
 			}
+			964 = {
+				add_dynamic_modifier = {
+					modifier = unplanned_offensive
+				}
+			}
+			293 = {
+				add_dynamic_modifier = {
+					modifier = unplanned_offensive
+				}
+			}
+			1040 = {
+				add_dynamic_modifier = {
+					modifier = unplanned_offensive
+				}
+			}
+			1241 = {
+				add_dynamic_modifier = {
+					modifier = unplanned_offensive
+				}
+			}
 			CSA = {
 				transfer_state = 1241
 				add_manpower = 15000
 				army_experience = 50
-				activate_mission = CSA_External_Support
 				load_oob = "generic_insurgency"
 				capital_scope = {
 					create_unit = {
@@ -403,10 +483,32 @@ country_event = {
 						owner = CSA
 					}
 				}
-				set_temp_variable = { percent_change = 100 }
-				change_domestic_influence_percentage = yes
+				add_to_variable = { var = domestic_influence_amount value = 2000 }
 			}
 			YEM = {
+				load_oob = "generic_insurgency"
+				1040 = {
+					create_unit = {
+						division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+						owner = YEM
+					}
+				}
+				964 = {
+					create_unit = {
+						division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+						owner = YEM
+					}
+				}
+				capital_scope = {
+					create_unit = {
+						division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+						owner = YEM
+					}
+					create_unit = {
+						division = "name = \"Infantry Division\" division_template = \"Infantry Division\" start_experience_factor = 0.75 start_equipment_factor = 0.5"
+						owner = YEM
+					}
+				}
 				YEM_qassem_munaser = {
 					set_nationality = CSA
 				}
@@ -458,19 +560,12 @@ country_event = {
 					defense_skill = 2
 					planning_skill = 2
 					logistics_skill = 2
-				}		
-			}
-			SAU = {
-				CSA = {
-					set_temp_variable = { percent_change = 60 }
-					set_temp_variable = { tag_index = PREV.id }
-					set_temp_variable = { influence_target = THIS.id }
-					change_influence_percentage = yes  
 				}
-			}
-			EGY = {
-				transfer_state = 1040
-				add_state_core = 1040
+				declare_war_on = {
+					target = CSA
+					type = civil_war
+				}
+	
 			}
 		}
 	}
@@ -486,7 +581,10 @@ country_event = {
 			is_ai = no
 		}
 		CSA = { change_tag_from = YEM }
-		YEM = { news_event = NYCW.1 }
+		YEM = {
+			news_event = NYCW.1
+			set_cosmetic_tag = YAR
+		}
 	}
 }
 
@@ -500,30 +598,8 @@ news_event = {
 	is_triggered_only = yes
 	major = yes
 
-	immediate = {
-		if = {
-			limit = {
-				tag = YEM
-			}
-			set_variable = { YEM.YEMEN_insurgency = 50 }
-			set_variable = { CSA.YEMEN_insurgency = 75 }
-			set_variable = { SAU.muk_funding = 10 }
-			set_variable = { JOR.muk_funding = 2 }
-			set_variable = { ENG.muk_funding = 3 }
-			set_variable = { CSA.global_muk_funding = 15 }
-		}
-	}
-
 	option = {
 		name = "Another conflict in the Middle East...."
-		YEM = {
-			set_country_flag = North_Yemen_Civil_War
-		}
-		CSA = {
-			set_country_flag = North_Yemen_Civil_War
-		}
-		EGY = {
-			set_country_flag = North_Yemen_Civil_War
-		}
+		set_global_flag = North_Yemen_Civil_War
 	}
 }
