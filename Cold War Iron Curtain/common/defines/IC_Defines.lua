@@ -36,8 +36,8 @@ NDefines.NAir.STRATEGIC_BOMBER_NUKE_AIR_SUPERIORITY = 10.0 -- How much air super
 NDefines.NAir.NAVAL_COMBAT_EXTERNAL_PLANES_JOIN_RATIO = 0.02 -- Max planes that can join a combat comparing to the total strength of the ships
 NDefines.NAir.COMBAT_STACK_LIMIT = 3 -- The biggest allowed dogfight combination (1vs1 or 2vs1). Bigger value cause that amount of airplanes matters more then their stats. Only used in naval air combat, for land air combat see COMBAT_MULTIPLANE_CAP
 NDefines.NAir.NAVAL_STRIKE_DAMAGE_TO_STR = 2 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
-NDefines.NAir.MISSION_COMMAND_POWER_COSTS = {  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
-NDefines.NAir.MISSION_FUEL_COSTS = {  1.0, 0.5, 0.2, 1.3, 1.3, 20.0, 3.0, 1.0, 1.3, 2.0, 0.5, 2.0, 2.0, 1.0 }
+NDefines.NAir.MISSION_COMMAND_POWER_COSTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+NDefines.NAir.MISSION_FUEL_COSTS = { 1.0, 0.5, 0.2, 1.3, 1.3, 20.0, 3.0, 1.0, 1.3, 2.0, 0.5, 2.0, 2.0, 1.0, 1.0, 1.0 }
 NDefines.NAir.CAS_NIGHT_ATTACK_FACTOR = 0.5 -- Balancing value to convert damage ( naval_strike_attack * hits ) to Strength reduction.
 NDefines.NAir.AIR_WING_AVERAGE_SIZE = 50 						-- Eyeballed average amount of airplanes in wing. Used when calculating air volunteer.
 
@@ -88,8 +88,9 @@ NDefines.NDiplomacy.TENSION_TIME_SCALE_START_DATE = "1999.1.1.12" -- Starting at
 NDefines.NDiplomacy.VOLUNTEERS_DIVISIONS_REQUIRED = 1 -- This many divisons are required for the country to be able to send volunteers.
 NDefines.NDiplomacy.VOLUNTEERS_PER_COUNTRY_ARMY = 0.05 -- Each army unit owned by the source country contributes this amount of volunteers to the limit.
 NDefines.NDiplomacy.VOLUNTEERS_PER_TARGET_PROVINCE = 0.05 -- Each province owned by the target country contributes this amount of volunteers to the limit.
+NDefines.NDiplomacy.ASSUME_FACTION_LEADERSHIP_PP_COST = 5000 -- Each province owned by the target country contributes this amount of volunteers to the limit.
 
-NDefines.NDiplomacy.VOLUNTEERS_TRANSFER_SPEED = 21
+NDefines.NDiplomacy.VOLUNTEERS_TRANSFER_SPEED = 7
 
 NDefines.NGame.END_DATE = "2050.5.23.12"
 NDefines.NGame.START_DATE = "1945.5.23.12"
@@ -127,7 +128,7 @@ NDefines.NTrade.RELATION_TRADE_FACTOR = 5 -- Trade factor is modified by Opinion
 NDefines.NFocus.FOCUS_POINT_DAYS = 5 -- Each point takes a week
 NDefines.NFocus.MAX_SAVED_FOCUS_PROGRESS = 15 -- This much progress can be saved while not having a focus selected
 
-NDefines.NGame.LAG_DAYS_FOR_LOWER_SPEED = 100
+NDefines.NGame.LAG_DAYS_FOR_LOWER_SPEED = 30
 NDefines.NGame.LAG_DAYS_FOR_PAUSE = 50
 
 NDefines.NAI.DIPLOMACY_SCARED_MINOR_EXTRA_RELUCTANCE = -50 -- extra reluctance to join stuff as scared minor
@@ -167,6 +168,7 @@ NDefines.NMilitary.LAND_COMBAT_ORG_DAMAGE_MODIFIER = 0.025
 NDefines.NMilitary.LAND_AIR_COMBAT_STR_DAMAGE_MODIFIER = 0.08
 NDefines.NMilitary.LAND_AIR_COMBAT_ORG_DAMAGE_MODIFIER = 0.12
 NDefines.NMilitary.LAND_COMBAT_STR_ARMOR_ON_SOFT_DICE_SIZE = 6
-NDefines.NMilitary.LAND_COMBAT_COLLATERAL_FACTOR = 0.02
+NDefines.NMilitary.LAND_COMBAT_COLLATERAL_FORT_FACTOR = 0.005	-- Factor to scale collateral damage to forts with.
+NDefines.NMilitary.LAND_COMBAT_COLLATERAL_INFRA_FACTOR = 0.0022	-- Factor to scale collateral damage to infra with.
 
 NDefines.NPolitics.BASE_POLITICAL_POWER_INCREASE = 2
