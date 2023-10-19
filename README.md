@@ -6,6 +6,7 @@
 
 
 The Year is 1949, a shattered planet begins to fall back into the arms of tyranny and conflict, as new rivalries emerge.  
+
 Welcome to a new era of struggle, determination and conflict, as nations struggle to achieve independence and power. Superpowers rise from the ashes of old, with ideologies that shall determine the fate of the human race permanently. As the superpowers jockey militarily and economically for supremacy, many nations are freed from the yokes of colonial oppression, and finally the people of entire continents, have a say in determining their destiny.  
 
 War brews in East Asia yet again, and the African continent will no longer bear the immoral oppression of their people. Eastern Europe is encompassed by the Soviet sphere, and the West seeks to salvage its crumbling throne.  
