@@ -4,6 +4,7 @@
 
 ![Steam Downloads](https://img.shields.io/steam/downloads/1458561226) ![Steam Favorites](https://img.shields.io/steam/favorites/1458561226) ![Steam Update Date](https://img.shields.io/steam/update-date/1458561226?label=Last%20updated)
 
+[![Download on Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=1458561226)]
 
 The Year is 1949, a shattered planet begins to fall back into the arms of tyranny and conflict, as new rivalries emerge.  
 
@@ -20,6 +21,10 @@ Will you spread your ideas across the globe peacefully, or will you tighten your
 ![Discord](https://img.shields.io/discord/459126880998522882?label=Discord) 
 ![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCJDC4dMr_bzf23EOgZEmFMA)
 ![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/cwic)
+
+[![Discord](https://discord.com/invite/AKKmh4x)]
+[![Youtube](https://www.youtube.com/@ironcurtainaworlddivided596/featured)]
+[![Reddit](https://www.reddit.com/r/CWIC/)]
 
 ---------------------
 
