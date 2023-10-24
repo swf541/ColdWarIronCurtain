@@ -486,34 +486,37 @@ country_event = {
 		name = decolonization.10.a
 		ai_chance = {
 			factor = 99
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 100
+			}
 		}
 		MAL = {
 			drop_cosmetic_tag = yes
-			if = {
-		limit = {
-		ENG = {
-			controls_state = 336
-		}	
-		}
-		transfer_state = 336
-			}
-			transfer_state = 333
-			transfer_state = 785
-			if = {
-		limit = {
-		711 = { is_core_of = SGP }
-		}
-		MAL = { transfer_state = 711 }
-		711 = { add_core_of = MAL }
+			every_state = {
+				limit = {
+					OR = {
+						is_core_of = SWK
+						is_core_of = NBO
+						is_core_of = SGP
+					}
+				}
+				MAL = { transfer_state = PREV }
 			}
 			if = {
-		limit = {
-		712 = { is_core_of = SGP }
-		}
-		MAL = { transfer_state = 712 }
-		712 = { add_core_of = MAL }
+				limit = {
+					711 = { is_core_of = SGP }
+				}
+				711 = { add_core_of = MAL }
+			}
+			if = {
+				limit = {
+					712 = { is_core_of = SGP }
+				}
+				712 = { add_core_of = MAL }
 			}
 		}
+		hidden_effect = { news_event = { id = Malaysia.0 hours = 3 random_hours = 6 } }
 	}
 
 	#North Borneo Plan
@@ -521,54 +524,64 @@ country_event = {
 		name = decolonization.10.b
 		ai_chance = {
 			factor = 1
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
 		}
 		set_autonomy = { target = BRU autonomy_state = autonomy_free }
 		MAL = {
 			drop_cosmetic_tag = yes
 			if = {
-		limit = {
-		ENG = {
-			controls_state = 336
-		}	
-		}
-		transfer_state = 336
+				limit = {
+					SGP = {
+						controls_state = 336
+					}	
+				}
+				transfer_state = 336
 			}
 			if = {
-		limit = {
-		711 = { is_core_of = SGP }
-		}
-		MAL = { transfer_state = 711 }
-		711 = { add_core_of = MAL }
+				limit = {
+					711 = { is_core_of = SGP }
+				}
+				MAL = { transfer_state = 711 }
+				711 = { add_core_of = MAL }
 			}
 			if = {
-		limit = {
-		712 = { is_core_of = SGP }
-		}
-		MAL = { transfer_state = 712 }
-		712 = { add_core_of = MAL }
+				limit = {
+					712 = { is_core_of = SGP }
+				}
+				MAL = { transfer_state = 712 }
+				712 = { add_core_of = MAL }
 			}
 		}
 		BRU = {
+			set_cosmetic_tag = NBR
 			set_politics = {
-		ruling_party = socialist
-		elections_allowed = yes
+				ruling_party = socialist
+				elections_allowed = yes
 			}
 			add_popularity = {
-		ideology = socialist
-		popularity = 0.9
+				ideology = socialist
+				popularity = 0.9
 			}
-			set_cosmetic_tag = NBR
-			transfer_state = 333
-			transfer_state = 785
-			333 = { add_core_of = BRU remove_core_of = MAL }
-			785 = { add_core_of = BRU remove_core_of = MAL }
+			every_state = {
+				limit = {
+					OR = {
+						is_core_of = SWK
+						is_core_of = NBO
+					}
+				}
+				BRU = { transfer_state = PREV }
+				PREV = { add_core_of = BRU remove_core_of = MAL }
+			}
 		}
 	}
 }
 
 #Malaya Independence Act
 country_event = {
-	id = decolonization.11 
+	id = decolonization.11
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.11"}
 	title = decolonization.11.t
 	desc = decolonization.11.d
@@ -581,25 +594,38 @@ country_event = {
 		set_autonomy = { target = MAL autonomy_state = autonomy_free }
 		MAL = {
 			add_ideas = un_member
-			set_politics = {
-		ruling_party = conservative
-		elections_allowed = yes
-			}
+			
 			add_popularity = {
-		ideology = conservative
-		popularity = 0.9
+				ideology = conservative
+				popularity = 1
+			}
+			set_politics = {
+				ruling_party = conservative
+				last_election = "1957.8.31"
+				election_frequency = 48
+				elections_allowed = no
+			}
+			
+			retire_character = MAL_Donald_MacGillivray
+			add_country_leader_role = {
+				character = MAL_Tunku_Abdul_Rahman
+				promote_leader = yes
+				country_leader = {
+					ideology = conservatism
+				}
+			}
+			
+			if = {
+				limit = {
+					NOT = { MAL = { owns_state = 1128 } }
+				}
+				MAL = { transfer_state = 1128 }
 			}
 			if = {
-		limit = {
-		ENG = { owns_state = 1128 }
-		}
-		MAL = { transfer_state = 1128 }
-			}
-			if = {
-		limit = {
-		ENG = { owns_state = 924 }
-		}
-		MAL = { transfer_state = 924 }
+				limit = {
+					NOT = { MAL = { owns_state = 924 } }
+				}
+				MAL = { transfer_state = 924 }
 			}
 		}
 	}
@@ -2155,5 +2181,342 @@ news_event = {
 	major = yes
 	option = {
 		name = "I forgot the Netherlands owned a part of South America"
+	}
+}
+#MAL Gerald Templar Appointed - 1952
+country_event = {
+	id = decolonization.58
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.58"}
+	title = "Gerald Templar Appointed High Commissioner for Malaya"
+	desc = decolonization.58.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = "Let’s See if He Can Turn Things Around."
+		
+		MAL = {
+			retire_character = MAL_Henry_Gurney
+			add_country_leader_role = {
+				character = MAL_Gerald_Templar
+				promote_leader = yes
+				country_leader = {
+					ideology = colonial_regime
+				}
+			}
+		}
+	}
+}
+#MAL Donald MacGillivray Appointed - 1954
+country_event = {
+	id = decolonization.59
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.59"}
+	title = "Donald MacGillivray Appointed High Commissioner for Malaya"
+	desc = decolonization.59.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = "Malaya Remains in Good Hands."
+		
+		MAL = {
+			remove_country_leader_role = {
+				character = MAL_Gerald_Templar
+				ideology = colonial_regime
+			}
+			add_country_leader_role = {
+				character = MAL_Donald_MacGillivray
+				promote_leader = yes
+				country_leader = {
+					ideology = colonial_regime
+				}
+			}
+		}
+	}
+}
+#SWK Duncan Stewart Appointed - 1949
+country_event = {
+	id = decolonization.60
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.60"}
+	title = "Duncan Stewart Appointed High Commissioner for Sarawak"
+	desc = decolonization.60.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = "A Seasoned Officer."
+		
+		SWK = {
+			retire_character = SWK_Charles_Arden_Clarke
+			add_country_leader_role = {
+				character = SWK_Duncan_Stewart
+				promote_leader = yes
+				country_leader = {
+					ideology = colonial_regime
+				}
+			}
+		}
+	}
+}
+#SWK Duncan Stewart Assassinated, Anthony Abell Appointed - 1949
+country_event = {
+	id = decolonization.61
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.61"}
+	title = "Duncan Stewart Has Been Assassinated!"
+	desc = decolonization.61.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = "Those Damned Nationalists."
+		
+		SWK = {
+			retire_character = SWK_Duncan_Stewart
+			add_country_leader_role = {
+				character = SWK_Anthony_Abell
+				promote_leader = yes
+				country_leader = {
+					ideology = colonial_regime
+				}
+			}
+		}
+	}
+}
+#SWK Alexander Waddell Appointed - 1959
+country_event = {
+	id = decolonization.62
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.62"}
+	title = "Alexander Waddell Appointed High Commissioner for Sarawak"
+	desc = decolonization.62.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = "Goodluck to Him."
+		
+		SWK = {
+			retire_character = SWK_Anthony_Abell
+			add_country_leader_role = {
+				character = SWK_Alexander_Waddell
+				promote_leader = yes
+				country_leader = {
+					ideology = colonial_regime
+				}
+			}
+		}
+	}
+}
+#NBO Ralph Hone Appointed - 1950
+country_event = {
+	id = decolonization.63
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.63"}
+	title = "Ralph Hone Appointed High Commissioner for North Borneo"
+	desc = decolonization.63.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = "A Man Fit for the Job."
+		
+		NBO = {
+			retire_character = NBO_Edward_Twining
+			add_country_leader_role = {
+				character = NBO_Ralph_Hone
+				promote_leader = yes
+				country_leader = {
+					ideology = colonial_regime
+				}
+			}
+		}
+	}
+}
+#NBO Roland Evelyn Turnbull - 1954
+country_event = {
+	id = decolonization.64
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.64"}
+	title = "Roland Evelyn Turnbull Appointed High Commissioner for North Borneo"
+	desc = decolonization.64.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = "We Wish Him Luck."
+		
+		NBO = {
+			retire_character = NBO_Ralph_Hone
+			add_country_leader_role = {
+				character = NBO_Roland_Evelyn_Turnbull
+				promote_leader = yes
+				country_leader = {
+					ideology = colonial_regime
+				}
+			}
+		}
+	}
+}
+#NBO William Goode - 1959
+country_event = {
+	id = decolonization.65
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.65"}
+	title = "William Goode Appointed High Commissioner for North Borneo"
+	desc = decolonization.65.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = "Mr. Worldwide."
+		
+		NBO = {
+			retire_character = NBO_Roland_Evelyn_Turnbull
+			add_country_leader_role = {
+				character = NBO_William_Goode
+				promote_leader = yes
+				country_leader = {
+					ideology = colonial_regime
+				}
+			}
+		}
+	}
+}
+#SGP John Fearns Nicoll - 1952.11.15
+country_event = {
+	id = decolonization.66
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.66"}
+	# title = "John Fearns Nicoll Appointed Governor of Singapore"
+	# desc = decolonization.66.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	hidden = yes
+	
+	immediate = {
+		SGP = {
+			retire_character = SGP_Franklin_Gimson
+			add_country_leader_role = {
+				character = SGP_John_Fearns_Nicoll
+				promote_leader = yes
+				country_leader = {
+					ideology = colonial_regime
+				}
+			}
+		}
+	}
+}
+#SGP Robert Black - 1955.06.30
+country_event = {
+	id = decolonization.67
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.67"}
+	# title = "Robert Black Appointed Governor of Singapore"
+	# desc = decolonization.67.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	hidden = yes
+	
+	immediate = {
+		SGP = {
+			retire_character = SGP_John_Fearns_Nicoll
+			add_country_leader_role = {
+				character = SGP_Robert_Black
+				promote_leader = yes
+				country_leader = {
+					ideology = colonial_regime
+				}
+			}
+		}
+	}
+}
+#SGP William Goode - 1957.12.09
+country_event = {
+	id = decolonization.68
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.68"}
+	# title = "William Goode Appointed Governor of Singapore"
+	# desc = decolonization.68.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	hidden = yes
+	
+	immediate = {
+		SGP = {
+			retire_character = SGP_Robert_Black
+			add_country_leader_role = {
+				character = SGP_William_Goode
+				promote_leader = yes
+				country_leader = {
+					ideology = colonial_regime
+				}
+			}
+		}
+	}
+}
+#SGP Autonomy/Lee Kuan Yew - 1959.6.9
+country_event = {
+	id = decolonization.69
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.69"}
+	title = "Loosening Our Grip on Singapore"
+	desc = decolonization.69.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	immediate = { hidden_effect = { news_event = { id = decolonization.70 hours = 3 random_hours = 6 } } }
+	
+	option = {
+		name = "It Must Be Done."
+		
+		set_autonomy = {
+			target = SGP
+			autonomy_state = autonomy_protectorate
+			end_wars = no
+			end_civil_wars = no
+		}
+		SGP = {
+			drop_cosmetic_tag = yes
+			set_cosmetic_tag = SGP_STATE
+			retire_character = SGP_William_Goode
+			
+			add_country_leader_role = {
+				character = SGP_Lee_Kuan_Yew
+				promote_leader = yes
+				country_leader = {
+					ideology = conservatism
+					expire = "1990.11.28"
+				}
+			}
+			set_politics = {
+				ruling_party = conservative
+				last_election = "1959.6.8"
+				elections_allowed = no
+			}
+			hidden_effect = {
+				set_popularities = { conservative = 100 }
+				leave_faction = yes
+			}
+		}
+	}
+}
+#SGP Autonomy/Lee Kuan Yew NEWS
+news_event = {
+	id = decolonization.70
+ 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = decolonization.70"}
+	title = "[GetNewspaperHeader] Birth of the State of Singapore"
+	desc = decolonization.70.d
+	picture = GFX_SGP_Autonomy
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = yes
+		
+	option = {
+		name = "A Step Forward."
 	}
 }
