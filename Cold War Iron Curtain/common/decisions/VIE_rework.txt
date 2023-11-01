@@ -4,28 +4,28 @@ VIE_Bao_Dai_Power_Minigame = {
 		#icon = generic_prepare_civil_war    
 
 		complete_effect = {
-                      
+			
 		}    
 
-		cost = 100 
+		cost = 15
 		days_re_enable = 90
   
 		fire_only_once = no 
 		selectable_mission = no          
-              
+		
 		ai_will_do = {                       
 			factor = 0                             
 		}
 	}     
 	Assure_Loyalty_to_France = {   
        
-		#ico n = generic_prepare_civil_war 
+		#icon = generic_prepare_civil_war 
   
 		complete_effect = {
 
 		}
 
-		cost = 100
+		cost = 15
 		days_re_enable = 90
 
 		fire_only_once = no
@@ -40,10 +40,13 @@ VIE_Bao_Dai_Power_Minigame = {
 		#icon = generic_prepare_civil_war
 
 		complete_effect = {
-
+			add_to_variable = {
+				var = Bao_Dai_Favoritism
+				value = 25
+			}
 		}
 
-		cost = 100
+		cost = 25
 		days_re_enable = 90
 
 		fire_only_once = no
@@ -58,10 +61,13 @@ VIE_Bao_Dai_Power_Minigame = {
 		#icon = generic_prepare_civil_war
 
 		complete_effect = {
-
+			add_to_variable = {
+				var = Bao_Dai_Favoritism
+				value = 5
+			}
 		}
 
-		cost = 100
+		cost = 25
 		days_re_enable = 90
 
 		fire_only_once = no
@@ -79,7 +85,7 @@ VIE_Bao_Dai_Power_Minigame = {
 
 		}
 
-		cost = 100
+		cost = 25
 		days_re_enable = 90
 
 		fire_only_once = no
@@ -97,7 +103,7 @@ VIE_Bao_Dai_Power_Minigame = {
 
 		}
 
-		cost = 100
+		cost = 25
 		days_re_enable = 90
 
 		fire_only_once = no
@@ -115,7 +121,7 @@ VIE_Bao_Dai_Power_Minigame = {
 
 		}
 
-		cost = 100
+		cost = 75
 		days_re_enable = 90
 
 		fire_only_once = no
@@ -133,7 +139,7 @@ VIE_Bao_Dai_Power_Minigame = {
 
 		}
 
-		cost = 100
+		cost = 45
 		days_re_enable = 90
 
 		fire_only_once = no
@@ -151,7 +157,7 @@ VIE_Bao_Dai_Power_Minigame = {
 
 		}
 
-		cost = 100
+		cost = 45
 		days_re_enable = 90
 
 		fire_only_once = no
@@ -161,28 +167,90 @@ VIE_Bao_Dai_Power_Minigame = {
 			factor = 0
 		}
 	}
+	Apprehend_CuongDe = {
+		#icon = generic_prepare_civil_war
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = VIE_CuongDe_Located_tt
+				has_country_flag = VIE_CuongDe_Pledged_Return
+			}
+			#required minigame stats
+		}
+		visible = {
+			has_completed_focus = VIE_Sideline_CuongDe_Ambitions
+			has_country_flag = VIE_Dealt_With_CuongDe
+		}
+		complete_effect = {
+			country_event = Initial_CuongDe.5
+		}
+
+		cost = 25
+
+		fire_only_once = yes
+		selectable_mission = no
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
 	Dealing_With_CuongDe_Countdown = {
 		activation = {
 			original_tag = VIE
-			NOT = { has_country_flag = VIE_CuongDe_Startup }
+			NOT = {
+				has_country_flag = VIE_CuongDe_Startup
+				has_country_flag = VIE_Dealt_With_CuongDe
+			}
 		}
 		available = {
 			has_completed_focus = VIE_Sideline_CuongDe_Ambitions
+			custom_trigger_tooltip = {
+				tooltip = VIE_CuongDe_Choice_Made_tt
+				OR = {
+					has_country_flag = VIE_Anti_CuongDe
+					has_country_flag = VIE_Pro_CuongDe
+				}
+			}
 		}
 
 		#icon = generic_prepare_civil_war
 		
 		days_mission_timeout = 30
-		selectable_mission = no
+		selectable_mission = yes
 		fire_only_once = yes
 		
 		complete_effect = {
 			clr_country_flag = VIE_CuongDe_Startup
-			set_country_flag = VIE_Dealt_With_CuongDe
+			set_country_flag = VIE_Dealing_with_CuongDe
+			mark_focus_tree_layout_dirty = yes
+			complete_national_focus = VIE_CuongDe_Press_Conferences
+			hidden_effect = {
+				every_country = {
+					limit = {
+						OR = {
+							original_tag = VIN
+							original_tag = VIE
+						}
+					}
+					PREV = { country_event = { id = Initial_CuongDe.4 hours = 1 } }
+				}
+			}
+			if = {
+				limit = {
+					has_country_flag = VIE_Anti_CuongDe
+				}
+				set_country_flag = VIE_Dealt_With_CuongDe
+			}
+			else_if = {
+				limit = {
+					has_country_flag = VIE_Pro_CuongDe
+				}
+				set_country_flag = VIE_CuongDe_Major_Opportunity
+			}
+			custom_effect_tooltip = VIE_CuongDe_Foreshadowing_tt
 		}
 		timeout_effect = {
 			clr_country_flag = VIE_CuongDe_Startup
-			set_country_flag = VIE_CuongDe_opportunity
+			set_country_flag = VIE_CuongDe_Opportunity
 		}
 	}
 	Dealing_With_Diem_Countdown = {
