@@ -1,13 +1,12 @@
 # coded by Harain
 calculate_mission_time = {
-	set_variable = { root.confirmed_time_part_1 = root.calculated_time }
-	multiply_variable = { root.confirmed_time_part_1 = 0.3 }
+	set_variable = { root.confirmed_time_part_1 = root.calculated_phase_1 }
 	round_variable = root.confirmed_time_part_1
-	set_variable = { root.confirmed_time_part_2 = root.calculated_time }
-	multiply_variable = { root.confirmed_time_part_2 = 0.3 }
+	set_variable = { root.confirmed_time_part_2 = root.calculated_phase_2 }
+	multiply_variable = { root.confirmed_time_part_2 = 0.5 }
 	round_variable = root.confirmed_time_part_2
-	set_variable = { root.confirmed_time_part_3 = root.calculated_time }
-	multiply_variable = { root.confirmed_time_part_3 = 0.3 }
+	set_variable = { root.confirmed_time_part_3 = root.calculated_phase_2 }
+	multiply_variable = { root.confirmed_time_part_3 = 0.5 }
 	round_variable = root.confirmed_time_part_3
 }
 calculate_risk = {
@@ -19,80 +18,60 @@ calculate_risk = {
 	round_variable = root.confirmed_risk_2
 	round_variable = root.confirmed_risk_1
 }
-calculate_breakthrough = {
-	set_variable = { root.confirmed_bt_1 = root.calculated_breakthrough_chance }
-	set_variable = { root.confirmed_bt_2 = 1 }
-	subtract_from_variable = { root.confirmed_bt_2 = root.calculated_breakthrough_chance  }
-	multiply_variable = { root.confirmed_bt_1 = 100 }
-	multiply_variable = { root.confirmed_bt_2 = 100 }
-	round_variable = root.confirmed_bt_1
-	round_variable = root.confirmed_bt_2
-}
+
 calculate_space_effect = {
-	set_variable = { root.calculated_risk = 0 }
-	set_variable = { root.budget_r = root.currentbudget }
-	multiply_variable = { root.budget_r = 0.001 }
-	add_to_variable = { root.calculated_risk = root.chosen_mission_r }
-	add_to_variable = { root.calculated_risk = root.chosen_space_craft_r }
-	subtract_from_variable = { root.calculated_risk = root.budget_r  }
+	set_variable = { calculated_range = chosen_vessel_range }
+	add_to_variable = { calculated_range = chosen_mission_range }
+	subtract_from_variable = { calculated_range = chosen_space_craft_range }
+	set_variable = { calculated_cost = chosen_space_craft_c }
+	add_to_variable = { calculated_cost = chosen_mission_c }
+	add_to_variable = { calculated_cost = chosen_vessel_c }
+	set_variable = { calculated_risk = chosen_space_craft_r }
+	add_to_variable = { calculated_risk = chosen_mission_r }
+	subtract_from_variable = { calculated_risk = chosen_vessel_r }
 	clamp_variable = {
 		var = root.calculated_risk
-		min = 0.01
+		min = 0
 		max = 1
 	}
-	set_variable = { root.calculated_cost = 0 }
-	set_variable = { root.budget_c = root.currentbudget }
-	multiply_variable = { root.budget_c = 0.1 }
-	add_to_variable = { root.calculated_cost = root.chosen_mission_c }
-	add_to_variable = { root.calculated_cost = root.chosen_space_craft_c }
-	subtract_from_variable = { root.calculated_cost = root.budget_c  }
-	clamp_variable = {
-		var = root.calculated_cost
-		min = 1
-	}
-	set_variable = { root.calculated_time = 0 }
-	set_variable = { root.budget_t = root.currentbudget }
-	multiply_variable = { root.budget_t = 0.3 }
-	add_to_variable = { root.calculated_time = root.chosen_mission_t }
-	add_to_variable = { root.calculated_time = root.chosen_space_craft_t }
-	subtract_from_variable = { root.calculated_time = root.budget_t  }
-	clamp_variable = {
-		var = root.calculated_time
-		min = 30
-	}
+	set_variable = { calculated_phase_1 = chosen_mission_t }
+	add_to_variable = { calculated_phase_1 = chosen_vessel_t }
+	set_variable = { calculated_phase_2 = chosen_space_craft_t }
 }
 clear_calculated = {
+	clear_variable = calculated_range
 	clear_variable = calculated_risk
 	clear_variable = calculated_cost
-	clear_variable = calculated_time
+	clear_variable = calculated_phase_1
+	clear_variable = calculated_phase_2
 }
 save_ship = {
 	set_variable = { root.saved_ship = root.selected_spacecraft }
 	set_variable = { root.saved_mission  = root.selected_mission }
-	set_variable = { root.saved_vehicle = root.selected_launchvehicle }
+	set_variable = { root.saved_vessel = root.selected_vessel }
 }
 clear_ships = {
 	clear_variable = saved_ship
 	clear_variable = saved_mission
-	clear_variable = saved_vehicle
+	clear_variable = saved_vessel
 }
 reset_choices = {
 	clear_variable = mission_blocked
+	clear_variable = chosen_mission_range
 	clear_variable = chosen_mission_r
 	clear_variable = chosen_mission_c
 	clear_variable = chosen_mission_t
-	clear_variable = chosen_mission_b
-	clear_variable = launchvehicle_blocked
-	clear_variable = chosen_launchvehicle_r
-	clear_variable = chosen_launchvehicle_c
-	clear_variable = chosen_launchvehicle_t
+	clear_variable = vessel_type_blocked
+	clear_variable = chosen_vessel_range
+	clear_variable = chosen_vessel_c
+	clear_variable = chosen_vessel_t
 	clear_variable = spacecraft_type_blocked
+	clear_variable = chosen_space_craft_range
 	clear_variable = chosen_space_craft_r
 	clear_variable = chosen_space_craft_c
 	clear_variable = chosen_space_craft_t
-	clear_variable = chosen_space_craft_b
 	clear_variable = selected_spacecraft
-	clear_variable = selected_launchvehicle
+	clear_variable = selected_vessel
 	clear_variable = selected_mission
 }
 clear_spacecraft = {
@@ -119,6 +98,13 @@ clear_mission = {
 	clear_variable = mission_cost
 	clear_variable = mission_time
 	clear_variable = mission_breakthrough_chance
+}
+clear_vessel = {
+	set_variable = { vessel_tex = 0 }
+	clear_variable = vessel_risk
+	clear_variable = vessel_cost
+	clear_variable = vessel_time
+	clear_variable = vessel_breakthrough_chance
 }
 clear_launchvehicle = {
 	set_variable = { launchvehicle_tex = 0 }
