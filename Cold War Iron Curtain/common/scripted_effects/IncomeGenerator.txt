@@ -1,3 +1,120 @@
+calculate_development_modifier_policy = {
+    set_variable = {
+        social_cost_modifier_total = 0
+    }
+    add_to_variable = { social_cost_modifier_total = social_cost_dev_level_five }
+    add_to_variable = { social_cost_modifier_total = social_cost_dev_level_four }
+    add_to_variable = { social_cost_modifier_total = social_cost_dev_level_three }
+    add_to_variable = { social_cost_modifier_total = social_cost_dev_level_two }
+    add_to_variable = { social_cost_modifier_total = social_cost_dev_level_one }
+    add_to_variable = { social_cost_modifier_total = social_cost_dev_level_zero }
+
+    divide_variable = { social_cost_dev_level_five = social_cost_modifier_total }
+    divide_variable = { social_cost_dev_level_four = social_cost_modifier_total }
+    divide_variable = { social_cost_dev_level_three = social_cost_modifier_total }
+    divide_variable = { social_cost_dev_level_two = social_cost_modifier_total }
+    divide_variable = { social_cost_dev_level_one = social_cost_modifier_total }
+    divide_variable = { social_cost_dev_level_zero = social_cost_modifier_total }
+
+	multiply_variable = { social_cost_dev_level_five = 5 }
+	multiply_variable = { social_cost_dev_level_four = 4 }
+	multiply_variable = { social_cost_dev_level_three = 3 }
+	multiply_variable = { social_cost_dev_level_two = 2 }
+	multiply_variable = { social_cost_dev_level_one = 1 }
+	multiply_variable = { social_cost_dev_level_zero = 0.25 }
+
+	set_variable = {
+		social_cost_dev_modifier = 0
+	}
+	add_to_variable = { social_cost_dev_modifier = social_cost_dev_level_five }
+	add_to_variable = { social_cost_dev_modifier = social_cost_dev_level_four }
+	add_to_variable = { social_cost_dev_modifier = social_cost_dev_level_three }
+	add_to_variable = { social_cost_dev_modifier = social_cost_dev_level_two }
+	add_to_variable = { social_cost_dev_modifier = social_cost_dev_level_one }
+	add_to_variable = { social_cost_dev_modifier = social_cost_dev_level_zero }
+
+	#Round to closest, get percentage difference, multiply by X per Y?
+
+	set_variable = {
+		social_cost_dev_modifier_rounded = social_cost_dev_modifier
+	}
+	round_variable = social_cost_dev_modifier_rounded
+	if = {
+		limit = {
+			check_variable = {
+				social_cost_dev_modifier_rounded = 5
+			}
+		}
+		set_variable = {
+			social_cost_dev_modifier_x = 2
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				social_cost_dev_modifier_rounded = 4
+			}
+		}
+		set_variable = {
+			social_cost_dev_modifier_x = 1.75
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				social_cost_dev_modifier_rounded = 3
+			}
+		}
+		set_variable = {
+			social_cost_dev_modifier_x = 1.5
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				social_cost_dev_modifier_rounded = 2
+			}
+		}
+		set_variable = {
+			social_cost_dev_modifier_x = 1.25
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				social_cost_dev_modifier_rounded = 1
+			}
+		}
+		set_variable = {
+			social_cost_dev_modifier_x = 1
+		}
+	}
+	else = {
+		set_variable = {
+			social_cost_dev_modifier_x = 0.75
+		}		
+	}
+	divide_variable = { social_cost_dev_modifier = social_cost_dev_modifier_rounded }
+	multiply_variable = {
+		social_cost_dev_modifier = social_cost_dev_modifier_x
+	}
+	if = {
+		limit = {
+			check_variable = {
+				social_cost_dev_modifier < 0.75
+			}
+		}
+		set_variable = {	#Floor
+			social_cost_dev_modifier = 0.75
+		}
+	}
+
+	#Set X and Multiply by X?
+	#0		1	2		3		4		5
+	#0.75	1	1.25	1.5		1.75	2
+}
+
+
 food_income_text = {
 	clear_array = Oil_Export_List
 	add_to_array = {
@@ -94,11 +211,6 @@ income_effect = {
 	#edict_expenditure = yes
 	corruption_idea_calc = yes
 	military_expenditure = yes
-	welfare_expenditure = yes
-	cpi_expenditure = yes
-	edu_expenditure = yes
-	health_expenditure = yes
-	public_expenditure = yes
 	flag_building_macro = yes
 	tax_rate = yes
 	domestic_bond_calc = yes
@@ -163,7 +275,68 @@ income_effect = {
 	clear_array = upgrade_estimate_automated_states_array
 	clear_array = upgrade_estimate_automated_states_cost_array
 	####
+	set_variable = {
+		strategic_forces_expend = 0
+	}
+	set_variable = {
+		social_cost_base = 0
+	}
 	every_owned_state = {
+		if = {
+			limit = {
+				development_level_five_check = yes
+			}
+			add_to_variable = {
+				ROOT.social_cost_dev_level_five = state_population_k
+			}
+		}
+		else_if = {
+			limit = {
+				development_level_four_check = yes
+			}
+			add_to_variable = {
+				ROOT.social_cost_dev_level_four = state_population_k
+			}
+		}
+		else_if = {
+			limit = {
+				development_level_three_check = yes
+			}
+			add_to_variable = {
+				ROOT.social_cost_dev_level_three = state_population_k
+			}
+		}
+		else_if = {
+			limit = {
+				development_level_two_check = yes
+			}
+			add_to_variable = {
+				ROOT.social_cost_dev_level_two = state_population_k
+			}
+		}
+		else_if = {
+			limit = {
+				development_level_one_check = yes
+			}
+			add_to_variable = {
+				ROOT.social_cost_dev_level_one = state_population_k
+			}
+		}
+		else_if = {
+			limit = {
+				development_level_zero_check = yes
+			}
+			add_to_variable = {
+				ROOT.social_cost_dev_level_zero = state_population_k
+			}
+		}
+		else = { }
+		add_to_variable = {
+			ROOT.social_cost_base = state_population_k
+		}
+		add_to_variable = {
+			ROOT.strategic_forces_expend = building_level@nuclear_reactor
+		}
 		add_to_variable = {
 			ROOT.industrial_complex_total = building_level@industrial_complex
 		}
@@ -320,6 +493,15 @@ income_effect = {
 			full_upgrade_estimate = yes
 		}
 	}
+	#Social Policy Expenses
+	calculate_development_modifier_policy = yes
+
+	welfare_expenditure = yes
+	cpi_expenditure = yes
+	edu_expenditure = yes
+	health_expenditure = yes
+	public_expenditure = yes
+
 	multiply_variable = {
 		ROOT.trade_infrastructure_total = 8
 	}
@@ -2459,6 +2641,175 @@ military_expenditure = {
 	add_to_variable = {
 		navy_expend = navy_tier_4
 	}
+	if = {
+		limit = {
+			has_idea = policy_navy_temp_0
+		}
+		multiply_variable = {
+			navy_expend = 0.5
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_navy_temp_1
+		}
+		multiply_variable = {
+			navy_expend = 0.625
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_navy_temp_2
+		}
+		multiply_variable = {
+			navy_expend = 0.75
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_navy_temp_3
+		}
+		multiply_variable = {
+			navy_expend = 0.875
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_navy_temp_4
+		}
+		multiply_variable = {
+			navy_expend = 1
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_5
+		}
+		multiply_variable = {
+			navy_expend = 1.125
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_6
+		}
+		multiply_variable = {
+			navy_expend = 1.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_7
+		}
+		multiply_variable = {
+			navy_expend = 1.375
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_8
+		}
+		multiply_variable = {
+			navy_expend = 1.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_9
+		}
+		multiply_variable = {
+			navy_expend = 1.625
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_10
+		}
+		multiply_variable = {
+			navy_expend = 1.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_11
+		}
+		multiply_variable = {
+			navy_expend = 1.875
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_12
+		}
+		multiply_variable = {
+			navy_expend = 2
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_13
+		}
+		multiply_variable = {
+			navy_expend = 2.125
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_14
+		}
+		multiply_variable = {
+			navy_expend = 2.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_15
+		}
+		multiply_variable = {
+			navy_expend = 2.375
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_16
+		}
+		multiply_variable = {
+			navy_expend = 2.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_17
+		}
+		multiply_variable = {
+			navy_expend = 2.625
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_18
+		}
+		multiply_variable = {
+			navy_expend = 2.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_19
+		}
+		multiply_variable = {
+			navy_expend = 2.875
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_navy_temp_20
+		}
+		multiply_variable = {
+			navy_expend = 3
+		}
+	}
+    else = { }
 	##airforce costs---------
 	##airforce tier 1
 	set_variable = {
@@ -2583,44 +2934,692 @@ military_expenditure = {
 	multiply_variable = {
 		total_planes = 0.01
 	}
-	set_variable = {
-		af_expend = 0
+	#set_variable = {
+	#	af_expend = total_planes
+	#}
+	if = {
+		limit = {
+			has_idea = policy_air_temp_0
+		}
+		multiply_variable = {
+			af_expend = 0.5
+		}
 	}
+	else_if = {
+		limit = {
+			has_idea = policy_air_temp_1
+		}
+		multiply_variable = {
+			af_expend = 0.625
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_air_temp_2
+		}
+		multiply_variable = {
+			af_expend = 0.75
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_air_temp_3
+		}
+		multiply_variable = {
+			af_expend = 0.875
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_air_temp_4
+		}
+		multiply_variable = {
+			af_expend = 1
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_5
+		}
+		multiply_variable = {
+			af_expend = 1.125
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_6
+		}
+		multiply_variable = {
+			af_expend = 1.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_7
+		}
+		multiply_variable = {
+			af_expend = 1.375
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_8
+		}
+		multiply_variable = {
+			af_expend = 1.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_9
+		}
+		multiply_variable = {
+			af_expend = 1.625
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_10
+		}
+		multiply_variable = {
+			af_expend = 1.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_11
+		}
+		multiply_variable = {
+			af_expend = 1.875
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_12
+		}
+		multiply_variable = {
+			af_expend = 2
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_13
+		}
+		multiply_variable = {
+			af_expend = 2.125
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_14
+		}
+		multiply_variable = {
+			af_expend = 2.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_15
+		}
+		multiply_variable = {
+			af_expend = 2.375
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_16
+		}
+		multiply_variable = {
+			af_expend = 2.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_17
+		}
+		multiply_variable = {
+			af_expend = 2.625
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_18
+		}
+		multiply_variable = {
+			af_expend = 2.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_19
+		}
+		multiply_variable = {
+			af_expend = 2.875
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_air_temp_20
+		}
+		multiply_variable = {
+			af_expend = 3
+		}
+	}
+    else = { }
+
 	set_variable = {
-		af_expend = total_planes
+		space_expend = ROOT.amount_research_slots
 	}
 	if = {
 		limit = {
+			has_idea = policy_special_temp_0
+		}
+		multiply_variable = {
+			space_expend = 0
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_special_temp_1
+		}
+		multiply_variable = {
+			space_expend = 0.25
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_special_temp_2
+		}
+		multiply_variable = {
+			space_expend = 0.5
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_special_temp_3
+		}
+		multiply_variable = {
+			space_expend = 0.75
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_special_temp_4
+		}
+		multiply_variable = {
+			space_expend = 1
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_5
+		}
+		multiply_variable = {
+			space_expend = 1.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_6
+		}
+		multiply_variable = {
+			space_expend = 1.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_7
+		}
+		multiply_variable = {
+			space_expend = 1.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_8
+		}
+		multiply_variable = {
+			space_expend = 2
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_9
+		}
+		multiply_variable = {
+			space_expend = 2.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_10
+		}
+		multiply_variable = {
+			space_expend = 2.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_11
+		}
+		multiply_variable = {
+			space_expend = 2.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_12
+		}
+		multiply_variable = {
+			space_expend = 3
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_13
+		}
+		multiply_variable = {
+			space_expend = 3.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_14
+		}
+		multiply_variable = {
+			space_expend = 3.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_15
+		}
+		multiply_variable = {
+			space_expend = 3.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_16
+		}
+		multiply_variable = {
+			space_expend = 4
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_17
+		}
+		multiply_variable = {
+			space_expend = 4.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_18
+		}
+		multiply_variable = {
+			space_expend = 4.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_19
+		}
+		multiply_variable = {
+			space_expend = 4.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_20
+		}
+		multiply_variable = {
+			space_expend = 5
+		}
+	}
+    else = { }
+	if = {
+		limit = {
+			has_idea = policy_special_temp_0
+		}
+		multiply_variable = {
+			strategic_forces_expend = 0.5
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_special_temp_1
+		}
+		multiply_variable = {
+			strategic_forces_expend = 0.625
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_special_temp_2
+		}
+		multiply_variable = {
+			strategic_forces_expend = 0.75
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_special_temp_3
+		}
+		multiply_variable = {
+			strategic_forces_expend = 0.875
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_special_temp_4
+		}
+		multiply_variable = {
+			strategic_forces_expend = 1
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_5
+		}
+		multiply_variable = {
+			strategic_forces_expend = 1.125
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_6
+		}
+		multiply_variable = {
+			strategic_forces_expend = 1.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_7
+		}
+		multiply_variable = {
+			strategic_forces_expend = 1.375
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_8
+		}
+		multiply_variable = {
+			strategic_forces_expend = 1.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_9
+		}
+		multiply_variable = {
+			strategic_forces_expend = 1.625
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_10
+		}
+		multiply_variable = {
+			strategic_forces_expend = 1.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_11
+		}
+		multiply_variable = {
+			strategic_forces_expend = 1.875
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_12
+		}
+		multiply_variable = {
+			strategic_forces_expend = 2
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_13
+		}
+		multiply_variable = {
+			strategic_forces_expend = 2.125
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_14
+		}
+		multiply_variable = {
+			strategic_forces_expend = 2.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_15
+		}
+		multiply_variable = {
+			strategic_forces_expend = 2.375
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_16
+		}
+		multiply_variable = {
+			strategic_forces_expend = 2.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_17
+		}
+		multiply_variable = {
+			strategic_forces_expend = 2.625
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_18
+		}
+		multiply_variable = {
+			strategic_forces_expend = 2.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_19
+		}
+		multiply_variable = {
+			strategic_forces_expend = 2.875
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_special_temp_20
+		}
+		multiply_variable = {
+			strategic_forces_expend = 3
+		}
+	}
+    else = { }
+
+
+	if = {
+		limit = {
+			has_idea = policy_military_temp_0
+		}
+		multiply_variable = {
+			mil_expend = 0.5
+		}
+	}
+	else_if = {
+		limit = {
 			has_idea = policy_military_temp_1
+		}
+		multiply_variable = {
+			mil_expend = 0.625
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_military_temp_2
+		}
+		multiply_variable = {
+			mil_expend = 0.75
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_military_temp_3
+		}
+		multiply_variable = {
+			mil_expend = 0.875
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_military_temp_4
 		}
 		multiply_variable = {
 			mil_expend = 1
 		}
 	}
-	if = {
+    else_if = {
 		limit = {
-			has_idea = policy_military_temp_2
+			has_idea = policy_military_temp_5
 		}
 		multiply_variable = {
-			mil_expend = 1.4
+			mil_expend = 1.125
 		}
 	}
-	if = {
+    else_if = {
 		limit = {
-			has_idea = policy_military_temp_3
+			has_idea = policy_military_temp_6
 		}
 		multiply_variable = {
-			mil_expend = 1.8
+			mil_expend = 1.25
 		}
 	}
-	if = {
+    else_if = {
 		limit = {
-			has_idea = policy_military_temp_4
+			has_idea = policy_military_temp_7
 		}
 		multiply_variable = {
-			mil_expend = 2.2
+			mil_expend = 1.375
 		}
 	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_8
+		}
+		multiply_variable = {
+			mil_expend = 1.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_9
+		}
+		multiply_variable = {
+			mil_expend = 1.625
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_10
+		}
+		multiply_variable = {
+			mil_expend = 1.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_11
+		}
+		multiply_variable = {
+			mil_expend = 1.875
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_12
+		}
+		multiply_variable = {
+			mil_expend = 2
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_13
+		}
+		multiply_variable = {
+			mil_expend = 2.125
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_14
+		}
+		multiply_variable = {
+			mil_expend = 2.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_15
+		}
+		multiply_variable = {
+			mil_expend = 2.375
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_16
+		}
+		multiply_variable = {
+			mil_expend = 2.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_17
+		}
+		multiply_variable = {
+			mil_expend = 2.625
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_18
+		}
+		multiply_variable = {
+			mil_expend = 2.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_19
+		}
+		multiply_variable = {
+			mil_expend = 2.875
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_military_temp_20
+		}
+		multiply_variable = {
+			mil_expend = 3
+		}
+	}
+    else = { }
+
 	##calc for corruption/subsidies
 	set_variable = {
 		mil_expend_display = mil_expend
@@ -2629,7 +3628,7 @@ military_expenditure = {
 		navy_expend_display = navy_expend
 	}
 	set_variable = {
-		af_expend_display = navy_expend
+		af_expend_display = af_expend
 	}
 	##
 	multiply_variable = {
@@ -2817,6 +3816,12 @@ military_expenditure = {
 	add_to_variable = {
 		mil_expend = af_expend
 	}
+	add_to_variable = {
+		mil_expend = strategic_forces_expend
+	}
+	add_to_variable = {
+		mil_expend = space_expend
+	}
 	subtract_from_variable = {
 		IncomeCheck = mil_expend
 	}
@@ -2829,10 +3834,8 @@ welfare_expenditure = {
 	set_variable = {
 		welfare_cost = 0
 	}
-	every_owned_state = {
-		add_to_variable = {
-			ROOT.welfare_cost = state_population_k
-		}
+	set_variable = {
+		welfare_cost = social_cost_base
 	}
 	multiply_variable = {
 		ROOT.welfare_cost = 0.001
@@ -2845,46 +3848,167 @@ welfare_expenditure = {
 			welfare_cost = 0.01
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_welfare_temp_1
 		}
 		multiply_variable = {
-			welfare_cost = 0.2
+			welfare_cost = 0.15
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_welfare_temp_2
 		}
 		multiply_variable = {
-			welfare_cost = 0.5
+			welfare_cost = 0.3
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_welfare_temp_3
+		}
+		multiply_variable = {
+			welfare_cost = 0.45
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_4
+		}
+		multiply_variable = {
+			welfare_cost = 0.6
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_5
+		}
+		multiply_variable = {
+			welfare_cost = 0.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_6
+		}
+		multiply_variable = {
+			welfare_cost = 0.9
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_7
+		}
+		multiply_variable = {
+			welfare_cost = 1.05
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_8
 		}
 		multiply_variable = {
 			welfare_cost = 1.2
 		}
 	}
-	if = {
+    else_if = {
 		limit = {
-			has_idea = policy_welfare_temp_4
+			has_idea = policy_welfare_temp_9
 		}
 		multiply_variable = {
-			welfare_cost = 2
+			welfare_cost = 1.35
 		}
 	}
-	if = {
+    else_if = {
 		limit = {
-			has_idea = policy_welfare_temp_5
+			has_idea = policy_welfare_temp_10
+		}
+		multiply_variable = {
+			welfare_cost = 1.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_11
+		}
+		multiply_variable = {
+			welfare_cost = 1.65
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_12
+		}
+		multiply_variable = {
+			welfare_cost = 1.8
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_13
+		}
+		multiply_variable = {
+			welfare_cost = 1.95
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_14
+		}
+		multiply_variable = {
+			welfare_cost = 2.1
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_15
+		}
+		multiply_variable = {
+			welfare_cost = 2.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_16
+		}
+		multiply_variable = {
+			welfare_cost = 2.4
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_17
+		}
+		multiply_variable = {
+			welfare_cost = 2.55
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_18
+		}
+		multiply_variable = {
+			welfare_cost = 2.70
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_19
+		}
+		multiply_variable = {
+			welfare_cost = 2.85
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_welfare_temp_20
 		}
 		multiply_variable = {
 			welfare_cost = 3
 		}
 	}
+    else = { }
 	set_variable = {
 		welfare_cost_display = welfare_cost
 	}
@@ -2927,10 +4051,8 @@ cpi_expenditure = {
 	set_variable = {
 		cpi_cost = 0
 	}
-	every_owned_state = {
-		add_to_variable = {
-			ROOT.cpi_cost = state_population_k
-		}
+	set_variable = {
+		cpi_cost = social_cost_base
 	}
 	multiply_variable = {
 		ROOT.cpi_cost = 0.001
@@ -2943,46 +4065,168 @@ cpi_expenditure = {
 			cpi_cost = 0.01
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_cpi_temp_1
 		}
 		multiply_variable = {
-			cpi_cost = 0.25
+			cpi_cost = 0.1
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_cpi_temp_2
+		}
+		multiply_variable = {
+			cpi_cost = 0.2
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_3
+		}
+		multiply_variable = {
+			cpi_cost = 0.3
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_4
+		}
+		multiply_variable = {
+			cpi_cost = 0.4
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_5
 		}
 		multiply_variable = {
 			cpi_cost = 0.5
 		}
 	}
-	if = {
+    else_if = {
 		limit = {
-			has_idea = policy_cpi_temp_3
+			has_idea = policy_cpi_temp_6
 		}
 		multiply_variable = {
-			cpi_cost = 0.75
+			cpi_cost = 0.6
 		}
 	}
-	if = {
+    else_if = {
 		limit = {
-			has_idea = policy_cpi_temp_4
+			has_idea = policy_cpi_temp_7
 		}
 		multiply_variable = {
-			cpi_cost = 1.25
+			cpi_cost = 0.7
 		}
 	}
-	if = {
+    else_if = {
 		limit = {
-			has_idea = policy_cpi_temp_5
+			has_idea = policy_cpi_temp_8
 		}
 		multiply_variable = {
-			cpi_cost = 1.75
+			cpi_cost = 0.8
 		}
 	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_9
+		}
+		multiply_variable = {
+			cpi_cost = 0.9
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_10
+		}
+		multiply_variable = {
+			cpi_cost = 1
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_11
+		}
+		multiply_variable = {
+			cpi_cost = 1.1
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_12
+		}
+		multiply_variable = {
+			cpi_cost = 1.2
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_13
+		}
+		multiply_variable = {
+			cpi_cost = 1.3
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_14
+		}
+		multiply_variable = {
+			cpi_cost = 1.4
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_15
+		}
+		multiply_variable = {
+			cpi_cost = 1.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_16
+		}
+		multiply_variable = {
+			cpi_cost = 1.6
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_17
+		}
+		multiply_variable = {
+			cpi_cost = 1.7
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_18
+		}
+		multiply_variable = {
+			cpi_cost = 1.8
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_19
+		}
+		multiply_variable = {
+			cpi_cost = 1.9
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_cpi_temp_20
+		}
+		multiply_variable = {
+			cpi_cost = 2
+		}
+	}
+    else = { }
+
 	set_variable = {
 		cpi_cost_display = cpi_cost
 	}
@@ -3194,10 +4438,8 @@ edu_expenditure = {
 	set_variable = {
 		edu_cost = 0
 	}
-	every_owned_state = {
-		add_to_variable = {
-			ROOT.edu_cost = state_population_k
-		}
+	set_variable = {
+		edu_cost = social_cost_base
 	}
 	multiply_variable = {
 		ROOT.edu_cost = 0.001
@@ -3210,38 +4452,168 @@ edu_expenditure = {
 			edu_cost = 0.01
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_education_temp_1
 		}
 		multiply_variable = {
-			edu_cost = 0.5
+			edu_cost = 0.15
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_education_temp_2
 		}
 		multiply_variable = {
-			edu_cost = 1
+			edu_cost = 0.3
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_education_temp_3
 		}
 		multiply_variable = {
-			edu_cost = 2
+			edu_cost = 0.45
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_education_temp_4
+		}
+		multiply_variable = {
+			edu_cost = 0.6
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_5
+		}
+		multiply_variable = {
+			edu_cost = 0.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_6
+		}
+		multiply_variable = {
+			edu_cost = 0.9
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_7
+		}
+		multiply_variable = {
+			edu_cost = 1.05
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_8
+		}
+		multiply_variable = {
+			edu_cost = 1.2
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_9
+		}
+		multiply_variable = {
+			edu_cost = 1.35
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_10
+		}
+		multiply_variable = {
+			edu_cost = 1.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_11
+		}
+		multiply_variable = {
+			edu_cost = 1.65
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_12
+		}
+		multiply_variable = {
+			edu_cost = 1.8
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_13
+		}
+		multiply_variable = {
+			edu_cost = 1.95
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_14
+		}
+		multiply_variable = {
+			edu_cost = 2.1
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_15
+		}
+		multiply_variable = {
+			edu_cost = 2.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_16
+		}
+		multiply_variable = {
+			edu_cost = 2.4
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_17
+		}
+		multiply_variable = {
+			edu_cost = 2.55
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_18
+		}
+		multiply_variable = {
+			edu_cost = 2.70
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_19
+		}
+		multiply_variable = {
+			edu_cost = 2.85
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_education_temp_20
 		}
 		multiply_variable = {
 			edu_cost = 3
 		}
 	}
+    else = { }
+
 	set_variable = {
 		edu_cost_display = edu_cost
 	}
@@ -3284,10 +4656,8 @@ health_expenditure = {
 	set_variable = {
 		health_cost = 0
 	}
-	every_owned_state = {
-		add_to_variable = {
-			ROOT.health_cost = state_population_k
-		}
+	set_variable = {
+		health_cost = social_cost_base
 	}
 	multiply_variable = {
 		ROOT.health_cost = 0.001
@@ -3300,46 +4670,167 @@ health_expenditure = {
 			health_cost = 0.01
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_healthcare_temp_1
 		}
 		multiply_variable = {
-			health_cost = 0.35
+			health_cost = 0.15
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_healthcare_temp_2
 		}
 		multiply_variable = {
-			health_cost = 0.8
+			health_cost = 0.3
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_healthcare_temp_3
 		}
 		multiply_variable = {
-			health_cost = 1.4
+			health_cost = 0.45
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_healthcare_temp_4
 		}
 		multiply_variable = {
-			health_cost = 2.3
+			health_cost = 0.6
 		}
 	}
-	if = {
+    else_if = {
 		limit = {
 			has_idea = policy_healthcare_temp_5
+		}
+		multiply_variable = {
+			health_cost = 0.75
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_6
+		}
+		multiply_variable = {
+			health_cost = 0.9
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_7
+		}
+		multiply_variable = {
+			health_cost = 1.05
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_8
+		}
+		multiply_variable = {
+			health_cost = 1.2
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_9
+		}
+		multiply_variable = {
+			health_cost = 1.35
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_10
+		}
+		multiply_variable = {
+			health_cost = 1.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_11
+		}
+		multiply_variable = {
+			health_cost = 1.65
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_12
+		}
+		multiply_variable = {
+			health_cost = 1.8
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_13
+		}
+		multiply_variable = {
+			health_cost = 1.95
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_14
+		}
+		multiply_variable = {
+			health_cost = 2.1
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_15
+		}
+		multiply_variable = {
+			health_cost = 2.25
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_16
+		}
+		multiply_variable = {
+			health_cost = 2.4
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_17
+		}
+		multiply_variable = {
+			health_cost = 2.55
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_18
+		}
+		multiply_variable = {
+			health_cost = 2.70
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_19
+		}
+		multiply_variable = {
+			health_cost = 2.85
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_healthcare_temp_20
 		}
 		multiply_variable = {
 			health_cost = 3
 		}
 	}
+    else = { }
 	##UK 50s Healthcare NHS##
 	if = {
 		limit = {
@@ -3408,10 +4899,8 @@ public_expenditure = {
 	set_variable = {
 		pub_cost = 0
 	}
-	every_owned_state = {
-		add_to_variable = {
-			ROOT.pub_cost = state_population_k
-		}
+	set_variable = {
+		pub_cost = social_cost_base
 	}
 	multiply_variable = {
 		ROOT.pub_cost = 0.001
@@ -3424,30 +4913,167 @@ public_expenditure = {
 			pub_cost = 0.01
 		}
 	}
-	if = {
+	else_if = {
 		limit = {
 			has_idea = policy_services_temp_1
+		}
+		multiply_variable = {
+			pub_cost = 0.1
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_services_temp_2
+		}
+		multiply_variable = {
+			pub_cost = 0.2
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_services_temp_3
+		}
+		multiply_variable = {
+			pub_cost = 0.3
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = policy_services_temp_4
 		}
 		multiply_variable = {
 			pub_cost = 0.4
 		}
 	}
-	if = {
+    else_if = {
 		limit = {
-			has_idea = policy_services_temp_2
+			has_idea = policy_services_temp_5
+		}
+		multiply_variable = {
+			pub_cost = 0.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_6
+		}
+		multiply_variable = {
+			pub_cost = 0.6
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_7
+		}
+		multiply_variable = {
+			pub_cost = 0.7
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_8
 		}
 		multiply_variable = {
 			pub_cost = 0.8
 		}
 	}
-	if = {
+    else_if = {
 		limit = {
-			has_idea = policy_services_temp_3
+			has_idea = policy_services_temp_9
+		}
+		multiply_variable = {
+			pub_cost = 0.9
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_10
+		}
+		multiply_variable = {
+			pub_cost = 1
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_11
+		}
+		multiply_variable = {
+			pub_cost = 1.1
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_12
+		}
+		multiply_variable = {
+			pub_cost = 1.2
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_13
 		}
 		multiply_variable = {
 			pub_cost = 1.3
 		}
 	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_14
+		}
+		multiply_variable = {
+			pub_cost = 1.4
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_15
+		}
+		multiply_variable = {
+			pub_cost = 1.5
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_16
+		}
+		multiply_variable = {
+			pub_cost = 1.6
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_17
+		}
+		multiply_variable = {
+			pub_cost = 1.7
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_18
+		}
+		multiply_variable = {
+			pub_cost = 1.8
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_19
+		}
+		multiply_variable = {
+			pub_cost = 1.9
+		}
+	}
+    else_if = {
+		limit = {
+			has_idea = policy_services_temp_20
+		}
+		multiply_variable = {
+			pub_cost = 2
+		}
+	}
+    else = { }
 	set_variable = {
 		pub_cost_display = pub_cost
 	}
