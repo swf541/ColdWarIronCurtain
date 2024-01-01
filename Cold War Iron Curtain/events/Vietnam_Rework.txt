@@ -7,9 +7,14 @@ add_namespace = Etat_du_Vietnam
 add_namespace = VIE_PMs
 add_namespace = VIE_Huu
 add_namespace = VIE_Tam
+
 add_namespace = Initial_CuongDe
 add_namespace = CuongDe
+add_namespace = CuongDe_NgoDinh
 add_namespace = CuongDe_Coup
+add_namespace = CuongDe_Successor
+add_namespace = NV_CuongDe
+
 add_namespace = BaoDai
 add_namespace = NgoDinh_Brothers
 
@@ -180,19 +185,15 @@ country_event = {
 	is_triggered_only = yes
 	fire_only_once = yes
 	
-	immediate = {
+	option = {
+		name = "Interesting"
+		add_stability = -0.05
 		if = {
 			limit = {
 				ROOT = { original_tag = VIE }
 			}
-			hidden_effect = { country_event = { id = Initial_CuongDe.5 days = 8 } }
+			complete_national_focus = VIE_CuongDe_Press_Conferences
 		}
-	}
-	
-	option = {
-		name = "Interesting"
-		add_stability = -0.05
-		complete_national_focus = VIE_CuongDe_Press_Conferences
 	}
 }
 
@@ -206,7 +207,7 @@ country_event = {
 	fire_only_once = yes
 	
 	immediate = {
-		hidden_effect = { country_event = { id = Initial_CuongDe.6 days = 7 } }
+		hidden_effect = { country_event = { id = Initial_CuongDe.6 days = 3 } }
 	}
 	
 	option = {
@@ -225,13 +226,29 @@ country_event = {
 
 	option = {
 		name = "Nuh uh"
+
 		complete_national_focus = VIE_Intercept_CuongDe_Return_Bangkok
 		reset_favoritism_minigame = yes
 		set_country_flag = VIE_CuongDe_Lost1
+
+		trigger = {
+			NOT = { has_country_flag = CuongDe_Victory1 }
+		}
 	}
 	
 	option = {
 		name = "Cuong-De eludes us."
+		
+		load_focus_tree = VIE_CuongDe_50
+		custom_effect_tooltip = VIE_CuongDe_Phase2_tt
+		hidden_effect = {
+			unlock_national_focus = VIE_CD_Sideline_CuongDe_Ambitions
+			unlock_national_focus = VIE_CD_CuongDe_Press_Conferences
+		}
+
+		trigger = {
+			has_country_flag = CuongDe_Victory1
+		}
 	}
 }
 
@@ -246,6 +263,360 @@ country_event = {
 
 	option = {
 		name = "Interesting"
+		country_event = { id = CuongDe.2 days = 1 }
+	}
+}
+
+country_event = {
+	id = CuongDe.2
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe.2"}
+	title = "Xac-Te Warns of Growing Cuong-De Influence"
+	desc = CuongDe.2.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		add_stability = -0.05
+		add_popularity = {
+			ideology = democratic 
+			popularity = 0.05
+		}
+		add_to_variable = {
+			var = Bao_Dai_Favoritism
+			value = -5
+			tooltip = Minus_5_BDF_tt
+		}
+		refresh_favoritism_minigame = yes
+	}
+}
+
+country_event = {
+	id = CuongDe.3
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe.3"}
+	title = "Cuong-De Pleads for Assistance Against Bao-Dai"
+	desc = CuongDe.3.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		add_to_variable = {
+			var = Alt_Favoritism
+			value = 5
+			tooltip = Add_5_AF_tt
+		}
+		refresh_favoritism_minigame = yes
+	}
+}
+
+#Cuong-De Deals With Ngo-Dinh Bros
+country_event = {
+	id = CuongDe_NgoDinh.1
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_NgoDinh.1"}
+	title = "The Ngo-Dinh Brothers Evade Arrest!"
+	desc = CuongDe_NgoDinh.1.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		set_country_flag = VIE_Diem_Not_Jailed
+		set_country_flag = VIE_Nhu_Not_Jailed
+	}
+}
+
+country_event = {
+	id = CuongDe_NgoDinh.2
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_NgoDinh.2"}
+	title = "Bao-Dai Has Jailed the Ngo-Dinh Brothers!"
+	desc = CuongDe_NgoDinh.2.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		set_country_flag = VIE_Diem_Jailed
+		set_country_flag = VIE_Nhu_Jailed
+	}
+}
+
+country_event = {
+	id = CuongDe_NgoDinh.3
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_NgoDinh.3"}
+	title = "Recruitment of the Ngo-Dinh Brothers"
+	desc = CuongDe_NgoDinh.3.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		add_stability = 0.05
+		add_popularity = {
+			ideology = trotskyism
+			popularity = 0.05
+		}
+		add_to_variable = {
+			var = Alt_Favoritism
+			value = 10
+			tooltip = Add_10_AF_tt
+		}
+		refresh_favoritism_minigame = yes
+		#Recruit Diem and Nhu
+		#recruit Nhu & Do-mau as generals upon victory
+	}
+}
+#End of Cuong-De Dealing With Ngo-Dinh Bros Event Chain
+
+country_event = {
+	id = CuongDe.4
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe.4"}
+	title = "Cuong-De Flees to Japan!"
+	desc = CuongDe.4.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+
+		reset_favoritism_minigame = yes
+		add_stability = 0.05
+		add_to_variable = {
+			var = Bao_Dai_Favoritism
+			value = 5
+			tooltip = Add_5_BDF_tt
+		}
+		custom_effect_tooltip = VIE_Saigon_Capital_tt
+		custom_effect_tooltip = VIE_activate_sect_menu_tt
+		
+		activate_sect_menu = yes
+		set_cosmetic_tag = VIE_FRA_ETAT
+		set_country_flag = VIE_unity_required
+		set_country_flag = VIE_Northern_Question_Flag
+		load_focus_tree = VIE_Bao_Dai_50
+		hidden_effect = {
+			set_capital	= { state = 286	}
+			country_event = { id = BaoDai.4 days = 3 random_days = 2 }
+			VIN = { country_event = { id = BaoDai.4 days = 5 } }
+		}
+	}
+}
+
+country_event = {
+	id = CuongDe.5
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe.5"}
+	title = "Cuong-De Crowned Head of Vietnam?"
+	desc = CuongDe.5.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+country_event = {
+	id = CuongDe.6
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe.6"}
+	title = "Purging of Bao-Dai's Army"
+	desc = CuongDe.6.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+
+		add_to_variable = {
+			var = VIE_Influence
+			value = 10
+		}
+		add_to_variable = {
+			var = FRA_Influence
+			value = -10
+		}
+		custom_effect_tooltip = Add_10_VIE_Influence_tt
+		every_unit_leader = {
+			limit = {
+				has_trait = BaoDai_Loyalist
+			}
+			retire_character = PREV
+		}
+		add_stability = -0.05
+	}
+}
+
+country_event = {
+	id = CuongDe.7
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe.7"}
+	title = "Bao-Dai Settles in Paris"
+	desc = CuongDe.7.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+
+		add_stability = -0.05
+	}
+}
+
+country_event = {
+	id = CuongDe.8
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe.8"}
+	title = "Nam-Hung's Dan-Vuong Idea"
+	desc = CuongDe.8.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+
+		add_stability = 0.05
+		add_popularity = {
+			ideology = democratic
+			popularity = 0.05
+		}
+	}
+}
+
+country_event = {
+	id = CuongDe.9
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe.9"}
+	title = "Nam-Hung's Pursuit for Economic Collaboration"
+	desc = CuongDe.9.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+news_event = {
+	id = CuongDe.0
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe.0"}
+	title = "[GetNewspaperHeader]Bao-Dai Exiled"
+	desc = CuongDe.0.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+news_event = {
+	id = CuongDe.100
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe.100"}
+	title = "[GetNewspaperHeader]Vietnam Adopts UN's Universal Declaration of Human Rights"
+	desc = CuongDe.100.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+country_event = {
+	id = NV_CuongDe.1
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = NV_CuongDe.1"}
+	title = "Cuong-De Proposes a Ceasefire"
+	desc = NV_CuongDe.1.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+country_event = {
+	id = NV_CuongDe.2
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = NV_CuongDe.2"}
+	title = "Diem Proposes Peacetalks"
+	desc = NV_CuongDe.2.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+country_event = {
+	id = CuongDe_Successor.1
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_Successor.1"}
+	title = "Cuong-De's Successor?"
+	desc = CuongDe_Successor.1.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+news_event = {
+	id = CuongDe_Successor.0
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_Successor.0"}
+	title = "[GetNewspaperHeader]Nhiep Crowned Head of Vietnam"
+	desc = CuongDe_Successor.0.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+news_event = {
+	id = CuongDe_Successor.100
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_Successor.100"}
+	title = "[GetNewspaperHeader]Diem Succeeds Cuong-De"
+	desc = CuongDe_Successor.100.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = yes
+
+	option = {
+		name = "Interesting"
+	}
+}
+
+news_event = {
+	id = CuongDe_Successor.200
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_Successor.200"}
+	title = "[GetNewspaperHeader]The Cao-Dai Takeover"
+	desc = CuongDe_Successor.200.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = yes
+
+	option = {
+		name = "Interesting"
 	}
 }
 
@@ -253,7 +624,7 @@ country_event = {
 country_event = {
 	id = CuongDe_Coup.1 #FRA options to accept/refuse aid to Cuong-De coup
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_Coup.1"}
-	title = "Greenlighting Coung-De's Coup?"
+	title = "Greenlighting Cuong-De's Coup?"
 	desc = CuongDe_Coup.1.d
 
 	is_triggered_only = yes
@@ -261,17 +632,29 @@ country_event = {
 
 	option = {
 		name = "Allow it"
-		
+		VIE = {
+			country_event = { id = CuongDe_Coup.2 hours = 6 }
+		}
+
+		trigger = {
+			VIE = { check_variable = { Alt_Favoritism > 74 } }
+		}
 	}
 	
 	option = {
 		name = "Refuse to aid Cuong-De"
-		
+		VIE = {
+			country_event = { id = CuongDe_Coup.3 hours = 6 }
+		}
+
+		trigger = {
+			VIE = { check_variable = { Alt_Favoritism < 75 } }
+		}
 	}
 }
 
 country_event = {
-	id = CuongDe_Coup.2 #FRA accepts
+	id = CuongDe_Coup.2
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_Coup.2"}
 	title = "France Agrees to Aid Our Coup"
 	desc = CuongDe_Coup.2.d
@@ -281,12 +664,13 @@ country_event = {
 
 	option = {
 		name = "Interesting"
-		
+
+		set_country_flag = FRA_Accept_CuongDe_Coup
 	}
 }
 
 country_event = {
-	id = CuongDe_Coup.3 #FRA accepts
+	id = CuongDe_Coup.3
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_Coup.3"}
 	title = "France Refuses to Aid Our Coup"
 	desc = CuongDe_Coup.3.d
@@ -297,6 +681,101 @@ country_event = {
 	option = {
 		name = "Interesting"
 		
+		set_country_flag = FRA_Refuse_CuongDe_Coup
+	}
+}
+
+country_event = {
+	id = CuongDe_Coup.4
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_Coup.4"}
+	title = "Our Time Is Now!"
+	desc = CuongDe_Coup.4.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Red Sun in our Hearts Chairman Cuong-De"
+		
+		country_event = { id = CuongDe_Coup.5 hours = 6 }
+
+		trigger = {
+			has_country_flag = FRA_Accept_CuongDe_Coup
+		}
+	}
+
+	option = {
+		name = "Its over..."
+		
+		country_event = { id = CuongDe.4 hours = 6 }
+
+		trigger = {
+			has_country_flag = FRA_Refuse_CuongDe_Coup
+		}
+	}
+}
+
+country_event = {
+	id = CuongDe_Coup.5
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_Coup.5"}
+	title = "A Moment Long Overdue..."
+	desc = CuongDe_Coup.5.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = "Interesting"
+		
+		#remove bao-dai from minigame
+		activate_sect_menu = yes
+		add_stability = 0.10
+		set_politics = {
+			ruling_party = democratic
+			elections_allowed = no
+			long_name = "Phuc-Quoc Hoi"
+			name = "PQ-H"
+		}
+		VIE_Cuong_De = {
+			set_character_name = "Nam-Hung"
+			set_portraits = {
+				civilian = { large = GFX_Cuong_De_Royal }
+			}
+			add_country_leader_role = {
+				promote_leader = yes
+				country_leader = {
+					ideology = progressive
+				}
+			}
+		}
+		VIN = { country_event = CuongDe.5 }
+		set_country_flag = VIE_CuongDe_Succeeds
+		set_country_flag = VIE_unity_required
+		mark_focus_tree_layout_dirty = yes
+		set_cosmetic_tag = VIE_CuongDe
+		news_event = { id = CuongDe_Coup.0 hours = 3 random_hours = 6 }
+		hidden_effect = {
+			add_popularity = {
+				ideology = democratic
+				popularity = 0.25
+			}
+			complete_national_focus = VIE_NH_NamHung_Vietnam_Emperor
+		}
+	}
+}
+
+news_event = {
+	id = CuongDe_Coup.0
+	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CuongDe_Coup.0"}
+	title = "[GetNewspaperHeader]The New Emperor of Vietnam"
+	desc = CuongDe_Coup.0.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = yes
+
+	option = {
+		name = "Interesting"
 	}
 }
 
