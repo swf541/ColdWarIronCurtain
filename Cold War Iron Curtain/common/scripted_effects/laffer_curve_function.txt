@@ -8,41 +8,7 @@ laffer_curve_function = {
     set_variable = {
         laffer_skewnewss = 0
     }
-    multiply_variable = { laffer_skewnewss = automated_population_census_lafter }
-    multiply_variable = { laffer_skewnewss = modern_population_census_lafter }
-    multiply_variable = { laffer_skewnewss = developed_population_census_lafter }
-    set_variable = {
-        total_advanced_dev = developed_population_census_lafter
-    }
-    add_to_variable = {
-        total_advanced_dev = modern_population_census_lafter
-    }
-    add_to_variable = {
-        total_advanced_dev = automated_population_census_lafter
-    }
-    subtract_from_variable = {
-        total_advanced_dev = 3
-    }
-    multiply_variable = {
-        total_advanced_dev = 0.25
-    }
-    add_to_variable = {
-        laffer_skewnewss = total_advanced_dev
-    }
-    set_variable = {
-        preindustrial_population_census_lafter_curve = preindustrial_population_census
-    }
-    multiply_variable = {
-        preindustrial_population_census_lafter_curve = 0.25
-    }
-    set_variable = {
-       industrial_population_census_lafter_curve = industrial_population_census
-    }
-    multiply_variable = {
-        industrial_population_census_lafter_curve = 0.25
-    }
-    subtract_from_variable = { laffer_skewnewss = preindustrial_population_census_lafter_curve }
-    subtract_from_variable = { laffer_skewnewss = industrial_population_census_lafter_curve }
+
     subtract_from_variable = { laffer_skewnewss = CorruptionLevel }
 
     set_variable = {
@@ -50,16 +16,21 @@ laffer_curve_function = {
     }
     #log = "[THIS.GetName] Skew: [?laffer_skewnewss]"
     set_variable = {
-        laffer_mean = 0.3
+        laffer_mean = 0.45
     }
-    multiply_variable = { automated_population_census_lafter = 0.25 }
-    multiply_variable = { developed_population_census_lafter = 0.25 }
-    multiply_variable = { modern_population_census_lafter = 0.25 }
-    multiply_variable = { laffer_mean = automated_population_census_lafter }
-    multiply_variable = { laffer_mean = modern_population_census_lafter }
-    multiply_variable = { laffer_mean = developed_population_census_lafter }
-    multiply_variable = { laffer_mean = underdeveloped_penalty }
-    multiply_variable = { laffer_mean = undeveloped_penalty }
+    set_variable = {
+        laffer_mean_adjustment = develoment_average_laffer
+    }
+    subtract_from_variable = {
+        laffer_mean_adjustment = 2
+    }
+    multiply_variable = {
+        laffer_mean_adjustment = 0.2
+    }
+    add_to_variable = {
+        laffer_mean = laffer_mean_adjustment
+    }
+
     #log = "[THIS.GetName] Mean: [?laffer_mean]"
 
     set_variable = {
@@ -69,12 +40,6 @@ laffer_curve_function = {
         laffer_mean_alpha_calc = laffer_standard_deviation
     }
     #log = "[THIS.GetName] Standard Deviation: [?laffer_standard_deviation]"
-
-    #if = { limit = { has_idea = policy_taxrate_temp_1 } set_variable = { laffer_tax_rate = 0.15 } }
-    #if = { limit = { has_idea = policy_taxrate_temp_2 } set_variable = { laffer_tax_rate = 0.25 } }
-    #if = { limit = { has_idea = policy_taxrate_temp_3 } set_variable = { laffer_tax_rate = 0.35 } }
-    #if = { limit = { has_idea = policy_taxrate_temp_4 } set_variable = { laffer_tax_rate = 0.45 } }
-    #if = { limit = { has_idea = policy_taxrate_temp_5 } set_variable = { laffer_tax_rate = 0.55 } }
 
     set_variable = { 
         laffer_tax_rate = laffer_weighted_average_tax_rate  #Weighted Average Tax Rate
@@ -802,14 +767,16 @@ laffer_curve_function_run = {
     subtract_from_variable = { laffer_skewnewss = CorruptionLevel }
 
 	if = { limit = { has_idea = policy_services_temp_0 } add_to_variable = { laffer_skewnewss = -0.1 } }
-	if = { limit = { has_idea = policy_services_temp_1 } add_to_variable = { laffer_skewnewss = -0.05 } }
-	if = { limit = { has_idea = policy_services_temp_2 } add_to_variable = { laffer_skewnewss = 0.05 } }
-	if = { limit = { has_idea = policy_services_temp_3 } add_to_variable = { laffer_skewnewss = 0.15 } }
+	else_if = { limit = { has_idea = policy_services_temp_1 } add_to_variable = { laffer_skewnewss = -0.05 } }
+	else_if = { limit = { has_idea = policy_services_temp_2 } add_to_variable = { laffer_skewnewss = 0.05 } }
+	else_if = { limit = { has_idea = policy_services_temp_3 } add_to_variable = { laffer_skewnewss = 0.15 } }
+    else = { }
 
 	if = { limit = { has_idea = policy_cpi_temp_0 } add_to_variable = { laffer_skewnewss = -0.02 } }
-	if = { limit = { has_idea = policy_cpi_temp_1 } add_to_variable = { laffer_skewnewss = -0.04 } }
-	if = { limit = { has_idea = policy_cpi_temp_4 } add_to_variable = { laffer_skewnewss = 0.02 } }
-	if = { limit = { has_idea = policy_cpi_temp_5 } add_to_variable = { laffer_skewnewss = 0.04 } }
+	else_if = { limit = { has_idea = policy_cpi_temp_1 } add_to_variable = { laffer_skewnewss = -0.04 } }
+	else_if = { limit = { has_idea = policy_cpi_temp_4 } add_to_variable = { laffer_skewnewss = 0.02 } }
+	else_if = { limit = { has_idea = policy_cpi_temp_5 } add_to_variable = { laffer_skewnewss = 0.04 } }
+    else = { }
 
     set_variable = {
         laffer_mean = 0.3
@@ -1258,33 +1225,33 @@ laffer_curve_function_run = {
     set_variable = {
         effective_tax_rate = normal_distribution
     }
-    if = {
-        limit = {
-            has_idea = policy_taxrate_temp_1
-            check_variable = {
-                laffer_skewnewss > 0
-            }
-        }
-        divide_variable = {
-            effective_tax_rate = 20
-        }
-    }
-    else_if = {
-        limit = {
-            has_idea = policy_taxrate_temp_1
-            check_variable = {
-                laffer_skewnewss < 0
-            }
-        }
-        divide_variable = {
-            effective_tax_rate = 26
-        }       
-    }
-    else = {
-        divide_variable = {
-            effective_tax_rate = 15
-        }
-    }
+    #if = {
+    #    limit = {
+    #        has_idea = policy_taxrate_temp_1
+    #        check_variable = {
+    #            laffer_skewnewss > 0
+    #        }
+    #    }
+    #    divide_variable = {
+    #        effective_tax_rate = 20
+    #    }
+    #}
+    #else_if = {
+    #    limit = {
+    #        has_idea = policy_taxrate_temp_1
+    #        check_variable = {
+    #            laffer_skewnewss < 0
+    #        }
+    #    }
+    #    divide_variable = {
+    #        effective_tax_rate = 26
+    #    }       
+    #}
+    #else = {
+    #    divide_variable = {
+    #        effective_tax_rate = 15
+    #    }
+    #}
     #log = "[THIS.GetName] Effective Tax Rate: [?effective_tax_rate]"
 
 }

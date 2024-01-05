@@ -1,3 +1,94 @@
+generate_tax_info = {
+    set_variable = { tax_total_upper_class_pay = national_total_upper_class_pay }
+    set_variable = { tax_total_upper_middle_class_pay = national_total_upper_middle_class_pay }
+    set_variable = { tax_total_middle_class_pay = national_total_middle_class_pay }
+    set_variable = { tax_total_lower_class_pay = national_total_lower_class_pay }
+
+    set_variable = { tax_divisor_total_upper_class_pay = national_total_upper_class_pay }
+    set_variable = { tax_divisor_total_upper_middle_class_pay = national_total_upper_middle_class_pay }
+    set_variable = { tax_divisor_total_middle_class_pay = national_total_middle_class_pay }
+    set_variable = { tax_divisor_total_lower_class_pay = national_total_lower_class_pay }
+
+	set_variable = { tax_total_national_income = 0 }
+	add_to_variable = { tax_total_national_income = tax_divisor_total_upper_class_pay }
+	add_to_variable = { tax_total_national_income = tax_divisor_total_upper_middle_class_pay }
+	add_to_variable = { tax_total_national_income = tax_divisor_total_middle_class_pay }
+	add_to_variable = { tax_total_national_income = tax_divisor_total_lower_class_pay }
+    
+    
+    divide_variable = { tax_divisor_total_upper_class_pay = tax_total_national_income }
+    divide_variable = { tax_divisor_total_upper_middle_class_pay = tax_total_national_income }
+    divide_variable = { tax_divisor_total_middle_class_pay = tax_total_national_income }
+    divide_variable = { tax_divisor_total_lower_class_pay = tax_total_national_income }
+
+    multiply_variable = { tax_divisor_total_upper_class_pay = upper_class_tax_rate }
+    multiply_variable = { tax_divisor_total_upper_middle_class_pay = upper_middle_class_tax_rate }
+    multiply_variable = { tax_divisor_total_middle_class_pay = middle_class_tax_rate }
+    multiply_variable = { tax_divisor_total_lower_class_pay = lower_class_tax_rate }
+
+    set_variable = { laffer_weighted_average_tax_rate = 0 }
+    add_to_variable = { laffer_weighted_average_tax_rate = tax_divisor_total_upper_class_pay }
+    add_to_variable = { laffer_weighted_average_tax_rate = tax_divisor_total_upper_middle_class_pay }
+    add_to_variable = { laffer_weighted_average_tax_rate = tax_divisor_total_middle_class_pay }
+    add_to_variable = { laffer_weighted_average_tax_rate = tax_divisor_total_lower_class_pay }
+
+    set_variable = { actual_tax_rate = laffer_weighted_average_tax_rate }
+
+    #Run Laffer Curve Here
+    laffer_curve_function = yes
+
+    #Get Tax Per Rate and then Efficiency Scores
+
+    multiply_variable = { tax_total_upper_class_pay = upper_class_tax_rate }
+    multiply_variable = { tax_total_upper_middle_class_pay = upper_middle_class_tax_rate }
+    multiply_variable = { tax_total_middle_class_pay = middle_class_tax_rate }
+    multiply_variable = { tax_total_lower_class_pay = lower_class_tax_rate }
+
+    multiply_variable = { tax_total_upper_class_pay = effective_tax_rate }
+    multiply_variable = { tax_total_upper_middle_class_pay = effective_tax_rate }
+    multiply_variable = { tax_total_middle_class_pay = effective_tax_rate }
+    multiply_variable = { tax_total_lower_class_pay = effective_tax_rate }
+
+    set_variable = { tax_base = 0 }
+    add_to_variable = { tax_base = tax_total_upper_class_pay }
+    add_to_variable = { tax_base = tax_total_upper_middle_class_pay }
+    add_to_variable = { tax_base = tax_total_middle_class_pay }
+    add_to_variable = { tax_base = tax_total_lower_class_pay }
+    set_variable = { tax_display = tax_base }
+
+    #add_to_variable = {
+    #    effective_tax_rate = 0.2
+    #}
+
+    multiply_variable = {
+        tax_display = effective_tax_rate
+    }
+    multiply_variable = {
+        tax_base = effective_tax_rate
+    }
+
+    set_variable = {
+        actual_tax_rate_adjusted = actual_tax_rate
+    }
+    multiply_variable = {
+        actual_tax_rate_adjusted = effective_tax_rate
+    }
+
+    set_variable = {
+        effective_tax_rate_display = actual_tax_rate
+    }
+    multiply_variable = {
+        effective_tax_rate_display = 100
+    }
+    multiply_variable = {
+        effective_tax_rate_display = 2
+    }
+    round_variable = effective_tax_rate_display
+    add_to_variable = {
+        effective_tax_rate_display = 89
+    }
+    Laffer_Graph_Financial_Tab_Update = yes
+}
 
 debug_policy_placement = {
     set_variable = {
@@ -69,10 +160,10 @@ debug_policy_placement = {
         air_level_value = 1
     }
     set_variable = {
-        strategic_forces_level_value = 1
+        strategic_forces_level_value = 0
     }
     set_variable = {
-        space_level_value = 1
+        space_level_value = 0
     }
 
     set_variable = {
@@ -1014,6 +1105,13 @@ increase_space_policy = {
         add_to_variable = {
             space_level_value = 1
         }
+        set_variable = {
+            currentbudget = ROOT.amount_research_slots
+        }
+        multiply_variable = {
+            currentbudget = space_level_value
+        }
+        refresh_space_gui = yes
     }
 
     if = {
@@ -1173,6 +1271,13 @@ decrease_space_policy = {
         add_to_variable = {
             space_level_value = -1
         }
+        set_variable = {
+            currentbudget = ROOT.amount_research_slots
+        }
+        multiply_variable = {
+            currentbudget = space_level_value
+        }
+        refresh_space_gui = yes
     }
     if = {
         limit = {
@@ -3074,6 +3179,9 @@ lower_tax_rate = {
         add_to_variable = {
            upper_tax_level_value = -1
         }
+        add_to_variable = {
+            upper_class_tax_rate = -0.05
+        }
     }
     if = {
         limit = {
@@ -3203,6 +3311,9 @@ increase_tax_rate = {
         }
         add_to_variable = {
            upper_tax_level_value = 1
+        }
+        add_to_variable = {
+            upper_class_tax_rate = 0.05
         }
     }
     if = {
@@ -3349,6 +3460,9 @@ decrease_upper_middle_tax_rate = {
         add_to_variable = {
             upper_middle_tax_level_value = -1
         }
+        add_to_variable = {
+            upper_middle_class_tax_rate = -0.05
+        }
     }
     if = {
         limit = {
@@ -3478,6 +3592,9 @@ increase_upper_middle_tax_rate = {
         }
         add_to_variable = {
             upper_middle_tax_level_value = 1
+        }
+        add_to_variable = {
+            upper_middle_class_tax_rate = 0.05
         }
     }
     if = {
@@ -3624,6 +3741,9 @@ decrease_lower_middle_tax_rate = {
         add_to_variable = {
             lower_middle_tax_level_value = -1
         }
+        add_to_variable = {
+            middle_class_tax_rate = -0.05
+        }
     }
     if = {
         limit = {
@@ -3753,6 +3873,9 @@ increase_lower_middle_tax_rate = {
         }
         add_to_variable = {
             lower_middle_tax_level_value = 1
+        }
+        add_to_variable = {
+            middle_class_tax_rate = 0.05
         }
     }
     if = {
@@ -3899,6 +4022,9 @@ decrease_lower_tax_rate = {
         add_to_variable = {
             lower_tax_level_value = -1
         }
+        add_to_variable = {
+            lower_class_tax_rate = -0.05
+        }
     }
     if = {
         limit = {
@@ -4028,6 +4154,9 @@ increase_lower_tax_rate = {
         }
         add_to_variable = {
             lower_tax_level_value = 1
+        }
+        add_to_variable = {
+            lower_class_tax_rate = 0.05
         }
     }
     if = {
@@ -7066,3 +7195,15 @@ free_trade_econ_policy = {
 }
 
 
+#Victory Test
+victory_screen_test_input = {
+    set_global_flag = Korean_War_Ceasefire_End
+    set_global_flag = Cuban_Revolution_American_Intervention_End
+    set_global_flag = Yugoslavia_Join_Nato_A
+    set_global_flag = Albanian_Subversion_B
+    set_global_flag = Greek_Civil_War_Government_Victory
+    set_global_flag = Suez_Crisis_Tripartite_Victory
+    set_global_flag = PRC_Chinese_Civil_War_End
+    set_global_flag = Indochina_War_Viet_Minh_Victory
+    set_global_flag = DDR_Reimann_Route
+}
