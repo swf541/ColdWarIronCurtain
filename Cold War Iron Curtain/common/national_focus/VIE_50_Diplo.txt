@@ -309,7 +309,24 @@ shared_focus = {
 				end_civil_wars = no
 			}
 		}
-		set_cosmetic_tag = VIE_ETAT
+		if = {
+			limit = {
+				has_cosmetic_tag = VIE_FRA_ETAT
+			}
+			set_cosmetic_tag = VIE_ETAT
+		}
+		else_if = {
+			limit = {
+				has_cosmetic_tag = VIE_RCB_FRA_ETAT
+			}
+			set_cosmetic_tag = VIE_RCB_ETAT
+		}
+		else_if = {
+			limit = {
+				has_cosmetic_tag = VIE_CCC_FRA_ETAT
+			}
+			set_cosmetic_tag = VIE_CCC_ETAT
+		}
 		add_to_variable = {
 			var = VIE_Influence
 			value = -5
@@ -469,8 +486,20 @@ shared_focus = {
 	}
 	x = 0
 	y = 1
+	bypass = {
+		custom_trigger_tooltip = {
+			tooltip = VIE_USA_Refuses_Early_Intervention_tt
+			has_country_flag = VIE_USA_Refuses_Early_Intervention
+		}
+	}
+	available = {
+		custom_trigger_tooltip = {
+			tooltip = VIE_USA_Accepts_Early_Intervention_tt
+			has_country_flag = VIE_USA_Accepts_Early_Intervention
+		}
+	}
 	completion_reward = {
-		USA = { country_event = VIE_USA_Support.2 }
+		#usa intervention stuff
 	}
 }
 shared_focus = {
@@ -1016,10 +1045,15 @@ shared_focus = {
 			tooltip = VIE_Korean_War_Starts_tt
 			has_global_flag = korean_war_begun
 		}
+		custom_trigger_tooltip = {
+			tooltip = VIE_Korean_War_Ongoing_tt
+			KOR = { has_war_with = KPA }
+		}
 	}
 	completion_reward = {
 		army_experience = 5
 		add_political_power = 50
+		country_event = VIE_KOR.1
 	}
 }
 shared_focus = {
@@ -1033,10 +1067,7 @@ shared_focus = {
 	}
 	cost = 1.4
 	available = {
-		custom_trigger_tooltip = {
-			tooltip = VIE_Korean_War_Ongoing_tt
-			KOR = { has_war_with = KPA }
-		}
+		always = no
 	}
 	relative_position_id = VIE_Korean_War
 	prerequisite = {
@@ -1051,37 +1082,38 @@ shared_focus = {
 	x = -2
 	y = 1
 	completion_reward = {
-		army_experience = 25
-		add_command_power = 25
-		
-		KOR = {
-			army_experience = 15
-			add_equipment_to_stockpile = {
-				type = infantry_equipment_0
-				amount = 1000
-				producer = VIE
+		effect_tooltip = {
+			army_experience = 25
+			add_command_power = 25
+			KOR = {
+				army_experience = 15
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_0
+					amount = 1000
+					producer = VIE
+				}
+				add_equipment_to_stockpile = {
+					type = motorized_equipment_1
+					amount = 50
+					producer = VIE
+				}
+				add_equipment_to_stockpile = {
+					type = mbt_equipment_0 
+					amount = 10
+					producer = FRA
+				}
 			}
-			add_equipment_to_stockpile = {
-				type = motorized_equipment_1
-				amount = 50
-				producer = VIE
+			add_to_variable = {
+				var = VIE_Influence
+				value = 5
 			}
-			add_equipment_to_stockpile = {
-				type = mbt_equipment_0 
-				amount = 10
-				producer = FRA
+			add_to_variable = {
+				var = FRA_Influence
+				value = -5
 			}
+			custom_effect_tooltip = Add_5_VIE_Influence_tt
+			refresh_favoritism_minigame = yes
 		}
-		add_to_variable = {
-			var = VIE_Influence
-			value = 5
-		}
-		add_to_variable = {
-			var = FRA_Influence
-			value = -5
-		}
-		custom_effect_tooltip = Add_5_VIE_Influence_tt
-		refresh_favoritism_minigame = yes
 	}
 }
 shared_focus = {
@@ -1095,10 +1127,7 @@ shared_focus = {
 	}
 	cost = 1.4
 	available = {
-		custom_trigger_tooltip = {
-			tooltip = VIE_Korean_War_Ongoing_tt
-			KOR = { has_war_with = KPA }
-		}
+		always = no
 	}
 	relative_position_id = VIE_Korean_War
 	prerequisite = {
@@ -1113,18 +1142,20 @@ shared_focus = {
 	x = 0
 	y = 1
 	completion_reward = {
-		add_stability = 0.05
-		add_political_power = 15
-		add_to_variable = {
-			var = VIE_Influence
-			value = -5
+		effect_tooltip = {
+			add_stability = 0.05
+			add_political_power = 15
+			add_to_variable = {
+				var = VIE_Influence
+				value = -5
+			}
+			add_to_variable = {
+				var = FRA_Influence
+				value = 5
+			}
+			custom_effect_tooltip = Add_5_FRA_Influence_tt
+			refresh_favoritism_minigame = yes
 		}
-		add_to_variable = {
-			var = FRA_Influence
-			value = 5
-		}
-		custom_effect_tooltip = Add_5_FRA_Influence_tt
-		refresh_favoritism_minigame = yes
 	}
 }
 shared_focus = {
@@ -1138,10 +1169,7 @@ shared_focus = {
 	}
 	cost = 1.4
 	available = {
-		custom_trigger_tooltip = {
-			tooltip = VIE_Korean_War_Ongoing_tt
-			KOR = { has_war_with = KPA }
-		}
+		always = no
 	}
 	relative_position_id = VIE_Korean_War
 	prerequisite = {
@@ -1156,41 +1184,26 @@ shared_focus = {
 	x = 2
 	y = 1
 	completion_reward = {
-		hidden_effect = {
-			add_ai_strategy = {
-				type = send_volunteers_desire
-				id = "KOR"
-				value = 5000
+		effect_tooltip = {
+			set_rule = {
+				desc = VIE_Korean_War_Send_Volunteers_tt
+				can_send_volunteers = yes
 			}
-			add_ai_strategy = {
-				type = support
-				id = "KOR"
-				value = 5000
+			army_experience = 15
+			air_experience = 15
+			add_command_power = 50
+			add_stability = -0.05
+			add_to_variable = {
+				var = VIE_Influence
+				value = 5
 			}
-			add_ai_strategy = {
-				type = befriend
-				id = "KOR"
-				value = 5000
+			add_to_variable = {
+				var = FRA_Influence
+				value = -5
 			}
+			custom_effect_tooltip = Add_5_VIE_Influence_tt
+			refresh_favoritism_minigame = yes
 		}
-		set_rule = {
-			desc = VIE_Korean_War_Send_Volunteers_tt
-			can_send_volunteers = yes
-		}
-		army_experience = 15
-		air_experience = 15
-		add_command_power = 50
-		add_stability = -0.05
-		add_to_variable = {
-			var = VIE_Influence
-			value = 5
-		}
-		add_to_variable = {
-			var = FRA_Influence
-			value = -5
-		}
-		custom_effect_tooltip = Add_5_VIE_Influence_tt
-		refresh_favoritism_minigame = yes
 	}
 }
 shared_focus = {
