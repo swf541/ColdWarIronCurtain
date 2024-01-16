@@ -356,6 +356,44 @@ YUG_ethnicity_opinion = {
 		}
 	}
 
+
+	YUG_yearly_political_impact_update = {
+
+		icon = mission_icon
+
+			activation = {		   
+				tag = YUG
+			}
+
+			allowed = {
+				tag = YUG
+			}
+
+			available = {
+				always = no
+			}
+
+			visible = {
+			    is_debug = yes
+			}		
+
+			available = {
+		
+			}
+
+			is_good = yes
+			days_mission_timeout = 350
+
+			timeout_effect = {
+		   	 	YUG_calculate_ethnic_opinion_factor = yes	   
+		   	 	custom_effect_tooltip = YUG_localisation_ethnic_opinion_factor_update 	
+			}
+
+			ai_will_do = {
+				factor = 0
+			}
+	}	
+
 	YUG_test_2 = {
 
 	icon = contract
@@ -382,13 +420,14 @@ YUG_ethnicity_opinion = {
 		           max = 100
 		        }
 		    }
-		    set_temp_variable = { yug_tempvar = 50 }
+		    set_temp_variable = { yug_tempvar = 5 }
 		    YUG_change_rof_var = yes
-		    set_temp_variable = { yug_tempvar = -25 }		    
+		    set_temp_variable = { yug_tempvar = -2 }		    
 		    YUG_change_mildef_var = yes
 		    YUG_change_intdef_var = yes
 
 		    YUG_calc_informbiro_effects = yes
+		    YUG_calculate_ethnic_opinion_factor = yes
 
 		    custom_effect_tooltip = YUG_localisation_serbian_positive
 		    load_focus_tree = YUG_50sR
@@ -443,6 +482,7 @@ YUG_petogodisnji_plan = {
 			days_mission_timeout = 588
 
 			timeout_effect = {
+				add_stability = -0.05
 		   	 	remove_country_flag = YUG_first_fiveyearplan
 		   	 	remove_ideas = DDR_idea_first_five_year_plan
 			}
@@ -465,6 +505,9 @@ YUG_informbiro = {
 
 			activation = {		   
 				check_variable = { Progress_ROF_var < 25 }	
+				NOT = {
+					has_country_flag = YUG_famine1
+				}
 			}
 
 			allowed = {
@@ -488,6 +531,8 @@ YUG_informbiro = {
 			timeout_effect = {
 		   	 	add_ideas = famine2
 		   	 	set_country_flag = YUG_famine1
+				set_temp_variable = { yug_tempvar = -10 }
+				YUG_change_intdef_var = yes		   	 	
 			}
 
 			ai_will_do = {
@@ -528,12 +573,88 @@ YUG_informbiro = {
 		   	 		add_idea = famine3
 		   	 	}
 		   	 	set_country_flag = YUG_famine2
+				set_temp_variable = { yug_tempvar = -40 }
+				YUG_change_intdef_var = yes			   	 	
 			}
 
 			ai_will_do = {
 				factor = 0
 			}
 	}	
+
+	YUG_security_apparatus_failing = {
+
+		icon = mission_icon
+
+			activation = {		   
+				check_variable = { Progress_INTDEF_var < 30 }	
+			}
+
+			allowed = {
+				tag = YUG
+			}
+
+			visible = {
+			    is_debug = yes
+			}		
+
+			available = {
+				OR = {
+				    custom_trigger_tooltip = {
+					    tooltip = yug_intdef_above_30	
+					    check_variable = { Progress_INTDEF_var > 30 }
+					}		
+					has_completed_focus = YUG_yugoslavia_free_from_soviets
+				}
+			}
+
+			is_good = no
+			days_mission_timeout = 15
+
+			timeout_effect = {
+				if = { 
+					limit = { check_variable = { yug_cominformistplot = 0 } }
+					complete_national_focus = YUG_scale_back_udba_operations
+				}
+				else_if = {
+					limit = { check_variable = { yug_cominformistplot = 1 } }
+					complete_national_focus = YUG_undermine_udba
+				}
+				else_if = {
+					limit = { check_variable = { yug_cominformistplot = 2 } }
+					complete_national_focus = YUG_gather_support_from_russophile_communists
+				}
+				else_if = {
+					limit = { check_variable = { yug_cominformistplot = 3 } }
+					complete_national_focus = YUG_fund_ragtag_cominformist_partisans
+				}
+				else_if = {
+					limit = { check_variable = { yug_cominformistplot = 4 } }
+					complete_national_focus = YUG_fund_pero_popivoda_return
+				}
+				else_if = {
+					limit = { check_variable = { yug_cominformistplot = 5 } }
+					complete_national_focus = YUG_sow_corruption_into_kos
+				}
+				else_if = {
+					limit = { check_variable = { yug_cominformistplot = 6 } }
+					complete_national_focus = YUG_a_deal_with_crusaders
+				}		
+				else_if = {
+					limit = { check_variable = { yug_cominformistplot = 6 } }
+					complete_national_focus = YUG_brand_rankovic_a_traitor
+				}	
+				else = {
+		   	 		complete_national_focus = YUG_assasinate_tito
+				}																						
+			}
+
+			ai_will_do = {
+				factor = 0
+			}
+	}
+
+
 
 }
 
