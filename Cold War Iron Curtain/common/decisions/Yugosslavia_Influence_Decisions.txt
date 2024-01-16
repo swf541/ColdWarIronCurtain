@@ -464,7 +464,7 @@ YUG_petogodisnji_plan = {
 			}		
 
 			available = {
-			    industrial_complex > 19
+			    industrial_complex > 17
 			    steel_factory > 2			    
 			    arms_factory > 4
 			    custom_trigger_tooltip = {
@@ -506,7 +506,10 @@ YUG_informbiro = {
 			activation = {		   
 				check_variable = { Progress_ROF_var < 25 }	
 				NOT = {
-					has_country_flag = YUG_famine1
+					OR = {
+						has_country_flag = YUG_famine1
+						has_country_flag = YUG_famine2
+					}
 				}
 			}
 
@@ -573,6 +576,7 @@ YUG_informbiro = {
 		   	 		add_idea = famine3
 		   	 	}
 		   	 	set_country_flag = YUG_famine2
+		   	 	clr_country_flag = YUG_famine1
 				set_temp_variable = { yug_tempvar = -40 }
 				YUG_change_intdef_var = yes			   	 	
 			}
@@ -580,6 +584,124 @@ YUG_informbiro = {
 			ai_will_do = {
 				factor = 0
 			}
+	}	
+
+	YUG_food_situation_improving = {
+
+		icon = mission_icon
+
+			activation = {		   
+				check_variable = { Progress_ROF_var > 25 }
+			    OR = {
+				  	has_country_flag = YUG_famine1
+				  	has_country_flag = YUG_famine2
+				}				
+			}
+
+			allowed = {
+				tag = YUG
+			}
+
+			visible = {
+			    is_debug = yes
+			}		
+
+			available = {
+			    custom_trigger_tooltip = {
+				    tooltip = yug_rof_below_25	
+				    check_variable = { Progress_ROF_var < 25 }
+				}		
+			}
+
+			is_good = yes
+			days_mission_timeout = 100
+
+			timeout_effect = {
+				if = {
+					limit = { has_idea = famine3 }
+		   	 		swap_ideas = {
+		   	 			remove_idea = famine3
+		   	 			add_idea = famine2
+		   	 		}
+		   	 		clr_country_flag = YUG_famine2
+		   	 		set_country_flag = YUG_famine1
+		   	 	}
+		   	 	else = {
+		   	 		remove_ideas = famine2
+		   	 		clr_country_flag = YUG_famine1
+		   	 	}
+			}
+
+			ai_will_do = {
+				factor = 0
+			}
+	}	
+
+	informbiro_the_Crusaders = {
+
+		icon = generic_civil_support
+
+		available = {
+			#has_country_flag = crusaders_crushed
+		
+			divisions_in_state = {
+				size > 2
+				state = 163
+			}
+			
+		}
+		cancel_trigger = {
+			has_country_flag = crusaders_crushed
+		}
+		
+		visible = {
+			tag = YUG
+		}
+
+		days_mission_timeout = 60
+
+		activation = {
+			has_country_flag = crusader_insurgency
+			NOT = {
+				has_country_flag = crusaders_crushed
+			}
+		}
+		ai_will_do = {
+			factor = 1
+		}
+
+		
+		visible = {
+			
+		}
+
+		fixed_random_seed = no
+
+		fire_only_once = no
+
+		is_good = no
+		
+		complete_effect = {
+			activate_mission = The_Crusaders
+		}
+
+		timeout_effect = {
+			#Outer Area
+			random_list = {
+				25 = {
+					add_to_variable = { crusader_insurgency = 1 } 
+					custom_effect_tooltip = 1_ins_tt
+				}
+				35 = {
+					add_to_variable = { crusader_insurgency = 2 } 
+					custom_effect_tooltip = 2_ins_tt
+				}
+				40 = {
+					
+				}
+			}
+			
+		}
 	}	
 
 	YUG_security_apparatus_failing = {
