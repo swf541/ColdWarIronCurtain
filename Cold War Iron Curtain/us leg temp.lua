@@ -1,7 +1,7 @@
 
 
 
-    Employee_Free_Choice_Act_Vote = {
+    Universal_Child_Care_Act_Vote = {
         
         allowed = { tag = USA }
         ai_will_do = { factor = 10 }
@@ -11,26 +11,27 @@
         }
         visible = {
             NOT = { has_country_flag = law_passing }
-            has_country_flag = Employee_Free_Choice_Act_Vote
+            has_country_flag = Universal_Child_Care_Act_Vote
         }
         cost = 50
         fire_only_once = yes
         
         complete_effect = {
             set_variable = {					
-                bipartisan_value = 0.45
+                bipartisan_value = 0.55
             }	
             set_country_flag = law_passing
             bipartisan_house_calc = yes
             
             hidden_effect = {
-                senate_normal_dem_support = yes
+                senate_progressive_dem_support = yes
+                senate_moderate_dem_support = yes
+                senate_gop_liberal_support = yes
             }
             
             effect_tooltip = {
                 add_political_power = 30
-                increase_union_policy = yes
-                step_towards_public = yes
+                add_ideas = Universal_Child_Care_Act
             } 			
         }
         days_remove = 50
@@ -43,8 +44,7 @@
                     }
                     country_event = { id = us_congress.100 }
                     add_political_power = 30
-                    increase_union_policy = yes
-                    step_towards_public = yes
+                    add_ideas = Universal_Child_Care_Act
                 }
                 if = {
                     limit = { 
@@ -76,3 +76,17 @@
     senate_gop_total_support
     
     senate_normal_dem_support
+
+    if = {
+        limit = {
+            has_idea = enforce_Consumer_Protection_Laws
+        }
+        remove_ideas = enforce_Consumer_Protection_Laws
+        add_ideas = strengthen_Consumer_Protection_Laws
+    }
+    if = {
+        limit = {
+            NOT = { has_idea = enforce_Consumer_Protection_Laws }
+        }
+        add_ideas = enforce_Consumer_Protection_Laws
+    }
