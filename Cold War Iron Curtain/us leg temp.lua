@@ -1,6 +1,6 @@
 
 
-    The_Workforce_of_Tommorrow_Act_Vote = {
+    Skilled_Enlisted_Reserve_Military_Training_Act_Vote = {
         
         allowed = { tag = USA }
         ai_will_do = { factor = 10 }
@@ -10,28 +10,29 @@
         }
         visible = {
             NOT = { has_country_flag = law_passing }
-            has_country_flag = The_Workforce_of_Tommorrow_Act_Vote
+            has_country_flag = Skilled_Enlisted_Reserve_Military_Training_Act_Vote
         }
         cost = 50
         fire_only_once = yes
         
         complete_effect = {
             set_variable = {					
-                bipartisan_value = 0.55
+                bipartisan_value = 0.7
             }	
             set_country_flag = law_passing
             bipartisan_house_calc = yes
             
             hidden_effect = {
-                senate_progressive_dem_support = yes
                 senate_dixiecrat_dem_support = yes
                 senate_moderate_dem_support = yes
-                senate_gop_liberal_support = yes
+                senate_gop_total_support = yes
             }
             
             effect_tooltip = {
                 add_political_power = 30
-                add_ideas = The_Workforce_of_Tommorrow_Act
+                increase_military_policy = yes
+                increase_military_policy = yes
+                increase_air_policy = yes
             } 			
         }
         days_remove = 50
@@ -44,7 +45,9 @@
                     }
                     country_event = { id = us_congress.100 }
                     add_political_power = 30
-                    add_ideas = The_Workforce_of_Tommorrow_Act
+                    increase_military_policy = yes
+                    increase_military_policy = yes
+                    increase_air_policy = yes
                 }
                 if = {
                     limit = { 
