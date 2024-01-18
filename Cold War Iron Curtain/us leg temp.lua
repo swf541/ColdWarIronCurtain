@@ -1,4 +1,5 @@
-    Food_Stamp_Personal_Responsibility_Act_Vote = {
+
+    Open_Government_Act_Vote = {
             
         allowed = { tag = USA }
         ai_will_do = { factor = 10 }
@@ -8,27 +9,26 @@
         }
         visible = {
             NOT = { has_country_flag = law_passing }
-            has_country_flag = Food_Stamp_Personal_Responsibility_Act_Vote
+            has_country_flag = Open_Government_Act_Vote
         }
         cost = 50
         fire_only_once = yes
         
         complete_effect = {
             set_variable = {					
-                bipartisan_value = 0.45
+                bipartisan_value = 0.55
             }	
             set_country_flag = law_passing
             bipartisan_house_calc = yes
             
             hidden_effect = {
-                senate_dixiecrat_dem_support = yes
-                senate_gop_conservative_support = yes
-                senate_gop_moderate_support = yes
+                senate_normal_dem_support = yes
+                senate_gop_liberal_support = yes
             }
             
             effect_tooltip = {
                 add_political_power = 30
-                reduce_welfare_rate = yes
+                increase_service_policy = yes
             } 			
         }
         days_remove = 50
@@ -41,7 +41,7 @@
                     }
                     country_event = { id = us_congress.100 }
                     add_political_power = 30
-                    reduce_welfare_rate = yes
+                    increase_service_policy = yes
                 }
                 if = {
                     limit = { 
@@ -88,3 +88,14 @@
 
     custom_effect_tooltip = ImmigrationIncrease_tt
     add_to_variable = { americanImm = 0.05  }
+
+    lower_tax_rate = yes
+    lower_tax_rate = yes
+    lower_tax_rate = yes
+    lower_tax_rate = yes
+    decrease_upper_middle_tax_rate = yes
+    decrease_upper_middle_tax_rate = yes
+    decrease_lower_middle_tax_rate = yes
+    decrease_lower_middle_tax_rate = yes
+    decrease_lower_tax_rate = yes
+    decrease_lower_tax_rate = yes
