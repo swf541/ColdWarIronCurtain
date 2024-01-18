@@ -1,4 +1,4 @@
-    Repeal_Gramm_Rudman_Hollings_Act_Vote = {
+    Food_Stamp_Personal_Responsibility_Act_Vote = {
             
         allowed = { tag = USA }
         ai_will_do = { factor = 10 }
@@ -8,7 +8,7 @@
         }
         visible = {
             NOT = { has_country_flag = law_passing }
-            has_country_flag = Repeal_Gramm_Rudman_Hollings_Act_Vote
+            has_country_flag = Food_Stamp_Personal_Responsibility_Act_Vote
         }
         cost = 50
         fire_only_once = yes
@@ -21,12 +21,14 @@
             bipartisan_house_calc = yes
             
             hidden_effect = {
-                senate_normal_dem_support = yes
+                senate_dixiecrat_dem_support = yes
+                senate_gop_conservative_support = yes
+                senate_gop_moderate_support = yes
             }
             
             effect_tooltip = {
                 add_political_power = 30
-                remove_ideas = Gramm_Rudman_Hollings_Balanced_Budget_Act
+                reduce_welfare_rate = yes
             } 			
         }
         days_remove = 50
@@ -39,7 +41,7 @@
                     }
                     country_event = { id = us_congress.100 }
                     add_political_power = 30
-                    remove_ideas = Gramm_Rudman_Hollings_Balanced_Budget_Act
+                    reduce_welfare_rate = yes
                 }
                 if = {
                     limit = { 
