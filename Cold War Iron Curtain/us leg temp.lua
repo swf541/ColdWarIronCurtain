@@ -1,5 +1,5 @@
 
-    Mutual_Development_and_Cooperation_Act_Vote = {
+    Civil_Rights_Act90_Vote = {
             
         allowed = { tag = USA }
         ai_will_do = { factor = 10 }
@@ -9,14 +9,14 @@
         }
         visible = {
             NOT = { has_country_flag = law_passing }
-            has_country_flag = Mutual_Development_and_Cooperation_Act_Vote
+            has_country_flag = Civil_Rights_Act90_Vote
         }
         cost = 50
         fire_only_once = yes
         
         complete_effect = {
             set_variable = {					
-                bipartisan_value = 0.7
+                bipartisan_value = 0.6
             }	
             set_country_flag = law_passing
             bipartisan_house_calc = yes
@@ -24,12 +24,11 @@
             hidden_effect = {
                 senate_normal_dem_support = yes
                 senate_gop_liberal_support = yes
-                senate_gop_moderate_support = yes
             }
             
             effect_tooltip = {
                 add_political_power = 30
-                add_ideas = Mutual_Development_and_Cooperation_Act
+                decrease_later_day_racial_modifier = yes
             } 			
         }
         days_remove = 50
@@ -40,17 +39,9 @@
                         check_variable = { supseat > 216 } 
                         check_variable = { supseat_sen > senate_passing_value } 
                     }
-                    country_event = { id = us_congress.100 }
-                    add_political_power = 30
-                    add_ideas = Mutual_Development_and_Cooperation_Act
+                    decrease_later_day_racial_modifier = yes
                 }
-                if = {
-                    limit = { 
-                        OR = {
-                            check_variable = { supseat < 217 } 
-                            check_variable = { supseat_sen < senate_failing_value  } 
-                        }
-                    }
+                else = {
                     country_event = { id = parliament.1 }
                 }
                 set_variable = { supseat = 0 }
