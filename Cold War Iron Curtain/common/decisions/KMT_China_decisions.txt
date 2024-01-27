@@ -137,6 +137,7 @@ Chinese_Civil_War_missions_category = {
 					CHI = {	
 						activate_mission = CHI_recapture_nanjing
 						activate_mission = CHI_recapture_wuhan
+						activate_mission = CHI_recapture_beiping
 				}	
 				}
 				if = {
@@ -443,6 +444,67 @@ Chinese_Civil_War_missions_category = {
         }
     }
 
+	CHI_move_capital_back_to_nanjing = {
+          visible = {
+			AND = {
+               PRC= {
+                   has_war_with = CHI
+               }
+               tag = CHI
+			   NOT = {has_global_flag = chinese_civil_war_over}
+			   has_global_flag = roc_rebound_shanghai
+			}   
+          }
+          cost = 50
+		  
+		  cancel_trigger = {
+		    OR = {
+				has_global_flag = chinese_civil_war_over
+				PRC = {
+					NOT = {
+						has_war_with = CHI
+					}
+				}
+			}
+	      }
+		  
+          available = {
+               tag = CHI
+               PRC= {
+                   has_war_with = CHI
+               }
+			   CHI = {
+				controls_state = 598
+				controls_state = 1573
+				controls_state = 606
+				controls_state = 1785
+				controls_state = 613
+			   }
+          }
+
+		  fire_only_once = yes 
+
+          complete_effect = {
+          }
+          days_remove = 10
+		  priority = 6
+		  icon = lkmt_flag
+          remove_effect = {
+			CHI = {
+				add_stability = 0.1
+				add_war_support = 0.1
+				set_capital = {
+					state = 598
+  					remember_old_capital = yes 
+				}
+				hidden_effect = {
+					country_event = KMT_Civilwar.18
+				}
+			}
+		 }				
+	}
+	
+
 	
 	CHI_recapture_nanjing = {
 
@@ -473,22 +535,23 @@ Chinese_Civil_War_missions_category = {
 			}
 		}
 	    
-		days_mission_timeout = 365
+		days_mission_timeout = 649 #2 years after fall of Nanjing 1949, April 23th#
 
 		complete_effect = {
 			news_event = KMT_Civilwar.15
 			PRC = {
+				add_war_support = -0.20
 				transfer_units_fraction= {
 				    target = CHI
-				    size = 0.2
-				    stockpile_ratio = 0.03
-				    army_ratio = 0.01
+				    size = 0.4
+				    stockpile_ratio = 0.1
+				    army_ratio = 0.1
 				    navy_ratio = 0
-				    air_ratio = 0.01
+				    air_ratio = 0.02
 				    keep_unit_leaders_trigger = {
 				    	always = yes
 					}
-			    }
+				}
 			}
 		}
 
@@ -515,7 +578,7 @@ Chinese_Civil_War_missions_category = {
 		cost = 0
 		priority = 7
 		fire_only_once = yes
-		priority = 11
+		priority = 12
 		cancel_trigger = {
 	
 			OR = {
@@ -528,18 +591,19 @@ Chinese_Civil_War_missions_category = {
 			}
 		}
 	    
-		days_mission_timeout = 365
+		days_mission_timeout = 819 #40th year Wuchang Uprising Anniversary October 10#
 
 		complete_effect = {
 			news_event = KMT_Civilwar.16
 			PRC = {
+				add_war_support = -0.20
 				transfer_units_fraction= {
 				    target = CHI
-				    size = 0.2
-				    stockpile_ratio = 0.03
-				    army_ratio = 0.01
+				    size = 0.4
+				    stockpile_ratio = 0.1
+				    army_ratio = 0.1
 				    navy_ratio = 0
-				    air_ratio = 0.01
+				    air_ratio = 0.02
 				    keep_unit_leaders_trigger = {
 				    	always = yes
 					}
@@ -552,6 +616,185 @@ Chinese_Civil_War_missions_category = {
 		      
 		}
 	}
+
+	CHI_recapture_beiping = {
+
+		icon = generic_prepare_civil_war
+		allowed = {
+			tag = CHI
+		}
+
+		available = {
+			608 = { is_controlled_by = CHI  } 
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = yes
+		priority = 13
+		cancel_trigger = {
+	
+			OR = {
+				has_global_flag = chinese_civil_war_over
+				PRC = {
+					NOT = {
+						has_war_with = CHI
+					}
+				}
+			}
+		}
+	    
+		days_mission_timeout = 988 #should be available until Chinese Civil war ends#
+
+		complete_effect = {
+			news_event = KMT_Civilwar.17
+			PRC = {
+				add_war_support = -0.35
+				transfer_units_fraction= {
+				    target = CHI
+				    size = 0.5
+				    stockpile_ratio = 0.25
+				    army_ratio = 0.35
+				    navy_ratio = 0
+				    air_ratio = 0.5
+				    keep_unit_leaders_trigger = {
+				    	always = yes
+					}
+			    }
+			}
+		}
+
+		timeout_effect = {
+			add_war_support = -0.15
+		      
+		}
+	}
+}
+
+Sino_American_arms_deal_civilwar_category = {
+	buy_american_rifles = {
+		
+			allowed = {tag = CHI}
+			visible = { 
+				has_global_flag = USA_end_armsembargo
+			}
+			available = {
+				CHI = { has_global_flag = USA_end_armsembargo }
+			}
+			activation = { always = yes }
+			cost = 75
+			days_remove = 20
+		
+			
+			remove_effect = {
+				add_equipment_to_stockpile = {
+				type = infantry_equipment_0
+				amount = 8000
+				producer = USA
+				}
+			}
+			days_re_enable = 90 
+		}
+		
+		buy_american_support_equipment = {
+		
+			allowed = {tag = CHI}
+			visible = {has_global_flag = USA_end_armsembargo}
+			available = {
+				CHI = { has_global_flag = USA_end_armsembargo }
+			}
+			activation = { always = yes }
+			cost = 80
+			days_remove = 20
+		
+			
+			remove_effect = {
+				add_equipment_to_stockpile = {
+				  type = support_equipment
+				  amount = 1000
+				  producer = USA
+				}
+			}
+			days_re_enable = 90 
+		}
+		
+		buy_american_trucks = {
+		
+			allowed = {tag = CHI}
+			visible = {has_global_flag = USA_end_armsembargo}
+			available = {
+				CHI = { has_global_flag = USA_end_armsembargo }
+			}
+			activation = { always = yes }
+			cost = 80
+			days_remove = 20
+		
+			
+			remove_effect = {
+				add_equipment_to_stockpile = {
+				  type = motorized_equipment
+				  amount = 300
+				  producer = USA
+				}
+			}
+			days_re_enable = 90
+		}
+
+		buy_american_artillery = {
+		
+			allowed = {tag = CHI}
+			visible = {has_global_flag = USA_end_armsembargo}
+			available = {
+				CHI = { has_global_flag = USA_end_armsembargo }
+			}
+			activation = { always = yes }
+			cost = 100
+			days_remove = 30
+		
+			
+			remove_effect = {
+				add_equipment_to_stockpile = {
+				  type = artillery_equipment
+				  amount = 600
+				  producer = USA
+				}
+				add_equipment_to_stockpile = {
+				  type = auto_cannon_equipment
+				  amount = 400
+				  producer = USA
+				} 
+				add_equipment_to_stockpile = {
+				  type = direct_fire_gun_equipment
+				  amount = 400
+				  producer = USA
+				} 
+			}
+			days_re_enable = 90 
+		}
+		
+		buy_american_planes = {
+		
+			allowed = {tag = CHI}
+			visible = {has_global_flag = USA_end_armsembargo}
+			available = {
+				CHI = { has_global_flag = USA_end_armsembargo }
+			}
+			activation = { always = yes }
+			cost = 200
+			days_remove = 30
+		
+			
+			remove_effect = {
+				add_equipment_to_stockpile = {
+				  type = fighter_equipment
+				  amount = 400
+				  producer = USA
+				}
+			}
+			days_re_enable = 90
+		}
 }
 
 Sino_American_Relations_Taiwan_50s_category = {
