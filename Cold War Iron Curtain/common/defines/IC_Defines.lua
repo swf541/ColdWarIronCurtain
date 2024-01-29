@@ -107,6 +107,7 @@ NDefines.NMilitary.BASE_DIVISION_BRIGADE_GROUP_COST = 3 	--Base cost to unlock a
 NDefines.NMilitary.BASE_DIVISION_BRIGADE_CHANGE_COST = 3	--Base cost to change a regiment column.
 NDefines.NMilitary.BASE_DIVISION_SUPPORT_SLOT_COST = 1 	--Base cost to unlock a support slot
 NDefines.NMilitary.EXPERIENCE_COMBAT_FACTOR = 0.1 --Combat bonus units get from their experience. Default value is 0.25. Experience per unit level = -x, 0, x, 2x, 3x, level 2 being the "basic" level and always having 0% bonus.
+NDefines.NMilitary.MIN_DIVISION_BRIGADE_HEIGHT = 5 -- Unlocks max brigade height in division designer by default to better align with starting templates
 
 NDefines.NNavy.CARRIER_STACK_PENALTY = 8 -- The most efficient is 4 carriers in combat. 5+ brings the penalty to the amount of wings in battle.
 NDefines.NNavy.CARRIER_STACK_PENALTY_EFFECT = 0.1 -- Each carrier above the optimal amount decreases the amount of airplanes being able to takeoff by such %.
