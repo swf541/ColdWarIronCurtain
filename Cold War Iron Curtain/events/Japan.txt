@@ -18,6 +18,7 @@ add_namespace = jap_genelec_a
 add_namespace = jap_genelec_b
 add_namespace = jap_dissolution
 add_namespace = jap_shipbuilding
+add_namespace = jap_yoshida
 add_namespace = jap_hatoyama
 add_namespace = jap_kaishinto
 
@@ -1337,15 +1338,14 @@ country_event = { #Jiyu-to Formation
 			name = JAP_Jiyuto_party
 		}
 		custom_effect_tooltip = JAP_Jiyuto_Formation_tt
-		set_political_party = {
-			ideology = Liberal_Conservatism
-			popularity = 49
-		}
-		set_political_party = {
-			ideology = conservative
-			popularity = 11
-		}
 		hidden_effect = {
+			set_popularities = {
+				Liberal_Conservatism = 49
+				conservative = 11
+				Social_Democratic = 29
+				centrist = 7
+				communism = 4
+			}
 			JAP_LHC_count_reset_effect = yes
 			set_variable = { JAP_Seats6 = 29 }
 			set_variable = { JAP_LHC_counter = 1 }
@@ -1422,15 +1422,14 @@ country_event = { #Merger of Kokukyo-to and Minshu-to
 			ideology = centrism
 		}
 		custom_effect_tooltip = JAP_Kokuminto_Formation_tt
-		set_political_party = {
-			ideology = centrist
-			popularity = 18
-		}
-		set_political_party = {
-			ideology = conservative
-			popularity = 0
-		}
 		hidden_effect = {
+			set_popularities = {
+				Liberal_Conservatism = 50
+				conservative = 0
+				Social_Democratic = 29
+				centrist = 17
+				communism = 4
+			}
 			JAP_LHC_count_reset_effect = yes
 			set_variable = { JAP_Seats6 = 29 }
 			set_variable = { JAP_LHC_counter = 2 }
@@ -1518,6 +1517,13 @@ country_event = { #Shakai-to Splits Up
 			popularity = 10
 		}
 		hidden_effect = {
+			set_popularities = {
+				Liberal_Conservatism = 50
+				Social_Democratic = 18
+				socialist = 11
+				centrist = 17
+				communism = 4
+			}
 			JAP_LHC_count_reset_effect = yes
 			set_variable = { JAP_Seats6 = 29 }
 			set_variable = { JAP_LHC_counter = 3 }
@@ -1822,15 +1828,15 @@ news_event = { #Bakayaro Dissolution
 			name = "Ichiro Hatoyama"
 			ideology = conservatism
 		}
-		set_political_party = {
-			ideology = Liberal_Conservatism
-			popularity = 35
-		}
-		set_political_party = {
-			ideology = conservative
-			popularity = 9
-		}
 		hidden_effect = {
+			set_popularities = {
+				Liberal_Conservatism = 41
+				conservative = 9
+				Social_Democratic = 18
+				socialist = 11
+				centrist = 17
+				communism = 4
+			}
 			set_party_name = {
 				ideology = Liberal_Conservatism
 				long_name = JAP_Jiyuto_Yoshida_party_long
@@ -2002,6 +2008,10 @@ country_event = { #Formation of Nihon Minshu-to
 				id = jap_parties.8
 				days = 63
 			}
+			country_event = {
+				id = jap_yoshida.1
+				days = 12
+			}
 		}
 		}
 	}
@@ -2031,6 +2041,14 @@ country_event = { #Formation of Nihon Minshu-to
 		custom_effect_tooltip = JAP_blank_tt
 		custom_effect_tooltip = JAP_Niminto_Formation_tt
 		hidden_effect = {
+			set_popularities = {
+				Liberal_Conservatism = 31
+				conservative = 36
+				Social_Democratic = 18
+				socialist = 11
+				centrist = 0
+				communism = 4
+			}
 			JAP_LHC_count_reset_effect = yes
 			set_variable = { JAP_LHC_counter = 8 }
 			set_variable = { Jiyuto_Seats = 180 }
@@ -2069,7 +2087,68 @@ country_event = { #Formation of Nihon Minshu-to
 	}
 }
 
-news_event = { 
+country_event = { #No-Confidence Motion Passed
+	id = jap_yoshida.1 
+	immediate = {
+		log = "[GetDateText]: [Root.GetTag]: id = jap_yoshida.1"
+		hidden_effect = {
+		JAP = {
+			country_event = {
+				id = jap_yoshida.2
+				days = 1
+			}
+		}
+		}
+	}
+	title = jap_yoshida.1.t
+	desc = jap_yoshida.1.d
+	picture = GFX_JAP_Yoshida_Event_1
+	
+	trigger = {
+		tag = JAP
+	}
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = no
+	
+	option = {
+		name = jap_yoshida.1.a
+	}
+}
+
+country_event = { #Yoshida Resigns
+	id = jap_yoshida.2 
+	immediate = {
+		log = "[GetDateText]: [Root.GetTag]: id = jap_yoshida.2"
+		hidden_effect = {
+			JAP = {
+				news_event = {
+					id = jap_hatoyama.1
+					days = 3
+				}
+			}
+		}
+	}
+	title = jap_yoshida.2.t
+	desc = jap_yoshida.2.d
+	picture = GFX_JAP_Yoshida_Event_2
+	
+	trigger = {
+		tag = JAP
+	}
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = no
+	
+	option = {
+		name = jap_yoshida.2.a
+		custom_effect_tooltip = JAP_Yoshida_Resign_tt
+	}
+}
+
+news_event = { #Hatoyama Sworn In
 	id = jap_hatoyama.1
 	immediate = {
 		log = "[GetDateText]: [Root.GetTag]: id = jap_hatoyama.1"
@@ -2078,11 +2157,44 @@ news_event = {
 			set_politics = {
 				ruling_party = conservative
 			}
+			JAP_Hatoyama_Approval_Reset_Effect = yes
+			if = {
+				limit = {
+					JAP = { is_ai = no }
+				}
+				JAP_Big_Event_Hatoyama_Effect = yes
+			}
+			JAP_LHC_count_reset_effect = yes
+			set_variable = { JAP_Seats6 = 21 }
+			add_to_variable = {
+				var = JAP_Seats2
+				value = Jiyuto_H_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Jiyuto_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Shakaito_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Shakaito_L_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Kyosanto_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Ronoto_Seats
+			}
 		}
 	}
 	title = jap_hatoyama.1
 	desc = jap_hatoyama.1
-	picture = jap_hatoyama.1
+	picture = GFX_JAP_Hatoyama_Event_1
 
 	trigger = {
 		tag = JAP
@@ -2093,7 +2205,8 @@ news_event = {
 	major = no
 	
 	option = {
-		name = 
+		name = jap_hatoyama.1.a
+		custom_effect_tooltip = JAP_New_PM_Event_tt
 	}
 }
 
@@ -2115,9 +2228,9 @@ country_event = { #27th Elections 1955
 		}
 		}
 	}
-	title = jap_dissolution_event_title
-	desc = jap_dissolution_event_description
-	picture = GFX_JAP_Generic_Lower_House_Empty
+	title = jap_heaven_dissolution_event_title
+	desc = jap_heaven_dissolution_event_description
+	picture = GFX_JAP_Heaven_Dissolution_Event
 
 	trigger = {
 		tag = JAP
@@ -2128,7 +2241,7 @@ country_event = { #27th Elections 1955
 	major = no
 	
 	option = {
-		name = jap_dissolution_event_response
+		name = jap_heaven_dissolution_event_response
 	}
 }
 
@@ -2166,7 +2279,42 @@ news_event = { #27th Elections 1955
 	id = jap_genelec_b.2
 	immediate = {
 		log = "[GetDateText]: [Root.GetTag]: id = jap_genelec_b.2"
-		JAP = { clr_country_flag = JAP_Lower_House_Dissolved_flag }
+		hidden_effect = {
+			JAP = { clr_country_flag = JAP_Lower_House_Dissolved_flag }
+			JAP_LHC_count_reset_effect = yes
+			set_variable = { Jiyuto_H_Seats = 185 }
+			set_variable = { Jiyuto_Seats = 112 }
+			set_variable = { Kokukyoto_Seats = 0 }
+			set_variable = { Shakaito_L_Seats = 89 }
+			set_variable = { Shakaito_Seats = 67 }
+			set_variable = { Ronoto_Seats = 4 }
+			set_variable = { Kyosanto_Seats = 2 }
+			set_variable = { JAP_Seats6 = 8 }
+			add_to_variable = {
+				var = JAP_Seats2
+				value = Jiyuto_H_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Jiyuto_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Shakaito_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Shakaito_L_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Kyosanto_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Ronoto_Seats
+			}
+		}
 	}
 	title = jap_genelec_b.2.t
 	desc = jap_genelec_b.2.d
@@ -2314,6 +2462,24 @@ news_event = { #Shakai-to Reunification
 	
 	option = {
 		name = jap_parties.10.a
+		custom_effect_tooltip = JAP_Shakaito_Formation_tt
+		hidden_effect = {
+			set_popularities = {
+				Liberal_Conservatism = 31
+				conservative = 36
+				Social_Democratic = 0
+				socialist = 29
+				centrist = 0
+				communism = 4
+			}
+			set_party_name = {
+				ideology = socialist
+				long_name = JAP_Shakaito_party_long
+				name = JAP_Shakaito_party
+			}
+			set_variable = { JAP_LHC_counter = 10 }
+			set_variable = { Shakaito_Seats = 156 }
+		}
 	}
 }
 
@@ -2322,12 +2488,12 @@ country_event = { #LDP Platform
 	immediate = {
 		log = "[GetDateText]: [Root.GetTag]: id = jap_parties.11"
 		hidden_effect = {
-		JAP = {
-			news_event = {
-				id = jap_parties.12
-				days = 5
+			JAP = {
+				news_event = {
+					id = jap_parties.12
+					days = 5
+				}
 			}
-		}
 		}
 	}
 	title = jap_parties.11.t
@@ -2352,12 +2518,59 @@ news_event = { #LDP Formation
 	immediate = {
 		log = "[GetDateText]: [Root.GetTag]: id = jap_parties.12"
 		hidden_effect = {
-		JAP = {
-			country_event = {
-				id = jap_parties.13
-				days = 427
+			JAP = {
+				country_event = {
+					id = jap_parties.13
+					days = 427
+				}
 			}
-		}
+			if = {
+				limit = {
+					JAP = { is_ai = no }
+				}
+				JAP_Big_Event_LDP_Formation_Effect = yes
+			}
+			set_popularities = {
+				Liberal_Conservatism = 0
+				conservative = 67
+				Social_Democratic = 0
+				socialist = 29
+				centrist = 0
+				communism = 4
+			}
+			set_party_name = {
+				ideology = conservative
+				long_name = JAP_LDP_party_long
+				name = JAP_LDP_party
+			}
+			set_party_name = {
+				ideology = Liberal_Conservatism
+				long_name = JAP_LDP_party_long
+				name = JAP_LDP_party
+			}
+			set_variable = { JAP_LHC_counter = 11 }
+			JAP_LHC_count_reset_effect = yes
+			set_variable = { Jiminto_Seats = 290 }
+			set_variable = { Shakaito_Seats = 156 }
+			set_variable = { Ronoto_Seats = 4 }
+			set_variable = { Kyosanto_Seats = 2 }
+			set_variable = { JAP_Seats6 = 15 }
+			add_to_variable = {
+				var = JAP_Seats2
+				value = Jiminto_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Shakaito_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Kyosanto_Seats
+			}
+			add_to_variable = {
+				var = JAP_Seats4
+				value = Ronoto_Seats
+			}
 		}
 	}
 	title = jap_parties.12.t

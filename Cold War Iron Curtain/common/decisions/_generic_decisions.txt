@@ -1,4 +1,883 @@
 variables_calculation_category = {
+	Russia_Election_1991_Round_One = {
+		icon = generic_operation
+
+		allowed = {
+			tag = RUS
+		}
+
+		available = {
+			always = no
+		} 
+
+		days_mission_timeout = 70
+		days_remove = 70
+
+		fire_only_once = no
+
+		activation = {
+			always = no
+		}
+		modifier = {
+		}
+		#Event List
+		#All News Unless Noted Elsewhise
+		#Russia_1991_Election.0 Election Rules and Schedule Established 
+		#Russia_1991_Election.1 Overview of Candidates (Country and Pick Candidate to Play As)
+		#Russia_1991_Election.2 Yeltsin Victory
+		#Russia_1991_Election.3 Yeltsin v. Ryzhkov Runoff
+		#Russia_1991_Election.4 Yeltsin v. Zhirinovsky Runoff
+		#Russia_1991_Election.5 Yeltsin v. Tuleyev Runoff
+		#Russia_1991_Election.6 Yeltsin v. Bakatin Runoff
+		#Russia_1991_Election.7 Yeltsin v. Makashov Runoff
+		#Russia_1991_Election.8 Yeltsin Runoff Victory (Against Communist)
+		#Russia_1991_Election.9 Yeltsin Runoff Victory (Against Zhirinovsky)
+		#Russia_1991_Election.10 Ryzhkov Runoff Victory
+		#Russia_1991_Election.11 Zhirinovsky Runoff Victory
+		#Russia_1991_Election.12 Tuleyev Runoff Victory
+		#Russia_1991_Election.13 Bakatin Runoff Victory
+		#Russia_1991_Election.14 Makashov Runoff Victory
+		
+		timeout_effect = {
+			Calculate_Election_Results = yes
+			if = {
+				limit = {
+					check_variable = {
+						RUS_Runoff_Check = 1
+					}
+				}
+				if = {	#1991 Assume Only Yeltsin Can Break 50%
+					limit = {
+						check_variable = {
+							RUS_Winner_Value = 1
+						}
+					}
+					news_event = Russia_1991_Election.2
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_Runoff_Check = 2
+					}
+				}
+				activate_mission = Russia_Election_1991_Round_Two
+				RUS_Clear_Current_Election_Candidates_and_Statistics = yes	#Keep Issues and Voter Rolls
+				Yeltsin_Campaign_Launch_Runoff_1991 = yes
+				if = {
+					limit = {
+						check_variable = {
+							RUS_RunnerUp_Value = 2
+						}
+					}
+					Ryzhkov_Campaign_Launch_Runoff_1991 = yes
+					news_event = Russia_1991_Election.3 #Yeltsin v. Ryzhkov Runoff
+				}
+				else_if  = {
+					limit = {
+						check_variable = {
+							RUS_RunnerUp_Value = 3
+						}
+					}
+					Zhirinovsky_Campaign_Launch_Runoff_1991 = yes
+					news_event = Russia_1991_Election.4 #Yeltsin v. Zhirinovsky Runoff
+				}
+				else_if  = {
+					limit = {
+						check_variable = {
+							RUS_RunnerUp_Value = 4
+						}
+					}
+					Tuleyev_Campaign_Launch_Runoff_1991 = yes
+					news_event = Russia_1991_Election.5 #Yeltsin v. Tuleyev Runoff
+				}			
+				else_if  = {
+					limit = {
+						check_variable = {
+							RUS_RunnerUp_Value = 5
+						}
+					}
+					Bakatin_Campaign_Launch_Runoff_1991 = yes
+					news_event = Russia_1991_Election.6 #Yeltsin v. Bakatin Runoff
+				}			
+				else_if  = {
+					limit = {
+						check_variable = {
+							RUS_RunnerUp_Value = 6
+						}
+					}
+					Makashov_Campaign_Launch_Runoff_1991 = yes
+					news_event = Russia_1991_Election.7 #Yeltsin v. Makashov Runoff
+				}	
+				else = { }
+			}
+			else = { }
+		}
+	}
+	Russia_Election_1991_Round_Two = {
+		icon = generic_operation
+
+		allowed = {
+			tag = RUS
+		}
+
+		available = {
+			always = no
+		} 
+
+		days_mission_timeout = 14
+		days_remove = 14
+
+		fire_only_once = no
+
+		activation = {
+			always = no
+		}
+		modifier = {
+		}
+
+		timeout_effect = {
+			Calculate_Election_Results = yes
+			if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 1
+					}
+					check_variable = {
+						RUS_RunnerUp_Value = 3
+					}
+				}
+				news_event = Russia_1991_Election.9 
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 1
+					}
+				}
+				news_event = Russia_1991_Election.8
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 2
+					}
+				}	
+				news_event = Russia_1991_Election.10 #Ryzhkov Runoff Victory
+				create_country_leader = {
+					name = "Nikolai Ryzhhkov"
+					picture = "Nikolai_Ryzhhkov.dds"
+					ideology = marxism_leninism
+				}
+				set_politics = {
+					ruling_party = communism
+					elections_allowed = no
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 3
+					}
+				}	
+				news_event = Russia_1991_Election.11 #Zhirinovsky Runoff Victory
+				create_country_leader = {
+					name = "Vladimir Zhirinovsky"
+					picture = "Vladimir_Zhirinovsky.dds"
+					ideology = fascism_ideology
+				}
+				set_politics = {
+					ruling_party = fascism
+					elections_allowed = no
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 4
+					}
+				}	
+				news_event = Russia_1991_Election.12 #Tuleyev Runoff Victory
+				create_country_leader = {
+					name = "Aman Tuleyev"
+					picture = "Aman_Tuleyev.dds"
+					ideology = liberal_communism
+				}
+				set_politics = {
+					ruling_party = communism
+					elections_allowed = no
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 5
+					}
+				}	
+				news_event = Russia_1991_Election.13 #Bakatin Runoff Victory
+				create_country_leader = {
+					name = "Vadim Bakatin"
+					picture = "Vadim_Bakatin.dds"
+					ideology = liberal_communism
+				}
+				set_politics = {
+					ruling_party = communism
+					elections_allowed = no
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 6
+					}
+				}	
+				news_event = Russia_1991_Election.14 #Makashov Runoff Victory
+				create_country_leader = {
+					name = "Albert Makashov"
+					picture = "Albert_Makashov.dds"
+					ideology = stalinism
+				}
+				set_politics = {
+					ruling_party = communism
+					elections_allowed = no
+				}
+			}
+			else = { }
+		}
+	}
+	#14 Days
+    The_Media_Cycle_RUS = {
+        icon = generic_operation
+
+        allowed = {
+            tag = RUS
+        }
+
+        available = {
+            custom_trigger_tooltip = {
+                tooltip = RUS_media_cycle_available_TT		
+                always = no
+            }
+            
+        } 
+
+        days_mission_timeout = 4
+		days_remove = 1 
+
+        fire_only_once = no
+
+        activation = {
+            always = no
+        }
+        modifier = {
+        }    
+
+        timeout_effect = {
+            custom_effect_tooltip = "RUS_ADS_TT"
+            #AI DO STUFF HERE
+
+
+            #Weekly Stat Resets
+            Russia_Election_Cycle_Stat_Updates = yes
+
+            #Media Cycle Dates for GUI
+            set_variable = {
+                current_media_cycle_start = global.num_days
+            }
+            add_to_variable = {
+                current_media_cycle_start = 1    #Date Format Fix
+            }
+            set_variable = {
+                next_media_cycle_start = current_media_cycle_start
+            }
+            add_to_variable = {
+                next_media_cycle_start = 4    
+            }
+            set_variable = {
+                second_next_media_cycle_start = next_media_cycle_start
+            }
+            add_to_variable = {
+                second_next_media_cycle_start = 4
+            }
+
+            modulo_variable = {
+                var = current_media_cycle_start
+                value = 365
+            }
+            modulo_variable = {
+                var = next_media_cycle_start
+                value = 365
+            }
+            modulo_variable = {
+                var = second_next_media_cycle_start
+                value = 365
+            }
+            #December
+            if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 334
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 12
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -334
+                }              
+            }
+            #November
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 304
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 11
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -304
+                }              
+            }
+            #October
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 273
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 10
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -273
+                }              
+            }
+            #September
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 243
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 9
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -243
+                }              
+            }
+            #August
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 212
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 8
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -212
+                }              
+            }
+            #July
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 181
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -181
+                }              
+            }
+            #June
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 151
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 6
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -151
+                }              
+            }
+            #May
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 120
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 5
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -120
+                }              
+            }
+            #April
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 90
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -90
+                }              
+            }
+            #March
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 59
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 3
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -59
+                }              
+            }
+            #February
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 31
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 2
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -31
+                }              
+            }
+            #January
+            else = {
+                set_variable = {
+                    current_media_cycle_start_month = 1
+                }
+            }
+            #December
+            if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 334
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 12
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -334
+                }              
+            }
+            #November
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 304
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 11
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -304
+                }              
+            }
+            #October
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 273
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 10
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -273
+                }              
+            }
+            #September
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 243
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 9
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -243
+                }              
+            }
+            #August
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 212
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 8
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -212
+                }              
+            }
+            #July
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 181
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -181
+                }              
+            }
+            #June
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 151
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 6
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -151
+                }              
+            }
+            #May
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 120
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 5
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -120
+                }              
+            }
+            #April
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 90
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -90
+                }              
+            }
+            #March
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 59
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 3
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -59
+                }              
+            }
+            #February
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 31
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 2
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -31
+                }              
+            }
+            #January
+            else = {
+                set_variable = {
+                    next_media_cycle_start_month = 1
+                }
+            }
+            #December
+            if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 334
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 12
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -334
+                }              
+            }
+            #November
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 304
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 11
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -304
+                }              
+            }
+            #October
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 273
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 10
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -273
+                }              
+            }
+            #September
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 243
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 9
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -243
+                }              
+            }
+            #August
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 212
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 8
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -212
+                }              
+            }
+            #July
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 181
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -181
+                }              
+            }
+            #June
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 151
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 6
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -151
+                }              
+            }
+            #May
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 120
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 5
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -120
+                }              
+            }
+            #April
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 90
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -90
+                }              
+            }
+            #March
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 59
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 3
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -59
+                }              
+            }
+            #February
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 31
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 2
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -31
+                }              
+            }
+            #January
+            else = {
+                set_variable = {
+                    second_next_media_cycle_start_month = 1
+                }
+            }
+
+            #Advert Effects Here
+            #RUS_election_ad_cycle_buyer = Playing_As                      #Buyer
+            #RUS_election_ad_cycle_type = selected_dem_topic               #Topic
+            #RUS_election_ad_cycle_target = RUS_election_ad_target_selected #Target
+            #RUS_election_ad_cycle_state = RUS_RUS_election_MEDIA_DETAILS   #State
+            #RUS_election_ad_cycle_status = 2                              #When Ads Conclude (2 Media Cycles Away)
+            #RUS_election_ad_cycle_format = media_type                     #Newspaper, Radio, TV
+            #RUS_election_ad_cycle_target_position                         #Target Position
+
+            
+            for_each_loop = {
+                array = RUS_election_ad_cycle_buyer  
+                if = {
+                    limit = {
+                        check_variable = {
+                            RUS_election_ad_cycle_status^i = 2
+                        }
+                    }
+                    add_to_variable = {
+                        RUS_election_ad_cycle_status^i = -1
+                    }
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            RUS_election_ad_cycle_status^i = 1
+                        }
+                    }
+                    add_to_variable = {
+                        RUS_election_ad_cycle_status^i = -1
+                    }
+
+                    Russia_Ad_Position_Finder = yes #Get Position of Target
+                    if = {
+                        limit = {
+                            check_variable = { 
+                                RUS_election_ad_cycle_type^i = 1
+                            }
+                        }
+                        set_variable = {
+                            support_modifier = 1
+                        }
+                    }
+                    if = {
+                        limit = {
+                            check_variable = {
+                                RUS_election_ad_cycle_type^i = 2
+                            }
+                        }
+                        set_variable = {
+                            support_modifier = -1
+                        }
+                    }
+                    else = {
+                        set_variable = {
+                            support_modifier = 1
+                        }                      
+                    }
+                    randomize_variable = {
+                        var = Support_Change
+                        distribution = uniform
+                        min = 0.5
+                        max = 2
+                    }
+                    multiply_variable = {
+                        Support_Change = RUS_election_ad_cycle_format^i
+                    }
+                    multiply_variable = {
+                        Support_Change = support_modifier
+                    }
+                    var:RUS_election_ad_cycle_state^i = {
+                        add_to_variable = {
+                            Canidate_Support^RUS.RUS_election_ad_cycle_target_position = RUS.Support_Change
+                        }
+                    }
+                }
+                else = {
+                }
+            }
+            #Refresh generate_campaign_map_russia Here
+            generate_campaign = yes
+
+            activate_mission = The_Media_Cycle_RUS
+        }
+    }
 	SPACE_RACE_RESEARCHING_TECH = {
 		allowed = {
 		
@@ -3414,6 +4293,25 @@ war_measures = {
 		complete_effect = {
 		}
    }
+   add_research_slots = {
+		icon = generic_industry
+		allowed = {
+		}
+		available = {
+			is_debug = yes
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			add_research_slot = 5
+		}
+	}
    focus_tree = {
 		icon = generic_industry
 		allowed = {
