@@ -1,0 +1,59 @@
+literacy_calculation = {
+	#log = "[?THIS.modifier@education_gain_rate]"
+
+	set_variable = { a = THIS.modifier@education_gain_rate }
+	multiply_variable = { a = 0.1 }
+
+	# let modifier be 0.01, then a is 0.001, lowest possible
+
+	#log = "a: [?a]"
+
+	every_owned_state = {
+		set_variable = { THIS.literacy_state_factor = THIS.literate_educated }
+
+		# let literacy be 50
+
+		multiply_variable = { THIS.literacy_state_factor = -0.05 }
+		multiply_variable = { THIS.literacy_state_factor = PREV.a }
+
+		#log = "Literacy: [?THIS.literate_educated]"
+
+		#now literacy would be 50*0.001*-0.05 OR 0.002(5)
+		set_variable = { THIS.func_coefficient = 5}
+		multiply_variable = { THIS.func_coefficient = PREV.a } 
+
+		#second part of function as two things are being multiplied by a/100 in f_a(x)
+
+		set_variable = { THIS.func_value = THIS.literacy_state_factor }
+		add_to_variable = { THIS.func_value = THIS.func_coefficient }
+
+		# calculation of function 
+
+		multiply_variable = { THIS.func_value = 5 }
+		add_to_variable = { THIS.func_value = -0.003 }
+
+		#extra calculations
+
+		if = {
+			limit = { check_variable = { PREV.modifier@education_gain_rate < 0.1 }}
+			add_to_variable = { THIS.func_value = -0.007 }		
+		}
+
+		#should modifier fall too high, make the decrease larger, particularily so that people dont just decrease education spending
+
+		#log = "Func value: [?THIS.func_value]"
+
+		add_to_variable = { THIS.literate_educated = THIS.func_value }
+
+		clamp_variable = {
+			var = THIS.literate_educated
+			min = 0
+			max = 100
+		}
+
+	}
+}
+
+# f_a(x) =  (-x * 0.05 + 5  ) * a/100
+# with minor changes like *50 and -0.003/-0.01
+# from 1 <= a <= 20
