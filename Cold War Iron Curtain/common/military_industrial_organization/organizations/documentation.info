@@ -1,0 +1,505 @@
+# Military Industrial Organization (MIO) database
+#
+# MIOs are replacement for design companies.
+# They give research bonuses, but most importantly they give bonuses to equipments (quality and production).
+#
+# 1 MIO is composed of 1 tree of unlockable traits.
+# The list of equipment a MIO can match is set in the MIO.
+# Then the equipment stat & production stat for the bonus is set in the traits.
+# The bonus is the combinaison of the two - e.g. soft attack for infantry equipment.
+# 
+# Trait can also unlock modifier for the MIO itself - in that case the equipment type does not matter.
+#
+# See "game/common/defines/00_graphics.lua" for configuration of coloring of lines in the trait trees
+# (for example, "TRAIT_LINE_ASSIGNED_COLOR").
+#
+# Example with all possible parts:
+# my_MIO_token = {
+#	name = loc_key # optional
+#	# if name provided, use TAG_loc_key if it exists. if not use loc_key (where TAG is the tag of the MIO owner)
+#	# if localization key TAG_my_MIO_token exists, use it 
+#	# else use loc key my_MIO_token
+#	# loc key may use scripted loc, scope will be set with this MIO
+#
+#	icon = GFX_key # optional
+#	# if icon provided, use GFX_key
+#	# if gfx key GFX_TAG_my_MIO_token exists, use it (where TAG is the tag of the MIO owner)
+#	# if gfx key GFX_my_MIO_token exists, use it
+#	# else use GFX_idea_unknown
+#
+#	allowed = { ... } # mandatory
+#   # country scope
+#   # allowed is evaluated when starting the game for all countries (even the ones that don't exist yet)
+#   # if trigger returns true, an instance of this MIO is created for this country
+#
+#	visible = { ... } # optional, default is always = yes
+#   # current MIO scope - FROM = country
+#   # visible is evaluated when displaying the MIO UIs
+#   # if trigger returns false, then the MIO is not visible for the player
+#
+#	available = { ... } # optional, default is always = yes
+#   # current MIO scope - FROM = country
+#   # available is evaluated when displaying the MIO UIs
+#   # if trigger returns false, then the MIO is visible but disabled and greyed-out
+#
+#   # for AI and script, a MIO is considered enabled if it is both visible and available
+#
+#   equipment_type = { equipment_type_token1 }
+#	# Equipment archetypes & categories used to match the MIO with variants
+#	# cf. script enum script_enum_equipment_bonus_type for possible values
+#	# This also works with equipment groups that can be found in game/common/equipment_groups
+#
+# 	research_categories = { infantry_weapons }
+#	# Research categories used to match the MIO with technlogies
+#	# Must match categories in game/common/technologies files
+#
+#	on_design_team_assigned_to_tech = { ... }
+#	on_design_team_assigned_to_variant = { ... }
+#	on_industrial_manufacturer_assigned = { ... }
+#	on_tech_research_cancelled = { ... }
+#	on_tech_research_completed = { ... }
+#	on_industrial_manufacturer_unassigned = { ... }
+#	# optional on-action effects - executed with current MIO scope and FROM = country
+#
+#   research_bonus = 0.2 # optional, default is define DESIGN_TEAM_RESEARCH_BONUS
+#   task_capacity = 3 # optional, default is define DEFAULT_INITIAL_TASK_CAPACITY
+#
+#
+#	ai_will_do = {
+#		...
+#	}
+#   # current MIO scope - FROM = country
+#	# AI weight modifier for this organization - optional
+#	# For documentation, see examples of ai_will_do throughout the content
+#
+#	# Flavor texts are displayed above the trait tree.
+#	# They are typically here to describe a column of traits - there is only room for 1 line!
+#	# You can have several flavor texts - repeat the tree_flavor_text block
+#	# use x to choose where to put the text on the horizontal axis.
+#	# x should be the horizontal coordinate of the cell where the center of the text will be.
+#	# For the text to be aligned with a point between 2 cells, use a decimal number. (e.g. x = 1.2)
+#	tree_header_text = {
+#		text = my_flavor_text_loc_key
+#		x = 1
+#	}
+#
+#	# In addition to the traits in trees, MIO can have an initial trait.
+#	# This one is unlocked from the start, and the bonuses applies directly.
+#	initial_trait = {
+#		# Only the following parameters are relevant for initial traits - all optional
+#		# See Trait parameters below for more details.
+#		name = my_loc_key # token initial_trait will be used for default name
+#		limit_to_equipment_type = { ... }
+#		equipment_bonus = { ... }
+#		production_bonus = { ... }
+#		organization_modifier = { ... }
+#	}
+#
+#	# Add traits to the tree
+#   # you can add as many as needed by repeating the trait block
+#	trait = {
+#		token = upgrade_1 # mandatory
+#		name = loc_key # optional
+#		# if name provided, use TAG_loc_key if it exists. if not use loc_key (where TAG is the tag of the MIO owner)
+#		# if localization key TAG_my_MIO_token_upgrade_1 exists, use it 
+#		# else use loc key my_MIO_token_upgrade_1
+#
+#		icon = GFX_key # optional
+#		# if icon provided, use GFX_key
+#		# if gfx key GFX_TAG_my_MIO_token_upgrade_1 exists, use it (where TAG is the tag of the MIO owner)
+#		# if gfx key GFX_my_MIO_token_upgrade_1 exists, use it
+#		# else use GFX_idea_unknown
+#
+#		special_trait_background  = yes # optional - default no
+#		# if yes, trait background will be golden to indicate an interesting trait
+#
+#		# if your trait is not the first in the tree, it needs at least one parent specified
+#       # with parent or any_parent
+#		parent = {
+#           traits = { parent traits }
+#           num_parents_needed = X # The number of parents that needs to be unlocked, default 1
+#       }
+#       any_parent = { parent traits } # Short hand for "parent = { traits = { parent traits } num_parents_needed = 1 }"
+#       all_parents = { parent traits} # Short hand for "parent = { traits = { parent traits } num_parents_needed = N }" where N is the number of parent traits
+#
+#		# The trait can be mutually exclusive with another (or more)
+#		# Note that the other trait should also have the mutually_exclusive parameter set
+#		mutually_exclusive= { upgrade4 }
+#
+#		visible = { ... } # optional, default is always = yes
+#   	# current MIO scope - FROM = country
+#   	# visible is evaluated when displaying the MIO UIs
+#   	# if trigger returns false, then the trait is not visible for the player
+#
+#		available = { ... } # optional, default is always = yes
+#   	# current MIO scope - FROM = country
+#   	# available is evaluated when displaying the MIO UIs
+#   	# if trigger returns false, then the trait is visible but disabled and greyed-out
+#
+#   	# for AI and script, a trait is considered enabled if it is both visible and available
+#
+#		on_complete = { ... } # optional
+#		# current MIO scope - FROM = country
+#		# Effects that will be executed when the trait is completed (aka unlocked)
+#
+#		limit_to_equipment_type = { ... } # Optional
+#		# By default, the bonuses in traits are applied to the equipment types at MIO level
+#		# But you can restrict them to equipment type contained in the ones at MIO level
+#		# eg. if MIO has list of equipment archetypes { light_armor medium_tank }, you may limit to archetype { light_tank }
+#		# eg. if MIO has equipment category { armor }, you may limit to archetypes { light_tank medium_tank }
+#		# This also works with equipment groups that can be found in game/common/equipment_groups
+#
+#       # Defines the bonus given when the trait is unlocked, and the MIO is assigned to an equipment variant
+#		# cf. script enum script_enum_equipment_stat for possible values
+#		equipment_bonus = {
+#			reliability = 0.2
+#			soft_attack = 0.1 # accepts as many stats as needed
+#		}
+#       # Defines the bonus given when the trait is unlocked, and the MIO is assigned to a production line
+#		# cf. script enum script_enum_production_stat for possible values
+#		production_bonus = {
+#			production_cost_factor = -0.1
+#			production_capacity_factor = 0.1 # accepts as many stats as needed
+#		}
+#
+#		# Defines modifiers that will apply on the Organization the trait is part of.
+#		# Only use modifiers relevant for MIOs - full list below.
+#		organization_modifier = {
+#			military_industrial_organization_research_bonus = 0.1
+#			military_industrial_organization_design_team_assign_cost = -0.33
+#			military_industrial_organization_design_team_change_cost = -0.5
+#			military_industrial_organization_industrial_manufacturer_assign_cost = -0.66
+#			military_industrial_organization_task_capacity = 2
+#			military_industrial_organization_size_up_requirement = -0.2
+#			military_industrial_organization_funds_gain = 0.5
+#		}
+#
+#		# Defines where the trait will be positioned in the tree grid (in the MIO Details UI)
+#       # x=0 y=0 is the top left position
+#       # Careful to not reuse twice the same position in the same tree
+#		position = { x=1 y=0 }
+#		# by default position is the absolute coordinate in the tree grid.
+#		# if relative_position_id is provided, it becomes a delta applied to the input trait position
+#		relative_position_id = trait_token
+#
+#		# AI weight modifier for this trait
+#		# For documentation, see examples of ai_will_do throughout the content
+#		# Warning : if the trait is part of a central tree, the trait's ai_will_do will override the central tree's!
+#		ai_will_do = {
+#			...
+#		}
+#	 }
+# }
+#
+# Another example where we build a new MIO by reusing an existing one
+# my_quick_unoriginal_MIO = {
+#	include = my_MIO_token
+#	# By default, every part of the my_MIO_token will be reused.
+#	# But you may override any part
+#	allowed = { ... }
+#	icon = another_GFX_key
+#	research_bonus = 0.3
+#
+#	# In order to override with default/empty value, put parameter name in delete_included_values
+#	# All parameters are eligible except the trait ones (see below)
+#	delete_included_values = { name on_design_team_assigned_to_variant initial_trait ... }
+#
+#	# For the initial trait
+#	# Usual trait API - just fill parts you want to override - the rest will keep the original values
+#	initial_trait = {
+#		icon = another_trait_GFX_key
+#	}
+#
+#	# Same for the traits that are copied into the including MIO as they are.
+#	# Use the following specific parameters to modify them.
+#	add_trait = { ... } # add a trait to the included tree - usual trait API
+#	remove_trait = { trait_token }
+#	override_trait = {
+#		token = trait_token # must match a trait in included MIO
+#		# Usual trait API - just fill parts you want to override - the rest will keep the original values
+#		equipment_bonus = { ... }
+#		is_available = { ... }
+#		# In order to override with default/empty value, put parameter name in delete_included_values
+#		# All parameters are eligible
+#		delete_included_values = { equipment_bonus relative_position_id ...  }
+#   }
+#	# !Warning! if included and including MIO are in 2 seperate files, you will need to "save" the 2 files to hot-reload the result.
+# }
+# NB: there are no load order constriction when using include. The included MIO just needs to exists somewhere in the organizations directory.
+
+
+
+
+########  #######  ##     ## #### ########  ##     ## ######## ##    ## ########     ######  ########    ###    ########  ######  
+##       ##     ## ##     ##  ##  ##     ## ###   ### ##       ###   ##    ##       ##    ##    ##      ## ##      ##    ##    ## 
+##       ##     ## ##     ##  ##  ##     ## #### #### ##       ####  ##    ##       ##          ##     ##   ##     ##    ##       
+######   ##     ## ##     ##  ##  ########  ## ### ## ######   ## ## ##    ##        ######     ##    ##     ##    ##     ######  
+##       ##  ## ## ##     ##  ##  ##        ##     ## ##       ##  ####    ##             ##    ##    #########    ##          ## 
+##       ##    ##  ##     ##  ##  ##        ##     ## ##       ##   ###    ##       ##    ##    ##    ##     ##    ##    ##    ## 
+########  ##### ##  #######  #### ##        ##     ## ######## ##    ##    ##        ######     ##    ##     ##    ##     ######  
+
+
+
+###  ##  #  # # #  ## 
+ #  #  # ## # # # #   
+ #  #### # ## ##   #  
+ #  #  # #  # # #   # 
+ #  #  # #  # # # ##  
+
+#maximum_speed
+#reliability
+#defense
+#breakthrough
+#armor_value
+#soft_attack
+#hard_attack
+#ap_attack
+#air_attack
+#build_cost_ic
+#fuel_consumption
+#hardness
+#armor_value
+#build_cost_ic
+#entrenchment - only if you have DLC NSB  and module dozer_blade
+#fuel_capacity - only if you have DLC NSB  and module expanded_fuel_tank
+
+
+
+ ## #  # ### ###   ## 
+#   #  #  #  #  # #   
+ #  ####  #  ###   #  
+  # #  #  #  #      # 
+##  #  # ### #    ##  
+
+#lg_armor_piercing (requires modules)
+#lg_attack (requires modules)
+#hg_armor_piercing (requires modules)
+#hg_attack (requires modules)
+#torpedo_attack (requires modules)
+#sub_attack (requires modules)
+#anti_air_attack (requires modules)
+#armor_value (requires modules)
+#surface_detection 
+#sub_detection (requires modules)
+#sub_visibility (sub only)
+#surface_visibility (surface only)
+#naval_speed 
+#reliability
+#naval_range
+#max_strength
+#fuel_consumption
+#build_cost_ic
+#manpower
+#naval_supremacy_factor
+#naval_torpedo_enemy_critical_chance_factor (if you have modules adding it)
+#naval_torpedo_damage_reduction_factor (if you have modules adding it)
+#carrier_size (this will get very bad for you I promise, equipment modifiers are a mistake)
+#mines_sweeping (only MTG and with modules)
+#mines_planting (only with MTG and modules)
+#naval_torpedo_hit_chance_factor (requires modules)
+#naval_light_gun_hit_chance_factor (requires modules)
+#naval_heavy_gun_hit_chance_factor (requires modules)
+
+
+
+###  #    ##  #  # ###  ## 
+#  # #   #  # ## # #   #   
+###  #   #### # ## ##   #  
+#    #   #  # #  # #     # 
+#    ### #  # #  # ### ##  
+
+#air_superiority
+#reliability
+#naval_strike_attack
+#naval_strike_targetting
+#manpower
+#fuel_consumption
+#build_cost_ic
+#resources
+#thrust - only if you have BBA DLC
+#weight - only if you have BBA DLC
+#maximum_speed
+#air_range
+#air_agility
+#air_attack
+#air_defence
+#surface_detection
+#sub_detection
+#air_ground_attack
+#air_bombing
+#mines_planting - if you have MtG and BBA
+#mines_sweeping - if you have MtG and BBA
+#night_penalty - only if you have BBA DLC (you need to have module because base value is 0 - radio navigatio
+
+
+
+#   #  ##  ### ### ###  ### ### #   
+## ## #  #  #  #   #  #  #  #   #   
+# # # ####  #  ##  ###   #  ##  #   
+#   # #  #  #  #   #  #  #  #   #   
+#   # #  #  #  ### #  # ### ### ### 
+
+
+##############################
+##### INFANTRY EQUIPMENT #####
+##############################
+#reliability
+#maximum_speed
+#defense
+#breakthrough
+#hardness - it is in the script, but the value is set to 0 (in the game, the UI doesn't show this value)
+#armor_value - it is in the script, but the value is set to 0 (in the game, the UI doesn't show this value)
+#soft_attack
+#hard_attack
+#ap_attack
+#air_attack - it is in the script but the value is set to 0 (in the game, the UI doesn't show this value)
+#build_cost_ic
+
+##############################
+##### SUPPORT EQUIPMENT ######
+##############################
+#reliability
+#build_cost_ic
+
+
+#############################
+#### ARTILLERY EQUIPMENT ####
+#############################
+#reliability
+#defense
+#breakthrough
+#hardness
+#armor_value
+#soft_attack
+#hard_attack
+#ap_attack
+#air_attack
+#build_cost_ic
+
+############################
+#### ANTI-AIR EQUIPMENT ####
+############################
+#reliability
+#defense
+#breakthrough
+#hardness
+#armor_value
+#soft_attack
+#hard_attack
+#ap_attack
+#air_attack
+#build_cost_ic
+
+#############################
+#### ANTI-TANK EQUIPMENT ####
+#############################
+#reliability
+#defense
+#breakthrough
+#hardness
+#armor_value
+#soft_attack
+#hard_attack
+#ap_attack
+#air_attack
+#build_cost_ic
+
+####################################
+#### ROCKET ARTILLERY EQUIPMENT ####
+####################################
+#reliability
+#defense
+#breakthrough
+#hardness
+#armor_value
+#soft_attack
+#hard_attack
+#ap_attack
+#air_attack
+#build_cost_ic
+
+
+##############################
+#### MOTORIZED EQUIPMENT #####
+##############################
+#maximum_speed
+#reliability
+#hardness
+#breakthrough
+#build_cost_ic
+#fuel_consumption
+
+####################################
+#### MOTORIZED ROCKET EQUIPMENT ####
+####################################
+#reliability
+#defense
+#breakthrough
+#hardness
+#armor_value
+#soft_attack
+#hard_attack
+#ap_attack
+#air_attack
+#build_cost_ic (edited)
+
+###############################
+#### MECHANIZED EQUIPMENT #####
+###############################
+#maximum_speed
+#reliability
+#defense
+#breakthrough
+#hardness
+#armor_value
+#ap_attack
+#air_attack
+#build_cost_ic
+#fuel_consumption
+
+#########################################
+#### AMPHIBIOUS MECHANIZED EQUIPMENT ####
+#########################################
+#maximum_speed
+#reliability
+#defense
+#breakthrough
+#hardness
+#armor_value
+#ap_attack
+#air_attack
+#build_cost_ic
+#fuel_consumption
+
+
+################################
+#### ARMORED CAR EQUIPMENT #####
+################################
+#maximum_speed
+#reliability
+#defense
+#breakthrough
+#hardness
+#armor_value
+#soft_attack
+#hard_attack
+#ap_attack
+#air_attack
+#build_cost_ic
+#fuel_consumption
+
+
+##########################
+#### TRAIN EQUIPMENT #####
+##########################
+#armor_value
+#build_cost_ic
+#air_attack
+
+################################
+#### RAILWAY GUN EQUIPMENT #####
+################################
+#reliability
+#maximum_speed
+#railway_gun_attack
+#build_cost_ic

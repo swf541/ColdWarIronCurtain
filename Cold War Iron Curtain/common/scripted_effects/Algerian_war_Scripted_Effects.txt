@@ -1,0 +1,397 @@
+spawn_algerian_war_units_fln = {
+    set_variable = {
+        available_fln_units = ALG_deployed_manpower
+    }
+    divide_variable = {
+        available_fln_units = 8000
+    }
+    round_variable = available_fln_units
+    set_variable = {
+        FLN_loop_units = available_fln_units
+    }
+	while_loop_effect = {
+		limit = {
+			check_variable = {
+				FLN_loop_units > 0
+			}	
+		}
+        subtract_from_variable = {
+            FLN_loop_units = 1
+        }
+        meta_effect = {
+            text = {
+                #create_unit = {
+                    #division = "name = \"Katiba\" division_template = \"Katiba\" start_experience_factor = 0.[EXP] start_equipment_factor = 1"
+                    #owner = ALG
+                #}  
+            }
+            EXP = "[?ALG_deployed_experience]"
+        }
+
+    }
+}
+
+algerian_war_conflict_casuality_end_script = {
+
+            ALG = {
+                set_country_flag = {
+                    flag = recent_conflict_algeria
+                    days = 50
+                    value = 1
+                }
+            }
+            ALE = {
+                set_country_flag = {
+                    flag = recent_conflict_algeria
+                    days = 50
+                    value = 1
+                }
+            }
+            FRA = {
+                set_country_flag = {
+                    flag = recent_conflict_algeria
+                    days = 50
+                    value = 1
+                }
+            }
+            if = {
+                limit = {
+                    has_country_flag = Oran_Operation
+                }
+                513 = {
+                    save_event_target_as = state_target_algeria
+                }  
+            }
+            else_if = {
+                limit = {
+                    has_country_flag = Constatine_Operation
+                }
+                460 = {
+                    save_event_target_as = state_target_algeria
+                }  
+            }
+            else = {
+                1587 = {
+                    save_event_target_as = state_target_algeria
+                }  
+            }
+            set_variable = {
+                ALG.Algerian_Strength_Strength_Old = ALG.Algerian_Strength_Strength
+            }
+            set_variable = {
+                FRA.Algerian_Strength_Strength_Old = FRA.Algerian_Strength_Strength
+            }
+			count_inflicted_casualties_on_current_enemies = yes
+            ALE = {
+                count_inflicted_casualties_on_current_enemies = yes
+            }
+			FRA = {
+				count_inflicted_casualties_on_current_enemies = yes
+			}
+			set_variable = {
+				French_Casualties_Algerian_Strength = current_inflicted_casualties_on_@FRA
+			}
+			set_variable = {
+				Algerian_Casualties_Algerian_Strength = FRA.current_inflicted_casualties_on_@ALG
+			}
+            add_to_variable = {
+                Algerian_Casualties_Algerian_Strength = ALE.current_inflicted_casualties_on_@ALG
+            }
+			set_variable = {
+				Algerian_Strength_Strength_Bonus = French_Casualties_Algerian_Strength
+			}
+			set_variable = {
+				French_Algerian_Strength_Strength_Bonus = Algerian_Casualties_Algerian_Strength
+			}
+			set_variable = {
+				ALG.French_Casualties_Algerian_Strength_Display = FRA.current_inflicted_casualties_on_@ALG
+			}
+			set_variable = {
+				ALG.Algerian_Casualties_Algerian_Strength_Display = ALG.current_inflicted_casualties_on_@FRA
+			} 
+			multiply_variable = {
+				ALG.French_Casualties_Algerian_Strength_Display = 1000
+			}
+			multiply_variable = {
+				ALG.Algerian_Casualties_Algerian_Strength_Display = 1000
+			}
+            if = {
+                limit = {
+                    country_exists = ALE
+                }
+                set_variable = {
+                    FRA.current_inflicted_casualties_on_@ALG = ALE.current_inflicted_casualties_on_@ALG
+                }
+            }
+			if = {
+				limit = {
+					check_variable = {
+						FRA.current_inflicted_casualties_on_@ALG > ALG.current_inflicted_casualties_on_@FRA
+					}
+				}
+				set_variable = {
+					experience_loss = FRA.current_inflicted_casualties_on_@ALG
+				}
+				multiply_variable = {
+					experience_loss = 0.1
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.ALG_deployed_experience = experience_loss
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.ALG_deployed_manpower = ALG.French_Casualties_Algerian_Strength_Display
+				}
+                if = {
+                    limit = {
+                        check_variable = {
+                            event_target:state_target_algeria.ALG_deployed_manpower > 0
+                        }
+                    }
+                    set_variable = {
+                        event_target:state_target_algeria.ALG_deployed_manpower = 0
+                    }
+                }
+				set_variable = {
+					experience_loss = ALG.current_inflicted_casualties_on_@FRA
+				}
+				multiply_variable = {
+					experience_loss = 0.1
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.FRA_deployed_experience = experience_loss
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.FRA_deployed_manpower = ALG.Algerian_Casualties_Algerian_Strength_Display
+				}
+                if = {
+                    limit = {
+                        check_variable = {
+                            event_target:state_target_algeria.FRA_deployed_manpower > 0
+                        }
+                    }
+                    set_variable = {
+                        event_target:state_target_algeria.FRA_deployed_manpower = 0
+                    }
+                }
+                if = {
+                    limit = {
+                        country_exists = ALE
+                    }
+                    add_war_support = 0.02
+                }
+                else = {
+                    FRA = {
+                        add_war_support = 0.02
+                    }
+                }
+
+				ALG = {
+					add_manpower = -1000
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						ALG.current_inflicted_casualties_on_@FRA > FRA.current_inflicted_casualties_on_@ALG
+					}
+				}
+				set_variable = {
+					experience_loss = FRA.current_inflicted_casualties_on_@ALG
+				}
+				multiply_variable = {
+					experience_loss = 0.1
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.ALG_deployed_experience = experience_loss
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.ALG_deployed_manpower = ALG.French_Casualties_Algerian_Strength_Display
+				}
+				set_variable = {
+					experience_loss = ALG.current_inflicted_casualties_on_@FRA
+				}
+				multiply_variable = {
+					experience_loss = 0.1
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.FRA_deployed_experience = experience_loss
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.FRA_deployed_manpower = ALG.current_inflicted_casualties_on_@FRA
+				}
+                if = {
+                    limit = {
+                        country_exists = ALE
+                    }
+                    add_war_support = -0.02
+                }
+                else = {
+                    FRA = {
+                        add_war_support = -0.02
+                    }
+                }
+				ALG = {
+					add_manpower = 3500
+				}
+			}
+			else = {
+				set_variable = {
+					experience_loss = FRA.current_inflicted_casualties_on_@ALG
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.ALG_deployed_experience = experience_loss
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.ALG_deployed_manpower = ALG.French_Casualties_Algerian_Strength_Display
+				}
+				set_variable = {
+					experience_loss = ALG.current_inflicted_casualties_on_@FRA
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.FRA_deployed_experience = experience_loss
+				}
+				subtract_from_variable = {
+					event_target:state_target_algeria.FRA_deployed_manpower = ALG.current_inflicted_casualties_on_@FRA
+				}
+			 }
+			set_variable = {
+				FRA.algeria_check = 1
+			}
+			set_variable = {
+				ALG.algeria_check = 1
+			}
+			clear_current_inflicted_casualties = yes
+
+			#diplomatic_relation = { country = FRA relation = war_relation active = no }
+            #diplomatic_relation = { country = ALE relation = war_relation active = no }
+			#FRA = { diplomatic_relation = { country = ALG relation = war_relation active = no } }
+            #ALE = { diplomatic_relation = { country = ALG relation = war_relation active = no } }
+            ALG = {
+                every_enemy_country = {
+                    diplomatic_relation = { country = ALG relation = war_relation active = no }
+                    #ALG = {
+                    #    diplomatic_relation = { country = PREV relation = war_relation active = no }
+                    #}
+                }
+            }
+            set_variable = {
+                ALG.Algerian_Strength_Strength_Current = ALG.Algerian_Strength_Strength
+            }
+            set_variable = {
+                FRA.Algerian_Strength_Strength_Current = FRA.Algerian_Strength_Strength
+            }
+
+            subtract_from_variable = {
+                ALG.Algerian_Strength_Strength_Current = ALG.Algerian_Strength_Strength_Old
+            }
+            subtract_from_variable = {
+                FRA.Algerian_Strength_Strength_Current = FRA.Algerian_Strength_Strength_Old
+            }
+
+
+            ALG = {
+                clr_country_flag = Oran_Operation
+                clr_country_flag = Constatine_Operation
+                clr_country_flag = Bouira_Operation
+                delete_unit = { 
+                    state = 460   
+                }
+               delete_unit = { 
+                    state = 1587
+                }
+               delete_unit = { 
+                    state = 513   
+                }
+            }   
+            ALE = {
+                clr_country_flag = Oran_Operation
+                clr_country_flag = Constatine_Operation
+                clr_country_flag = Bouira_Operation
+                delete_unit = { 
+                    state = 460   
+                }
+                delete_unit = { 
+                    state = 1587
+                }
+                delete_unit = { 
+                    state = 513   
+                }
+                delete_unit = { 
+                    state = 460   
+                }
+                delete_unit = { 
+                    state = 1587
+                }
+                delete_unit = { 
+                    state = 513   
+                }              
+                delete_unit = { 
+                    state = 460   
+                }
+               delete_unit = { 
+                    state = 1587
+                }
+               delete_unit = { 
+                    state = 513   
+                }
+            }       
+	FRA = {
+		clr_country_flag = Oran_Operation
+		clr_country_flag = Constatine_Operation
+		clr_country_flag = Bouira_Operation
+		delete_unit_template_and_units = {
+			division_template = "Force Republicaine de Securite"
+			disband = no #will refund equipment and manpower
+		}
+        if = {
+            limit = {
+                date < 1960.1.1
+            }
+            division_template = {
+                name = "Force Republicaine de Securite"			#Basic
+                division_names_group = FRA_COL_01
+                regiments = {
+                    militia = { x = 0 y = 0 }				#1000
+                    militia = { x = 0 y = 1 }				#1000
+                    militia = { x = 0 y = 2 }				#1000
+                    militia = { x = 0 y = 3 }				#1000
+                }
+                support = {
+                    cavalry_special_force = { x = 0 y = 0 }	#500
+                }
+                priority = 0
+            }
+        }
+        else = {
+            division_template = {
+                name = "Force Republicaine de Securite"			#Basic
+                division_names_group = FRA_COL_01
+                template_counter = 72
+                regiments = {
+                    infantry = { x = 0 y = 0 }
+                    infantry = { x = 0 y = 1 }
+                    infantry = { x = 0 y = 2 }
+                    infantry = { x = 1 y = 0 }
+                    infantry = { x = 1 y = 1 }
+                    infantry = { x = 1 y = 2 }
+                    infantry = { x = 2 y = 0 }
+                    infantry = { x = 2 y = 1 }
+                    infantry = { x = 2 y = 2 }
+                    light_artillery = { x = 3 y = 0 }
+                    artillery = { x = 3 y = 1 }
+                    direct_fire_gun = { x = 3 y = 2 }
+                }
+                support = {
+                    engineer = { x = 0 y = 0 }
+                    recon = { x = 0 y = 1 }
+                    logistics_company = { x = 0 y = 2 }
+                    field_hospital = { x = 0 y = 3 }
+                    signal_company = { x = 0 y = 4 }
+                    maintenance_company = { x = 1 y = 0 }
+                    auto_cannon_support = { x = 1 y = 1 }
+                }
+            }
+        }
+
+	}
+}

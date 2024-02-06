@@ -9,58 +9,43 @@ create_pie_chart = {
 		value = 1 # 1 is value for neutrality frame, so we don't have to make a loop for it
 		size = 100 # 100 pieces, each percent is one piece
 	}
+		#yellow_frame
+		#red_frame
+		#gura_chart_frame
 	set_temp_variable = { industrial_pop = IND_DISPLAY }
 	add_to_temp_variable = { industrial_pop = refinery_total }
 	add_to_temp_variable = { industrial_pop = DOCK_TOTAL }	
-
-	set_variable = {industry_gui_total = industrial_pop }
-
-	divide_temp_variable = {industrial_pop = display_income }
-	multiply_temp_variable = { industrial_pop = 100 }
-	round_temp_variable = industrial_pop
-
+	set_variable = { industry_gui_total = industrial_pop }	
+	
 	set_temp_variable = { agricultural_pop = FARM_DISPLAY }
-	divide_temp_variable = {agricultural_pop = display_income }
-	multiply_temp_variable = { agricultural_pop = 100 }
-	round_temp_variable = agricultural_pop 
-	set_variable = { ROOT.last_idx = industrial_pop }
-	add_to_temp_variable = { agricultural_pop = ROOT.last_idx }
-	for_loop_effect = {
-		start = ROOT.last_idx
-		end = agricultural_pop
-		set_variable = { pie_chart^v = 2 }
-		add_to_variable = { ROOT.last_idx = 1 }
-	}
-
-	set_temp_variable = { tax_pop = tax_display }
-	divide_temp_variable = {tax_pop = display_income }
-	multiply_temp_variable = { tax_pop = 100 }
-	round_temp_variable = tax_pop
-	add_to_temp_variable = { tax_pop = ROOT.last_idx }
-	for_loop_effect = {
-		start = ROOT.last_idx
-		end = tax_pop
-		set_variable = { pie_chart^v = 3 }
-		add_to_variable = { ROOT.last_idx = 1 }
-	}
-
+	
+	set_temp_variable = {tax_gui_total = tax_base }
+	
 	set_temp_variable = { services_pop = OP_Display }
 	add_to_temp_variable = { services_pop = tourism_infrastructure_total }
 	add_to_temp_variable = { services_pop = resource_income }
-	set_variable = {services_gui_total = services_pop }
-	divide_temp_variable = {services_pop = display_income }
-	multiply_temp_variable = { services_pop = 100 }
-	round_temp_variable = services_pop 
-	add_to_temp_variable = { services_pop = ROOT.last_idx }
-	for_loop_effect = {
-		start = ROOT.last_idx
-		end = services_pop
-		set_variable = { pie_chart^v = 4 }
-	}
-
-	clear_variable = ROOT.last_idx
-	add_to_variable = { pie_chart_dirty = 1 }
-
+	set_variable = { services_gui_total = services_pop }
+	
+	set_temp_variable = {total_pie_1 = tax_gui_total }
+	add_to_temp_variable = { total_pie_1 = agricultural_pop }
+	add_to_temp_variable = { total_pie_1 = industrial_pop }
+	add_to_temp_variable = { total_pie_1 = services_pop }
+	divide_temp_variable = { tax_gui_total = total_pie_1 }
+	divide_temp_variable = { agricultural_pop = total_pie_1 }
+	divide_temp_variable = { industrial_pop = total_pie_1 }
+	divide_temp_variable = { services_pop = total_pie_1 }
+	multiply_temp_variable = { agricultural_pop = 100 } 
+	multiply_temp_variable = { industrial_pop = 100 } 
+	multiply_temp_variable = { tax_gui_total = 100 } 
+	multiply_temp_variable = { services_pop = 100 } 
+	set_temp_variable = {final_pie = tax_gui_total }
+	set_variable = { green_frame = final_pie }
+	add_to_temp_variable = { final_pie = agricultural_pop }
+	set_variable = { red_frame = final_pie }
+	add_to_temp_variable = { final_pie = services_pop }
+	set_variable = { gura_chart_frame = final_pie }
+	add_to_temp_variable = { final_pie = industrial_pop }
+	set_variable = { yellow_frame = final_pie }
 
 	##military chart
 
@@ -170,4 +155,449 @@ create_pie_chart = {
 
 	clear_variable = ROOT.last_idx
 	add_to_variable = { 3pie_chart_dirty = 1 }
+}
+income_graph = {
+	clear_array = adjusted_points_array
+	find_highest_in_array = {
+		array = income_array
+		value = highest_point
+		index = max_index
+	} #Take the highest number
+	find_lowest_in_array = {
+		array = income_array
+		value = lowest_point
+	} #Take the lowest number
+	for_each_loop = {
+		array = income_array
+		for_loop_effect = {
+			end = income_array^num
+			value = v
+			find_highest_in_array = {
+				array = income_array
+				value = max
+				index = max_index
+			}
+			find_lowest_in_array = {
+				array = income_array
+				value = min
+				index = min_index
+			}
+			set_variable = { highest_point^v = max }
+			set_variable = { lowest_point^v = min }
+		}
+		set_temp_variable = { adjusted_point = income_array^i }
+		set_temp_variable = { range = highest_point }
+		subtract_from_temp_variable = { range = lowest_point }
+		subtract_from_temp_variable = { adjusted_point = lowest_point }
+		if = {
+			limit = {
+				NOT = {
+					check_variable = { range = 0 }
+				}
+			}
+			divide_temp_variable = { adjusted_point = range }
+		}	
+		multiply_temp_variable = { adjusted_point = 100 }
+		round_temp_variable = adjusted_point
+		add_to_array = { adjusted_points_array = adjusted_point }
+	}
+	set_variable = { highest_point_label  = highest_point }
+	if = {
+		limit = {	
+			check_variable = { lowest_point = highest_point }
+		}
+		set_variable = { lowest_point_label = 1 }
+	}
+	else = {
+		set_variable = { lowest_point_label = lowest_point }
+	}
+	clear_array = balance_frames
+	for_loop_effect = {
+		start = 0
+		end = 23
+		value = i
+		
+		set_temp_variable = { j = i }
+		add_to_temp_variable = { j = 1 }
+		set_temp_variable = { y_h = adjusted_points_array^j }
+		set_temp_variable = { y_l = adjusted_points_array^i }
+
+		round_temp_variable = y_h
+		round_temp_variable = y_l
+		
+		set_temp_variable = { endpoints = y_l }
+		multiply_temp_variable = { endpoints = 1000 }
+		add_to_temp_variable = { endpoints = y_h }
+		add_to_array = { balance_frames = endpoints }
+	}
+	set_variable = { sum = 0 }
+	for_each_loop = {
+		array = adjusted_points_array
+		# set_variable = { normalized = adjusted_points_array^i }
+		# log = "Normalize = [?normalized]"
+		set_temp_variable = { add = adjusted_points_array^i }
+		add_to_variable = { sum = add }
+	}
+	divide_variable = { sum = adjusted_points_array^num }
+	# round_variable = sum
+	set_variable = { middle_point_label = sum }
+	
+	clear_variable = highest_point
+	clear_variable = lowest_point
+}
+food_production_graph = {
+	clear_array = adjusted_agri_points_array
+	find_highest_in_array = {
+		array = food_array
+		value = highest_point
+		index = max_index
+	} #Take the highest number
+	find_lowest_in_array = {
+		array = food_array
+		value = lowest_point
+	} #Take the lowest number
+	for_each_loop = {
+		array = food_array
+		for_loop_effect = {
+			end = food_array^num
+			value = v
+			find_highest_in_array = {
+				array = food_array
+				value = max
+				index = max_index
+			}
+			find_lowest_in_array = {
+				array = food_array
+				value = min
+				index = min_index
+			}
+			set_variable = { highest_point^v = max }
+			set_variable = { lowest_point^v = min }
+		}
+		set_temp_variable = { adjusted_point = food_array^i }
+		set_temp_variable = { range = highest_point }
+		subtract_from_temp_variable = { range = lowest_point }
+		subtract_from_temp_variable = { adjusted_point = lowest_point }
+		if = {
+			limit = {
+				NOT = {
+					check_variable = { range = 0 }
+				}
+			}
+			divide_temp_variable = { adjusted_point = range }
+		}	
+		multiply_temp_variable = { adjusted_point = 100 }
+		round_temp_variable = adjusted_point
+		add_to_array = { adjusted_agri_points_array = adjusted_point }
+	}
+	set_variable = { highest_point_agri_prod_label  = highest_point }
+	if = {
+		limit = {	
+			check_variable = { lowest_point = highest_point }
+		}
+		set_variable = { lowest_point_agri_prod_label = 1 }
+	}
+	else = {
+		set_variable = { lowest_point_agri_prod_label = lowest_point }
+	}
+	clear_array = agri_frames
+	for_loop_effect = {
+		start = 0
+		end = 23
+		value = i
+		
+		set_temp_variable = { j = i }
+		add_to_temp_variable = { j = 1 }
+		set_temp_variable = { y_h = adjusted_agri_points_array^j }
+		set_temp_variable = { y_l = adjusted_agri_points_array^i }
+
+		round_temp_variable = y_h
+		round_temp_variable = y_l
+		
+		set_temp_variable = { endpoints = y_l }
+		multiply_temp_variable = { endpoints = 1000 }
+		add_to_temp_variable = { endpoints = y_h }
+		add_to_array = { agri_frames = endpoints }
+	}
+	set_variable = { sum = 0 }
+	for_each_loop = {
+		array = adjusted_agri_points_array
+		# set_variable = { normalized = adjusted_agri_points_array^i }
+		# log = "Normalize = [?normalized]"
+		set_temp_variable = { add = adjusted_agri_points_array^i }
+		add_to_variable = { sum = add }
+	}
+	divide_variable = { sum = adjusted_agri_points_array^num }
+	# round_variable = sum
+	set_variable = { middle_point_agri_prod_label = sum }
+	
+	clear_variable = highest_point
+	clear_variable = lowest_point
+}
+debt_graph = {
+	clear_array = adjusted_debt_points_array
+	find_highest_in_array = {
+		array = debt_array
+		value = highest_point
+		index = max_index
+	} #Take the highest number
+	find_lowest_in_array = {
+		array = debt_array
+		value = lowest_point
+	} #Take the lowest number
+	for_each_loop = {
+		array = debt_array
+		for_loop_effect = {
+			end = debt_array^num
+			value = v
+			find_highest_in_array = {
+				array = debt_array
+				value = max
+				index = max_index
+			}
+			find_lowest_in_array = {
+				array = debt_array
+				value = min
+				index = min_index
+			}
+			set_variable = { highest_point^v = max }
+			set_variable = { lowest_point^v = min }
+		}
+		set_temp_variable = { adjusted_point = debt_array^i }
+		set_temp_variable = { range = highest_point }
+		subtract_from_temp_variable = { range = lowest_point }
+		subtract_from_temp_variable = { adjusted_point = lowest_point }
+		if = {
+			limit = {
+				NOT = {
+					check_variable = { range = 0 }
+				}
+			}
+			divide_temp_variable = { adjusted_point = range }
+		}	
+		multiply_temp_variable = { adjusted_point = 100 }
+		round_temp_variable = adjusted_point
+		add_to_array = { adjusted_debt_points_array = adjusted_point }
+	}
+	set_variable = { highest_point_debt_label  = highest_point }
+	if = {
+		limit = {	
+			check_variable = { lowest_point = highest_point }
+		}
+		set_variable = { lowest_point_debt_label = 1 }
+	}
+	else = {
+		set_variable = { lowest_point_debt_label = lowest_point }
+	}
+	clear_array = debt_frames
+	for_loop_effect = {
+		start = 0
+		end = 23
+		value = i
+		
+		set_temp_variable = { j = i }
+		add_to_temp_variable = { j = 1 }
+		set_temp_variable = { y_h = adjusted_debt_points_array^j }
+		set_temp_variable = { y_l = adjusted_debt_points_array^i }
+
+		round_temp_variable = y_h
+		round_temp_variable = y_l
+		
+		set_temp_variable = { endpoints = y_l }
+		multiply_temp_variable = { endpoints = 1000 }
+		add_to_temp_variable = { endpoints = y_h }
+		add_to_array = { debt_frames = endpoints }
+	}
+	set_variable = { sum = 0 }
+	for_each_loop = {
+		array = adjusted_debt_points_array
+		# set_variable = { normalized = adjusted_agri_points_array^i }
+		# log = "Normalize = [?normalized]"
+		set_temp_variable = { add = adjusted_debt_points_array^i }
+		add_to_variable = { sum = add }
+	}
+	divide_variable = { sum = adjusted_debt_points_array^num }
+	# round_variable = sum
+	set_variable = { middle_point_debt_label = sum }
+	
+	clear_variable = highest_point
+	clear_variable = lowest_point
+}
+electricity_graph = {
+	clear_array = adjusted_electricity_points_array
+	find_highest_in_array = {
+		array = electricity_array
+		value = highest_point
+		index = max_index
+	} #Take the highest number
+	find_lowest_in_array = {
+		array = electricity_array
+		value = lowest_point
+	} #Take the lowest number
+	for_each_loop = {
+		array = electricity_array
+		for_loop_effect = {
+			end = electricity_array^num
+			value = v
+			find_highest_in_array = {
+				array = electricity_array
+				value = max
+				index = max_index
+			}
+			find_lowest_in_array = {
+				array = electricity_array
+				value = min
+				index = min_index
+			}
+			set_variable = { highest_point^v = max }
+			set_variable = { lowest_point^v = min }
+		}
+		set_temp_variable = { adjusted_point = electricity_array^i }
+		set_temp_variable = { range = highest_point }
+		subtract_from_temp_variable = { range = lowest_point }
+		subtract_from_temp_variable = { adjusted_point = lowest_point }
+		if = {
+			limit = {
+				NOT = {
+					check_variable = { range = 0 }
+				}
+			}
+			divide_temp_variable = { adjusted_point = range }
+		}	
+		multiply_temp_variable = { adjusted_point = 100 }
+		round_temp_variable = adjusted_point
+		add_to_array = { adjusted_electricity_points_array = adjusted_point }
+	}
+	set_variable = { highest_point_electricity_label  = highest_point }
+	if = {
+		limit = {	
+			check_variable = { lowest_point = highest_point }
+		}
+		set_variable = { lowest_point_electricity_label = 1 }
+	}
+	else = {
+		set_variable = { lowest_point_electricity_label = lowest_point }
+	}
+	clear_array = electricity_frames
+	for_loop_effect = {
+		start = 0
+		end = 23
+		value = i
+		
+		set_temp_variable = { j = i }
+		add_to_temp_variable = { j = 1 }
+		set_temp_variable = { y_h = adjusted_electricity_points_array^j }
+		set_temp_variable = { y_l = adjusted_electricity_points_array^i }
+
+		round_temp_variable = y_h
+		round_temp_variable = y_l
+		
+		set_temp_variable = { endpoints = y_l }
+		multiply_temp_variable = { endpoints = 1000 }
+		add_to_temp_variable = { endpoints = y_h }
+		add_to_array = { electricity_frames = endpoints }
+	}
+	set_variable = { sum = 0 }
+	for_each_loop = {
+		array = adjusted_electricity_points_array
+		# set_variable = { normalized = adjusted_agri_points_array^i }
+		# log = "Normalize = [?normalized]"
+		set_temp_variable = { add = adjusted_electricity_points_array^i }
+		add_to_variable = { sum = add }
+	}
+	divide_variable = { sum = adjusted_electricity_points_array^num }
+	# round_variable = sum
+	set_variable = { middle_point_electricity_label = sum }
+	
+	clear_variable = highest_point
+	clear_variable = lowest_point
+}
+milexp_graph = {
+	clear_array = adjusted_milexp_points_array
+	find_highest_in_array = {
+		array = milexp_array
+		value = highest_point
+		index = max_index
+	} #Take the highest number
+	find_lowest_in_array = {
+		array = milexp_array
+		value = lowest_point
+	} #Take the lowest number
+	for_each_loop = {
+		array = milexp_array
+		for_loop_effect = {
+			end = milexp_array^num
+			value = v
+			find_highest_in_array = {
+				array = milexp_array
+				value = max
+				index = max_index
+			}
+			find_lowest_in_array = {
+				array = milexp_array
+				value = min
+				index = min_index
+			}
+			set_variable = { highest_point^v = max }
+			set_variable = { lowest_point^v = min }
+		}
+		set_temp_variable = { adjusted_point = milexp_array^i }
+		set_temp_variable = { range = highest_point }
+		subtract_from_temp_variable = { range = lowest_point }
+		subtract_from_temp_variable = { adjusted_point = lowest_point }
+		if = {
+			limit = {
+				NOT = {
+					check_variable = { range = 0 }
+				}
+			}
+			divide_temp_variable = { adjusted_point = range }
+		}	
+		multiply_temp_variable = { adjusted_point = 100 }
+		round_temp_variable = adjusted_point
+		add_to_array = { adjusted_milexp_points_array = adjusted_point }
+	}
+	set_variable = { highest_point_expenditures_label  = highest_point }
+	if = {
+		limit = {	
+			check_variable = { lowest_point = highest_point }
+		}
+		set_variable = { lowest_point_expenditures_label = 1 }
+	}
+	else = {
+		set_variable = { lowest_point_expenditures_label = lowest_point }
+	}
+	clear_array = expenditures_frames
+	for_loop_effect = {
+		start = 0
+		end = 23
+		value = i
+		
+		set_temp_variable = { j = i }
+		add_to_temp_variable = { j = 1 }
+		set_temp_variable = { y_h = adjusted_milexp_points_array^j }
+		set_temp_variable = { y_l = adjusted_milexp_points_array^i }
+
+		round_temp_variable = y_h
+		round_temp_variable = y_l
+		
+		set_temp_variable = { endpoints = y_l }
+		multiply_temp_variable = { endpoints = 1000 }
+		add_to_temp_variable = { endpoints = y_h }
+		add_to_array = { expenditures_frames = endpoints }
+	}
+	set_variable = { sum = 0 }
+	for_each_loop = {
+		array = adjusted_milexp_points_array
+		# set_variable = { normalized = adjusted_agri_points_array^i }
+		# log = "Normalize = [?normalized]"
+		set_temp_variable = { add = adjusted_milexp_points_array^i }
+		add_to_variable = { sum = add }
+	}
+	divide_variable = { sum = adjusted_milexp_points_array^num }
+	# round_variable = sum
+	set_variable = { middle_point_expenditures_label = sum }
+	
+	clear_variable = highest_point
+	clear_variable = lowest_point
 }

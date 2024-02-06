@@ -2,8 +2,8 @@
 # See documentation.info file for more detailed scripting information.
 
 peace_ai_desires = {
-	
-	take_our_cores = {
+
+    take_our_cores = {
         peace_action_type = { take_states }
         enable = {
             ROOT = { tag = ROOT.FROM } #We are negotiating for ourselves
@@ -12,14 +12,200 @@ peace_ai_desires = {
         ai_desire = 100
     }
 
+    generic_influence_cutoff = { #Only do force gov and liberate outside influence range
+        peace_action_type = { take_states puppet }
+        enable = {
+            ROOT = { tag = ROOT.FROM } #We are negotiating for ourselves
+            OR = {
+                has_government = democratic
+                has_government = communism
+            }
+            ROOT.FROM.FROM.FROM = { NOT = { is_core_of = ROOT.FROM } } #It is not ours
+            ROOT.FROM.FROM.FROM = {
+                NOT = { is_claimed_by = ROOT.FROM }
+                pc_is_state_outside_influence_for_winner = ROOT.FROM
+                #is_coastal = no
+                NOT = {
+                    OR = {
+                        AND = {
+                            is_capital = yes
+                            is_coastal = yes
+                        }
+                        state = 738 #California
+                        state = 860 #Cote Nord
+                        state = 458 #Tunis
+                        state = 446 #Suez
+                        state = 126 #London
+                        state = 286 #Indochina
+                        AND = {
+                            ROOT.FROM = { capital_scope = { is_on_continent = europe } }
+                            OR = {
+                                state = 137 #Crimea
+                                state = 797 #Istanbul
+                                state = 118 #Gibraltar
+                            }
+                        }
+                    }
+                }
+            } #It is not claimed by us
+        }
+        ai_desire = -1000
+    }
+
+    generic_influence_cutoff_force_government_fascism_unaligned = { #Don't do ANYTHING outside influence range
+        peace_action_type = { take_states puppet force_government liberate }
+        enable = {
+            # ROOT = { tag = ROOT.FROM } #We are negotiating for ourselves
+            NOT = {
+                OR = {
+                    has_government = democratic
+                    has_government = communism
+                }
+            }
+            # ROOT.FROM.FROM.FROM = { NOT = { is_core_of = ROOT } } #It is not ours
+            ROOT.FROM.FROM.FROM = {
+                NOT = { is_claimed_by = ROOT.FROM }
+                ROOT.FROM = { pc_is_winner = yes }
+                pc_is_state_outside_influence_for_winner = ROOT.FROM
+                # is_coastal = no
+                NOT = {
+                    OR = {
+                        AND = {
+                            is_capital = yes
+                            is_coastal = yes
+                        }
+                        state = 738 #California
+                        state = 860 #Cote Nord
+                        state = 458 #Tunis
+                        state = 446 #Suez
+                        state = 126 #London
+                        state = 286 #Indochina
+                        AND = {
+                            ROOT.FROM = { capital_scope = { is_on_continent = europe } }
+                            OR = {
+                                state = 137 #Crimea
+                                state = 797 #Istanbul
+                                state = 118 #Gibraltar
+                            }
+                        }
+                    }
+                }
+            } #It is not claimed by us
+			#Special Japan China Handling; this has logic elsewhere which we reluctantly have to special case.
+			NOT = {
+				AND = { #NOT is sneakily NOR
+					ROOT = {
+						original_tag = JAP
+					}
+					ROOT.FROM.FROM = {
+						original_tag = CHI
+					}
+				}
+			}
+        }
+        ai_desire = -1000
+    }
+	
+    force_gov_puppets = {
+        peace_action_type = force_government
+        enable = {
+            ROOT = {
+                has_government = democratic
+                ROOT.FROM.FROM = {
+                    NOT = { has_government = democratic }
+                    is_subject = yes
+                }
+            }
+        }
+        ai_desire = 100
+    }
+
+    doesnt_control_no_claim = {
+        peace_action_type = { take_states }
+        enable = {
+            ROOT = { tag = ROOT.FROM } #We are negotiating for ourselves
+            ROOT.FROM.FROM.FROM = {
+                NOT = { is_core_of = ROOT.FROM }
+                NOT = { is_claimed_by = ROOT.FROM }
+                NOT = { is_controlled_by = ROOT.FROM }
+            }
+        }
+        ai_desire = -20
+    }
+
+    ### The above trigger looks extremely harsh. In reality, this means the AI is more inclined to step through nearby land without bunny hopping and potentially leaving gaps.
+
+    democracy_force_government_on_austria = {
+        peace_action_type = force_government
+        enable = {
+            is_historical_focus_on = yes
+            is_major = yes
+            ROOT = { has_government = democratic }
+            ROOT.FROM = { tag = AUS }
+            ROOT.FROM.FROM.FROM = { is_core_of = AUS }
+        }
+        ai_desire = 100
+    }
+
+    fascist_majors_on_a_mission = {
+        peace_action_type = take_states
+        enable = {
+            ROOT = { 
+                NOT = { tag = JAP }            #We aren't Japan (special handling)
+                is_major = yes                #We are big
+                has_government = fascism    #We are the baddies
+                tag = ROOT.FROM                #We are acting for ourselves
+            }
+        }
+
+        ai_desire = 50
+    }
+
+    fascist_puppet_desire = {
+        peace_action_type = puppet
+        enable = {
+            ROOT = { 
+                NOT = { tag = JAP }            #We aren't Japan (special handling)
+                is_major = yes                #We are big
+                has_government = fascism    #We are the baddies
+            }
+        }
+
+        ai_desire = -50
+    }
+
+    fascist_liberate_desire = {
+        peace_action_type = liberate
+        enable = {
+            ROOT = { 
+                NOT = { tag = JAP }            #We aren't Japan (special handling)
+                is_major = yes                #We are big
+                has_government = fascism    #We are the baddies
+                tag = ROOT.FROM                #We are acting for ourselves
+            }
+            ROOT.FROM.FROM = { NOT = { has_government = fascism } }
+        }
+
+        ai_desire = -75
+    }
+
+    # Breakaway countries in the Soviet Civil war don't want to liberate stuff
+    breakaway_country = {
+        peace_action_type = { liberate puppet force_government }
+        enable = {
+           ROOT = { has_country_flag = SOV_breakaway_country_flag }
+        }
+        ai_desire = -200  # just don't, please
+    }
+
 
     # Force gov on communism preferably
     democracy_force_government_on_communism = {
         peace_action_type = force_government
         enable = {
             ROOT = { has_government = democratic }
-            ROOT.FROM = { has_government = communism }
-            ROOT.FROM.FROM.FROM = { NOT = { is_claimed_by = ROOT.FROM } }
+            ROOT.FROM.FROM = { has_government = communism }
+            ROOT.FROM.FROM.FROM = { NOT = { is_claimed_by = ROOT.FROM.FROM } }
         }
         ai_desire = 50
     }
@@ -40,10 +226,10 @@ peace_ai_desires = {
         enable = {
             ROOT = {
                 NOT = { has_government = democratic }
-				NOT = { has_government = fascism }
-				NOT = {
-					tag = ROOT.FROM
-				}
+                NOT = { has_government = fascism }
+                NOT = {
+                    tag = ROOT.FROM
+                }
             }
             ROOT.FROM.FROM.FROM = {
                 NOT = { is_core_of = ROOT.FROM }
@@ -60,7 +246,7 @@ peace_ai_desires = {
                 NOT = {
                     OR = {
                         is_claimed_by = ROOT.FROM
-						any_neighbor_state = {
+                        any_neighbor_state = {
                             OR = {
                                 is_owned_by = ROOT.FROM
                                 pc_is_state_claimed_by = ROOT.FROM
@@ -123,6 +309,20 @@ peace_ai_desires = {
         ai_desire = -10
     }
 
+    generic_occupies_player_state = {
+        peace_action_type = { take_states puppet liberate force_government }
+
+        enable = {
+            FROM.FROM.FROM = { 
+                NOT = { is_controlled_by = ROOT }
+                controller = {
+                    pc_is_loser = no
+                    is_ai = no
+                }
+            }
+        }
+        ai_desire = -20
+    }
 
     democrats_dont_liberate_the_wrong_ideology = {
         peace_action_type = liberate
@@ -143,7 +343,25 @@ peace_ai_desires = {
         peace_action_type = { puppet }
 
         enable = {
-            FROM.FROM = { pc_is_forced_government_by = ROOT }
+            if = {
+                limit = { has_government = democratic }
+                ROOT.FROM.FROM = { pc_is_forced_government_to = democratic }
+            }
+            else_if = {
+                limit = { has_government = fascism }
+                ROOT.FROM.FROM = { pc_is_forced_government_to = fascism }
+            }
+            else_if = {
+                limit = { has_government = communism }
+                ROOT.FROM.FROM = { pc_is_forced_government_to = communism }
+            }
+            else_if = {
+                limit = { has_government = neutrality }
+                ROOT.FROM.FROM = { pc_is_forced_government_to = neutrality }
+            }
+            else = {
+                always = no
+            }
         }
         ai_desire = -200
     }
@@ -200,11 +418,11 @@ peace_ai_desires = {
         peace_action_type = { puppet force_government }
         enable = {
             ROOT.FROM.FROM.FROM = {
-                NOT = { is_core_of = ROOT.FROM.FROM }
+                NOT = { is_core_of = ROOT.FROM }
             }
         }
 
-        ai_desire = -50
+        ai_desire = -200
     }
 
 
@@ -217,14 +435,15 @@ peace_ai_desires = {
             }
         }
 
-        ai_desire = 10
+        ai_desire = 20
     }
 
 
     try_and_take_neighbors_when_forcing_gov = { #Leaving here; this has unintended consequences, but we need it for SOV
         peace_action_type = { force_government puppet }
         enable = {
-			ROOT.FROM.FROM = { original_tag = SOV }
+            ROOT = { has_government = democratic }
+            ROOT.FROM.FROM = { original_tag = SOV }
             ROOT.FROM.FROM.FROM = {
                 any_neighbor_state = {
                     OR = {
@@ -234,22 +453,23 @@ peace_ai_desires = {
                 }
             }
         }
-	
+
         ai_desire = 50
     }
-	
-	dont_take_land_if_sov_government_is_forced = { 
+
+    dont_take_land_if_sov_government_is_forced = {
         peace_action_type = { take_states puppet }
         enable = {
-			ROOT.FROM.FROM = { 
-				original_tag = SOV 
-				pc_is_forced_government = yes
-			}
+            ROOT = { has_government = democratic }
+            ROOT.FROM.FROM = {
+                original_tag = SOV
+                pc_is_forced_government = yes
+            }
             ROOT.FROM.FROM.FROM = {
                 NOT = { is_claimed_by = ROOT.FROM }
             }
         }
-	
+
         ai_desire = -50
     }
 
@@ -298,15 +518,31 @@ peace_ai_desires = {
     non_aligned_should_stick_to_claims = {
         peace_action_type = take_states
         enable = {
-            ROOT = { has_government = neutrality }
+            ROOT = { 
+                has_government = neutrality
+                is_major = no
+            }
             ROOT.FROM.FROM.FROM = {
                 NOT = { is_claimed_by = ROOT.FROM }
                 NOT = { is_core_of = ROOT.FROM }
             }
         }
-        ai_desire = -50
+        ai_desire = -20
     }
 
+    it_is_a_non_coastal_adjacency = {
+        peace_action_type = take_states
+        enable = {
+            ROOT.FROM = { tag = ROOT }
+            ROOT.FROM.FROM.FROM = {
+                is_coastal = no
+                any_neighbor_state = {
+                    is_owned_by = ROOT
+                }
+            }
+        }
+        ai_desire = 10
+    }
 
     wrong_ideology_faction_members_dont_force_gov = {
         peace_action_type = force_government
@@ -321,50 +557,74 @@ peace_ai_desires = {
         }
         ai_desire = -200
     }
-	
-	avoid_forcing_gov_if_ally_has_core = {
+
+    avoid_forcing_gov_if_ally_has_core = {
         peace_action_type = force_government
         enable = {
             ROOT.FROM.FROM.FROM = {
-				any_country_with_core = {
-					exists = yes
-					pc_is_on_same_side_as = ROOT
-				}
-			}
+                any_country_with_core = {
+                    exists = yes
+                    pc_is_on_same_side_as = ROOT
+                }
+            }
         }
         ai_desire = -200
     }
 
-    force_gov_puppets = {
-        peace_action_type = force_government
+    do_force_government_if_forced_to_our_ideology = {
+        peace_action_type = { force_government }
+
         enable = {
-            ROOT = {
-                has_government = democratic
-                ROOT.FROM.FROM = {
-                    NOT = { has_government = democratic }
-                    is_subject = yes
-                }
+            if = {
+                limit = { has_government = democratic }
+                ROOT.FROM.FROM = { pc_is_forced_government_to = democratic }
+            }
+            else_if = {
+                limit = { has_government = fascism }
+                ROOT.FROM.FROM = { pc_is_forced_government_to = fascism }
+            }
+            else_if = {
+                limit = { has_government = communism }
+                ROOT.FROM.FROM = { pc_is_forced_government_to = communism }
+            }
+            else_if = {
+                limit = { has_government = neutrality }
+                ROOT.FROM.FROM = { pc_is_forced_government_to = neutrality }
+            }
+            else = {
+                always = no
             }
         }
-        ai_desire = 100
+        ai_desire = 20
     }
 
 
-    dont_take_states_for_wrong_ideology_allies = {
+    dont_resurrect_hitler = {
+        peace_action_type = liberate
+        enable = {
+            ROOT.FROM = {
+                original_tag = GER
+                has_government = fascism
+            }
+        }
+        ai_desire = -100
+    }
+
+    fascism_take_states_germany_sov = {
         peace_action_type = take_states
         enable = {
             ROOT = {
-                NOT = {
-                    tag = ROOT.FROM
-                }
+                tag = ROOT.FROM
             }
-            ROOT.FROM = {
-                NOT = { has_same_ideology = yes }
+            ROOT = {
+                has_government = fascism
+            }
+            ROOT.FROM.FROM = {
+                tag = SOV
             }
         }
-        ai_desire = -20
+        ai_desire = 25
     }
-
 
 
     prefer_take_states_for_puppets_with_cores = {
@@ -425,59 +685,329 @@ peace_ai_desires = {
         }
         ai_desire = -75
     }
-	
-	return_puppet_cores = { #This simply has to be the highest priority.
-		peace_action_type = take_states
-		enable = {
-			ROOT.FROM = {
-				OR = {
-					is_subject_of = ROOT
-					AND = {
-						pc_is_puppeted_by = ROOT
-						NOT = { original_tag = GER } #This messes with yalta too much.
-					}
-				}
-			}
-			ROOT.FROM.FROM.FROM = {
-				is_core_of = ROOT.FROM
-				NOT = { is_core_of = ROOT }
-			}
-		}
-		ai_desire = 70 #Acceptable values
-	}
-	
-	allies_dont_liberate_on_sov = {
+
+    no_more_spains_after_scw = {
+        peace_action_type = { force_government puppet liberate }
+        enable = {
+            ROOT = { NOT = { original_tag = SPR } }            #But we are not originally a spain
+            has_global_flag = spanish_civil_war             #And the spaindome is ongoing
+            NOT = { has_global_flag = scw_over }            #But the spaindome has not yet been resolved
+            ROOT.FROM.FROM = { original_tag = SPR }            #And it is being taken from an original spain
+            any_country = {                                    #Any country that was an original spain is on our side
+                original_tag = SPR
+                pc_is_on_same_side_as = ROOT
+            }
+        }
+        ai_desire = -200
+    }
+
+    return_the_spains = {
+        peace_action_type = take_states
+        enable = {
+            OR = {
+                any_country = {                                            #Any country that was an original spain is on our side
+                    original_tag = SPR
+                    pc_is_on_same_side_as = ROOT
+                }
+                original_tag = SPR                                        #Or we are a spain
+            }
+            ROOT.FROM = { original_tag = SPR }                            #A spain is the recipient
+            has_global_flag = spanish_civil_war                            #The spaindome is ongoing
+            NOT = { has_global_flag = scw_over }                        #But not over
+            ROOT.FROM.FROM.FROM = { owner = { original_tag = SPR } }    #The state was owned by a spain
+        }
+        ai_desire = 60
+    }
+
+    return_puppet_cores = { #This simply has to be the highest priority.
+        peace_action_type = take_states
+        enable = {
+            ROOT.FROM = {
+                OR = {
+                    is_subject_of = ROOT
+                    AND = {
+                        pc_is_puppeted_by = ROOT
+                        NOT = { original_tag = GER } #This messes with yalta too much.
+                    }
+                }
+            }
+            ROOT.FROM.FROM.FROM = {
+                is_core_of = ROOT.FROM
+                NOT = { is_core_of = ROOT }
+            }
+        }
+        ai_desire = 70 #Acceptable values
+    }
+
+    allies_dont_liberate_on_sov = {
         peace_action_type = { liberate puppet }
         enable = {
             ROOT = {
                 OR = {
-					has_government = democratic
-					has_government = neutrality
-				}
+                    has_government = democratic
+                    has_government = neutrality
+                }
             }
             ROOT.FROM.FROM = {
                 tag = SOV
-				is_major = yes
+                is_major = yes
             }
         }
         ai_desire = -50
     }
-	
-	allies_force_gov_on_sov = {
+
+    allies_force_gov_on_sov = {
         peace_action_type = force_government
         enable = {
             ROOT = {
-                OR = {
-					has_government = democratic
-					has_government = neutrality
-				}
+                has_government = democratic
             }
             ROOT.FROM.FROM = {
                 tag = SOV
-				is_major = yes
+                is_major = yes
             }
         }
         ai_desire = 30
+    }
+
+    civil_war_participants_dont_accept_each_other = {
+        peace_action_type = { force_government puppet liberate }
+        enable = {
+            ROOT = {
+                has_civil_war = yes
+                original_tag = FROM # has same original tag as Recipient
+            }
+        }
+        ai_desire = -200
+    }
+
+    #############
+    # Puppets
+    #############
+
+    puppets_dont_interfere_take_states = { #Puppets will focus on helping others most likely, or biidding on their own claims/cores
+        peace_action_type = take_states
+        enable = {
+            is_subject = yes
+            NOT = {
+                OR = {
+                    ROOT.FROM.FROM.FROM = { is_claimed_by = ROOT.FROM }
+                    ROOT.FROM.FROM.FROM = { is_core_of = ROOT.FROM }
+                }
+            }
+        }
+        ai_desire = -200
+    }
+
+    puppets_dont_interfere_others = { #Puppets will not try and puppet/liberate/force-gov
+        peace_action_type = { force_government puppet liberate }
+        enable = {
+            is_subject = yes
+            OVERLORD = {
+                NOT = { tag = ROOT.FROM }
+            }
+        }
+        ai_desire = -200
+    }
+
+    #############
+    # Unaligned
+    #############
+
+    nonaligned_mostly_take_states = { #We are empire
+        peace_action_type = { puppet liberate force_government }
+        enable = {
+            ROOT = { has_government = neutrality }
+        }
+        ai_desire = -120
+    }
+
+    #############
+    # Misc
+    #############
+
+    puppet_if_another_puppet_has_core = {
+        peace_action_type = puppet
+        enable = {
+            ROOT.FROM.FROM.FROM = {
+                NOT = {
+                    any_country_with_core = {
+                        is_subject_of = ROOT #Not a pc subject
+                    }
+                }
+                any_country_with_core = {
+                    pc_is_puppeted_by = ROOT #Is a puppet created in PC
+                }
+            }
+        }
+        ai_desire = 30
+    }
+
+    dont_do_other_things_if_we_should_liberate = {
+        peace_action_type = { take_states puppet force_government }
+        enable = {
+            ROOT.FROM.FROM.FROM = {
+                any_country_with_core = {
+                    pc_is_liberated = yes
+                }
+            }
+        }
+        ai_desire = -200 #This value has to be highly weighted to offset some other things
+    }
+
+    minors_dont_fragment_as_much = {
+        peace_action_type = { puppet liberate }
+        enable = {
+            is_major = no
+            ROOT.FROM.FROM = { pc_is_puppeted = yes }
+            NOT = { ROOT.FROM.FROM = { pc_is_puppeted_by = ROOT } }
+        }
+        ai_desire = -100
+    }
+
+    minors_dont_puppet_or_liberate_at_all_because_you_cant_finish_the_job = {
+        peace_action_type = { puppet liberate }
+        enable = {
+            is_major = no
+            ROOT.FROM = { pc_is_liberated = no }
+        }
+        ai_desire = -100
+    }
+
+    majors_dont_fragment_as_much_less = {
+        peace_action_type = { puppet liberate }
+        enable = {
+            is_major = yes
+            ROOT.FROM.FROM = {
+                pc_is_puppeted = yes
+                NOT = { ROOT.FROM.FROM = { pc_is_puppeted_by = ROOT } }
+                NOT = { original_tag = GER }
+            }
+        }
+        ai_desire = -50
+    }
+
+    minors_follow_your_leader_when_forcing_gov = {
+        peace_action_type = force_government
+        enable = {
+            is_major = no
+            ROOT.FROM.FROM = { pc_is_forced_government = no }
+        }
+        ai_desire = -100
+    }
+
+    continuous_force_gov_desire = {
+        peace_action_type = { force_government }
+        enable = {
+            FROM.FROM = { pc_is_forced_government_by = ROOT }
+        }
+        ai_desire = 30
+    }
+
+
+    continuous_puppet = {
+        peace_action_type = { puppet }
+        enable = {
+            ROOT.FROM = { pc_is_puppeted_by = ROOT }
+        }
+        ai_desire = 100
+    }
+
+    leave_player_controlled_land_until_later_in_the_process = {
+        peace_action_type = { take_states puppet force_government liberate }
+        enable = {
+            ROOT.FROM.FROM.FROM = {
+                controller = {
+                    is_ai = no
+                }
+            }
+        }
+        ai_desire = -10
+    }
+
+    minors_avoid_interfering_with_random_claims = {
+        peace_action_type = { take_states }
+        enable = {
+            ROOT = { is_ai = yes }
+            ROOT.FROM = {
+                tag = ROOT
+                is_major = no
+            }
+            ROOT.FROM.FROM.FROM = {
+                NOT = {
+                    OR = {
+                        is_claimed_by = ROOT
+                        is_core_of = ROOT
+                    }
+                }
+            }
+        }
+        ai_desire = -80
+    }
+
+    dont_even_try_to_puppet_large_states = { ###Too messy
+        peace_action_type = { puppet }
+
+        enable = {
+            ROOT.FROM.FROM = { check_variable = { num_owned_states > 30 } }
+        }
+        ai_desire = -200
+    }
+
+    dont_liberate_if_puppeted = { ###Too messy
+        peace_action_type = { liberate }
+
+        enable = {
+            ROOT.FROM = { pc_is_puppeted = yes }
+        }
+        ai_desire = -200
+    }
+
+    dont_take_state_if_already_puppeted_by_us = { ###Too messy
+        peace_action_type = { take_state }
+
+        enable = {
+            ROOT.FROM = { pc_is_puppeted_by = ROOT }
+        }
+        ai_desire = -200
+    }
+
+    puppet_their_puppets = {
+        peace_action_type = { puppet }
+
+        enable = {
+            is_faction_leader = yes
+            ROOT.FROM.FROM = { 
+                is_subject = yes
+                OR = {
+                    pc_is_puppeted = no
+                    pc_is_puppeted_by = ROOT
+                }
+                overlord = {
+                    NOT = { tag = GER }
+                }
+            }
+            ROOT.FROM.FROM.FROM = {
+                NOT = { is_claimed_by = ROOT }
+                NOT = { is_core_of = ROOT }
+            }
+        }
+        ai_desire = 70
+    }
+
+    dont_force_their_puppets = {
+        peace_action_type = { force_government }
+
+        enable = {
+            ROOT.FROM.FROM = { 
+                is_subject = yes
+            }
+            ROOT.FROM.FROM.FROM = {
+                NOT = { is_claimed_by = ROOT }
+                NOT = { is_core_of = ROOT }
+            }
+        }
+        ai_desire = -90
     }
 
 }

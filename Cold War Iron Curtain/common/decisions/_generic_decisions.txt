@@ -790,7 +790,47 @@ variables_calculation_category = {
 				#log = "[GetDateText]: [Root.GetTag]: industrial pulse effect"
 				industrial_pulse = yes
 
-
+				if = {
+					limit = {
+						check_variable = { quarterly_report = 4 }
+						is_ai = no
+					}
+					resize_array = {
+						array = income_array
+						value = IncomeCheck
+						size = 25
+					}
+					remove_from_array = { array = income_array index = 0 }
+					resize_array = {
+						array = food_array
+						value = FoodBalanceTotal
+						size = 25
+					}
+					remove_from_array = { array = food_array index = 0 }
+					resize_array = {
+						array = debt_array
+						value = currentDebt
+						size = 25
+					}
+					remove_from_array = { array = debt_array index = 0 }
+					resize_array = {
+						array = electricity_array
+						value = resource@electricity
+						size = 25
+					}
+					remove_from_array = { array = electricity_array index = 0 }
+					resize_array = {
+						array = milexp_array
+						value = mil_expend
+						size = 25
+					}
+					remove_from_array = { array = milexp_array index = 0 }
+					set_variable = { quarterly_report = 0 }
+				}
+				else = {
+					add_to_variable = { quarterly_report = 1 }
+				}
+				
 				activate_mission = ic_Financial
 
 				#log = "[GetDateText]: [Root.GetTag]: chemical weapon effect and removal calc"
@@ -946,6 +986,69 @@ variables_calculation_category = {
 				log = "[GetDateText]: [Root.GetTag]: industrial pulse effect"
 				industrial_pulse = yes
 				monthly_power_projection_gain = yes
+				if = {	
+					limit = {
+						# is_ai = no
+						exists = yes
+					}
+					for_loop_effect = {
+						start = 0
+						end = 25
+						value = i
+						set_temp_variable = { new_income = random }
+						multiply_temp_variable = { new_income = 80 }
+						add_to_temp_variable = { new_income = 10 }
+						round_temp_variable = new_income
+						set_temp_variable = { new_food = random }
+						multiply_temp_variable = { new_food = 80 }
+						add_to_temp_variable = { new_food = 10 }
+						round_temp_variable = new_food
+						set_temp_variable = { new_debt = random }
+						multiply_temp_variable = { new_debt = 80 }
+						add_to_temp_variable = { new_debt = 10 }
+						round_temp_variable = new_debt
+						set_temp_variable = { new_electricity = random }
+						multiply_temp_variable = { new_electricity = 80 }
+						add_to_temp_variable = { new_electricity = 10 }
+						round_temp_variable = new_electricity
+						set_temp_variable = { new_milexp = random }
+						multiply_temp_variable = { new_milexp = 80 }
+						add_to_temp_variable = { new_milexp = 10 }
+						round_temp_variable = new_milexp
+						resize_array = {
+							array = income_array
+							value = new_income
+							size = 25
+						}
+						remove_from_array = { array = income_array index = 0 }
+						resize_array = {
+							array = food_array
+							value = new_food
+							size = 25
+						}
+						remove_from_array = { array = food_array index = 0 }
+						resize_array = {
+							array = debt_array
+							value = new_debt
+							size = 25
+						}
+						remove_from_array = { array = debt_array index = 0 }
+						resize_array = {
+							array = electricity_array
+							value = new_electricity
+							size = 25
+						}
+						remove_from_array = { array = electricity_array index = 0 }
+						resize_array = {
+							array = milexp_array
+							value = new_milexp
+							size = 25
+						}
+						remove_from_array = { array = milexp_array index = 0 }
+					}
+					set_variable = { quarterly_report = 4 }
+					add_to_variable = { currentDebt = debt_array^23 }
+				}
 			}
 		}
 		ai_will_do = {
@@ -1169,10 +1272,6 @@ variables_calculation_category = {
 				province = 11823
 			}
 			launch_nuke = { 
-				state = 1326
-				province = 1326
-			}
-			launch_nuke = { 
 				state = 1325
 				province = 3929
 			}
@@ -1269,43 +1368,6 @@ variables_calculation_category = {
 		}
 	}
 }
-
-
-
-propaganda_efforts = {
-	Propose_a_Neutral_Reunified_Germany = {
-
-		icon = generic_propaganda
-
-		available = {
-			date > 1952.3.1
-			original_tag = SOV
-		}
-		visible = {
-			has_country_leader = {
-				name = "Joseph Stalin"
-				ruling_only = yes
-			}
-			original_tag = SOV
-		}
-
-		fire_only_once = yes
-
-
-		cost = 0
-
-		complete_effect = {
-			country_event = StalinNotes.1
-		}
-		
-		ai_will_do = {
-			factor = 1
-
-		}
-	}
-
-}
-
 operations = {
 #	soviet_intervention = {
 #
@@ -1344,6 +1406,39 @@ operations = {
 #			factor = 0
 #		}
 #	}
+	cancel_berlin_blockade = {
+		icon = decision_lebensraum
+		fire_only_once = yes 
+
+		ai_will_do = {
+			factor = 1
+		}
+
+		allowed = {
+			tag = SOV
+		}
+
+		available = {
+			USA = {
+				has_idea = maintain_airlift
+			}
+			
+		}
+
+		visible = {
+			USA = {
+				has_idea = maintain_airlift
+			}
+			
+		}
+
+		complete_effect = {
+			USA = {
+				remove_ideas = maintain_airlift
+			}
+			news_event = news.1002
+		}
+	}
 	PAK_Afghan_Relations_Border_War = {
 		allowed = {
 			tag = PAK
@@ -1725,8 +1820,30 @@ operations = {
 			always = no
 		}
 		cancel_trigger = {
-			NOT = {
-				has_war_with = SYR
+			if = {
+				limit = {
+					EGY = {
+						owns_state = 554
+					}
+				}
+				NOT = {
+					has_war_with = EGY
+				}
+			}
+			else_if = {
+				limit = {
+					LEB = {
+						owns_state = 554
+					}
+				}
+				NOT = {
+					has_war_with = LEB
+				}
+			}
+			else = {
+				NOT = {
+					has_war_with = SYR
+				}
 			}
 		}
 		cost = 0
@@ -1740,6 +1857,8 @@ operations = {
 		timeout_effect = {
 			custom_effect_tooltip = IRQ_INTERVEITON_TT
 			white_peace = SYR
+			white_peace = LEB
+			white_peace = EGY
 			news_event = CIA_SYRIA.58
 		}
 
@@ -1759,8 +1878,30 @@ operations = {
 			always = no
 		}
 		cancel_trigger = {
-			NOT = {
-				has_war_with = SYR
+			if = {
+				limit = {
+					EGY = {
+						owns_state = 554
+					}
+				}
+				NOT = {
+					has_war_with = EGY
+				}
+			}
+			else_if = {
+				limit = {
+					LEB = {
+						owns_state = 554
+					}
+				}
+				NOT = {
+					has_war_with = LEB
+				}
+			}
+			else = {
+				NOT = {
+					has_war_with = SYR
+				}
 			}
 		}
 		cost = 0
@@ -1802,21 +1943,110 @@ operations = {
 				transfer_state = 810
 				transfer_state = 777
 				transfer_state = 680
+				white_peace = SYR
+				white_peace = LEB
+				white_peace = EGY
 			}
 			else_if = {
 				limit = {
-					SYR = {
-						controls_state = 905
+					controls_state = 894
+					controls_state = 677
+					controls_state = 810
+					controls_state = 777
+					controls_state = 680
+					controls_state = 554
+				}
+				news_event = CIA_SYRIA.60
+				EGY = {
+					release = SYR
+				}
+				SYR = {
+					create_country_leader = {
+						name = "Umar Kabbani"
+						picture = "Umar_Kabbani.dds"
+						ideology = military_junta
+					}
+					set_politics = {
+						ruling_party = neutrality
+						elections_allowed = no
+					}
+				set_autonomy = {
+                    target = SYR
+						autonomy_state = autonomy_associated_state
+                    }
+				}
+				894 = {
+					add_core_of = TUR
+				}
+				677 = {
+					add_core_of = TUR
+				}
+				810 = {
+					add_core_of = TUR
+				}
+				777 = {
+					add_core_of = TUR
+				}
+				680 = {
+					add_core_of = TUR
+				}
+				transfer_state = 894
+				transfer_state = 677
+				transfer_state = 810
+				transfer_state = 777
+				transfer_state = 680
+				white_peace = SYR
+				white_peace = LEB
+				white_peace = EGY
+			}
+			else_if = {
+				limit = {
+					OR = {
+						SYR = {
+							controls_state = 905
+						}
+						LEB = {
+							controls_state = 905
+						}
+						EGY = {
+							controls_state = 905
+						}
 					}
 				}
 				news_event = CIA_SYRIA.61
+				if = {
+					limit = {
+						EGY = {
+							controls_state = 905
+						}
+					}
+					EGY = {
+						transfer_state = 905
+					}
+				}
+				else_if = {
+					limit = {
+						LEB = {
+							controls_state = 905
+						}
+					}
+					LEB = {
+						transfer_state = 905
+					}
+				}
+				else = {
 				SYR = {
 					transfer_state = 905
 				}
+				}
 				white_peace = SYR
+				white_peace = LEB
+				white_peace = EGY
 			}
 			else = {
 				white_peace = SYR
+				white_peace = LEB
+				white_peace = EGY
 			}
 			
 			news_event = CIA_SYRIA.58
@@ -2963,115 +3193,3 @@ war_measures = {
 		}
 	}
 }
-
- foreign_politics = {
-	start_suez_debug = {
-		icon = generic_industry
-		allowed = {
-		}
-
-		available = {
-			is_debug = yes
-			is_ai = no
-		}
-		visible = {
-			is_debug = yes
-			is_ai = no
-		}
-		cost = 0
-		ai_will_do = {
-			factor = 0
-		}
-		complete_effect = {
-			EGY = {
-				country_event = suez.2
-				BAH = { country_event = Suez_Crisis_Gulf.50 }
-				QAT = { country_event = QAT_Suez_Crisis.1 }
-			}
-		}
-   }
-
-   can_build_railway_test = {
-		icon = generic_industry
-		allowed = {
-		}
-
-		available = {
-			is_debug = yes
-			can_build_railway = {
-				start_province = 9671 ##use start_state instead if you want to check between states instead of provinces
-				target_province = 9814 ##ditto, target_state
-			}
-		}
-		visible = {
-			is_debug = yes
-			is_ai = no
-		}
-		cost = 0
-		ai_will_do = {
-			factor = 0
-		}
-		complete_effect = {
-		}
-   }
-   form_indochina_faction = {
-		icon = generic_industry
-		allowed = {
-		}
-
-		available = {
-			is_debug = yes
-		}
-		visible = {
-			is_debug = yes
-			is_ai = no
-		}
-		cost = 0
-		ai_will_do = {
-			factor = 0
-		}
-		complete_effect = {
-				country_event = CPSU20.1
-				hidden_effect = {
-					load_focus_tree = SOV_Kaganovich
-					complete_national_focus = SOV_Kaganovichs_Union
-					create_country_leader = {
-						name = "Lazar Kaganovich"
-						picture = "Lazar_Kaganovich.dds"
-						desc = ""
-						ideology = marxism_leninism
-					}
-				}
-		}
-   }
-
-   has_railway_test = {
-		icon = generic_industry
-		allowed = {
-		}
-
-		available = {
-			is_debug = yes
-			has_railway_connection = {
-				start_province = 9671
-				target_province = 9814
-			}
-		}
-		visible = {
-			is_debug = yes
-			is_ai = no
-		}
-		cost = 0
-		ai_will_do = {
-			factor = 0
-		}
-		complete_effect = {
-		}
-   }
-}
-
-economy_decisions = {
-
-}
-
-
