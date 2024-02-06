@@ -1,0 +1,402 @@
+add_namespace = CWIC_ARG_CHL_union
+
+# 
+country_event = {
+	id = CWIC_ARG_CHL_union.1
+	title = "Argentina demand the Union" #CWIC_ARG_CHL_union.1.t
+	desc = "Description" #CWIC_ARG_CHL_union.1.desc
+
+	trigger = {
+		tag = CHL
+	}
+	is_triggered_only = yes
+
+	fire_only_once = yes
+	
+	option = { # accept ARG annex CHL
+		name = "Acept the annexation" #CWIC_ARG_CHL_union.1.a
+		clr_global_flag = CWIC_ARG_CHL_union_influence_flag
+		
+		CHL = {
+			clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+			every_character = {
+				limit = {
+					is_army_leader = yes
+				}
+				set_nationality = {
+					target_country = ARG
+				}
+			}
+		}		
+		ARG = {
+			clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+			annex_country = {
+				target = CHL
+				transfer_troops = yes
+			}
+		}
+		ai_chance = {
+			base = 80
+		}
+	}
+	option = { # refuse CHL annexion
+		name = "Refuse the annexation" #CWIC_ARG_CHL_union.1.b
+		ARG = {
+			country_event = CWIC_ARG_CHL_union.3
+		}		
+		custom_effect_tooltip = effect_CHL_civil_war_of_unification_tt
+		ARG = {
+			set_autonomy = {
+				target = CL1
+				autonomy_state = autonomy_integrated_puppet
+			}
+		}
+		hidden_effect = {
+			every_state = {
+				limit = { 
+					is_core_of = CHL
+				}
+				add_core_of = CL1
+			}
+			every_state = {
+				limit = { 
+					is_core_of = CHL
+					is_capital = no
+				}
+				transfer_state_to = CL1
+			}
+			CHL = {
+				transfer_units_fraction = {
+					target = CL1
+					size = 0.3
+					stockpile_ratio = 0.1
+					army_ratio = 0.1
+					navy_ratio = 0.1
+					air_ratio = 0.1
+				}
+				declare_war_on = {
+					target = CL1
+					type = civil_war
+				}
+				declare_war_on = {
+					target = ARG
+				}
+			}
+		}
+		ai_chance = {
+			base = 20
+		}
+	}
+}
+
+country_event = {
+	id = CWIC_ARG_CHL_union.2
+	title = "Chile demand the Union" #CWIC_ARG_CHL_union.2.t
+	desc = "Description" #CWIC_ARG_CHL_union.2.desc
+
+	trigger = {
+		tag = ARG
+	}
+
+	is_triggered_only = yes
+
+	fire_only_once = yes
+	
+	option = { # accept CHL annex ARG
+		name = "Accept the annexation" #CWIC_ARG_CHL_union.2.a
+		clr_global_flag = CWIC_ARG_CHL_union_influence_flag
+		ARG = {
+			clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+			every_character = {
+				limit = {
+					is_army_leader = yes
+				}
+				set_nationality = {
+					target_country = CHL
+				}
+			}
+		}		
+		CHL = {
+			clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+			annex_country = {
+				target = ARG
+				transfer_troops = yes
+			}
+		}
+
+		ai_chance = {
+			base = 60
+		}
+	}
+	option = { # refuse ARG annexion
+		name = "Refuse the annexation" #CWIC_ARG_CHL_union.2.b
+		CHL = {
+			country_event = CWIC_ARG_CHL_union.3
+		}
+		
+		custom_effect_tooltip = effect_ARG_civil_war_of_unification_tt
+
+		hidden_effect = {
+			every_state = {
+				limit = { 
+					is_core_of = ARG
+				}
+				add_core_of = AR1
+			}
+			every_state = {
+				limit = { 
+					is_core_of = ARG
+					is_capital = no
+				}
+				transfer_state_to = AR1
+			}
+			ARG = {
+				transfer_units_fraction = {
+					target = AR1
+					size = 0.3
+					stockpile_ratio = 0.1
+					army_ratio = 0.1
+					navy_ratio = 0.1
+					air_ratio = 0.1
+				}
+				declare_war_on = {
+					target = AR1
+					type = civil_war
+				}
+				declare_war_on = {
+					target = CHL
+				}
+			}
+		}
+		ai_chance = {
+			base = 40
+		}
+	}
+}
+
+country_event = {
+	id = CWIC_ARG_CHL_union.3
+	title = "Refuse the Union Agreement" #CWIC_ARG_CHL_union.3.t
+	desc = "Description" #CWIC_ARG_CHL_union.3.desc
+
+	trigger = {
+		OR = {
+			tag = ARG
+			tag = CHL
+		}		
+	}
+
+	is_triggered_only = yes
+
+	fire_only_once = yes
+	
+	option = { # no agreement of unification
+		name = "Its the will of the people" #CWIC_ARG_CHL_union.3.a
+		clr_global_flag = CWIC_ARG_CHL_union_influence_flag
+		ARG = {
+			clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+		}
+		CHL = {
+			clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+		}
+
+		ai_chance = {
+			base = 10
+		}
+	}
+}
+
+country_event = {
+	id = CWIC_ARG_CHL_union.4
+	title = "The [ARG.GetLeader] Union Proposal" #CWIC_ARG_CHL_union.4.t
+	desc = "Description" #CWIC_ARG_CHL_union.4.desc
+
+	trigger = {
+		tag = CHL	
+	}
+
+	is_triggered_only = yes
+
+	fire_only_once = yes
+	
+	option = { # accept the proposal of unification #probabilidad del 70 de aceptar la propuesta
+		name = "Accept the proposal of Union" #CWIC_ARG_CHL_union.4.a
+		CHL = {
+			set_global_flag = CWIC_ARG_CHL_union_influence_flag	
+		}			
+		ARG = {
+			set_global_flag = CWIC_ARG_CHL_union_influence_flag	
+			country_event = CWIC_ARG_CHL_union.5
+		}
+		
+		ai_chance = {
+			base = 80
+		}
+	}
+
+	option = { # refuse the proposal unification #probabilidad del 30 de rechazar la propuesta
+		name = "Deny the proposal of Union" #CWIC_ARG_CHL_union.4.b
+		ARG = {
+			country_event = CWIC_ARG_CHL_union.6
+		}		
+
+		ai_chance = {
+			base = 10
+		}
+	}
+}
+
+country_event = {
+	id = CWIC_ARG_CHL_union.5
+	title = "The [CHL.GetAdjective] Accept our proposal" #CWIC_ARG_CHL_union.5.t
+	desc = "Description" #CWIC_ARG_CHL_union.5.d
+
+	trigger = {
+		tag = ARG		
+	}
+
+	is_triggered_only = yes
+
+	fire_only_once = yes
+	
+	option = { # Chilean accepts the union proposal
+		name = "Accept the proposal of Union" #CWIC_ARG_CHL_union.5.a
+
+		ARG = {
+			set_country_flag = CWIC_ARG_with_CHL_union_active_mission
+			activate_mission = ARG_the_ARG_and_CHL_unification_mission
+		}
+		CHL = {
+			set_country_flag = CWIC_ARG_with_CHL_union_active_mission
+			activate_mission = ARG_the_ARG_and_CHL_unification_mission
+		}
+
+		ai_chance = {
+			base = 70
+		}
+	}
+}
+
+country_event = {
+	id = CWIC_ARG_CHL_union.6
+	title = "The [CHL.GetAdjective] have rejected our proposal" #CWIC_ARG_CHL_union.6.t
+	desc = "Description" #CWIC_ARG_CHL_union.5.d
+
+	trigger = {
+		tag = ARG		
+	}
+
+	is_triggered_only = yes
+
+	fire_only_once = yes
+	
+	option = { # Chilean deny the union proposal
+		name = "They not want the Unification, for now..." #CWIC_ARG_CHL_union.6.a
+
+		ai_chance = {
+			base = 70
+		}
+	}
+}
+
+country_event = {
+	id = CWIC_ARG_CHL_union.7
+	title = "Activate the Union of ARG and CHL" #CWIC_ARG_CHL_union.7.t
+	desc = "Description" #CWIC_ARG_CHL_union.7.d
+
+	trigger = {
+		tag = ARG		
+	}
+
+	is_triggered_only = yes
+
+	fire_only_once = yes
+	
+	option = { # his option is for the focus of re-unification
+		name = "Activate the Union" #CWIC_ARG_CHL_union.7.a 
+		custom_effect_tooltip = effect_ARG_CHL_union_proposal_tt
+
+		CHL = {
+			country_event = CWIC_ARG_CHL_union.4
+		}		
+		ai_chance = {
+			base = 70
+		}
+	}
+}
+
+country_event = {
+	id = CWIC_ARG_CHL_union.8
+	title = "Activate the Union of ARG and CHL" #CWIC_ARG_CHL_union.8.t
+	desc = "Description" #CWIC_ARG_CHL_union.8.desc
+
+	trigger = {
+		tag = ARG		
+	}
+
+	is_triggered_only = yes
+
+	fire_only_once = yes
+	
+	option = { # his option is for the focus of re-unification
+		name = "Activate the Union" #CWIC_ARG_CHL_union.8.a 
+
+		ARG = {
+			annex_country = {
+				target = CL1
+				transfer_troops = yes
+			}
+		}	
+		every_state = {
+			limit = {
+				OR = {
+					is_claimed_by = CHL
+					is_core_of = CHL
+				}				
+			}
+			remove_core_of = CHL
+			remove_claim_by = CHL
+		}
+		ai_chance = {
+			base = 70
+		}
+	}
+}
+
+country_event = {
+	id = CWIC_ARG_CHL_union.9
+	title = "Activate the Union of ARG and CHL" #CWIC_ARG_CHL_union.9.t
+	desc = "Description" #CWIC_ARG_CHL_union.9.desc
+
+	trigger = {
+		tag = CHL		
+	}
+
+	is_triggered_only = yes
+
+	fire_only_once = yes
+	
+	option = { # his option is for the focus of re-unification
+		name = "Activate the Union" #CWIC_ARG_CHL_union.9.a 
+
+		CHL = {
+			annex_country = {
+				target = AR1
+				transfer_troops = yes
+			}
+		}	
+		every_state = {
+			limit = {
+				OR = {
+					is_claimed_by = ARG
+					is_core_of = ARG
+				}				
+			}
+			remove_core_of = ARG
+			remove_claim_by = ARG
+		}	
+		ai_chance = {
+			base = 70
+		}
+	}
+}
