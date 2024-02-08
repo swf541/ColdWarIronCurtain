@@ -627,59 +627,51 @@ VIE_Bao_Dai_Power_Minigame = {
 }
 
 VIE_State_Integration_Decisions = {
-	VIE_Truly_Unified_Vietnam = {
+	State_NLF_Revolt = {
 		#icon = generic_civil_support
-		
-		visible = {
-			always = yes
-		}
-		available = {
-			always = yes
-		}
-		fire_only_once = yes
-		
-		cost = 25
-		
-		complete_effect = {
-			
-		}
-	}
-	NLF_Revolt_Mission = {
-		activation = {
-			has_country_flag = VIE_CCC_Unification
-			has_country_flag = VIE_unity_required
-		}
-		available = {
-			has_completed_focus = VIE_Pacifying_NamPhan_Countryside
-		}
 
-		#icon = generic_prepare_civil_war
+		state_target = yes
+		target_trigger = {
+			FROM = {
+				resistance > 75
+				NOT = { is_core_of = VIE }
+			}
+		}
+		available = {
+			FROM = {
+				resistance < 76
+				is_fully_controlled_by = VIE
+			}
+		}
+		cancel_trigger = {
+			FROM = {
+				OR = {
+					is_core_of = VIE
+					NOT = {
+						is_owned_and_controlled_by = VIE
+					}
+				}
+			}
+		}
+		target_array = VIE.owned_controlled_states
+		on_map_mode = decision_view_only
 		
 		days_mission_timeout = 24
 		selectable_mission = no
-		
-		complete_effect = {
-			every_owned_state = {
-				limit = {
-					NOT = { is_core_of = ROOT }
-				}
-				add_core_of = ROOT
-			}
-		}
+		days_re_enable = 3
+		is_good = no
+
 		timeout_effect = {
-			random_owned_controlled_state = {
-				limit = {
-					is_core_of = CCC
-					NOT = { is_core_of = ROOT }
-				}
-				create_unit = {
-					division = "name = \"Viet-Minh Revolt Militia\" division_template = \"Dan Quan Viet Minh\" start_experience_factor = 0.2"
-					allow_spawning_on_enemy_provs = yes
-					owner = NLF
+			hidden_effect = {
+				FROM = {
+					create_unit = {
+						division = "name = \"Viet-Minh Revolt Militia\" division_template = \"Dan Quan Viet Minh\" start_experience_factor = 0.2 start_equipment_factor = 0.5"
+						allow_spawning_on_enemy_provs = yes
+						owner = NLF
+					}
 				}
 			}
-			custom_effect_tooltip = NLF_Revolt_tt
-			activate_mission = NLF_Revolt_Mission
+			custom_effect_tooltip = State_NLF_Revolt_tt
 		}
 	}
 }
