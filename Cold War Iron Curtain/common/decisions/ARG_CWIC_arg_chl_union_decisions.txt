@@ -1,0 +1,205 @@
+###################################################
+###################################################
+#### BALANCE OF INFLUENCE OF ARG AND CHL UNION ####
+###################################################
+###################################################
+
+CWIC_ARG_CHL_union_category = {
+	ARG_the_ARG_and_CHL_unification_mission = {
+		#icon = GFX_decision_arg_increase_peronist_resistance_mission
+
+		days_mission_timeout = 5 # 290
+
+		activation = { 
+			has_country_flag = CWIC_ARG_with_CHL_union_active_mission
+		}
+		available = {
+			#CHL se convierte en puppet de ARG
+			#ARG se convierte en puppet de CHL
+			OR = {
+				CHL = {
+					is_puppet_of = ARG
+				} 
+				ARG = {
+					is_puppet_of = CHL
+				}				 
+			}					
+		}
+
+		is_good = yes
+
+		selectable_mission = no
+
+		visible = {
+			OR = {
+				tag = ARG
+				tag = CHL
+			}
+			NOT = {
+				OR = {
+					ARG = {
+						has_country_flag = CWIC_ARG_CHL_UNION_winner_flag
+					}
+					CHL = {
+						has_country_flag = CWIC_ARG_CHL_UNION_winner_flag
+					}
+				}				
+			}
+		}
+
+		cancel_if_not_visible = yes
+
+		#ignora esto, si no lo ves no es feo
+		timeout_effect = { 	
+			if = {
+				limit = {
+					tag = ARG
+				}
+				custom_effect_tooltip = effect_ARG_annex_CHL_union_tt	
+			}
+
+			if = {
+				limit = {
+					tag = CHL
+				}
+				custom_effect_tooltip = effect_CHL_annex_ARG_union_tt	
+			}
+
+			if = {
+				limit = {
+					check_variable = { ARG.var_ARG_influence_about_CHL > ARG.var_CHL_influence_about_ARG }
+				}
+				ARG = {
+					set_country_flag = CWIC_ARG_CHL_UNION_winner_flag
+					clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+				}
+				CHL = {
+					country_event = CWIC_ARG_CHL_union.1
+					clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+				}
+				
+				clr_global_flag = CWIC_ARG_CHL_union_influence_flag				
+
+				else_if = {
+					limit = { 
+						check_variable = { ARG.var_CHL_influence_about_ARG > ARG.var_ARG_influence_about_CHL }
+					}
+					CHL = {
+						set_country_flag = CWIC_ARG_CHL_UNION_winner_flag
+						clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+					}
+					ARG = {
+						country_event = CWIC_ARG_CHL_union.2
+						clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+					}
+					clr_global_flag = CWIC_ARG_CHL_union_influence_flag	
+
+					else = {
+						clr_global_flag = CWIC_ARG_CHL_union_influence_flag	
+						ARG = {
+							country_event = CWIC_ARG_CHL_union.3 
+							clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+						}
+						CHL = {
+							country_event = CWIC_ARG_CHL_union.3 
+							clr_country_flag = CWIC_ARG_with_CHL_union_active_mission
+						}
+					}
+				}					
+			}
+		}
+
+		cancel_trigger = {
+			#NOT caida de Peron (lider del pais)
+			#NOT caida de Ibaniez (lider del pais)
+			#NOT chile debe existir
+			#NOT arg debe existir
+			#arg es puppet
+			#chl es puppet
+		}
+
+		complete_effect = { #	
+		}
+	}
+
+	CWIC_increase_the_influence_in_chile_decision = {
+		priority = 20
+		allowed = {
+			tag = ARG
+		}
+
+		cost = 50
+
+		visible = {
+			has_global_flag = CWIC_ARG_CHL_union_influence_flag
+		}
+
+		available = {			
+		}
+
+		cancel_if_not_visible = yes
+
+		complete_effect = {	
+			add_to_variable = { var = ARG.var_ARG_influence_about_CHL value = 10 }
+		}
+	}
+	CWIC_increase_the_influence_in_argentina_decision = {
+		priority = 10
+		allowed = {
+			tag = CHL
+		}
+
+		available = {			
+		}
+
+		visible = {
+			has_global_flag = CWIC_ARG_CHL_union_influence_flag
+		}
+
+		cancel_if_not_visible = yes
+
+		complete_effect = {	
+			add_to_variable = { var = ARG.var_CHL_influence_about_ARG value = 10 }
+		}
+	}
+
+	CWIC_decrease_the_influence_in_argentina_decision = {
+		priority = 10
+		allowed = {
+			tag = ARG
+		}
+
+		visible = {
+			has_global_flag = CWIC_ARG_CHL_union_influence_flag
+		}
+
+		cancel_if_not_visible = yes
+
+		available = {			
+		}
+
+		complete_effect = {	
+			subtract_from_variable = { var = ARG.var_CHL_influence_about_ARG value = 10 } 
+		}
+	}
+
+	CWIC_decrease_the_influence_in_chile_decision = {
+		priority = 10
+		allowed = {
+			tag = CHL
+		}
+
+		visible = {
+			has_global_flag = CWIC_ARG_CHL_union_influence_flag
+		}
+
+		cancel_if_not_visible = yes
+
+		available = {			
+		}
+
+		complete_effect = {	
+			subtract_from_variable = { var = ARG.var_ARG_influence_about_CHL value = 10 } 
+		}
+	}
+}
