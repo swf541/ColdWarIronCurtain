@@ -166,21 +166,29 @@ focus_tree = {
 			}
 			custom_effect_tooltip = check_khr_tt
 			set_variable = {
-				num_food_after_goal_1 = FoodProdTotal
+				num_food_after_goal_1 = synthetic_refinery_quantity
 			}
 			set_variable = {
-				num_food_after_goal_2 = USA.FoodProdTotal
+				num_food_after_goal_2 = USA.industrial_complex_quantity
+			}
+			set_variable = {
+				num_food_after_goal_3 = office_park_quantity
 			}
 			multiply_variable = {
 				var = num_food_after_goal_1
-				value = 4
+				value = 2
 			}
 			multiply_variable = {
 				var = num_food_after_goal_2
 				value = 2
 			}
+			multiply_variable = {
+				var = num_food_after_goal_3
+				value = 2
+			}
 			round_variable = num_food_after_goal_1
 			round_variable = num_food_after_goal_2
+			round_variable = num_food_after_goal_3
 		}
 	}
 
@@ -1405,27 +1413,52 @@ focus_tree = {
 			date > 1964.07.26
 		}
 		completion_reward = {
-			log = "[GetDateText]: [Root.GetName]: Focus SOV_review_khrushchev_plans"
+			log = "[GetDateText]: [Root.GetName]: Focus SOV_review_khrushchev_plans"			
+			custom_effect_tooltip = check_khr_tt
+			set_variable = {
+				validation_variable = 0
+			}
 			if = {
 				limit = {
-					check_variable = { FoodProdTotal > num_food_after_goal_1 }
-					check_variable = { FoodProdTotal < num_food_after_goal_2 }
+					check_variable = { synthetic_refinery_quantity > num_food_after_goal_1}
 				}
-				set_country_flag = SOV_KHR_Successful_Plan
-				# country_event = SOV_KAG.14 #Event about the Seventh Five Year plan completion 
+				add_to_variable = {
+					validation_variable = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { industrial_complex_quantity > num_food_after_goal_2 }
+				}
+				add_to_variable = {
+					validation_variable = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { office_park_quantity > num_food_after_goal_3 }
+				}
+				add_to_variable = {
+					validation_variable = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { validation_variable = 3 }
+				}
+				set_country_flag = SOV_KHR_Successful_Plan_even_better
 			}
 			else_if = {
 				limit = {
-					check_variable = { FoodProdTotal > num_food_after_goal_2 }
+					check_variable = { validation_variable = 2 }
 				}
-				set_country_flag = SOV_KHR_Successful_Plan_even_better
-				# country_event = SOV_KAG.14 #Event about the Seventh Five Year plan completion 
+				set_country_flag = SOV_KHR_Successful_Plan
 			}
 			else = {
 				# country_event = SOV_KAG.15 #Event about the Seventh Five Year plan failing
 				set_country_flag = SOV_KHR_Loss
 			}
-			custom_effect_tooltip = result_fyp2_tt
+			custom_effect_tooltip = result_fypkhr_tt
 			hidden_effect = {
 				country_event = {
 					id = soviet_leader_change.2
