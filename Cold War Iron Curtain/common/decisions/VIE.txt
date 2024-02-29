@@ -423,6 +423,7 @@ VIE_Bao_Dai_Power_Minigame = {
 		selectable_mission = no
 
 		complete_effect = {
+			add_political_power = -15
 			add_to_variable = {
 				currentMoney = -0.10
 			}
@@ -484,6 +485,7 @@ VIE_Bao_Dai_Power_Minigame = {
 		selectable_mission = no
 
 		complete_effect = {
+			add_political_power = -25
 			add_to_variable = {
 				currentMoney = -0.25
 			}
@@ -520,6 +522,7 @@ VIE_Bao_Dai_Power_Minigame = {
 		selectable_mission = no
 
 		complete_effect = {
+			add_political_power = -20
 			add_to_variable = {
 				currentMoney = -0.20
 			}
@@ -556,6 +559,7 @@ VIE_Bao_Dai_Power_Minigame = {
 		selectable_mission = no
 
 		complete_effect = {
+			add_political_power = -20
 			add_to_variable = {
 				currentMoney = -0.20
 			}
@@ -592,6 +596,7 @@ VIE_Bao_Dai_Power_Minigame = {
 		selectable_mission = no
 
 		complete_effect = {
+			add_political_power = -15
 			add_to_variable = {
 				currentMoney = -0.15
 			}
@@ -904,6 +909,10 @@ VIE_Bao_Dai_Power_Minigame = {
 		activation = {
 			check_variable = { FRA_Influence < 10 }
 			NOT = { has_country_flag = VIE_FRA_Coup }
+			OR = {
+				has_character = CCC_Jean_Leroy
+				has_character = VIE_Nguyen_Van_Hinh
+			}
 		}
 		available = {
 			custom_trigger_tooltip = {
@@ -926,6 +935,81 @@ VIE_Bao_Dai_Power_Minigame = {
 				else = {
 					country_event = French_Coup.2
 				}
+			}
+		}
+	}
+}
+
+VIE_State_Industrialization = {
+	State_Industrialization_Ready = {
+		state_target = yes
+		target_trigger = {
+			FROM = {
+				has_state_flag = Not_Industrialized
+			}
+		}
+		cancel_trigger = {
+			FROM = {
+				NOT = {
+					is_owned_and_controlled_by = VIE
+				}
+			}
+		}
+		target_array = VIE.owned_controlled_states
+		on_map_mode = decision_view_only 
+		
+		days_remove = 90
+		fixed_random_seed = no
+
+		custom_cost_trigger = {
+			has_political_power > 49
+			check_variable = {
+				currentMoney > 0.49
+			}
+		}
+		custom_cost_text = VIE_has_500_mil
+
+		complete_effect = {
+			hidden_effect = {
+				add_political_power = -50
+				add_to_variable = {
+					currentMoney = -0.50
+				}
+			}
+		}
+		remove_effect = {
+			FROM = {
+				clr_state_flag = Not_Industrialized
+				hidden_effect = {
+					random_list = {
+						10 = {
+							modifier = {
+								factor = 1.5
+								water_infrastructure > 0
+							}
+							add_building_construction = {
+								type = agri_industrial_complex
+								level = 1
+								instant_build = yes
+							}
+						}
+						10 = {
+							add_building_construction = {
+								type = industrial_complex
+								level = 1
+								instant_build = yes
+							}
+						}
+						10 = {
+							add_building_construction = {
+								type = steel_factory
+								level = 1
+								instant_build = yes
+							}
+						}
+					}
+				}
+				custom_effect_tooltip = VIE_State_Industrialization_tt
 			}
 		}
 	}
