@@ -271,54 +271,6 @@ country_event = {
 	}
 }
 
-# Annexation of SIK
-country_event = {
-	id = prc.12 
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = prc.12"}
-	title = prc.12.t
-	desc = prc.12.d
-
-	fire_only_once = yes
-	is_triggered_only = yes
-
-	option = {
-		name = prc.12.a
-		annex_country = { target = SIK transfer_troops = yes }
-	}
-}
-
-# Annexation of SIK to SIK
-country_event = {
-	id = prc.13 
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = prc.13"}
-	title = prc.13.t
-	desc = prc.13.d
-
-	is_triggered_only = yes
-
-	fire_only_once = yes
-
-	option = {
-		name = prc.13.a
-		PRC = { annex_country = { target = SIK } }
-		ai_chance = {
-			factor = 90
-		}
-	}
-
-	option = {
-		name = prc.13.b
-		PRC = {
-			declare_war_on = {
-				target = SIK
-				type = annex_everything
-			}
-		}
-		ai_chance = {
-			factor = 10
-		}
-	}
-}
 
 # China event from Cambodia: Become puppet or not
 country_event = {
@@ -775,38 +727,44 @@ country_event = {
 }
 country_event = {
 	id = prc.200
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = prc.200"}
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = prc.200"}
 	title = "Chairman Mao passed away."
 	desc = PRC.200.d
 	#picture = GFX_news_event_india_troops
 	trigger = {
 		has_global_flag = ROC_taiwan
 		has_government = maoism
-		NOT = {
-			has_country_leader = {
-				name = "Liu Shaoqi"
-				ruling_only = yes
-			}
+		has_country_leader = {
+			character = PRC_mao_zedong
+			ruling_only = yes
 		}
 	}
 	is_triggered_only = yes
 	fire_only_once = yes
+	immediate = {
+		hidden_effect = {
+			kill_country_leader = yes
+			retire_character = PRC_mao_zedong
+			add_country_leader_role = {
+				character = PRC_Hua_Guofeng
+				promote_leader = yes
+				country_leader = {
+					ideology = mao_zedong_thought
+					expire = "1992.10.20.1"
+					traits = {
+						
+					}
+				}
+			}
+			country_event = {
+				id = prc70s.102
+				hours = 8
+			}
+		}
+	}
 
 	option = {
 		name = "He is a great man."
-		kill_country_leader = yes
-		hidden_effect = {
-			create_country_leader = {
-				name = "Hua Guofeng"
-				desc = "HUA_GUOFENG_desc"
-				picture = "Hua_Guofeng.dds"
-				expire = "1986.9.9"
-				ideology = maoist
-				traits = {
-					
-				}
-			}
-		}
 	}
 }
 country_event = {
@@ -817,10 +775,11 @@ country_event = {
 	#picture = GFX_news_event_india_troops
 	trigger = {
 		has_global_flag = ROC_taiwan
-		has_government = maoism
-		has_country_leader = {
-			name = "Liu Shaoqi"
-			ruling_only = yes
+		NOT = {
+			has_country_leader = {
+				character = PRC_mao_zedong
+				ruling_only = yes
+			}
 		}
 	}
 	is_triggered_only = yes
@@ -1052,18 +1011,12 @@ country_event = {
 		custom_effect_tooltip = LinBiao_gain_influence_tt
 		add_to_variable = { Linbiao_influence = 10 } 
 		set_variable = { cpc_bar_e = LinBiao_influence }
-		country_event = {
-			id = prc.209
-		}
 	}
 	option = {
 		name = "Failed to passed."
 		custom_effect_tooltip = LinBiao_lose_influence_tt
 		add_to_variable = { Linbiao_influence = -10 } 
 		set_variable = { cpc_bar_e = LinBiao_influence }
-		country_event = {
-			id = prc.209
-		}
 	}
 }
 country_event = {
