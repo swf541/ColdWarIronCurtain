@@ -1,4 +1,10 @@
 calculate_development_modifier_policy = {
+	set_variable = {
+		social_cost_base = 0
+	}
+	set_variable = {
+		outcrowding_limit = 1
+	}	#Limit on max domestic loans
 	call_policy_setup_values = yes
     set_variable = {
         social_cost_modifier_total = 0
@@ -123,6 +129,7 @@ calculate_development_modifier_policy = {
 }
 call_policy_setup_values = {
 	every_owned_state = {
+		state_population_category_check = yes
 		if = {
 			limit = {
 				development_level_five_check = yes
@@ -172,15 +179,181 @@ call_policy_setup_values = {
 			}
 		}
 		else = { }
+		income_effect_every_owned_scope = yes
+	}
+}
+income_effect_every_owned_scope = {
+	add_to_variable = {
+		ROOT.outcrowding_limit = building_level@office_park
+	}
+
+	add_to_variable = {
+		ROOT.social_cost_base = state_population_k
+	}
+	add_to_variable = {
+		ROOT.strategic_forces_expend = building_level@nuclear_reactor
+	}
+	add_to_variable = {
+		ROOT.industrial_complex_total = building_level@industrial_complex
+	}
+	add_to_variable = {
+		ROOT.farm_total = building_level@agri_industrial_complex
+	}
+	add_to_variable = {
+		ROOT.dockyard_total = building_level@dockyard
+	}
+	add_to_variable = {
+		ROOT.oil_refinery_total = building_level@synthetic_refinery
+	}
+	add_to_variable = {
+		ROOT.steel_works_total = building_level@steel_factory
+	}
+	add_to_variable = {
+		ROOT.tungsten_factory_total = building_level@tungsten_factory
+	}
+	add_to_variable = {
+		ROOT.fossil_fuel_powerplant_total = building_level@fossil_fuel_powerplant
+	}
+	add_to_variable = {
+		ROOT.renewable_powerplant_total = building_level@renewable_powerplant
+	}
+	add_to_variable = {
+		ROOT.nuclear_powerplant_total = building_level@nuclear_powerplant
+	}
+	add_to_variable = {
+		ROOT.tourism_infrastructure_total = tourism_infrastructure
+	}
+	add_to_variable = {
+		ROOT.office_park_total = building_level@office_park
+	}		#+2
+	add_to_variable = {
+		ROOT.trade_infrastructure_total = building_level@air_base
+	}
+	#add_to_variable = { ROOT.trade_infrastructure_total = building_level@naval_base }
+	add_to_variable = {
+		ROOT.trade_infrastructure_total = office_park_total
+	}
+	#
+	add_to_variable = {
+		ROOT.trade_infrastructure_total = building_level@state_infrastructure
+	}
+	if = {
+		#Add to upgrade progress
+		limit = {
+			check_variable = {
+				upgrade_progress > 0
+			}
+			OR = {
+				has_state_category = pop1
+				has_state_category = pop2
+				has_state_category = pop1dev1
+				has_state_category = pop2dev1
+				has_state_category = pop1dev2
+				has_state_category = pop2dev2
+				has_state_category = pop1dev3
+				has_state_category = pop2dev3
+				has_state_category = pop1dev4
+				has_state_category = pop2dev4
+			}
+		}
+		add_to_variable = {
+			upgrade_progress = global.upgrade_per_month_fast
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				upgrade_progress > 0
+			}
+			OR = {
+				has_state_category = pop3
+				has_state_category = pop4
+				has_state_category = pop5
+				has_state_category = pop7
+				has_state_category = pop3dev1
+				has_state_category = pop4dev1
+				has_state_category = pop5dev1
+				has_state_category = pop7dev1
+				has_state_category = pop3dev2
+				has_state_category = pop4dev2
+				has_state_category = pop5dev2
+				has_state_category = pop7dev2
+				has_state_category = pop3dev3
+				has_state_category = pop4dev3
+				has_state_category = pop5dev3
+				has_state_category = pop7dev3
+				has_state_category = pop3dev4
+				has_state_category = pop4dev4
+				has_state_category = pop5dev4
+				has_state_category = pop7dev4
+			}
+		}
+		add_to_variable = {
+			upgrade_progress = global.upgrade_per_month_nominal
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				upgrade_progress > 0
+			}
+			OR = {
+				has_state_category = pop10
+				has_state_category = pop15
+				has_state_category = pop10dev1
+				has_state_category = pop15dev1
+				has_state_category = pop10dev2
+				has_state_category = pop15dev2
+				has_state_category = pop10dev3
+				has_state_category = pop15dev3
+				has_state_category = pop10dev4
+				has_state_category = pop15dev4
+			}
+		}
+		add_to_variable = {
+			upgrade_progress = global.upgrade_per_month_slow
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				upgrade_progress > 0
+			}
+			OR = {
+				has_state_category = pop20
+				has_state_category = pop20dev1
+				has_state_category = pop20dev2
+				has_state_category = pop20dev3
+				has_state_category = pop20dev4
+			}
+		}
+		add_to_variable = {
+			upgrade_progress = global.upgrade_per_month_marathon
+		}
+	}
+	if = {
+		limit = {
+			check_variable = {
+				upgrade_progress > 99
+			}
+		}			#Upgrade state if reached full progress
+		Upgrade_State_effect = yes
+	}
+	#Measure cost of state upgrades for tooltip
+	if = {
+		limit = {
+			ROOT = {
+				is_ai = no
+			}
+		}			#AI has no use for this data and would only waste processing power. Less AI means less AI lag so it balances as players control more of the world, effectively not creating lag at all.
+		full_upgrade_estimate = yes
 	}
 }
 
 income_effect = {
+	calculate_development_modifier_policy = yes
 	gdp_calculation_effect = yes
 	#DO NOT TOUCH FILE WITHOUT APPROVAL; IDEALLY FROM SWF
-	every_owned_state = {
-		state_population_category_check = yes
-	}
 	set_variable = {
 		grossdomesticproduct_influence_limit = grossdomesticproduct
 	}
@@ -298,223 +471,8 @@ income_effect = {
 	set_variable = {
 		strategic_forces_expend = 0
 	}
-	set_variable = {
-		social_cost_base = 0
-	}
-	every_owned_state = {
-		if = {
-			limit = {
-				development_level_five_check = yes
-			}
-			add_to_variable = {
-				ROOT.social_cost_dev_level_five = state_population_k
-			}
-		}
-		else_if = {
-			limit = {
-				development_level_four_check = yes
-			}
-			add_to_variable = {
-				ROOT.social_cost_dev_level_four = state_population_k
-			}
-		}
-		else_if = {
-			limit = {
-				development_level_three_check = yes
-			}
-			add_to_variable = {
-				ROOT.social_cost_dev_level_three = state_population_k
-			}
-		}
-		else_if = {
-			limit = {
-				development_level_two_check = yes
-			}
-			add_to_variable = {
-				ROOT.social_cost_dev_level_two = state_population_k
-			}
-		}
-		else_if = {
-			limit = {
-				development_level_one_check = yes
-			}
-			add_to_variable = {
-				ROOT.social_cost_dev_level_one = state_population_k
-			}
-		}
-		else_if = {
-			limit = {
-				development_level_zero_check = yes
-			}
-			add_to_variable = {
-				ROOT.social_cost_dev_level_zero = state_population_k
-			}
-		}
-		else = { }
-		add_to_variable = {
-			ROOT.social_cost_base = state_population_k
-		}
-		add_to_variable = {
-			ROOT.strategic_forces_expend = building_level@nuclear_reactor
-		}
-		add_to_variable = {
-			ROOT.industrial_complex_total = building_level@industrial_complex
-		}
-		add_to_variable = {
-			ROOT.farm_total = building_level@agri_industrial_complex
-		}
-		add_to_variable = {
-			ROOT.dockyard_total = building_level@dockyard
-		}
-		add_to_variable = {
-			ROOT.oil_refinery_total = building_level@synthetic_refinery
-		}
-		add_to_variable = {
-			ROOT.steel_works_total = building_level@steel_factory
-		}
-		add_to_variable = {
-			ROOT.tungsten_factory_total = building_level@tungsten_factory
-		}
-		add_to_variable = {
-			ROOT.fossil_fuel_powerplant_total = building_level@fossil_fuel_powerplant
-		}
-		add_to_variable = {
-			ROOT.renewable_powerplant_total = building_level@renewable_powerplant
-		}
-		add_to_variable = {
-			ROOT.nuclear_powerplant_total = building_level@nuclear_powerplant
-		}
-		add_to_variable = {
-			ROOT.tourism_infrastructure_total = tourism_infrastructure
-		}
-		add_to_variable = {
-			ROOT.office_park_total = building_level@office_park
-		}		#+2
-		add_to_variable = {
-			ROOT.trade_infrastructure_total = building_level@air_base
-		}
-		#add_to_variable = { ROOT.trade_infrastructure_total = building_level@naval_base }
-		add_to_variable = {
-			ROOT.trade_infrastructure_total = office_park_total
-		}
-		#
-		add_to_variable = {
-			ROOT.trade_infrastructure_total = building_level@state_infrastructure
-		}
-		if = {
-			#Add to upgrade progress
-			limit = {
-				check_variable = {
-					upgrade_progress > 0
-				}
-				OR = {
-					has_state_category = pop1
-					has_state_category = pop2
-					has_state_category = pop1dev1
-					has_state_category = pop2dev1
-					has_state_category = pop1dev2
-					has_state_category = pop2dev2
-					has_state_category = pop1dev3
-					has_state_category = pop2dev3
-					has_state_category = pop1dev4
-					has_state_category = pop2dev4
-				}
-			}
-			add_to_variable = {
-				upgrade_progress = global.upgrade_per_month_fast
-			}
-		}
-		else_if = {
-			limit = {
-				check_variable = {
-					upgrade_progress > 0
-				}
-				OR = {
-					has_state_category = pop3
-					has_state_category = pop4
-					has_state_category = pop5
-					has_state_category = pop7
-					has_state_category = pop3dev1
-					has_state_category = pop4dev1
-					has_state_category = pop5dev1
-					has_state_category = pop7dev1
-					has_state_category = pop3dev2
-					has_state_category = pop4dev2
-					has_state_category = pop5dev2
-					has_state_category = pop7dev2
-					has_state_category = pop3dev3
-					has_state_category = pop4dev3
-					has_state_category = pop5dev3
-					has_state_category = pop7dev3
-					has_state_category = pop3dev4
-					has_state_category = pop4dev4
-					has_state_category = pop5dev4
-					has_state_category = pop7dev4
-				}
-			}
-			add_to_variable = {
-				upgrade_progress = global.upgrade_per_month_nominal
-			}
-		}
-		else_if = {
-			limit = {
-				check_variable = {
-					upgrade_progress > 0
-				}
-				OR = {
-					has_state_category = pop10
-					has_state_category = pop15
-					has_state_category = pop10dev1
-					has_state_category = pop15dev1
-					has_state_category = pop10dev2
-					has_state_category = pop15dev2
-					has_state_category = pop10dev3
-					has_state_category = pop15dev3
-					has_state_category = pop10dev4
-					has_state_category = pop15dev4
-				}
-			}
-			add_to_variable = {
-				upgrade_progress = global.upgrade_per_month_slow
-			}
-		}
-		else_if = {
-			limit = {
-				check_variable = {
-					upgrade_progress > 0
-				}
-				OR = {
-					has_state_category = pop20
-					has_state_category = pop20dev1
-					has_state_category = pop20dev2
-					has_state_category = pop20dev3
-					has_state_category = pop20dev4
-				}
-			}
-			add_to_variable = {
-				upgrade_progress = global.upgrade_per_month_marathon
-			}
-		}
-		if = {
-			limit = {
-				check_variable = {
-					upgrade_progress > 99
-				}
-			}			#Upgrade state if reached full progress
-			Upgrade_State_effect = yes
-		}
-		#Measure cost of state upgrades for tooltip
-		if = {
-			limit = {
-				ROOT = {
-					is_ai = no
-				}
-			}			#AI has no use for this data and would only waste processing power. Less AI means less AI lag so it balances as players control more of the world, effectively not creating lag at all.
-			full_upgrade_estimate = yes
-		}
-	}
+
 	#Social Policy Expenses
-	calculate_development_modifier_policy = yes
 
 	welfare_expenditure = yes
 	cpi_expenditure = yes
@@ -4762,14 +4720,7 @@ domestic_bond_calc = {
 			available_liquidity = 1
 		}
 	}	#Failsafe to prevent crash
-	set_variable = {
-		outcrowding_limit = 1
-	}	#Limit on max domestic loans
-	every_owned_state = {
-		add_to_variable = {
-			ROOT.outcrowding_limit = building_level@office_park
-		}
-	}
+
 	multiply_variable = {
 		outcrowding_limit = 10
 	}	#Billions per office park
