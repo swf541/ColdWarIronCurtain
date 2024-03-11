@@ -899,6 +899,7 @@ calculate_factory_gross_profits = {
 
 			#Mils
 			set_temp_variable = { baseValue = 0.5 }
+			multiply_temp_variable = { baseValue = arms_factory_tech }
 			multiply_temp_variable = { baseValue = productivity_factor }
 			multiply_temp_variable = { baseValue = PREV.mil_productivity_factor }			
 			add_to_array = {
@@ -909,6 +910,7 @@ calculate_factory_gross_profits = {
 
 			#Office
 			set_temp_variable = { baseValue = 5.25 }
+			multiply_temp_variable = { baseValue = office_park_tech }
 			multiply_temp_variable = { baseValue = productivity_factor }
 			multiply_temp_variable = { baseValue = PREV.ofp_productivity_factor }			
 			add_to_array = {
@@ -919,6 +921,7 @@ calculate_factory_gross_profits = {
 
 			#Steel Fac
 			set_temp_variable = { baseValue = 1.25 }
+			multiply_temp_variable = { baseValue = steel_works_tech }
 			multiply_temp_variable = { baseValue = productivity_factor }
 			multiply_temp_variable = { baseValue = PREV.stl_productivity_factor }			
 			add_to_array = {
@@ -929,6 +932,7 @@ calculate_factory_gross_profits = {
 
 			#Tungsten Fac 
 			set_temp_variable = { baseValue = 0.75 }
+			multiply_temp_variable = { baseValue = tungsten_factory_tech }
 			multiply_temp_variable = { baseValue = productivity_factor }
 			multiply_temp_variable = { baseValue = PREV.tng_productivity_factor }			
 			add_to_array = {
@@ -939,6 +943,7 @@ calculate_factory_gross_profits = {
 
 			#Food
 			set_temp_variable = { baseValue = 0.4 }
+			multiply_temp_variable = { baseValue = farm_tech }
 			multiply_temp_variable = { baseValue = productivity_factor }
 			multiply_temp_variable = { baseValue = PREV.fod_productivity_factor }			
 			add_to_array = {
@@ -1076,12 +1081,17 @@ calculate_net_poptype_earnings = {
 }
 
 gdp_calculation_effect = {
+	get_technology_building_bonuses = yes	#Sets Tech and Modifier bonuses for buildings
+	generate_tax_info = yes 				#Sets Laffer Curve and Updates GUI
+
 	employing_effect = yes
 	calculate_factory_gross_profits = yes
 	calculate_gross_factory_earnings = yes
 	calculate_net_poptype_earnings = yes
 	calculate_take_taxes_from_people = yes
 	calculate_sum_up_total = yes
+
+	GDP_Extra_Calcs = yes					#Extra Logging and GUI Effects
 }
 
 testing = {
@@ -1091,29 +1101,41 @@ testing = {
 }
 
 calculate_take_taxes_from_people = {
-	set_variable = { IncomeCheck = 0 }
+	set_variable = { TaxCheck = 0 }
+	laffer_curve_function = yes
+	set_variable = { pop_lowerclass_tax_rate = effective_tax_rate }
+	set_variable = { pop_middleclass_tax_rate = effective_tax_rate }
+	set_variable = { pop_upperclass_tax_rate = effective_tax_rate }
+	set_variable = { pop_corporateclass_tax_rate = effective_tax_rate }
+
+	multiply_variable = { pop_lowerclass_tax_rate = owner:modifier@tax_rate_lower_class }
+	multiply_variable = { pop_middleclass_tax_rate = owner:modifier@tax_rate_middle_class }
+	multiply_variable = { pop_upperclass_tax_rate = owner:modifier@tax_rate_upper_class }
+	multiply_variable = { pop_corporateclass_tax_rate = owner:modifier@tax_rate_corporate }
+
 	every_owned_state = {
+
 		set_temp_variable = { pop_lowerclass_taken_wage = pop_lowerclass_gross_wage }
-		multiply_temp_variable = { pop_lowerclass_taken_wage = owner:modifier@tax_rate_lower_class }
+		multiply_temp_variable = { pop_lowerclass_taken_wage = owner:pop_lowerclass_tax_rate }
 
 		set_temp_variable = { pop_substinents_taken_wage = pop_substinents_gross_wage }
-		multiply_temp_variable = { pop_substinents_taken_wage = owner:modifier@tax_rate_lower_class }
-		add_to_temp_variable = { pop_lowerclass_taken_wage  = pop_substinents_taken_wage}
+		multiply_temp_variable = { pop_substinents_taken_wage = owner:pop_lowerclass_tax_rate }
+		add_to_temp_variable = { pop_lowerclass_taken_wage = pop_substinents_taken_wage}
 
-		add_to_variable = { PREV.IncomeCheck = pop_lowerclass_taken_wage }
+		add_to_variable = { PREV.TaxCheck = pop_lowerclass_taken_wage }
 
 		set_variable = { pop_lowerclass_net_wage = pop_lowerclass_gross_wage }
 		multiply_variable = { pop_lowerclass_taken_wage = 0.5 }
 		subtract_from_variable = { pop_lowerclass_net_wage = pop_lowerclass_taken_wage} 
 
 		set_temp_variable = { pop_middleclass_taken_wage = pop_middleclass_gross_wage }
-		multiply_temp_variable = { pop_middleclass_taken_wage = owner:modifier@tax_rate_middle_class }
+		multiply_temp_variable = { pop_middleclass_taken_wage = owner:pop_middleclass_tax_rate }
 
 		set_temp_variable = { pop_artisan_taken_wage = pop_artisan_gross_wage }
-		multiply_temp_variable = { pop_artisan_taken_wage = owner:modifier@tax_rate_middle_class }
+		multiply_temp_variable = { pop_artisan_taken_wage = owner:pop_middleclass_tax_rate }
 		add_to_temp_variable = { pop_middleclass_taken_wage  = pop_artisans_taken_wage }
 
-		add_to_variable = { PREV.IncomeCheck = pop_middleclass_taken_wage }
+		add_to_variable = { PREV.TaxCheck = pop_middleclass_taken_wage }
 
 		set_variable = { pop_middleclass_net_wage = pop_middleclass_gross_wage }
 		multiply_variable = { pop_middleclass_taken_wage = 0.5 }		
@@ -1122,13 +1144,16 @@ calculate_take_taxes_from_people = {
 		if = {
 			limit = { check_variable = { net_factory_earnings > 0 }}
 			set_temp_variable = { net_factory_taxed_earnings = net_factory_earnings }
-			multiply_temp_variable = { net_factory_taxed_earnings = owner:modifier@tax_rate_corporate }
-			add_to_variable = { PREV.IncomeCheck = net_factory_taxed_earnings }			
+			multiply_temp_variable = { net_factory_taxed_earnings = owner:pop_corporateclass_tax_rate }
+			add_to_variable = { PREV.TaxCheck = net_factory_taxed_earnings }			
 		}
-		log = "[?owner:modifier@tax_rate_middle_class]"
+		log = "[?pop_middleclass_tax_rate]"
 	}	
-	divide_variable = { IncomeCheck = 100 }
-	log = "[?IncomeCheck]"
+	divide_variable = { TaxCheck = 100 }
+	set_variable = {
+		tax_display = TaxCheck
+	}
+	log = "[?TaxCheck]"
 }
 
 calculate_sum_up_total = {
@@ -1159,3 +1184,508 @@ calculate_sum_up_total = {
 ## Artisan: +2.2 / +11 Per 100.000
 ## Worker: +2.4 / +12 Per 100.000
 ## Bureaucrat: 3.2 / +16 Per 100.000
+
+#SWF Stuff
+get_technology_building_bonuses = {
+	set_variable = {
+		arms_factory_tech = 1
+	}
+	add_to_variable = {	#policy bonus
+		arms_factory_tech = modifier@modifier_arms_factory_income 
+	}
+
+	set_variable = {
+		farm_tech = 1
+	}
+	if = {
+		limit = {
+			has_tech = agriculture_I
+		}
+		add_to_variable = {
+			farm_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = agriculture_II
+		}
+		add_to_variable = {
+			farm_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = agriculture_III
+		}
+		add_to_variable = {
+			farm_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = agriculture_IV
+		}
+		add_to_variable = {
+			farm_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = agriculture_V
+		}
+		add_to_variable = {
+			farm_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = agriculture_VI
+		}
+		add_to_variable = {
+			farm_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = agriculture_VII
+		}
+		add_to_variable = {
+			farm_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = agriculture_VIII
+		}
+		add_to_variable = {
+			farm_tech = 0.05
+		}
+	}
+	add_to_variable = {
+		farm_tech = farm_income_bonus
+	}
+
+	set_variable = {
+		dockyard_tech = 1
+	}
+	if = {
+		limit = {
+			has_tech = logistics_I
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_II
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_III
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_IV_A
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_IV_B
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_V_A
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_V_B
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_VI
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_VII_A
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_VII_B
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_VIII_A
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_VIII_B
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_IX
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_X
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_XI
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_XII
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_XIII
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+	if = {
+		limit = {
+			has_tech = logistics_XIV
+		}
+		add_to_variable = {
+			dockyard_tech = 0.05
+		}
+	}
+
+	set_variable = {
+		oil_refinery_tech = 1
+	}
+	if = {
+		limit = {
+			has_tech = ww_oil
+		}
+		add_to_variable = {
+			oil_refinery_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = plastics_I
+		}
+		add_to_variable = {
+			oil_refinery_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = plastics_II
+		}
+		add_to_variable = {
+			oil_refinery_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = plastics_III
+		}
+		add_to_variable = {
+			oil_refinery_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = plastics_IV
+		}
+		add_to_variable = {
+			oil_refinery_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = plastics_V
+		}
+		add_to_variable = {
+			oil_refinery_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = plastics_VI
+		}
+		add_to_variable = {
+			oil_refinery_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = plastics_VII
+		}
+		add_to_variable = {
+			oil_refinery_tech = 0.15
+		}
+	}
+
+	#steel_factory
+	set_variable = {
+		steel_works_tech = 1
+	}
+	if = {
+		limit = {
+			has_tech = materials_I
+		}
+		add_to_variable = {
+			steel_works_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = materials_II
+		}
+		add_to_variable = {
+			steel_works_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = materials_III
+		}
+		add_to_variable = {
+			steel_works_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = materials_IV
+		}
+		add_to_variable = {
+			steel_works_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = materials_V
+		}
+		add_to_variable = {
+			steel_works_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = materials_VI
+		}
+		add_to_variable = {
+			steel_works_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = materials_VII
+		}
+		add_to_variable = {
+			steel_works_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = materials_VIII
+		}
+		add_to_variable = {
+			steel_works_tech = 0.15
+		}
+	}
+	#tungsten_factory
+	set_variable = {
+		tungsten_factory_tech = 1
+	}
+	if = {
+		limit = {
+			has_tech = chemistry_I
+		}
+		add_to_variable = {
+			tungsten_factory_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = chemistry_II
+		}
+		add_to_variable = {
+			tungsten_factory_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = chemistry_III
+		}
+		add_to_variable = {
+			tungsten_factory_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = chemistry_IV
+		}
+		add_to_variable = {
+			tungsten_factory_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = chemistry_V
+		}
+		add_to_variable = {
+			tungsten_factory_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = chemistry_VI
+		}
+		add_to_variable = {
+			tungsten_factory_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = chemistry_VII
+		}
+		add_to_variable = {
+			tungsten_factory_tech = 0.15
+		}
+	}
+	#office_park x2 +15%		office_park_total
+	set_variable = {
+		office_park_tech = 1
+	}
+	if = {
+		limit = {
+			has_tech = consumer_electronics_I
+		}
+		add_to_variable = {
+			office_park_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = consumer_electronics_II
+		}
+		add_to_variable = {
+			office_park_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = consumer_electronics_III
+		}
+		add_to_variable = {
+			office_park_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = consumer_electronics_IV
+		}
+		add_to_variable = {
+			office_park_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = consumer_electronics_V
+		}
+		add_to_variable = {
+			office_park_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = consumer_electronics_VI
+		}
+		add_to_variable = {
+			office_park_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = consumer_electronics_VII
+		}
+		add_to_variable = {
+			office_park_tech = 0.15
+		}
+	}
+	if = {
+		limit = {
+			has_tech = consumer_electronics_VIII
+		}
+		add_to_variable = {
+			office_park_tech = 0.15
+		}
+	}
+	add_to_variable = {
+		office_park_tech = modifier@office_park_income_adjustment
+	}
+	if = {
+		limit = {
+			has_country_flag = office_park_penalty
+		}
+		multiply_variable = {
+			office_park_total = office_park_penalty_rate
+		}
+	}
+}
