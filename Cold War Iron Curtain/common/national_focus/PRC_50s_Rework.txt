@@ -6355,9 +6355,13 @@ shared_focus = {
     prerequisite = {
         focus = PRC_50s_Establish_Contacts_With_the_Outside_World
     }
-    bypass = {
-        has_global_flag = korean_war_china_can_intervene
-        has_global_flag = korean_war
+    allow_branch = {
+        OR = {
+            has_global_flag = korean_war_begun
+            has_global_flag = korean_war_south_victory
+            has_global_flag = korean_war_north_victory
+            has_global_flag = KOREA_CEASEFIRE_UN
+        }
     }
     completion_reward = {
         KPA = {
@@ -6365,7 +6369,7 @@ shared_focus = {
         }
     }
     ai_will_do = {
-        base = 10
+        base = 1000
     }
 }
 shared_focus = {
@@ -6379,11 +6383,18 @@ shared_focus = {
         focus = PRC_50s_Prepare_to_Intervene_in_Korean_War
     }
     available = {
-        always = no
+        has_war_with = KOR
+    }
+    bypass = {
+        KPA = {
+            NOT = {
+                has_war_with = KOR
+            }
+        }
     }
     completion_reward = {
         add_to_variable = {
-            equipment_capture_factor = 0.2
+            equipment_capture_factor = 0.1
             tooltip = PRC_50s_People_s_Liberation_Army_land_change
         }
         add_to_variable = {
@@ -6405,7 +6416,14 @@ shared_focus = {
         focus = PRC_50s_Prepare_to_Intervene_in_Korean_War
     }
     available = {
-        always = no
+        has_war_with = KOR
+    }
+    bypass = {
+        KPA = {
+            NOT = {
+                has_war_with = KOR
+            }
+        }
     }
     completion_reward = {
         hidden_effect = {
@@ -6430,6 +6448,19 @@ shared_focus = {
     cost = 3.6
     x = -1
     y = 2
+    offset = {
+        x = 1
+        y = 0
+        trigger = {
+            OR = {
+                AND = {
+                    has_global_flag = korean_war_south_victory
+                    has_global_flag = annexation_of_north_korea
+                }
+                has_global_flag = KOREA_CEASEFIRE_UN
+            }
+        }
+    }
     relative_position_id = PRC_50s_Prepare_to_Intervene_in_Korean_War
     prerequisite = {
         focus = PRC_50s_Adapt_to_The_Korean_Battlefield
@@ -6440,12 +6471,36 @@ shared_focus = {
     mutually_exclusive = {
         focus = PRC_50s_Reunification_of_The_Korean_Peninsula
     }
+    allow_branch = {
+        NOT = {
+            has_global_flag = korean_war_north_victory
+            has_global_flag = annexation_of_south_korea
+        }
+    }
     available = {
         always = no
     }
     completion_reward = {
-        add_stability = 0.1
-        add_war_support = -0.1
+        if = {
+            limit = {
+                KPA = {
+                    exists = no
+                }
+            }
+            add_stability = -0.1
+            add_war_support = -0.1
+            add_political_power = -100
+        }
+        else_if = {
+            limit = { 
+                KPA = {
+                    exists = yes
+                }
+            }
+            add_stability = 0.05
+            add_political_power = 20
+        }
+        mark_focus_tree_layout_dirty = yes
     }
     ai_will_do = {
         base = 10
@@ -6457,6 +6512,14 @@ shared_focus = {
     cost = 3.6
     x = 1
     y = 2
+    offset = {
+        x = -1
+        y = 0
+        trigger = {
+            has_global_flag = korean_war_north_victory
+            has_global_flag = annexation_of_south_korea
+        }
+    }
     relative_position_id = PRC_50s_Prepare_to_Intervene_in_Korean_War
     prerequisite = {
         focus = PRC_50s_Adapt_to_The_Korean_Battlefield
@@ -6467,13 +6530,25 @@ shared_focus = {
     mutually_exclusive = {
         focus = PRC_50s_Sign_A_Ceasefire_Agreement
     }
+    allow_branch = {
+        NOT = {
+            OR = {
+                AND = {
+                    has_global_flag = korean_war_south_victory
+                    has_global_flag = annexation_of_north_korea
+                }
+                has_global_flag = KOREA_CEASEFIRE_UN
+            }
+        }
+    }
     available = {
         always = no
     }
     completion_reward = {
         add_stability = 0.1
-        add_war_support = 0.1
-        add_political_power = 100
+        add_war_support = 0.05
+        add_political_power = 150
+        mark_focus_tree_layout_dirty = yes
     }
     ai_will_do = {
         base = 10
@@ -6489,10 +6564,12 @@ shared_focus = {
     prerequisite = {
         focus = PRC_50s_Sign_A_Ceasefire_Agreement
     }
-    available = {
+    allow_branch = {
         KPA = {
             exists = no
         }
+    }
+    available = {
     }
     completion_reward = {
         KPA = {
@@ -6548,6 +6625,14 @@ shared_focus = {
     cost = 3.6
     x = 2
     y = 3
+    offset = {
+        x = -4
+        y = 0
+        trigger = {
+            has_global_flag = korean_war_north_victory
+            has_global_flag = annexation_of_south_korea
+        }
+    }
     relative_position_id = PRC_50s_Prepare_to_Intervene_in_Korean_War
     prerequisite = {
         focus = PRC_50s_Reunification_of_The_Korean_Peninsula
@@ -6602,13 +6687,16 @@ shared_focus = {
     mutually_exclusive = {
         focus = PRC_50s_Instigate_Yan_an_Faction_Coup
     }
-    available = {
-        NOT = {
-            has_completed_focus = PRC_50s_Reunification_of_The_Korean_Peninsula
+    allow_branch = {
+        has_completed_focus = PRC_50s_Sign_A_Ceasefire_Agreement
+        KPA = {
+            exists = no
         }
         KOR = {
             exists = yes
         }
+    }
+    available = {
     }
     completion_reward = {
         set_temp_variable = { temp_x = 5 }
@@ -6664,15 +6752,17 @@ shared_focus = {
     mutually_exclusive = {
         focus = PRC_50s_Instigate_Yan_an_Faction_Coup
     }
-    available = {
-        NOT = {
-            has_completed_focus = PRC_50s_Reunification_of_The_Korean_Peninsula
-        }
+    allow_branch = {
+        has_completed_focus = PRC_50s_Sign_A_Ceasefire_Agreement
         KOR = {
             exists = yes
-        }
+        } 
+    }
+    available = {
+        always = no
     }
     completion_reward = {
+        custom_effect_tooltip = THIS_IS_WIP_TT
         declare_war_on = { target = KOR type = annex_everything }
         KPA = {
             declare_war_on = { target = KOR type = annex_everything }
@@ -6700,6 +6790,15 @@ shared_focus = {
     }
     mutually_exclusive = {
         focus = PRC_50s_Instigate_Yan_an_Faction_Coup
+    }
+    allow_branch = {
+        OR = {
+            has_completed_focus = PRC_50s_Sign_A_Ceasefire_Agreement
+            has_completed_focus = PRC_50s_Reunification_of_The_Korean_Peninsula
+        }
+        KPA = {
+            exists = yes
+        }
     }
     completion_reward = {
         set_temp_variable = { temp_x = 5 }
@@ -6753,6 +6852,15 @@ shared_focus = {
     }
     mutually_exclusive = {
         focus = PRC_50s_Maintain_Friendly_Relation_with_DPRK
+    }
+    allow_branch = {
+        OR = {
+            has_completed_focus = PRC_50s_Sign_A_Ceasefire_Agreement
+            has_completed_focus = PRC_50s_Reunification_of_The_Korean_Peninsula
+        }            
+        KPA = {
+            exists = yes
+        }
     }
     completion_reward = {
         custom_effect_tooltip = PRC_50s_Instigate_Yan_an_Faction_Coup_tt
