@@ -124,19 +124,37 @@ shared_focus = {
 		start_border_war = {
 			change_state_after_war = no 
 			combat_width = 80 #
-			minimum_duration_in_days = 18
+			#minimum_duration_in_days = 18
 			attacker = {
 				state = 1557
 				num_provinces = 3
-				modifier = 10
-				on_win = PRC_50s_Rework_event.41
+				modifier = 1
+				on_win = {
+                    country_event = PRC_50s_Rework_event.41
+                }
+                on_lose = {
+                    declare_war_on = {
+                        target = TIB
+                        type = annex_everything
+                    }
+                    set_country_flag = Tibet_Invasion_1
+                    activate_mission = The_Invasion_of_Tibet
+                    RAJ = {
+                        country_event = PRC_TIBETAN.10
+                    }
+                }
 			}
 			defender = {
 				state = 867
 				num_provinces = 3
 				modifier = 0.1
+                on_win = {
+                }
+                on_lose = {
+                }
 			}
 		}
+        
 	}
 	ai_will_do = {
 		base = 10
@@ -6463,9 +6481,12 @@ shared_focus = {
         focus = PRC_50s_Reunification_of_The_Korean_Peninsula
     }
     allow_branch = {
-        NOT = {
-            has_global_flag = korean_war_north_victory
-            has_global_flag = annexation_of_south_korea
+        OR = {
+            AND = {
+                has_global_flag = korean_war_south_victory
+                has_global_flag = annexation_of_north_korea
+            }
+            has_global_flag = KOREA_CEASEFIRE_UN
         }
     }
     available = {
@@ -6522,15 +6543,8 @@ shared_focus = {
         focus = PRC_50s_Sign_A_Ceasefire_Agreement
     }
     allow_branch = {
-        NOT = {
-            OR = {
-                AND = {
-                    has_global_flag = korean_war_south_victory
-                    has_global_flag = annexation_of_north_korea
-                }
-                has_global_flag = KOREA_CEASEFIRE_UN
-            }
-        }
+        has_global_flag = korean_war_north_victory
+        #has_global_flag = annexation_of_south_korea
     }
     available = {
         always = no
