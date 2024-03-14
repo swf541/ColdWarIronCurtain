@@ -766,7 +766,7 @@ calculate_conversion_farmer_artisan = {
 				#log = "Now: [?THIS.theoretical_substinents_sum] Substinents, [?theoretical_artisan_sum] Artisans, [?theoretical_unemployed] Unemployed; Unemployment Rate: [?unemployment_factor|%]"
 			}
 		}
-		log = ""
+		#log = ""
 }
 
 calculate_conversion_labourer_worker = {
@@ -779,12 +779,105 @@ calculate_conversion_labourer_worker = {
 	}
 }
 
+calculate_conversion_lwa_capitalist_and_bureaucrat = {
+	every_owned_state = {
+		set_temp_variable = { economic_x_axis_minus_1 = PREV.economic_x_axis }
+		add_to_temp_variable = { economic_x_axis_minus_1 = -1 }
+
+		set_variable = { theoretical_capitalist_sum = 0 }	
+
+		set_temp_variable = { worker_to_capitalist_sum = theoretical_worker_sum }
+		multiply_temp_variable = { worker_to_capitalist_sum = 0.002 }		
+		multiply_temp_variable = { worker_to_capitalist_sum = 0.05 }		
+		multiply_temp_variable = { worker_to_capitalist_sum = economic_x_axis_minus_1 }		
+
+		subtract_from_variable = { theoretical_worker_sum = worker_to_capitalist_sum }
+		add_to_variable = { theoretical_capitalist_sum = worker_to_capitalist_sum }
+
+		set_temp_variable = { artisan_to_capitalist_sum = theoretical_artisan_sum }
+		multiply_temp_variable = { artisan_to_capitalist_sum = 0.002 }		
+		multiply_temp_variable = { artisan_to_capitalist_sum = 0.05 }		
+		multiply_temp_variable = { artisan_to_capitalist_sum = economic_x_axis_minus_1 }		
+
+		subtract_from_variable = { theoretical_artisan_sum = artisan_to_capitalist_sum }
+		add_to_variable = { theoretical_capitalist_sum = artisan_to_capitalist_sum }
+
+		set_temp_variable = { labourer_to_capitalist_sum = theoretical_labourer_sum }
+		multiply_temp_variable = { labourer_to_capitalist_sum = 0.001 }
+		multiply_temp_variable = { labourer_to_capitalist_sum = 0.05 }		
+		multiply_temp_variable = { labourer_to_capitalist_sum = economic_x_axis_minus_1 }		
+
+		subtract_from_variable = { theoretical_labourer_sum = labourer_to_capitalist_sum }
+		add_to_variable = { theoretical_capitalist_sum = labourer_to_capitalist_sum }
+
+		#log = "[?theoretical_capitalist_sum] "
+	}
+	every_owned_state = {
+		set_temp_variable = { bureaucrat_factor_reduction = 0.025 } 
+		multiply_temp_variable = { bureaucrat_factor_reduction = PREV.economic_x_axis }
+		set_temp_variable = { bureaucrat_factor = 0.8 }
+		subtract_from_temp_variable = { bureaucrat_factor = bureaucrat_factor_reduction }
+
+		set_variable = { theoretical_bureaucrat_sum = 0 }	
+
+		set_temp_variable = { worker_to_bureaucrat_sum = theoretical_worker_sum }
+		multiply_temp_variable = { worker_to_bureaucrat_sum = 0.008 }		
+		multiply_temp_variable = { worker_to_bureaucrat_sum = 0.5 }
+		multiply_temp_variable = { worker_to_bureaucrat_sum = bureaucrat_factor }		
+
+
+		subtract_from_variable = { theoretical_worker_sum = worker_to_bureaucrat_sum }
+		add_to_variable = { theoretical_bureaucrat_sum = worker_to_bureaucrat_sum }
+
+		set_temp_variable = { artisan_to_bureaucrat_sum = theoretical_artisan_sum }
+		multiply_temp_variable = { artisan_to_bureaucrat_sum = 0.004 }	
+		multiply_temp_variable = { artisan_to_bureaucrat_sum = 0.5 }
+		multiply_temp_variable = { artisan_to_bureaucrat_sum = bureaucrat_factor }		
+
+
+		subtract_from_variable = { theoretical_artisan_sum = artisan_to_bureaucrat_sum }
+		add_to_variable = { theoretical_bureaucrat_sum = artisan_to_bureaucrat_sum }
+
+		set_temp_variable = { labourer_to_bureaucrat_sum = theoretical_labourer_sum }
+		multiply_temp_variable = { labourer_to_bureaucrat_sum = 0.008 }
+		multiply_temp_variable = { labourer_to_bureaucrat_sum = 0.5 }
+		multiply_temp_variable = { labourer_to_bureaucrat_sum = bureaucrat_factor }		
+
+
+		subtract_from_variable = { theoretical_labourer_sum = labourer_to_bureaucrat_sum }
+		add_to_variable = { theoretical_bureaucrat_sum = labourer_to_bureaucrat_sum }
+
+		#log = "[?PREV.economic_x_axis] "
+	}	
+}
+
 
 list_worker_type = {
+	set_variable = { labourer_sum = 0 }
+	set_variable = { worker_sum = 0 }
+	set_variable = { soldier_sum = 0 }
+	set_variable = { farmer_sum = 0 }
+	set_variable = { artisan_sum = 0 }
+	set_variable = { substinents_sum = 0 }
+	set_variable = { unemployed_sum = 0 }
+	set_variable = { capitalist_sum = 0 }	
+	set_variable = { bureaucrat_sum = 0}
+
 	every_owned_state = {
 		#log = "[?THIS.GetId.GetName] LWSFAS Workforce: [?THIS.theoretical_labourer_sum], [?THIS.theoretical_worker_sum], [?THIS.theoretical_soldier_sum], [?THIS.theoretical_farmer_sum],  [?THIS.theoretical_artisan_sum], [?THIS.theoretical_substinents_sum]"
 		#log = "Unemployed = [?THIS.theoretical_unemployed] or [?THIS.unemployment_factor|%], Employable Population = [?This.employable_population]"
+		add_to_variable = { PREV.labourer_sum = theoretical_labourer_sum }
+		add_to_variable = { PREV.worker_sum = theoretical_worker_sum }
+		add_to_variable = { PREV.soldier_sum = theoretical_soldier_sum }
+		add_to_variable = { PREV.farmer_sum = theoretical_farmer_sum }
+		add_to_variable = { PREV.artisan_sum = theoretical_artisan_sum }
+		add_to_variable = { PREV.substinents_sum = theoretical_substinents_sum }
+		add_to_variable = { PREV.unemployed_sum = theoretical_unemployed }
+		add_to_variable = { PREV.capitalist_sum = theoretical_capitalist_sum }	
+		add_to_variable = { PREV.bureaucrat_sum = theoretical_bureaucrat_sum}		
 	}
+	log = "Workforce: L [?labourer_sum], W [?worker_sum], S [?soldier_sum], F [?farmer_sum]"
+	log = "Workforce: A [?artisan_sum], Sb [?substinents_sum], U [?unemploymed_sum], C [?capitalist_sum], B [?bureaucrat_sum]"
 }
 
 reset_potential_problems = {
@@ -796,6 +889,8 @@ reset_potential_problems = {
 		set_variable = { theoretical_artisan_sum = 0 }
 		set_variable = { theoretical_substinents_sum = 0 }
 		set_variable = { theoretical_unemployed = 0 }
+		set_variable = { theoretical_capitalist_sum = 0 }	
+		set_variable = { theoretical_bureaucrat_sum = 0}		
 	}
 }
 
@@ -811,7 +906,8 @@ employing_effect = {
 	calculate_theoretical_population = yes
 	calculate_unemployment_factor = yes
 	calculate_conversion_labourer_worker = yes	
-	#list_worker_type = yes
+	calculate_conversion_lwa_capitalist_and_bureaucrat = yes
+	list_worker_type = yes
 }
 
 
@@ -819,6 +915,7 @@ employing_effect = {
 ###########################################################################################################
 
 calculate_national_productivity_factor = {
+	get_electricity_debuff = yes
 	every_owned_state = {
 		set_variable = { productivity_factor = 0 }
 
@@ -851,9 +948,50 @@ calculate_national_productivity_factor = {
 
 		multiply_variable = { productivity_factor = overemployment_factor }
 
+		#Also check infrastructure
+
+		set_temp_variable = { modifier_infra_factor = 0.05 }
+		multiply_temp_variable = { modifier_infra_factor = infrastructure_level }
+		add_to_temp_variable = { modifier_infra_factor = 1 }
+		
+		multiply_variable = { productivity_factor = modifier_infra_factor }
+
+		multiply_variable = { productivity_factor = PREV.electricity_debuff_factor }		
+
 		#log = "[?THIS.productivity_factor] at [THIS.GetId.GetName]"
 
 	}
+}
+
+get_total_factory = {
+	set_variable = { total_factory_amount = 0 }
+	every_owned_state = {
+		add_to_variable = { PREV.total_factory_amount = THIS.buildings^8 }
+	}
+}
+
+get_electricity_debuff = {
+	get_total_factory = yes
+	set_variable = { electricity_debuff_factor = 1}
+
+	set_temp_variable = { electricity_into_variable = resource@electricity}			
+	if = {
+		limit = {
+			check_variable = { electricity_into_variable < 0}
+		}
+		multiply_temp_variable = { electricity_into_variable = -1 }
+		# turns positive
+		divide_temp_variable = { electricity_into_variable = total_factory_amount}
+
+		subtract_from_variable = { electricity_debuff_factor = electricity_into_variable}
+		if = {
+			limit = {
+				check_variable = { electricity_debuff_factor < 0 }
+			}
+			set_temp_variable = { electricity_debuff_factor = 0 }			
+		}
+	}
+	#log = "Electricity providence factor of [?electricity_debuff_factor]"	
 }
 
 check_individual_factory_productivity = {
@@ -879,7 +1017,10 @@ check_individual_factory_productivity = {
 	add_to_variable = { fod_productivity_factor = 1 }				
 
 	set_variable = { rsc_productivity_factor = modifier@other_resources_income_bonus }
-	add_to_variable = { rsc_productivity_factor = 1 }					
+	add_to_variable = { rsc_productivity_factor = 1 }			
+
+	#set_variable = { doc_productivity_factor = modifier@dockyard_income_bonus }
+	#add_to_variable = { doc_productivity_factor = 1 }			
 }
 
 calculate_factory_gross_profits = {
@@ -962,6 +1103,15 @@ calculate_factory_gross_profits = {
 				value = baseValue
 			}			
 
+			set_temp_variable = { baseValue = 2 }
+			multiply_temp_variable = { baseValue = productivity_factor }
+			multiply_temp_variable = { baseValue = PREV.doc_productivity_factor }						
+			add_to_array = {
+				array = THIS.Building_Profits
+				index = 7
+				value = baseValue
+			}						
+
 			#log = "Array: [?THIS.Building_Profits^0] [?THIS.Building_Profits^1] [?THIS.Building_Profits^2] [?THIS.Building_Profits^3] [?THIS.Building_Profits^4] [?THIS.Building_Profits^5] [?THIS.Building_Profits^6] at [THIS.GetID.GetName]"
 	}
 }
@@ -981,7 +1131,7 @@ calculate_gross_factory_earnings = {
 		add_to_variable = { gross_factory_earnings = mils_gross_factory_earnings }
 
 
-		set_temp_variable = { docks_gross_factory_earnings = THIS.Building_Profits^1 }
+		set_temp_variable = { docks_gross_factory_earnings = THIS.Building_Profits^7 }
 		multiply_temp_variable = { docks_gross_factory_earnings = THIS.buildings^2 }
 		add_to_variable = { gross_factory_earnings = docks_gross_factory_earnings }
 
@@ -1073,11 +1223,39 @@ calculate_net_poptype_earnings = {
 
 		subtract_from_variable = { net_factory_earnings = pop_middleclass_gross_wage }		
 
+		#Upper-Class Pop
+
+		set_temp_variable = { pop_bureaucrat_gross_wage = theoretical_bureaucrat_sum }
+		multiply_temp_variable = { pop_bureaucrat_gross_wage = 3.5 }
+		multiply_temp_variable = { pop_bureaucrat_gross_wage = productivity_factor }
+		divide_temp_variable = { pop_bureaucrat_gross_wage = 100 }		
+
+
+		set_temp_variable = { pop_capitalist_gross_wage = theoretical_capitalist_sum }
+		if = {
+			limit = { check_variable = PREV.economic_x_axis < 6}
+			multiply_temp_variable = { pop_capitalist_gross_wage = 2.5 }
+		}
+		else = {
+			multiply_temp_variable = { pop_capitalist_gross_wage = 100 }
+		}
+		multiply_temp_variable = { pop_capitalist_gross_wage = productivity_factor }
+		divide_temp_variable = { pop_capitalist_gross_wage = 100 }		
+
+		add_to_variable = { pop_upperclass_gross_wage = pop_capitalist_gross_wage }
+
+
 		#log = "[?THIS.GetID.GetName]: [?net_factory_earnings] compared to [?gross_factory_earnings], [?pop_lowerclass_gross_wage], [?pop_middleclass_gross_wage]"
 		#log = "[?THIS.GetID.GetName]: Substinents Earning: [?pop_substinents_gross_wage], Artisan Earning: [?pop_artisan_gross_wage]^^"
 
 	}
 	calculate_sum_up_total = yes	
+}
+
+testing = {
+	every_country = {
+		gdp_calculation_effect = yes
+	}
 }
 
 gdp_calculation_effect = {
@@ -1094,12 +1272,6 @@ gdp_calculation_effect = {
 	GDP_Extra_Calcs = yes					#Extra Logging and GUI Effects
 }
 
-testing = {
-	every_country = {
-		gdp_calculation_effect = yes
-	}
-}
-
 calculate_take_taxes_from_people = {
 	set_variable = { IncomeTotal = 0 }
 	laffer_curve_function = yes
@@ -1114,13 +1286,12 @@ calculate_take_taxes_from_people = {
 	multiply_variable = { pop_corporateclass_tax_rate = owner:modifier@tax_rate_corporate }
 
 	every_owned_state = {
-
 		set_temp_variable = { pop_lowerclass_taken_wage = pop_lowerclass_gross_wage }
 		multiply_temp_variable = { pop_lowerclass_taken_wage = owner:pop_lowerclass_tax_rate }
 
 		set_temp_variable = { pop_substinents_taken_wage = pop_substinents_gross_wage }
 		multiply_temp_variable = { pop_substinents_taken_wage = owner:pop_lowerclass_tax_rate }
-		add_to_temp_variable = { pop_lowerclass_taken_wage = pop_substinents_taken_wage}
+		add_to_temp_variable = { pop_lowerclass_taken_wage  = pop_substinents_taken_wage}
 
 		add_to_variable = { PREV.IncomeTotal = pop_lowerclass_taken_wage }
 
@@ -1147,7 +1318,7 @@ calculate_take_taxes_from_people = {
 			multiply_temp_variable = { net_factory_taxed_earnings = owner:pop_corporateclass_tax_rate }
 			add_to_variable = { PREV.IncomeTotal = net_factory_taxed_earnings }			
 		}
-		log = "[?pop_middleclass_tax_rate]"
+		#log = "[?pop_middleclass_tax_rate]"
 	}	
 	divide_variable = { IncomeTotal = 100 }
 	set_variable = {
@@ -1175,15 +1346,6 @@ calculate_sum_up_total = {
 	#log = "[?grossdomesticproduct]"
 }
 
-## Unemployed: -0.2 / -1 Per 100.000
-## Substinent: +0.2 / +1 Per 100.000
-## Farmer: +0.8 / +4 Per 100.000
-## Labourer: +1.2 / +6 Per 100.000
-## Soldier: +1.6 / +8 Per 100.000
-
-## Artisan: +2.2 / +11 Per 100.000
-## Worker: +2.4 / +12 Per 100.000
-## Bureaucrat: 3.2 / +16 Per 100.000
 
 #SWF Stuff
 get_technology_building_bonuses = {
