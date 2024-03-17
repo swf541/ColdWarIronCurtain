@@ -14,10 +14,96 @@ country_event = {
 	immediate = {
 		set_temp_variable = { tempIx = temp_nuke_target^num }
 		subtract_from_temp_variable = { tempIx = 1}
-		log = " [GetDateText]: [Root.GetTag]: id = wmd_nuke.2 - Nuking state [?temp_nuke_target^tempIx.GetName]"
-		launch_nuke = {
-			state = var:temp_nuke_target^tempIx
-			use_nuke = yes
+		var:temp_nuke_target^tempIx = {
+			owner = {
+				log = "[GetDateText]: [Root.GetTag] : [THIS.GetName] STATE [PREV.GetName]"
+				set_temp_variable = { PREV.PREV.failed_nuking = THIS.antinuke } ##FAILURE
+				set_temp_variable = { PREV.PREV.successful_nuking = 1 } ##SUCCESS
+				subtract_from_temp_variable = { PREV.PREV.successful_nuking = THIS.antinuke }
+				log = "[GetDateText]: [Root.GetTag] : Anti Nuke Percentage[?THIS.antinuke|%]"
+			}
+			if = {
+				limit = {
+					non_damaged_building_level = {
+						building = anti_air_building
+						level > 1
+					}
+					non_damaged_building_level = {
+						building = anti_air_building
+						level < 3
+					}
+				}
+				set_temp_variable = { PREV.AALevelCoverage = 5 }
+			}
+			else_if = {
+				limit = {
+					non_damaged_building_level = {
+						building = anti_air_building
+						level > 2
+					}
+					non_damaged_building_level = {
+						building = anti_air_building
+						level < 4
+					}
+				}
+				set_temp_variable = { PREV.AALevelCoverage = 10 }
+			}
+			else_if = {
+				limit = {
+					non_damaged_building_level = {
+						building = anti_air_building
+						level > 3
+					}
+					non_damaged_building_level = {
+						building = anti_air_building
+						level < 5
+					}
+				}
+				set_temp_variable = { PREV.AALevelCoverage = 15 }
+			}
+			else_if = {
+				limit = {
+					non_damaged_building_level = {
+						building = anti_air_building
+						level > 4
+					}
+				}
+				set_temp_variable = { PREV.AALevelCoverage = 20 }
+			}
+			else = {
+				set_temp_variable = { PREV.AALevelCoverage = 0 }
+			}
+		}
+		
+		multiply_temp_variable = { failed_nuking = 100 }
+		multiply_temp_variable = { successful_nuking = 100 }
+		round_temp_variable = successful_nuking
+		round_temp_variable = failed_nuking
+		add_to_temp_variable = { failed_nuking = AALevelCoverage }
+		subtract_from_temp_variable = { successful_nuking = AALevelCoverage }
+		clamp_temp_variable = {
+			var = failed_nuking
+			min = 0
+			max = 100
+		}
+		clamp_temp_variable = {
+			var = successful_nuking
+			min = 0
+			max = 100
+		}
+		random_list = {
+			successful_nuking = {
+				launch_nuke = {
+					state = var:temp_nuke_target^tempIx
+					use_nuke = yes
+				}
+				log = "[GetDateText]: [Root.GetTag] : Failure Chance [?failed_nuking]"
+				log = "[GetDateText]: [Root.GetTag] : Success Chance [?successful_nuking]"
+				log = " [GetDateText]: [Root.GetTag]: id = wmd_nuke.2 - Nuking state [?temp_nuke_target^tempIx.GetName] SUCCESS"
+			}
+			failed_nuking = {
+				log = " [GetDateText]: [Root.GetTag]: id = wmd_nuke.2 - Nuking state [?temp_nuke_target^tempIx.GetName] FAILED"
+			}
 		}
 		if = { limit = { check_variable = { tempIx = 0 } }
 			clear_array = temp_nuke_target
