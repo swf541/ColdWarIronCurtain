@@ -4035,6 +4035,177 @@ war_measures = {
  foreign_politics = {
 
  
+	increase_defcon = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_ai = ye
+				if = { limit = { has_idea = defcon_system_5 }
+					custom_trigger_tooltip = {
+						tooltip = highest_defcon_TT
+						NOT = { has_idea = defcon_system_5 }
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = DEFCON_cooldown_TT
+					NOT = { check_variable = { DEFCON_cooldown = 1 } }
+				}
+				custom_trigger_tooltip = {
+					tooltip = has_nukes_TT
+					check_variable = { num_of_nukes > 0 }
+				}
+				has_war = no
+		}
+		visible = {
+			is_ai = yes
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 1000
+		}
+		complete_effect = {
+			if = { 
+				limit = { 
+					has_idea = defcon_system_1
+				}
+				remove_ideas = defcon_system_1
+				add_ideas = defcon_system_2
+			}
+			else_if = { limit = { has_idea = defcon_system_2 }
+				remove_ideas = defcon_system_2
+				add_ideas = defcon_system_3
+			}
+			else_if = { limit = { has_idea = defcon_system_3 }
+				remove_ideas = defcon_system_3
+				add_ideas = defcon_system_4
+			}
+			else_if = { limit = { has_idea = defcon_system_4 }
+				remove_ideas = defcon_system_4
+				add_ideas = defcon_system_5
+			}
+			else = { log = "raise defcon fail" }
+			set_variable = { DEFCON_cooldown = 1 }
+			THIS = { activate_mission = WMD_defcon_cooldown }
+		}
+	}
+	
+	decrease_defcon = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_ai = yes
+				if = { limit = { has_idea = defcon_system_1 }
+					custom_trigger_tooltip = {
+						tooltip = lowest_defcon_TT
+						NOT = { has_idea = defcon_system_1 }
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = DEFCON_cooldown_TT
+					NOT = { check_variable = { DEFCON_cooldown = 1 } }
+				}
+				custom_trigger_tooltip = {
+					tooltip = has_nukes_TT
+					check_variable = { num_of_nukes > 0 }
+				}
+				if = { limit = { has_idea = defcon_system_5 }
+					custom_trigger_tooltip = {
+						tooltip = needs_60_WT_TT
+						threat > 0.6
+					}
+				}
+				else_if = { limit = { has_idea = defcon_system_4 }
+					custom_trigger_tooltip = {
+						tooltip = needs_80_WT_TT
+						threat > 0.8
+					}
+				}
+				else_if = { limit = { has_idea = defcon_system_3 }
+					custom_trigger_tooltip = {
+						tooltip = needs_90_WT_TT
+						threat > 0.9
+					}
+					custom_trigger_tooltip = {
+						tooltip = must_be_at_war_2_TT
+						has_war = yes
+					}
+				}
+				else_if = { limit = { has_idea = defcon_system_2 }
+					custom_trigger_tooltip = {
+						tooltip = needs_100_WT_TT
+						threat > 0.999
+					}
+					custom_trigger_tooltip = {
+						tooltip = must_be_at_war_1_TT
+						has_war = yes
+					}
+				}
+		}
+		visible = {
+			is_ai = yes
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 1000
+		}
+		complete_effect = {
+				if = { limit = { has_idea = defcon_system_5 }
+					remove_ideas = defcon_system_5
+					add_ideas = defcon_system_4
+				}
+				else_if = { limit = { has_idea = defcon_system_4 }
+					remove_ideas = defcon_system_4
+					add_ideas = defcon_system_3
+				}
+				else_if = { limit = { has_idea = defcon_system_3 }
+					remove_ideas = defcon_system_3
+					add_ideas = defcon_system_2
+				}
+				else_if = { limit = { has_idea = defcon_system_2 }
+					remove_ideas = defcon_system_2
+					add_ideas = defcon_system_1
+				}
+				else = {
+					add_ideas = defcon_system_5
+				}
+				set_variable = { DEFCON_cooldown = 1 }
+				THIS = { activate_mission = WMD_defcon_cooldown }
+		}
+	}
+	nuclear_war = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_ai = yes
+			has_war = yes
+			has_idea = defcon_system_1
+			check_variable = { var = wmd_missiles_total value = var:missile_cost compare = greater_than_or_equals }
+			OR = {
+				original_tag = USA
+				original_tag = SOV
+			}
+		}
+		visible = {
+			is_ai = yes
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 1000
+		}
+		complete_effect = {
+			wmd_select_all_enemies = yes
+			wmd_distance_calculator = yes
+			wmd_check_strike_missiles = yes
+			wmd_nuke_launch = yes
+		}
+	}
+   
 	prc_wins_CCW_debug = {
 		icon = generic_industry
 		allowed = {
