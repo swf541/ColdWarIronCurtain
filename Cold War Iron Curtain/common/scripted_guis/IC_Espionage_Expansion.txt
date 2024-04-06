@@ -1,0 +1,3057 @@
+scripted_gui = {
+    intelligence_button_overlay = {
+        context_type = player_context
+        window_name = "intelligence_button_overlay"
+        parent_window_name = country_menu_window
+
+        properties = { 
+            Espionage_Button_Overlay = {
+                frame = paramilitary_toggle
+            }
+        }
+        effects = {
+            Espionage_Button_Overlay_click = {
+                if = {
+                    limit = {
+                        check_variable = {
+                            paramilitary_alt_toggle = 3
+                        }
+                    }
+                    play_song = "Espionage_Trailer"
+                    set_country_flag = played_song
+                }
+                
+                if = {
+                    limit = {
+                        check_variable = {
+                            paramilitary_toggle = 2
+                        }
+                    }
+                    set_variable = {
+                        paramilitary_toggle = 0
+                    }
+                }
+                else = {
+                    set_variable = {
+                        paramilitary_toggle = 2
+                    }
+                }
+            }
+        }
+    }
+    intelligence_bulletin_slot_one = {
+        context_type = player_context
+        window_name = "intelligence_bulletin_slot_one"
+		visible = {
+			check_variable = {
+				paramilitary_slot_one_bulletin = 1 
+			}
+		}
+        properties = {
+            Operative_Slot_One_News_Event_Pic = {
+                image = "[Slot_One_Espionage_News_Picture]"
+            }
+        }
+        effects = {
+            event_option_background_click = {
+                set_variable = {
+                    paramilitary_slot_one_bulletin = 0
+                }
+            }
+        }
+    }
+	country_special_operations_selection_list = {
+        context_type = player_context
+        window_name = "special_operations_selection_target_list_menu"
+        dynamic_lists = {
+            special_operations_selection_listing_grid = {
+                array = paramilitary_operative_squad_leader
+                change_scope = no
+				entry_container = special_operations_selection_target_list_entry
+            }
+        }
+        properties = {
+            operative_squad_portrait = {
+                image = "[RecruitmentPortraits]"
+            }
+        }
+        triggers = {
+            special_operations_selection_target_entry_button_active_visible = {
+                check_variable = {
+                    paramilitary_operative_squad_leader_on_mission^i = 1
+                }
+            }
+            special_operations_selection_target_entry_button_visible = {
+                check_variable = {
+                    paramilitary_operative_squad_leader_on_mission^i = 0
+                }
+            }
+            confirm_button_click_enabled = {
+                check_variable = { 
+                    squad_selected_part_one = 1
+                }
+            }
+        }
+		visible = {
+			check_variable = {
+				paramilitary_selection_toggle = 1 
+			}
+		}
+		effects = {
+            special_operations_selection_target_entry_button_click = {
+                set_variable = { 
+                    squad_selected_part_one = 1
+                }
+                set_variable = {
+                    selected_squad_temp = paramilitary_squad_id^i
+                }
+            }
+            confirm_button_click = {
+                set_variable = {
+                    squad_selected = 1
+                }
+                set_variable = {
+                    current_page = selected_squad_temp
+                }
+                set_variable = {
+                    paramilitary_selection_toggle = 0
+                }
+                set_variable = {
+                    selected_squad_temp = 0
+                }
+            }
+            close_button_click = {
+                set_variable = {
+                    paramilitary_selection_toggle = 0
+                }
+            }
+        }
+    }   
+    operation_overview_window_black_ops = {
+
+		context_type = player_context
+		ai_enabled = {
+			always = no
+		}
+        properties = {
+            black_ops_phase_title_1_picture = {
+                image = "[Phase1Picture]"
+            }
+            black_ops_phase_title_2_picture = {
+                image = "[Phase2Picture]"
+            }
+            black_ops_phase_title_3_picture = {
+                image = "[Phase3Picture]"
+            }
+            black_ops_target_country_flag = {
+                image = "[?selected_operation_index_target.GetFlag]"
+            }
+            black_ops_outlook_content = {
+                frame = selected_operation_index_risk
+            }
+            black_ops_progressbar_content = {
+                frame = selected_operation_index_duration_color
+            }
+            black_ops_cost_content = {
+                frame = selected_operation_index_cost_color
+            }
+            portrait_btn = {
+                image = "[OperativeSquadPortrait1]"
+            }           
+        }
+		window_name = "operation_overview_window_black_ops"
+		visible = {
+			check_variable = {
+				show_espionage_details_menu = 1 
+			}
+		}
+        triggers = {
+            black_ops_btn_collect_click_enabled = {
+                check_variable = {
+                    squad_selected = 1
+                }
+            }
+        }
+        effects = {
+            portrait_btn_click = {
+                set_variable = {
+                    paramilitary_selection_toggle = 1
+                }
+                clear_array = ROOT.portrait
+                for_each_loop = {
+                    array = operative_leader_portrait_tokens
+                    add_to_array = { portrait = operative_leader_portrait_tokens^i }
+                }
+            }
+            black_ops_btn_collect_click = {
+                set_variable = {
+                    selected_squad_origin = current_page
+                }
+                launch_operation_effect = yes
+                set_variable = {
+                    paramilitary_selection_toggle = 0
+                }
+                set_variable = {
+                    show_espionage_details_menu = 0
+                }
+                set_variable = {
+                    squad_selected = 0
+                }
+                set_variable = {
+                    current_page = 0
+                }
+            }
+            btn_close_black_ops_click = {
+                set_variable = {
+                    show_espionage_details_menu = 0
+                }
+            }
+        }
+    }
+
+    paramilitary_tab_menu_window = {
+
+		context_type = player_context
+		ai_enabled = {
+			always = no
+		}
+		window_name = "paramilitary_tab_menu_window"
+        properties = {
+            agency_specific_bg = {
+                image = "[GetCountryBG]" 
+            }
+        }
+        triggers = {
+
+            agency_logo_SOV_visible = {
+                tag = SOV
+            }
+            agency_logo_USA_visible = {
+                tag = USA
+            }
+        
+        }
+		visible = {
+			check_variable = {
+				paramilitary_toggle = 2 
+			}
+		}
+        effects = {
+            close_button_click = {
+                set_variable = {
+                    paramilitary_toggle = 0
+                }
+            }
+        }
+    }
+
+	paramilitary_operation_list = {
+        context_type = player_context
+        window_name = "paramilitary_operation_list"
+		parent_scripted_gui = "paramilitary_tab_menu_window"
+        dynamic_lists = {
+            operations_grid = {
+                array = ROOT.local_possible_operations
+                change_scope = no
+				entry_container = BLACK_OPS_operation_entry
+            }
+        }
+        triggers = {
+            entry_background_completed_visible = {
+                check_variable = {
+                    local_possible_operations_completed_status^i = 2
+                }
+            }
+            entry_button_completed_icon_visible = {
+                check_variable = {
+                    local_possible_operations_completed_status^i = 2
+                }
+            }
+            entry_button_wip_icon_visible = {
+                check_variable = {
+                    local_possible_operations_completed_status^i = 1
+                }
+            }
+            entry_background_available_click_enabled = {
+                current_entry_visible_trigger = yes
+            }
+            entry_button_click_enabled = {
+                current_entry_visible_trigger = yes
+            }
+        }
+		#visible = { 
+		#	check_variable = {
+		#		show_resolution = 1 
+		#	}
+		#}
+        effects = {
+            entry_button_click = {
+                set_variable = {
+                    show_espionage_details_menu = 1
+                }
+                set_variable = {
+                    current_page = 0
+                }
+                set_variable = {
+                    selected_operation_index_target = local_possible_operations_target^i
+                }
+                set_variable = {
+                    selected_operation_personnel_target = local_possible_operations_personnel_target^i
+                }
+                set_variable = {
+                    selected_operation_index_id_token = local_possible_operations_id_token^i
+                }
+                set_variable = {
+                    selected_operation_index = local_possible_operations^i
+                }
+                set_variable = {
+                    selected_operation_index_risk = local_possible_operations_risk_level^i
+                }
+                set_variable = {
+                    selected_operation_index_cost = local_possible_operations_money_cost^i
+                }
+                set_variable = {
+                    selected_operation_index_mission_type = local_possible_operations_operation_type^i
+                }
+                set_variable = {
+                    selected_operation_index_mission_duration = global.mission_type_length^selected_operation_index_mission_type
+                }
+
+                if = {
+                    limit = {
+                        check_variable = {
+                            selected_operation_index_mission_duration < 11
+                        }
+                    }
+                    set_variable = { selected_operation_index_duration_color = 1}
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            selected_operation_index_mission_duration < 26
+                        }
+                    }   
+                    set_variable = { selected_operation_index_duration_color = 2 }
+               
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            selected_operation_index_mission_duration < 51
+                        }
+                    }        
+                    set_variable = { selected_operation_index_duration_color = 3 }
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            selected_operation_index_mission_duration < 76
+                        }
+                    }   
+                    set_variable = { selected_operation_index_duration_color = 4 }                
+                }
+                else = {
+                    set_variable = { selected_operation_index_duration_color = 5 }
+                }
+                if = {
+                    limit = {
+                        check_variable = {
+                            selected_operation_index_cost = 0
+                        }
+                    }
+                    set_variable = { selected_operation_index_cost_color = 1 }
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            selected_operation_index_cost < 6
+                        }
+                    }    
+                    set_variable = { selected_operation_index_cost_color = 2 }             
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            selected_operation_index_cost < 11
+                        }
+                    }     
+                    set_variable = { selected_operation_index_cost_color = 3 }
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            selected_operation_index_cost < 25
+                        }
+                    }    
+                    set_variable = { selected_operation_index_cost_color = 4 }
+                }
+                else = {
+                    set_variable = { selected_operation_index_cost_color = 5 }
+                }
+
+                
+            }
+        }
+    }
+    paramilitary_trait_tree_window = {
+
+		context_type = player_context
+		ai_enabled = {
+			always = no
+		}
+		window_name = "paramilitary_trait_tree_window"
+        properties = {
+
+            unit_leader = {
+                image = "[OperativeSquadPortrait1]"
+            }
+            unit_leader_2 = {
+                image = "[OperativeSquadPortrait2]"
+            }
+            unit_leader_3 = {
+                image = "[OperativeSquadPortrait3]"
+            }
+            unit_leader_4 = {
+                image = "[OperativeSquadPortrait4]"
+            }
+            unit_leader_5 = {
+                image = "[OperativeSquadPortrait5]"
+            }
+            leader_exp_fg_mid = {
+                frame = operative_1_current_experience^current_page
+            }
+            operative_exp_fg_2_mid = {
+                frame = operative_2_current_experience^current_page
+            }
+            operative_exp_fg_3_mid = {
+                frame = operative_3_current_experience^current_page
+            }
+            operative_exp_fg_4_mid = {
+                frame = operative_4_current_experience^current_page
+            }
+            operative_exp_fg_5_mid = {
+                frame = operative_5_current_experience^current_page
+            }
+    
+        }
+		visible = {
+			check_variable = {
+				paramilitary_info_toggle = 1 
+			}
+		}
+        effects = {
+            close_button_click = {
+                set_variable = {
+                    paramilitary_info_toggle = 0
+                }
+            }
+        }
+    }
+	death_squad_traits = {
+        context_type = player_context
+        window_name = "death_squad_traits"
+		parent_scripted_gui = "paramilitary_trait_tree_window"
+        dynamic_lists = {
+            death_squad_traits_listing_grid = {
+                array = ROOT.blacks_ops_team_current_traits
+                change_scope = no
+				entry_container = death_squad_traits_entry
+            }
+        }
+        properties = {
+            Current_Trait = {
+                image = "[TraitsEntryIcon]"
+            }
+        }
+    }
+	death_squad_history = {
+        context_type = player_context
+        window_name = "death_squad_history"
+		parent_scripted_gui = "paramilitary_trait_tree_window"
+        dynamic_lists = {
+            death_squad_history_listing_grid = {
+                array = ROOT.black_ops_team_history_entries
+                change_scope = no
+				entry_container = black_ops_history_entry
+            }
+        }
+        properties = {
+            history_country_flag = {
+                image = "[?black_ops_team_history_entries_flags^i.GetFlag]"
+            }
+        }
+    }
+	espionage_paramilitary_display_select = {
+
+		context_type = player_context
+		ai_enabled = {
+			always = no
+		}
+		window_name = "espionage_paramilitary_display_select"
+		parent_scripted_gui = "paramilitary_tab_menu_window"
+		visible = {
+			#check_variable = { intel_domestic_toggle = 0 }
+		}
+        triggers = {
+            display_paramilitary_info_click_enabled = {
+                check_variable = { num_espionage_paramilitary_squads > 0 }
+            }
+        }
+        effects = {
+            display_projects_info_click = {
+                set_variable = { show_bay_of_pigs = 0 }
+                clear_array = ROOT.current_operations_potential_toggle
+                if = {
+                    limit = {
+                        check_variable = {
+                            show_projects = 1
+                        }
+                    }
+                    set_variable = {
+                        show_projects = 0
+                    }
+                }
+                else = {
+                    set_variable = {
+                        show_projects = 1
+                    }
+                }
+            }
+            display_paramilitary_info_click = {
+                set_variable = {
+                    paramilitary_info_toggle = 1
+                }
+                set_variable = {
+                    current_page = 1
+                }
+                clear_array = black_ops_team_history_entries
+                clear_array = blacks_ops_team_current_traits
+                clear_array = black_ops_team_history_dates
+                clear_array = black_ops_team_history_entries_flags
+                clear_array = black_ops_team_history_entries_target 
+                clear_array = black_ops_team_history_entry_status
+                meta_effect = { 
+                    text = {
+                        for_each_loop = {
+                            array = black_ops_group_[ARRAY_NUMBER]_history_entry_status
+                            add_to_array = { black_ops_team_history_entry_status = black_ops_group_[ARRAY_NUMBER]_history_entry_status^i }
+                        }
+                        for_each_loop = {
+                            array = black_ops_group_[ARRAY_NUMBER]_traits
+                            add_to_array = { blacks_ops_team_current_traits = black_ops_group_[ARRAY_NUMBER]_traits^i }
+                        }
+                        for_each_loop = {
+                            array = black_ops_group_[ARRAY_NUMBER]_history
+                            add_to_array = { black_ops_team_history_dates = black_ops_group_[ARRAY_NUMBER]_history^i }
+                        } 
+                        for_each_loop = {
+                            array = black_ops_group_[ARRAY_NUMBER]_history_entry
+                            add_to_array = { black_ops_team_history_entries = black_ops_group_[ARRAY_NUMBER]_history_entry^i }
+                        }
+                        for_each_loop = {
+                            array = black_ops_group_[ARRAY_NUMBER]_history_entry_flag
+                            add_to_array = { black_ops_team_history_entries_flags = black_ops_group_[ARRAY_NUMBER]_history_entry_flag^i }
+                        }
+                        for_each_loop = {
+                            array = black_ops_group_[ARRAY_NUMBER]_history_entry_target
+                            add_to_array = { black_ops_team_history_entries_target = black_ops_group_[ARRAY_NUMBER]_history_entry_target^i }
+                        }
+                    }
+                    TAG = "[?ROOT.GetTag]"
+                    OPERATIVE = "[?operative_number]"
+                    ARRAY_NUMBER = "[?current_page]"
+                }    
+            }
+        }
+    }
+	Paramilitary_Intel_Button_Placeholder = {
+
+		context_type = player_context
+		ai_enabled = {
+			always = no
+		}
+		window_name = "espionage_paramilitary_select"
+		parent_scripted_gui = "paramilitary_tab_menu_window"
+		visible = {
+			#check_variable = { intel_domestic_toggle = 0 }
+		}
+        effects = {
+            create_special_operations_team_start_click = {
+                if = {      #Soviet Name and Portrait Diversity Set
+                    limit = {
+                        tag = SOV
+                    }
+                    clear_array = espionage_paramilitary_operative_type
+                    clear_array = espionage_paramilitary_operative_name_type
+                    add_to_array = { espionage_paramilitary_operative_type = 100 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 101 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 102 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 103 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 104 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 105 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 106 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 107 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 108 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 109 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 110 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 111 }
+                    soviet_espionage_name_list_entry = yes
+                    add_to_array = { espionage_paramilitary_operative_type = 112 }
+                    soviet_espionage_name_list_entry = yes
+
+                }
+                set_variable = { italian_first_name_number = 50 }
+                set_variable = { italian_surname_number = 43 }
+                set_variable = { american_first_name_number = 113 }
+                set_variable = { american_surname_number = 229 }
+                set_variable = { german_first_name_number = 39 }
+                set_variable = { german_surname_number = 27 }
+                set_variable = { russian_first_name_number = 36 }
+                set_variable = { russian_surname_number = 41 }
+
+                set_variable = { ukranian_first_name_number = 52 }
+                set_variable = { belarussian_first_name_number = 75 }
+                set_variable = { lithuanian_first_name_number = 50 }
+                set_variable = { latvian_first_name_number = 50 }
+                set_variable = { estonian_first_name_number = 50 }
+                set_variable = { uzbek_first_name_number = 64 }
+                set_variable = { kazakh_first_name_number = 26 }
+                set_variable = { kyrgyz_first_name_number = 49 }
+                set_variable = { tajik_first_name_number = 59 }
+                set_variable = { turkmen_first_name_number = 72 }
+                set_variable = { azeri_first_name_number = 81 }
+                set_variable = { georgian_first_name_number = 36 }
+                set_variable = { armenian_first_name_number = 77 } 
+                set_variable = { kalmyk_first_name_number = 49 }
+                set_variable = { chechen_first_name_number = 39 }
+                set_variable = { komi_first_name_number = 41 }
+                set_variable = { mari_first_name_number = 123}
+                set_variable = { tatar_first_name_number = 34 } 
+                set_variable = { volga_german_first_name_number = 133} 
+                set_variable = { romani_first_name_number = 54 }    
+                set_variable = { chuvash_first_name_number = 113} 
+                set_variable = { bashkir_first_name_number = 141}
+                set_variable = { mordvin_first_name_number = 37 } 
+                set_variable = { soviet_jewish_first_name_number = 101} 
+
+                set_variable = { ukranian_surname_number = 42 }
+                set_variable = { belarussian_surname_number = 42 }
+                set_variable = { lithuanian_surname_number = 50 }
+                set_variable = { latvian_surname_number = 48 }
+                set_variable = { estonian_surname_number = 50 }
+                set_variable = { uzbek_surname_number = 69 }
+                set_variable = { kazakh_surname_number = 82 }
+                set_variable = { kyrgyz_surname_number = 42 }
+                set_variable = { tajik_surname_number = 64 }
+                set_variable = { turkmen_surname_number = 12 }
+                set_variable = { azeri_surname_number = 65 }
+                set_variable = { georgian_surname_number = 54 }
+                set_variable = { armenian_surname_number = 66 }
+                set_variable = { kalmyk_surname_number = 23 }
+                set_variable = { chechen_surname_number = 76 }
+                set_variable = { komi_surname_number = 10 }
+                set_variable = { mari_surname_number = 82 }
+                set_variable = { tatar_surname_number = 40 }
+                set_variable = { volga_german_surname_number = 23 }
+                set_variable = { romani_surname_number = 48 }
+                set_variable = { chuvash_surname_number = 30 }
+                set_variable = { bashkir_surname_number = 14 }
+                set_variable = { mordvin_surname_number = 16 }
+                set_variable = { soviet_jewish_surname_number = 126 }
+
+                #RUS
+                #UKR     First Name = 52  | Surname = 42
+                #BLR     First Name = 75  | Surname = 42
+                #LIT     First Name = 50  | Surname = 50
+                #LAT     First Name = 50  | Surname = 48
+                #EST     First Name = 50  | Surname = 50
+                #UZB     First Name = 64  | Surname = 69
+                #KAZ     First Name = 26  | Surname = 82
+                #KYR     First Name = 49  | Surname = 42
+                #TJK     First Name = 59  | Surname = 64
+                #TMS     First Name = 72  | Surname = 12
+                #AZR     First Name = 81  | Surname = 65
+                #GEO     First Name = 36  | Surname = 54
+                #ARM     First Name = 77  | Surname = 66
+                #KLY     First Name = 49  | Surname = 23
+                #CHE     First Name = 39  | Surname = 76
+                #KOM     First Name = 41  | Surname = 10
+                #MRI     First Name = 123 | Surname = 82
+                #TTR     First Name = 34  | Surname = 40
+                #GSR     First Name = 133 | Surname = 23
+                #RMI     First Name = 54  | Surname = 48
+                #CHV     First Name = 113 | Surname = 30
+                #BSK     First Name = 141 | Surname = 14
+                #MRD     First Name = 37  | Surname = 16
+                #AZK     First Name = 101 | Surname = 126
+                
+                set_variable = { european_portrait_max = 55 }
+
+                set_variable = {
+                   paramilitary_recruit_toggle = 1
+               }
+               set_variable = {
+                    name_verification = 0
+               }
+               clear_array = ROOT.chars
+               clear_array = ROOT.first_name
+               clear_array = ROOT.surname
+               clear_array = ROOT.portrait
+                for_each_loop = {
+                    array = espionage_paramilitary_operative_name_type
+                    if = {
+                        limit = {
+                            check_variable = { v = ITA.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = italian_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 1
+                            max = european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = italian_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = USA.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = american_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 1
+                            max = european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = american_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = GER.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = german_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 1
+                            max = european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = german_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = GSR.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = volga_german_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 1
+                            max = european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = volga_german_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                        ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = RMI.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = romani_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 1
+                            max = european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = romani_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                        ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = AZK.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = soviet_jewish_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 1
+                            max = european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = soviet_jewish_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                        ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = RUS.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = russian_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = russian_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = UKR.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = ukranian_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = ukranian_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = BLR.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = belarussian_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = belarussian_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = LIT.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = lithuanian_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = lithuanian_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = LAT.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = latvian_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = latvian_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = EST.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = estonian_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = estonian_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = GEO.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = georgian_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = georgian_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = ARM.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = armenian_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = armenian_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = CHE.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = chechen_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = chechen_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = AZR.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = azeri_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = azeri_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = MRD.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = mordvin_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = mordvin_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = KOM.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = komi_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = komi_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = MRI.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = mari_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 200
+                            max = eastern_european_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = mari_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+
+                    if = {
+                        limit = {
+                            check_variable = { v = UZB.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = uzbek_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 400
+                            max = steppe_portrait_max
+
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = uzbek_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = KAZ.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = kazakh_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 400
+                            max = steppe_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = kazakh_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = KYR.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = kyrgyz_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 400
+                            max = steppe_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = kyrgyz_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = TJK.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = tajik_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                         randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 400
+                            max = steppe_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = tajik_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = TMS.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = turkmen_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 400
+                            max = steppe_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = turkmen_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = KLY.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = kalmyk_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 400
+                            max = steppe_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = kalmyk_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = BSK.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = bashkir_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 400
+                            max = steppe_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = bashkir_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    if = {
+                        limit = {
+                            check_variable = { v = TTR.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = tatar_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 400
+                            max = steppe_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = tatar_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                    
+                    if = {
+                        limit = {
+                            check_variable = { v = CHV.id }
+                        }
+                        randomize_variable = {
+                            var = randomized_first_name
+                            distribution = uniform
+                            min = 1
+                            max = chuvash_first_name_number
+                        }
+                        round_variable = randomized_first_name
+                        add_to_array = {
+                            ROOT.first_name = randomized_first_name
+                        } 
+                        randomize_variable = {
+                            var = randomized_portrait
+                            distribution = uniform
+                            min = 400
+                            max = steppe_portrait_max
+                        }
+                        round_variable = randomized_portrait
+                        add_to_array = {
+                            ROOT.portrait = randomized_portrait
+                        } 
+                        randomize_variable = {
+                            var = randomized_surname
+                            distribution = uniform
+                            min = 1
+                            max = chuvash_surname_number
+                        }
+                        round_variable = randomized_surname
+                        add_to_array = {
+                           ROOT.surname = randomized_surname
+                        } 
+                    }
+                }
+            }
+        }
+    }
+	country_special_operations_recruitment_list = {
+        context_type = player_context
+        window_name = "special_operations_recruitment_target_list_menu"
+        dynamic_lists = {
+            special_operations_recruitment_listing_grid = {
+                array = espionage_paramilitary_operative_type
+                change_scope = no
+				entry_container = special_operations_recruitment_target_list_entry
+            }
+        }
+        properties = {
+            operative_portrait = {
+                image = "[RecruitmentPortraits]"
+            }
+        }
+        triggers = {
+            special_operations_recruitment_target_entry_button_active_visible = {
+                check_variable = {
+                    espionage_paramilitary_operative_type_selection^i = 1
+                }
+            }
+            special_operations_recruitment_target_entry_button_visible = {
+                check_variable = {
+                    espionage_paramilitary_operative_type_selection^i = 0
+                }
+            }
+            next_button_click_enabled = {
+                check_variable = {
+                    operative_number_step < 5
+                }
+            }
+            create_group_click_enabled = {
+                check_variable = {
+                    operative_number_step = 5
+                }         
+                check_variable = {
+                    name_verification = 1
+                }       
+            }
+            name_toggle_unconfirm_visible = {
+                check_variable = {
+                    name_verification = 0
+                }
+            }
+            name_toggle_confirm_visible = {
+                check_variable = {
+                    name_verification = 1
+                }
+            }
+        }
+
+
+		visible = {
+			check_variable = {
+				paramilitary_recruit_toggle = 1 
+			}
+		}
+		effects = {
+            
+            close_button_click = {
+                set_variable = {
+                    paramilitary_recruit_toggle = 0
+                }
+                set_variable = {
+                    operative_number_step = 0
+                }
+                clear_array = espionage_paramilitary_operative_type_selection
+                clear_array = temp_build_espionage_paramilitary_operative_type
+                clear_array = temp_build_espionage_paramilitary_operative_name_type
+                clear_array = temp_build_first_name
+                clear_array = temp_build_surname
+                clear_array = temp_build_portrait
+                for_each_loop = {
+                    array = espionage_paramilitary_operative_type
+                    set_variable = {
+                        espionage_paramilitary_operative_type_selection^i = 0
+                    }
+                    
+                }
+ 
+            }
+            create_group_click = {
+                add_to_variable = { num_espionage_paramilitary_squads = 1 }
+                add_to_variable = { Black_Ops_Maintenance_Monthly = 2 }
+                #SET NAME ARRAY
+                set_variable = { paramilitary_group_name_char1^num_espionage_paramilitary_squads = chars^0 }
+                set_variable = { paramilitary_group_name_char2^num_espionage_paramilitary_squads = chars^1 }
+                set_variable = { paramilitary_group_name_char3^num_espionage_paramilitary_squads = chars^2 }
+                set_variable = { paramilitary_group_name_char4^num_espionage_paramilitary_squads = chars^3 }
+                set_variable = { paramilitary_group_name_char5^num_espionage_paramilitary_squads = chars^4 }
+                set_variable = { paramilitary_group_name_char6^num_espionage_paramilitary_squads = chars^5 }
+                set_variable = { paramilitary_group_name_char7^num_espionage_paramilitary_squads = chars^6 }
+                set_variable = { paramilitary_group_name_char8^num_espionage_paramilitary_squads = chars^7 }
+                set_variable = { paramilitary_group_name_char9^num_espionage_paramilitary_squads = chars^8 }
+                set_variable = { paramilitary_group_name_char10^num_espionage_paramilitary_squads = chars^9 }
+                set_variable = { paramilitary_group_name_char11^num_espionage_paramilitary_squads = chars^10 }
+                set_variable = { paramilitary_group_name_char12^num_espionage_paramilitary_squads = chars^11 }
+                set_variable = { paramilitary_group_name_char13^num_espionage_paramilitary_squads = chars^12 }
+                set_variable = { paramilitary_group_name_char14^num_espionage_paramilitary_squads = chars^13 }
+                set_variable = { paramilitary_group_name_char15^num_espionage_paramilitary_squads = chars^14 }
+                set_variable = { paramilitary_group_name_char16^num_espionage_paramilitary_squads = chars^15 }
+                set_variable = { paramilitary_group_name_char17^num_espionage_paramilitary_squads = chars^16 }
+                set_variable = { paramilitary_group_name_char18^num_espionage_paramilitary_squads = chars^17 }
+                set_variable = { paramilitary_group_name_char19^num_espionage_paramilitary_squads = chars^18 }
+                set_variable = { paramilitary_group_name_char20^num_espionage_paramilitary_squads = chars^19 }
+                set_variable = { paramilitary_group_name_char21^num_espionage_paramilitary_squads = chars^20 }
+                set_variable = { paramilitary_group_name_char22^num_espionage_paramilitary_squads = chars^21 }
+                set_variable = { paramilitary_group_name_char23^num_espionage_paramilitary_squads = chars^22 }
+                set_variable = { paramilitary_group_name_char24^num_espionage_paramilitary_squads = chars^23 }
+                set_variable = { paramilitary_group_name_char25^num_espionage_paramilitary_squads = chars^24 }
+                set_variable = { paramilitary_group_name_char26^num_espionage_paramilitary_squads = chars^25 }
+                set_variable = { paramilitary_group_name_char27^num_espionage_paramilitary_squads = chars^26 }
+                set_variable = { paramilitary_group_name_char28^num_espionage_paramilitary_squads = chars^27 }
+                set_variable = { paramilitary_group_name_char29^num_espionage_paramilitary_squads = chars^28 }
+                set_variable = { paramilitary_group_name_char30^num_espionage_paramilitary_squads = chars^29 }
+                set_variable = { paramilitary_group_name_char31^num_espionage_paramilitary_squads = chars^30 }
+                set_variable = { paramilitary_group_name_char32^num_espionage_paramilitary_squads = chars^31 }
+
+                add_to_array = { paramilitary_group_title_char1 = chars^0 }
+                add_to_array = { paramilitary_group_title_char2 = chars^1 }
+                add_to_array = { paramilitary_group_title_char3 = chars^2 }
+                add_to_array = { paramilitary_group_title_char4 = chars^3 }
+                add_to_array = { paramilitary_group_title_char5 = chars^4 }
+                add_to_array = { paramilitary_group_title_char6 = chars^5 }
+                add_to_array = { paramilitary_group_title_char7 = chars^6 }
+                add_to_array = { paramilitary_group_title_char8 = chars^7 }
+                add_to_array = { paramilitary_group_title_char9 = chars^8 }
+                add_to_array = { paramilitary_group_title_char10 = chars^9 }
+                add_to_array = { paramilitary_group_title_char11 = chars^10 }
+                add_to_array = { paramilitary_group_title_char12 = chars^11 }
+                add_to_array = { paramilitary_group_title_char13 = chars^12 }
+                add_to_array = { paramilitary_group_title_char14 = chars^13 }
+                add_to_array = { paramilitary_group_title_char15 = chars^14 }
+                add_to_array = { paramilitary_group_title_char16 = chars^15 }
+                add_to_array = { paramilitary_group_title_char17 = chars^16 }
+                add_to_array = { paramilitary_group_title_char18 = chars^17 }
+                add_to_array = { paramilitary_group_title_char19 = chars^18 }
+                add_to_array = { paramilitary_group_title_char20 = chars^19 }
+                add_to_array = { paramilitary_group_title_char21 = chars^20 }
+                add_to_array = { paramilitary_group_title_char22 = chars^21 }
+                add_to_array = { paramilitary_group_title_char23 = chars^22 }
+                add_to_array = { paramilitary_group_title_char24 = chars^23 }
+                add_to_array = { paramilitary_group_title_char25 = chars^24 }
+                add_to_array = { paramilitary_group_title_char26 = chars^25 }
+                add_to_array = { paramilitary_group_title_char27 = chars^26 }
+                add_to_array = { paramilitary_group_title_char28 = chars^27 }
+                add_to_array = { paramilitary_group_title_char29 = chars^28 }
+                add_to_array = { paramilitary_group_title_char30 = chars^29 }
+                add_to_array = { paramilitary_group_title_char31 = chars^30 }
+                add_to_array = { paramilitary_group_title_char32 = chars^31 }
+                #Squad Leader 
+                set_variable = {
+                    paramilitary_operative_squad_leader_level^num_espionage_paramilitary_squads = 1
+                }   
+                set_variable = {
+                    paramilitary_operative_squad_leader_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^0
+                }
+
+                set_variable = {
+                    paramilitary_operative_squad_leader_name_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_name_type^0
+                }
+                set_variable = {
+                   paramilitary_operative_squad_leader_first_name^num_espionage_paramilitary_squads = temp_build_first_name^0
+                }
+                set_variable = {
+                   paramilitary_operative_squad_leader_surname^num_espionage_paramilitary_squads = temp_build_surname^0
+                }       
+                set_variable = {
+                    paramilitary_operative_squad_leader_portrait^num_espionage_paramilitary_squads = temp_build_portrait^0 
+                }
+                set_variable = {
+                    current_page = num_espionage_paramilitary_squads
+                }
+                add_to_variable = {
+                    ROOT.operative_number = 1
+                } 
+                meta_effect = { 
+                    text = {
+                        generate_character = { #create + recruit
+                            token_base = [TAG]_Operative_[OPERATIVE] 
+                        }   
+                        add_to_array = {
+                            array = paramilitary_operative_squad_leader
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                        add_to_array = {
+                            array = operative_tokens
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_traits
+                            value = temp_build_espionage_paramilitary_operative_type^0
+                        }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_history
+                            value = global.date      #Established Date
+                        }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_history_entry
+                            value = 0.5      #Established
+                        }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_history_entry_status
+                            value = 1    
+                        }
+                        add_to_array = { 
+                            array = black_ops_group_[ARRAY_NUMBER]_history_entry_flag
+                            value = ROOT.id      
+                        }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_history_entry_target
+                            value = ROOT.id      
+                        }
+                        
+                    }
+                    TAG = "[?ROOT.GetTag]"
+                    OPERATIVE = "[?operative_number]"
+                    ARRAY_NUMBER = "[?current_page]"
+                }    
+                add_to_array = {
+                    operative_leader_firstname_selection = temp_build_first_name^0
+                }
+                add_to_array = {
+                   operative_leader_surname_selection = temp_build_surname^0
+                }       
+                add_to_array = { operative_leader_portrait_tokens = temp_build_portrait^0 }
+                add_to_array = { operative_portrait_tokens = temp_build_portrait^0 }
+                add_to_array = { paramilitary_squad_id = num_espionage_paramilitary_squads }    #Same As Page Number
+                add_to_array = { paramilitary_squad_id_status = 1 }    #Same As Page Number
+                #Member 2
+                set_variable = {
+                    paramilitary_operative_squad_unit_2_level^num_espionage_paramilitary_squads = 1
+                }   
+                set_variable = {
+                    paramilitary_operative_squad_unit_2_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^1
+                }
+                set_variable = {
+                    paramilitary_operative_squad_unit_2_name_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_name_type^1
+                }
+                set_variable = {
+                   paramilitary_operative_squad_unit_2_first_name^num_espionage_paramilitary_squads = temp_build_first_name^1
+                }
+                set_variable = {
+                   paramilitary_operative_squad_unit_2_surname^num_espionage_paramilitary_squads = temp_build_surname^1
+                }      
+                set_variable = {
+                    paramilitary_operative_squad_unit_2_portrait^num_espionage_paramilitary_squads = temp_build_portrait^1 
+                }
+                add_to_variable = {
+                    ROOT.operative_number = 1
+                }
+                meta_effect = { 
+                    text = {
+                        generate_character = { #create + recruit
+                            token_base = [TAG]_Operative_[OPERATIVE] 
+                        }   
+                        add_to_array = {
+                            array = paramilitary_operative_squad_unit_2
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                        add_to_array = {
+                            array = operative_tokens
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_traits
+                            value = temp_build_espionage_paramilitary_operative_type^1
+                        }
+                    }
+                    TAG = "[?ROOT.GetTag]"
+                    OPERATIVE = "[?operative_number]"
+                    ARRAY_NUMBER = "[?current_page]"
+                }    
+                add_to_array = { operative_portrait_tokens = temp_build_portrait^1 }
+                #Member 3
+                set_variable = {
+                    paramilitary_operative_squad_unit_3_level^num_espionage_paramilitary_squads = 1
+                }   
+                set_variable = {
+                    paramilitary_operative_squad_unit_3_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^2
+                }
+                set_variable = {
+                    paramilitary_operative_squad_unit_3_name_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_name_type^2
+                }
+                set_variable = {
+                   paramilitary_operative_squad_unit_3_first_name^num_espionage_paramilitary_squads = temp_build_first_name^2
+                }
+                set_variable = {
+                   paramilitary_operative_squad_unit_3_surname^num_espionage_paramilitary_squads = temp_build_surname^2
+                }      
+                set_variable = {
+                    paramilitary_operative_squad_unit_3_portrait^num_espionage_paramilitary_squads = temp_build_portrait^2 
+                }
+                add_to_variable = {
+                    ROOT.operative_number = 1
+                }
+                meta_effect = { 
+                    text = {
+                        generate_character = { #create + recruit
+                            token_base = [TAG]_Operative_[OPERATIVE] 
+                        }   
+                        add_to_array = {
+                            array = paramilitary_operative_squad_unit_3
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                        add_to_array = {
+                            array = operative_tokens
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_traits
+                            value = temp_build_espionage_paramilitary_operative_type^2
+                        }
+                    }
+                    TAG = "[?ROOT.GetTag]"
+                    OPERATIVE = "[?operative_number]"
+                    ARRAY_NUMBER = "[?current_page]"
+                }    
+                add_to_array = { operative_portrait_tokens = temp_build_portrait^2 }
+                #Member 4
+                set_variable = {
+                    paramilitary_operative_squad_unit_4_level^num_espionage_paramilitary_squads = 1
+                }   
+                set_variable = {
+                    paramilitary_operative_squad_unit_4_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^3
+                }
+                set_variable = {
+                    paramilitary_operative_squad_unit_4_name_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_name_type^3
+                }
+                set_variable = {
+                   paramilitary_operative_squad_unit_4_first_name^num_espionage_paramilitary_squads = temp_build_first_name^3
+                }
+                set_variable = {
+                   paramilitary_operative_squad_unit_4_surname^num_espionage_paramilitary_squads = temp_build_surname^3
+                }     
+                set_variable = {
+                    paramilitary_operative_squad_unit_4_portrait^num_espionage_paramilitary_squads = temp_build_portrait^3 
+                } 
+                add_to_variable = {
+                    ROOT.operative_number = 1
+                }
+                meta_effect = { 
+                    text = {
+                        generate_character = { #create + recruit
+                            token_base = [TAG]_Operative_[OPERATIVE] 
+                        }   
+                        add_to_array = {
+                            array = paramilitary_operative_squad_unit_4
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                        add_to_array = {
+                            array = operative_tokens
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_traits
+                            value = temp_build_espionage_paramilitary_operative_type^3
+                        }
+                    }
+                    TAG = "[?ROOT.GetTag]"
+                    OPERATIVE = "[?operative_number]"
+                    ARRAY_NUMBER = "[?current_page]"
+                }    
+                add_to_array = { operative_portrait_tokens = temp_build_portrait^3 }
+                #Member 5
+                set_variable = {
+                    paramilitary_operative_squad_unit_5_level^num_espionage_paramilitary_squads = 1
+                }   
+                set_variable = {
+                    paramilitary_operative_squad_unit_5_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_type^4
+                }
+                set_variable = {
+                    paramilitary_operative_squad_unit_5_name_type^num_espionage_paramilitary_squads = temp_build_espionage_paramilitary_operative_name_type^4
+                }
+                set_variable = {
+                   paramilitary_operative_squad_unit_5_first_name^num_espionage_paramilitary_squads = temp_build_first_name^4
+                }
+                set_variable = {
+                   paramilitary_operative_squad_unit_5_surname^num_espionage_paramilitary_squads = temp_build_surname^4
+                }      
+                set_variable = {
+                    paramilitary_operative_squad_unit_5_portrait^num_espionage_paramilitary_squads = temp_build_portrait^4 
+                }
+                set_variable = {
+                    paramilitary_recruit_toggle = 0
+                }
+                set_variable = {
+                    operative_number_step = 0
+                }
+                add_to_variable = {
+                    ROOT.operative_number = 1
+                }
+                meta_effect = { 
+                    text = {
+                        generate_character = { #create + recruit
+                            token_base = [TAG]_Operative_[OPERATIVE] 
+                        }   
+                        add_to_array = {
+                            array = paramilitary_operative_squad_unit_5
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                        add_to_array = {
+                            array = operative_tokens
+                            value = token:[TAG]_Operative_[OPERATIVE] 
+                        }
+                        add_to_array = {
+                            array = black_ops_group_[ARRAY_NUMBER]_traits
+                            value = temp_build_espionage_paramilitary_operative_type^4
+                        }
+                    }
+                    TAG = "[?ROOT.GetTag]"
+                    OPERATIVE = "[?operative_number]"
+                    ARRAY_NUMBER = "[?current_page]"
+                }    
+                add_to_array = { operative_portrait_tokens = temp_build_portrait^4 }
+                #CREATE TEAM
+
+                #CLEARING OLD DATA
+                clear_array = espionage_paramilitary_operative_type_selection
+                clear_array = temp_build_espionage_paramilitary_operative_type
+                clear_array = temp_build_espionage_paramilitary_operative_name_type
+                clear_array = temp_build_first_name
+                clear_array = temp_build_surname
+                clear_array = temp_build_portrait
+                for_each_loop = {
+                    array = espionage_paramilitary_operative_type
+                    set_variable = {
+                        espionage_paramilitary_operative_type_selection^i = 0
+                    }
+                }
+            }
+            next_button_click = {
+                set_variable = {
+                    espionage_paramilitary_operative_type_selection^selected = 1
+                }
+                add_to_array = {
+                  temp_build_espionage_paramilitary_operative_type = temp_build_espionage_paramilitary_operative_type_1
+                }
+                add_to_array = {
+                  temp_build_espionage_paramilitary_operative_name_type = temp_build_espionage_paramilitary_operative_name_type_1
+                }
+                add_to_array = {
+                  temp_build_first_name = temp_build_first_name_1
+                }
+                add_to_array = {
+                  temp_build_surname = temp_build_surname_1
+                }
+                add_to_array = {
+                  temp_build_portrait = temp_build_portrait_1
+                }
+                set_variable = {
+                   selected = 0
+                }
+                set_variable = { temp_build_espionage_paramilitary_operative_type_1 = 0 }
+                set_variable = { temp_build_espionage_paramilitary_operative_name_type_1 = 0 }
+                set_variable = { temp_build_first_name_1 = 0 }
+                set_variable = { temp_build_surname_1 = 0 }
+                add_to_variable = {
+                    operative_number_step = 1
+                }
+            }
+			special_operations_recruitment_target_entry_button_click = {
+                set_variable = {
+                    selected = i
+                }
+                set_variable = {
+                  temp_build_espionage_paramilitary_operative_type_1 = espionage_paramilitary_operative_type^i
+                }
+                set_variable = {
+                  temp_build_espionage_paramilitary_operative_name_type_1 = espionage_paramilitary_operative_name_type^i
+                }
+                set_variable = {
+                  temp_build_first_name_1 = first_name^i
+                }
+                set_variable = {
+                  temp_build_surname_1 = surname^i
+                }
+                set_variable = {
+                    temp_build_portrait_1 = portrait^i
+                }
+            }
+            name_toggle_unconfirm_click = {
+				if = {
+                    limit = {
+                        check_variable = {
+                            name_verification = 0
+                        }
+                    }
+                    set_variable = {
+                        name_verification = 1
+                    }
+                }	
+                else = {
+                    set_variable = {
+                        name_verification = 0
+                    }                   
+                }
+            }
+            name_toggle_confirm_click = {
+				if = {
+                    limit = {
+                        check_variable = {
+                            name_verification = 0
+                        }
+                    }
+                    set_variable = {
+                        name_verification = 1
+                    }
+                }	
+                else = {
+                    set_variable = {
+                        name_verification = 0
+                    }                   
+                }
+            }
+            #SPECIAL NAMING STUFF
+			keypress_backspace_click = {
+				get_keypress_backspace = yes
+			}
+			keypress_space_click = { get_keypress_space = yes }
+			keypress_exclamation_mark_click = { get_keypress_exclamation_mark = yes }
+			keypress_lbracket_click = { get_keypress_lbracket = yes }
+			keypress_rbracket_click = { get_keypress_rbracket = yes }
+			keypress_asterix_click = { get_keypress_asterix = yes }
+			keypress_plus_click = { get_keypress_plus = yes }
+			keypress_comma_click = { get_keypress_comma = yes }
+			keypress_hyphen_click = { get_keypress_hyphen = yes }
+			keypress_dot_click = { get_keypress_dot = yes }
+			keypress_slash_click = { get_keypress_slash = yes }
+			keypress_colon_click = { get_keypress_colon = yes }
+			keypress_semicolon_click = { get_keypress_semicolon = yes }
+			keypress_lesser_than_click = { get_keypress_lesser_than = yes }
+			keypress_equal_to_click = { get_keypress_equal_to = yes }
+			keypress_greater_than_click = { get_keypress_greater_than = yes }
+			keypress_question_mark_click = { get_keypress_question_mark = yes }
+			keypress_at_click = { get_keypress_at = yes }
+			keypress_0_click = { get_keypress_0 = yes }
+			keypress_1_click = { get_keypress_1 = yes }
+			keypress_2_click = { get_keypress_2 = yes }
+			keypress_3_click = { get_keypress_3 = yes }
+			keypress_4_click = { get_keypress_4 = yes }
+			keypress_5_click = { get_keypress_5 = yes }
+			keypress_6_click = { get_keypress_6 = yes }
+			keypress_7_click = { get_keypress_7 = yes }
+			keypress_8_click = { get_keypress_8 = yes }
+			keypress_9_click = { get_keypress_9 = yes }
+
+			# ENG
+			keypress_shift_A_click = { get_keypress_shift_A = yes }
+			keypress_shift_B_click = { get_keypress_shift_B = yes }
+			keypress_shift_C_click = { get_keypress_shift_C = yes }
+			keypress_shift_D_click = { get_keypress_shift_D = yes }
+			keypress_shift_E_click = { get_keypress_shift_E = yes }
+			keypress_shift_F_click = { get_keypress_shift_F = yes }
+			keypress_shift_G_click = { get_keypress_shift_G = yes }
+			keypress_shift_H_click = { get_keypress_shift_H = yes }
+			keypress_shift_I_click = { get_keypress_shift_I = yes }
+			keypress_shift_J_click = { get_keypress_shift_J = yes }
+			keypress_shift_K_click = { get_keypress_shift_K = yes }
+			keypress_shift_L_click = { get_keypress_shift_L = yes }
+			keypress_shift_M_click = { get_keypress_shift_M = yes }
+			keypress_shift_N_click = { get_keypress_shift_N = yes }
+			keypress_shift_O_click = { get_keypress_shift_O = yes }
+			keypress_shift_P_click = { get_keypress_shift_P = yes }
+			keypress_shift_Q_click = { get_keypress_shift_Q = yes }
+			keypress_shift_R_click = { get_keypress_shift_R = yes }
+			keypress_shift_S_click = { get_keypress_shift_S = yes }
+			keypress_shift_T_click = { get_keypress_shift_T = yes }
+			keypress_shift_U_click = { get_keypress_shift_U = yes }
+			keypress_shift_V_click = { get_keypress_shift_V = yes }
+			keypress_shift_W_click = { get_keypress_shift_W = yes }
+			keypress_shift_X_click = { get_keypress_shift_X = yes }
+			keypress_shift_Y_click = { get_keypress_shift_Y = yes }
+			keypress_shift_Z_click = { get_keypress_shift_Z = yes }
+			keypress_a_click = { get_keypress_a = yes }
+			keypress_b_click = { get_keypress_b = yes }
+			keypress_c_click = { get_keypress_c = yes }
+			keypress_d_click = { get_keypress_d = yes }
+			keypress_e_click = { get_keypress_e = yes }
+			keypress_f_click = { get_keypress_f = yes }
+			keypress_g_click = { get_keypress_g = yes }
+			keypress_h_click = { get_keypress_h = yes }
+			keypress_i_click = { get_keypress_i = yes }
+			keypress_j_click = { get_keypress_j = yes }
+			keypress_k_click = { get_keypress_k = yes }
+			keypress_l_click = { get_keypress_l = yes }
+			keypress_m_click = { get_keypress_m = yes }
+			keypress_n_click = { get_keypress_n = yes }
+			keypress_o_click = { get_keypress_o = yes }
+			keypress_p_click = { get_keypress_p = yes }
+			keypress_q_click = { get_keypress_q = yes }
+			keypress_r_click = { get_keypress_r = yes }
+			keypress_s_click = { get_keypress_s = yes }
+			keypress_t_click = { get_keypress_t = yes }
+			keypress_u_click = { get_keypress_u = yes }
+			keypress_v_click = { get_keypress_v = yes }
+			keypress_w_click = { get_keypress_w = yes }
+			keypress_x_click = { get_keypress_x = yes }
+			keypress_y_click = { get_keypress_y = yes }
+			keypress_z_click = { get_keypress_z = yes }
+
+        }
+    }
+    #Generic
+	black_ops_projects_generic_selection_menu = {
+        context_type = player_context
+        window_name = "black_ops_projects_generic_selection_menu"
+		parent_scripted_gui = "paramilitary_tab_menu_window"
+        dynamic_lists = {
+            generic_selection_menu_listing_grid = {
+                array = generic_selection_menu_list #List of Countries
+                change_scope = yes
+				entry_container = generic_selection_menu_list_entry
+            }
+        }
+		ai_enabled = {
+			always = no
+		}
+        visible = {
+            check_variable = {
+                generic_operations_selected_target = 0
+            } 
+            check_variable = {
+                show_generic_operations = 1
+            }
+        }
+        effects = { 
+            generic_selection_menu_list_entry_button_click = {
+                set_variable = {
+                    ROOT.generic_operations_selected_target = v
+                }
+                save_global_event_target_as = operations_selected_target
+                ROOT = {
+                    generate_espionage_toggles = yes
+                }
+                set_variable = {
+                    ci_strength_temp = THIS.modifier@drift_defence_factor
+                }
+                subtract_from_variable = {
+                    ci_strength_temp = 1
+                }
+                set_variable = {
+                    ROOT.national_ci_strength^v = ci_strength_temp
+                }
+                
+                if = {
+                    limit = {
+                        insurgency_check = yes
+                    }
+                    set_variable = {
+                        insurgency_active = 1
+                    }
+                }
+                if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.espionage_network_status^v = 0
+                        }
+                        
+                    }
+                    add_to_array = { ROOT.local_generic_possible_operations_operation_type = 100 }
+
+                    add_to_array = { ROOT.local_possible_operations = 1 }
+                    add_to_array = { ROOT.local_possible_operations_risk_level = 2 }
+                    add_to_array = { ROOT.local_possible_operations_operation_type = 23 }
+                    add_to_array = { ROOT.local_possible_operations_money_cost = 25 }
+                    add_to_array = { ROOT.local_possible_operations_repeatable_condition = 1 }
+                    add_to_array = { ROOT.local_possible_operations_id_token = 1 }
+                    add_to_array = { ROOT.local_possible_operations_target = v }
+                    add_to_array = { ROOT.local_possible_operations_personnel_target = 1 }  #Void
+                }
+                else = {    #If Established Mission to Expand Network
+                    add_to_array = { local_generic_possible_operations_operation_type = 12 }
+
+                    add_to_array = { ROOT.local_possible_operations = 2 }
+                    add_to_array = { ROOT.local_possible_operations_risk_level = 2 }
+                    add_to_array = { ROOT.local_possible_operations_operation_type = 19 }
+                    add_to_array = { ROOT.local_possible_operations_money_cost = 25 }
+                    add_to_array = { ROOT.local_possible_operations_repeatable_condition = 2 }
+                    add_to_array = { ROOT.local_possible_operations_id_token = 2 }
+                    add_to_array = { ROOT.local_possible_operations_target = v }
+                    add_to_array = { ROOT.local_possible_operations_personnel_target = 1 }  #Void
+
+                    #Assasinate Admirals
+                    #Sabotage Nuclear Programme
+                    #Sabotage Nuclear Site
+                    #Sabotage Airfield
+                    #Sabotage Military Industry
+                    #Sabotage Dockyard
+                    #Sabotage Port
+                    #Sabotage Civilian Industry
+                    #Blow Up Key Infrastructure
+                    #Perform Terrorist Attack
+                    #Prepare Local Uprising
+                    #Contact Resistance Group 
+                    #Train Local Resistance
+                    #Arm Local Resistance
+                    #Embed into Insurgency
+                    #Counter Espionage Embed
+                    #Steal Technology
+                }
+                
+            }
+        }
+    }
+
+    
+	black_ops_projects_generic_selected_menu = {
+        context_type = player_context
+        window_name = "black_ops_projects_generic_selected_menu"
+		parent_scripted_gui = "paramilitary_tab_menu_window"
+
+		ai_enabled = {
+			always = no
+		}
+        dynamic_lists = {
+            black_ops_projects_generic_missions_listing_grid = {
+                array = ROOT.local_generic_possible_operations_operation_type
+                change_scope = no
+				entry_container = black_ops_projects_generic_missions_list_entry
+            }
+        }
+
+        visible = {
+            NOT = {
+                check_variable = {
+                    generic_operations_selected_target = 0
+                }
+            }
+            check_variable = {
+                show_generic_operations = 1
+            }
+        }
+        triggers = {
+            nat_info_mission_eligibility_none_visible = {
+                check_variable = {
+                    current_operations_potential_toggle^0 = 0
+                }
+            }
+            name_toggle_unconfirm_visible = {
+                check_variable = {
+                    generic_operation_types_confirm^i = 0
+                }
+            }
+            name_toggle_confirm_visible = {
+                check_variable = {
+                    generic_operation_types_confirm^i = 1
+                }              
+            }          
+        }
+
+        effects = {   
+            name_toggle_unconfirm_click = {
+                set_variable = {
+                    generic_operation_types_confirm^i = 1
+                }    
+                var:generic_operations_selected_target = {
+                    #add_tech_stealing_operations = yes
+                    #add_assassinate_generals_operations = yes
+                    #add_assassinate_admirals_operations = yes
+                    #add_terrorist_attack_operations = yes
+                    #add_local_uprising_operations = yes
+                    add_arms_factory_sabotage_operations = yes
+                }
+            }
+            name_toggle_confirm_click = {
+                set_variable = {
+                    generic_operation_types_confirm^i = 0
+                }              
+            }
+        }
+    }
+    #Projects
+	black_ops_projects_bay_of_pigs_menu = {
+        context_type = player_context
+        window_name = "black_ops_projects_bay_of_pigs"
+		parent_scripted_gui = "paramilitary_tab_menu_window"
+        dynamic_lists = {
+            black_ops_projects_bay_of_pigs_material_listing_grid = {
+                array = USA.bay_of_pigs_material_list
+                change_scope = no
+				entry_container = black_ops_projects_bay_of_pigs_material_list_entry
+            }
+            black_ops_projects_bay_of_pigs_tokens_listing_grid = {
+                array = USA.bay_of_pigs_operation_list
+                change_scope = no
+				entry_container = black_ops_projects_bay_of_pigs_tokens_list_entry
+            }
+        }
+		ai_enabled = {
+			always = no
+		}
+        visible = {
+            check_variable = {
+                show_bay_of_pigs = 1
+            }
+        }
+    }
+	black_ops_projects_uia_menu = {
+        context_type = player_context
+        window_name = "black_ops_projects_anti_uia"
+		parent_scripted_gui = "paramilitary_tab_menu_window"
+		ai_enabled = {
+			always = no
+		} 
+        dynamic_lists = {
+            black_ops_projects_anti_ui_listing_grid = {
+                array = UIA.core_states
+                change_scope = yes
+				entry_container = black_ops_projects_anti_ui_list_entry
+            }
+        }
+        visible = {
+            check_variable = {
+                show_uia = 1
+            }
+        }  
+    }
+	black_ops_projects_fbk_menu = {
+        context_type = player_context
+        window_name = "black_ops_projects_anti_fbk"
+		parent_scripted_gui = "paramilitary_tab_menu_window"
+		ai_enabled = {
+			always = no
+		} 
+        dynamic_lists = {
+            black_ops_projects_anti_fbk_listing_grid = {
+                array = FBK.core_states
+                change_scope = yes
+				entry_container = black_ops_projects_anti_fbk_list_entry
+            }
+        }
+        visible = {
+            check_variable = {
+                show_fbk = 1
+            }
+        }  
+    }
+	black_ops_projects_list_menu_list = {
+        context_type = player_context
+        window_name = "black_ops_projects_list_menu"
+		parent_scripted_gui = "paramilitary_tab_menu_window"
+		ai_enabled = {
+			always = no
+		}
+        dynamic_lists = {
+            black_ops_projects_listing_grid = {
+                array = ROOT.black_ops_project_list
+                change_scope = no
+				entry_container = black_ops_projects_list_entry
+            }
+        }
+		visible = {
+			check_variable = {
+				show_projects = 1 
+			}
+		}
+		effects = {
+		black_ops_projects_entry_button_click = {
+            clear_array = local_possible_operations
+            clear_array = local_possible_operations_risk_level
+            clear_array = local_possible_operations_operation_type
+            clear_array = local_possible_operations_money_cost
+            clear_array = local_possible_operations_repeatable_condition
+            clear_array = local_possible_operations_target
+            clear_array = local_possible_operations_id_token
+            clear_array = local_possible_operations_personnel_target
+            
+            if = {
+                limit = {
+                    check_variable = { ROOT.black_ops_project_list^i = 100}
+                }
+                clear_array = generic_selection_menu_list
+                set_variable = {
+                    generic_operations_selected_target = 0
+                }
+                
+                every_country = {
+                    limit = {
+                        NOT = {
+                            tag = ROOT
+                        }
+                    }
+                    clear_array = ROOT.local_generic_possible_operations_operation_type
+                    add_to_array = {
+                        ROOT.generic_selection_menu_list = THIS
+                    }
+                }
+                set_variable = {
+                    show_generic_operations = 1
+                }                 
+            }
+            if = {                  
+                limit = {
+                    tag = USA
+                    check_variable = { ROOT.black_ops_project_list^i = 1 }
+                }
+                if = {
+                    limit = {
+                        NOT = {
+                            has_country_flag = Bay_of_Pigs_Project_Setup
+                        }
+                    }
+                    set_country_flag = Bay_of_Pigs_Project_Setup
+                    add_to_array = { USA.bay_of_pigs_material_list = 1 }
+                    add_to_array = { USA.bay_of_pigs_material_list = 2 }
+                    add_to_array = { USA.bay_of_pigs_material_list = 3 }
+                    add_to_array = { USA.bay_of_pigs_material_list = 4 }
+                    add_to_array = { USA.bay_of_pigs_material_list = 5 }
+                    add_to_array = { USA.bay_of_pigs_material_list = 6 }
+                    add_to_array = { USA.bay_of_pigs_material_list = 7 }
+                    add_to_array = { USA.bay_of_pigs_material_list = 8 }
+                    add_to_array = { USA.bay_of_pigs_material_list = 9 }
+                    add_to_array = { USA.bay_of_pigs_material_list = 10 }
+                    add_to_array = { USA.bay_of_pigs_material_list = 11 }
+
+                    add_to_array = { USA.bay_of_pigs_operation_list = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_list = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_list = 3 }
+                    add_to_array = { USA.bay_of_pigs_operation_list = 4 }
+                    add_to_array = { USA.bay_of_pigs_operation_list = 5 }
+                    add_to_array = { USA.bay_of_pigs_operation_list = 6 }
+                    add_to_array = { USA.bay_of_pigs_operation_list = 7 }
+                    add_to_array = { USA.bay_of_pigs_operation_list = 8 }
+
+                    add_to_array = { USA.bay_of_pigs_operation = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation = 3 }
+                    add_to_array = { USA.bay_of_pigs_operation = 4 }
+                    add_to_array = { USA.bay_of_pigs_operation = 5 }
+                    add_to_array = { USA.bay_of_pigs_operation = 6 }
+                    add_to_array = { USA.bay_of_pigs_operation = 7 }
+                    add_to_array = { USA.bay_of_pigs_operation = 8 }
+                    add_to_array = { USA.bay_of_pigs_operation = 9 }
+                    add_to_array = { USA.bay_of_pigs_operation = 10 }
+                    add_to_array = { USA.bay_of_pigs_operation = 11 }
+                    add_to_array = { USA.bay_of_pigs_operation = 12 }
+                    add_to_array = { USA.bay_of_pigs_operation = 13 }
+                    add_to_array = { USA.bay_of_pigs_operation = 14 }
+                    add_to_array = { USA.bay_of_pigs_operation = 15 }
+                    add_to_array = { USA.bay_of_pigs_operation = 16 }
+                    add_to_array = { USA.bay_of_pigs_operation = 17 }
+
+                    add_to_array = { USA.bay_of_pigs_operation_target = USA.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = GUA.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = USA.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = USA.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = GUA.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = GUA.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = USA.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = USA.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = GUA.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = GUA.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = USA.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = CUB.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = CUB.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = CUB.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = CUB.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = CUB.id }
+                    add_to_array = { USA.bay_of_pigs_operation_target = CUB.id }
+
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 100 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 101 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 102 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 103 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 104 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 105 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 106 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 107 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 108 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 109 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 110 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 111 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 112 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 113 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 114 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 115 }
+                    add_to_array = { USA.bay_of_pigs_operation_id_tokens = 116 }
+
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 4 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 5 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 4 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 5 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 5 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 5 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 6 }
+
+                    add_to_array = { USA.bay_of_pigs_operation_type = 22 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 13 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 19 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 4 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 14 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 14 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 18 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 19 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 4 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 18 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 4 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 3 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 22 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 21 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 20 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 10 }
+                    add_to_array = { USA.bay_of_pigs_operation_type = 8 }
+
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+                    add_to_array = { USA.bay_of_pigs_operation_risk_level = 0 }
+
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_repeatable_condition = 1 }
+
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 5 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 10 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 3 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 5 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 3 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 3 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 5 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 10 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 5 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 1 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 2 }
+                    add_to_array = { USA.bay_of_pigs_operation_cost = 10 }
+
+                }
+                set_variable = {
+                    show_projects = 0 
+                }
+                set_variable = {
+                    show_project_info = 1 
+                }
+                set_variable = {
+                    show_bay_of_pigs = 1 
+                }
+                clear_array = local_possible_operations
+                clear_array = local_possible_operations_risk_level
+                clear_array = local_possible_operations_operation_type
+                clear_array = local_possible_operations_money_cost
+                clear_array = local_possible_operations_repeatable_condition
+                clear_array = local_possible_operations_target
+                clear_array = local_possible_operations_id_token
+                for_each_loop = {
+                    array = USA.bay_of_pigs_operation
+                    add_to_array = { local_possible_operations = USA.bay_of_pigs_operation^i }
+                    add_to_array = { local_possible_operations_risk_level = USA.bay_of_pigs_operation_risk_level^i }
+                    add_to_array = { local_possible_operations_operation_type = USA.bay_of_pigs_operation_type^i }
+                    add_to_array = { local_possible_operations_money_cost = USA.bay_of_pigs_operation_cost^i }
+                    add_to_array = { local_possible_operations_repeatable_condition = USA.bay_of_pigs_operation_repeatable_condition^i }
+                    add_to_array = { local_possible_operations_target = USA.bay_of_pigs_operation_target^i }
+                    add_to_array = { local_possible_operations_id_token = USA.bay_of_pigs_operation_id_tokens^i }       
+                }
+                
+            }
+            if = {                  
+                limit = {
+                    check_variable = { ROOT.black_ops_project_list^i = 500 }
+                }
+                set_variable = {
+                    show_projects = 0 
+                }
+                set_variable = {
+                    show_project_info = 1 
+                }
+                set_variable = {
+                    show_uia = 1 
+                }
+                if = {
+                    limit = {
+                        NOT = {
+                            has_country_flag = Anti_UIA_Project_Setup
+                        }
+                    }
+                    set_country_flag = Anti_UIA_Project_Setup
+                    every_owned_state = {
+                        limit = {
+                            is_core_of = UIA
+                        }
+                        add_to_array = { SOV.uia_operation = 2 }
+                        add_to_array = { SOV.uia_operation_id_tokens = 501 }
+                        add_to_array = { SOV.uia_operation_risk_level = 3 }
+                        add_to_array = { SOV.uia_operation_type = 25 }  
+                        add_to_array = { SOV.uia_personnel_target = THIS.id }
+                        add_to_array = { SOV.uia_operation_target = UIA.id }
+                        add_to_array = { SOV.uia_operation_repeatable_condition = 2 }
+                        add_to_array = { SOV.uia_operation_cost = 2 }
+                    }
+
+                    add_to_array = { SOV.uia_operation = 1 }
+                    add_to_array = { SOV.uia_operation = 3 }
+                    add_to_array = { SOV.uia_operation = 4 }
+                    add_to_array = { SOV.uia_operation = 5 }
+                    add_to_array = { SOV.uia_operation = 6 }
+                    add_to_array = { SOV.uia_operation = 7 }
+
+                    add_to_array = { SOV.uia_operation_target = UIA.id }
+                    add_to_array = { SOV.uia_operation_target = UIA.id }
+                    add_to_array = { SOV.uia_operation_target = UIA.id }
+                    add_to_array = { SOV.uia_operation_target = UIA.id }
+                    add_to_array = { SOV.uia_operation_target = UIA.id }
+                    add_to_array = { SOV.uia_operation_target = UIA.id }
+
+                    add_to_array = { SOV.uia_operation_id_tokens = 500 }
+                    add_to_array = { SOV.uia_operation_id_tokens = 502 }
+                    add_to_array = { SOV.uia_operation_id_tokens = 503 }
+                    add_to_array = { SOV.uia_operation_id_tokens = 504 }
+                    add_to_array = { SOV.uia_operation_id_tokens = 505 }
+                    add_to_array = { SOV.uia_operation_id_tokens = 506 }
+
+                    add_to_array = { SOV.uia_operation_risk_level = 4 }
+                    add_to_array = { SOV.uia_operation_risk_level = 3 }
+                    add_to_array = { SOV.uia_operation_risk_level = 3 }
+                    add_to_array = { SOV.uia_operation_risk_level = 2 }
+                    add_to_array = { SOV.uia_operation_risk_level = 2 } 
+                    add_to_array = { SOV.uia_operation_risk_level = 5 }
+
+                    add_to_array = { SOV.uia_operation_type = 7 }
+                    add_to_array = { SOV.uia_operation_type = 25 }
+                    add_to_array = { SOV.uia_operation_type = 15 }
+                    add_to_array = { SOV.uia_operation_type = 25 }
+                    add_to_array = { SOV.uia_operation_type = 25 }
+                    add_to_array = { SOV.uia_operation_type = 7 }
+
+                    add_to_array = { SOV.uia_operation_repeatable_condition = 1 }
+                    add_to_array = { SOV.uia_operation_repeatable_condition = 2 }
+                    add_to_array = { SOV.uia_operation_repeatable_condition = 1 }
+                    add_to_array = { SOV.uia_operation_repeatable_condition = 1 }
+                    add_to_array = { SOV.uia_operation_repeatable_condition = 1 }
+                    add_to_array = { SOV.uia_operation_repeatable_condition = 1 }
+
+                    add_to_array = { SOV.uia_operation_cost = 3 }
+                    add_to_array = { SOV.uia_operation_cost = 1 }
+                    add_to_array = { SOV.uia_operation_cost = 5 }
+                    add_to_array = { SOV.uia_operation_cost = 1 }
+                    add_to_array = { SOV.uia_operation_cost = 1 }
+                    add_to_array = { SOV.uia_operation_cost = 4 }
+
+                    add_to_array = { SOV.uia_personnel_target = 1 }
+                    add_to_array = { SOV.uia_personnel_target = 1 }
+                    add_to_array = { SOV.uia_personnel_target = 1 }
+                    add_to_array = { SOV.uia_personnel_target = 1 }
+                    add_to_array = { SOV.uia_personnel_target = 1 }
+                    add_to_array = { SOV.uia_personnel_target = 1 }
+                }
+                clear_array = local_possible_operations
+                clear_array = local_possible_operations_risk_level
+                clear_array = local_possible_operations_operation_type
+                clear_array = local_possible_operations_money_cost
+                clear_array = local_possible_operations_repeatable_condition
+                clear_array = local_possible_operations_target
+                clear_array = local_possible_operations_id_token
+                clear_array = local_possible_operations_personnel_target
+                for_each_loop = {
+                    array = SOV.uia_operation
+                    add_to_array = { local_possible_operations = SOV.uia_operation^i }
+                    add_to_array = { local_possible_operations_risk_level = SOV.uia_operation_risk_level^i }
+                    add_to_array = { local_possible_operations_operation_type = SOV.uia_operation_type^i }
+                    add_to_array = { local_possible_operations_money_cost = SOV.uia_operation_cost^i }
+                    add_to_array = { local_possible_operations_repeatable_condition = SOV.uia_operation_repeatable_condition^i }
+                    add_to_array = { local_possible_operations_target = SOV.uia_operation_target^i }
+                    add_to_array = { local_possible_operations_id_token = SOV.uia_operation_id_tokens^i } 
+                    add_to_array = { local_possible_operations_personnel_target = SOV.uia_personnel_target^i }      
+                }  
+            }
+            if = {
+                limit = {
+                    check_variable = { ROOT.black_ops_project_list^i = 501 }
+                }
+                set_variable = {
+                    show_projects = 0 
+                }
+                set_variable = {
+                    show_project_info = 1 
+                }
+                set_variable = {
+                    show_fbk = 1 
+                }
+            }
+        }
+        }
+    }
+	black_ops_generic_project_toggles = { 
+        context_type = player_context
+        window_name = "black_ops_generic_project_toggles_menu"
+		parent_scripted_gui = "black_ops_projects_generic_selected_menu"
+
+		ai_enabled = {
+			always = no
+		}
+        visible = {
+            NOT = { 
+                check_variable = {
+                    generic_operations_selected_target = 0
+                }
+            }
+            check_variable = {
+                show_generic_operations = 1
+            }
+        }
+        triggers = {
+            mission_toggle_unconfirm_visible = {
+                check_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 0
+                }
+            }
+            mission_toggle_confirm_visible = {
+                check_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 1
+                }
+            }
+        }
+        effects = {
+             mission_toggle_unconfirm_click = {
+                set_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 1
+                }
+                if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.current_operations_potential_toggle^i = 1
+                        }
+                    }
+                    var:generic_operations_selected_target = {
+                        add_assassinate_generals_operations = yes
+                        add_assassinate_admirals_operations = yes
+                    }
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.current_operations_potential_toggle^i = 2
+                        }
+                    }
+                    var:generic_operations_selected_target = {
+                        add_nuclear_site_sabotage_operations = yes
+                        add_sabotage_nuclear_programme_operations = yes
+                    }
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.current_operations_potential_toggle^i = 3
+                        }
+                    }
+                    var:generic_operations_selected_target = {
+                        add_arms_factory_sabotage_operations = yes
+                        add_factory_sabotage_operations = yes
+                        add_airfield_sabotage_operations = yes
+                        add_dockyard_sabotage_operations = yes
+                        add_port_sabotage_operations = yes
+                        add_infrastructure_sabotage_operations = yes
+                    }
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.current_operations_potential_toggle^i = 4
+                        }
+                    }
+                    var:generic_operations_selected_target = {
+                       add_terrorist_attack_operations = yes
+                    }
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.current_operations_potential_toggle^i = 5
+                        }
+                    }
+                    var:generic_operations_selected_target = {
+                        add_local_uprising_operations = yes
+                        add_local_resistance_contacts_operations = yes
+                        add_arm_local_resistance_operations = yes
+                    }
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.current_operations_potential_toggle^i = 6
+                        }
+                    }
+                    var:generic_operations_selected_target = {
+                        Make_Embed_into_Insurgency_List = yes
+                        Make_Into_Counter_Espionage_Embed = yes
+                    }
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.current_operations_potential_toggle^i = 7
+                        }
+                    }
+                    var:generic_operations_selected_target = {
+                        add_tech_stealing_operations = yes
+                    }
+                }
+                else = { }
+            }
+            mission_toggle_confirm_click = {
+                set_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 0
+                }
+                refresh_possible_generic_missions = yes
+            }           
+        }
+        dynamic_lists = {
+            blacks_ops_generic_mission_types_toggle_listing_grid = {
+                array = ROOT.current_operations_potential_toggle
+                change_scope = no
+				entry_container = blacks_ops_generic_mission_types_toggle_list
+            }
+        }
+    }
+}

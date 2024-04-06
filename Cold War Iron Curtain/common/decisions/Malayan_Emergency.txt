@@ -6,11 +6,16 @@ malaysian_emergency_category = {
 		available = {
 			tag = MAL
 			country_exists = MLA
-			 date > 1950.3.1
-			 date < 1960.1.1
-			 has_border_war = no
+			date > 1950.3.1
+			date < 1960.1.1
+			has_border_war = no
 		}
-
+		
+		visible = {
+			tag = MAL
+			NOT = { has_country_flag = Semur_River_Battle }
+		}
+		
 		cost = 0
 
 		fire_only_once = yes
@@ -34,6 +39,7 @@ malaysian_emergency_category = {
 					on_cancel = Indochina_War.4
 				}
 			}
+			set_country_flag = Semur_River_Battle
 		}
 
 		ai_will_do = {
@@ -45,17 +51,21 @@ malaysian_emergency_category = {
 		available = {
 			tag = MAL
 			country_exists = MLA
-			 date > 1954.1.1
-			 date < 1960.1.1
-			 has_border_war = no
+			date > 1954.1.1
+			date < 1960.1.1
+			has_border_war = no
 		}
-
+		
+		visible = {
+			tag = MAL
+			NOT = { has_country_flag = operation_termite }
+		}
+		
 		cost = 0
 
 		fire_only_once = yes
 
 		complete_effect = {
-			set_country_flag = operation_termite
 			start_border_war = {
 				change_state_after_war = no
 				attacker = {
@@ -74,6 +84,7 @@ malaysian_emergency_category = {
 					on_cancel = Indochina_War.4
 				}
 			}
+			set_country_flag = operation_termite
 		}
 
 		ai_will_do = {
@@ -85,9 +96,15 @@ malaysian_emergency_category = {
 		available = {
 			tag = MAL
 			country_exists = MLA
-
-			has_country_flag = operation_termite 
 			has_border_war = no
+			custom_trigger_tooltip = {
+				tooltip = Has_Operation_Termite_tt
+				has_country_flag = operation_termite 
+			}
+		}
+
+		visible = {
+			tag = MAL
 		}
 
 		days_re_enable = 60
@@ -122,8 +139,15 @@ malaysian_emergency_category = {
 		available = {
 			tag = MAL
 			country_exists = MLA
-			has_country_flag = operation_termite 
 			has_border_war = no
+			custom_trigger_tooltip = {
+				tooltip = Has_Operation_Termite_tt
+				has_country_flag = operation_termite 
+			}
+		}
+
+		visible = {
+			tag = MAL
 		}
 
 		days_re_enable = 60
@@ -158,8 +182,15 @@ malaysian_emergency_category = {
 		available = {
 			tag = MAL
 			country_exists = MLA
-			has_country_flag = operation_termite 
 			has_border_war = no
+			custom_trigger_tooltip = {
+				tooltip = Has_Operation_Termite_tt
+				has_country_flag = operation_termite 
+			}
+		}
+
+		visible = {
+			tag = MAL
 		}
 
 		days_re_enable = 60
@@ -195,9 +226,17 @@ malaysian_emergency_category = {
 			tag = MAL
 			country_exists = MLA
 			has_border_war = no
-			check_variable = { MAL.victory_points > 1000 }
-			check_variable = { MLA.victory_points < MAL.victory_points }
+			custom_trigger_tooltip = {
+				tooltip = Can_Exile_MLA_tt
+				check_variable = { MAL.victory_points > 1000 }
+				check_variable = { MLA.victory_points < MAL.victory_points }
+			}
 		}
+
+		visible = {
+			tag = MAL
+		}
+
 		cost = 0
 		fire_only_once = yes
 
@@ -205,7 +244,8 @@ malaysian_emergency_category = {
 			annex_country = {
 				target = MLA
 			}
-			news_event = malayan_emergency.300
+			set_global_flag = MAL_EMERGENCY_MAL_Victory
+			#news_event = malayan_emergency.300 ???
 		}
 		ai_will_do = {
 			factor = 1 
@@ -216,9 +256,16 @@ malaysian_emergency_category = {
 	   available = {
 			tag = MLA
 			country_exists = MAL
-			 has_border_war = no
-			 check_variable = { MLA.victory_points > 800 }
-			 check_variable = { MAL.victory_points < MLA.victory_points }
+			has_border_war = no
+			custom_trigger_tooltip = {
+				tooltip = Can_Liberate_MAL_tt
+				check_variable = { MLA.victory_points > 800 }
+				check_variable = { MAL.victory_points < MLA.victory_points }
+			}
+		}
+
+		visible = {
+			tag = MLA
 		}
 
 		cost = 0
@@ -229,9 +276,65 @@ malaysian_emergency_category = {
 			annex_country = {
 				target = MAL
 			}
-			transfer_state = 1128
-			transfer_state = 924
-			news_event = malayan_emergency.301
+			ENG = {
+				every_state = {
+					limit = {
+						is_core_of = ENG
+						is_core_of = MLA
+					}
+					remove_core_of = PREV
+					transfer_state_to = MLA
+				}
+			}
+			SGP = {
+				drop_cosmetic_tag = yes
+				set_cosmetic_tag = SGP_ENG_GAR
+				hidden_effect = {
+					retire_country_leader = yes
+					set_popularities = {
+						neutrality = 100
+					}
+					set_politics = {
+						ruling_party = neutrality
+						elections_allowed = no
+					}
+					set_party_name = { 
+						ideology = neutrality
+						name = "ECBA"
+						long_name = "Eastern Command of the British Army"
+					}
+				}
+			}
+			MAL = {
+				MAL_Gerald_Templar = {
+					set_nationality = SGP
+					add_country_leader_role = {
+						promote_leader = yes
+						country_leader = {
+							ideology = despotism
+						}
+					}
+				}
+				hidden_effect = {
+					every_character = {
+						limit = {
+							NOT = { is_character = MAL_Abdul_Razak_Hussein }
+						}
+						set_nationality = SGP
+					}
+				}
+			}
+			every_country = {
+				limit = {
+					OR = {
+						original_tag = MAL
+						original_tag = ENG
+					}
+				}
+				country_event = MLA_Victory.1
+			}
+			news_event = { id = MLA_Victory.0 hours = 3 random_hours = 6 }
+			set_global_flag = MAL_EMERGENCY_MLA_Victory
 		}
 
 

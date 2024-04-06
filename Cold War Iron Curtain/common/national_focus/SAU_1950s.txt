@@ -211,6 +211,8 @@ focus_tree = {
 				idea = repression
 				days = 365
 			}
+			set_variable = { THIS.idea_len_@token:repression = 365 }
+			set_variable = { THIS.idea_date_@token:repression = global.num_days }
 			add_stability = 0.02
 		}
 	}
@@ -542,7 +544,26 @@ focus_tree = {
 		x = 7
 		y = 3
 		completion_reward = {
-			decrease_fiscal_collapse = yes
+			if = {
+				limit = {
+					has_idea = fiscal_collapse_3
+				}
+				remove_ideas = fiscal_collapse_3
+				add_ideas = fiscal_collapse_2
+			}
+			else_if = {
+				limit = {
+					has_idea = fiscal_collapse_2
+				}
+				remove_ideas = fiscal_collapse_2
+				add_ideas = fiscal_collapse_1
+			}
+			else_if = {
+				limit = {
+					has_idea = fiscal_collapse_1
+				}
+				remove_ideas = fiscal_collapse_1
+			}
 		}
 	}
 	focus = {
@@ -640,7 +661,26 @@ focus_tree = {
 		x = 10
 		y = 3
 		completion_reward = {
-			decrease_fiscal_collapse = yes
+			if = {
+				limit = {
+					has_idea = fiscal_collapse_3
+				}
+				remove_ideas = fiscal_collapse_3
+				add_ideas = fiscal_collapse_2
+			}
+			else_if = {
+				limit = {
+					has_idea = fiscal_collapse_2
+				}
+				remove_ideas = fiscal_collapse_2
+				add_ideas = fiscal_collapse_1
+			}
+			else_if = {
+				limit = {
+					has_idea = fiscal_collapse_1
+				}
+				remove_ideas = fiscal_collapse_1
+			}
 		}
 	}
 	focus = {
@@ -666,6 +706,8 @@ focus_tree = {
 				idea = DDR_idea_first_five_year_plan
 				days = 1625
 			}
+			set_variable = { THIS.idea_len_@token:DDR_idea_first_five_year_plan = 1625 }
+			set_variable = { THIS.idea_date_@token:DDR_idea_first_five_year_plan = global.num_days }
 		}
 	}
 	focus = {
@@ -807,6 +849,8 @@ focus_tree = {
 				idea = infrastructure_development
 				days = 750
 			}
+			set_variable = { THIS.idea_len_@token:infrastructure_development = 750 }
+			set_variable = { THIS.idea_date_@token:infrastructure_development = global.num_days }
 		}
 	}
 	focus = {
@@ -899,7 +943,26 @@ focus_tree = {
 		x = 11
 		y = 9
 		completion_reward = {
-			decrease_fiscal_collapse = yes
+			if = {
+				limit = {
+					has_idea = fiscal_collapse_3
+				}
+				remove_ideas = fiscal_collapse_3
+				add_ideas = fiscal_collapse_2
+			}
+			if = {
+				limit = {
+					has_idea = fiscal_collapse_2
+				}
+				remove_ideas = fiscal_collapse_2
+				add_ideas = fiscal_collapse_1
+			}
+			if = {
+				limit = {
+					has_idea = fiscal_collapse_1
+				}
+				remove_ideas = fiscal_collapse_1
+			}
 		}
 	}
 	focus = {
@@ -1275,7 +1338,6 @@ focus_tree = {
 		}
 		mutually_exclusive = {
 			focus = SAU_Seek_A_Middle_Path
-			focus = SAU_Increase_Collaboration_with_the_Egyptian_Military
 		}
 		x = 25
 		y = 3
@@ -1360,11 +1422,8 @@ focus_tree = {
 		x = 30
 		y = 3
 		completion_reward = {
-			add_to_variable = {
-				var = domestic_influence_amount
-				value = 200
-			}
-			recalculate_influence = yes
+			set_temp_variable = { percent_change = 20 }
+			change_domestic_influence_percentage = yes
 			add_political_power = 50
 		}
 	}
@@ -1444,12 +1503,11 @@ focus_tree = {
 		}
 		mutually_exclusive = {
 			focus = SAU_Seek_A_Middle_Path
-			focus = SAU_Purge_Nasserists_in_the_Military
 		}
 		x = 35
 		y = 3
 		completion_reward = {
-			add_ideas = egyptian_technical_advisors
+			add_ideas = egyptian_technical_advisors_
 		}
 	}
 	focus = {
@@ -1672,36 +1730,10 @@ focus_tree = {
 		y = 11
 		completion_reward = {
 			JOR = {
-				for_loop_effect = {
-					end = influence_array^num
-					value = v
-					if = {
-						limit = {
-							check_variable = {
-								influence_array^v = PREV
-							}
-						}
-						add_to_variable = {
-							influence_array_val^v = 100
-						}
-						set_country_flag = found
-					}
-				}
-				if = {
-					limit = {
-						NOT = {
-							has_country_flag = found
-						}
-					}
-					add_to_array = {
-						influence_array = PREV.id
-					}
-					add_to_array = {
-						influence_array_val = 100
-					}
-				}
-				clr_country_flag = found
-				recalculate_influence = yes
+				set_temp_variable = { percent_change = 20 }
+				set_temp_variable = { tag_index = ROOT.id }
+				set_temp_variable = { influence_target = THIS.id }
+				change_influence_percentage = yes
 				add_stability = 0.05
 			}
 		}
@@ -1795,11 +1827,8 @@ focus_tree = {
 		completion_reward = {
 			add_manpower = -500
 			air_experience = -10
-			add_to_variable = {
-				var = domestic_influence_amount
-				value = 200
-			}
-			recalculate_influence = yes
+			set_temp_variable = { percent_change = 10 }
+			change_domestic_influence_percentage = yes
 		}
 	}
 	focus = {
@@ -2298,38 +2327,10 @@ focus_tree = {
 		x = 49
 		y = 12
 		completion_reward = {
-			YEM = {
-				for_loop_effect = {
-					end = influence_array^num
-					value = v
-					if = {
-						limit = {
-							check_variable = {
-								influence_array^v = PREV
-							}
-						}
-						add_to_variable = {
-							influence_array_val^v = 100
-						}
-						set_country_flag = found
-					}
-				}
-				if = {
-					limit = {
-						NOT = {
-							has_country_flag = found
-						}
-					}
-					add_to_array = {
-						influence_array = PREV.id
-					}
-					add_to_array = {
-						influence_array_val = 100
-					}
-				}
-				clr_country_flag = found
-				recalculate_influence = yes
-			}
+			set_temp_variable = { percent_change = 20 }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = YEM.id }
+			change_influence_percentage = yes
 			give_guarantee = YEM
 		}
 	}
@@ -2381,36 +2382,10 @@ focus_tree = {
 				add_to_variable = {
 					currentMoney = 10
 				}
-				for_loop_effect = {
-					end = influence_array^num
-					value = v
-					if = {
-						limit = {
-							check_variable = {
-								influence_array^v = PREV
-							}
-						}
-						add_to_variable = {
-							influence_array_val^v = 100
-						}
-						set_country_flag = found
-					}
-				}
-				if = {
-					limit = {
-						NOT = {
-							has_country_flag = found
-						}
-					}
-					add_to_array = {
-						influence_array = PREV.id
-					}
-					add_to_array = {
-						influence_array_val = 100
-					}
-				}
-				clr_country_flag = found
-				recalculate_influence = yes
+				set_temp_variable = { percent_change = 20 }
+				set_temp_variable = { tag_index = ROOT.id }
+				set_temp_variable = { influence_target = THIS.id }
+				change_influence_percentage = yes
 			}
 		}
 	}
@@ -2456,6 +2431,8 @@ focus_tree = {
 				idea = military_modernization
 				days = 1250
 			}
+			set_variable = { THIS.idea_len_@token:military_modernization = 1250 }
+			set_variable = { THIS.idea_date_@token:military_modernization = global.num_days }
 		}
 	}
 	focus = {
@@ -2547,6 +2524,8 @@ focus_tree = {
 				idea = increased_living_standards
 				days = 1250
 			}
+			set_variable = { THIS.idea_len_@token:increased_living_standards = 1250 }
+			set_variable = { THIS.idea_date_@token:increased_living_standards = global.num_days }
 		}
 	}
 	focus = {
@@ -2573,14 +2552,6 @@ focus_tree = {
 		}
 		x = 2
 		y = 16
-		available = {
-			EGY = {
-				has_country_leader = {
-					name = "Gamal Abdel Nasser"
-					ruling_only = yes
-				}
-			}
-		}
 		completion_reward = {
 			every_owned_state = {
 				add_core_of = EGY
@@ -2617,6 +2588,8 @@ focus_tree = {
 				idea = repression
 				days = 1250
 			}
+			set_variable = { THIS.idea_len_@token:repression = 1250 }
+			set_variable = { THIS.idea_date_@token:repression = global.num_days }
 		}
 	}
 	focus = {
@@ -2639,6 +2612,8 @@ focus_tree = {
 				idea = industrial_development
 				days = 750
 			}
+			set_variable = { THIS.idea_len_@token:industrial_development = 750 }
+			set_variable = { THIS.idea_date_@token:industrial_development = global.num_days }
 		}
 	}
 	focus = {
@@ -2710,6 +2685,8 @@ focus_tree = {
 				idea = economic_growth
 				days = 1250
 			}
+			set_variable = { THIS.idea_len_@token:economic_growth = 1250 }
+			set_variable = { THIS.idea_date_@token:economic_growth = global.num_days }
 		}
 	}
 	focus = {
@@ -2735,6 +2712,8 @@ focus_tree = {
 				idea = american_loans
 				days = 2250
 			}
+			set_variable = { THIS.idea_len_@token:american_loans = 2250 }
+			set_variable = { THIS.idea_date_@token:american_loans = global.num_days }
 			add_to_variable = {
 				currentMoney = 30
 			}
@@ -2871,68 +2850,16 @@ focus_tree = {
 			}
 			SAU = {
 				IRQ = {
-					for_loop_effect = {
-						end = influence_array^num
-						value = v
-						if = {
-							limit = {
-								check_variable = {
-									influence_array^v = PREV
-								}
-							}
-							add_to_variable = {
-								influence_array_val^v = 100
-							}
-							set_country_flag = found
-						}
-					}
-					if = {
-						limit = {
-							NOT = {
-								has_country_flag = found
-							}
-						}
-						add_to_array = {
-							influence_array = PREV.id
-						}
-						add_to_array = {
-							influence_array_val = 100
-						}
-					}
-					clr_country_flag = found
-					recalculate_influence = yes
+					set_temp_variable = { percent_change = 20 }
+					set_temp_variable = { tag_index = ROOT.id }
+					set_temp_variable = { influence_target = THIS.id }
+					change_influence_percentage = yes
 				}
 				JOR = {
-					for_loop_effect = {
-						end = influence_array^num
-						value = v
-						if = {
-							limit = {
-								check_variable = {
-									influence_array^v = PREV
-								}
-							}
-							add_to_variable = {
-								influence_array_val^v = 100
-							}
-							set_country_flag = found
-						}
-					}
-					if = {
-						limit = {
-							NOT = {
-								has_country_flag = found
-							}
-						}
-						add_to_array = {
-							influence_array = PREV.id
-						}
-						add_to_array = {
-							influence_array_val = 100
-						}
-					}
-					clr_country_flag = found
-					recalculate_influence = yes
+					set_temp_variable = { percent_change = 20 }
+					set_temp_variable = { tag_index = ROOT.id }
+					set_temp_variable = { influence_target = THIS.id }
+					change_influence_percentage = yes
 				}
 			}
 		}
@@ -2983,68 +2910,16 @@ focus_tree = {
 			}
 			SAU = {
 				IRQ = {
-					for_loop_effect = {
-						end = influence_array^num
-						value = v
-						if = {
-							limit = {
-								check_variable = {
-									influence_array^v = PREV
-								}
-							}
-							add_to_variable = {
-								influence_array_val^v = 100
-							}
-							set_country_flag = found
-						}
-					}
-					if = {
-						limit = {
-							NOT = {
-								has_country_flag = found
-							}
-						}
-						add_to_array = {
-							influence_array = PREV.id
-						}
-						add_to_array = {
-							influence_array_val = 100
-						}
-					}
-					clr_country_flag = found
-					recalculate_influence = yes
+					set_temp_variable = { percent_change = 20 }
+					set_temp_variable = { tag_index = ROOT.id }
+					set_temp_variable = { influence_target = THIS.id }
+					change_influence_percentage = yes
 				}
 				JOR = {
-					for_loop_effect = {
-						end = influence_array^num
-						value = v
-						if = {
-							limit = {
-								check_variable = {
-									influence_array^v = PREV
-								}
-							}
-							add_to_variable = {
-								influence_array_val^v = 100
-							}
-							set_country_flag = found
-						}
-					}
-					if = {
-						limit = {
-							NOT = {
-								has_country_flag = found
-							}
-						}
-						add_to_array = {
-							influence_array = PREV.id
-						}
-						add_to_array = {
-							influence_array_val = 100
-						}
-					}
-					clr_country_flag = found
-					recalculate_influence = yes
+					set_temp_variable = { percent_change = 20 }
+					set_temp_variable = { tag_index = ROOT.id }
+					set_temp_variable = { influence_target = THIS.id }
+					change_influence_percentage = yes
 				}
 			}
 		}
@@ -3161,11 +3036,10 @@ focus_tree = {
 				idea = revolutionary_fervor
 				days = 1250
 			}
-			add_to_variable = {
-				var = domestic_influence_amount
-				value = 200
-			}
-			recalculate_influence = yes
+			set_variable = { THIS.idea_len_@token:revolutionary_fervor = 1250 }
+			set_variable = { THIS.idea_date_@token:revolutionary_fervor = global.num_days }
+			set_temp_variable = { percent_change = 20 }
+			change_domestic_influence_percentage = yes
 		}
 	}
 	focus = {
@@ -3289,108 +3163,30 @@ focus_tree = {
 						ideology = nationalist
 						popularity = 0.05
 					}
-					for_loop_effect = {
-						end = influence_array^num
-						value = v
-						if = {
-							limit = {
-								check_variable = {
-									influence_array^v = PREV
-								}
-							}
-							add_to_variable = {
-								influence_array_val^v = 100
-							}
-							set_country_flag = found
-						}
-					}
-					if = {
-						limit = {
-							NOT = {
-								has_country_flag = found
-							}
-						}
-						add_to_array = {
-							influence_array = PREV.id
-						}
-						add_to_array = {
-							influence_array_val = 100
-						}
-					}
-					clr_country_flag = found
-					recalculate_influence = yes
+					set_temp_variable = { percent_change = 20 }
+					set_temp_variable = { tag_index = ROOT.id }
+					set_temp_variable = { influence_target = THIS.id }
+					change_influence_percentage = yes
 				}
 				KUW = {
 					add_popularity = {
 						ideology = nationalist
 						popularity = 0.05
 					}
-					for_loop_effect = {
-						end = influence_array^num
-						value = v
-						if = {
-							limit = {
-								check_variable = {
-									influence_array^v = PREV
-								}
-							}
-							add_to_variable = {
-								influence_array_val^v = 100
-							}
-							set_country_flag = found
-						}
-					}
-					if = {
-						limit = {
-							NOT = {
-								has_country_flag = found
-							}
-						}
-						add_to_array = {
-							influence_array = PREV.id
-						}
-						add_to_array = {
-							influence_array_val = 100
-						}
-					}
-					clr_country_flag = found
-					recalculate_influence = yes
+					set_temp_variable = { percent_change = 20 }
+					set_temp_variable = { tag_index = ROOT.id }
+					set_temp_variable = { influence_target = THIS.id }
+					change_influence_percentage = yes
 				}
 				BHR = {
 					add_popularity = {
 						ideology = nationalist
 						popularity = 0.05
 					}
-					for_loop_effect = {
-						end = influence_array^num
-						value = v
-						if = {
-							limit = {
-								check_variable = {
-									influence_array^v = PREV
-								}
-							}
-							add_to_variable = {
-								influence_array_val^v = 100
-							}
-							set_country_flag = found
-						}
-					}
-					if = {
-						limit = {
-							NOT = {
-								has_country_flag = found
-							}
-						}
-						add_to_array = {
-							influence_array = PREV.id
-						}
-						add_to_array = {
-							influence_array_val = 100
-						}
-					}
-					clr_country_flag = found
-					recalculate_influence = yes
+					set_temp_variable = { percent_change = 20 }
+					set_temp_variable = { tag_index = ROOT.id }
+					set_temp_variable = { influence_target = THIS.id }
+					change_influence_percentage = yes
 				}
 			}
 		}
@@ -3437,6 +3233,8 @@ focus_tree = {
 				idea = centralization
 				days = 1650
 			}
+			set_variable = { THIS.idea_len_@token:centralization = 1650 }
+			set_variable = { THIS.idea_date_@token:centralization = global.num_days }
 		}
 	}
 }

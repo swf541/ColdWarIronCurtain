@@ -1,4 +1,5 @@
 on_actions = {
+
 	on_state_control_changed = {
 		#ROOT = new controller country
 		#FROM = old controller country
@@ -34,6 +35,8 @@ on_actions = {
 							is_fully_controlled_by = FRA
 						}
 					}
+
+
 				}
 				ISR = { country_event = operationkadesh.5 }
 			}
@@ -64,6 +67,95 @@ on_actions = {
 			if = {
 				limit = {
 					FROM = {
+						tag = DOM
+					} 
+					tag = DMC
+				}
+				log = "1"
+				DOM = {
+					set_country_flag = Victory_over_DMC_as_DOM
+					country_event = DOM_EndDem_Loyalist_Civil_War.1 
+				}
+			}
+			if = {
+				limit = {
+					FROM = {
+						tag = DMC
+					} 
+					tag = DOM
+				}
+				log = "2"
+				DMC = {
+					set_country_flag = Victory_over_DOM_as_DMC
+					country_event = DOM_EndDem_Constitutionalist_Civil_War.1
+				}
+			}
+			if = {
+				limit = {
+					FROM = {
+						tag = DOM
+					} 
+					tag = DML
+				}
+				log = "3"
+				DOM = {
+					set_country_flag = Victory_over_DML_as_DOM
+					country_event = DOM_EndDem_Constitutionalist_Civil_War.1
+				}
+			}
+			if = {
+				limit = {
+					FROM = {
+						tag = DML
+					} 
+					tag = DOM
+				}
+				log = "4"
+				DML = {
+					set_country_flag = Victory_over_DOM_as_DML
+					country_event = DOM_EndDem_Loyalist_Civil_War.1 
+				}
+			}
+			if = {
+				limit = {
+					FROM = {
+						OR = {
+							is_in_faction_with = PDG
+							original_tag = PDG
+						}
+						
+					}
+					ROOT = {
+						original_tag = GRE
+					}
+				}
+				ROOT = {
+					if = {
+						limit = {
+							is_ai = no
+						}
+						country_event = TUR_SOV.102
+					}
+				}
+				FROM = {
+					PDG = {
+						annex_country = {
+							target = GRE
+							transfer_troops = no
+						}
+					}
+					SOV = {
+						set_autonomy = {
+							target = PDG
+							autonomous_state = autonomy_easternbloc
+							freedom_level = 0.4
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					FROM = {
 						original_tag = SOV
 						has_country_flag = Flag_Invasion_of_Turkey
 					}
@@ -88,52 +180,6 @@ on_actions = {
 					country_event = resource.1250
 				}
 			}
-			if = {
-				limit = {
-					FROM = {
-						OR = {
-							original_tag = PDG
-							is_in_faction_with = PDG
-						}
-					}
-					ROOT = { 
-						original_tag = GRE 
-						has_country_flag = Flag_Greek_Civil_War
-					}
-				}
-				ROOT = {
-					if = {
-						limit = {
-							is_ai = no
-						}
-						country_event = TUR_SOV.102
-					}
-				}
-				FROM = {
-					if = {
-						limit = {
-							original_tag = PDG
-						}
-						annex_country = {
-							target = ROOT
-							transfer_troops = no
-						}
-					}
-					SOV = {
-						set_autonomy = {
-							target = PDG
-							autonomous_state = autonomy_easternbloc
-							freedom_level = 0.4
-						}
-					}
-					if = {
-						limit = {
-							is_ai = no
-						}
-						country_event = TUR_SOV.102
-					}
-				}
-			}
 			# Korean War - North wins
 			if = {
 				limit = {
@@ -155,7 +201,6 @@ on_actions = {
 					news_event = korea.8
 					PRC = {
 						white_peace = USA
-						white_peace = CHI
 						white_peace = KOR
 						country_event = korean_surrender.4
 					}
@@ -168,6 +213,7 @@ on_actions = {
 				}
 				ROOT = {
 					country_event = korean_surrender.5
+					complete_national_focus = KOR_retreat_to_jeju_island
 					every_owned_state = {
 						limit = {
 							NOT = {
@@ -210,7 +256,6 @@ on_actions = {
 				FROM = {
 					news_event = korea.12
 					CHI = {
-						white_peace = PRC
 						white_peace = KPA
 					}
 					USA = {
@@ -286,12 +331,6 @@ on_actions = {
 				}
 				clr_global_flag = North_Yemen_Civil_War
 			}
-		}
-	}
-	
-	
-	on_capitulation = {
-		effect = {
 			if = {
 				limit = {
 					OR = {
@@ -1236,6 +1275,157 @@ on_actions = {
 
 			if = {
 				limit = {
+					FROM = {
+						OR = {
+							original_tag = PDG
+							is_in_faction_with = PDG
+						}
+					}
+					ROOT = { TAG = GRE }
+				}
+				PDG = {
+					white_peace = GRE
+					annex_country = {
+						target = GRE
+						transfer_troops = no
+					}
+				}
+				SOV = {
+					set_autonomy = {
+						target = PDG
+						autonomous_state = autonomy_easternbloc
+						freedom_level = 0.4
+					}
+				}
+			}
+			# Korean War - North wins
+			if = {
+				limit = {
+					ROOT = { TAG = KOR }
+					OR = {
+						FROM = { TAG = KPA }
+						FROM = { TAG = PRC }
+						FROM = { TAG = SOV }
+					}
+					has_global_flag = korean_war
+				}
+				log = "[GetDateText]: [Root.GetTag]: On Action Capitulation for Korean War: North wins"
+				SOV = {
+					white_peace = KOR
+					white_peace = USA
+					white_peace = CHI
+				}
+				PRC = {
+					country_event = korean_surrender.4
+					white_peace = KOR
+					white_peace = USA
+					if = { limit = { has_global_flag = chinese_civil_war_over }
+						white_peace = CHI
+						dismantle_faction = yes
+					}
+				}
+				USA = {
+					white_peace = SOV
+					white_peace = PRC
+					dismantle_faction = yes
+				}
+				KOR = {
+					country_event = korean_surrender.5
+					every_owned_state = {
+						limit = { is_core_of = KOR }
+						add_core_of = KPA
+					}
+				}
+				CHI = {
+					white_peace = SOV
+					if = { limit = { has_global_flag = chinese_civil_war_over }
+						white_peace = KPA
+						white_peace = PRC
+						dismantle_faction = yes
+					}
+				}
+				KPA = {
+					country_event = korean_surrender.3
+					white_peace = USA
+					if = { limit = { has_global_flag = chinese_civil_war_over }
+						white_peace = CHI
+						dismantle_faction = yes
+					}
+					leave_faction = yes
+					annex_country = { target = KOR transfer_troops = yes }
+					set_global_flag = KOREA_CEASEFIRE_UN
+					clr_global_flag = korean_war
+				}
+				
+			}
+			# Korean War - South wins
+			if = {
+				limit = {
+					FROM = { tag = KOR }
+					OR = {
+						AND = {
+							ROOT = { tag = PRC }
+							PRC = { has_idea = korean_war }
+						}
+						ROOT = { tag = KPA }
+					}
+					has_global_flag = korean_war
+					
+				}
+				log = "[GetDateText]: [Root.GetTag]: On Action Capitulation for Korean War: South wins"
+				SOV = {
+					white_peace = KOR
+					white_peace = USA
+					white_peace = CHI
+				}
+				PRC = {
+					white_peace = KOR
+					white_peace = USA
+					if = { limit = { has_global_flag = chinese_civil_war_over }
+						white_peace = CHI
+					}
+				}
+				USA = {
+					white_peace = SOV
+					white_peace = PRC
+					dismantle_faction = yes
+				}
+				CHI = {
+					white_peace = SOV
+					if = { limit = { has_global_flag = chinese_civil_war_over }
+						white_peace = KPA
+						white_peace = PRC
+						dismantle_faction = yes
+					}
+				}
+				KPA = {
+					if = { limit = { has_global_flag = chinese_civil_war_over }
+						white_peace = KOR
+						white_peace = USA
+						white_peace = CHI
+						dismantle_faction = yes
+					}
+					every_owned_state = {
+						limit = { is_core_of = KPA }
+						add_core_of = KOR
+					}
+				}
+				KOR = {
+					white_peace = PRC
+					if = { limit = { has_global_flag = chinese_civil_war_over }
+						white_peace = KPA
+						dismantle_faction = yes
+					}
+					white_peace = SOV
+					news_event = korea.12
+					annex_country = { target = KPA transfer_troops = yes }
+					set_global_flag = KOREA_CEASEFIRE_UN
+					clr_global_flag = korean_war
+				}
+			}
+			
+			if = {
+				limit = {
 					FROM = { tag = NGA }
 					ROOT = { tag = BFR }
 				}
@@ -1243,33 +1433,7 @@ on_actions = {
 			}
 			##### end of moved from 00_on_actions.txt #####
 
-			# PRC capitulates against CHI or USA
-			if = {
-				limit = {
-					ROOT = {
-						tag = PRC
-						OR = {
-							has_country_flag = american_invasion_prc_49
-							has_global_flag = roc_rebound_shanghai
-							date < 1951.6.1
-						}
-						NOT = {
-							has_focus_tree = PRC_SOV_50s
-						}
-						NOT = {
-							has_focus_tree = PRC_SOV_60s
-						}
-					}
-					FROM = {
-						OR = {
-							tag = USA
-							tag = CHI
-						}
-					}
-				}
-				PRC_Lose_CCW = yes
-			}
-			####
+			
 
 			if = {
 				limit = {
@@ -1307,6 +1471,7 @@ on_actions = {
                 news_event = PRC_TIBETAN.7
                 annex_country = { target = TIB transfer_troops = no }
 			}
+
 			if = {
 				limit = {
 					ROOT = {
@@ -1755,7 +1920,7 @@ on_actions = {
 			# I added check for flag korean_war, which fixes this case, but i don't think any of this is needed
 			# since it's already handled at the start of this file (or am i missing something? - Harain
 
-#Asian Liberation War
+
 			if = {
 				limit = {
 					has_global_flag = asian_liberation_war
@@ -1834,6 +1999,13 @@ on_actions = {
 					}
 				}
 				XSM = {
+					SOV = {
+						add_to_array = { sphere_tag_list = XSM.id }
+					}
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+						}
 					add_ideas = martial_law
 					retire_country_leader = yes
 					create_country_leader = {
@@ -1852,6 +2024,13 @@ on_actions = {
 					}
 				}
 				YUN = {
+					SOV = {
+						add_to_array = { sphere_tag_list = YUN.id }
+					}
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+						}
 					add_ideas = martial_law
 					retire_country_leader = yes
 					create_country_leader = {
@@ -1874,6 +2053,13 @@ on_actions = {
 					}
 				}
 				GXC = {
+					SOV = {
+						add_to_array = { sphere_tag_list = GXC.id }
+					}
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+						}
 					add_ideas = martial_law
 					set_cosmetic_tag = GXC_Occupation
 					transfer_state = 592
@@ -1901,7 +2087,7 @@ on_actions = {
 							}
 				}
 				CHI = {
-					white_peace = YUN
+					white_peace = YUN 
 					annex_country = {
 						target = YUN 
 					}

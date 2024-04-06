@@ -1,4 +1,66 @@
 scripted_gui = {
+	national_ideas_menu = {
+		window_name = "show_national_ideas"
+
+		context_type = player_context
+		visible = {
+			check_variable = {
+				show_national_ideas = 1
+			}
+		}		
+		effects = {
+			close_button_click = {
+				set_variable = {
+					show_national_ideas = 0
+				}
+			}
+		}
+	}
+	national_ideas_list = {
+        context_type = player_context
+        window_name = "national_ideas_list"
+		parent_scripted_gui = national_ideas_menu
+        dynamic_lists = {
+            national_ideas_list_grid = {
+                array = ROOT.current_idea_list
+				entry_container = national_ideas_list_entry
+            }
+        }
+		effects = {
+			national_ideas_list_entry_right_click = { 
+				meta_effect = { text = { show_ideas_tooltip = [IDEA_TOKEN] } IDEA_TOKEN = "[?v.GetTokenKey]" }
+				if = {
+					limit = { has_variable = THIS.idea_date_@var:v }
+					
+					set_temp_variable = { idea_expiry = THIS.idea_date_@var:v } # Start at the start num_days of the timed idea
+					add_to_temp_variable = { idea_expiry = THIS.idea_len_@var:v } # Find the end num_days of the timed idea
+					set_temp_variable = { temp_days = idea_expiry }
+					subtract_from_temp_variable = { temp_days = global.num_days } # Subtract today's num_days to find how many days are left
+					
+					# This isn't for catching expired timed ideas, those would not show up in the array on account of having expired, 
+					# it's actually in case an idea is added as timed and then later re-added as permanent. Stupid edge case which will probably never happen!
+					
+					if = {
+						limit = { NOT = { check_variable = { temp_days < 0 } } } 
+						
+						custom_effect_tooltip = timed_idea_expiry_tip
+					} 
+					else_if = {
+						limit = { NOT = { check_variable = { idea_expiry < last_refresh_date } } }
+						
+						custom_effect_tooltip = timed_idea_just_expired_tip
+					}   
+				}
+				meta_effect = {
+					text = {
+						set_temp_variable = { desc_token = token:[IDEA_TOKEN]_description }
+					}
+					IDEA_TOKEN = "[?v.GetTokenKey]"
+				}
+				custom_effect_tooltip = idea_description_tip
+			}
+		}
+	}
 	japan_diet_window = {
 		window_name = "parliament_window_jap_container"
  
@@ -39,6 +101,17 @@ scripted_gui = {
 						check_variable = { ROOT.country_politics_list^i = 3 }
 					}
 					set_variable = { policy_legislation = 3 }
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.country_politics_list^i = 26 }
+						has_country_flag = activate_sect_menu
+					}
+					set_variable = {
+						show_vie_sect_gui = 1
+					}
+					vietnam_sect_conditions_met_check = yes
+					vietnam_faction_ui_update_number = yes
 				}
 				if = {
 					limit = {
@@ -96,6 +169,55 @@ scripted_gui = {
 					}
 					set_variable = { CPC_PB_GUI_VISIBLE = 1 }
 					close_all_windows = yes
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.country_politics_list^i = 60 }
+					}
+					set_variable = { KOR_Election_UI = 1 }
+					close_all_windows = yes
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.country_politics_list^i = 61 }
+					}
+					set_variable = { RUS_View_Pol = 1 }
+					close_all_windows = yes
+				}
+				if = {
+					limit = {
+						check_variable = { ROOT.country_politics_list^i = 52 }
+					}
+					set_temp_variable = { show = 1 }
+					subtract_from_temp_variable = { show = show_national_ideas }
+					close_all_windows = yes
+					set_variable = { show_national_ideas = show }
+					clear_array = current_idea_list
+					set_variable = {
+						last_refresh_date = global.num_days
+					}
+					for_each_loop = {
+						array = global.all_idea_tokens
+						if = {
+							limit = {
+								meta_trigger = {
+									text = {
+										has_idea = [IDEA_TOKEN]
+									}
+									IDEA_TOKEN = "[?global.all_idea_tokens^i.GetTokenKey]"
+								}
+							}
+							meta_effect = {
+								text = {
+									add_to_array = {
+										array = ROOT.current_idea_list
+										value = [IDEA_TOKEN]
+									}
+								}
+								IDEA_TOKEN = "[?v]"
+							}
+						}
+					}
 				}
 			}
 		}
@@ -350,10 +472,14 @@ scripted_gui = {
 					idea = rel_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:rel_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:rel_cooldown = global.num_days }
 				add_timed_idea = {
 					idea = rel_instability_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:rel_instability_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:rel_instability_cooldown = global.num_days }
 			}
 			policy_REL_POL_level_1_click = {
 				add_political_power = -300
@@ -370,10 +496,14 @@ scripted_gui = {
 					idea = rel_cooldown
 					days = 730
 				}
+				set_variable = { THIS.idea_len_@token:rel_cooldown = 730 }
+				set_variable = { THIS.idea_date_@token:rel_cooldown = global.num_days }
 				add_timed_idea = {
 					idea = rel_instability_cooldown_moderate
 					days = 730
 				}
+				set_variable = { THIS.idea_len_@token:rel_instability_cooldown_moderate = 730 }
+				set_variable = { THIS.idea_date_@token:rel_instability_cooldown_moderate = global.num_days }
 			}
 			policy_REL_POL_level_2_click = {
 				if = {
@@ -387,6 +517,8 @@ scripted_gui = {
 						idea = rel_instability_cooldown_minor
 						days = 365
 					}
+					set_variable = { THIS.idea_len_@token:rel_instability_cooldown_minor = 365 }
+					set_variable = { THIS.idea_date_@token:rel_instability_cooldown_minor = global.num_days }
 				}
 				add_political_power = -150
 				set_variable = { legislation_support = 0 }
@@ -403,6 +535,8 @@ scripted_gui = {
 					idea = rel_cooldown
 					days = 365
 				}
+				set_variable = { THIS.idea_len_@token:rel_cooldown = 365 }
+				set_variable = { THIS.idea_date_@token:rel_cooldown = global.num_days }
 			}
 			policy_REL_POL_level_3_click = {
 				add_political_power = -150
@@ -420,6 +554,8 @@ scripted_gui = {
 					idea = rel_cooldown
 					days = 365
 				}
+				set_variable = { THIS.idea_len_@token:rel_cooldown = 365 }
+				set_variable = { THIS.idea_date_@token:rel_cooldown = global.num_days }
 			}
 			policy_REL_POL_level_3a_click = {
 				add_political_power = -150
@@ -435,6 +571,8 @@ scripted_gui = {
 					idea = rel_cooldown
 					days = 365
 				}
+				set_variable = { THIS.idea_len_@token:rel_cooldown = 365 }
+				set_variable = { THIS.idea_date_@token:rel_cooldown = global.num_days }
 			}
 			policy_REL_POL_level_0a_click = {
 				add_political_power = -600
@@ -450,10 +588,14 @@ scripted_gui = {
 					idea = rel_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:rel_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:rel_cooldown = global.num_days }
 				add_timed_idea = {
 					idea = rel_instability_cooldown_atheist
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:rel_instability_cooldown_atheist = 1095 }
+				set_variable = { THIS.idea_date_@token:rel_instability_cooldown_atheist = global.num_days }
 			}
 		}
 		triggers = {
@@ -816,6 +958,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_services_temp_1_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_services_temp_1_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_services_temp_1_preserved = global.num_days }
 				}
 				if = {
 					limit = { has_idea = pub_expansion_cooldown }
@@ -864,6 +1008,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_services_temp_2_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_services_temp_2_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_services_temp_2_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -876,6 +1022,8 @@ scripted_gui = {
 						idea = pub_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:pub_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:pub_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -921,6 +1069,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_services_temp_3_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_services_temp_3_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_services_temp_3_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -933,6 +1083,8 @@ scripted_gui = {
 						idea = pub_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:pub_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:pub_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -971,6 +1123,8 @@ scripted_gui = {
 						idea = pub_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:pub_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:pub_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -1222,6 +1376,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_healthcare_temp_1_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_healthcare_temp_1_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_healthcare_temp_1_preserved = global.num_days }
 				}
 				if = {
 					limit = { has_idea = health_expansion_cooldown }
@@ -1274,6 +1430,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_healthcare_temp_2_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_healthcare_temp_2_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_healthcare_temp_2_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -1286,6 +1444,8 @@ scripted_gui = {
 						idea = health_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:health_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:health_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -1335,6 +1495,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_healthcare_temp_3_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_healthcare_temp_3_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_healthcare_temp_3_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -1347,6 +1509,8 @@ scripted_gui = {
 						idea = health_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:health_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:health_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -1396,6 +1560,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_healthcare_temp_3_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_healthcare_temp_3_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_healthcare_temp_3_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -1408,6 +1574,8 @@ scripted_gui = {
 						idea = health_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:health_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:health_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -1457,6 +1625,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_healthcare_temp_4_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_healthcare_temp_4_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_healthcare_temp_4_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -1469,6 +1639,8 @@ scripted_gui = {
 						idea = health_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:health_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:health_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -1509,6 +1681,8 @@ scripted_gui = {
 						idea = health_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:health_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:health_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -1531,15 +1705,13 @@ scripted_gui = {
 					has_idea = health_expansion_cooldown
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						OR = {
-							has_idea = Failing_Health_System_5
-							has_idea = Failing_Health_System_4
-							has_idea = Failing_Health_System_3
-							has_idea = Failing_Health_System_2
-							has_idea = Failing_Health_System_1
-						}
+					tag = SOV
+					OR = {
+						has_idea = Failing_Health_System_5
+						has_idea = Failing_Health_System_4
+						has_idea = Failing_Health_System_3
+						has_idea = Failing_Health_System_2
+						has_idea = Failing_Health_System_1
 					}
 				}
 				OR = {
@@ -1577,15 +1749,13 @@ scripted_gui = {
 					has_idea = policy_healthcare_temp_1_preserved
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						OR = {
-							has_idea = Failing_Health_System_5
-							has_idea = Failing_Health_System_4
-							has_idea = Failing_Health_System_3
-							has_idea = Failing_Health_System_2
-							has_idea = Failing_Health_System_1
-						}
+					tag = SOV
+					OR = {
+						has_idea = Failing_Health_System_5
+						has_idea = Failing_Health_System_4
+						has_idea = Failing_Health_System_3
+						has_idea = Failing_Health_System_2
+						has_idea = Failing_Health_System_1
 					}
 				}
 				NOT = { has_country_flag = IMF_SAP_ENACTED }
@@ -1628,15 +1798,13 @@ scripted_gui = {
 				}
 			policy_HEALTH_POL_level_2_click_enabled = {
 				NOT = {
-					AND = {
-						tag = SOV
-						OR = {
-							has_idea = Failing_Health_System_5
-							has_idea = Failing_Health_System_4
-							has_idea = Failing_Health_System_3
-							has_idea = Failing_Health_System_2
-							has_idea = Failing_Health_System_1
-						}
+					tag = SOV
+					OR = {
+						has_idea = Failing_Health_System_5
+						has_idea = Failing_Health_System_4
+						has_idea = Failing_Health_System_3
+						has_idea = Failing_Health_System_2
+						has_idea = Failing_Health_System_1
 					}
 				}
 				OR = {
@@ -1688,15 +1856,13 @@ scripted_gui = {
 				}
 			policy_HEALTH_POL_level_3_click_enabled = {
 				NOT = {
-					AND = {
-						tag = SOV
-						OR = {
-							has_idea = Failing_Health_System_5
-							has_idea = Failing_Health_System_4
-							has_idea = Failing_Health_System_3
-							has_idea = Failing_Health_System_2
-							has_idea = Failing_Health_System_1
-						}
+					tag = SOV
+					OR = {
+						has_idea = Failing_Health_System_5
+						has_idea = Failing_Health_System_4
+						has_idea = Failing_Health_System_3
+						has_idea = Failing_Health_System_2
+						has_idea = Failing_Health_System_1
 					}
 				}
 				OR = {
@@ -1747,15 +1913,13 @@ scripted_gui = {
 				}
 			policy_HEALTH_POL_level_4_click_enabled = {
 				NOT = {
-					AND = {
-						tag = SOV
-						OR = {
-							has_idea = Failing_Health_System_5
-							has_idea = Failing_Health_System_4
-							has_idea = Failing_Health_System_3
-							has_idea = Failing_Health_System_2
-							has_idea = Failing_Health_System_1
-						}
+					tag = SOV
+					OR = {
+						has_idea = Failing_Health_System_5
+						has_idea = Failing_Health_System_4
+						has_idea = Failing_Health_System_3
+						has_idea = Failing_Health_System_2
+						has_idea = Failing_Health_System_1
 					}
 				}
 				OR = {
@@ -1805,15 +1969,13 @@ scripted_gui = {
 				}
 			policy_HEALTH_POL_level_5_click_enabled = {
 				NOT = {
-					AND = {
-						tag = SOV
-						OR = {
-							has_idea = Failing_Health_System_5
-							has_idea = Failing_Health_System_4
-							has_idea = Failing_Health_System_3
-							has_idea = Failing_Health_System_2
-							has_idea = Failing_Health_System_1
-						}
+					tag = SOV
+					OR = {
+						has_idea = Failing_Health_System_5
+						has_idea = Failing_Health_System_4
+						has_idea = Failing_Health_System_3
+						has_idea = Failing_Health_System_2
+						has_idea = Failing_Health_System_1
 					}
 				}
 				OR = {
@@ -1904,6 +2066,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_education_temp_1_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_education_temp_1_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_education_temp_1_preserved = global.num_days }
 				}
 				if = {
 					limit = { has_idea = edu_expansion_cooldown }
@@ -1954,6 +2118,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_education_temp_2_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_education_temp_2_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_education_temp_2_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -1966,6 +2132,8 @@ scripted_gui = {
 						idea = edu_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:edu_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:edu_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -2013,6 +2181,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_education_temp_3_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_education_temp_3_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_education_temp_3_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -2025,6 +2195,8 @@ scripted_gui = {
 						idea = edu_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:edu_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:edu_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -2072,6 +2244,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_education_temp_3_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_education_temp_3_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_education_temp_3_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -2084,6 +2258,8 @@ scripted_gui = {
 						idea = edu_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:edu_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:edu_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -2123,6 +2299,8 @@ scripted_gui = {
 						idea = edu_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:edu_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:edu_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -2144,12 +2322,10 @@ scripted_gui = {
 					has_idea = edu_expansion_cooldown
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						has_country_leader = {
-							name = "Lazar Kaganovich"
-							ruling_only = yes
-						}
+					tag = SOV
+					has_country_leader = {
+						name = "Lazar Kaganovich"
+						ruling_only = yes
 					}
 				}
 				OR = {
@@ -2186,12 +2362,10 @@ scripted_gui = {
 					has_idea = policy_education_temp_1_preserved
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						has_country_leader = {
-							name = "Lazar Kaganovich"
-							ruling_only = yes
-						}
+					tag = SOV
+					has_country_leader = {
+						name = "Lazar Kaganovich"
+						ruling_only = yes
 					}
 				}
 				OR = {
@@ -2244,12 +2418,10 @@ scripted_gui = {
 					has_idea = policy_education_temp_2_preserved
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						has_country_leader = {
-							name = "Lazar Kaganovich"
-							ruling_only = yes
-						}
+					tag = SOV
+					has_country_leader = {
+						name = "Lazar Kaganovich"
+						ruling_only = yes
 					}
 				}
 				OR = {
@@ -2305,12 +2477,10 @@ scripted_gui = {
 					has_idea = policy_education_temp_3_preserved
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						has_country_leader = {
-							name = "Lazar Kaganovich"
-							ruling_only = yes
-						}
+					tag = SOV
+					has_country_leader = {
+						name = "Lazar Kaganovich"
+						ruling_only = yes
 					}
 				}
 				NOT = { has_country_flag = IMF_SAP_ENACTED }
@@ -2358,12 +2528,10 @@ scripted_gui = {
 					has_idea = policy_education_temp_4_preserved
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						has_country_leader = {
-							name = "Lazar Kaganovich"
-							ruling_only = yes
-						}
+					tag = SOV
+					has_country_leader = {
+						name = "Lazar Kaganovich"
+						ruling_only = yes
 					}
 				}
 				NOT = { has_country_flag = IMF_SAP_ENACTED }
@@ -2474,6 +2642,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_military_temp_2_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_military_temp_2_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_military_temp_2_preserved = global.num_days }
 				}
 				if = {
 					limit = { has_idea = mil_expansion_cooldown }
@@ -2522,6 +2692,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_military_temp_3_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_military_temp_3_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_military_temp_3_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -2534,6 +2706,8 @@ scripted_gui = {
 						idea = mil_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:mil_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:mil_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -2579,6 +2753,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_military_temp_4_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_military_temp_4_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_military_temp_4_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -2591,6 +2767,8 @@ scripted_gui = {
 						idea = mil_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:mil_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:mil_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -2629,6 +2807,8 @@ scripted_gui = {
 						idea = mil_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:mil_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:mil_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -2888,6 +3068,8 @@ scripted_gui = {
 						idea = wel_cooldown
 						days = 720
 					}
+					set_variable = { THIS.idea_len_@token:wel_cooldown = 720 }
+					set_variable = { THIS.idea_date_@token:wel_cooldown = global.num_days }
 				}
 				if = {
 					limit = {
@@ -2916,6 +3098,8 @@ scripted_gui = {
 						idea = wel_cooldown
 						days = 720
 					}
+					set_variable = { THIS.idea_len_@token:wel_cooldown = 720 }
+					set_variable = { THIS.idea_date_@token:wel_cooldown = global.num_days }
 				}
 				if = {
 					limit = {
@@ -2944,6 +3128,8 @@ scripted_gui = {
 						idea = wel_cooldown
 						days = 720
 					}
+					set_variable = { THIS.idea_len_@token:wel_cooldown = 720 }
+					set_variable = { THIS.idea_date_@token:wel_cooldown = global.num_days }
 				}
 				if = {
 					limit = {
@@ -2972,6 +3158,8 @@ scripted_gui = {
 						idea = wel_cooldown
 						days = 720
 					}
+					set_variable = { THIS.idea_len_@token:wel_cooldown = 720 }
+					set_variable = { THIS.idea_date_@token:wel_cooldown = global.num_days }
 				}
 				if = {
 					limit = {
@@ -3000,6 +3188,8 @@ scripted_gui = {
 						idea = wel_cooldown
 						days = 720
 					}
+					set_variable = { THIS.idea_len_@token:wel_cooldown = 720 }
+					set_variable = { THIS.idea_date_@token:wel_cooldown = global.num_days }
 				}
 				add_political_power = -150
 				set_variable = { legislation_support = 0 }
@@ -3302,6 +3492,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_cpi_temp_1_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_cpi_temp_1_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_cpi_temp_1_preserved = global.num_days }
 				}
 				if = {
 					limit = { has_idea = cpi_expansion_cooldown }
@@ -3354,6 +3546,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_cpi_temp_2_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_cpi_temp_2_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_cpi_temp_2_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -3366,6 +3560,8 @@ scripted_gui = {
 						idea = cpi_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:cpi_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:cpi_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -3415,6 +3611,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_cpi_temp_3_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_cpi_temp_3_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_cpi_temp_3_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -3427,6 +3625,8 @@ scripted_gui = {
 						idea = cpi_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:cpi_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:cpi_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -3476,6 +3676,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_cpi_temp_3_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_cpi_temp_3_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_cpi_temp_3_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -3488,6 +3690,8 @@ scripted_gui = {
 						idea = cpi_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:cpi_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:cpi_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -3537,6 +3741,8 @@ scripted_gui = {
 						}
 					}
 					add_timed_idea = { idea = policy_cpi_temp_4_preserved days = 730 }
+					set_variable = { THIS.idea_len_@token:policy_cpi_temp_4_preserved = 730 }
+					set_variable = { THIS.idea_date_@token:policy_cpi_temp_4_preserved = global.num_days }
 				}
 				if = {
 					limit = {
@@ -3549,6 +3755,8 @@ scripted_gui = {
 						idea = cpi_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:cpi_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:cpi_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -3589,6 +3797,8 @@ scripted_gui = {
 						idea = cpi_expansion_cooldown
 						days = 730
 					}
+					set_variable = { THIS.idea_len_@token:cpi_expansion_cooldown = 730 }
+					set_variable = { THIS.idea_date_@token:cpi_expansion_cooldown = global.num_days }
 				}
 				remove_ideas = cooldown_void
 				set_variable = { legislation_support = 0 }
@@ -3693,12 +3903,10 @@ scripted_gui = {
 					has_idea = policy_cpi_temp_1_preserved
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						has_country_leader = {
-							name = "Lazar Kaganovich"
-							ruling_only = yes
-						}
+					tag = SOV
+					has_country_leader = {
+						name = "Lazar Kaganovich"
+						ruling_only = yes
 					}
 				}
 				NOT = { has_country_flag = IMF_SAP_ENACTED }
@@ -3751,12 +3959,10 @@ scripted_gui = {
 					has_idea = policy_cpi_temp_2_preserved
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						has_country_leader = {
-							name = "Lazar Kaganovich"
-							ruling_only = yes
-						}
+					tag = SOV
+					has_country_leader = {
+						name = "Lazar Kaganovich"
+						ruling_only = yes
 					}
 				}
 				NOT = { has_country_flag = IMF_SAP_ENACTED }
@@ -3808,12 +4014,10 @@ scripted_gui = {
 					has_idea = policy_cpi_temp_3_preserved
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						has_country_leader = {
-							name = "Lazar Kaganovich"
-							ruling_only = yes
-						}
+					tag = SOV
+					has_country_leader = {
+						name = "Lazar Kaganovich"
+						ruling_only = yes
 					}
 				}
 				NOT = { has_country_flag = IMF_SAP_ENACTED }
@@ -3864,12 +4068,10 @@ scripted_gui = {
 					has_idea = policy_cpi_temp_4_preserved
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						has_country_leader = {
-							name = "Lazar Kaganovich"
-							ruling_only = yes
-						}
+					tag = SOV
+					has_country_leader = {
+						name = "Lazar Kaganovich"
+						ruling_only = yes
 					}
 				}
 				NOT = { has_country_flag = IMF_SAP_ENACTED }
@@ -3917,12 +4119,10 @@ scripted_gui = {
 					has_idea = policy_cpi_temp_5_preserved
 				}
 				NOT = {
-					AND = {
-						tag = SOV
-						has_country_leader = {
-							name = "Lazar Kaganovich"
-							ruling_only = yes
-						}
+					tag = SOV
+					has_country_leader = {
+						name = "Lazar Kaganovich"
+						ruling_only = yes
 					}
 				}
 				NOT = { has_country_flag = IMF_SAP_ENACTED }
@@ -4249,6 +4449,8 @@ scripted_gui = {
 					idea = saga_cooldown
 					days = 730
 				}
+				set_variable = { THIS.idea_len_@token:saga_cooldown = 730 }
+				set_variable = { THIS.idea_date_@token:saga_cooldown = global.num_days }
 			}
 			policy_SAGA_POL_level_1_click = {
 				if = {
@@ -4259,6 +4461,8 @@ scripted_gui = {
 						idea = saga_instability_cooldown
 						days = 1095
 					}
+					set_variable = { THIS.idea_len_@token:saga_instability_cooldown = 1095 }
+					set_variable = { THIS.idea_date_@token:saga_instability_cooldown = global.num_days }
 				}
 				add_political_power = -300
 				set_variable = { legislation_support = 0 }
@@ -4274,6 +4478,8 @@ scripted_gui = {
 					idea = saga_cooldown
 					days = 730
 				}
+				set_variable = { THIS.idea_len_@token:saga_cooldown = 730 }
+				set_variable = { THIS.idea_date_@token:saga_cooldown = global.num_days }
 			}
 			policy_SAGA_POL_level_2_click = {
 				if = {
@@ -4284,6 +4490,8 @@ scripted_gui = {
 						idea = saga_instability_cooldown
 						days = 180
 					}
+					set_variable = { THIS.idea_len_@token:saga_instability_cooldown = 180 }
+					set_variable = { THIS.idea_date_@token:saga_instability_cooldown = global.num_days }
 				}
 				add_political_power = -300
 				set_variable = { legislation_support = 0 }
@@ -4299,6 +4507,8 @@ scripted_gui = {
 					idea = saga_cooldown
 					days = 730
 				}
+				set_variable = { THIS.idea_len_@token:saga_cooldown = 730 }
+				set_variable = { THIS.idea_date_@token:saga_cooldown = global.num_days }
 			}
 			policy_SAGA_POL_level_4_click = {
 				add_political_power = -300
@@ -4315,6 +4525,8 @@ scripted_gui = {
 					idea = saga_cooldown
 					days = 730
 				}
+				set_variable = { THIS.idea_len_@token:saga_cooldown = 730 }
+				set_variable = { THIS.idea_date_@token:saga_cooldown = global.num_days }
 			}
 			policy_SAGA_POL_level_4a_click = {
 				add_political_power = -300
@@ -4331,6 +4543,8 @@ scripted_gui = {
 					idea = saga_cooldown
 					days = 730
 				}
+				set_variable = { THIS.idea_len_@token:saga_cooldown = 730 }
+				set_variable = { THIS.idea_date_@token:saga_cooldown = global.num_days }
 			}
 
 		}
@@ -4565,6 +4779,8 @@ scripted_gui = {
 						idea = rac_instability_cooldown
 						days = 640
 					}
+					set_variable = { THIS.idea_len_@token:rac_instability_cooldown = 640 }
+					set_variable = { THIS.idea_date_@token:rac_instability_cooldown = global.num_days }
 					set_country_flag = RAC_POL_1-0
 					clr_country_flag = RAC_POL_2-1
 					clr_country_flag = RAC_POL_3-2
@@ -4578,6 +4794,8 @@ scripted_gui = {
 						idea = rac_instability_cooldown
 						days = 1095
 					}
+					set_variable = { THIS.idea_len_@token:rac_instability_cooldown = 1095 }
+					set_variable = { THIS.idea_date_@token:rac_instability_cooldown = global.num_days }
 					set_country_flag = RAC_POL_1-0
 					clr_country_flag = RAC_POL_2-1
 					clr_country_flag = RAC_POL_3-2
@@ -4596,6 +4814,8 @@ scripted_gui = {
 					idea = rac_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:rac_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:rac_cooldown = global.num_days }
 			}
 			policy_RAC_POL_level_1_click = {
 				if = {
@@ -4607,6 +4827,8 @@ scripted_gui = {
 						idea = rac_instability_cooldown
 						days = 640
 					}
+					set_variable = { THIS.idea_len_@token:rac_instability_cooldown = 640 }
+					set_variable = { THIS.idea_date_@token:rac_instability_cooldown = global.num_days }
 					clr_country_flag = RAC_POL_1-0
 					set_country_flag = RAC_POL_2-1
 					clr_country_flag = RAC_POL_3-2
@@ -4620,6 +4842,8 @@ scripted_gui = {
 						idea = rac_instability_cooldown
 						days = 1095
 					}
+					set_variable = { THIS.idea_len_@token:rac_instability_cooldown = 1095 }
+					set_variable = { THIS.idea_date_@token:rac_instability_cooldown = global.num_days }
 					clr_country_flag = RAC_POL_1-0
 					set_country_flag = RAC_POL_2-1
 					clr_country_flag = RAC_POL_3-2
@@ -4638,6 +4862,8 @@ scripted_gui = {
 					idea = rac_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:rac_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:rac_cooldown = global.num_days }
 			}
 			policy_RAC_POL_level_2_click = {
 				if = {
@@ -4649,6 +4875,8 @@ scripted_gui = {
 						idea = rac_instability_cooldown
 						days = 365
 					}
+					set_variable = { THIS.idea_len_@token:rac_instability_cooldown = 365 }
+					set_variable = { THIS.idea_date_@token:rac_instability_cooldown = global.num_days }
 				}
 				else_if = {
 					limit = {
@@ -4658,6 +4886,8 @@ scripted_gui = {
 						idea = rac_instability_cooldown
 						days = 1095
 					}
+					set_variable = { THIS.idea_len_@token:rac_instability_cooldown = 1095 }
+					set_variable = { THIS.idea_date_@token:rac_instability_cooldown = global.num_days }
 					clr_country_flag = RAC_POL_1-0
 					clr_country_flag = RAC_POL_2-1
 					set_country_flag = RAC_POL_3-2
@@ -4676,6 +4906,8 @@ scripted_gui = {
 					idea = rac_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:rac_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:rac_cooldown = global.num_days }
 			}
 			policy_RAC_POL_level_3_click = {
 				add_political_power = -450
@@ -4691,6 +4923,8 @@ scripted_gui = {
 					idea = rac_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:rac_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:rac_cooldown = global.num_days }
 			}
 			policy_RAC_POL_level_3a_click = {
 				add_political_power = -450
@@ -4706,6 +4940,8 @@ scripted_gui = {
 					idea = rac_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:rac_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:rac_cooldown = global.num_days }
 			}
 				
 		}
@@ -4948,6 +5184,8 @@ scripted_gui = {
 					idea = wom_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:wom_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:wom_cooldown = global.num_days }
 			}
 			policy_WOM_POL_level_1_click = {
 				if = {
@@ -4958,6 +5196,8 @@ scripted_gui = {
 						idea = wom_instability_cooldown
 						days = 1095
 					}
+					set_variable = { THIS.idea_len_@token:wom_instability_cooldown = 1095 }
+					set_variable = { THIS.idea_date_@token:wom_instability_cooldown = global.num_days }
 				}
 				add_political_power = -300
 				set_variable = { legislation_support = 0 }
@@ -4973,6 +5213,8 @@ scripted_gui = {
 					idea = wom_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:wom_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:wom_cooldown = global.num_days }
 			}
 			policy_WOM_POL_level_2_click = {
 				if = {
@@ -4983,6 +5225,8 @@ scripted_gui = {
 						idea = wom_instability_cooldown
 						days = 1095
 					}
+					set_variable = { THIS.idea_len_@token:wom_instability_cooldown = 1095 }
+					set_variable = { THIS.idea_date_@token:wom_instability_cooldown = global.num_days }
 				}
 				add_political_power = -300
 				set_variable = { legislation_support = 0 }
@@ -4998,6 +5242,8 @@ scripted_gui = {
 					idea = wom_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:wom_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:wom_cooldown = global.num_days }
 			}
 			policy_WOM_POL_level_3_click = {
 				if = {
@@ -5008,6 +5254,8 @@ scripted_gui = {
 						idea = wom_instability_cooldown
 						days = 1095
 					}
+					set_variable = { THIS.idea_len_@token:wom_instability_cooldown = 1095 }
+					set_variable = { THIS.idea_date_@token:wom_instability_cooldown = global.num_days }
 				}
 				add_political_power = -300
 				set_variable = { legislation_support = 0 }
@@ -5023,6 +5271,8 @@ scripted_gui = {
 					idea = wom_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:wom_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:wom_cooldown = global.num_days }
 			}
 			policy_WOM_POL_level_4_click = {
 				add_political_power = -300
@@ -5039,6 +5289,8 @@ scripted_gui = {
 					idea = wom_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:wom_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:wom_cooldown = global.num_days }
 			}
 			policy_WOM_POL_level_4a_click = {
 				add_political_power = -300
@@ -5055,6 +5307,8 @@ scripted_gui = {
 					idea = wom_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:wom_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:wom_cooldown = global.num_days }
 				
 			}
 		}
@@ -5322,10 +5576,14 @@ scripted_gui = {
 					idea = union_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:union_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:union_cooldown = global.num_days }
 				add_timed_idea = {
 					idea = union_instability_cooldown
 					days = 1095
 				}
+				set_variable = { THIS.idea_len_@token:union_instability_cooldown = 1095 }
+				set_variable = { THIS.idea_date_@token:union_instability_cooldown = global.num_days }
 			}
 			policy_UNION_POL_level_1_click = {
 				if = {
@@ -5336,6 +5594,8 @@ scripted_gui = {
 						idea = union_instability_cooldown
 						days = 185
 					}
+					set_variable = { THIS.idea_len_@token:union_instability_cooldown = 185 }
+					set_variable = { THIS.idea_date_@token:union_instability_cooldown = global.num_days }
 				}
 				add_political_power = -150
 				set_variable = { legislation_support = 0 }
@@ -5350,6 +5610,8 @@ scripted_gui = {
 					idea = union_cooldown
 					days = 365
 				}
+				set_variable = { THIS.idea_len_@token:union_cooldown = 365 }
+				set_variable = { THIS.idea_date_@token:union_cooldown = global.num_days }
 			}
 			policy_UNION_POL_level_2_click = {
 				add_political_power = -150
@@ -5365,6 +5627,8 @@ scripted_gui = {
 					idea = union_cooldown
 					days = 365
 				}
+				set_variable = { THIS.idea_len_@token:union_cooldown = 365 }
+				set_variable = { THIS.idea_date_@token:union_cooldown = global.num_days }
 			}
 			policy_UNION_POL_level_3_click = {
 				add_political_power = -150
@@ -5380,6 +5644,8 @@ scripted_gui = {
 					idea = union_cooldown
 					days = 365
 				}
+				set_variable = { THIS.idea_len_@token:union_cooldown = 365 }
+				set_variable = { THIS.idea_date_@token:union_cooldown = global.num_days }
 			}
 			policy_UNION_POL_level_4_click = {
 				add_political_power = -150
@@ -5395,6 +5661,8 @@ scripted_gui = {
 					idea = union_cooldown
 					days = 365
 				}
+				set_variable = { THIS.idea_len_@token:union_cooldown = 365 }
+				set_variable = { THIS.idea_date_@token:union_cooldown = global.num_days }
 			}
 		}
 		triggers = {
@@ -5621,6 +5889,8 @@ scripted_gui = {
 					idea = media_cooldown
 					days = 180
 				}
+				set_variable = { THIS.idea_len_@token:media_cooldown = 180 }
+				set_variable = { THIS.idea_date_@token:media_cooldown = global.num_days }
 			}
 			policy_MEDIA_POL_level_1_click = {
 				add_political_power = -300
@@ -5636,6 +5906,8 @@ scripted_gui = {
 					idea = media_cooldown
 					days = 180
 				}
+				set_variable = { THIS.idea_len_@token:media_cooldown = 180 }
+				set_variable = { THIS.idea_date_@token:media_cooldown = global.num_days }
 			}
 			policy_MEDIA_POL_level_2_click = {
 				add_political_power = -300
@@ -5651,6 +5923,8 @@ scripted_gui = {
 					idea = media_cooldown
 					days = 180
 				}
+				set_variable = { THIS.idea_len_@token:media_cooldown = 180 }
+				set_variable = { THIS.idea_date_@token:media_cooldown = global.num_days }
 			}
 			policy_MEDIA_POL_level_3_click = {
 				add_political_power = -300
@@ -5666,6 +5940,8 @@ scripted_gui = {
 					idea = media_cooldown
 					days = 180
 				}
+				set_variable = { THIS.idea_len_@token:media_cooldown = 180 }
+				set_variable = { THIS.idea_date_@token:media_cooldown = global.num_days }
 			}
 			policy_MEDIA_POL_level_3a_click = {
 				add_political_power = -300
@@ -5681,6 +5957,8 @@ scripted_gui = {
 					idea = media_cooldown
 					days = 180
 				}
+				set_variable = { THIS.idea_len_@token:media_cooldown = 180 }
+				set_variable = { THIS.idea_date_@token:media_cooldown = global.num_days }
 			}
 				
 		}

@@ -11,6 +11,9 @@ korean_war_prc_category = {
 			PRC = {
 				has_war_with = KOR
 			}
+			NOT = {
+				CHI = {has_country_flag = CHI_Korean_Full_intervention}
+			}
 			PRC = {
 				NOT = {
 					has_government = communism
@@ -49,6 +52,8 @@ korean_war_prc_category = {
 				annex_country = { target = KPA transfer_troops = yes }
 				set_global_flag = KOREA_CEASEFIRE_UN
 			}
+
+			complete_national_focus = PRC_50s_Sign_A_Ceasefire_Agreement
 		}
 	}
 
@@ -70,6 +75,11 @@ korean_war_prc_category = {
 		available = {
 			has_global_flag = korean_war_china_can_intervene
 			has_global_flag = korean_war
+			NOT = {
+					PRC = {
+					has_war_with = CHI
+					}
+			}
 		}
 		complete_effect = {
 			KPA = { add_to_faction = PRC }
@@ -82,27 +92,38 @@ korean_war_prc_category = {
 				idea = fight_against_the_imperialist1
 				days = 70
 			}
+			set_variable = { THIS.idea_len_@token:fight_against_the_imperialist1 = 70 }
+			set_variable = { THIS.idea_date_@token:fight_against_the_imperialist1 = global.num_days }
 			KPA = {
 				add_timed_idea = {
 				idea = fight_against_the_imperialist1
 				days = 70
 				}
+				set_variable = { THIS.idea_len_@token:fight_against_the_imperialist1 = 70 }
+				set_variable = { THIS.idea_date_@token:fight_against_the_imperialist1 = global.num_days }
 			}
 			add_timed_idea = {
 				idea = korean_war
 				days = 1800
 			}
+			set_variable = { THIS.idea_len_@token:korean_war = 1800 }
+			set_variable = { THIS.idea_date_@token:korean_war = global.num_days }
 			KOR = {
 				add_timed_idea = {
 					idea = unprepared_defenses
 					days = 90
 				}
+				set_variable = { THIS.idea_len_@token:unprepared_defenses = 90 }
+				set_variable = { THIS.idea_date_@token:unprepared_defenses = global.num_days }
 			}
 			USA = {
 				add_timed_idea = {
 					idea = unprepared_defenses
 					days = 90
 				}
+				set_variable = { THIS.idea_len_@token:unprepared_defenses = 90 }
+				set_variable = { THIS.idea_date_@token:unprepared_defenses = global.num_days }
+				country_event = MacArthur_Dismissal.2
 			}
 			set_country_flag = KPA_INTERVENTION_1
 
@@ -296,6 +317,9 @@ korean_war_prc_category = {
 				country_event = korea.16
 				set_global_flag = KOREA_CEASEFIRE_UN
 			}
+			PRC = {
+				complete_national_focus = PRC_50s_Sign_A_Ceasefire_Agreement
+			}
 			USA = {
 				remove_ideas = korean_war_un_usa
 			}
@@ -346,6 +370,115 @@ korean_war_prc_category = {
 		}
 		ai_will_do = {
 			factor = 0
+		}
+	}
+}
+
+korean_war_kpa_category = {	
+	unify_korea = {
+		icon = generic_industry
+		allowed = {
+			tag = KPA
+		}
+		visible = {
+			original_tag = KPA
+			country_exists = KOR
+			OR = {
+				AND = {
+					OR = {
+						has_government = communism
+						has_government = maoism
+					}
+					has_country_flag = kor_war_clear
+					date > 1950.6.1
+					date < 1960.1.1					
+				}
+				AND = {
+					is_ai = yes
+					date > 1950.6.1
+					date < 1960.1.1							
+				}
+			}
+
+		}
+		fire_only_once = yes
+		cost = 0
+		complete_effect = {
+			KOR = {
+				every_owned_state = {
+					remove_core_of = KPA
+				}
+			}
+			USA = { activate_mission = Korean_War_Ceasefire }
+			every_owned_state = {
+				remove_core_of = KOR
+			}
+			add_named_threat = {
+				threat = 30
+				name = korean_War
+			}
+			country_event = korea.1
+			add_ideas = korean_war
+			add_ideas = kpa_korean_war
+			add_timed_idea = {
+				idea = take_the_south
+				days = 25
+			}
+			set_variable = { THIS.idea_len_@token:take_the_south = 25 }
+			set_variable = { THIS.idea_date_@token:take_the_south = global.num_days }
+			create_faction = "People's Defense Coalition"
+			set_global_flag = korean_war
+			hidden_effect = {
+				USA = { add_ideas = korean_war_un_usa }
+				add_manpower = 100000
+				every_country = {
+					if = {
+						limit = {
+							OR = {
+								tag = AST #does
+								tag = CAN #doesn't
+								tag = SAF #sends 
+								tag = COL #does
+								tag = SIA #sends
+								tag = ETH #sends 
+								tag = JAP #doesn't
+								tag = CHI #sends
+								tag = FRA #sends
+								tag = ENG #sends
+								tag = BEL #doesn't
+								tag = HOL #doesn't
+								tag = LUX #does
+								tag = GRE #doesn't
+								tag = TUR #doesn't
+								tag = SPR #does
+								tag = NZL
+								tag = PHI
+							}
+						}
+						add_ideas = korean_war_un
+						add_ai_strategy = {
+							type = send_volunteers_desire
+							id = "KOR"
+							value = 5000
+						}
+						add_ai_strategy = {
+							type = support
+							id = "KOR"
+							value = 5000
+						}
+						add_ai_strategy = {
+							type = befriend
+							id = "KOR"
+							value = 5000
+						}
+					}
+				}
+			}
+			KOR = { add_ideas = korean_war }
+		}
+		ai_will_do = {
+			factor = 1
+
 		}
 	}
 }

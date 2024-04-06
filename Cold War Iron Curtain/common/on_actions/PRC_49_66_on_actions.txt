@@ -4,10 +4,10 @@ on_actions = {
 		effect = {
 			if = {
 				limit = {
-					date < "1949.10.1"
+					date < 1949.10.01
 				}
 				PRC = {
-
+					
 					country_event = {
 						id = PRC_50s_Rework_event.11
 						days = 121
@@ -125,7 +125,7 @@ on_actions = {
 						array = country_politics_list
 						value = 51
 					}
-					has_country_flag = Found_PRC_flag
+					has_country_flag = PRC_Founding_of_New_China_flag
 				}
 				for_each_loop = {
 					array = PRC_faction_struggle_system_faction_supporter_feffect
@@ -229,60 +229,89 @@ on_actions = {
 		effect = { 
 			if = {
 				limit = {
+					NOT = {
+						has_global_flag = chinese_civil_war_over
+						has_global_flag = ROC_taiwan
+						has_global_flag = roc_rebound_shanghai
+					}
+					ROOT = {
+						tag = PRC
+					}	
+					FROM = {
+						tag = CHI
+					}
+					FROM.FROM = {
+						OR = {
+							state = 1787
+							state = 283
+							state = 604
+							state = 1359
+						}
+					}
+				}
+				PRC = {
+					transfer_state = FROM.FROM
+				}
+			}
+			if = {
+				limit = {
 					FROM.FROM = {
 						state = 867
 					}
 					ROOT = {
 						tag = PRC
+						has_country_flag = Tibet_Invasion_1
 					}
 					FROM = {
 						tag = TIB
 					}
 				}
 				PRC = {
-					country_event = prc_tib.4
+					country_event = {
+						id = PRC_50s_Rework_event.41
+						hours = 8
+					}
+					#transfer_state = FROM.FROM
+					clr_country_flag = Tibet_Invasion_1
 				}
 			}
 			if = {
 				limit = {
-					OR = {
-						AND = {
-							PRC = {
-								controls_state = 605
-							}
-							NOT = {
-								has_global_flag = chinese_civil_war_over
-								has_global_flag = ROC_taiwan
-							}
-								FROM.FROM = {
-								state = 1569
-							}
-							ROOT = {
-								tag = PRC
-							}
-							FROM = {
-								tag = CHI
-							}
+					NOT = {
+						has_global_flag = chinese_civil_war_over
+						has_global_flag = ROC_taiwan
+						has_global_flag = roc_rebound_shanghai
+					}
+					ROOT = {
+						tag = PRC
+					}	
+					FROM = {
+						tag = CHI
+						num_of_controlled_states < 10
+					}
+					FROM.FROM = {
+						is_core_of = PRC
+						is_core_of = CHI
+						if = {
+							limit = { state = 605 }
+							PRC = { controls_state = 1569 }
 						}
-						AND = {
-							PRC = {
+						else_if = {
+							limit = { state = 1569 }
+							PRC = { controls_state = 605 }
+						}
+						else_if = {
+							limit = {
+								NOT = {
+									state = 605
+									state = 1569
+								}
+							}
+							PRC = { 
+								controls_state = 605 
 								controls_state = 1569
 							}
-							NOT = {
-								has_global_flag = chinese_civil_war_over
-								has_global_flag = ROC_taiwan
-							}
-							FROM.FROM = {
-								state = 605
-							}
-							ROOT = {
-								tag = PRC
-							}
-							FROM = {
-								tag = CHI
-							}
 						}
-
 					}
 				}
 				ROC_lose_CCW = yes

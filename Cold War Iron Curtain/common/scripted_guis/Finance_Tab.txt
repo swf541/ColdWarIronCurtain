@@ -1,0 +1,2428 @@
+scripted_gui = {
+	Loan_Confirmation_Window = {
+		context_type = player_context
+
+		window_name = "Loan_Confirmation"
+		properties = {
+			country_flag_for_trade_screen = {
+				image = "[this_loan_country.GetFlag]"
+			}	
+			root_flag_for_trade_screen = {
+				image = "[this_loan_country.GetFlag]"
+			}	
+		}
+		visible = {
+			check_variable = { show_loan_screen = 1 }
+		}	
+		triggers = {
+			increase_loan_term_click_enabled = {
+				check_variable = {
+					current_index < max_index
+				}
+			}
+			decrease_loan_term_click_enabled = {
+				check_variable = {
+					current_index > 0
+				}
+			}
+			increase_loan_principal_click_enabled = {
+				check_variable = {
+					purchase_amount < CurrentMaxBorrowable
+				}
+			}
+			decrease_loan_principal_click_enabled = {
+				check_variable = {
+					purchase_amount > 0
+				}
+			}
+		}
+		effects = {
+			confirm_loan_purchase_click = {
+				set_variable = {
+					loan_amount = potential_loan_total
+				}
+				add_to_array = {
+					debtTotalsArray = loan_amount
+				}
+				add_to_array = {
+					debtOwnerArray = global_event_target:this_loan_country
+				}
+				add_to_array = {
+					debtOwnerDomesticStatusArray = bank_name_prompt
+				}
+				add_to_array = {
+					debtInterestArray = potential_loan_interest
+				}
+				set_variable = {
+					debtPayment = potential_loan_monthly_cost
+				}
+				add_to_array = { debtPaymentArray = debtPayment }
+				add_to_variable = { currentDebtPayments = debtPayment }
+				loan_set_assigning_borrowable = yes
+				
+				#close screen
+				set_variable = {
+					show_loan_screen = 0
+				}
+			}
+			cancel_button_click = {
+				set_variable = {
+					show_loan_screen = 0
+				}
+			}
+			increase_loan_term_click = {
+				add_to_variable = { current_index = 1 }
+				ROOT = {
+					calculate_loan_details = yes
+				}
+			}
+			decrease_loan_term_click = {
+				add_to_variable = { current_index = -1 }
+				ROOT = {
+					calculate_loan_details = yes
+				}
+			}
+			increase_loan_principal_click = {
+				add_to_variable = {
+					purchase_amount = 1
+				}
+				ROOT = {
+					calculate_loan_details = yes
+				}
+			}
+			decrease_loan_principal_click = {
+				add_to_variable = {
+					purchase_amount = -1
+				}
+				ROOT = {
+					calculate_loan_details = yes
+				}
+			}
+		}	
+	}
+    Finance_tab_menu = {
+
+		context_type = player_context
+
+		window_name = "countryfinanceview"
+		visible = {
+			check_variable = { show_finance = 1 }
+            #always = yes
+		}	
+        properties = {
+			Credit_Rating_Icon = {
+				image = "[GetCreditRatingGFX]"
+			}	
+            World_Bank_Flag = {
+				image = "[WBK.GetFlag]"
+			}	
+            IMF_Flag = {
+				image = "[GER.GetFlag]"
+			}	
+            Morgan_Flag = {
+				image = "[JPM.GetFlag]"
+			}	
+            Deustche_Flag = {
+				image = "[DBA.GetFlag]"
+			}	
+            Suisse_Flag = {
+				image = "[SKA.GetFlag]"
+			}	
+            Chiyoda_Flag = {
+				image = "[CHY.GetFlag]"
+			}	
+            Barclays_Flag = {
+				image = "[BRC.GetFlag]"
+			}	
+            Banque_Paris_Flag = {
+				image = "[BNP.GetFlag]"
+			}	
+            Domestic_Bank_Flag = {
+				image = "[ROOT.GetFlag]"
+			}	
+            Reserve_Bank_Flag = {
+				image = "[ROOT.GetFlag]"
+			}	
+			Healthcare_Slider_Line = {
+				x = healthcare_slider_gui
+			}
+			Welfare_Slider_Line = {
+				x = welfare_slider_gui
+			}
+			Education_Slider_Line = {
+				x = education_slider_gui
+			}
+			Policing_Slider_Line = {
+				x = policing_slider_gui
+			}
+			Public_Services_Slider_Line = {
+				x = public_services_slider_gui
+			}
+			Army_Slider_Line = {
+				x = army_slider_gui
+			}
+			Navy_Slider_Line = {
+				x = navy_slider_gui
+			}
+			Air_Slider_Line = {
+				x = air_slider_gui
+			}
+			Strategic_Forces_Slider_Line = {
+				x = strategic_forces_slider_gui
+			}
+			Space_Slider_Line = {
+				x = space_slider_gui
+			}
+			Taxes_Slider_Line = {		#Upper
+				x = upper_tax_slider_gui
+			}
+			Taxes_Slider_Upper_Middle_Line = {
+				x = corporate_tax_slider_gui
+			}
+			Taxes_Slider_Lower_Middle_Line = {
+				x = lower_middle_tax_slider_gui
+			}
+			Taxes_Slider_Lower_Line = {
+				x = lower_tax_slider_gui
+			}
+        }
+
+        triggers = {
+            Current_Debts_Header_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+            Monthly_Pay_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+            Interest_Rate_Specific_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+            Total_Outstanding_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+            Current_Debts_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+			Current_Monthly_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+			Interest_Monthly_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+			Current_Total_visible = {
+                check_variable = { show_current_loans = 1 }
+            }
+            #Borrowing
+            Potential_Creditors_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Available_Creditors_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Term_Length_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Interest_Rate_Borrowing_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Total_Available_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Open_World_Bank_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            World_Bank_Title_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            World_Bank_Max_Borrowable_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            World_Bank_Term_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            World_Bank_Rate_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            World_Bank_Flag_frame2_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            World_Bank_Flag_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            World_Bank_Available_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Open_IMF_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            IMF_Title_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            IMF_Max_Borrowable_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            IMF_Term_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            IMF_Rate_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            IMF_Flag_frame2_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            IMF_Flag_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            IMF_Available_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Potential_Transnational_Creditors_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Available_Transnational_Creditors_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Open_Morgan_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Morgan_Title_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Morgan_Max_Borrowable_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Morgan_Term_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Morgan_Rate_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Morgan_Flag_frame2_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Morgan_Flag_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Morgan_Available_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Open_Deustche_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Deustche_Title_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Deustche_Max_Borrowable_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Deustche_Term_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Deustche_Rate_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Deustche_Flag_frame2_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Deustche_Flag_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Deustche_Available_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Open_Suisse_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Suisse_Title_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Suisse_Max_Borrowable_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Suisse_Term_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Suisse_Rate_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Suisse_Flag_frame2_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Suisse_Flag_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Suisse_Available_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Open_Chiyoda_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Chiyoda_Title_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Chiyoda_Max_Borrowable_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Chiyoda_Term_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Chiyoda_Rate_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Chiyoda_Flag_frame2_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Chiyoda_Flag_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Chiyoda_Available_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Open_Barclays_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Barclays_Title_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Barclays_Max_Borrowable_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Barclays_Term_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Barclays_Rate_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Barclays_Flag_frame2_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Barclays_Flag_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Barclays_Available_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Open_Banque_Paris_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Banque_Paris_Title_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Banque_Paris_Max_Borrowable_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Banque_Paris_Term_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Banque_Paris_Rate_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Banque_Paris_Flag_frame2_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Banque_Paris_Flag_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Banque_Paris_Available_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Potential_International_Creditors_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Available_International_Creditors_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Open_Domestic_Bank_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Domestic_Bank_Title_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Domestic_Max_Borrowable_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Domestic_Term_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Domestic_Rate_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Domestic_Bank_Flag_frame2_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Domestic_Bank_Flag_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Domestic_Bank_Available_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Open_Reserve_Bank_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Reserve_Bank_Title_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Reserve_Max_Borrowable_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Reserve_Term_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Reserve_Rate_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Reserve_Bank_Flag_frame2_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Reserve_Bank_Flag_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+            Reserve_Bank_Available_visible = {
+                check_variable = { show_current_borrowing = 1 }
+            }
+
+            Fiscal_Overview_Header_visible = {
+                check_variable = { show_current_overview = 1 }
+            }
+			3pie0_visible = { check_variable = { show_current_overview = 1 } }
+			3pie1_visible = { check_variable = { show_current_overview = 1 } }
+			3pie2_visible = { check_variable = { show_current_overview = 1 } }
+			3pie3_visible = { check_variable = { show_current_overview = 1 } }
+			3pie4_visible = { check_variable = { show_current_overview = 1 } }
+			3pie5_visible = { check_variable = { show_current_overview = 1 } }
+			3pie6_visible = { check_variable = { show_current_overview = 1 } }
+			3pie7_visible = { check_variable = { show_current_overview = 1 } }
+			3pie8_visible = { check_variable = { show_current_overview = 1 } }
+			3pie9_visible = { check_variable = { show_current_overview = 1 } }
+			3pie10_visible = { check_variable = { show_current_overview = 1 } }
+			3pie11_visible = { check_variable = { show_current_overview = 1 } }
+			3pie12_visible = { check_variable = { show_current_overview = 1 } }
+			3pie13_visible = { check_variable = { show_current_overview = 1 } }
+			3pie14_visible = { check_variable = { show_current_overview = 1 } }
+			3pie15_visible = { check_variable = { show_current_overview = 1 } }
+			3pie16_visible = { check_variable = { show_current_overview = 1 } }
+			3pie17_visible = { check_variable = { show_current_overview = 1 } }
+			3pie18_visible = { check_variable = { show_current_overview = 1 } }
+			3pie19_visible = { check_variable = { show_current_overview = 1 } }
+			3pie20_visible = { check_variable = { show_current_overview = 1 } }
+			3pie21_visible = { check_variable = { show_current_overview = 1 } }
+			3pie22_visible = { check_variable = { show_current_overview = 1 } }
+			3pie23_visible = { check_variable = { show_current_overview = 1 } }
+			3pie24_visible = { check_variable = { show_current_overview = 1 } }
+			3pie25_visible = { check_variable = { show_current_overview = 1 } }
+			3pie26_visible = { check_variable = { show_current_overview = 1 } }
+			3pie27_visible = { check_variable = { show_current_overview = 1 } }
+			3pie28_visible = { check_variable = { show_current_overview = 1 } }
+			3pie29_visible = { check_variable = { show_current_overview = 1 } }
+			3pie30_visible = { check_variable = { show_current_overview = 1 } }
+			3pie31_visible = { check_variable = { show_current_overview = 1 } }
+			3pie32_visible = { check_variable = { show_current_overview = 1 } }
+			3pie33_visible = { check_variable = { show_current_overview = 1 } }
+			3pie34_visible = { check_variable = { show_current_overview = 1 } }
+			3pie35_visible = { check_variable = { show_current_overview = 1 } }
+			3pie36_visible = { check_variable = { show_current_overview = 1 } }
+			3pie37_visible = { check_variable = { show_current_overview = 1 } }
+			3pie38_visible = { check_variable = { show_current_overview = 1 } }
+			3pie39_visible = { check_variable = { show_current_overview = 1 } }
+			3pie40_visible = { check_variable = { show_current_overview = 1 } }
+			3pie41_visible = { check_variable = { show_current_overview = 1 } }
+			3pie42_visible = { check_variable = { show_current_overview = 1 } }
+			3pie43_visible = { check_variable = { show_current_overview = 1 } }
+			3pie44_visible = { check_variable = { show_current_overview = 1 } }
+			3pie45_visible = { check_variable = { show_current_overview = 1 } }
+			3pie46_visible = { check_variable = { show_current_overview = 1 } }
+			3pie47_visible = { check_variable = { show_current_overview = 1 } }
+			3pie48_visible = { check_variable = { show_current_overview = 1 } }
+			3pie49_visible = { check_variable = { show_current_overview = 1 } }
+			3pie50_visible = { check_variable = { show_current_overview = 1 } }
+			3pie51_visible = { check_variable = { show_current_overview = 1 } }
+			3pie52_visible = { check_variable = { show_current_overview = 1 } }
+			3pie53_visible = { check_variable = { show_current_overview = 1 } }
+			3pie54_visible = { check_variable = { show_current_overview = 1 } }
+			3pie55_visible = { check_variable = { show_current_overview = 1 } }
+			3pie56_visible = { check_variable = { show_current_overview = 1 } }
+			3pie57_visible = { check_variable = { show_current_overview = 1 } }
+			3pie58_visible = { check_variable = { show_current_overview = 1 } }
+			3pie59_visible = { check_variable = { show_current_overview = 1 } }
+			3pie60_visible = { check_variable = { show_current_overview = 1 } }
+			3pie61_visible = { check_variable = { show_current_overview = 1 } }
+			3pie62_visible = { check_variable = { show_current_overview = 1 } }
+			3pie63_visible = { check_variable = { show_current_overview = 1 } }
+			3pie64_visible = { check_variable = { show_current_overview = 1 } }
+			3pie65_visible = { check_variable = { show_current_overview = 1 } }
+			3pie66_visible = { check_variable = { show_current_overview = 1 } }
+			3pie67_visible = { check_variable = { show_current_overview = 1 } }
+			3pie68_visible = { check_variable = { show_current_overview = 1 } }
+			3pie69_visible = { check_variable = { show_current_overview = 1 } }
+			3pie70_visible = { check_variable = { show_current_overview = 1 } }
+			3pie71_visible = { check_variable = { show_current_overview = 1 } }
+			3pie72_visible = { check_variable = { show_current_overview = 1 } }
+			3pie73_visible = { check_variable = { show_current_overview = 1 } }
+			3pie74_visible = { check_variable = { show_current_overview = 1 } }
+			3pie75_visible = { check_variable = { show_current_overview = 1 } }
+			3pie76_visible = { check_variable = { show_current_overview = 1 } }
+			3pie77_visible = { check_variable = { show_current_overview = 1 } }
+			3pie78_visible = { check_variable = { show_current_overview = 1 } }
+			3pie79_visible = { check_variable = { show_current_overview = 1 } }
+			3pie80_visible = { check_variable = { show_current_overview = 1 } }
+			3pie81_visible = { check_variable = { show_current_overview = 1 } }
+			3pie82_visible = { check_variable = { show_current_overview = 1 } }
+			3pie83_visible = { check_variable = { show_current_overview = 1 } }
+			3pie84_visible = { check_variable = { show_current_overview = 1 } }
+			3pie85_visible = { check_variable = { show_current_overview = 1 } }
+			3pie86_visible = { check_variable = { show_current_overview = 1 } }
+			3pie87_visible = { check_variable = { show_current_overview = 1 } }
+			3pie88_visible = { check_variable = { show_current_overview = 1 } }
+			3pie89_visible = { check_variable = { show_current_overview = 1 } }
+			3pie90_visible = { check_variable = { show_current_overview = 1 } }
+			3pie91_visible = { check_variable = { show_current_overview = 1 } }
+			3pie92_visible = { check_variable = { show_current_overview = 1 } }
+			3pie93_visible = { check_variable = { show_current_overview = 1 } }
+			3pie94_visible = { check_variable = { show_current_overview = 1 } }
+			3pie95_visible = { check_variable = { show_current_overview = 1 } }
+			3pie96_visible = { check_variable = { show_current_overview = 1 } }
+			3pie97_visible = { check_variable = { show_current_overview = 1 } }
+			3pie98_visible = { check_variable = { show_current_overview = 1 } }
+			3pie99_visible = { check_variable = { show_current_overview = 1 } }
+			4pie0_visible = { check_variable = { show_current_overview = 1 } }
+			4pie1_visible = { check_variable = { show_current_overview = 1 } }
+			4pie2_visible = { check_variable = { show_current_overview = 1 } }
+			4pie3_visible = { check_variable = { show_current_overview = 1 } }
+			4pie4_visible = { check_variable = { show_current_overview = 1 } }
+			4pie5_visible = { check_variable = { show_current_overview = 1 } }
+			4pie6_visible = { check_variable = { show_current_overview = 1 } }
+			4pie7_visible = { check_variable = { show_current_overview = 1 } }
+			4pie8_visible = { check_variable = { show_current_overview = 1 } }
+			4pie9_visible = { check_variable = { show_current_overview = 1 } }
+			4pie10_visible = { check_variable = { show_current_overview = 1 } }
+			4pie11_visible = { check_variable = { show_current_overview = 1 } }
+			4pie12_visible = { check_variable = { show_current_overview = 1 } }
+			4pie13_visible = { check_variable = { show_current_overview = 1 } }
+			4pie14_visible = { check_variable = { show_current_overview = 1 } }
+			4pie15_visible = { check_variable = { show_current_overview = 1 } }
+			4pie16_visible = { check_variable = { show_current_overview = 1 } }
+			4pie17_visible = { check_variable = { show_current_overview = 1 } }
+			4pie18_visible = { check_variable = { show_current_overview = 1 } }
+			4pie19_visible = { check_variable = { show_current_overview = 1 } }
+			4pie20_visible = { check_variable = { show_current_overview = 1 } }
+			4pie21_visible = { check_variable = { show_current_overview = 1 } }
+			4pie22_visible = { check_variable = { show_current_overview = 1 } }
+			4pie23_visible = { check_variable = { show_current_overview = 1 } }
+			4pie24_visible = { check_variable = { show_current_overview = 1 } }
+			4pie25_visible = { check_variable = { show_current_overview = 1 } }
+			4pie26_visible = { check_variable = { show_current_overview = 1 } }
+			4pie27_visible = { check_variable = { show_current_overview = 1 } }
+			4pie28_visible = { check_variable = { show_current_overview = 1 } }
+			4pie29_visible = { check_variable = { show_current_overview = 1 } }
+			4pie30_visible = { check_variable = { show_current_overview = 1 } }
+			4pie31_visible = { check_variable = { show_current_overview = 1 } }
+			4pie32_visible = { check_variable = { show_current_overview = 1 } }
+			4pie33_visible = { check_variable = { show_current_overview = 1 } }
+			4pie34_visible = { check_variable = { show_current_overview = 1 } }
+			4pie35_visible = { check_variable = { show_current_overview = 1 } }
+			4pie36_visible = { check_variable = { show_current_overview = 1 } }
+			4pie37_visible = { check_variable = { show_current_overview = 1 } }
+			4pie38_visible = { check_variable = { show_current_overview = 1 } }
+			4pie39_visible = { check_variable = { show_current_overview = 1 } }
+			4pie40_visible = { check_variable = { show_current_overview = 1 } }
+			4pie41_visible = { check_variable = { show_current_overview = 1 } }
+			4pie42_visible = { check_variable = { show_current_overview = 1 } }
+			4pie43_visible = { check_variable = { show_current_overview = 1 } }
+			4pie44_visible = { check_variable = { show_current_overview = 1 } }
+			4pie45_visible = { check_variable = { show_current_overview = 1 } }
+			4pie46_visible = { check_variable = { show_current_overview = 1 } }
+			4pie47_visible = { check_variable = { show_current_overview = 1 } }
+			4pie48_visible = { check_variable = { show_current_overview = 1 } }
+			4pie49_visible = { check_variable = { show_current_overview = 1 } }
+			4pie50_visible = { check_variable = { show_current_overview = 1 } }
+			4pie51_visible = { check_variable = { show_current_overview = 1 } }
+			4pie52_visible = { check_variable = { show_current_overview = 1 } }
+			4pie53_visible = { check_variable = { show_current_overview = 1 } }
+			4pie54_visible = { check_variable = { show_current_overview = 1 } }
+			4pie55_visible = { check_variable = { show_current_overview = 1 } }
+			4pie56_visible = { check_variable = { show_current_overview = 1 } }
+			4pie57_visible = { check_variable = { show_current_overview = 1 } }
+			4pie58_visible = { check_variable = { show_current_overview = 1 } }
+			4pie59_visible = { check_variable = { show_current_overview = 1 } }
+			4pie60_visible = { check_variable = { show_current_overview = 1 } }
+			4pie61_visible = { check_variable = { show_current_overview = 1 } }
+			4pie62_visible = { check_variable = { show_current_overview = 1 } }
+			4pie63_visible = { check_variable = { show_current_overview = 1 } }
+			4pie64_visible = { check_variable = { show_current_overview = 1 } }
+			4pie65_visible = { check_variable = { show_current_overview = 1 } }
+			4pie66_visible = { check_variable = { show_current_overview = 1 } }
+			4pie67_visible = { check_variable = { show_current_overview = 1 } }
+			4pie68_visible = { check_variable = { show_current_overview = 1 } }
+			4pie69_visible = { check_variable = { show_current_overview = 1 } }
+			4pie70_visible = { check_variable = { show_current_overview = 1 } }
+			4pie71_visible = { check_variable = { show_current_overview = 1 } }
+			4pie72_visible = { check_variable = { show_current_overview = 1 } }
+			4pie73_visible = { check_variable = { show_current_overview = 1 } }
+			4pie74_visible = { check_variable = { show_current_overview = 1 } }
+			4pie75_visible = { check_variable = { show_current_overview = 1 } }
+			4pie76_visible = { check_variable = { show_current_overview = 1 } }
+			4pie77_visible = { check_variable = { show_current_overview = 1 } }
+			4pie78_visible = { check_variable = { show_current_overview = 1 } }
+			4pie79_visible = { check_variable = { show_current_overview = 1 } }
+			4pie80_visible = { check_variable = { show_current_overview = 1 } }
+			4pie81_visible = { check_variable = { show_current_overview = 1 } }
+			4pie82_visible = { check_variable = { show_current_overview = 1 } }
+			4pie83_visible = { check_variable = { show_current_overview = 1 } }
+			4pie84_visible = { check_variable = { show_current_overview = 1 } }
+			4pie85_visible = { check_variable = { show_current_overview = 1 } }
+			4pie86_visible = { check_variable = { show_current_overview = 1 } }
+			4pie87_visible = { check_variable = { show_current_overview = 1 } }
+			4pie88_visible = { check_variable = { show_current_overview = 1 } }
+			4pie89_visible = { check_variable = { show_current_overview = 1 } }
+			4pie90_visible = { check_variable = { show_current_overview = 1 } }
+			4pie91_visible = { check_variable = { show_current_overview = 1 } }
+			4pie92_visible = { check_variable = { show_current_overview = 1 } }
+			4pie93_visible = { check_variable = { show_current_overview = 1 } }
+			4pie94_visible = { check_variable = { show_current_overview = 1 } }
+			4pie95_visible = { check_variable = { show_current_overview = 1 } }
+			4pie96_visible = { check_variable = { show_current_overview = 1 } }
+			4pie97_visible = { check_variable = { show_current_overview = 1 } }
+			4pie98_visible = { check_variable = { show_current_overview = 1 } }
+			4pie99_visible = { check_variable = { show_current_overview = 1 } }
+			2pie0_visible = { check_variable = { show_current_overview = 1 } }
+			2pie1_visible = { check_variable = { show_current_overview = 1 } }
+			2pie2_visible = { check_variable = { show_current_overview = 1 } }
+			2pie3_visible = { check_variable = { show_current_overview = 1 } }
+			2pie4_visible = { check_variable = { show_current_overview = 1 } }
+			2pie5_visible = { check_variable = { show_current_overview = 1 } }
+			2pie6_visible = { check_variable = { show_current_overview = 1 } }
+			2pie7_visible = { check_variable = { show_current_overview = 1 } }
+			2pie8_visible = { check_variable = { show_current_overview = 1 } }
+			2pie9_visible = { check_variable = { show_current_overview = 1 } }
+			2pie10_visible = { check_variable = { show_current_overview = 1 } }
+			2pie11_visible = { check_variable = { show_current_overview = 1 } }
+			2pie12_visible = { check_variable = { show_current_overview = 1 } }
+			2pie13_visible = { check_variable = { show_current_overview = 1 } }
+			2pie14_visible = { check_variable = { show_current_overview = 1 } }
+			2pie15_visible = { check_variable = { show_current_overview = 1 } }
+			2pie16_visible = { check_variable = { show_current_overview = 1 } }
+			2pie17_visible = { check_variable = { show_current_overview = 1 } }
+			2pie18_visible = { check_variable = { show_current_overview = 1 } }
+			2pie19_visible = { check_variable = { show_current_overview = 1 } }
+			2pie20_visible = { check_variable = { show_current_overview = 1 } }
+			2pie21_visible = { check_variable = { show_current_overview = 1 } }
+			2pie22_visible = { check_variable = { show_current_overview = 1 } }
+			2pie23_visible = { check_variable = { show_current_overview = 1 } }
+			2pie24_visible = { check_variable = { show_current_overview = 1 } }
+			2pie25_visible = { check_variable = { show_current_overview = 1 } }
+			2pie26_visible = { check_variable = { show_current_overview = 1 } }
+			2pie27_visible = { check_variable = { show_current_overview = 1 } }
+			2pie28_visible = { check_variable = { show_current_overview = 1 } }
+			2pie29_visible = { check_variable = { show_current_overview = 1 } }
+			2pie30_visible = { check_variable = { show_current_overview = 1 } }
+			2pie31_visible = { check_variable = { show_current_overview = 1 } }
+			2pie32_visible = { check_variable = { show_current_overview = 1 } }
+			2pie33_visible = { check_variable = { show_current_overview = 1 } }
+			2pie34_visible = { check_variable = { show_current_overview = 1 } }
+			2pie35_visible = { check_variable = { show_current_overview = 1 } }
+			2pie36_visible = { check_variable = { show_current_overview = 1 } }
+			2pie37_visible = { check_variable = { show_current_overview = 1 } }
+			2pie38_visible = { check_variable = { show_current_overview = 1 } }
+			2pie39_visible = { check_variable = { show_current_overview = 1 } }
+			2pie40_visible = { check_variable = { show_current_overview = 1 } }
+			2pie41_visible = { check_variable = { show_current_overview = 1 } }
+			2pie42_visible = { check_variable = { show_current_overview = 1 } }
+			2pie43_visible = { check_variable = { show_current_overview = 1 } }
+			2pie44_visible = { check_variable = { show_current_overview = 1 } }
+			2pie45_visible = { check_variable = { show_current_overview = 1 } }
+			2pie46_visible = { check_variable = { show_current_overview = 1 } }
+			2pie47_visible = { check_variable = { show_current_overview = 1 } }
+			2pie48_visible = { check_variable = { show_current_overview = 1 } }
+			2pie49_visible = { check_variable = { show_current_overview = 1 } }
+			2pie50_visible = { check_variable = { show_current_overview = 1 } }
+			2pie51_visible = { check_variable = { show_current_overview = 1 } }
+			2pie52_visible = { check_variable = { show_current_overview = 1 } }
+			2pie53_visible = { check_variable = { show_current_overview = 1 } }
+			2pie54_visible = { check_variable = { show_current_overview = 1 } }
+			2pie55_visible = { check_variable = { show_current_overview = 1 } }
+			2pie56_visible = { check_variable = { show_current_overview = 1 } }
+			2pie57_visible = { check_variable = { show_current_overview = 1 } }
+			2pie58_visible = { check_variable = { show_current_overview = 1 } }
+			2pie59_visible = { check_variable = { show_current_overview = 1 } }
+			2pie60_visible = { check_variable = { show_current_overview = 1 } }
+			2pie61_visible = { check_variable = { show_current_overview = 1 } }
+			2pie62_visible = { check_variable = { show_current_overview = 1 } }
+			2pie63_visible = { check_variable = { show_current_overview = 1 } }
+			2pie64_visible = { check_variable = { show_current_overview = 1 } }
+			2pie65_visible = { check_variable = { show_current_overview = 1 } }
+			2pie66_visible = { check_variable = { show_current_overview = 1 } }
+			2pie67_visible = { check_variable = { show_current_overview = 1 } }
+			2pie68_visible = { check_variable = { show_current_overview = 1 } }
+			2pie69_visible = { check_variable = { show_current_overview = 1 } }
+			2pie70_visible = { check_variable = { show_current_overview = 1 } }
+			2pie71_visible = { check_variable = { show_current_overview = 1 } }
+			2pie72_visible = { check_variable = { show_current_overview = 1 } }
+			2pie73_visible = { check_variable = { show_current_overview = 1 } }
+			2pie74_visible = { check_variable = { show_current_overview = 1 } }
+			2pie75_visible = { check_variable = { show_current_overview = 1 } }
+			2pie76_visible = { check_variable = { show_current_overview = 1 } }
+			2pie77_visible = { check_variable = { show_current_overview = 1 } }
+			2pie78_visible = { check_variable = { show_current_overview = 1 } }
+			2pie79_visible = { check_variable = { show_current_overview = 1 } }
+			2pie80_visible = { check_variable = { show_current_overview = 1 } }
+			2pie81_visible = { check_variable = { show_current_overview = 1 } }
+			2pie82_visible = { check_variable = { show_current_overview = 1 } }
+			2pie83_visible = { check_variable = { show_current_overview = 1 } }
+			2pie84_visible = { check_variable = { show_current_overview = 1 } }
+			2pie85_visible = { check_variable = { show_current_overview = 1 } }
+			2pie86_visible = { check_variable = { show_current_overview = 1 } }
+			2pie87_visible = { check_variable = { show_current_overview = 1 } }
+			2pie88_visible = { check_variable = { show_current_overview = 1 } }
+			2pie89_visible = { check_variable = { show_current_overview = 1 } }
+			2pie90_visible = { check_variable = { show_current_overview = 1 } }
+			2pie91_visible = { check_variable = { show_current_overview = 1 } }
+			2pie92_visible = { check_variable = { show_current_overview = 1 } }
+			2pie93_visible = { check_variable = { show_current_overview = 1 } }
+			2pie94_visible = { check_variable = { show_current_overview = 1 } }
+			2pie95_visible = { check_variable = { show_current_overview = 1 } }
+			2pie96_visible = { check_variable = { show_current_overview = 1 } }
+			2pie97_visible = { check_variable = { show_current_overview = 1 } }
+			2pie98_visible = { check_variable = { show_current_overview = 1 } }
+			2pie99_visible = { check_variable = { show_current_overview = 1 } }
+			Fiscal_Overview_visible = { check_variable = { show_current_overview = 1 } }
+			Balance_Label_visible = { check_variable = { show_current_overview = 1 } }
+			Balance_Label_YOY_visible = { check_variable = { show_current_overview = 1 } }
+			Electricity_Label_visible = { check_variable = { show_current_overview = 1 } }
+			Electricity_Label_YOY_visible = { check_variable = { show_current_overview = 1 } }
+			Agricultural_Label_visible = { check_variable = { show_current_overview = 1 } }
+			Agricultural_Label_YOY_visible = { check_variable = { show_current_overview = 1 } }
+			BALANCE_BG_visible = { check_variable = { show_current_overview = 1 } }
+			ELECTRICITY_BALANCE_BG_visible = { check_variable = { show_current_overview = 1 } }
+			FOOD_BALANCE_BG_visible = { check_variable = { show_current_overview = 1 } }
+			INCOME_PIE_BG_visible = { check_variable = { show_current_overview = 1 } }
+			EXPENSE_PIE_BG_visible = { check_variable = { show_current_overview = 1 } }
+			MILITARY_PIE_BG_visible = { check_variable = { show_current_overview = 1 } }
+			pie_front2_visible = { check_variable = { show_current_overview = 1 } }
+			pie_front_visible = { check_variable = { show_current_overview = 1 } }
+			pie_front_inc_visible = { check_variable = { show_current_overview = 1 } }
+
+			military_header_visible = { check_variable = { show_current_overview = 1 } }
+			army_expend_visible = { check_variable = { show_current_overview = 1 } }
+			navy_expend_visible = { check_variable = { show_current_overview = 1 } }
+			af_expend_visible = { check_variable = { show_current_overview = 1 } }
+			mil_pie_total_value_visible = { check_variable = { show_current_overview = 1 } }
+			Monthly_Income_visible = { check_variable = { show_current_overview = 1 } }
+			monthly_income_industry_visible = { check_variable = { show_current_overview = 1 } }
+			monthly_income_agri_visible = { check_variable = { show_current_overview = 1 } }
+			monthly_income_taxes_visible = { check_variable = { show_current_overview = 1 } }
+			monthly_income_services_visible = { check_variable = { show_current_overview = 1 } }
+			inc_pie_total_value_visible = { check_variable = { show_current_overview = 1 } }
+			monthly_expense_education_visible = { check_variable = { show_current_overview = 1 } }
+			monthly_expense_domestic_visible = { check_variable = { show_current_overview = 1 } }
+			monthly_expense_public_visible = { check_variable = { show_current_overview = 1 } }
+			monthly_expense_military_visible = { check_variable = { show_current_overview = 1 } }
+			exp_pie_total_value_visible = { check_variable = { show_current_overview = 1 } }
+			Monthly_Expenses_visible = { check_variable = { show_current_overview = 1 } }
+			pie1bg_visible = { check_variable = { show_current_overview = 1 } }
+			Fiscal_Overview_CRT_visible = { check_variable = { show_current_overview = 1 } }
+			Fiscal_Frame_visible = { check_variable = { show_current_overview = 1 } }
+			Healthcare_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Healthcare_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Army_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Army_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Navy_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Navy_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Education_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Education_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Policing_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Policing_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Public_Services_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Public_Services_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Welfare_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Welfare_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Air_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Air_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Strategic_Forces_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Strategic_Forces_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Space_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Space_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Education_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Education_Slider_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Education_Slider_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Education_Slider_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Education_Slider_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Education_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Civilian_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Monetary_Spending_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Policing_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Policing_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Policing_Slider_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Policing_Slider_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Policing_Slider_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Policing_Slider_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Public_Services_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Public_Services_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Public_Services_Slider_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Public_Services_Slider_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Public_Services_Slider_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Public_Services_Slider_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Welfare_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Welfare_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Welfare_Slider_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Welfare_Slider_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Welfare_Slider_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Welfare_Slider_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Healthcare_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Healthcare_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Healthcare_Slider_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Healthcare_Slider_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Healthcare_Slider_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Healthcare_Slider_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Military_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Army_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Army_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Army_Slider_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Army_Slider_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Army_Slider_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Army_Slider_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Navy_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Navy_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Navy_Slider_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Navy_Slider_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Navy_Slider_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Navy_Slider_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Air_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Air_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Air_Slider_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Air_Slider_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Air_Slider_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Air_Slider_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Strategic_Forces_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Strategic_Forces_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Strategic_Forces_Slider_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Strategic_Forces_Slider_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Strategic_Forces_Slider_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Strategic_Forces_Slider_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Space_Exp_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Space_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Space_Slider_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Space_Slider_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Space_Slider_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Space_Slider_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Laffer_Label_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Tax_Side_Label_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Inf_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Inc_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+
+			Education_Slider_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Education_Slider_Circle_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Education_Slider_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Education_Slider_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+
+			Monetary_Frame_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Monetary_Overlay_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+
+			Taxes_Slider_Upper_Middle_Inc_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Upper_Middle_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Upper_Middle_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Upper_Middle_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Upper_Middle_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Upper_Middle_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Middle_Inc_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Middle_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Middle_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Middle_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Middle_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Middle_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Inc_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Line_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Center_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Limit_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Limit_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Upper_Middle_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Upper_Middle_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Middle_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Middle_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Right_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+			Taxes_Slider_Lower_Left_visible = {
+				check_variable = { show_current_fiscal = 1 }
+			}
+        }
+
+		properties = {
+			4pie0 = { frame = 4pie_chart^0 }
+			4pie1 = { frame = 4pie_chart^1 }
+			4pie2 = { frame = 4pie_chart^2 }
+			4pie3 = { frame = 4pie_chart^3 }
+			4pie4 = { frame = 4pie_chart^4 }
+			4pie5 = { frame = 4pie_chart^5 }
+			4pie6 = { frame = 4pie_chart^6 }
+			4pie7 = { frame = 4pie_chart^7 }
+			4pie8 = { frame = 4pie_chart^8 }
+			4pie9 = { frame = 4pie_chart^9 }
+			4pie10 = { frame = 4pie_chart^10 }
+			4pie11 = { frame = 4pie_chart^11 }
+			4pie12 = { frame = 4pie_chart^12 }
+			4pie13 = { frame = 4pie_chart^13 }
+			4pie14 = { frame = 4pie_chart^14 }
+			4pie15 = { frame = 4pie_chart^15 }
+			4pie16 = { frame = 4pie_chart^16 }
+			4pie17 = { frame = 4pie_chart^17 }
+			4pie18 = { frame = 4pie_chart^18 }
+			4pie19 = { frame = 4pie_chart^19 }
+			4pie20 = { frame = 4pie_chart^20 }
+			4pie21 = { frame = 4pie_chart^21 }
+			4pie22 = { frame = 4pie_chart^22 }
+			4pie23 = { frame = 4pie_chart^23 }
+			4pie24 = { frame = 4pie_chart^24 }
+			4pie25 = { frame = 4pie_chart^25 }
+			4pie26 = { frame = 4pie_chart^26 }
+			4pie27 = { frame = 4pie_chart^27 }
+			4pie28 = { frame = 4pie_chart^28 }
+			4pie29 = { frame = 4pie_chart^29 }
+			4pie30 = { frame = 4pie_chart^30 }
+			4pie31 = { frame = 4pie_chart^31 }
+			4pie32 = { frame = 4pie_chart^32 }
+			4pie33 = { frame = 4pie_chart^33 }
+			4pie34 = { frame = 4pie_chart^34 }
+			4pie35 = { frame = 4pie_chart^35 }
+			4pie36 = { frame = 4pie_chart^36 }
+			4pie37 = { frame = 4pie_chart^37 }
+			4pie38 = { frame = 4pie_chart^38 }
+			4pie39 = { frame = 4pie_chart^39 }
+			4pie40 = { frame = 4pie_chart^40 }
+			4pie41 = { frame = 4pie_chart^41 }
+			4pie42 = { frame = 4pie_chart^42 }
+			4pie43 = { frame = 4pie_chart^43 }
+			4pie44 = { frame = 4pie_chart^44 }
+			4pie45 = { frame = 4pie_chart^45 }
+			4pie46 = { frame = 4pie_chart^46 }
+			4pie47 = { frame = 4pie_chart^47 }
+			4pie48 = { frame = 4pie_chart^48 }
+			4pie49 = { frame = 4pie_chart^49 }
+			4pie50 = { frame = 4pie_chart^50 }
+			4pie51 = { frame = 4pie_chart^51 }
+			4pie52 = { frame = 4pie_chart^52 }
+			4pie53 = { frame = 4pie_chart^53 }
+			4pie54 = { frame = 4pie_chart^54 }
+			4pie55 = { frame = 4pie_chart^55 }
+			4pie56 = { frame = 4pie_chart^56 }
+			4pie57 = { frame = 4pie_chart^57 }
+			4pie58 = { frame = 4pie_chart^58 }
+			4pie59 = { frame = 4pie_chart^59 }
+			4pie60 = { frame = 4pie_chart^60 }
+			4pie61 = { frame = 4pie_chart^61 }
+			4pie62 = { frame = 4pie_chart^62 }
+			4pie63 = { frame = 4pie_chart^63 }
+			4pie64 = { frame = 4pie_chart^64 }
+			4pie65 = { frame = 4pie_chart^65 }
+			4pie66 = { frame = 4pie_chart^66 }
+			4pie67 = { frame = 4pie_chart^67 }
+			4pie68 = { frame = 4pie_chart^68 }
+			4pie69 = { frame = 4pie_chart^69 }
+			4pie70 = { frame = 4pie_chart^70 }
+			4pie71 = { frame = 4pie_chart^71 }
+			4pie72 = { frame = 4pie_chart^72 }
+			4pie73 = { frame = 4pie_chart^73 }
+			4pie74 = { frame = 4pie_chart^74 }
+			4pie75 = { frame = 4pie_chart^75 }
+			4pie76 = { frame = 4pie_chart^76 }
+			4pie77 = { frame = 4pie_chart^77 }
+			4pie78 = { frame = 4pie_chart^78 }
+			4pie79 = { frame = 4pie_chart^79 }
+			4pie80 = { frame = 4pie_chart^80 }
+			4pie81 = { frame = 4pie_chart^81 }
+			4pie82 = { frame = 4pie_chart^82 }
+			4pie83 = { frame = 4pie_chart^83 }
+			4pie84 = { frame = 4pie_chart^84 }
+			4pie85 = { frame = 4pie_chart^85 }
+			4pie86 = { frame = 4pie_chart^86 }
+			4pie87 = { frame = 4pie_chart^87 }
+			4pie88 = { frame = 4pie_chart^88 }
+			4pie89 = { frame = 4pie_chart^89 }
+			4pie90 = { frame = 4pie_chart^90 }
+			4pie91 = { frame = 4pie_chart^91 }
+			4pie92 = { frame = 4pie_chart^92 }
+			4pie93 = { frame = 4pie_chart^93 }
+			4pie94 = { frame = 4pie_chart^94 }
+			4pie95 = { frame = 4pie_chart^95 }
+			4pie96 = { frame = 4pie_chart^96 }
+			4pie97 = { frame = 4pie_chart^97 }
+			4pie98 = { frame = 4pie_chart^98 }
+			4pie99 = { frame = 4pie_chart^99 }
+		}
+		properties = {
+			3pie0 = { frame = 3pie_chart^0 }
+			3pie1 = { frame = 3pie_chart^1 }
+			3pie2 = { frame = 3pie_chart^2 }
+			3pie3 = { frame = 3pie_chart^3 }
+			3pie4 = { frame = 3pie_chart^4 }
+			3pie5 = { frame = 3pie_chart^5 }
+			3pie6 = { frame = 3pie_chart^6 }
+			3pie7 = { frame = 3pie_chart^7 }
+			3pie8 = { frame = 3pie_chart^8 }
+			3pie9 = { frame = 3pie_chart^9 }
+			3pie10 = { frame = 3pie_chart^10 }
+			3pie11 = { frame = 3pie_chart^11 }
+			3pie12 = { frame = 3pie_chart^12 }
+			3pie13 = { frame = 3pie_chart^13 }
+			3pie14 = { frame = 3pie_chart^14 }
+			3pie15 = { frame = 3pie_chart^15 }
+			3pie16 = { frame = 3pie_chart^16 }
+			3pie17 = { frame = 3pie_chart^17 }
+			3pie18 = { frame = 3pie_chart^18 }
+			3pie19 = { frame = 3pie_chart^19 }
+			3pie20 = { frame = 3pie_chart^20 }
+			3pie21 = { frame = 3pie_chart^21 }
+			3pie22 = { frame = 3pie_chart^22 }
+			3pie23 = { frame = 3pie_chart^23 }
+			3pie24 = { frame = 3pie_chart^24 }
+			3pie25 = { frame = 3pie_chart^25 }
+			3pie26 = { frame = 3pie_chart^26 }
+			3pie27 = { frame = 3pie_chart^27 }
+			3pie28 = { frame = 3pie_chart^28 }
+			3pie29 = { frame = 3pie_chart^29 }
+			3pie30 = { frame = 3pie_chart^30 }
+			3pie31 = { frame = 3pie_chart^31 }
+			3pie32 = { frame = 3pie_chart^32 }
+			3pie33 = { frame = 3pie_chart^33 }
+			3pie34 = { frame = 3pie_chart^34 }
+			3pie35 = { frame = 3pie_chart^35 }
+			3pie36 = { frame = 3pie_chart^36 }
+			3pie37 = { frame = 3pie_chart^37 }
+			3pie38 = { frame = 3pie_chart^38 }
+			3pie39 = { frame = 3pie_chart^39 }
+			3pie40 = { frame = 3pie_chart^40 }
+			3pie41 = { frame = 3pie_chart^41 }
+			3pie42 = { frame = 3pie_chart^42 }
+			3pie43 = { frame = 3pie_chart^43 }
+			3pie44 = { frame = 3pie_chart^44 }
+			3pie45 = { frame = 3pie_chart^45 }
+			3pie46 = { frame = 3pie_chart^46 }
+			3pie47 = { frame = 3pie_chart^47 }
+			3pie48 = { frame = 3pie_chart^48 }
+			3pie49 = { frame = 3pie_chart^49 }
+			3pie50 = { frame = 3pie_chart^50 }
+			3pie51 = { frame = 3pie_chart^51 }
+			3pie52 = { frame = 3pie_chart^52 }
+			3pie53 = { frame = 3pie_chart^53 }
+			3pie54 = { frame = 3pie_chart^54 }
+			3pie55 = { frame = 3pie_chart^55 }
+			3pie56 = { frame = 3pie_chart^56 }
+			3pie57 = { frame = 3pie_chart^57 }
+			3pie58 = { frame = 3pie_chart^58 }
+			3pie59 = { frame = 3pie_chart^59 }
+			3pie60 = { frame = 3pie_chart^60 }
+			3pie61 = { frame = 3pie_chart^61 }
+			3pie62 = { frame = 3pie_chart^62 }
+			3pie63 = { frame = 3pie_chart^63 }
+			3pie64 = { frame = 3pie_chart^64 }
+			3pie65 = { frame = 3pie_chart^65 }
+			3pie66 = { frame = 3pie_chart^66 }
+			3pie67 = { frame = 3pie_chart^67 }
+			3pie68 = { frame = 3pie_chart^68 }
+			3pie69 = { frame = 3pie_chart^69 }
+			3pie70 = { frame = 3pie_chart^70 }
+			3pie71 = { frame = 3pie_chart^71 }
+			3pie72 = { frame = 3pie_chart^72 }
+			3pie73 = { frame = 3pie_chart^73 }
+			3pie74 = { frame = 3pie_chart^74 }
+			3pie75 = { frame = 3pie_chart^75 }
+			3pie76 = { frame = 3pie_chart^76 }
+			3pie77 = { frame = 3pie_chart^77 }
+			3pie78 = { frame = 3pie_chart^78 }
+			3pie79 = { frame = 3pie_chart^79 }
+			3pie80 = { frame = 3pie_chart^80 }
+			3pie81 = { frame = 3pie_chart^81 }
+			3pie82 = { frame = 3pie_chart^82 }
+			3pie83 = { frame = 3pie_chart^83 }
+			3pie84 = { frame = 3pie_chart^84 }
+			3pie85 = { frame = 3pie_chart^85 }
+			3pie86 = { frame = 3pie_chart^86 }
+			3pie87 = { frame = 3pie_chart^87 }
+			3pie88 = { frame = 3pie_chart^88 }
+			3pie89 = { frame = 3pie_chart^89 }
+			3pie90 = { frame = 3pie_chart^90 }
+			3pie91 = { frame = 3pie_chart^91 }
+			3pie92 = { frame = 3pie_chart^92 }
+			3pie93 = { frame = 3pie_chart^93 }
+			3pie94 = { frame = 3pie_chart^94 }
+			3pie95 = { frame = 3pie_chart^95 }
+			3pie96 = { frame = 3pie_chart^96 }
+			3pie97 = { frame = 3pie_chart^97 }
+			3pie98 = { frame = 3pie_chart^98 }
+			3pie99 = { frame = 3pie_chart^99 }
+		}
+
+		properties = {
+			2pie0 = { frame = 2pie_chart^0 }
+			2pie1 = { frame = 2pie_chart^1 }
+			2pie2 = { frame = 2pie_chart^2 }
+			2pie3 = { frame = 2pie_chart^3 }
+			2pie4 = { frame = 2pie_chart^4 }
+			2pie5 = { frame = 2pie_chart^5 }
+			2pie6 = { frame = 2pie_chart^6 }
+			2pie7 = { frame = 2pie_chart^7 }
+			2pie8 = { frame = 2pie_chart^8 }
+			2pie9 = { frame = 2pie_chart^9 }
+			2pie10 = { frame = 2pie_chart^10 }
+			2pie11 = { frame = 2pie_chart^11 }
+			2pie12 = { frame = 2pie_chart^12 }
+			2pie13 = { frame = 2pie_chart^13 }
+			2pie14 = { frame = 2pie_chart^14 }
+			2pie15 = { frame = 2pie_chart^15 }
+			2pie16 = { frame = 2pie_chart^16 }
+			2pie17 = { frame = 2pie_chart^17 }
+			2pie18 = { frame = 2pie_chart^18 }
+			2pie19 = { frame = 2pie_chart^19 }
+			2pie20 = { frame = 2pie_chart^20 }
+			2pie21 = { frame = 2pie_chart^21 }
+			2pie22 = { frame = 2pie_chart^22 }
+			2pie23 = { frame = 2pie_chart^23 }
+			2pie24 = { frame = 2pie_chart^24 }
+			2pie25 = { frame = 2pie_chart^25 }
+			2pie26 = { frame = 2pie_chart^26 }
+			2pie27 = { frame = 2pie_chart^27 }
+			2pie28 = { frame = 2pie_chart^28 }
+			2pie29 = { frame = 2pie_chart^29 }
+			2pie30 = { frame = 2pie_chart^30 }
+			2pie31 = { frame = 2pie_chart^31 }
+			2pie32 = { frame = 2pie_chart^32 }
+			2pie33 = { frame = 2pie_chart^33 }
+			2pie34 = { frame = 2pie_chart^34 }
+			2pie35 = { frame = 2pie_chart^35 }
+			2pie36 = { frame = 2pie_chart^36 }
+			2pie37 = { frame = 2pie_chart^37 }
+			2pie38 = { frame = 2pie_chart^38 }
+			2pie39 = { frame = 2pie_chart^39 }
+			2pie40 = { frame = 2pie_chart^40 }
+			2pie41 = { frame = 2pie_chart^41 }
+			2pie42 = { frame = 2pie_chart^42 }
+			2pie43 = { frame = 2pie_chart^43 }
+			2pie44 = { frame = 2pie_chart^44 }
+			2pie45 = { frame = 2pie_chart^45 }
+			2pie46 = { frame = 2pie_chart^46 }
+			2pie47 = { frame = 2pie_chart^47 }
+			2pie48 = { frame = 2pie_chart^48 }
+			2pie49 = { frame = 2pie_chart^49 }
+			2pie50 = { frame = 2pie_chart^50 }
+			2pie51 = { frame = 2pie_chart^51 }
+			2pie52 = { frame = 2pie_chart^52 }
+			2pie53 = { frame = 2pie_chart^53 }
+			2pie54 = { frame = 2pie_chart^54 }
+			2pie55 = { frame = 2pie_chart^55 }
+			2pie56 = { frame = 2pie_chart^56 }
+			2pie57 = { frame = 2pie_chart^57 }
+			2pie58 = { frame = 2pie_chart^58 }
+			2pie59 = { frame = 2pie_chart^59 }
+			2pie60 = { frame = 2pie_chart^60 }
+			2pie61 = { frame = 2pie_chart^61 }
+			2pie62 = { frame = 2pie_chart^62 }
+			2pie63 = { frame = 2pie_chart^63 }
+			2pie64 = { frame = 2pie_chart^64 }
+			2pie65 = { frame = 2pie_chart^65 }
+			2pie66 = { frame = 2pie_chart^66 }
+			2pie67 = { frame = 2pie_chart^67 }
+			2pie68 = { frame = 2pie_chart^68 }
+			2pie69 = { frame = 2pie_chart^69 }
+			2pie70 = { frame = 2pie_chart^70 }
+			2pie71 = { frame = 2pie_chart^71 }
+			2pie72 = { frame = 2pie_chart^72 }
+			2pie73 = { frame = 2pie_chart^73 }
+			2pie74 = { frame = 2pie_chart^74 }
+			2pie75 = { frame = 2pie_chart^75 }
+			2pie76 = { frame = 2pie_chart^76 }
+			2pie77 = { frame = 2pie_chart^77 }
+			2pie78 = { frame = 2pie_chart^78 }
+			2pie79 = { frame = 2pie_chart^79 }
+			2pie80 = { frame = 2pie_chart^80 }
+			2pie81 = { frame = 2pie_chart^81 }
+			2pie82 = { frame = 2pie_chart^82 }
+			2pie83 = { frame = 2pie_chart^83 }
+			2pie84 = { frame = 2pie_chart^84 }
+			2pie85 = { frame = 2pie_chart^85 }
+			2pie86 = { frame = 2pie_chart^86 }
+			2pie87 = { frame = 2pie_chart^87 }
+			2pie88 = { frame = 2pie_chart^88 }
+			2pie89 = { frame = 2pie_chart^89 }
+			2pie90 = { frame = 2pie_chart^90 }
+			2pie91 = { frame = 2pie_chart^91 }
+			2pie92 = { frame = 2pie_chart^92 }
+			2pie93 = { frame = 2pie_chart^93 }
+			2pie94 = { frame = 2pie_chart^94 }
+			2pie95 = { frame = 2pie_chart^95 }
+			2pie96 = { frame = 2pie_chart^96 }
+			2pie97 = { frame = 2pie_chart^97 }
+			2pie98 = { frame = 2pie_chart^98 }
+			2pie99 = { frame = 2pie_chart^99 }
+		}
+
+		triggers = {
+			Taxes_Slider_Left_click_enabled = {
+				#tax_policy_free_change_enabled = yes
+				check_variable = {
+					upper_tax_level_value > 1
+				}
+			}
+			Taxes_Slider_Right_click_enabled = {
+				#tax_policy_free_change_enabled = yes
+				check_variable = {
+					upper_tax_level_value < 20
+				}
+			}
+			Taxes_Slider_Upper_Middle_Left_click_enabled = {
+				#tax_policy_free_change_enabled = yes
+				check_variable = {
+					corporate_tax_level_value > 1
+				}
+			}
+			Taxes_Slider_Upper_Middle_Right_click_enabled = {
+				#tax_policy_free_change_enabled = yes
+				check_variable = {
+					corporate_tax_level_value < 20
+				}
+			}
+			Taxes_Slider_Lower_Middle_Left_click_enabled = {
+				#tax_policy_free_change_enabled = yes
+				check_variable = {
+					lower_middle_tax_level_value > 1
+				}
+			}
+			Taxes_Slider_Lower_Middle_Right_click_enabled = {
+				#tax_policy_free_change_enabled = yes
+				check_variable = {
+					lower_middle_tax_level_value < 20
+				}
+			}
+			Taxes_Slider_Lower_Left_click_enabled = {
+				#tax_policy_free_change_enabled = yes
+				check_variable = {
+					lower_tax_level_value > 1
+				}
+			}
+			Taxes_Slider_Lower_Right_click_enabled = {
+				#tax_policy_free_change_enabled = yes
+				check_variable = {
+					lower_tax_level_value < 20
+				}
+			}
+
+			Army_Slider_Left_click_enabled = {
+				#military_policy_free_change_enabled = yes
+				check_variable = {
+					army_level_value > 1
+				}
+			}
+			Army_Slider_Right_click_enabled = {
+				#military_policy_free_change_enabled = yes
+				check_variable = {
+					army_level_value < 20
+				}
+			}
+
+			Navy_Slider_Left_click_enabled = {
+				#military_policy_free_change_enabled = yes
+				check_variable = {
+					navy_level_value > 1
+				}
+			}
+			Navy_Slider_Right_click_enabled = {
+				#military_policy_free_change_enabled = yes
+				check_variable = {
+					navy_level_value < 20
+				}
+			}
+
+			Air_Slider_Left_click_enabled = {
+				#military_policy_free_change_enabled = yes
+				check_variable = {
+					air_level_value > 1
+				}
+			}
+			Air_Slider_Right_click_enabled = {
+				#military_policy_free_change_enabled = yes
+				check_variable = {
+					air_level_value < 20
+				}
+			}
+
+			Strategic_Forces_Slider_Left_click_enabled = {
+				#military_policy_free_change_enabled = yes
+				check_variable = {
+					strategic_forces_level_value > 1
+				}
+			}
+			Strategic_Forces_Slider_Right_click_enabled = {
+				#military_policy_free_change_enabled = yes
+				check_variable = {
+					strategic_forces_level_value < 20
+				}
+			}
+
+			Space_Slider_Left_click_enabled = {
+				#military_policy_free_change_enabled = yes
+				check_variable = {
+					space_level_value > 1
+				}
+			}
+			Space_Slider_Right_click_enabled = {
+				#military_policy_free_change_enabled = yes
+				check_variable = {
+					space_level_value < 20
+				}
+			}
+
+			
+			Education_Slider_Left_click_enabled = {
+				#civilian_policy_free_change_enabled = yes
+				check_variable = {
+					education_level_value > 1
+				}
+			}
+			Education_Slider_Right_click_enabled = {
+				#civilian_policy_free_change_enabled = yes
+				check_variable = {
+					education_level_value < 20
+				}
+			}
+
+			Policing_Slider_Left_click_enabled = {
+				#civilian_policy_free_change_enabled = yes
+				check_variable = {
+					policing_level_value > 1
+				}
+			}
+			Policing_Slider_Right_click_enabled = {
+				#civilian_policy_free_change_enabled = yes
+				check_variable = {
+					policing_level_value < 20
+				}
+			}
+
+			Public_Services_Slider_Left_click_enabled = {
+				#civilian_policy_free_change_enabled = yes
+				check_variable = {
+					public_services_level_value > 1
+				}
+			}
+			Public_Services_Slider_Right_click_enabled = {
+				#civilian_policy_free_change_enabled = yes
+				check_variable = {
+					public_services_level_value < 20
+				}
+			}
+
+			Welfare_Slider_Left_click_enabled = {
+				#civilian_policy_free_change_enabled = yes
+				check_variable = {
+					welfare_level_value > 1
+				}
+			}
+			Welfare_Slider_Right_click_enabled = {
+				#civilian_policy_free_change_enabled = yes
+				check_variable = {
+					welfare_level_value < 20
+				}
+			}
+
+			Healthcare_Slider_Right_click_enabled = {
+				#civilian_policy_free_change_enabled = yes
+				check_variable = {
+					healthcare_level_value < 20
+				}
+			}
+			Healthcare_Slider_Left_click_enabled = {
+				#civilian_policy_free_change_enabled = yes
+				check_variable = {
+					healthcare_level_value > 1
+				}
+			}
+		}
+
+
+		effects = {
+			Education_Exp_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_education_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?education_level_value]" }
+			}
+			Policing_Exp_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_cpi_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?policing_level_value]" }
+			} 
+			Public_Services_Exp_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_services_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?public_services_level_value]" }
+			}
+			Welfare_Exp_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_welfare_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?welfare_level_value]" }
+			}
+			Healthcare_Exp_click = {   
+				meta_effect = { text = { show_ideas_tooltip = policy_healthcare_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?healthcare_level_value]" }
+			}
+			Army_Exp_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_military_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?army_level_value]" }
+			}
+			Navy_Exp_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_navy_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?navy_level_value]" }
+			}
+			Air_Exp_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_air_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?air_level_value]" }
+			}
+			Strategic_Forces_Exp_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_special_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?strategic_forces_level_value]" }
+			}
+			Space_Exp_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_space_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?space_level_value]" }
+			}
+			Taxes_Inc_click = {   
+				meta_effect = { text = { show_ideas_tooltip = policy_taxrate_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?upper_tax_level_value]" }
+			} 
+			Taxes_Slider_Upper_Middle_Inc_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_taxrate_corporate_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?corporate_tax_level_value]" }
+			}
+			Taxes_Slider_Lower_Middle_Inc_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_taxrate_lower_middle_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?lower_middle_tax_level_value]" }
+			}
+			Taxes_Slider_Lower_Inc_click = { 
+				meta_effect = { text = { show_ideas_tooltip = policy_taxrate_lower_temp_[IDEA_TOKEN] } IDEA_TOKEN = "[?lower_tax_level_value]" }
+			}
+			close_button_click = {
+				set_variable = {
+					show_finance = 0
+				}
+			}
+			#Policies
+			Healthcare_Slider_Left_click = {
+				lower_healthcare_rate = yes
+			}
+			Healthcare_Slider_Right_click = {
+				increase_healthcare_rate = yes
+			}
+			Welfare_Slider_Left_click = {
+				reduce_welfare_rate = yes
+			}
+			Welfare_Slider_Right_click = {
+				increase_welfare_rate = yes
+			}
+
+			Public_Services_Slider_Left_click = {
+				decrease_service_policy = yes
+			}
+			Public_Services_Slider_Right_click = {
+				increase_service_policy = yes
+			}
+
+			Policing_Slider_Left_click = {
+				decrease_cpi_policy = yes
+			}
+			Policing_Slider_Right_click = {
+				increase_cpi_policy = yes
+			}
+
+			Education_Slider_Left_click = {
+				decrease_education_rate = yes
+			}
+			Education_Slider_Right_click = {
+				increase_education_rate = yes
+			}
+
+			Army_Slider_Left_click = {
+				decrease_military_policy = yes
+			}
+			Army_Slider_Right_click = {
+				increase_military_policy = yes
+			}
+
+			Navy_Slider_Left_click = {
+				decrease_navy_policy = yes
+			}
+			Navy_Slider_Right_click = {
+				increase_navy_policy = yes
+			}
+
+			Air_Slider_Left_click = {
+				decrease_air_policy = yes
+			}
+			Air_Slider_Right_click = {
+				increase_air_policy = yes
+			}
+
+			Strategic_Forces_Slider_Left_click = {
+				decrease_strategic_forces_policy = yes
+			}
+			Strategic_Forces_Slider_Right_click = {
+				increase_strategic_forces_policy = yes
+			}
+
+			Space_Slider_Left_click = {
+				decrease_space_policy = yes
+			}
+			Space_Slider_Right_click = {
+				increase_space_policy = yes
+			}
+
+			Taxes_Slider_Left_click = {
+				lower_tax_rate = yes
+			}
+			Taxes_Slider_Right_click = {
+				increase_tax_rate = yes
+			}
+
+			Taxes_Slider_Upper_Middle_Left_click = {
+				decrease_corporate_tax_rate = yes
+			}
+			Taxes_Slider_Upper_Middle_Right_click = {
+				increase_corporate_tax_rate = yes
+			}
+
+			Taxes_Slider_Lower_Middle_Left_click = {
+				decrease_lower_middle_tax_rate = yes
+			}
+			Taxes_Slider_Lower_Middle_Right_click = {
+				increase_lower_middle_tax_rate = yes
+			}
+
+			Taxes_Slider_Lower_Left_click = {
+				decrease_lower_tax_rate = yes
+			}
+			Taxes_Slider_Lower_Right_click = {
+				increase_lower_tax_rate = yes
+			}
+			
+
+			#
+			Open_Reserve_Bank_click = {
+				set_variable = { show_loan_screen = 1 }
+				save_global_event_target_as = this_loan_country
+				set_variable = {
+					bank_name_prompt = 1
+				}
+				set_variable = { purchase_amount = 0 }
+				set_variable = { CurrentMaxBorrowable = ReserveMaxBorrowable }
+				clear_array = purchase_length
+				add_to_array = { purchase_length = 5 }
+				add_to_array = { purchase_length = 7 }
+				add_to_array = { purchase_length = 10 }
+
+				clear_array = currentInterestRateCalc
+				add_to_array = { currentInterestRateCalc = ReserveCurrentInterestRate }
+				add_to_array = { currentInterestRateCalc = ReserveCurrentInterestRate }
+				add_to_array = { currentInterestRateCalc = ReserveCurrentInterestRate }
+
+				set_variable = { max_index = 2 }
+				set_variable = { current_index = 0 }
+			}
+			Open_Domestic_Bank_click = {
+				set_variable = { show_loan_screen = 1 }
+				save_global_event_target_as = this_loan_country
+				set_variable = {
+					bank_name_prompt = 2
+				}
+				set_variable = { purchase_amount = 0 }
+				set_variable = { CurrentMaxBorrowable = available_liquidity }
+				clear_array = purchase_length
+				add_to_array = { purchase_length = 5 }
+				add_to_array = { purchase_length = 10 }
+				add_to_array = { purchase_length = 15 }
+				add_to_array = { purchase_length = 20 }
+
+				clear_array = currentInterestRateCalc
+				add_to_array = { currentInterestRateCalc = Interest_Rate }
+				add_to_array = { currentInterestRateCalc = Interest_Rate }
+				set_variable = {
+					Interest_Rate_Adjusted = Interest_Rate
+				}
+				multiply_variable = {
+					Interest_Rate_Adjusted = 1.2
+				}
+				add_to_array = { currentInterestRateCalc = Interest_Rate_Adjusted }
+				multiply_variable = {
+					Interest_Rate_Adjusted = 1.2
+				}
+				add_to_array = { currentInterestRateCalc = Interest_Rate_Adjusted }
+
+				set_variable = { max_index = 3 }
+				set_variable = { current_index = 0 }			
+			}
+			Open_Banque_Paris_click = {
+				set_variable = { show_loan_screen = 1 }
+				BNP = {
+					save_global_event_target_as = this_loan_country
+				}
+				set_variable = {
+					bank_name_prompt = 3
+				}
+				set_variable = { purchase_amount = 0 }
+				set_variable = { CurrentMaxBorrowable = ParisMaxBorrowable }
+				clear_array = purchase_length
+				add_to_array = { purchase_length = 5 }
+
+				clear_array = currentInterestRateCalc
+				add_to_array = { currentInterestRateCalc = ParisCurrentInterestRate }
+
+				set_variable = { max_index = 0 }
+				set_variable = { current_index = 0 }			
+
+			}
+			Open_Barclays_click = {
+				set_variable = { show_loan_screen = 1 }
+				BRC = {
+					save_global_event_target_as = this_loan_country
+				}
+				set_variable = {
+					bank_name_prompt = 4
+				}
+				set_variable = { purchase_amount = 0 }
+				set_variable = { CurrentMaxBorrowable = BarclaysMaxBorrowable }
+				clear_array = purchase_length
+				add_to_array = { purchase_length = 5 }
+
+				clear_array = currentInterestRateCalc
+				add_to_array = { currentInterestRateCalc = BarclaysCurrentInterestRate }
+
+				set_variable = { max_index = 0 }
+				set_variable = { current_index = 0 }	
+			}
+			Open_Chiyoda_click = {
+				set_variable = { show_loan_screen = 1 }
+				CHY = {
+					save_global_event_target_as = this_loan_country
+				}
+				set_variable = {
+					bank_name_prompt = 5
+				}
+				set_variable = { purchase_amount = 0 }
+				set_variable = { CurrentMaxBorrowable = MitsubishiMaxBorrowable }
+				clear_array = purchase_length
+				add_to_array = { purchase_length = 5 }
+
+				clear_array = currentInterestRateCalc
+				add_to_array = { currentInterestRateCalc = MitsubishiCurrentInterestRate }
+
+				set_variable = { max_index = 0 }
+				set_variable = { current_index = 0 }	
+			}
+			Open_Suisse_click = {
+				set_variable = { show_loan_screen = 1 }
+				SKA = {
+					save_global_event_target_as = this_loan_country
+				}
+				set_variable = {
+					bank_name_prompt = 6
+				}
+				set_variable = { purchase_amount = 0 }
+				set_variable = { CurrentMaxBorrowable = SuisseMaxBorrowable }
+				clear_array = purchase_length
+				add_to_array = { purchase_length = 5 }
+
+				clear_array = currentInterestRateCalc
+				add_to_array = { currentInterestRateCalc = SuisseCurrentInterestRate }
+
+				set_variable = { max_index = 0 }
+				set_variable = { current_index = 0 }	
+			}
+			Open_Deustche_click = {
+				set_variable = { show_loan_screen = 1 }
+				DBA = {
+					save_global_event_target_as = this_loan_country
+				}
+				set_variable = {
+					bank_name_prompt = 7
+				}
+				set_variable = { purchase_amount = 0 }
+				set_variable = { CurrentMaxBorrowable = DeutscheMaxBorrowable }
+				clear_array = purchase_length
+				add_to_array = { purchase_length = 5 }
+
+				clear_array = currentInterestRateCalc
+				add_to_array = { currentInterestRateCalc = DeutscheCurrentInterestRate }
+
+				set_variable = { max_index = 0 }
+				set_variable = { current_index = 0 }	
+			}
+			Open_Morgan_click = {
+				set_variable = { show_loan_screen = 1 }
+				JPM = {
+					save_global_event_target_as = this_loan_country
+				}
+				set_variable = {
+					bank_name_prompt = 8
+				}
+				set_variable = { purchase_amount = 0 }
+				set_variable = { CurrentMaxBorrowable = MorganMaxBorrowable }
+				clear_array = purchase_length
+				add_to_array = { purchase_length = 5 }
+
+				clear_array = currentInterestRateCalc
+				add_to_array = { currentInterestRateCalc = MorganCurrentInterestRate }
+
+				set_variable = { max_index = 0 }
+				set_variable = { current_index = 0 }	
+			}
+			Open_IMF_click = {  
+				set_variable = { show_loan_screen = 1 }
+				GER = {
+					save_global_event_target_as = this_loan_country
+				}
+				set_variable = {
+					bank_name_prompt = 9
+				}
+				set_variable = { purchase_amount = 0 }
+				set_variable = { CurrentMaxBorrowable = IMFMaxBorrowable }
+				clear_array = purchase_length
+				add_to_array = { purchase_length = 1 }
+				add_to_array = { purchase_length = 2 }
+				add_to_array = { purchase_length = 3 }
+				add_to_array = { purchase_length = 4 }
+
+				clear_array = currentInterestRateCalc
+				add_to_array = { currentInterestRateCalc = 7 }
+				add_to_array = { currentInterestRateCalc = 9 }
+				add_to_array = { currentInterestRateCalc = 12 }
+				add_to_array = { currentInterestRateCalc = 15 }
+
+				set_variable = { max_index = 3 }
+				set_variable = { current_index = 0 }	
+			}
+			Open_World_Bank_click = {  
+				set_variable = { show_loan_screen = 1 }
+				WBK = {
+					save_global_event_target_as = this_loan_country
+				}
+				
+				set_variable = {
+					bank_name_prompt = 10
+				}
+				set_variable = { purchase_amount = 0 }
+				set_variable = { CurrentMaxBorrowable = WorldMaxBorrowable }
+				clear_array = purchase_length
+				add_to_array = { purchase_length = 5  }
+				add_to_array = { purchase_length = 10 }
+				add_to_array = { purchase_length = 15 }
+				add_to_array = { purchase_length = 20 }
+				add_to_array = { purchase_length = 25 }
+				add_to_array = { purchase_length = 30 }
+				add_to_array = { purchase_length = 35 }
+
+				clear_array = currentInterestRateCalc
+				add_to_array = { currentInterestRateCalc = 1.35 }
+				add_to_array = { currentInterestRateCalc = 1.35 }
+				add_to_array = { currentInterestRateCalc = 1.62 }
+				add_to_array = { currentInterestRateCalc = 1.95 }
+				add_to_array = { currentInterestRateCalc = 2.34 }
+				add_to_array = { currentInterestRateCalc = 2.81 }
+				add_to_array = { currentInterestRateCalc = 3.37 }
+
+				set_variable = { max_index = 6 }
+				set_variable = { current_index = 0 }	
+			}
+            Overview_Button_click = {
+                set_variable = { show_current_overview = 1 }
+                set_variable = { show_current_borrowing = 0 }
+                set_variable = { show_current_loans = 0 }
+				set_variable = { show_current_fiscal = 0 }
+            }
+            Borrowing_Button_click = {
+                set_variable = { show_current_borrowing = 1 }
+                set_variable = { show_current_loans = 0 }
+                set_variable = { show_current_overview = 0 }
+				set_variable = { show_current_fiscal = 0 }
+            }
+			Fiscal_Button_click = {
+                set_variable = { show_current_borrowing = 0 }
+                set_variable = { show_current_loans = 0 }
+                set_variable = { show_current_overview = 0 }
+				set_variable = { show_current_fiscal = 1 }
+				Laffer_Graph_Financial_Tab_Update = yes
+			}
+            Debts_Button_click = {
+                clear_array = currentDebtTotalsArray
+                clear_array = currentDebtPaymentArray
+                clear_array = currentDebtOwnerArray
+                clear_array = currentDebtInterestArray
+                for_each_loop = {
+                    array = debtOwnerArray
+                    index = i
+                    if = {
+                        limit = {
+                            check_variable = {
+                                debtTotalsArray^i > 0
+                            }
+                        }
+                        add_to_array = { currentDebtTotalsArray = debtTotalsArray^i }
+                        add_to_array = { currentDebtPaymentArray = debtPaymentArray^i }
+                        add_to_array = { currentDebtOwnerArray = debtOwnerArray^i }
+						add_to_array = { currentdebtInterestArray = debtInterestArray^i }
+                        #set_variable = {
+                        #    interest_rate_array_adj = debtInterestArray^i
+                        #}
+                        #add_to_variable = {
+                        #    interest_rate_array_adj = -1
+                        #}
+                        #add_to_array = { currentDebtInterestArray = interest_rate_array_adj }
+                    }
+                }
+                set_variable = { show_current_loans = 1 }
+                set_variable = { show_current_borrowing = 0 }
+                set_variable = { show_current_overview = 0 }
+				set_variable = { show_current_fiscal = 0 }
+            }
+        }
+    }
+    Finance_Tab_Current_Loans_Section = {
+        context_type = player_context
+        parent_scripted_gui = "Finance_tab_menu"
+        window_name = "current_loans_grid"
+		visible = {
+			check_variable = { show_current_loans = 1 }
+		}	
+		properties = {
+			country_flag_for_current_loans = {
+				image = "[THIS.GetFlag]"
+			}
+        }
+		dynamic_lists = { 
+			current_debts_listing_grid = {
+				array = currentDebtOwnerArray
+                change_scope = yes
+				entry_container = current_debts_listing_entry
+			}
+        }
+    }
+}
+scripted_gui = {
+	line_graph_sample_scripted_gui = {
+		window_name = "line_graph_sample_gui"
+		context_type = player_context
+        parent_scripted_gui = "Finance_tab_menu"
+
+		effects = {
+			close_button_click = {
+				clr_country_flag = open_line_gui
+			}
+			add_button_click = {
+				# Invoke scripted effect to add a random point to the line
+				# See scripted effect file
+
+				SAMPLE_add_random_point_to_line = yes
+			}
+		}
+
+		# Set up dynamic list to generate one line segment per point
+		dynamic_lists = {
+			line_segments = {
+				array = GDP_graph_offsets
+				change_scope = no
+				entry_container = line_graph_line_segment
+				index = segment_idx
+			}
+		}
+
+		properties = {
+			segment = {
+				# Sets they position of the line segment to the graph offset
+				# Equal to -y1
+				y = GDP_graph_offsets^segment_idx
+
+				# Tells the shader how steep to draw the line
+				# Must be equal to (y2 - y1) / 2 + 50
+				frame = GDP_graph_slopes^segment_idx
+			}
+		}
+
+		triggers = {
+			# Optional. This hides every other x label, to give them some breathing room
+			label_visible = {
+				set_temp_variable = { si = segment_idx }
+				modulo_temp_variable = { si = 2 }
+				check_variable = { si = 0 }
+			}
+		}
+	}
+}
+scripted_gui = {
+	line_graph_income_scripted_gui = {
+		window_name = "line_graph_income_gui"
+		context_type = player_context
+        parent_scripted_gui = "Finance_tab_menu"
+		visible = {
+            check_variable = { show_current_overview = 1 }
+		}	
+		# Set up dynamic list to generate one line segment per point
+		dynamic_lists = {
+			line_segments = {
+				array = Income_graph_offsets
+				change_scope = no
+				entry_container = income_line_graph_line_segment
+				index = segment_idx
+			}
+		}
+
+		properties = {
+			segment = {
+				# Sets they position of the line segment to the graph offset
+				# Equal to -y1
+				y = Income_graph_offsets^segment_idx
+
+				# Tells the shader how steep to draw the line
+				# Must be equal to (y2 - y1) / 2 + 50
+				frame = Income_graph_slopes^segment_idx
+			}
+		}
+
+		triggers = {
+			# Optional. This hides every other x label, to give them some breathing room
+			label_visible = {
+				set_temp_variable = { si = segment_idx }
+				modulo_temp_variable = { si = 2 }
+				check_variable = { si = 0 }
+			}
+		}
+	}
+}
+
+scripted_gui = {
+	line_graph_debt_scripted_gui = {
+		window_name = "line_graph_debt_gui"
+		context_type = player_context
+        parent_scripted_gui = "Finance_tab_menu"
+		visible = {
+            
+		}	
+		effects = {
+			close_button_click = {
+				clr_country_flag = open_line_gui
+			}
+			add_button_click = {
+				# Invoke scripted effect to add a random point to the line
+				# See scripted effect file
+
+				SAMPLE_add_random_point_to_line = yes
+			}
+		}
+
+		# Set up dynamic list to generate one line segment per point
+		dynamic_lists = {
+			line_segments = {
+				array = Debt_graph_offsets
+				change_scope = no
+				entry_container = debt_line_graph_line_segment
+				index = segment_idx
+			}
+		}
+
+		properties = {
+			segment = {
+				# Sets they position of the line segment to the graph offset
+				# Equal to -y1
+				y = Debt_graph_offsets^segment_idx
+
+				# Tells the shader how steep to draw the line
+				# Must be equal to (y2 - y1) / 2 + 50
+				frame = Debt_graph_slopes^segment_idx
+			}
+		}
+
+		triggers = {
+			# Optional. This hides every other x label, to give them some breathing room
+			label_visible = {
+				set_temp_variable = { si = segment_idx }
+				modulo_temp_variable = { si = 2 }
+				check_variable = { si = 0 }
+			}
+		}
+	}
+}
+
+scripted_gui = {
+	line_graph_electricity_scripted_gui = {
+		window_name = "line_graph_electricity_gui"
+		context_type = player_context
+        parent_scripted_gui = "Finance_tab_menu"
+		visible = {
+            check_variable = { show_current_overview = 1 }
+		}	
+		# Set up dynamic list to generate one line segment per point
+		dynamic_lists = {
+			line_segments = {
+				array = Electricity_graph_offsets
+				change_scope = no
+				entry_container = electricity_line_graph_line_segment
+				index = segment_idx
+			}
+		}
+
+		properties = {
+			segment = {
+				# Sets they position of the line segment to the graph offset
+				# Equal to -y1
+				y = Electricity_graph_offsets^segment_idx
+
+				# Tells the shader how steep to draw the line
+				# Must be equal to (y2 - y1) / 2 + 50
+				frame = Electricity_graph_slopes^segment_idx
+			}
+		}
+
+		triggers = {
+			# Optional. This hides every other x label, to give them some breathing room
+			label_visible = {
+				set_temp_variable = { si = segment_idx }
+				modulo_temp_variable = { si = 2 }
+				check_variable = { si = 0 }
+			}
+		}
+	}
+}
+scripted_gui = {
+	line_graph_laffer_scripted_gui = {
+		window_name = "line_graph_laffer_gui"
+		context_type = player_context
+        parent_scripted_gui = "Finance_tab_menu"
+		visible = {
+            check_variable = { show_current_fiscal = 1 }
+		}	
+		triggers = {
+			laffer_line_visible = {}
+		}
+		# Set up dynamic list to generate one line segment per point
+		dynamic_lists = {
+			line_segments = {
+				array = Laffer_graph_offsets
+				change_scope = no
+				entry_container = laffer_line_graph_line_segment
+				index = segment_idx
+			}
+		}
+
+		properties = {
+			laffer_line = {
+				x = effective_tax_rate_display
+			}
+			segment = {
+				# Sets they position of the line segment to the graph offset
+				# Equal to -y1
+				y = Laffer_graph_offsets^segment_idx
+
+				# Tells the shader how steep to draw the line
+				# Must be equal to (y2 - y1) / 2 + 50
+				frame = Laffer_graph_slopes^segment_idx
+			}
+		}
+
+		triggers = {
+			# Optional. This hides every other x label, to give them some breathing room
+			label_visible = {
+				set_temp_variable = { si = segment_idx }
+				modulo_temp_variable = { si = 2 }
+				check_variable = { si = 0 }
+			}
+		}
+	}
+}
+
+scripted_gui = {
+	line_graph_food_scripted_gui = {
+		window_name = "food_graph_gui"
+		context_type = player_context
+        parent_scripted_gui = "Finance_tab_menu"
+		visible = {
+            check_variable = { show_current_overview = 1 }
+		}	
+		# Set up dynamic list to generate one line segment per point
+		dynamic_lists = {
+			line_segments = {
+				array = Food_graph_offsets
+				change_scope = no
+				entry_container = food_line_graph_line_segment
+				index = segment_idx
+			}
+		}
+
+		properties = {
+			segment = {
+				# Sets they position of the line segment to the graph offset
+				# Equal to -y1
+				y = Food_graph_offsets^segment_idx
+
+				# Tells the shader how steep to draw the line
+				# Must be equal to (y2 - y1) / 2 + 50
+				frame = Food_graph_slopes^segment_idx
+			}
+		}
+
+		triggers = {
+			# Optional. This hides every other x label, to give them some breathing room
+			label_visible = {
+				set_temp_variable = { si = segment_idx }
+				modulo_temp_variable = { si = 2 }
+				check_variable = { si = 0 }
+			}
+		}
+	}
+
+	finance_topbar_button = {
+		context_type = player_context
+		window_name = "finance_topbar_button"
+		parent_window_name = "after_intel_agency_button"
+		effects = {
+			finance_tab_open_click = {
+				ROOT = {
+					set_temp_variable = { show = 1 }
+					subtract_from_temp_variable = { show = show_finance }
+					close_all_windows = yes
+					set_variable = { show_finance = show }
+					var:sphere_leader = {
+						save_global_event_target_as = local_sphere_leader
+					}		
+				}
+			}	
+		}
+	}
+}

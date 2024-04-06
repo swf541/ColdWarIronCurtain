@@ -1,4 +1,117 @@
 # coded by Harain
+calculate_mission_time = {
+	set_variable = { root.confirmed_time_part_1 = root.calculated_phase_1 }
+	round_variable = root.confirmed_time_part_1
+	set_variable = { root.confirmed_time_part_2 = root.calculated_phase_2 }
+	multiply_variable = { root.confirmed_time_part_2 = 0.5 }
+	round_variable = root.confirmed_time_part_2
+	set_variable = { root.confirmed_time_part_3 = root.calculated_phase_2 }
+	multiply_variable = { root.confirmed_time_part_3 = 0.5 }
+	round_variable = root.confirmed_time_part_3
+}
+calculate_risk = {
+	set_variable = { root.confirmed_risk_1 = root.calculated_risk }
+	set_variable = { root.confirmed_risk_2 = 1 }
+	subtract_from_variable = { root.confirmed_risk_2 = root.calculated_risk  }
+	multiply_variable = { root.confirmed_risk_1 = 100 }
+	multiply_variable = { root.confirmed_risk_2 = 100 }
+	round_variable = root.confirmed_risk_2
+	round_variable = root.confirmed_risk_1
+}
+
+calculate_space_effect = {
+	set_variable = { calculated_range = chosen_vessel_range }
+	add_to_variable = { calculated_range = chosen_mission_range }
+	subtract_from_variable = { calculated_range = chosen_space_craft_range }
+	set_variable = { calculated_cost = chosen_space_craft_c }
+	add_to_variable = { calculated_cost = chosen_mission_c }
+	add_to_variable = { calculated_cost = chosen_vessel_c }
+	set_variable = { calculated_risk = chosen_space_craft_r }
+	add_to_variable = { calculated_risk = chosen_mission_r }
+	subtract_from_variable = { calculated_risk = chosen_vessel_r }
+	clamp_variable = {
+		var = root.calculated_risk
+		min = 0
+		max = 1
+	}
+	set_variable = { calculated_phase_1 = chosen_mission_t }
+	add_to_variable = { calculated_phase_1 = chosen_vessel_t }
+	set_variable = { calculated_phase_2 = chosen_space_craft_t }
+}
+clear_calculated = {
+	clear_variable = calculated_range
+	clear_variable = calculated_risk
+	clear_variable = calculated_cost
+	clear_variable = calculated_phase_1
+	clear_variable = calculated_phase_2
+}
+save_ship = {
+	set_variable = { root.saved_ship = root.selected_spacecraft }
+	set_variable = { root.saved_mission  = root.selected_mission }
+	set_variable = { root.saved_vessel = root.selected_vessel }
+}
+clear_ships = {
+	clear_variable = saved_ship
+	clear_variable = saved_mission
+	clear_variable = saved_vessel
+}
+reset_choices = {
+	clear_variable = mission_blocked
+	clear_variable = chosen_mission_range
+	clear_variable = chosen_mission_r
+	clear_variable = chosen_mission_c
+	clear_variable = chosen_mission_t
+	clear_variable = vessel_type_blocked
+	clear_variable = chosen_vessel_range
+	clear_variable = chosen_vessel_c
+	clear_variable = chosen_vessel_t
+	clear_variable = spacecraft_type_blocked
+	clear_variable = chosen_space_craft_range
+	clear_variable = chosen_space_craft_r
+	clear_variable = chosen_space_craft_c
+	clear_variable = chosen_space_craft_t
+	clear_variable = selected_spacecraft
+	clear_variable = selected_vessel
+	clear_variable = selected_mission
+}
+clear_spacecraft = {
+	set_variable = { spacecraft_tex = 0 }
+	clear_variable = spacecraft_risk
+	clear_variable = spacecraft_cost
+	clear_variable = spacecraft_time
+	clear_variable = spacecraft_breakthrough_chance
+}
+refresh_space_gui = {
+	if = {
+		limit = {
+			check_variable = { ROOT.refresh_space_race_main = 1 }
+		}
+		set_variable = { ROOT.refresh_space_race_main = 0 }
+	}
+	else = {
+		set_variable = { ROOT.refresh_space_race_main = 1 }
+	}
+}
+clear_mission = {
+	set_variable = { mission_tex = 0 }
+	clear_variable = mission_risk
+	clear_variable = mission_cost
+	clear_variable = mission_time
+	clear_variable = mission_breakthrough_chance
+}
+clear_vessel = {
+	set_variable = { vessel_tex = 0 }
+	clear_variable = vessel_risk
+	clear_variable = vessel_cost
+	clear_variable = vessel_time
+	clear_variable = vessel_breakthrough_chance
+}
+clear_launchvehicle = {
+	set_variable = { launchvehicle_tex = 0 }
+	clear_variable = launchvehicle_risk
+	clear_variable = launchvehicle_cost
+	clear_variable = launchvehicle_time
+}
 space_race_get_top_5 = {
 	clear_array = global.top_space_race_array_country
 	clear_array = global.top_space_race_array_num_decisions
@@ -124,5 +237,896 @@ space_race_get_top_5 = {
 		add_to_array = { global.top_space_race_array_country = global.space_race_array_country^temp_max_country_index }
 		add_to_array = { global.top_space_race_array_num_decisions = global.space_race_array_num_decisions^temp_max_country_index }
 		log = "    5th Country: [?global.top_space_race_array_country^4.GetTag] - Missions: [?global.top_space_race_array_num_decisions^4]"
+	}
+}
+
+
+#Space Research Stuff by Swf
+research_space_tech_launch = {
+	subtract_from_variable = {
+		space_tech_being_researched_year_modifier = global.year
+	}
+	add_to_variable = {
+		space_tech_being_researched_year_modifier = 1
+	}
+	set_variable = {
+		test_research_speed = space_tech_being_researched_year_modifier
+	}
+	if = {
+		limit = {
+			check_variable = {
+				space_tech_being_researched_year_modifier < 1
+			}
+			check_variable = {
+				space_tech_being_researched_year_modifier > 0
+			}
+		}
+		set_variable = {
+			space_tech_being_researched_year_modifier = 0
+		}
+		add_to_variable = {
+			space_tech_being_researched_year_modifier = 219
+		}
+
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				space_tech_being_researched_year_modifier < 0
+			}
+		}
+		multiply_variable = {
+			space_tech_being_researched_year_modifier = 0.10
+		}
+		set_variable = {
+			test_three_for_space = space_tech_being_researched_year_modifier
+		}
+		multiply_variable = {
+			space_tech_being_researched_year_modifier = 219
+		}
+		add_to_variable = {
+			space_tech_being_researched_year_modifier = 219
+		}
+	}
+	else = {
+		divide_variable = {
+			space_tech_being_researched_year_modifier = 2
+		}
+		multiply_variable = {
+			space_tech_being_researched_year_modifier = 219
+		}
+		add_to_variable = {
+			space_tech_being_researched_year_modifier = 219
+		}
+	}
+
+}
+research_space_tech_budget_calculation = {
+	set_variable = { show_space_tech_category_id = 0 }
+	set_variable = {
+		space_research_budget_modifier = currentbudget
+	}
+	multiply_variable = {
+		space_research_budget_modifier = 2
+	}
+	divide_variable = {
+		space_research_budget_modifier = 100
+	}
+	if = {
+		limit = {
+			check_variable = {
+				space_research_budget_modifier < 1
+			}
+		}
+		subtract_from_variable = {
+			space_research_budget_modifier = 1
+		}
+		multiply_variable = {
+			space_research_budget_modifier = -1
+		}
+		add_to_variable = {
+			space_research_budget_modifier = 1
+		}
+		multiply_variable = {
+			space_tech_being_researched_year_modifier = space_research_budget_modifier
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				space_research_budget_modifier > 1
+			}	
+		}
+		add_to_variable = {
+			space_research_budget_modifier = -1
+		}
+		divide_variable = {
+			space_research_budget_modifier = 2
+		}
+		set_variable = {
+			space_tech_being_researched_year_modifier_calc = space_tech_being_researched_year_modifier
+		}
+		multiply_variable = {
+			space_tech_being_researched_year_modifier_calc = space_research_budget_modifier
+		}
+		subtract_from_variable = {
+			space_tech_being_researched_year_modifier = space_tech_being_researched_year_modifier_calc
+		}
+	}
+}
+
+get_space_budget_max = {
+	set_variable = {
+		space_budget_cap = amount_research_slots
+	}
+	multiply_variable = {
+		space_budget_cap = 10
+	}
+	set_variable = {
+		space_budget_cap_shift = space_budget_cap
+	}
+	subtract_from_variable = {
+		space_budget_cap_shift = 9
+	}
+}
+
+space_research_completed = {
+	if = {
+		limit = {
+			check_variable = {
+				space_tech_being_researched_category = 1
+			}
+		}
+		add_to_array = {
+			structural_components_researched = space_tech_being_researched
+		}
+		if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 1 }
+			}
+			enable_wood_metal_frame_material = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 2 }
+			}
+			enable_2_4_meter_vessels = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 3 }
+			}
+			enable_stainless_steel_material = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 4 }
+			}
+			enable_continuous_pressurization_optimization = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 5 }
+			}
+			enable_4_8_meter_vessels = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 6 }
+			}
+			enable_common_bulkhead_material = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 7 }
+			}
+			enable_balloon_tanks_optimization = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 8 }
+			}
+			enable_8_12_meter_vessels = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 9 }
+			}
+			enable_advanced_plumbing_optimization = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 10 }
+			}
+			enable_anti_slosh_baffles_optimization = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 11 }
+			}
+			enable_12_16_meter_vessel = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 12 }
+			}
+			enable_titanium_material = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 13 }
+			}
+			enable_pressure_vessel_temperature_control_optimization = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 14 }
+			}
+			enable_16_24_meter_vessels = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 15 }
+			}
+			enable_carbon_fiber_composite_material = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 16 }
+			}
+			enable_external_fuel_tanks_optimization = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 17 }
+			}
+			enable_24_30_meter_vessels = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 18 }
+			}
+			enable_aluminium_lithium_alloys_material = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 19 }
+			}
+			enable_carbon_fiber_segments_optimization = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 20 }
+			}
+			enable_super_lightweight_tanks_optimization = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 21 }
+			}
+			enable_helium_pressurization_optimization = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 1 }
+				check_variable = { space_tech_being_researched = 22 }
+			}
+			enable_orbital_construction_optimization = yes
+		}
+		else = { }
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				space_tech_being_researched_category = 2	#Power
+			}
+		}	
+		add_to_array = {
+			power_components_researched = space_tech_being_researched
+		}
+		if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 2 }
+				check_variable = { space_tech_being_researched = 1 }
+			}
+			enable_mercuric_oxide_power = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 2 }
+				check_variable = { space_tech_being_researched = 2 }
+			}
+			enable_nickel_cadium_power = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 2 }
+				check_variable = { space_tech_being_researched = 3 }
+			}
+			enable_hydrogen_oxygen_power = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 2 }
+				check_variable = { space_tech_being_researched = 4 }
+			}
+			enable_radiostope_power = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 2 }
+				check_variable = { space_tech_being_researched = 5 }
+			}
+			enable_solar_panels_power = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 2 }
+				check_variable = { space_tech_being_researched = 6 }
+			}
+			enable_tracking_solar_panels_power = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 2 }
+				check_variable = { space_tech_being_researched = 7 }
+			}
+			enable_lithium_ion_power = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 2 }
+				check_variable = { space_tech_being_researched = 8 }
+			}
+			enable_methane_fuel_power = yes
+		}
+		else = { }
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				space_tech_being_researched_category = 3
+			}
+		}	
+		add_to_array = {
+			data_components_researched = space_tech_being_researched
+		}
+		if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 3 }
+				check_variable = { space_tech_being_researched = 1 }
+			}
+			enable_sstv_communication = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 3 }
+				check_variable = { space_tech_being_researched = 2 }
+			}
+			enable_geosynchronous_relay_communication = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 3 }
+				check_variable = { space_tech_being_researched = 3 }
+			}
+			enable_broadband_internet_communication = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 3 }
+				check_variable = { space_tech_being_researched = 4 }
+			}
+			enable_microwave_communication = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 3 }
+				check_variable = { space_tech_being_researched = 5 }
+			}
+			enable_laser_communication = yes
+		}
+		else = { }
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				space_tech_being_researched_category = 4
+			}
+		}	
+		add_to_array = {
+			chemical_propulsion_components_researched = space_tech_being_researched
+		}
+		#1-8
+		if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 4 }
+				check_variable = { space_tech_being_researched = 1 }
+			}
+			enable_liquid_propellants_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 4 }
+				check_variable = { space_tech_being_researched = 2 }
+			}
+			enable_hybrid_propellants_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 4 }
+				check_variable = { space_tech_being_researched = 3 }
+			}
+			enable_solid_propellants_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 4 }
+				check_variable = { space_tech_being_researched = 4 }
+			}
+			enable_cryogenic_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 4 }
+				check_variable = { space_tech_being_researched = 5 }
+			}
+			enable_duel_mode_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 4 }
+				check_variable = { space_tech_being_researched = 6 }
+			}
+			enable_tripropellent_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 4 }
+				check_variable = { space_tech_being_researched = 7 }
+			}
+			enable_variable_thrust_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 4 }
+				check_variable = { space_tech_being_researched = 8 }
+			}
+			enable_precooled_propulsion = yes
+		}
+		else = { }
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				space_tech_being_researched_category = 5
+			}
+		}	
+		add_to_array = {
+			electricity_propulsion_components_researched = space_tech_being_researched
+		}
+		#1-13
+		if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 2 }
+			}
+			enable_pulsed_plasma_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 3 }
+			}
+			enable_pulsed_inductive_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 4 }
+			}
+			enable_magnetoplasmadynamic_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 5 }
+			}
+			enable_variable_specific_impulse_magnetoplasma_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 6 }
+			}
+			enable_gridded_ion_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 7 }
+			}
+			enable_hall_effect_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 8 }
+			}
+			enable_advanced_gridded_ion_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 9 }
+			}
+			enable_field_emission_electric_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 10 }
+			}
+			enable_resistojet_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 11 }
+			}
+			enable_arcjet_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 12 }
+			}
+			enable_wakefield_electron_beam_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 5 }
+				check_variable = { space_tech_being_researched = 13 }
+			}
+			enable_microwave_propulsion = yes
+		}
+		else = { }
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				space_tech_being_researched_category = 6
+			}
+		}	
+		add_to_array = {
+			nuclear_propulsion_components_researched = space_tech_being_researched
+		}
+		#1-14
+		if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 2 }
+			}
+			enable_solid_core_nuclear_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 3 }
+			}
+			enable_bimodal_reactor_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 4 }
+			}
+			enable_pebble_bed_solid_core_nuclear_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 5 }
+			}
+			enable_liquid_core_nuclear_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 6 }
+			}
+			enable_vapor_core_nuclear_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 7 }
+			}
+			enable_closed_cycle_nuclear_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 8 }
+			}
+			enable_open_cycle_nuclear_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 9 }
+			}
+			enable_fission_fragment_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 10 }
+			}
+			enable_dusty_plasma_fission_fragment_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 11 }
+			}
+			enable_nuclear_pulse_propulsion = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 12 }
+			}
+			
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 13 }
+			}
+			enable_inertial_confinement_fusion_pulse = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = { space_tech_being_researched_category = 6 }
+				check_variable = { space_tech_being_researched = 14 }
+			}
+			enable_nuclear_pulse_sail_propulsion = yes
+		}
+		else = { }
+	}
+	else = { }
+}
+
+#Estimates for tooltips
+get_structural_tech_research_estimates = {
+    clear_array = currentspacetechdaystoresearch
+    for_each_loop = {
+        array = global.structural_components_year
+		set_variable = {
+			space_research_estimate_year = global.structural_components_year^i
+		}
+
+        research_space_tech_estimate_power = yes
+        research_space_tech_estimate_budget_power = yes
+
+        add_to_array ={
+            currentspacetechdaystoresearch = space_tech_being_researched_year_modifier
+        } 
+    }
+}
+get_data_tech_research_estimates = {
+    clear_array = currentspacetechdaystoresearch
+    for_each_loop = {
+        array = global.data_components_year
+		set_variable = {
+			space_research_estimate_year = global.data_components_year^i
+		}
+
+        research_space_tech_estimate_power = yes
+        research_space_tech_estimate_budget_power = yes
+
+        add_to_array ={
+            currentspacetechdaystoresearch = space_tech_being_researched_year_modifier
+        } 
+    }
+}
+get_chemical_propulsion_tech_research_estimates = {
+    clear_array = currentspacetechdaystoresearch
+    for_each_loop = {
+        array = global.chemical_propulsion_components_year
+		set_variable = {
+			space_research_estimate_year = global.chemical_propulsion_components_year^i
+		}
+
+        research_space_tech_estimate_power = yes
+        research_space_tech_estimate_budget_power = yes
+
+        add_to_array ={
+            currentspacetechdaystoresearch = space_tech_being_researched_year_modifier
+        } 
+    }
+}
+get_nuclear_propulsion_tech_research_estimates = {
+    clear_array = currentspacetechdaystoresearch
+    for_each_loop = {
+        array = global.nuclear_propulsion_components_year
+		set_variable = {
+			space_research_estimate_year = global.nuclear_propulsion_components_year^i
+		}
+
+        research_space_tech_estimate_power = yes
+        research_space_tech_estimate_budget_power = yes
+
+        add_to_array ={
+            currentspacetechdaystoresearch = space_tech_being_researched_year_modifier
+        } 
+    }
+}
+get_electricity_propulsion_tech_research_estimates = {
+    clear_array = currentspacetechdaystoresearch
+    for_each_loop = {
+        array = global.electricity_propulsion_components_year
+		set_variable = {
+			space_research_estimate_year = global.electricity_propulsion_components_year^i
+		}
+
+        research_space_tech_estimate_power = yes
+        research_space_tech_estimate_budget_power = yes
+
+        add_to_array ={
+            currentspacetechdaystoresearch = space_tech_being_researched_year_modifier
+        } 
+    }
+}
+get_power_tech_research_estimates = {
+    clear_array = currentspacetechdaystoresearch
+    for_each_loop = {
+        array = global.power_components_year
+		set_variable = {
+			space_research_estimate_year = global.power_components_year^i
+		}
+
+        research_space_tech_estimate_power = yes
+        research_space_tech_estimate_budget_power = yes
+
+        add_to_array ={
+            currentspacetechdaystoresearch = space_tech_being_researched_year_modifier
+        } 
+    }
+}
+research_space_tech_estimate_power = {
+    set_variable = {
+        space_tech_being_researched_year_modifier = space_research_estimate_year
+    }
+	subtract_from_variable = {
+		space_tech_being_researched_year_modifier = global.year
+	}
+	add_to_variable = {
+		space_tech_being_researched_year_modifier = 1
+	}
+	set_variable = {
+		test_research_speed = space_tech_being_researched_year_modifier
+	}
+	if = {
+		limit = {
+			check_variable = {
+				space_tech_being_researched_year_modifier < 1
+			}
+			check_variable = {
+				space_tech_being_researched_year_modifier > 0
+			}
+		}
+		set_variable = {
+			space_tech_being_researched_year_modifier = 0
+		}
+		add_to_variable = {
+			space_tech_being_researched_year_modifier = 219
+		}
+
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				space_tech_being_researched_year_modifier < 0
+			}
+		}
+		multiply_variable = {
+			space_tech_being_researched_year_modifier = 0.10
+		}
+		set_variable = {
+			test_three_for_space = space_tech_being_researched_year_modifier
+		}
+		multiply_variable = {
+			space_tech_being_researched_year_modifier = 219
+		}
+		add_to_variable = {
+			space_tech_being_researched_year_modifier = 219
+		}
+	}
+	else = {
+		divide_variable = {
+			space_tech_being_researched_year_modifier = 2
+		}
+		multiply_variable = {
+			space_tech_being_researched_year_modifier = 219
+		}
+		add_to_variable = {
+			space_tech_being_researched_year_modifier = 219
+		}
+	}
+
+}
+research_space_tech_estimate_budget_power = {
+	set_variable = {
+		space_research_budget_modifier = currentbudget
+	}
+	multiply_variable = {
+		space_research_budget_modifier = 2
+	}
+	divide_variable = {
+		space_research_budget_modifier = 100
+	}
+	if = {
+		limit = {
+			check_variable = {
+				space_research_budget_modifier < 1
+			}
+		}
+		subtract_from_variable = {
+			space_research_budget_modifier = 1
+		}
+		multiply_variable = {
+			space_research_budget_modifier = -1
+		}
+		add_to_variable = {
+			space_research_budget_modifier = 1
+		}
+		multiply_variable = {
+			space_tech_being_researched_year_modifier = space_research_budget_modifier
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				space_research_budget_modifier > 1
+			}	
+		}
+		add_to_variable = {
+			space_research_budget_modifier = -1
+		}
+		divide_variable = {
+			space_research_budget_modifier = 2
+		}
+		set_variable = {
+			space_tech_being_researched_year_modifier_calc = space_tech_being_researched_year_modifier
+		}
+		multiply_variable = {
+			space_tech_being_researched_year_modifier_calc = space_research_budget_modifier
+		}
+		subtract_from_variable = {
+			space_tech_being_researched_year_modifier = space_tech_being_researched_year_modifier_calc
+		}
 	}
 }

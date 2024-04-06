@@ -3,15 +3,6 @@
 
 # this creates a pie chart of popularities - can be easily adapted to show anything that adds up to 100%
 create_pie_chart = {
-	clear_array = pie_chart
-	resize_array = {
-		array = pie_chart
-		value = 1 # 1 is value for neutrality frame, so we don't have to make a loop for it
-		size = 100 # 100 pieces, each percent is one piece
-	}
-		#yellow_frame
-		#red_frame
-		#gura_chart_frame
 	set_temp_variable = { industrial_pop = IND_DISPLAY }
 	add_to_temp_variable = { industrial_pop = refinery_total }
 	add_to_temp_variable = { industrial_pop = DOCK_TOTAL }	
@@ -25,27 +16,63 @@ create_pie_chart = {
 	add_to_temp_variable = { services_pop = tourism_infrastructure_total }
 	add_to_temp_variable = { services_pop = resource_income }
 	set_variable = { services_gui_total = services_pop }
-	
-	set_temp_variable = {total_pie_1 = tax_gui_total }
-	add_to_temp_variable = { total_pie_1 = agricultural_pop }
-	add_to_temp_variable = { total_pie_1 = industrial_pop }
-	add_to_temp_variable = { total_pie_1 = services_pop }
-	divide_temp_variable = { tax_gui_total = total_pie_1 }
-	divide_temp_variable = { agricultural_pop = total_pie_1 }
-	divide_temp_variable = { industrial_pop = total_pie_1 }
-	divide_temp_variable = { services_pop = total_pie_1 }
-	multiply_temp_variable = { agricultural_pop = 100 } 
-	multiply_temp_variable = { industrial_pop = 100 } 
-	multiply_temp_variable = { tax_gui_total = 100 } 
-	multiply_temp_variable = { services_pop = 100 } 
-	set_temp_variable = {final_pie = tax_gui_total }
-	set_variable = { green_frame = final_pie }
-	add_to_temp_variable = { final_pie = agricultural_pop }
-	set_variable = { red_frame = final_pie }
-	add_to_temp_variable = { final_pie = services_pop }
-	set_variable = { gura_chart_frame = final_pie }
-	add_to_temp_variable = { final_pie = industrial_pop }
-	set_variable = { yellow_frame = final_pie }
+
+    set_variable = { income_display_gui_total = 0 }
+    add_to_variable = { income_display_gui_total = tax_base }
+    add_to_variable = { income_display_gui_total = services_gui_total }
+    add_to_variable = { income_display_gui_total = industry_gui_total }
+    add_to_variable = { income_display_gui_total = FARM_DISPLAY }
+
+    clear_array = 4pie_chart
+	resize_array = {
+		array = 4pie_chart
+		value = 1 # 1 is value for neutrality frame, so we don't have to make a loop for it
+		size = 100 # 100 pieces, each percent is one piece
+	}
+	set_temp_variable = { tax_pop = tax_base }
+	divide_temp_variable = {tax_pop = income_display_gui_total }
+	multiply_temp_variable = { tax_pop = 100 }
+	round_temp_variable = tax_pop`
+
+	set_temp_variable = { services_pop = services_gui_total }
+	divide_temp_variable = {services_pop = income_display_gui_total }
+	multiply_temp_variable = { services_pop = 100 }
+	round_temp_variable = services_pop 
+	set_variable = { ROOT.last_idx = tax_pop }
+	add_to_temp_variable = { services_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = services_pop
+		set_variable = { 4pie_chart^v = 2 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+
+	set_temp_variable = { industry_pop = industry_gui_total }
+	divide_temp_variable = {industry_pop = income_display_gui_total }
+	multiply_temp_variable = { industry_pop = 100 }
+	round_temp_variable = industry_pop
+	add_to_temp_variable = { industry_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = industry_pop
+		set_variable = { 4pie_chart^v = 3 }
+		add_to_variable = { ROOT.last_idx = 1 }
+	}
+
+	set_temp_variable = { farm_pop = FARM_DISPLAY }
+	divide_temp_variable = {farm_pop = income_display_gui_total }
+	multiply_temp_variable = { farm_pop = 100 }
+	round_temp_variable = farm_pop 
+	add_to_temp_variable = { farm_pop = ROOT.last_idx }
+	for_loop_effect = {
+		start = ROOT.last_idx
+		end = farm_pop
+		set_variable = { 4pie_chart^v = 4 }
+	}
+
+	clear_variable = ROOT.last_idx
+	add_to_variable = { 4pie_chart_dirty = 1 }
+
 
 	##military chart
 
@@ -108,6 +135,7 @@ create_pie_chart = {
 		value = 1 # 1 is value for neutrality frame, so we don't have to make a loop for it
 		size = 100 # 100 pieces, each percent is one piece
 	}
+
 	set_temp_variable = { military_expenditure = mil_expend }
 	divide_temp_variable = { military_expenditure = totalexp }
 	multiply_temp_variable = { military_expenditure = 100 }

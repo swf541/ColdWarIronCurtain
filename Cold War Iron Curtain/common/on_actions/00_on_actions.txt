@@ -1,4 +1,107 @@
 on_actions = {
+	on_monthly = {
+		effect = {
+			monthly_education_pulse = yes
+			#gdp_calculation_effect = yes
+			if = {
+				limit = {
+					is_ai = no
+				}
+				GDP_Graph_Financial_Tab_Update = yes
+				GDP_Debt_Graph_Financial_Tab_Update = yes
+				Food_Graph_Financial_Tab_Update = yes
+				Income_Graph_Financial_Tab_Update = yes
+				Electricity_Graph_Financial_Tab_Update = yes
+			}
+			add_to_variable = {
+				Current_Month = 1
+			}
+			add_to_variable = {
+				month_counter = 1
+			}
+			if = {	#Reset to January after December
+				limit = {
+					check_variable = {
+						Current_Month > 12
+					}
+				}
+				set_variable = {
+					Current_Month = 1
+				}
+				#GDP YOY
+				set_variable = {
+					yoy_change_gdp = grossdomesticproduct
+				}
+				subtract_from_variable = {
+					yoy_change_gdp = last_year_gdp
+				}
+				set_variable = {
+					last_year_gdp = grossdomesticproduct
+				}
+				#GDP-Debt YOY
+				set_variable = {
+					yoy_change_debt = GDP_Debt_Ratio
+				}
+				subtract_from_variable = {
+					yoy_change_debt = last_year_debt
+				}
+				set_variable = {
+					last_year_debt = GDP_Debt_Ratio
+				}
+				#Food YOY
+				set_variable = {
+					yoy_change_food = FoodBalanceTotal
+				}
+				subtract_from_variable = {
+					yoy_change_food = last_year_food
+				}
+				set_variable = {
+					last_year_food = FoodBalanceTotal
+				}
+				#Electricity YOY
+				set_variable = {
+					yoy_change_electricty = resource@electricity
+				}
+				subtract_from_variable = {
+					yoy_change_electricty = last_year_electricty
+				}
+				set_variable = {
+					last_year_electricty = resource@electricity
+				}
+				#Balance YOY
+				set_variable = {
+					yoy_change_balance = IncomeCheck
+				}
+				subtract_from_variable = {
+					yoy_change_balance = last_year_balance
+				}
+				set_variable = {
+					last_year_balance = IncomeCheck
+				}
+			}
+			add_to_array = {
+				Month_Label = Current_Month
+			}
+			if = {	#keeps in balance
+				limit = {
+					check_variable = { month_counter > 20 }
+				}
+				remove_from_array = { array = Month_Label index = 0 }
+			}
+
+			#ENG = {
+			#	calculate_div_limit = yes
+			#	if = {
+			#		limit = {
+			#			has_completed_focus = UK_60s_Amalgamate_Our_Regiments
+			#			check_variable = { div_limit < num_divisions }
+			#		}
+			#		add_ideas = ENG_div_limit_exceededz
+			#		country_event = ENG_event.23
+			#	}
+			#}
+		}
+	}
 	# country 
 	on_new_term_election = {
 		random_events = {
@@ -46,20 +149,6 @@ on_actions = {
 			100 = mex.2
 		}
 		random_events = {
-			100 = wgr.2500
-			100 = wgr.200
-			100 = wgr.201
-			100 = wgr.202
-			100 = wgr.204
-			100 = wgr.205
-			100 = wgr.206
-			100 = wgr.207
-			100 = wgr.208
-			100 = wgr.209
-			100 = wgr.210
-			100 = wgr.211
-		}
-		random_events = {
 			100 = ita.200
 			100 = ita.250
 			100 = ita.201
@@ -76,17 +165,6 @@ on_actions = {
 			100 = fin.204
 			100 = fin.205
 			100 = fin.206
-		}
-		random_events = {
-			100 = japan_elections.1
-			100 = japan_elections.2
-			100 = japan_elections.3
-			100 = japan_elections.4	
-		}
-		random_events = {
-			100 = KOR_Elections.1963
-			100 = KOR_Elections.1967
-			100 = KOR_Elections.1971
 		}
 		random_events = {
 			100 = cw_saf.1
@@ -212,17 +290,26 @@ on_actions = {
 	}
 	on_leave_faction = {
 		effect = {
-			FROM = {
-				add_opinion_modifier = {
-					modifier = faction_traitor
-					target = ROOT
-					days = 365
+			if = {
+				limit = {
+					NOT = {
+						FROM = {
+							original_tag = VIE
+						}
+					}
 				}
-			
-				add_opinion_modifier = {
-					modifier = faction_traitor_trade
-					target = ROOT
-					days = 365
+				FROM = {
+					add_opinion_modifier = {
+						modifier = faction_traitor
+						target = ROOT
+						days = 365
+					}
+				
+					add_opinion_modifier = {
+						modifier = faction_traitor_trade
+						target = ROOT
+						days = 365
+					}
 				}
 			}
 			if = {
@@ -304,6 +391,7 @@ on_actions = {
 							is_subject = yes
 							OVERLORD = { has_idea = nato_member }
 							has_civil_war = no # check if this is a NATO puppet's civil war
+							NOT = { original_tag = VIE } # prevents VIE from calling FRA into their shenanigans
 						}
 					}
 				}
@@ -341,6 +429,18 @@ on_actions = {
 	#ROOT is new controller #FROM is old controller #FROM.FROM is state ID
 	on_state_control_changed = {
 		effect = {
+			if = {
+				limit = {
+					FROM.FROM = {
+						state = 336
+					}
+					ROOT = {
+						tag = MLA
+					}
+					has_global_flag = MAL_EMERGENCY_MLA_Victory
+				}
+				MLA = { country_event = MLA.0 }
+			}
 			if = {
 				limit = {
 					FROM.FROM = {
@@ -650,11 +750,37 @@ on_actions = {
 	#FROM is the state nuked
 	on_nuke_drop = {
 		effect = {
-			if = { limit = { NOT = { has_global_flag = wmd_first_nuke } } #First Nuke
+			if = { 
+				limit = {
+					FROM = {
+						is_core_of = USA 
+					}
+					USA = {
+						has_country_flag = SDI_suceed
+					}
+				} 
+				#news_event SDI sucessful shootdown	
+			}
+			if = {
+				limit = {
+					NOT = {
+						has_global_flag = wmd_first_nuke
+					} 
+				} #First Nuke
 				set_global_flag = wmd_first_nuke
 				news_event = nuke_dropped.1
 			}
-			if = { limit = { FROM = { state = 529 } NOT = { has_global_flag = hiroshima_nuked } } news_event = nuke_dropped.2 } #Hiroshima
+			if = { 
+				limit = { 
+					FROM = {
+						state = 529 
+					} 
+					NOT = { 
+						has_global_flag = hiroshima_nuked 
+					} 
+				} 
+				news_event = nuke_dropped.2
+			} #Hiroshima
 			else_if = { limit = { FROM = { state = 528 } NOT = { has_global_flag = nagasaki_nuked } } news_event = nuke_dropped.3 } #Nagasaki
 			else_if = { limit = { FROM = { state = 742 } NOT = { has_global_flag = berlin_nuked } } news_event = nuke_dropped.4 } #West Berlin
 			else_if = { limit = { FROM = { state = 744 } NOT = { has_global_flag = berlin_nuked } } news_event = nuke_dropped.4 } #East Berlin
@@ -711,12 +837,338 @@ on_actions = {
 	#Not run on a specific country.
 	on_startup = {
 		effect = {
+			SOV = {
+				init_russian_duma_seat_placement = yes
+			}
+			#SOV = {
+			#	#Policy test
+			#	set_variable = { corporate_startup_rate = 5 }
+			#	startup_spending_and_tax_loops = yes
+			#}
+			#Central America Corporate GUI
+			BLZ = {
+				set_variable = { United_Fruit_Company_Control = 7 }
+				set_variable = { Standard_Fruit_Company_Control = 3 }
+				set_variable = { American_Support = 0 }	#Irrelevant
+				set_variable = { Domestic_Control = 90 }
+				set_variable = { British_Support = 100 }
+				set_variable = { LATAM_POL_SYSTEM = 6 }
+				set_variable = { LATAM_COM_THREAT_LEVEL = 1 }
+			}
+			GUA = {
+				set_variable = { United_Fruit_Company_Control = 85 }
+				set_variable = { Standard_Fruit_Company_Control = 15 }
+				set_variable = { American_Support = 55 }
+				set_variable = { Domestic_Control = 0 }
+				set_variable = { LATAM_POL_SYSTEM = 1 }
+				set_variable = { LATAM_COM_THREAT_LEVEL = 3 }
+			}
+			HON = {
+				set_variable = { United_Fruit_Company_Control = 40 }
+				set_variable = { Standard_Fruit_Company_Control = 60 }
+				set_variable = { American_Support = 90 }
+				set_variable = { Domestic_Control = 0 }
+				set_variable = { LATAM_POL_SYSTEM = 1 }
+				set_variable = { LATAM_COM_THREAT_LEVEL = 1 }
+			}
+			ELS = {
+				set_variable = { United_Fruit_Company_Control = 35 }
+				set_variable = { Standard_Fruit_Company_Control = 65 }
+				set_variable = { American_Support = 85 }
+				set_variable = { Domestic_Control = 0 }
+				set_variable = { LATAM_POL_SYSTEM = 3 }
+				set_variable = { LATAM_COM_THREAT_LEVEL = 1 }
+			}
+			NIC = {
+				set_variable = { United_Fruit_Company_Control = 80 }
+				set_variable = { Standard_Fruit_Company_Control = 20 }
+				set_variable = { American_Support = 100 }
+				set_variable = { Domestic_Control = 0 }
+				set_variable = { LATAM_POL_SYSTEM = 4 }
+				set_variable = { LATAM_COM_THREAT_LEVEL = 1 }
+			}
+			COS = {
+				set_variable = { United_Fruit_Company_Control = 75 }
+				set_variable = { Standard_Fruit_Company_Control = 25 }
+				set_variable = { American_Support = 100 }
+				set_variable = { Domestic_Control = 0 }
+				set_variable = { LATAM_POL_SYSTEM = 2 }
+				set_variable = { LATAM_COM_THREAT_LEVEL = 2 }
+			}
+			PAN = {
+				set_variable = { United_Fruit_Company_Control = 80 }
+				set_variable = { Standard_Fruit_Company_Control = 20 }
+				set_variable = { American_Support = 100 }
+				set_variable = { Domestic_Control = 0 }
+				set_variable = { LATAM_POL_SYSTEM = 2 }
+				set_variable = { LATAM_COM_THREAT_LEVEL = 1 }
+			}
+
+			#Espionage Stuff
+			USA = {
+				add_to_array = {
+					black_ops_project_list = 100
+				}
+				add_to_array = {
+					black_ops_project_list = 1
+				}
+				add_to_array = { espionage_paramilitary_operative_type = 2 }
+				add_to_array = { espionage_paramilitary_operative_name_type = USA.id }
+				add_to_array = { espionage_paramilitary_operative_type = 3 }
+				add_to_array = { espionage_paramilitary_operative_name_type = USA.id }
+				add_to_array = { espionage_paramilitary_operative_type = 4 }
+				add_to_array = { espionage_paramilitary_operative_name_type = USA.id }
+				add_to_array = { espionage_paramilitary_operative_type = 5 }
+				add_to_array = { espionage_paramilitary_operative_name_type = USA.id }
+				add_to_array = { espionage_paramilitary_operative_type = 6 }
+				add_to_array = { espionage_paramilitary_operative_name_type = GER.id }
+				add_to_array = { espionage_paramilitary_operative_type = 7 }
+				add_to_array = { espionage_paramilitary_operative_name_type = GER.id }
+				add_to_array = { espionage_paramilitary_operative_type = 8 }
+				add_to_array = { espionage_paramilitary_operative_name_type = ITA.id }
+				add_to_array = { espionage_paramilitary_operative_type = 9 }
+				add_to_array = { espionage_paramilitary_operative_name_type = USA.id }
+				add_to_array = { espionage_paramilitary_operative_type = 10 }
+				add_to_array = { espionage_paramilitary_operative_name_type = USA.id }
+				add_to_array = { espionage_paramilitary_operative_type = 11 }
+				add_to_array = { espionage_paramilitary_operative_name_type = USA.id }
+				add_to_array = { espionage_paramilitary_operative_type = 12 }
+				add_to_array = { espionage_paramilitary_operative_name_type = USA.id }
+				add_to_array = { espionage_paramilitary_operative_type = 13 }
+				add_to_array = { espionage_paramilitary_operative_name_type = USA.id }
+			}
+			SOV = {
+				add_to_array = {
+					black_ops_project_list = 500	#Pacifying Western Ukraine
+				}
+				add_to_array = {
+					black_ops_project_list = 501	#Restoring Order to the Baltics
+				}
+				add_to_array = {
+					black_ops_project_list = 100	#El Generico
+				}
+			}
+			#Add Check for Bookmark 
+
+			#Stuggle Stuff
+			add_to_array = { global.burma_struggle_endings = 1 }	#
+			add_to_array = { global.burma_struggle_endings = 2 }	#
+			add_to_array = { global.burma_struggle_endings = 3 }	#
+			add_to_array = { global.burma_struggle_endings = 4 }	#
+			add_to_array = { global.burma_struggle_endings = 5 }	#
+
+			#Space Techs Setup
+			add_to_array = { global.space_research_categories = 1 } #structural_components
+			add_to_array = { global.space_research_categories = 2 } #propulsion_components
+			add_to_array = { global.space_research_categories = 3 } #power_components
+			add_to_array = { global.space_research_categories = 4 } #data_components
+
+			add_to_array = { global.space_research_propulsion_categories = 1 }	#Chemical
+			add_to_array = { global.space_research_propulsion_categories = 2 }	#Electrical
+			add_to_array = { global.space_research_propulsion_categories = 3 }	#Nuclear
+
+			add_to_array = { global.structural_components_year = 1940 } add_to_array = { global.structural_components = 1 }  #Wood and Metal Vessel Frames
+			add_to_array = { global.structural_components_year = 1945 } add_to_array = { global.structural_components = 2 }  #2-4 Meter Pressure Vessels    #Requires Advanced Rocketry
+			add_to_array = { global.structural_components_year = 1950 } add_to_array = { global.structural_components = 3 }     #Stainless Steel
+			add_to_array = { global.structural_components_year = 1950 } add_to_array = { global.structural_components = 4 }     #Continuous Pressurization  
+			add_to_array = { global.structural_components_year = 1955 } add_to_array = { global.structural_components = 5 }  #4-8 Meter Pressure Vessels    #Requires IRBM I
+			add_to_array = { global.structural_components_year = 1960 } add_to_array = { global.structural_components = 6 }     #Common Bulkhead
+			add_to_array = { global.structural_components_year = 1960 } add_to_array = { global.structural_components = 7 }     #Balloon Tanks
+			add_to_array = { global.structural_components_year = 1965 } add_to_array = { global.structural_components = 8 }  #8-12 Meter Pressure Vessels   #Requires ICBM I
+			add_to_array = { global.structural_components_year = 1970 } add_to_array = { global.structural_components = 9 }     #Advanced Plumbing
+			add_to_array = { global.structural_components_year = 1970 } add_to_array = { global.structural_components = 10 }    #Anti-slosh/vortex baffles
+			add_to_array = { global.structural_components_year = 1975 } add_to_array = { global.structural_components = 11 } #12-16 Meter Pressure Vessels  #Requires ICBM 2
+			add_to_array = { global.structural_components_year = 1980 } add_to_array = { global.structural_components = 12 }    #Titanium Frame Construction
+			add_to_array = { global.structural_components_year = 1980 } add_to_array = { global.structural_components = 13 }    #Pressure Vessel Temperature Control
+			add_to_array = { global.structural_components_year = 1985 } add_to_array = { global.structural_components = 14 } #16-24 Meter Pressure Vessels  #Requires ICBM 3
+			add_to_array = { global.structural_components_year = 1990 } add_to_array = { global.structural_components = 15 }    #Carbon Fiber Composites
+			add_to_array = { global.structural_components_year = 1990 } add_to_array = { global.structural_components = 16 }    #External Fuel Tanks
+			add_to_array = { global.structural_components_year = 1995 } add_to_array = { global.structural_components = 17 } #24-30 Meter Pressure Vessels  #Requires ICBM 4
+			add_to_array = { global.structural_components_year = 2000 } add_to_array = { global.structural_components = 18 }    #Aluminum-Lithium Alloys
+			add_to_array = { global.structural_components_year = 2010 } add_to_array = { global.structural_components = 19 }    #Carbon Fibre Segments
+			add_to_array = { global.structural_components_year = 2000 } add_to_array = { global.structural_components = 20 }    #Super Lightweight Tanks
+			add_to_array = { global.structural_components_year = 2010 } add_to_array = { global.structural_components = 21 }    #Helium Pressurization
+			add_to_array = { global.structural_components_year = 2020 } add_to_array = { global.structural_components = 22 }    #Orbital Ship Construction
+
+			#Requires Advanced Rocketry | Gives Bonuses Towards Ballistic Missile Tech on Completion
+			add_to_array = { global.chemical_propulsion_components_year = 1940 } add_to_array = { global.chemical_propulsion_components = 1 } #Liquid-propellant Rocket
+			add_to_array = { global.chemical_propulsion_components_year = 1945 } add_to_array = { global.chemical_propulsion_components = 2 } #Hybrid Propellant Rocket
+			add_to_array = { global.chemical_propulsion_components_year = 1950 } add_to_array = { global.chemical_propulsion_components = 3 } #Solid-propellant Rocket
+			add_to_array = { global.chemical_propulsion_components_year = 1960 } add_to_array = { global.chemical_propulsion_components = 4 } #Chryogenic Rocket
+			add_to_array = { global.chemical_propulsion_components_year = 1975 } add_to_array = { global.chemical_propulsion_components = 5 } #Dual Mode Propulsion Rocket
+			add_to_array = { global.chemical_propulsion_components_year = 1990 } add_to_array = { global.chemical_propulsion_components = 6 } #Tri-propellant Rockets
+			add_to_array = { global.chemical_propulsion_components_year = 2005 } add_to_array = { global.chemical_propulsion_components = 7 } #Variable Thrust Solid Rocket
+			add_to_array = { global.chemical_propulsion_components_year = 2020 } add_to_array = { global.chemical_propulsion_components = 8 } #Precooled Air-breathing Rocket Engines
+
+			# Requires propulsion_components = 3 } #Solid-propellant Rocket
+			add_to_array = { global.electricity_propulsion_components_year = 1955 } add_to_array = { global.electricity_propulsion_components = 1 }  #Electric Propulsion Theory
+			add_to_array = { global.electricity_propulsion_components_year = 1960 } add_to_array = { global.electricity_propulsion_components = 2 } #Pulsed Plasma Thruster
+			add_to_array = { global.electricity_propulsion_components_year = 1980 } add_to_array = { global.electricity_propulsion_components = 3 } #Pulsed Inductive Thruster
+			add_to_array = { global.electricity_propulsion_components_year = 2000 } add_to_array = { global.electricity_propulsion_components = 4 } #Magnetoplasmadynamic Thruster
+			add_to_array = { global.electricity_propulsion_components_year = 2025 } add_to_array = { global.electricity_propulsion_components = 5 } #VASIMIR
+
+			add_to_array = { global.electricity_propulsion_components_year = 1960 } add_to_array = { global.electricity_propulsion_components = 6 } #Gridded Ion Thruster  #Requires Electric Propulsion Theory
+			add_to_array = { global.electricity_propulsion_components_year = 1970 } add_to_array = { global.electricity_propulsion_components = 7 } #Hall Effect Thruster
+			add_to_array = { global.electricity_propulsion_components_year = 1990 } add_to_array = { global.electricity_propulsion_components = 8 } #Advanced Gridded Ion Thruster
+			add_to_array = { global.electricity_propulsion_components_year = 2025 } add_to_array = { global.electricity_propulsion_components = 9 } #Field-emmission Electric Propulsion
+
+			add_to_array = { global.electricity_propulsion_components_year = 1965 } add_to_array = { global.electricity_propulsion_components = 10 } #Resistojet Thruster   #Requires Electric Propulsion Theory
+			add_to_array = { global.electricity_propulsion_components_year = 1985 } add_to_array = { global.electricity_propulsion_components = 11 } #Arcjet Thruster
+			add_to_array = { global.electricity_propulsion_components_year = 2005 } add_to_array = { global.electricity_propulsion_components = 12 } #Wakefield Electron Beam
+			add_to_array = { global.electricity_propulsion_components_year = 2025 } add_to_array = { global.electricity_propulsion_components = 13 } #Microwave Electrothermal Thruster
+
+			# Requires propulsion_components = 3 } #Solid-propellant Rocket & Small Scale Nuclear Reactor
+			add_to_array = { global.nuclear_propulsion_components_year = 1955 } add_to_array = { global.nuclear_propulsion_components = 1 } #Nuclear Propulsion Theory
+			add_to_array = { global.nuclear_propulsion_components_year = 1965 } add_to_array = { global.nuclear_propulsion_components = 2 } #Solid Core Nuclear Thermal Rocket     #Requires Experimental Nuclear Engines
+			add_to_array = { global.nuclear_propulsion_components_year = 1970 } add_to_array = { global.nuclear_propulsion_components = 3 }    #Bimodal Reactor
+			add_to_array = { global.nuclear_propulsion_components_year = 1975 } add_to_array = { global.nuclear_propulsion_components = 4 } #Pebble Bed Solid Core Nuclear Thermal Rocket #Requires Basic Nuclear Engines
+			add_to_array = { global.nuclear_propulsion_components_year = 1985 } add_to_array = { global.nuclear_propulsion_components = 5 } #Liquid Core Nuclear Thermal Rocket
+			add_to_array = { global.nuclear_propulsion_components_year = 1995 } add_to_array = { global.nuclear_propulsion_components = 6 } #Droplet Core Nuclear Thermal Rocket
+			add_to_array = { global.nuclear_propulsion_components_year = 2005 } add_to_array = { global.nuclear_propulsion_components = 7 } #Vapor Core Nuclear Thermal Rocket
+			add_to_array = { global.nuclear_propulsion_components_year = 2015 } add_to_array = { global.nuclear_propulsion_components = 8 } #Closed Cycle Nuclear Thermal Rocket
+			add_to_array = { global.nuclear_propulsion_components_year = 2025 } add_to_array = { global.nuclear_propulsion_components = 9 } #Open Cycle Nuclear Thermal Rocket
+			# Requires Liquid Core Nuclear Thermal Rocket
+			add_to_array = { global.nuclear_propulsion_components_year = 1990 } add_to_array = { global.nuclear_propulsion_components = 10 } #Fission Fragment
+			add_to_array = { global.nuclear_propulsion_components_year = 2020 } add_to_array = { global.nuclear_propulsion_components = 11 } #Dusty Plasma Fission Fragment
+			# Requires Nuclear Propulsion Theory & Basic Nuclear Engines
+			add_to_array = { global.nuclear_propulsion_components_year = 1960 } add_to_array = { global.nuclear_propulsion_components = 12 } #Nuclear Pulse Propulsion
+			add_to_array = { global.nuclear_propulsion_components_year = 1990 } add_to_array = { global.nuclear_propulsion_components = 13 } #Inertial Confinement Fusion Pulse Propulsion #Requires Fusion Reactor Theory
+			add_to_array = { global.nuclear_propulsion_components_year = 2020 } add_to_array = { global.nuclear_propulsion_components = 14 } #Nuclear Pulse Sail Propulsion #Requires Tokamak Fusion Reactors
+
+			add_to_array = { global.power_components_year = 1940 } add_to_array = { global.power_components = 1 } #Space-rated Mercuric Oxide Batteries
+			add_to_array = { global.power_components_year = 1955 } add_to_array = { global.power_components = 2 } #Space-rated Nickel-Cadmium Batteries
+			add_to_array = { global.power_components_year = 1965 } add_to_array = { global.power_components = 3 } #Hydrogen-Oxygen Fuel Cells
+			add_to_array = { global.power_components_year = 1975 } add_to_array = { global.power_components = 4 } #Radioisotope Thermoelectric Generators
+			add_to_array = { global.power_components_year = 1985 } add_to_array = { global.power_components = 5 } #Solar-Tracking Rotating Panels
+			add_to_array = { global.power_components_year = 1995 } add_to_array = { global.power_components = 6 } #Microwave Power Transmission
+			add_to_array = { global.power_components_year = 2005 } add_to_array = { global.power_components = 7 } #Space-rated Lithium Ion Batteries
+			add_to_array = { global.power_components_year = 2015 } add_to_array = { global.power_components = 8 } #High Density Methane Fuel Cells
+
+			add_to_array = { global.data_components_year = 1940 } add_to_array = { global.data_components = 1 } #Directional Antenna
+			add_to_array = { global.data_components_year = 1960 } add_to_array = { global.data_components = 2 } #SSTV Image Transmission      #Requires Satellite Communication
+			add_to_array = { global.data_components_year = 1980 } add_to_array = { global.data_components = 3 } #Geosynchronous Relay Communication Networks
+			add_to_array = { global.data_components_year = 2000 } add_to_array = { global.data_components = 4 } #Broadband Internet         #Requires The New Internet and 4G LTE
+			add_to_array = { global.data_components_year = 2020 } add_to_array = { global.data_components = 5 } #Laser-Space Communication   #Requires Information Age CE
+
 ######################################################################
 #####################CWIC DEFINES, DO NOT TOUCH#######################
 			#defines version
 			set_variable = { ICDefinesVersion = 37 }
 			#Use [?global.varname] in loc to display them
 			#Use global.varname in scripts to use them
+			#Banking Arrays
+			add_to_array = { global.IMF_Interest_Rate = 7 }
+			add_to_array = { global.IMF_Interest_Rate = 9 }
+			add_to_array = { global.IMF_Interest_Rate = 12 }
+			add_to_array = { global.IMF_Interest_Rate = 15 }
+
+			add_to_array = { global.WBK_Interest_Rate = 1.35 }
+			add_to_array = { global.WBK_Interest_Rate = 1.35 }
+			add_to_array = { global.WBK_Interest_Rate = 1.62 }
+			add_to_array = { global.WBK_Interest_Rate = 1.95 }
+			add_to_array = { global.WBK_Interest_Rate = 2.34 }
+			add_to_array = { global.WBK_Interest_Rate = 2.81 }
+			add_to_array = { global.WBK_Interest_Rate = 3.37 }
+			
+			add_to_array = {
+				global.WBK_Term_Lengths = 5
+			}
+			add_to_array = {
+				global.WBK_Term_Lengths = 10
+			}
+			add_to_array = {
+				global.WBK_Term_Lengths = 15
+			}
+			add_to_array = {
+				global.WBK_Term_Lengths = 20
+			}
+			add_to_array = {
+				global.WBK_Term_Lengths = 25
+			}
+			add_to_array = {
+				global.WBK_Term_Lengths = 30
+			}
+			add_to_array = {
+				global.WBK_Term_Lengths = 35
+			}
+
+			add_to_array = {
+				global.International_Commercial_Term_Lengths = 5
+			}
+
+			add_to_array = {
+				global.IMF_Term_Interest_Rate = 0.07
+			}
+			add_to_array = {
+				global.IMF_Term_Interest_Rate = 0.09
+			}
+			add_to_array = {
+				global.IMF_Term_Interest_Rate = 0.12
+			}
+			add_to_array = {
+				global.IMF_Term_Interest_Rate = 0.15
+			}
+
+			add_to_array = {
+				global.WBK_Term_Interest_Rate = 0.005
+			}
+			add_to_array = {
+				global.WBK_Term_Interest_Rate = 0.007
+			}
+			add_to_array = {
+				global.WBK_Term_Interest_Rate = 0.01
+			}
+			add_to_array = {
+				global.WBK_Term_Interest_Rate = 0.015
+			}
+			add_to_array = {
+				global.WBK_Term_Interest_Rate = 0.02
+			}
+			add_to_array = {
+				global.WBK_Term_Interest_Rate = 0.027
+			}
+			add_to_array = {
+				global.WBK_Term_Interest_Rate = 0.03
+			}
+
+			add_to_array = {
+				global.IMF_Term_Lengths = 1
+			}
+			add_to_array = {
+				global.IMF_Term_Lengths = 2
+			}
+			add_to_array = {
+				global.IMF_Term_Lengths = 3
+			}
+			add_to_array = {
+				global.IMF_Term_Lengths = 4
+			}
+
+			add_to_array = {
+				global.Domestic_Commercial_Term_Lengths = 5
+			}
+			add_to_array = {
+				global.Domestic_Commercial_Term_Lengths = 10
+			}
+			add_to_array = {
+				global.Domestic_Commercial_Term_Lengths = 15
+			}
+			add_to_array = {
+				global.Domestic_Commercial_Term_Lengths = 20
+			}
+
+			add_to_array = {
+				global.Domestic_Reserve_Term_Lengths = 5
+			}
+			add_to_array = {
+				global.Domestic_Reserve_Term_Lengths = 7
+			}
+			add_to_array = {
+				global.Domestic_Reserve_Term_Lengths = 10
+			}
+
+
+
 			#Bulk is 10x the base
 			#Large is 3x base
 			#Upgrade cost categories = global.UPC_(category)
@@ -731,7 +1183,429 @@ on_actions = {
 				add_to_array = {
 					food_export_prior = 0
 				}
+				set_variable = {
+					Current_Month = 5
+				}
+				add_to_array = {
+					spacecraft_list = 1
+				}
+	
+				add_to_array = {
+					spacecraft_list = 2
+				}
+	
+				add_to_array = {
+					spacecraft_list = 3
+				}
+	
+				add_to_array = {
+					spacecraft_list = 4
+				}
+	
+				add_to_array = {
+					spacecraft_list = 5
+				}
+	
+				add_to_array = {
+					spacecraft_list = 6
+				}
+	
+				add_to_array = {
+					spacecraft_list = 7
+				}
+	
+				add_to_array = {
+					spacecraft_list = 8
+				}
+	
+				add_to_array = {
+					spacecraft_list = 9
+				}
+	
+				add_to_array = {
+					spacecraft_list = 10
+				}
+	
+				add_to_array = {
+					spacecraft_list = 11
+				}
+	
+				add_to_array = {
+					spacecraft_list = 12
+				}
+	
+				add_to_array = {
+					spacecraft_list = 13
+				}
+	
+				add_to_array = {
+					spacecraft_list = 14
+				}
+	
+				add_to_array = {
+					spacecraft_list = 15
+				}
+	
+				add_to_array = {
+					spacecraft_list = 16
+				}
+	
+				add_to_array = {
+					spacecraft_list = 17
+				}
+	
+				add_to_array = {
+					spacecraft_list = 18
+				}
+	
+				add_to_array = {
+					spacecraft_list = 19
+				}
+	
+				add_to_array = {
+					spacecraft_list = 20
+				}
+	
+				add_to_array = {
+					spacecraft_list = 21
+				}
+	
+				add_to_array = {
+					spacecraft_list = 22
+				}
+	
+				add_to_array = {
+					spacecraft_list = 23
+				}
+	
+				add_to_array = {
+					spacecraft_list = 24
+				}
+	
+				add_to_array = {
+					spacecraft_list = 25
+				}
+	
+				add_to_array = {
+					spacecraft_list = 26
+				}
+	
+				add_to_array = {
+					spacecraft_list = 27
+				}
+	
+				add_to_array = {
+					spacecraft_list = 28
+				}
+	
+				add_to_array = {
+					spacecraft_list = 29
+				}
+	
+				add_to_array = {
+					spacecraft_list = 30
+				}
+	
+				add_to_array = {
+					spacecraft_list = 31
+				}
+	
+				add_to_array = {
+					spacecraft_list = 32
+				}
+	
+				add_to_array = {
+					spacecraft_list = 33
+				}
+	
+				add_to_array = {
+					spacecraft_list = 34
+				}
+	
+				add_to_array = {
+					spacecraft_list = 35
+				}
+	
+				add_to_array = {
+					spacecraft_list = 36
+				}
+	
+				add_to_array = {
+					spacecraft_list = 37
+				}
+	
+				add_to_array = {
+					spacecraft_list = 38
+				}
+	
+				add_to_array = {
+					spacecraft_list = 39
+				}
+	
+				add_to_array = {
+					spacecraft_list = 40
+				}
+	
+				add_to_array = {
+					spacecraft_list = 41
+				}
+				add_to_array = {
+					spacecraft_list = 42
+				}
+	
+				add_to_array = {
+					vessel_list = 1
+				}
+				add_to_array = {
+					vessel_list = 2
+				}
+				add_to_array = {
+					vessel_list = 3
+				}
+				add_to_array = {
+					vessel_list = 4
+				}
+				add_to_array = {
+					vessel_list = 5
+				}
+				add_to_array = {
+					vessel_list = 6
+				}
+				add_to_array = {
+					vessel_list = 7
+				}
+					add_to_array = {
+						mission_list = 2
+					}
+	
+					add_to_array = {
+						mission_list = 3
+					}
+	
+					add_to_array = {
+						mission_list = 4
+					}
+	
+					add_to_array = {
+						mission_list = 5
+					}
+	
+					add_to_array = {
+						mission_list = 6
+					}
+	
+					add_to_array = {
+						mission_list = 7
+					}
+	
+					add_to_array = {
+						mission_list = 8
+					}
+	
+					add_to_array = {
+						mission_list = 9
+					}
+	
+					add_to_array = {
+						mission_list = 12
+					}
+	
+					add_to_array = {
+						mission_list = 13
+					}
+	
+					add_to_array = {
+						mission_list = 14
+					}
+	
+					add_to_array = {
+						mission_list = 15
+					}
+	
+					add_to_array = {
+						mission_list = 17
+					}
+	
+					add_to_array = {
+						mission_list = 18
+					}
+	
+					add_to_array = {
+						mission_list = 19
+					}
+	
+					add_to_array = {
+						mission_list = 20
+					}
+	
+					add_to_array = {
+						mission_list = 22
+					}
+	
+					add_to_array = {
+						mission_list = 23
+					}
+	
+					add_to_array = {
+						mission_list = 24
+					}
+	
+					add_to_array = {
+						mission_list = 25
+					}
+	
+					add_to_array = {
+						mission_list = 28
+					}
+	
+					add_to_array = {
+						mission_list = 29
+					}
+	
+					add_to_array = {
+						mission_list = 31
+					}
+	
+					add_to_array = {
+						mission_list = 32
+					}
+	
+					add_to_array = {
+						mission_list = 33
+					}
+	
+					add_to_array = {
+						mission_list = 34
+					}
+	
+					add_to_array = {
+						mission_list = 35
+					}
+	
+					add_to_array = {
+						mission_list = 36
+					}
+	
+					add_to_array = {
+						mission_list = 37
+					}
+	
+					add_to_array = {
+						mission_list = 38
+					}
+	
+					add_to_array = {
+						mission_list = 40
+					}
+	
+					add_to_array = {
+						mission_list = 41
+					}
 			}
+
+			#HDI Values 
+			add_to_array = { global.sol_cost = 0.002 }
+			add_to_array = { global.sol_cost = 0.003 }
+			add_to_array = { global.sol_cost = 0.004 }
+			add_to_array = { global.sol_cost = 0.005 }
+			add_to_array = { global.sol_cost = 0.006 }
+			add_to_array = { global.sol_cost = 0.007 }
+			add_to_array = { global.sol_cost = 0.008 }
+			add_to_array = { global.sol_cost = 0.009 }
+			add_to_array = { global.sol_cost = 0.010 }
+			add_to_array = { global.sol_cost = 0.011 }
+			add_to_array = { global.sol_cost = 0.012 }
+			add_to_array = { global.sol_cost = 0.013 }
+			add_to_array = { global.sol_cost = 0.015 }
+			add_to_array = { global.sol_cost = 0.016 }
+			add_to_array = { global.sol_cost = 0.018 }
+			add_to_array = { global.sol_cost = 0.019 }
+			add_to_array = { global.sol_cost = 0.021 }
+			add_to_array = { global.sol_cost = 0.024 }
+			add_to_array = { global.sol_cost = 0.026 }
+			add_to_array = { global.sol_cost = 0.029 }
+			add_to_array = { global.sol_cost = 0.031 }
+			add_to_array = { global.sol_cost = 0.035 }
+			add_to_array = { global.sol_cost = 0.038 }
+			add_to_array = { global.sol_cost = 0.042 }
+			add_to_array = { global.sol_cost = 0.046 }
+			add_to_array = { global.sol_cost = 0.051 }
+			add_to_array = { global.sol_cost = 0.056 }
+			add_to_array = { global.sol_cost = 0.061 }
+			add_to_array = { global.sol_cost = 0.067 }
+			add_to_array = { global.sol_cost = 0.074 }
+			add_to_array = { global.sol_cost = 0.081 }
+			add_to_array = { global.sol_cost = 0.090 }
+			add_to_array = { global.sol_cost = 0.098 }
+			add_to_array = { global.sol_cost = 0.108 }
+			add_to_array = { global.sol_cost = 0.119 }
+			add_to_array = { global.sol_cost = 0.131 }
+			add_to_array = { global.sol_cost = 0.144 }
+			add_to_array = { global.sol_cost = 0.159 }
+			add_to_array = { global.sol_cost = 0.174 }
+			add_to_array = { global.sol_cost = 0.192 }
+			add_to_array = { global.sol_cost = 0.211 }
+			add_to_array = { global.sol_cost = 0.232 }
+			add_to_array = { global.sol_cost = 0.255 }
+			add_to_array = { global.sol_cost = 0.281 }
+			add_to_array = { global.sol_cost = 0.309 }
+			add_to_array = { global.sol_cost = 0.340 }
+			add_to_array = { global.sol_cost = 0.374 }
+			add_to_array = { global.sol_cost = 0.411 }
+			add_to_array = { global.sol_cost = 0.453 }
+			add_to_array = { global.sol_cost = 0.498 }
+			add_to_array = { global.sol_cost = 0.548 }
+			add_to_array = { global.sol_cost = 0.602 }
+			add_to_array = { global.sol_cost = 0.663 }
+			add_to_array = { global.sol_cost = 0.729 }
+			add_to_array = { global.sol_cost = 0.802 }
+			add_to_array = { global.sol_cost = 0.882 }
+			add_to_array = { global.sol_cost = 0.970 }
+			add_to_array = { global.sol_cost = 1.067 }
+			add_to_array = { global.sol_cost = 1.174 }
+			add_to_array = { global.sol_cost = 1.291 }
+			add_to_array = { global.sol_cost = 1.420 }
+			add_to_array = { global.sol_cost = 1.562 }
+			add_to_array = { global.sol_cost = 1.719 }
+			add_to_array = { global.sol_cost = 1.891 }
+			add_to_array = { global.sol_cost = 2.080 }
+			add_to_array = { global.sol_cost = 2.288 }
+			add_to_array = { global.sol_cost = 2.516 }
+			add_to_array = { global.sol_cost = 2.768 }
+			add_to_array = { global.sol_cost = 3.045 }
+			add_to_array = { global.sol_cost = 3.349 }
+			add_to_array = { global.sol_cost = 3.684 }
+			add_to_array = { global.sol_cost = 4.053 }
+			add_to_array = { global.sol_cost = 4.458 }
+			add_to_array = { global.sol_cost = 4.904 }
+			add_to_array = { global.sol_cost = 5.394 }
+			add_to_array = { global.sol_cost = 5.933 }
+			add_to_array = { global.sol_cost = 6.527 }
+			add_to_array = { global.sol_cost = 7.180 }
+			add_to_array = { global.sol_cost = 7.897 }
+			add_to_array = { global.sol_cost = 8.687 }
+			add_to_array = { global.sol_cost = 9.556 }
+			add_to_array = { global.sol_cost = 10.512 }
+			add_to_array = { global.sol_cost = 11.563 }
+			add_to_array = { global.sol_cost = 12.719 }
+			add_to_array = { global.sol_cost = 13.991 }
+			add_to_array = { global.sol_cost = 15.390 }
+			add_to_array = { global.sol_cost = 16.929 }
+			add_to_array = { global.sol_cost = 18.622 }
+			add_to_array = { global.sol_cost = 20.484 }
+			add_to_array = { global.sol_cost = 22.532 }
+			add_to_array = { global.sol_cost = 24.786 }
+			add_to_array = { global.sol_cost = 27.264 }
+			add_to_array = { global.sol_cost = 29.991 }
+			add_to_array = { global.sol_cost = 32.990 }
+			add_to_array = { global.sol_cost = 36.289 }
+			add_to_array = { global.sol_cost = 39.918 }
+			add_to_array = { global.sol_cost = 43.909 }
+			add_to_array = { global.sol_cost = 48.300 }
+			add_to_array = { global.sol_cost = 53.130 }
+			add_to_array = { global.sol_cost = 58.443 }
+
+			#END
 			set_variable = { global.base_transport_cost_divisor = 200 } #How much to divide distance_to@state to get the transport cost for state to state trade.
 			set_variable = { global.base_shipping_cost_divisor = 1000 } #How much to divide distance_to@state to get the shipping cost for country to country trade.
 
@@ -750,7 +1624,7 @@ on_actions = {
 			#AI RATIOS FOR ECONOMICS AND BUILDING#
 			set_variable = { ai_power_ratio = 0.25 } #Ratio of power plants to office park/industrial park/dockyard/military factory
 			set_variable = { ai_office_ratio = 0.25 } #Ratio of office parks to industrial parks
-			set_variable = { ai_agri_investment = 0.25 } #Percentage of industry to invest in agri-industrial complexes until positive
+			set_variable = { ai_agri_investment = 0.20 } #Percentage of industry to invest in agri-industrial complexes until positive
 			set_variable = { ai_water_point = 25 } #Number of factories minimum to start investing 15 industrial parks regularly to building water infra
 			set_variable = { ai_renewable_point = 45 } #Number of factories minimum to start diverting to renewable and nuclear power
 			set_variable = { ai_renewable_ratio = 0.3 } #Ratio of renewable to fossil when the renewable point is reached
@@ -1281,10 +2155,31 @@ on_actions = {
 			clear_array = global.top_space_race_array_country
 			clear_array = global.top_space_race_array_num_decisions
 		    every_country = {
+				#Econ 3.0 Start
+				set_variable = { national_total_lower_class_pop = 0 }
+				set_variable = { national_total_middle_class_pop = 0 }
+				set_variable = { national_total_upper_middle_class_pop = 0 }
+				set_variable = { national_total_upper_class_pop = 0 }
+
+				set_variable = { national_total_lower_class_pay = 0 }
+				set_variable = { national_total_middle_class_pay = 0 }
+				set_variable = { national_total_upper_middle_class_pay = 0 }
+				set_variable = { national_total_upper_class_pay = 0 }
+
+				set_variable = { national_total_employed_pops = 0 }
+
+				for_each_scope_loop = {	
+					array = owned_states
+
+					set_employment_in_state = yes
+				}
+				set_starting_info = yes
+				#gdp_test_script_take_5 = yes
+				#Econ 3.0 End
 				starting_policies = yes
 				set_variable = { num_space_race_decisions = 0}
 				ic_pulse = yes
-				startup_influence = yes
+				
 				add_to_variable = { decryptTotal = 1 }
 				add_to_variable = { encryptTotal = 1 }
 				set_country_flag = bonds.25
@@ -1337,6 +2232,9 @@ on_actions = {
 					major_religion_placeholder = yes
 				}
 				add_to_array = {
+					country_politics_list = 52	#Idea Grid
+				}
+				add_to_array = {
 					country_politics_list = 1	#Normal Policies
 				}
 				add_to_array = {
@@ -1376,6 +2274,14 @@ on_actions = {
 					}
 					add_to_array = {
 						country_politics_list = 25	#ARAB LEAGUE
+					}
+				}
+				if = {
+					limit = {
+						tag = KOR
+					}
+					add_to_array = {
+						country_politics_list = 60	#Election
 					}
 				}
 			    if = { limit = { has_tech = jet_interceptor1 } add_ideas = interceptor_cost_1_idea }
@@ -1538,6 +2444,7 @@ on_actions = {
 				army_experience = 666666
 				navy_experience = 666666
 				air_experience = 666666
+				#country_event = TUTOR.666
 			}
 			HOK = {
 				army_experience = 250
@@ -1564,7 +2471,280 @@ on_actions = {
                     }
                 }
 			}
+			SOV = {
+				set_country_flag = Is_In_Sphere
+				set_variable = {
+					Sphere_Leader = SOV.id
+				}
+				POL = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				ROM = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				ALB = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				MON = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				SIK = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				BUL = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				CZE = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				DDR = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				HUN = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+					
+				}
+				KRD = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				SRT = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				ADR = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				MEN = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = SOV.id
+					}
+				}
+				add_to_array = { sphere_tag_list = SOV.id }
+				add_to_array = { sphere_tag_list = POL.id }
+				add_to_array = { sphere_tag_list = ROM.id }
+				add_to_array = { sphere_tag_list = HUN.id }
+				add_to_array = { sphere_tag_list = CZE.id }
+				add_to_array = { sphere_tag_list = DDR.id }
+				add_to_array = { sphere_tag_list = ALB.id }
+				add_to_array = { sphere_tag_list = MON.id }
+				add_to_array = { sphere_tag_list = SIK.id }
+				add_to_array = { sphere_tag_list = BUL.id }
+				add_to_array = { sphere_tag_list = ADR.id }
+				add_to_array = { sphere_tag_list = SRT.id }
+				add_to_array = { sphere_tag_list = KRD.id }
+				add_to_array = { sphere_tag_list = MEN.id }
+
+
+
+
+
+
+
+				
+			}
 			USA = {
+				country_event = {
+					id = Primary_Season.1
+					days = 953
+				}
+				set_country_flag = Is_In_Sphere
+				set_variable = {
+					Sphere_Leader = USA.id
+				}
+				ELS = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				GUA = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				CUB = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				COS = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				PAN = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				JAP = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				KOR = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				LIB = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				HON = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				PHI = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				HAI = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				DOM = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				ECU = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				COL = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				PRU = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				CHL = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				VEN = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				NIC = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				BOL = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				URG = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				PAR = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				MEX = {
+					set_country_flag = Is_In_Sphere
+					set_variable = {
+						Sphere_Leader = USA.id
+					}
+				}
+				set_variable = { var = domestic_influence_amount value = 100 }
+				startup_influence = yes
+				add_to_array = { sphere_tag_list = USA.id }
+				add_to_array = { sphere_tag_list = ELS.id }
+				add_to_array = { sphere_tag_list = GUA.id }
+				add_to_array = { sphere_tag_list = CUB.id }
+				add_to_array = { sphere_tag_list = COS.id }
+				add_to_array = { sphere_tag_list = PAN.id }
+				add_to_array = { sphere_tag_list = JAP.id }
+				add_to_array = { sphere_tag_list = KOR.id }
+				add_to_array = { sphere_tag_list = LIB.id }
+				add_to_array = { sphere_tag_list = HON.id }
+				add_to_array = { sphere_tag_list = PHI.id }
+				add_to_array = { sphere_tag_list = HAI.id }
+				add_to_array = { sphere_tag_list = DOM.id }
+				add_to_array = { sphere_tag_list = ECU.id }
+				add_to_array = { sphere_tag_list = COL.id }
+				add_to_array = { sphere_tag_list = PRU.id }
+				add_to_array = { sphere_tag_list = CHL.id }
+				add_to_array = { sphere_tag_list = VEN.id }
+				add_to_array = { sphere_tag_list = NIC.id }
+				add_to_array = { sphere_tag_list = BOL.id }
+				add_to_array = { sphere_tag_list = URG.id }
+				add_to_array = { sphere_tag_list = PAR.id }
+				add_to_array = { sphere_tag_list = MEX.id }
+				Key_Issues_Set_Startup = yes
 				army_experience = 100
 				navy_experience = 100
                 for_loop_effect = {
@@ -1627,18 +2807,6 @@ on_actions = {
 			ISR = {
 				army_experience = 50
 			}
-			FRA = {
-				set_division_template_lock = {
-					division_template = "Force Republicaine de Securite"
-					is_locked = yes
-				} 
-			} 
-			ALE = {
-				set_division_template_lock = {
-					division_template = "Force Republicaine de Securite"
-					is_locked = yes
-				} 
-			} 
             #UN Setup+Trade+AL
 			UNS = {
 				export_script_for_pool = yes
@@ -1794,24 +2962,20 @@ on_actions = {
 				country_event = { id = tutorial.2000 hours = 1 }
 				#country_event = tutorial.1
 			}
-			UNS = {
-				standard_deviation_for_industrial_base = yes
-			}
 			COL = {
 				country_event = COL_pol.1
 			}
 
             #Additional Other
-			USA = {
+			every_country = {
+				credit_calculation_work = yes
 				country_event = focus_check.1
 			}
+			UNS = {
+				set_country_flag = Startup_Credit_Rating_Assigned
+			}
 			SOV = {
-				if = {
-					limit = {
-						date < 1956.1.1
-					}
-					country_event = sov.1001
-				}
+				country_event = sov.1001
 			}
 			VTC = {
 				set_country_flag = ic_pulse_one_flag
@@ -1834,7 +2998,14 @@ on_actions = {
 					}		
 				}
 			}
+			### ENG DIV LIMIT STUFF
+			set_variable = {
+				div_limit = num_of_factories
+			}
+			multiply_variable = {
+				div_limit = -0.05
+			}  
+			######################
         }
-
     }
 }

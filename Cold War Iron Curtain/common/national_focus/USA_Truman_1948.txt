@@ -31,6 +31,182 @@ focus_tree = {
 		#	}
 		#}
 		completion_reward = {
+			add_ideas = NATO_espionage_5_idea
+			NAT = {
+				add_political_power = 500
+			}
+			for_each_loop = {
+				array = sphere_tag_list
+				value = v
+				index = i
+				ROOT = { add_political_power = 100 }
+				if = {
+					limit = {
+						NOT = {
+							is_in_array = {
+								array = ROOT.investment_potential_list
+								value = v
+							}
+						}
+						NOT = {
+							check_variable = { v = ROOT.id }
+						}
+					}
+					add_to_array = { ROOT.investment_potential_list = v }
+				}
+			}
+
+			
+			ELS = { set_variable = { employable_modifier_adjustment = 0.15 } }
+			COS = { set_variable = { employable_modifier_adjustment = 0.15 } }
+			PAN = { set_variable = { employable_modifier_adjustment = 0.15 } }
+			HAI = { set_variable = { employable_modifier_adjustment = 0.15 } }
+			GHA = { set_variable = { employable_modifier_adjustment = 0.15 } }
+			UGA = { set_variable = { employable_modifier_adjustment = 0.05 } }
+			NIC = { set_variable = { employable_modifier_adjustment = 0.15 } }
+			GUA = { set_variable = { employable_modifier_adjustment = 0.15 } }
+			FIN = { set_variable = { employable_modifier_adjustment = 0.1 } }
+			SWE = { set_variable = { employable_modifier_adjustment = 0.1 } }
+			JOR = { set_variable = { employable_modifier_adjustment = 0.2 } }
+			ICE = { set_variable = { employable_modifier_adjustment = 0.5 } }
+			ISR = { set_variable = { employable_modifier_adjustment = 0.3 } }
+			367 = {
+				set_employment_in_state = yes
+			}
+			357 = {
+				set_employment_in_state = yes
+			}
+			every_country = {
+				set_variable = { total_pop_k_test = 0 }
+				set_variable = { rgo_employment = 0 }
+				set_variable = { power_employment = 0 }
+				set_variable = { refinery_employment = 0 }
+				set_variable = { dockyard_employment = 0 }
+				set_variable = { office_employment = 0 }
+				set_variable = { arms_employment = 0 }
+				set_variable = { farm_employment = 0 }
+				set_variable = { industrial_employment = 0 }
+
+				every_owned_state = {
+					limit = {
+						is_core_of = PREV
+					}
+					set_variable = {
+						local_pop_k_test = state_population_k
+					}
+					set_variable = {
+						employable_modifier = 0
+					}
+					add_to_variable = {
+						employable_modifier = PREV.employable_modifier_adjustment
+					}
+					if = {
+						limit = {
+							development_level_zero_check = yes
+						}
+						add_to_variable = { 
+							employable_modifier = 0.10
+						}
+
+						multiply_variable = {
+							local_pop_k_test = employable_modifier
+						}
+					}
+					else_if = {
+						limit = {
+							development_level_one_check = yes
+						}
+						add_to_variable = { 
+							employable_modifier = 0.2
+						}
+
+						multiply_variable = {
+							local_pop_k_test = employable_modifier
+						}
+					}
+					else_if = {
+						limit = {
+							development_level_two_check = yes
+						}
+						add_to_variable = { 
+							employable_modifier = 0.35
+						}
+
+						multiply_variable = {
+							local_pop_k_test = employable_modifier
+						}
+					}
+					else_if = {
+						limit = {
+							development_level_three_check = yes
+						}
+						add_to_variable = { 
+							employable_modifier = 0.38
+						}
+
+						multiply_variable = {
+							local_pop_k_test = employable_modifier
+						}
+					}
+					add_to_variable = {
+						PREV.total_pop_k_test = local_pop_k_test
+					}
+					add_to_variable = {
+						PREV.rgo_employment = resource@steel
+					}
+					add_to_variable = {
+						PREV.rgo_employment = resource@chromium
+					}
+					add_to_variable = {
+						PREV.rgo_employment = resource@aluminium
+					}
+					add_to_variable = {
+						PREV.rgo_employment = resource@oil
+					}
+					add_to_variable = {
+						PREV.rgo_employment = resource@tungsten
+					}
+					add_to_variable = {
+						PREV.power_employment = building_level@fossil_fuel_powerplant
+					}
+					add_to_variable = {
+						PREV.industrial_employment = building_level@industrial_complex
+					}
+					add_to_variable = {
+						PREV.refinery_employment = building_level@tungsten_factory
+					}
+					add_to_variable = {
+						PREV.refinery_employment = building_level@synthetic_refinery
+					}
+					add_to_variable = {
+						PREV.refinery_employment = building_level@steel_factory
+					}
+					add_to_variable = {
+						PREV.farm_employment = building_level@agri_industrial_complex
+					}
+					add_to_variable = {
+						PREV.office_employment = building_level@office_park
+					}
+					add_to_variable = {
+						PREV.dockyard_employment = building_level@dockyard
+					}
+					add_to_variable = {
+						PREV.arms_employment = building_level@arms_factory
+					}
+				}
+				log = "[THIS.GetTag]:Workforce [?total_pop_k_test]"
+				log = "[THIS.GetTag]:RGO Number [?rgo_employment]"
+				log = "[THIS.GetTag]:Power Plants [?power_employment]"
+				log = "[THIS.GetTag]:Refineries [?refinery_employment]"
+				log = "[THIS.GetTag]:Dockyards [?dockyard_employment]"
+				log = "[THIS.GetTag]:Offices [?office_employment]"
+				log = "[THIS.GetTag]:Arms Plants [?arms_employment]"
+				log = "[THIS.GetTag]:Farms [?farm_employment]"
+				log = "[THIS.GetTag]:Factories [?industrial_employment]"
+			}
+		
+
+
 			#every_country = {
 #
 			#	set_variable = {
@@ -539,6 +715,9 @@ focus_tree = {
 				idea = economic_growth
 				days = 600
 			}
+			set_variable = { THIS.idea_len_@token:economic_growth = 600 }
+			set_variable = { THIS.idea_date_@token:economic_growth = global.num_days }
+
 		}
 	}
 	focus = {

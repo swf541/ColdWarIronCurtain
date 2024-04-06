@@ -1,0 +1,395 @@
+NATO_decisions_category = {
+
+	NATO_vote_yes = {
+		allowed = {
+			always = no 
+		}
+
+		visible = {
+			NOT = {
+				has_country_flag = NATO_voted_on_issue 
+			}
+		}
+
+		complete_effect = {
+			set_country_flag = NATO_voted_on_issue
+			set_variable = { NATO_vote_value = 1 }
+
+			if = {
+				limit = {
+					is_ai = no
+				}
+
+				set_variable = { NATO_vote_intention = 5  }
+			}
+			add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+			
+		}
+
+		ai_will_do = {
+			modifier = {
+				add = 10 
+				check_variable = { NATO_vote_intention > 0 }
+			}
+		}
+	}
+
+	NATO_vote_no = {
+		allowed = { always = no }
+
+		visible = {
+			NOT = {
+				has_country_flag = NATO_voted_on_issue 
+			}
+		}
+
+		complete_effect = {
+			set_country_flag = NATO_voted_on_issue
+			set_variable = { NATO_vote_value = -1 }
+			if = {
+				limit = {
+					is_ai = no
+				}
+
+				set_variable = { NATO_vote_intention = -5  }
+			}
+			add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+		}
+
+		ai_will_do = {
+			modifier = {
+				add = 10 
+
+				check_variable = { NATO_vote_intention < 0 }
+			}
+		}
+	}
+
+	NATO_vote_neutral = {
+		allowed = { always = no }
+
+		visible = {
+			NOT = {
+				has_country_flag = NATO_voted_on_issue 
+			}
+		}
+
+		complete_effect = {
+			set_country_flag = NATO_voted_on_issue
+			set_variable = { NATO_vote_value = 0 }
+			add_to_variable = { NAT.NATO_gui_dirty = 0.1 }
+		}
+
+		ai_will_do = {
+			modifier = {
+				add = 10 
+
+				check_variable = { NATO_vote_intention = 0 }
+			}
+		}
+	}
+
+	NATO_vote_mission = {
+
+		allowed = { 
+			always = no 
+		}
+		available = {
+
+			NATO_total_votes = yes
+
+			custom_trigger_tooltip = {
+
+				set_temp_variable = { total_votes = NATO_votes_positive }
+				add_to_temp_variable = { total_votes = NATO_votes_negative }
+				add_to_temp_variable = { total_votes = NATO_votes_neutral }
+				check_variable = { total_votes = NAT.NATO_member_countries^num }
+				tooltip = NATO_countries_have_voted
+			}
+		
+			custom_trigger_tooltip = {
+				tooltip = NATO_voting_successful
+				
+				check_variable = { var = NATO_votes_positive value = NATO_votes_majority_needed compare = greater_than_or_equals }
+			}
+
+			custom_trigger_tooltip = {
+				tooltip = NATO_voting_no_vetoes
+
+				NOT = { check_variable = { NATO_votes_negative > 0 } }
+			}
+
+			hidden_trigger = { tag = NAT }
+		}
+
+		is_good = no
+		days_mission_timeout = 30 
+
+		complete_effect = {
+
+			if = {  
+				limit = { 
+					tag = NAT 
+				} 
+				meta_effect = {
+					text = {
+						NATO_issue_[NATO_ACTIVE_ISSUE_TOKEN]_effect = yes 
+					}
+					NATO_ACTIVE_ISSUE_TOKEN = "[?NAT.NATO_issue_id]"
+				}
+				#custom_effect_tooltip = "show to NATO"
+			}
+			else = {
+				effect_tooltip = {
+					meta_effect = {
+						text = {
+							NATO_issue_[NATO_ACTIVE_ISSUE_TOKEN]_effect = yes 
+						}
+						NATO_ACTIVE_ISSUE_TOKEN = "[?NAT.NATO_issue_id]"
+					}
+				}
+				#custom_effect_tooltip = "show to non NATO countries "
+			}
+
+			NATO_cleanup_voting = yes 	
+		}
+
+		timeout_effect = {
+		if = {
+		limit = { NOT = { NAT = { check_variable = { NATO_issue_id = 3 } } } }
+			custom_effect_tooltip = NATO_vote_failure_tt
+			hidden_effect = {
+				if = {
+					limit = { 
+						tag = NAT
+					}
+
+					add_to_variable = { NAT.NATO_political_cooperation = -5 }
+				}
+			}
+		}
+		else = {
+			custom_effect_tooltip = NATO_vote_failure_none_tt
+			event_target:NATO_toronto_accord_applicant = {
+			country_event = twrta.3003
+			}
+		}
+		NATO_cleanup_voting = yes 
+		}
+	}
+
+	NATO_ai_whip_positive = {
+		allowed = {
+			always = no
+		}
+
+		fire_only_once = no
+
+		#target_array = NAT.NATO_member_countries not needed really
+		visible = { 
+			is_ai = yes 
+			check_variable = { NATO_vote_intention > 9.999 }
+		}
+
+		available = {
+			set_temp_variable = { NATO_whipper = ROOT }
+			set_temp_variable = { NATO_whippee = FROM }
+			NATO_whip_positive_allowed = yes 
+		}
+
+		complete_effect = {
+			set_temp_variable = { NATO_whipper = ROOT }
+			set_temp_variable = { NATO_whippee = FROM }
+			NATO_whip_positive = yes 
+		}
+
+		ai_will_do = {
+			base = 0 #usually don't bother
+			modifier = { #prioritize vetoers
+				add = 200
+				FROM = {
+					check_variable = { NATO_vote_value < 0 }
+				}
+			}
+			modifier = { #continue doing until a majority is secured, but don't do this if there is a vetoer still 
+				add = 20
+				NATO_total_votes = yes
+				check_variable = { NATO_votes_positive < NATO_votes_majority_needed }
+				NOT = { check_variable = { NATO_votes_negative > 0 } }
+			}
+			modifier = {
+				add = -1000
+				FROM = { #NEVER whip more than once
+					has_country_flag = { flag = has_been_whipped_by_@PREV }
+				}
+			}
+		}
+	}
+
+	# NATO_ai_whip_negative = { # THIS DECISION IS UNNECESSARY AS ALL TAGS HAVE A VETO POWER
+	# 	allowed = {
+	# 		always = no
+	# 	}
+
+	# 	fire_only_once = no
+
+	# 	#target_array = NAT.NATO_member_countries not needed really
+	# 	visible = { 
+	# 		is_ai = yes 
+	# 		check_variable = { NATO_vote_intention < -9.999 }
+	# 	}
+
+	# 	available = {
+	# 		set_temp_variable = { NATO_whipper = ROOT }
+	# 		set_temp_variable = { NATO_whippee = FROM }
+	# 		NATO_whip_negative_allowed = yes 
+	# 	}
+
+	# 	complete_effect = {
+	# 		set_temp_variable = { NATO_whipper = ROOT }
+	# 		set_temp_variable = { NATO_whippee = FROM }
+	# 		NATO_whip_negative = yes 
+	# 	}
+
+	# 	ai_will_do = { #AI will never 
+	# 		base = 0 #usually don't bother 
+	# 		modifier = { #prioritize voters for
+	# 			add = 200
+	# 			FROM = {
+	# 				check_variable = { NATO_vote_value > 0 }
+	# 			}
+	# 		}
+	# 	}
+	#}
+
+	#NATO_mission_example_debug = {
+	#	allowed = {
+	#		always = yes
+	#	}
+	#
+	#	complete_effect = {
+	#		set_variable = { NAT.NATO_issue_id = 1 }
+	#
+	#		AST = { 
+	#			set_variable = { NATO_vote_intention = 5 }
+	#		}
+	#		ENG = { 
+	#			set_variable = { NATO_vote_intention = 10 } #countries with voting intentions 10 < or -10> will automatically whip
+	#			add_political_power = 2000 #temporary to test AI prioritization
+	#		}
+	#		CAN = { 
+	#			set_variable = { NATO_vote_intention = 5 } 
+	#		}
+	#		USA = { 
+	#			set_variable = { NATO_vote_intention = 5 }
+	#		}
+	#		ICE = {
+	#			set_variable = { NATO_vote_intention = 2 }
+	#		}
+	#		#custom_effect_tooltip = "tooltip here"
+	#		NATO_initialize_voting = yes
+	#	}
+	#} 
+	
+	#NATO_norwegian_mission = {
+	#	icon = generic_ignite_civil_war
+	#	allowed = {
+	#		tag = ENG
+	#	}
+	#	visible = {
+	#	NOT = {
+	#	NAT = {
+	#	has_variable = NATO_issue_id
+	#		}
+	#	}
+	#	NOR = {
+	#	has_war_with = GER
+	#	OR = {
+	#	has_government = paternal_autocrat
+	#	is_democratic = yes
+	#			}
+	#		}
+	#	}
+	#	cost = 10
+	#	ai_will_do = {
+	#		factor = 500
+	#	}
+	#	fire_only_once = yes
+	#	complete_effect = {
+	#		set_variable = { NAT.NATO_issue_id = 1 }
+	#
+	#		AST = { 
+	#			set_variable = { NATO_vote_intention = -5 }
+	#		}
+	#		ENG = { 
+	#			set_variable = { NATO_vote_intention = 10 } #countries with voting intentions 10 < or -10> will automatically whip
+	#		}
+	#		CAN = { 
+	#			set_variable = { NATO_vote_intention = 5 } 
+	#		}
+	#		USA = { 
+	#			set_variable = { NATO_vote_intention = 5 }
+	#		}
+	#		custom_effect_tooltip = "TA_NORWAY_MOTION_START"
+	#		NATO_initialize_voting = yes 
+	#	}
+	#}
+
+	NATO_Greek_Civil_War_Intervention = {
+		allowed = {
+			
+		}
+		visible = {
+			NOT = {
+				has_global_flag = NATO_Greek_Intervention_Proposed
+			}
+			is_in_faction_with = NAT
+			GRE = {
+				has_war_with = PDG
+			}
+		}
+		available = {
+			GRE = {
+				has_war_with = PDG
+				surrender_progress > 0.75
+			}
+		}
+		complete_effect = {
+			set_global_flag = NATO_Greek_Intervention_Proposed
+			set_variable = { NAT.NATO_issue_id = 10 }
+			every_country = {
+				limit = {
+					is_in_faction_with = NAT
+				}
+				if = {
+					limit = {
+						tag = ROOT
+					}
+					set_variable = { NATO_vote_intention = 10 }
+				}
+				else_if = {
+					limit = {
+						tag = ENG
+					}
+					set_variable = { NATO_vote_intention = 10 }
+				}
+				else_if = {
+					limit = {
+						tag = USA
+					}
+					set_variable = { NATO_vote_intention = 10 }
+				}
+				else = {
+					randomize_variable = {
+						var = NATO_vote_intention
+						distribution = uniform
+						min = -10
+						max = 10
+					}
+				}
+			}
+			custom_effect_tooltip = "NATO_GREECE_MOTION_START"
+			NATO_initialize_voting = yes
+		}
+	} 
+}

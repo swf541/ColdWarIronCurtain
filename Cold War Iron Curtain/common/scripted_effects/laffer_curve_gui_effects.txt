@@ -1,0 +1,748 @@
+gui_numbers_generate_laffer = {
+    add_political_power = 50
+    clear_array = laffer_gui_segments
+    clear_array = effective_tax_rate_gui_info
+    set_variable = {
+        laffer_gui_var = 0
+    }
+    set_variable = {
+        laffer_gui_count = 1
+    }
+    set_variable = {
+        current_laffer_variable = 0
+    }
+    #End
+    while_loop_effect = {
+        limit = {
+            check_variable = {
+                laffer_gui_var < 100
+            }
+        }
+        add_to_variable = {
+            laffer_gui_count = 1
+        }
+        add_to_variable = {
+            laffer_gui_var = 5
+        }
+        laffer_curve_function_for_gui = yes
+        add_to_variable = {
+            current_laffer_variable = 0.05
+        }
+    }
+}
+laffer_curve_function_for_gui = {
+
+    #Establish taxrate mean and standard deviation
+
+    set_variable = {
+        laffer_skewnewss = 0
+    }
+
+    #Add Penalties for Dev
+    subtract_from_variable = { laffer_skewnewss = CorruptionLevel }
+
+    set_variable = {
+        laffer_alpha = laffer_skewnewss
+    }
+    #log = "[THIS.GetName] Skew: [?laffer_skewnewss]"
+    set_variable = {
+        laffer_mean = 0.45
+    }
+    set_variable = {
+        laffer_mean_adjustment = develoment_average_laffer
+    }
+    subtract_from_variable = {
+        laffer_mean_adjustment = 2
+    }
+    multiply_variable = {
+        laffer_mean_adjustment = 0.2
+    }
+    add_to_variable = {
+        laffer_mean = laffer_mean_adjustment
+    }
+    #log = "[THIS.GetName] Mean: [?laffer_mean]"
+
+    set_variable = {
+        laffer_standard_deviation = 0.25
+    }
+    set_variable = {
+        laffer_mean_alpha_calc = laffer_standard_deviation
+    }
+    #log = "[THIS.GetName] Standard Deviation: [?laffer_standard_deviation]"
+
+    set_variable = {
+        laffer_tax_rate = current_laffer_variable
+    }
+    #log = "[THIS.GetName] Value X (Tax Rate): [?laffer_tax_rate]"
+
+    set_variable = {
+        skewness_error_calc = laffer_skewnewss
+    }
+    set_variable = {
+        mean_error_calc = laffer_mean
+    }
+    set_variable = {
+        standard_deviation_error_calc = laffer_standard_deviation
+    }
+    set_variable = {
+        laffer_tax_rate_error_calc = laffer_tax_rate
+    }
+
+    #Solve for Error Calc
+    #z = skewness*(taxrate-mean)/(standard deviation*1.41)
+
+    subtract_from_variable = {
+        laffer_tax_rate_error_calc = mean_error_calc
+    }
+    multiply_variable = {
+        standard_deviation_error_calc = 1.41
+    }
+    divide_variable = {
+        laffer_tax_rate_error_calc = standard_deviation_error_calc
+    }
+    multiply_variable = {
+        laffer_tax_rate_error_calc = skewness_error_calc
+    }
+    set_variable = {
+        laffer_error_z_calc_1 = laffer_tax_rate_error_calc
+    }
+    set_variable = {
+        laffer_error_z_calc_2 = laffer_tax_rate_error_calc
+    }
+    set_variable = {
+        laffer_error_z_calc_3 = laffer_tax_rate_error_calc
+    }
+    set_variable = {
+        laffer_error_z_calc_exponent = laffer_tax_rate_error_calc
+    }
+    #log = "[THIS.GetName] Value Z: [?laffer_tax_rate_error_calc]"
+    #chi = 1 - (1/(1+0.071z+0.042z^2+0.009z^3)^16)
+
+    multiply_variable = {
+        laffer_error_z_calc_1 = 0.071
+    }
+    multiply_variable = {
+        laffer_error_z_calc_2 = laffer_error_z_calc_exponent
+    }
+    multiply_variable = {
+        laffer_error_z_calc_2 = 0.042
+    }
+    multiply_variable = {
+        laffer_error_z_calc_3 = laffer_error_z_calc_exponent
+    }
+    multiply_variable = {
+        laffer_error_z_calc_3 = laffer_error_z_calc_exponent
+    }
+    multiply_variable = {
+        laffer_error_z_calc_3 = 0.009
+    }
+    add_to_variable = {
+        laffer_error_z_calc_1 = laffer_error_z_calc_2
+    }
+    add_to_variable = {
+        laffer_error_z_calc_1 = laffer_error_z_calc_3
+    }
+    add_to_variable = {
+        laffer_error_z_calc_1 = 1
+    }
+    set_variable = {
+        laffer_error_z_calc_1_pre_exponent = laffer_error_z_calc_1
+    }
+    set_variable = {
+        laffer_error_z_calc_1_exponent = laffer_error_z_calc_1
+    }
+    set_variable = {
+        exponent = 15
+    }
+    while_loop_effect = {
+        limit = {
+            check_variable = { exponent > 0 }
+        }
+        subtract_from_variable = {
+            exponent = 1
+        }
+        multiply_variable = {
+            laffer_error_z_calc_1 = laffer_error_z_calc_1_exponent
+        }
+    }
+    set_variable = {
+        laffer_chi = 1
+    }
+    set_variable = {
+        laffer_chi_calc = 1
+    }
+    divide_variable = {
+        laffer_chi_calc = laffer_error_z_calc_1
+    }
+    subtract_from_variable = {
+        laffer_chi = laffer_chi_calc
+    }
+    #log = "[THIS.GetName] Chi: [?laffer_chi]"
+    #error = 0.5(chi + 1)
+    add_to_variable = {
+        laffer_chi = 1
+    }
+    multiply_variable = {
+        laffer_chi = 0.5
+    }
+    set_variable = {
+        error_calculation = laffer_chi
+    }
+    #log = "[THIS.GetName] Error Calculation: [?error_calculation]"
+    #Standard Calc Begins
+    set_variable = {
+        standard_deviation_laffer_nd_calc_1 = laffer_standard_deviation
+    }
+    set_variable = {
+        standard_deviation_laffer_nd_calc_2 = laffer_standard_deviation
+    }
+    set_variable = {
+        euler_number = 1
+    }
+    set_variable = {
+        normal_distribution_calc = 2
+    }
+    set_variable = {
+        normal_distribution_tax_rate = laffer_tax_rate
+    }
+    set_variable = {
+        normal_distribution_tax_rate_test_1 = normal_distribution_tax_rate
+    }
+    set_variable = {
+        normal_distribution_mean = laffer_mean
+    }
+    #normal distribution = (2/(standard deviation * 4.44))*2.71^(-1(x-mean)^2)/2*standard deviation^2
+
+    #left half
+    multiply_variable = {
+        standard_deviation_laffer_nd_calc_1 = 2.506
+    }
+    #log = "[THIS.GetName] standard_deviation_laffer_nd_calc_1: [?standard_deviation_laffer_nd_calc_1]"
+    divide_variable = {
+        normal_distribution_calc = standard_deviation_laffer_nd_calc_1
+    }
+
+    #far right half
+    multiply_variable = {
+        standard_deviation_laffer_nd_calc_2 = laffer_standard_deviation
+    }
+    multiply_variable = {
+        standard_deviation_laffer_nd_calc_2 = 2
+    }
+
+    #right half
+    subtract_from_variable = {
+        normal_distribution_tax_rate = normal_distribution_mean
+    }
+    set_variable = {
+        normal_distribution_tax_rate_exponent = normal_distribution_tax_rate
+    }
+    multiply_variable = {
+        normal_distribution_tax_rate = normal_distribution_tax_rate_exponent
+    }
+    multiply_variable = {
+        normal_distribution_tax_rate = -1
+    }
+
+    divide_variable = {
+        normal_distribution_tax_rate = standard_deviation_laffer_nd_calc_2
+    }
+    set_variable = {
+        euler_number_exponent = normal_distribution_tax_rate
+    }
+    set_variable = {
+        euler_number_exponent_factor = euler_number
+    }
+    #log = "[THIS.GetName] Euler Number Exponent: [?euler_number_exponent]"
+    while_loop_effect = {
+        limit = {
+            NOT = {
+                check_variable = { euler_number_exponent = 1 }
+            }
+            NOT = {
+                check_variable = { euler_number_exponent = 0 }
+            }
+        }
+        add_to_variable = {
+            n = 1
+        }
+        if = {
+            limit = {
+                OR = {
+                    check_variable = {
+                        euler_number_exponent < -1
+                    }
+                    check_variable = {
+                        euler_number_exponent = -1
+                    }
+                }
+            }
+            add_to_variable = {
+                euler_number_exponent = 1
+            }
+            multiply_variable = {
+                euler_number = 0.369
+            }
+        }
+        else_if = {
+            limit = {
+                check_variable = {
+                    euler_number_exponent < 0
+                }
+                check_variable = {
+                    euler_number_exponent > -1
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent < -0.85
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 0.407
+                }
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent < -0.75
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 0.450
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent < -0.65
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 0.497
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent < -0.55
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 0.549
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent < -0.45
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 0.607
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent < -0.35
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 0.671
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent < -0.25
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 0.741
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent < -0.15
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 0.819
+                }            
+            }
+            else = {
+                multiply_variable = {
+                    euler_number = 0.975
+                }             
+            }
+            set_variable = {
+                euler_number_exponent = 0
+            }
+        }
+        else_if = {
+            limit = {
+                OR = {
+                    check_variable = {
+                        euler_number_exponent > 1
+                    }
+                    check_variable = {
+                        euler_number_exponent = 1
+                    }
+                }
+            }
+            subtract_from_variable = {
+                euler_number_exponent = 1
+            }
+            multiply_variable = {
+                euler_number = euler_number_exponent_factor
+            }
+        }
+        else_if = {
+            limit = {
+                check_variable = {
+                    euler_number_exponent > 0
+                }
+                check_variable = {
+                    euler_number_exponent < 1
+                }
+            }
+            if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent > 0.85
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 2.452
+                }
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent > 0.75
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 2.220
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent > 0.65
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 2.009
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent > 0.55
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 1.818
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent > 0.45
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 1.646
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent > 0.35
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 1.490
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent > 0.25
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 1.348
+                }            
+            }
+            else_if = {
+                limit = {
+                    check_variable = {
+                        euler_number_exponent > 0.15
+                    }
+                }
+                multiply_variable = {
+                    euler_number = 1.220
+                }            
+            }
+            else = {
+                multiply_variable = {
+                    euler_number = 1.104
+                }             
+            }
+            set_variable = {
+                euler_number_exponent = 0
+            }
+        }
+
+    }
+    #log = "[THIS.GetName] Exponent: [?n]"
+    #log = "[THIS.GetName] Euler Number Post Exp Loop: [?euler_number]"
+    
+    multiply_variable = {
+        normal_distribution_calc = euler_number
+    }
+    set_variable = {
+        normal_distribution = normal_distribution_calc
+    }
+    #log = "[THIS.GetName] Normal Distribution: [?normal_distribution]"
+    #SOLVING for f = error*normal distribution
+    #f = effective taxrate
+    set_variable = {
+        effective_tax_rate_gui = 0
+    }
+    multiply_variable = {
+       normal_distribution = error_calculation
+    }
+    set_variable = {
+        effective_tax_rate_gui = normal_distribution
+    }
+    set_variable = {
+        laffer_mean_calculator = laffer_mean
+    }
+    set_variable = {
+        laffer_skewnewss_calculator = laffer_skewnewss
+    }
+    if = {
+        limit = {
+            NOT = {
+                check_variable = {
+                    laffer_skewnewss = 0
+                }
+            }
+        }
+        #mean+std*0.797 Left
+        add_to_variable = {
+            laffer_mean_alpha_calc = laffer_mean_calculator
+        }
+        multiply_variable = {
+            laffer_mean_alpha_calc = 0.797
+        }
+        set_variable = {
+            laffer_alpha_calc = laffer_alpha
+        }
+        set_variable = {
+            inversion = 0
+        }
+        if = {
+            limit = {
+                check_variable = {
+                    laffer_alpha < 0
+                }
+            }
+            set_variable = {
+                inversion = 1
+            }
+        }
+        #log = "[THIS.GetName] Alpha Check Pre Approximation: [?laffer_alpha_calc]"
+        if = { limit = { check_variable = { laffer_alpha_calc > 0.0975 } } set_variable = { laffer_alpha_calc = 1.414 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.925 } } set_variable = { laffer_alpha_calc = 1.379 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.875 } } set_variable = { laffer_alpha_calc = 1.345 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.825 } } set_variable = { laffer_alpha_calc = 1.312 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.775 } } set_variable = { laffer_alpha_calc = 1.280 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.725 } } set_variable = { laffer_alpha_calc = 1.25 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.675 } } set_variable = { laffer_alpha_calc = 1.220 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.625 } } set_variable = { laffer_alpha_calc = 1.192 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.575 } } set_variable = { laffer_alpha_calc = 1.166 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.525 } } set_variable = { laffer_alpha_calc = 1.141 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.475 } } set_variable = { laffer_alpha_calc = 1.118 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.425 } } set_variable = { laffer_alpha_calc = 1.096 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.375 } } set_variable = { laffer_alpha_calc = 1.077 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.325 } } set_variable = { laffer_alpha_calc = 1.059 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.275 } } set_variable = { laffer_alpha_calc = 1.044 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.225 } } set_variable = { laffer_alpha_calc = 1.030 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.175 } } set_variable = { laffer_alpha_calc = 1.019 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.125 } } set_variable = { laffer_alpha_calc = 1.011 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.075 } } set_variable = { laffer_alpha_calc = 1.004 } }
+        else_if = { limit = { check_variable = { laffer_alpha_calc > 0.025 } } set_variable = { laffer_alpha_calc = 1.001 } }
+        else = { set_variable = { laffer_alpha_calc = 1 } }
+        #log = "[THIS.GetName] Alpha Check Post Approximation: [?laffer_alpha_calc]"
+        if = {
+            limit = {
+                check_variable = {
+                    inversion = 1
+                }
+            }
+            multiply_variable = {
+                laffer_alpha_calc = -1
+            }  
+        }
+        #log = "[THIS.GetName] Alpha Check Post Approximation Post Inversion: [?laffer_alpha_calc]"
+        divide_variable = {
+            laffer_mean_alpha_calc = laffer_alpha_calc
+        }
+        
+    }
+    if = {
+        limit = {
+            check_variable = {
+                laffer_skewnewss = 0
+            }
+        }
+        set_variable = {
+            laffer_mean_alpha_calc = laffer_mean_calculator
+        }
+    }
+    #log = "[THIS.GetName] Revised Mean for Maxima: [?laffer_mean_alpha_calc]"
+    laffer_curve_function_mean_for_gui = yes
+}
+laffer_curve_function_mean_for_gui = {
+    #log = "[THIS.GetName] Mean Function Ran: Yes"
+
+    #Establish taxrate mean and standard deviation
+
+    set_variable = {
+        laffer_skewnewss = 0
+    }
+    set_variable = {
+        laffer_mean = laffer_mean_alpha_calc
+    }
+
+    set_variable = {
+        laffer_standard_deviation = 0.25
+    }
+
+    set_variable = { laffer_tax_rate = laffer_mean_alpha_calc }
+
+    #Standard Calc Begins
+    set_variable = {
+        standard_deviation_laffer_nd_calc_1 = laffer_standard_deviation
+    }
+    set_variable = {
+        standard_deviation_laffer_nd_calc_2 = laffer_standard_deviation
+    }
+    set_variable = {
+        euler_number = 1
+    }
+    set_variable = {
+        normal_distribution_calc = 2
+    }
+    set_variable = {
+        normal_distribution_tax_rate = laffer_tax_rate
+    }
+    set_variable = {
+        normal_distribution_tax_rate_test_1 = normal_distribution_tax_rate
+    }
+    set_variable = {
+        normal_distribution_mean = laffer_mean
+    }
+
+    #left half
+    multiply_variable = {
+        standard_deviation_laffer_nd_calc_1 = 2.506
+    }
+    divide_variable = {
+        normal_distribution_calc = standard_deviation_laffer_nd_calc_1
+    }
+
+    #far right half
+    multiply_variable = {
+        standard_deviation_laffer_nd_calc_2 = laffer_standard_deviation
+    }
+    multiply_variable = {
+        standard_deviation_laffer_nd_calc_2 = 2
+    }
+
+    #right half
+    subtract_from_variable = {
+        normal_distribution_tax_rate = normal_distribution_mean
+    }
+    set_variable = {
+        normal_distribution_tax_rate_exponent = normal_distribution_tax_rate
+    }
+    multiply_variable = {
+        normal_distribution_tax_rate = normal_distribution_tax_rate_exponent
+    }
+    multiply_variable = {
+        normal_distribution_tax_rate = -1
+    }
+
+    divide_variable = {
+        normal_distribution_tax_rate = standard_deviation_laffer_nd_calc_2
+    }
+    set_variable = {
+        euler_number_exponent = normal_distribution_tax_rate
+    }
+    set_variable = {
+        euler_number_exponent_factor = euler_number
+    }
+    
+    multiply_variable = {
+        normal_distribution_calc = euler_number
+    }
+    set_variable = {
+        normal_distribution = normal_distribution_calc
+    }
+    #SOLVING for f = error*normal distribution
+    #f = effective taxrate
+    set_variable = {
+        maxiumum_tax_rate = 0
+    }
+    multiply_variable = {
+       normal_distribution = 0.5
+    }
+    set_variable = {
+        maxiumum_tax_rate = normal_distribution
+    }
+    divide_variable = {
+        effective_tax_rate_gui = maxiumum_tax_rate
+    }
+    if = {
+        limit = {
+            check_variable = {
+                effective_tax_rate_gui > 1
+            }
+        }
+        set_variable = {
+            effective_tax_rate_gui = 1
+        }
+    }
+    #multiply_variable = {
+    #    effective_tax_rate_gui = current_laffer_variable
+    #}
+    add_to_array = {
+        effective_tax_rate_gui_info = effective_tax_rate_gui
+    }
+    multiply_variable = {
+        effective_tax_rate_gui = 100
+    }
+    round_variable = effective_tax_rate_gui
+    if = {
+        limit = {
+            check_variable = {
+                effective_tax_rate_gui = 0
+            }
+        }
+        add_to_variable = {
+            effective_tax_rate_gui = 1
+        }
+    }
+    
+    add_to_array = {
+        laffer_gui_segments = effective_tax_rate_gui
+    }
+}

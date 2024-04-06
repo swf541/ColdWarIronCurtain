@@ -14,24 +14,36 @@ on_actions = {
 				limit = { has_country_flag = flag_influencing } # is influencing
 				if = {
 					# make sure influenced country still exists
-					limit = { country_exists = influence_target }
+					limit = { country_exists = influence_target_tag }
 					add_to_variable = { foreignPowerProjection = -1 }
 					add_political_power = -50
-					set_temp_variable = { influence_gain = 50 }
-					multiply_variable = { var = influence_gain value = decryptTotal }
-					if = {
-						limit = {
-							any_of = {
-								array = influence_target:influence_array
-								check_variable = { influence_target:influence_array^i = ROOT.id }
-								set_temp_variable = { tempIndex = i }
-							}
-						}
-						add_to_variable = { influence_target:influence_array_val^tempIndex = influence_gain }
-						log = "  i: [?tempIndex] / influence_array^i.Tag: [?influence_target:influence_array^i.GetTag]"
-						log = "  [ROOT.GetTag] is daily influencing [?influence_target.GetTag] by [?influence_gain]"
-					} 
-					var:influence_target = { recalculate_influence = yes }
+
+					set_temp_variable = { influence_gain = 0.5 }
+					set_variable = { drift_modifier = influence_target_tag:modifier@drift_defence_factor }
+					add_to_variable = { drift_modifier = 0.001 }
+					divide_variable = { influence_gain = drift_modifier }
+
+					set_temp_variable = { percent_change = influence_gain }
+					set_temp_variable = { tag_index = ROOT.id }
+					set_temp_variable = { influence_target = influence_target_tag }
+					change_influence_percentage = yes					
+
+					#
+					#set_temp_variable = { influence_gain = 50 }
+					#multiply_variable = { var = influence_gain value = decryptTotal }
+					#if = {
+					#	limit = {
+					#		any_of = {
+					#			array = influence_target_tag:influence_array
+					#			check_variable = { influence_target_tag:influence_array^i = ROOT.id }
+					#			set_temp_variable = { tempIndex = i }
+					#		}
+					#	}
+					#	add_to_variable = { influence_target_tag:influence_array_val^tempIndex = influence_gain }
+					#	log = "  i: [?tempIndex] / influence_array^i.Tag: [?influence_target_tag:influence_array^i.GetTag]"
+					#	log = "  [ROOT.GetTag] is daily influencing [?influence_target_tag.GetTag] by [?influence_gain]"
+					#} 
+					#var:influence_target_tag = { recalculate_influence = yes }
 					# after daily influencing, check if it can afford the next daily tick
 					if = {
 						limit = {
@@ -43,13 +55,13 @@ on_actions = {
 						#log = "can't afford - canceling"
 						#remove_ideas = idea_influencing_daily # to be added if pdx fixes an issue with removing it
 						clr_country_flag = flag_influencing
-						var:influence_target = { clear_variable = influenced_by }
+						var:influence_target_tag = { clear_variable = influenced_by }
 						set_variable = { show_stop_influencing = 1 }
 					}
 				}
 				else = { # country doesn't exist, probably annexed
 					clr_country_flag = flag_influencing
-					var:influence_target = { clear_variable = influenced_by }
+					var:influence_target_tag = { clear_variable = influenced_by }
 					set_variable = { show_stop_influencing = 1 }
 				}
 			}

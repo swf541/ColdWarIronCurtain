@@ -1,0 +1,712 @@
+SAMPLE_add_random_point_to_line = {
+	# Adds a random point to the line graph
+
+	# This count is displayed as an x-axis label, increment it
+	add_to_variable = { SAMPLE_count = 1 }
+
+	# We keep track of the last y position so we can calculate the slope
+	set_variable = { SAMPLE_last_y_position = SAMPLE_y_position }
+	
+	# Random new y position, 10-90
+	set_variable = { SAMPLE_y_position = random }
+	multiply_variable = { SAMPLE_y_position = 80 }
+	add_to_variable = { SAMPLE_y_position = 10 }
+	round_variable = SAMPLE_y_position
+
+	# Prune arrays so they hold at most 20 elements
+	if = {
+		limit = {
+			check_variable = { SAMPLE_count > 20 }
+		}
+		remove_from_array = { array = SAMPLE_graph_offsets index = 0 }
+		remove_from_array = { array = SAMPLE_graph_slopes index = 0 }
+		remove_from_array = { array = SAMPLE_numbers index = 0 }
+	}
+
+	# The y position offset is the inverse of the y position
+	set_temp_variable = { offset = SAMPLE_last_y_position }
+	multiply_temp_variable = { offset = -1 }
+	add_to_array = { SAMPLE_graph_offsets = offset }
+
+	# The 'slope' here is simply the difference between the current y value and the last one, divided by 2 plus 50
+	# These last two changes are needed for the shader
+	set_temp_variable = { diff = SAMPLE_y_position }
+	subtract_from_temp_variable = { diff = SAMPLE_last_y_position }
+	divide_temp_variable = { diff = 2 }
+	add_to_temp_variable = { diff = 50 }
+	add_to_array = { SAMPLE_graph_slopes = diff }
+	
+	add_to_array = { SAMPLE_numbers = SAMPLE_count }
+}
+
+SAMPLE_add_random_point_to_line = {
+	# Adds a random point to the line graph
+
+	# This count is displayed as an x-axis label, increment it
+	add_to_variable = { SAMPLE_count = 1 }
+
+	# We keep track of the last y position so we can calculate the slope
+	set_variable = { SAMPLE_last_y_position = SAMPLE_y_position }
+	
+	# Random new y position, 10-90
+	set_variable = { SAMPLE_y_position = random }
+	multiply_variable = { SAMPLE_y_position = 80 }
+	add_to_variable = { SAMPLE_y_position = 10 }
+	round_variable = SAMPLE_y_position
+
+	# Prune arrays so they hold at most 20 elements
+	if = {
+		limit = {
+			check_variable = { SAMPLE_count > 20 }
+		}
+		remove_from_array = { array = SAMPLE_graph_offsets index = 0 }
+		remove_from_array = { array = SAMPLE_graph_slopes index = 0 }
+		remove_from_array = { array = SAMPLE_numbers index = 0 }
+	}
+
+	# The y position offset is the inverse of the y position
+	set_temp_variable = { offset = SAMPLE_last_y_position }
+	multiply_temp_variable = { offset = -1 }
+	add_to_array = { SAMPLE_graph_offsets = offset }
+
+	# The 'slope' here is simply the difference between the current y value and the last one, divided by 2 plus 50
+	# These last two changes are needed for the shader
+	set_temp_variable = { diff = SAMPLE_y_position }
+	subtract_from_temp_variable = { diff = SAMPLE_last_y_position }
+	divide_temp_variable = { diff = 2 }
+	add_to_temp_variable = { diff = 50 }
+	add_to_array = { SAMPLE_graph_slopes = diff }
+	
+	add_to_array = { SAMPLE_numbers = SAMPLE_count }
+}
+GDP_Debt_Graph_Financial_Tab_Update = {
+	set_variable = {
+		GDP_Debt_Ratio = currentDebt
+	}
+	divide_variable = {
+		GDP_Debt_Ratio = grossdomesticproduct
+	}
+	add_to_array = { GDP_ratio_numbers = GDP_Debt_Ratio }
+
+	#Start
+	set_variable = {
+		Debt_count = 0
+	}
+	clear_array = Debt_graph_offsets
+	clear_array = Debt_graph_slopes
+	clear_array = current_Debt_numbers
+	clear_array = Debt_numbers
+	for_each_loop = {
+		array = GDP_ratio_numbers
+		add_to_array = { current_Debt_numbers = v }
+	}
+	find_highest_in_array = {
+		array = GDP_ratio_numbers
+		value = max
+		index = max_index
+	}
+	find_lowest_in_array = {
+		array = GDP_ratio_numbers
+		value = min
+		index = min_index
+	}
+	set_variable = {
+		max_debt = max
+	}
+	set_variable = {
+		max_debt_test = max
+	}
+	set_variable = {
+		min_debt = min
+	}
+	set_variable = {
+		min_debt_neg = min
+	}
+	multiply_variable = {
+		min_debt_neg = -1
+	}
+	subtract_from_variable = {
+		max_debt = min_debt
+	}
+	clear_array = Debt_numbers
+	for_each_loop = {
+		array = current_Debt_numbers
+		set_variable = {
+			value_temp = v
+		}
+		add_to_variable = {
+			value_temp = min_debt_neg
+		}
+		divide_variable = { value_temp = max }
+		multiply_variable = { value_temp = 80 }
+		add_to_variable = { value_temp = 10 }
+		round_variable = value_temp
+
+		add_to_array = {
+			value_check_debt = value_temp
+		}
+
+		Debt_add_random_point_to_line = yes		
+	}
+}
+Debt_add_random_point_to_line = {
+	# Adds a random point to the line graph
+
+	# This count is displayed as an x-axis label, increment it
+	add_to_variable = { Debt_count = 1 }
+
+	# We keep track of the last y position so we can calculate the slope
+	set_variable = { Debt_last_y_position = Debt_y_position }
+	
+	# Random new y position, 10-90
+	set_variable = { Debt_y_position = value_temp }
+
+
+	# Prune arrays so they hold at most 20 elements
+	if = {
+		limit = {
+			check_variable = { Debt_count > 20 }
+		}
+		remove_from_array = { array = Debt_graph_offsets index = 0 }
+		remove_from_array = { array = Debt_graph_slopes index = 0 }
+		remove_from_array = { array = Debt_numbers index = 0 }
+	}
+
+	# The y position offset is the inverse of the y position
+	set_temp_variable = { offset = Debt_last_y_position }
+	multiply_temp_variable = { offset = -1 }
+	add_to_array = { Debt_graph_offsets = offset }
+
+	# The 'slope' here is simply the difference between the current y value and the last one, divided by 2 plus 50
+	# These last two changes are needed for the shader
+	set_temp_variable = { diff = Debt_y_position }
+	subtract_from_temp_variable = { diff = Debt_last_y_position }
+	divide_temp_variable = { diff = 2 }
+	add_to_temp_variable = { diff = 50 }
+	add_to_array = { Debt_graph_slopes = diff }
+	
+	add_to_array = { Debt_numbers = Debt_count }
+}
+
+GDP_Graph_Financial_Tab_Update = {
+	set_variable = {
+		GDP_count = 0
+	}
+	add_to_array = { GDP_base_numbers = grossdomesticproduct }
+	clear_array = GDP_graph_offsets
+	clear_array = GDP_graph_slopes
+	clear_array = current_GDP_numbers
+	clear_array = GDP_numbers
+	for_each_loop = {
+		array = GDP_base_numbers
+		add_to_array = { current_GDP_numbers = v }
+	}
+	find_highest_in_array = {
+		array = GDP_base_numbers
+		value = max
+		index = max_index
+	}
+	find_lowest_in_array = {
+		array = GDP_base_numbers
+		value = min
+		index = min_index
+	}
+	set_variable = {
+		max_gdp = max
+	}
+	set_variable = {
+		max_gdp_test = max
+	}
+	set_variable = {
+		min_gdp = min
+	}
+	set_variable = {
+		min_gdp_neg = min
+	}
+	multiply_variable = {
+		min_gdp_neg = -1
+	}
+	subtract_from_variable = {
+		max_gdp = min_gdp
+	}
+	clear_array = GDP_numbers
+	for_each_loop = {
+		array = current_GDP_numbers
+		set_variable = {
+			value_temp = v
+		}
+		add_to_variable = {
+			value_temp = min_gdp_neg
+		}
+		divide_variable = { value_temp = max }
+		multiply_variable = { value_temp = 80 }
+		add_to_variable = { value_temp = 10 }
+		round_variable = value_temp
+
+		add_to_array = {
+			value_check_gdp = value_temp
+		}
+
+
+		GDP_add_random_point_to_line = yes		
+	}
+
+}
+
+GDP_add_random_point_to_line = {
+	# Adds a random point to the line graph
+
+	# This count is displayed as an x-axis label, increment it
+	add_to_variable = { GDP_count = 1 }
+
+	# We keep track of the last y position so we can calculate the slope
+	set_variable = { GDP_last_y_position = GDP_y_position }
+	
+	# Random new y position, 10-90
+	set_variable = { GDP_y_position = value_temp }
+
+
+	# Prune arrays so they hold at most 20 elements
+	if = {
+		limit = {
+			check_variable = { GDP_count > 20 }
+		}
+		remove_from_array = { array = GDP_graph_offsets index = 0 }
+		remove_from_array = { array = GDP_graph_slopes index = 0 }
+		remove_from_array = { array = GDP_numbers index = 0 }
+	}
+
+	# The y position offset is the inverse of the y position
+	set_temp_variable = { offset = GDP_last_y_position }
+	multiply_temp_variable = { offset = -1 }
+	add_to_array = { GDP_graph_offsets = offset }
+
+	# The 'slope' here is simply the difference between the current y value and the last one, divided by 2 plus 50
+	# These last two changes are needed for the shader
+	set_temp_variable = { diff = GDP_y_position }
+	subtract_from_temp_variable = { diff = GDP_last_y_position }
+	divide_temp_variable = { diff = 2 }
+	add_to_temp_variable = { diff = 50 }
+	add_to_array = { GDP_graph_slopes = diff }
+	
+	add_to_array = { GDP_numbers = GDP_count }
+}
+
+Food_Graph_Financial_Tab_Update = {
+	add_to_array = { 
+		food_base_numbers = FoodBalanceTotal 
+	}
+ 
+	#Start
+	set_variable = {
+		Food_count = 0
+	}
+	clear_array = Food_graph_offsets
+	clear_array = Food_graph_slopes
+	clear_array = current_Food_numbers
+	clear_array = Food_numbers
+	for_each_loop = {
+		array = food_base_numbers
+		add_to_array = { current_Food_numbers = v }
+	}
+	find_highest_in_array = {
+		array = food_base_numbers
+		value = max
+		index = max_index
+	}
+	find_lowest_in_array = {
+		array = food_base_numbers
+		value = min
+		index = min_index
+	}
+	set_variable = {
+		max_food = max
+	}
+	set_variable = {
+		max_food_test = max
+	}
+	set_variable = {
+		min_food = min
+	}
+	set_variable = {
+		min_food_neg = min
+	}
+	multiply_variable = {
+		min_food_neg = -1
+	}
+	subtract_from_variable = {
+		max_food = min_food
+	}
+	clear_array = Food_numbers
+	for_each_loop = {
+		array = current_Food_numbers
+		set_variable = {
+			value_temp = v
+		}
+		add_to_variable = {
+			value_temp = min_food_neg
+		}
+		divide_variable = { value_temp = max }
+		multiply_variable = { value_temp = 80 }
+		add_to_variable = { value_temp = 10 }
+		round_variable = value_temp
+
+		add_to_array = {
+			value_check_food = value_temp
+		}
+
+		Food_add_random_point_to_line = yes		
+	}
+}
+Food_add_random_point_to_line = {
+	# Adds a random point to the line graph
+
+	# This count is displayed as an x-axis label, increment it
+	add_to_variable = { Food_count = 1 }
+
+	# We keep track of the last y position so we can calculate the slope
+	set_variable = { Food_last_y_position = Food_y_position }
+	
+	# Random new y position, 10-90
+	set_variable = { Food_y_position = value_temp }
+
+
+	# Prune arrays so they hold at most 20 elements
+	if = {
+		limit = {
+			check_variable = { Food_count > 20 }
+		}
+		remove_from_array = { array = Food_graph_offsets index = 0 }
+		remove_from_array = { array = Food_graph_slopes index = 0 }
+		remove_from_array = { array = Food_numbers index = 0 }
+	}
+
+	# The y position offset is the inverse of the y position
+	set_temp_variable = { offset = Food_last_y_position }
+	multiply_temp_variable = { offset = -1 }
+	add_to_array = { Food_graph_offsets = offset }
+
+	# The 'slope' here is simply the difference between the current y value and the last one, divided by 2 plus 50
+	# These last two changes are needed for the shader
+	set_temp_variable = { diff = Food_y_position }
+	subtract_from_temp_variable = { diff = Food_last_y_position }
+	divide_temp_variable = { diff = 2 }
+	add_to_temp_variable = { diff = 50 }
+	add_to_array = { Food_graph_slopes = diff }
+	
+	add_to_array = { Food_numbers = Food_count }
+}
+
+
+
+Electricity_Graph_Financial_Tab_Update = {
+	add_to_array = { 
+		electricity_base_numbers = resource@electricity 
+	}
+ 
+	#Start
+	set_variable = {
+		Electricity_count = 0
+	}
+	clear_array = Electricity_graph_offsets
+	clear_array = Electricity_graph_slopes
+	clear_array = current_Electricity_numbers
+	clear_array = Electricity_numbers
+	for_each_loop = {
+		array = electricity_base_numbers
+		add_to_array = { current_Electricity_numbers = v }
+	}
+	find_highest_in_array = {
+		array = electricity_base_numbers
+		value = max
+		index = max_index
+	}
+	find_lowest_in_array = {
+		array = electricity_base_numbers
+		value = min
+		index = min_index
+	}
+	set_variable = {
+		max_electricity = max
+	}
+	set_variable = {
+		max_electricity_test = max
+	}
+	set_variable = {
+		min_electricity = min
+	}
+	set_variable = {
+		min_electricity_neg = min
+	}
+	multiply_variable = {
+		min_electricity_neg = -1
+	}
+	subtract_from_variable = {
+		max_electricity = min_electricity
+	}
+	clear_array = Electricity_numbers
+	for_each_loop = {
+		array = current_Electricity_numbers
+		set_variable = {
+			value_temp = v
+		}
+		add_to_variable = {
+			value_temp = min_electricity_neg
+		}
+		divide_variable = { value_temp = max }
+		multiply_variable = { value_temp = 80 }
+		add_to_variable = { value_temp = 10 }
+		round_variable = value_temp
+
+		add_to_array = {
+			value_check_electricity = value_temp
+		}
+
+		Electricity_add_random_point_to_line = yes		
+	}
+}
+Electricity_add_random_point_to_line = {
+	# Adds a random point to the line graph
+
+	# This count is displayed as an x-axis label, increment it
+	add_to_variable = { Electricity_count = 1 }
+
+	# We keep track of the last y position so we can calculate the slope
+	set_variable = { Electricity_last_y_position = Electricity_y_position }
+	
+	# Random new y position, 10-90
+	set_variable = { Electricity_y_position = value_temp }
+
+
+	# Prune arrays so they hold at most 20 elements
+	if = {
+		limit = {
+			check_variable = { Electricity_count > 20 }
+		}
+		remove_from_array = { array = Electricity_graph_offsets index = 0 }
+		remove_from_array = { array = Electricity_graph_slopes index = 0 }
+		remove_from_array = { array = Electricity_numbers index = 0 }
+	}
+
+	# The y position offset is the inverse of the y position
+	set_temp_variable = { offset = Electricity_last_y_position }
+	multiply_temp_variable = { offset = -1 }
+	add_to_array = { Electricity_graph_offsets = offset }
+
+	# The 'slope' here is simply the difference between the current y value and the last one, divided by 2 plus 50
+	# These last two changes are needed for the shader
+	set_temp_variable = { diff = Electricity_y_position }
+	subtract_from_temp_variable = { diff = Electricity_last_y_position }
+	divide_temp_variable = { diff = 2 }
+	add_to_temp_variable = { diff = 50 }
+	add_to_array = { Electricity_graph_slopes = diff }
+	
+	add_to_array = { Electricity_numbers = Electricity_count }
+}
+Income_Graph_Financial_Tab_Update = {
+	add_to_array = { 
+		income_base_numbers = IncomeCheck
+	}
+ 
+	#Start
+	set_variable = {
+		Income_count = 0
+	}
+	clear_array = Income_graph_offsets
+	clear_array = Income_graph_slopes
+	clear_array = current_Income_numbers
+	clear_array = Income_numbers
+	for_each_loop = {
+		array = income_base_numbers
+		add_to_array = { current_Income_numbers = v }
+	}
+	find_highest_in_array = {
+		array = income_base_numbers
+		value = max
+		index = max_index
+	}
+	find_lowest_in_array = {
+		array = income_base_numbers
+		value = min
+		index = min_index
+	}
+	set_variable = {
+		max_income = max
+	}
+	set_variable = {
+		max_income_test = max
+	}
+	set_variable = {
+		min_income = min
+	}
+	set_variable = {
+		min_income_neg = min
+	}
+	multiply_variable = {
+		min_income_neg = -1
+	}
+	subtract_from_variable = {
+		max_income = min_income
+	}
+	clear_array = Income_numbers
+	for_each_loop = {
+		array = current_Income_numbers
+		set_variable = {
+			value_temp = v
+		}
+		add_to_variable = {
+			value_temp = min_income_neg
+		}
+		divide_variable = { value_temp = max }
+		multiply_variable = { value_temp = 80 }
+		add_to_variable = { value_temp = 10 }
+		round_variable = value_temp
+
+		add_to_array = {
+			value_check_income = value_temp
+		}
+
+		Income_add_random_point_to_line = yes		
+	}
+}
+Income_add_random_point_to_line = {
+	# Adds a random point to the line graph
+
+	# This count is displayed as an x-axis label, increment it
+	add_to_variable = { Income_count = 1 }
+
+	# We keep track of the last y position so we can calculate the slope
+	set_variable = { Income_last_y_position = Income_y_position }
+	
+	# Random new y position, 10-90
+	set_variable = { Income_y_position = value_temp }
+
+
+	# Prune arrays so they hold at most 20 elements
+	if = {
+		limit = {
+			check_variable = { Income_count > 20 }
+		}
+		remove_from_array = { array = Income_graph_offsets index = 0 }
+		remove_from_array = { array = Income_graph_slopes index = 0 }
+		remove_from_array = { array = Income_numbers index = 0 }
+	}
+
+	# The y position offset is the inverse of the y position
+	set_temp_variable = { offset = Income_last_y_position }
+	multiply_temp_variable = { offset = -1 }
+	add_to_array = { Income_graph_offsets = offset }
+
+	# The 'slope' here is simply the difference between the current y value and the last one, divided by 2 plus 50
+	# These last two changes are needed for the shader
+	set_temp_variable = { diff = Income_y_position }
+	subtract_from_temp_variable = { diff = Income_last_y_position }
+	divide_temp_variable = { diff = 2 }
+	add_to_temp_variable = { diff = 50 }
+	add_to_array = { Income_graph_slopes = diff }
+	
+	add_to_array = { Income_numbers = Income_count }
+}
+
+Laffer_Graph_Financial_Tab_Update = {
+    gui_numbers_generate_laffer = yes
+ 
+	#Start
+	set_variable = {
+		Laffer_count = 0
+	}
+	clear_array = Laffer_graph_offsets
+	clear_array = Laffer_graph_slopes
+	clear_array = current_Laffer_numbers
+	clear_array = Laffer_numbers
+	for_each_loop = {
+		array = laffer_gui_segments
+		add_to_array = { current_Laffer_numbers = v }
+	}
+	find_highest_in_array = {
+		array = laffer_gui_segments
+		value = max
+		index = max_index
+	}
+	find_lowest_in_array = {
+		array = laffer_gui_segments
+		value = min
+		index = min_index
+	}
+	set_variable = {
+		max_laffer = max
+	}
+	set_variable = {
+		max_laffer_test = max
+	}
+	set_variable = {
+		min_laffer = min
+	}
+	set_variable = {
+		min_laffer_neg = min
+	}
+	multiply_variable = {
+		min_laffer_neg = -1
+	}
+	subtract_from_variable = {
+		max_laffer = min_laffer
+	}
+	clear_array = Laffer_numbers
+	for_each_loop = {
+		array = current_Laffer_numbers
+		set_variable = {
+			value_temp = v
+		}
+		add_to_variable = {
+			value_temp = min_laffer_neg
+		}
+		divide_variable = { value_temp = max }
+		multiply_variable = { value_temp = 80 }
+		add_to_variable = { value_temp = 10 }
+		round_variable = value_temp
+
+		add_to_array = {
+			value_check_laffer = value_temp
+		}
+
+		Laffer_add_random_point_to_line = yes		
+	}
+}
+Laffer_add_random_point_to_line = {
+	# Adds a random point to the line graph
+
+	# This count is displayed as an x-axis label, increment it
+	add_to_variable = { Laffer_count = 1 }
+
+	# We keep track of the last y position so we can calculate the slope
+	set_variable = { Laffer_last_y_position = Laffer_y_position }
+	
+	# Random new y position, 10-90
+	set_variable = { Laffer_y_position = value_temp }
+
+
+	# Prune arrays so they hold at most 20 elements
+	if = {
+		limit = {
+			check_variable = { Laffer_count > 20 }
+		}
+		remove_from_array = { array = Laffer_graph_offsets index = 0 }
+		remove_from_array = { array = Laffer_graph_slopes index = 0 }
+		remove_from_array = { array = Laffer_numbers index = 0 }
+	}
+
+	# The y position offset is the inverse of the y position
+	set_temp_variable = { offset = Laffer_last_y_position }
+	multiply_temp_variable = { offset = -1 }
+	add_to_array = { Laffer_graph_offsets = offset }
+
+	# The 'slope' here is simply the difference between the current y value and the last one, divided by 2 plus 50
+	# These last two changes are needed for the shader
+	set_temp_variable = { diff = Laffer_y_position }
+	subtract_from_temp_variable = { diff = Laffer_last_y_position }
+	divide_temp_variable = { diff = 2 }
+	add_to_temp_variable = { diff = 50 }
+	add_to_array = { Laffer_graph_slopes = diff }
+	
+	add_to_array = { Laffer_numbers = Laffer_count }
+}

@@ -1,4 +1,907 @@
 variables_calculation_category = {
+	Russia_Election_1991_Round_One = {
+		icon = generic_operation
+
+		allowed = {
+			tag = RUS
+		}
+
+		available = {
+			always = no
+		} 
+
+		days_mission_timeout = 70
+		days_remove = 70
+
+		fire_only_once = no
+
+		activation = {
+			always = no
+		}
+		modifier = {
+		}
+		#Event List
+		#All News Unless Noted Elsewhise
+		#Russia_1991_Election.0 Election Rules and Schedule Established 
+		#Russia_1991_Election.1 Overview of Candidates (Country and Pick Candidate to Play As)
+		#Russia_1991_Election.2 Yeltsin Victory
+		#Russia_1991_Election.3 Yeltsin v. Ryzhkov Runoff
+		#Russia_1991_Election.4 Yeltsin v. Zhirinovsky Runoff
+		#Russia_1991_Election.5 Yeltsin v. Tuleyev Runoff
+		#Russia_1991_Election.6 Yeltsin v. Bakatin Runoff
+		#Russia_1991_Election.7 Yeltsin v. Makashov Runoff
+		#Russia_1991_Election.8 Yeltsin Runoff Victory (Against Communist)
+		#Russia_1991_Election.9 Yeltsin Runoff Victory (Against Zhirinovsky)
+		#Russia_1991_Election.10 Ryzhkov Runoff Victory
+		#Russia_1991_Election.11 Zhirinovsky Runoff Victory
+		#Russia_1991_Election.12 Tuleyev Runoff Victory
+		#Russia_1991_Election.13 Bakatin Runoff Victory
+		#Russia_1991_Election.14 Makashov Runoff Victory
+		
+		timeout_effect = {
+			Calculate_Election_Results = yes
+			if = {
+				limit = {
+					check_variable = {
+						RUS_Runoff_Check = 1
+					}
+				}
+				if = {	#1991 Assume Only Yeltsin Can Break 50%
+					limit = {
+						check_variable = {
+							RUS_Winner_Value = 1
+						}
+					}
+					news_event = Russia_1991_Election.2
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_Runoff_Check = 2
+					}
+				}
+				activate_mission = Russia_Election_1991_Round_Two
+				RUS_Clear_Current_Election_Candidates_and_Statistics = yes	#Keep Issues and Voter Rolls
+				Yeltsin_Campaign_Launch_Runoff_1991 = yes
+				if = {
+					limit = {
+						check_variable = {
+							RUS_RunnerUp_Value = 2
+						}
+					}
+					Ryzhkov_Campaign_Launch_Runoff_1991 = yes
+					news_event = Russia_1991_Election.3 #Yeltsin v. Ryzhkov Runoff
+				}
+				else_if  = {
+					limit = {
+						check_variable = {
+							RUS_RunnerUp_Value = 3
+						}
+					}
+					Zhirinovsky_Campaign_Launch_Runoff_1991 = yes
+					news_event = Russia_1991_Election.4 #Yeltsin v. Zhirinovsky Runoff
+				}
+				else_if  = {
+					limit = {
+						check_variable = {
+							RUS_RunnerUp_Value = 4
+						}
+					}
+					Tuleyev_Campaign_Launch_Runoff_1991 = yes
+					news_event = Russia_1991_Election.5 #Yeltsin v. Tuleyev Runoff
+				}			
+				else_if  = {
+					limit = {
+						check_variable = {
+							RUS_RunnerUp_Value = 5
+						}
+					}
+					Bakatin_Campaign_Launch_Runoff_1991 = yes
+					news_event = Russia_1991_Election.6 #Yeltsin v. Bakatin Runoff
+				}			
+				else_if  = {
+					limit = {
+						check_variable = {
+							RUS_RunnerUp_Value = 6
+						}
+					}
+					Makashov_Campaign_Launch_Runoff_1991 = yes
+					news_event = Russia_1991_Election.7 #Yeltsin v. Makashov Runoff
+				}	
+				else = { }
+			}
+			else = { }
+		}
+	}
+	Russia_Election_1991_Round_Two = {
+		icon = generic_operation
+
+		allowed = {
+			tag = RUS
+		}
+
+		available = {
+			always = no
+		} 
+
+		days_mission_timeout = 14
+		days_remove = 14
+
+		fire_only_once = no
+
+		activation = {
+			always = no
+		}
+		modifier = {
+		}
+
+		timeout_effect = {
+			Calculate_Election_Results = yes
+			if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 1
+					}
+					check_variable = {
+						RUS_RunnerUp_Value = 3
+					}
+				}
+				news_event = Russia_1991_Election.9 
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 1
+					}
+				}
+				news_event = Russia_1991_Election.8
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 2
+					}
+				}	
+				news_event = Russia_1991_Election.10 #Ryzhkov Runoff Victory
+				create_country_leader = {
+					name = "Nikolai Ryzhhkov"
+					picture = "Nikolai_Ryzhhkov.dds"
+					ideology = marxism_leninism
+				}
+				set_politics = {
+					ruling_party = communism
+					elections_allowed = no
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 3
+					}
+				}	
+				news_event = Russia_1991_Election.11 #Zhirinovsky Runoff Victory
+				create_country_leader = {
+					name = "Vladimir Zhirinovsky"
+					picture = "Vladimir_Zhirinovsky.dds"
+					ideology = fascism_ideology
+				}
+				set_politics = {
+					ruling_party = fascism
+					elections_allowed = no
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 4
+					}
+				}	
+				news_event = Russia_1991_Election.12 #Tuleyev Runoff Victory
+				create_country_leader = {
+					name = "Aman Tuleyev"
+					picture = "Aman_Tuleyev.dds"
+					ideology = liberal_communism
+				}
+				set_politics = {
+					ruling_party = communism
+					elections_allowed = no
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 5
+					}
+				}	
+				news_event = Russia_1991_Election.13 #Bakatin Runoff Victory
+				create_country_leader = {
+					name = "Vadim Bakatin"
+					picture = "Vadim_Bakatin.dds"
+					ideology = liberal_communism
+				}
+				set_politics = {
+					ruling_party = communism
+					elections_allowed = no
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						RUS_First_Place_Value = 6
+					}
+				}	
+				news_event = Russia_1991_Election.14 #Makashov Runoff Victory
+				create_country_leader = {
+					name = "Albert Makashov"
+					picture = "Albert_Makashov.dds"
+					ideology = stalinism
+				}
+				set_politics = {
+					ruling_party = communism
+					elections_allowed = no
+				}
+			}
+			else = { }
+		}
+	}
+	#14 Days
+    The_Media_Cycle_RUS = {
+        icon = generic_operation
+
+        allowed = {
+            tag = RUS
+        }
+
+        available = {
+            custom_trigger_tooltip = {
+                tooltip = RUS_media_cycle_available_TT		
+                always = no
+            }
+            
+        } 
+
+        days_mission_timeout = 4
+		days_remove = 1 
+
+        fire_only_once = no
+
+        activation = {
+            always = no
+        }
+        modifier = {
+        }    
+
+        timeout_effect = {
+            custom_effect_tooltip = "RUS_ADS_TT"
+            #AI DO STUFF HERE
+
+
+            #Weekly Stat Resets
+            Russia_Election_Cycle_Stat_Updates = yes
+
+            #Media Cycle Dates for GUI
+            set_variable = {
+                current_media_cycle_start = global.num_days
+            }
+            add_to_variable = {
+                current_media_cycle_start = 1    #Date Format Fix
+            }
+            set_variable = {
+                next_media_cycle_start = current_media_cycle_start
+            }
+            add_to_variable = {
+                next_media_cycle_start = 4    
+            }
+            set_variable = {
+                second_next_media_cycle_start = next_media_cycle_start
+            }
+            add_to_variable = {
+                second_next_media_cycle_start = 4
+            }
+
+            modulo_variable = {
+                var = current_media_cycle_start
+                value = 365
+            }
+            modulo_variable = {
+                var = next_media_cycle_start
+                value = 365
+            }
+            modulo_variable = {
+                var = second_next_media_cycle_start
+                value = 365
+            }
+            #December
+            if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 334
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 12
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -334
+                }              
+            }
+            #November
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 304
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 11
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -304
+                }              
+            }
+            #October
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 273
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 10
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -273
+                }              
+            }
+            #September
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 243
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 9
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -243
+                }              
+            }
+            #August
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 212
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 8
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -212
+                }              
+            }
+            #July
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 181
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -181
+                }              
+            }
+            #June
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 151
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 6
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -151
+                }              
+            }
+            #May
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 120
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 5
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -120
+                }              
+            }
+            #April
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 90
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -90
+                }              
+            }
+            #March
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 59
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 3
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -59
+                }              
+            }
+            #February
+            else_if = {
+                limit = {
+                    check_variable = {
+                        current_media_cycle_start > 31
+                    }
+                }
+                set_variable = {
+                    current_media_cycle_start_month = 2
+                }
+                add_to_variable = {
+                    current_media_cycle_start = -31
+                }              
+            }
+            #January
+            else = {
+                set_variable = {
+                    current_media_cycle_start_month = 1
+                }
+            }
+            #December
+            if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 334
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 12
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -334
+                }              
+            }
+            #November
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 304
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 11
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -304
+                }              
+            }
+            #October
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 273
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 10
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -273
+                }              
+            }
+            #September
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 243
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 9
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -243
+                }              
+            }
+            #August
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 212
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 8
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -212
+                }              
+            }
+            #July
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 181
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -181
+                }              
+            }
+            #June
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 151
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 6
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -151
+                }              
+            }
+            #May
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 120
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 5
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -120
+                }              
+            }
+            #April
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 90
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -90
+                }              
+            }
+            #March
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 59
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 3
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -59
+                }              
+            }
+            #February
+            else_if = {
+                limit = {
+                    check_variable = {
+                        next_media_cycle_start > 31
+                    }
+                }
+                set_variable = {
+                    next_media_cycle_start_month = 2
+                }
+                add_to_variable = {
+                    next_media_cycle_start = -31
+                }              
+            }
+            #January
+            else = {
+                set_variable = {
+                    next_media_cycle_start_month = 1
+                }
+            }
+            #December
+            if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 334
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 12
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -334
+                }              
+            }
+            #November
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 304
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 11
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -304
+                }              
+            }
+            #October
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 273
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 10
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -273
+                }              
+            }
+            #September
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 243
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 9
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -243
+                }              
+            }
+            #August
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 212
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 8
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -212
+                }              
+            }
+            #July
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 181
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -181
+                }              
+            }
+            #June
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 151
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 6
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -151
+                }              
+            }
+            #May
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 120
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 5
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -120
+                }              
+            }
+            #April
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 90
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 7
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -90
+                }              
+            }
+            #March
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 59
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 3
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -59
+                }              
+            }
+            #February
+            else_if = {
+                limit = {
+                    check_variable = {
+                        second_next_media_cycle_start > 31
+                    }
+                }
+                set_variable = {
+                    second_next_media_cycle_start_month = 2
+                }
+                add_to_variable = {
+                    second_next_media_cycle_start = -31
+                }              
+            }
+            #January
+            else = {
+                set_variable = {
+                    second_next_media_cycle_start_month = 1
+                }
+            }
+
+            #Advert Effects Here
+            #RUS_election_ad_cycle_buyer = Playing_As                      #Buyer
+            #RUS_election_ad_cycle_type = selected_dem_topic               #Topic
+            #RUS_election_ad_cycle_target = RUS_election_ad_target_selected #Target
+            #RUS_election_ad_cycle_state = RUS_RUS_election_MEDIA_DETAILS   #State
+            #RUS_election_ad_cycle_status = 2                              #When Ads Conclude (2 Media Cycles Away)
+            #RUS_election_ad_cycle_format = media_type                     #Newspaper, Radio, TV
+            #RUS_election_ad_cycle_target_position                         #Target Position
+
+            
+            for_each_loop = {
+                array = RUS_election_ad_cycle_buyer  
+                if = {
+                    limit = {
+                        check_variable = {
+                            RUS_election_ad_cycle_status^i = 2
+                        }
+                    }
+                    add_to_variable = {
+                        RUS_election_ad_cycle_status^i = -1
+                    }
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            RUS_election_ad_cycle_status^i = 1
+                        }
+                    }
+                    add_to_variable = {
+                        RUS_election_ad_cycle_status^i = -1
+                    }
+
+                    Russia_Ad_Position_Finder = yes #Get Position of Target
+                    if = {
+                        limit = {
+                            check_variable = { 
+                                RUS_election_ad_cycle_type^i = 1
+                            }
+                        }
+                        set_variable = {
+                            support_modifier = 1
+                        }
+                    }
+                    if = {
+                        limit = {
+                            check_variable = {
+                                RUS_election_ad_cycle_type^i = 2
+                            }
+                        }
+                        set_variable = {
+                            support_modifier = -1
+                        }
+                    }
+                    else = {
+                        set_variable = {
+                            support_modifier = 1
+                        }                      
+                    }
+                    randomize_variable = {
+                        var = Support_Change
+                        distribution = uniform
+                        min = 0.5
+                        max = 2
+                    }
+                    multiply_variable = {
+                        Support_Change = RUS_election_ad_cycle_format^i
+                    }
+                    multiply_variable = {
+                        Support_Change = support_modifier
+                    }
+                    var:RUS_election_ad_cycle_state^i = {
+                        add_to_variable = {
+                            Canidate_Support^RUS.RUS_election_ad_cycle_target_position = RUS.Support_Change
+                        }
+                    }
+                }
+                else = {
+                }
+            }
+            #Refresh generate_campaign_map_russia Here
+            generate_campaign = yes
+
+            activate_mission = The_Media_Cycle_RUS
+        }
+    }
+	SPACE_RACE_RESEARCHING_TECH = {
+		allowed = {
+		
+		}
+		available = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0
+		}
+		fixed_random_seed = no
+		selectable_mission = no
+		days_mission_timeout = var:space_tech_being_researched_year_modifier
+		fire_only_once = no
+		activation = {
+			always = no
+		}
+		timeout_effect = {
+			set_variable = {
+				show_space_researched_tech = 1
+			}
+			space_research_completed = yes
+		}
+	}
 	UN_Intervention_Coalition = {
 		allowed = {
 		
@@ -15,7 +918,6 @@ variables_calculation_category = {
 		fire_only_once = no
 		activation = {
 			always = no
-
 		}
 		timeout_effect = {
 			clr_country_flag = UN_Coalition_Target
@@ -25,7 +927,6 @@ variables_calculation_category = {
 			}
 			news_event = UN_RESOLUTION.32
 		}
-
 	}
 	Send_Troops_to_Vietnam = {
 
@@ -441,6 +1342,8 @@ variables_calculation_category = {
 							idea = influence_increase_cost
 							days = 3650
 						}
+						set_variable = { THIS.idea_len_@token:influence_increase_cost = 3650 }
+						set_variable = { THIS.idea_date_@token:influence_increase_cost = global.num_days }
 					}
 				}
 				if = {
@@ -452,6 +1355,8 @@ variables_calculation_category = {
 							idea = UN_national_asset_freeze
 							days = 3650
 						}
+						set_variable = { THIS.idea_len_@token:UN_national_asset_freeze = 3650 }
+						set_variable = { THIS.idea_date_@token:UN_national_asset_freeze = global.num_days }
 					}
 					news_event = UN_RESOLUTION.5
 				}
@@ -464,6 +1369,8 @@ variables_calculation_category = {
 							idea = UN_officials_sanctioned
 							days = 3650
 						}
+						set_variable = { THIS.idea_len_@token:UN_officials_sanctioned = 3650 }
+						set_variable = { THIS.idea_date_@token:UN_officials_sanctioned = global.num_days }
 					}
 					news_event = UN_RESOLUTION.6
 				}
@@ -727,7 +1634,7 @@ variables_calculation_category = {
 		
 		timeout_effect = {
 			export_script_for_pool = yes
-			standard_deviation_for_industrial_base = yes
+			credit_calculation_work = yes
 			every_country = {
 				if = {
 					limit = {
@@ -769,8 +1676,141 @@ variables_calculation_category = {
 				country_event = trade.5
 				country_event = trade.6
 				country_event = trade.7
+				
 
 				log = "[GetDateText]: [Root.GetTag]: ic_Financial pulse"
+				#log = "[GetDateText]: [Root.GetTag]: chemical weapon effect and removal calc"
+				set_variable = { national_total_lower_class_pop = 0 }
+				set_variable = { national_total_middle_class_pop = 0 }
+				set_variable = { national_total_upper_middle_class_pop = 0 }
+				set_variable = { national_total_upper_class_pop = 0 }
+
+				set_variable = { national_total_lower_class_pay = 0 }
+				set_variable = { national_total_middle_class_pay = 0 }
+				set_variable = { national_total_upper_middle_class_pay = 0 }
+				set_variable = { national_total_upper_class_pay = 0 }
+
+				set_variable = { national_total_employed_pops = 0 }
+				for_each_scope_loop = {	
+					array = owned_states
+
+					set_employment_in_state = yes
+					if = {
+						limit = {
+							has_state_flag = napalm_attacked
+						}
+						add_to_variable = { napalm_total = -1 }
+						if = {
+							limit = {
+								check_variable = { napalm_total < 1 }
+							}
+							clr_state_flag = napalm_attacked
+							set_variable = { napalm_total = 0 }
+							remove_province_modifier = {
+								static_modifiers = { napalm }
+								province = {
+									all_provinces = yes 
+								}
+							}
+						}
+					}
+					if = {
+						limit = {
+							has_state_flag = agent_orange_attacked
+						}
+						add_to_variable = { agent_orange_total = -1 }
+						if = {
+							limit = {
+								check_variable = { napalm_total < 1 }
+							}
+							clr_state_flag = agent_orange_attacked
+							set_variable = { agent_orange_total = 0 }
+							remove_province_modifier = {
+								static_modifiers = { agent_orange2 }
+								province = {
+									all_provinces = yes 
+								}
+							}
+						}
+					}
+					if = {
+						limit = {
+							has_state_flag = mustard_gas_attacked
+						}
+						add_to_variable = { mustard_gas_total = -1 }
+						if = {
+							limit = {
+								check_variable = { mustard_gas_total < 1 }
+							}
+							clr_state_flag = mustard_gas_attacked
+							set_variable = { mustard_gas_total = 0 }
+							remove_province_modifier = {
+								static_modifiers = { mustard_gas }
+								province = {
+									all_provinces = yes 
+								}
+							}
+						}
+					}
+					if = {
+						limit = {
+							has_state_flag = white_phosphorus_attacked
+						}
+						add_to_variable = { white_phosphorus_total = -1 }
+						if = {
+							limit = {
+								check_variable = { white_phosphorus_total < 1 }
+							}
+							clr_state_flag = white_phosphorus_attacked
+							set_variable = { white_phosphorus_total = 0 }
+							remove_province_modifier = {
+								static_modifiers = { white_phosphorus }
+								province = {
+									all_provinces = yes 
+								}
+							}
+						}
+					}
+					if = {
+						limit = {
+							has_state_flag = sarin_attacked
+						}
+						add_to_variable = { sarin_total = -1 }
+						if = {
+							limit = {
+								check_variable = { sarin_total < 1 }
+							}
+							clr_state_flag = sarin_attacked
+							set_variable = { sarin_total = 0 }
+							remove_province_modifier = {
+								static_modifiers = { sarin }
+								province = {
+									all_provinces = yes 
+								}
+							}
+						}
+					}
+					if = {
+						limit = {
+							has_state_flag = vx_attacked
+						}
+						add_to_variable = { vx_total = -1 }
+						if = {
+							limit = {
+								check_variable = { vx_total < 1 }
+							}
+							clr_state_flag = vx_attacked
+							set_variable = { vx_total = 0 }
+							remove_province_modifier = {
+								static_modifiers = { vx VM EA_3990 GV A_234 }
+								province = {
+									all_provinces = yes 
+								}
+							}
+						}
+					}
+				}
+
 				#log = "[GetDateText]: [Root.GetTag]: gdp calc effect"
 				gdp_calculation = yes
 
@@ -833,121 +1873,7 @@ variables_calculation_category = {
 				
 				activate_mission = ic_Financial
 
-				#log = "[GetDateText]: [Root.GetTag]: chemical weapon effect and removal calc"
-				every_owned_state = {
-					limit = {
-						has_state_flag = napalm_attacked
-					}
-					add_to_variable = { napalm_total = -1 }
-					if = {
-						limit = {
-							check_variable = { napalm_total < 1 }
-						}
-						clr_state_flag = napalm_attacked
-						set_variable = { napalm_total = 0 }
-						remove_province_modifier = {
-							static_modifiers = { napalm }
-							province = {
-								all_provinces = yes 
-							}
-						}
-					}
-				}
-				every_owned_state = {
-					limit = {
-						has_state_flag = agent_orange_attacked
-					}
-					add_to_variable = { agent_orange_total = -1 }
-					if = {
-						limit = {
-							check_variable = { napalm_total < 1 }
-						}
-						clr_state_flag = agent_orange_attacked
-						set_variable = { agent_orange_total = 0 }
-						remove_province_modifier = {
-							static_modifiers = { agent_orange2 }
-							province = {
-								all_provinces = yes 
-							}
-						}
-					}
-				}
-				every_owned_state = {
-					limit = {
-						has_state_flag = mustard_gas_attacked
-					}
-					add_to_variable = { mustard_gas_total = -1 }
-					if = {
-						limit = {
-							check_variable = { mustard_gas_total < 1 }
-						}
-						clr_state_flag = mustard_gas_attacked
-						set_variable = { mustard_gas_total = 0 }
-						remove_province_modifier = {
-							static_modifiers = { mustard_gas }
-							province = {
-								all_provinces = yes 
-							}
-						}
-					}
-				}
-				every_owned_state = {
-					limit = {
-						has_state_flag = white_phosphorus_attacked
-					}
-					add_to_variable = { white_phosphorus_total = -1 }
-					if = {
-						limit = {
-							check_variable = { white_phosphorus_total < 1 }
-						}
-						clr_state_flag = white_phosphorus_attacked
-						set_variable = { white_phosphorus_total = 0 }
-						remove_province_modifier = {
-							static_modifiers = { white_phosphorus }
-							province = {
-								all_provinces = yes 
-							}
-						}
-					}
-				}
-				every_owned_state = {
-					limit = {
-						has_state_flag = sarin_attacked
-					}
-					add_to_variable = { sarin_total = -1 }
-					if = {
-						limit = {
-							check_variable = { sarin_total < 1 }
-						}
-						clr_state_flag = sarin_attacked
-						set_variable = { sarin_total = 0 }
-						remove_province_modifier = {
-							static_modifiers = { sarin }
-							province = {
-								all_provinces = yes 
-							}
-						}
-					}
-				}
-				every_owned_state = {
-					limit = {
-						has_state_flag = vx_attacked
-					}
-					add_to_variable = { vx_total = -1 }
-					if = {
-						limit = {
-							check_variable = { vx_total < 1 }
-						}
-						clr_state_flag = vx_attacked
-						set_variable = { vx_total = 0 }
-						remove_province_modifier = {
-							static_modifiers = { vx VM EA_3990 GV A_234 }
-							province = {
-								all_provinces = yes 
-							}
-						}
-					}
-				}
+				monthly_borrowing_and_interest_pulse = yes
 				#log = "[GetDateText]: [Root.GetTag]: emergency_policy_replanning scripted effect"
 				#emergency_policy_replanning = yes
 			}
@@ -1368,6 +2294,43 @@ variables_calculation_category = {
 		}
 	}
 }
+
+
+
+propaganda_efforts = {
+	Propose_a_Neutral_Reunified_Germany = {
+
+		icon = generic_propaganda
+
+		available = {
+			date > 1952.3.1
+			original_tag = SOV
+		}
+		visible = {
+			has_country_leader = {
+				name = "Joseph Stalin"
+				ruling_only = yes
+			}
+			original_tag = SOV
+		}
+
+		fire_only_once = yes
+
+
+		cost = 0
+
+		complete_effect = {
+			country_event = StalinNotes.1
+		}
+		
+		ai_will_do = {
+			factor = 1
+
+		}
+	}
+
+}
+
 operations = {
 #	soviet_intervention = {
 #
@@ -1520,79 +2483,7 @@ operations = {
 		}
 	}
 
-	The_Chinese_Civil_war = {
-		icon = generic_prepare_civil_war
-		allowed = {
-			major_countries = yes
-		}
-		available = {
-			always = no
-		}
-		fire_only_once = yes
-		days_mission_timeout = 740
-		cancel_trigger = {
-			OR = {
-				has_global_flag = chinese_civil_war_over
-				PRC = {
-					NOT = {
-						has_war_with = CHI
-					}
-				}
-			}
-			
-		}
-		timeout_effect = {
-			if = {
-				limit = {
-					tag = PRC
-				}
-				if = {
-					limit = {
-						PRC = {
-							surrender_progress > 0.79
-						}
-					}
-					PRC_Lose_CCW = yes
-				}
-				else_if = {
-					limit = {
-						PRC = {
-							has_global_flag = roc_rebound_shanghai
-							surrender_progress > 0.59
-						}
-					}
-					PRC_Lose_CCW = yes
-				}
-				else = {
-					ROC_lose_CCW = yes
-				}
-			}
-			else = {
-				effect_tooltip = {
-					if = {
-						limit = {
-							PRC = {
-								surrender_progress > 0.79
-							}
-						}
-						PRC_Lose_CCW = yes
-					}
-					else_if = {
-						limit = {
-							PRC = {
-								has_global_flag = roc_rebound_shanghai
-								surrender_progress > 0.59
-							}
-						}
-						PRC_Lose_CCW = yes
-					}
-					else = {
-						ROC_lose_CCW = yes
-					}
-				}
-			}
-		}
-	}
+	
 	THIRD_BALKAN_WAR_TIMER = {
 		icon = generic_prepare_civil_war
 		allowed = {
@@ -2058,60 +2949,7 @@ operations = {
 	}
 
 
-	The_Shanghai_Campaign = {
-
-		icon = generic_prepare_civil_war
-		allowed = {
-			tag = CHI
-		}
-
-		available = {
-			613 = { is_fully_controlled_by = PRC  } 
-		}
-		activation = {
-			always = no
-		}
-		cost = 0
-
-		fire_only_once = yes
-		selectable_mission = yes
-
-		days_mission_timeout = 50
-
-		complete_effect = {
-			news_event = Shanghai_Campaign.1
-		}
-
-		timeout_effect = {
-			if = {
-				limit = {
-					613 = { is_fully_controlled_by = PRC  } 
-				}
-				news_event = Shanghai_Campaign.1
-			}
-			else = {
-				news_event = Shanghai_Campaign.2 
-				set_global_flag = roc_rebound_shanghai
-				if = {
-					limit = {
-						CHI = {
-							is_ai = no
-						}
-					}
-					PRC = {
-						add_days_mission_timeout = {
-							mission = The_Chinese_Civil_war
-							days = 1095
-						}						
-					}
-				}
-			}
-		}
-
-		ai_will_do = {
-			factor = 0
-		}
-	}
+	
 	UN_CEASEFIRE_RAJ_1962 = {
 		icon = generic_prepare_civil_war
 		allowed = {
@@ -2434,8 +3272,8 @@ operations = {
 						controls_state = 620
 						controls_state = 607
 						controls_state = 615
-						controls_state = 622		
-					}
+						controls_state = 622
+					}	
 				}
 				PRC_Lose_CCW = yes
 			}
@@ -3193,3 +4031,892 @@ war_measures = {
 		}
 	}
 }
+
+ foreign_politics = {
+
+ 
+	increase_defcon = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_ai = ye
+				if = { limit = { has_idea = defcon_system_5 }
+					custom_trigger_tooltip = {
+						tooltip = highest_defcon_TT
+						NOT = { has_idea = defcon_system_5 }
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = DEFCON_cooldown_TT
+					NOT = { check_variable = { DEFCON_cooldown = 1 } }
+				}
+				custom_trigger_tooltip = {
+					tooltip = has_nukes_TT
+					check_variable = { num_of_nukes > 0 }
+				}
+				has_war = no
+		}
+		visible = {
+			is_ai = yes
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 1000
+		}
+		complete_effect = {
+			if = { 
+				limit = { 
+					has_idea = defcon_system_1
+				}
+				remove_ideas = defcon_system_1
+				add_ideas = defcon_system_2
+			}
+			else_if = { limit = { has_idea = defcon_system_2 }
+				remove_ideas = defcon_system_2
+				add_ideas = defcon_system_3
+			}
+			else_if = { limit = { has_idea = defcon_system_3 }
+				remove_ideas = defcon_system_3
+				add_ideas = defcon_system_4
+			}
+			else_if = { limit = { has_idea = defcon_system_4 }
+				remove_ideas = defcon_system_4
+				add_ideas = defcon_system_5
+			}
+			else = { log = "raise defcon fail" }
+			set_variable = { DEFCON_cooldown = 1 }
+			THIS = { activate_mission = WMD_defcon_cooldown }
+		}
+	}
+	
+	decrease_defcon = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_ai = yes
+				if = { limit = { has_idea = defcon_system_1 }
+					custom_trigger_tooltip = {
+						tooltip = lowest_defcon_TT
+						NOT = { has_idea = defcon_system_1 }
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = DEFCON_cooldown_TT
+					NOT = { check_variable = { DEFCON_cooldown = 1 } }
+				}
+				custom_trigger_tooltip = {
+					tooltip = has_nukes_TT
+					check_variable = { num_of_nukes > 0 }
+				}
+				if = { limit = { has_idea = defcon_system_5 }
+					custom_trigger_tooltip = {
+						tooltip = needs_60_WT_TT
+						threat > 0.6
+					}
+				}
+				else_if = { limit = { has_idea = defcon_system_4 }
+					custom_trigger_tooltip = {
+						tooltip = needs_80_WT_TT
+						threat > 0.8
+					}
+				}
+				else_if = { limit = { has_idea = defcon_system_3 }
+					custom_trigger_tooltip = {
+						tooltip = needs_90_WT_TT
+						threat > 0.9
+					}
+					custom_trigger_tooltip = {
+						tooltip = must_be_at_war_2_TT
+						has_war = yes
+					}
+				}
+				else_if = { limit = { has_idea = defcon_system_2 }
+					custom_trigger_tooltip = {
+						tooltip = needs_100_WT_TT
+						threat > 0.999
+					}
+					custom_trigger_tooltip = {
+						tooltip = must_be_at_war_1_TT
+						has_war = yes
+					}
+				}
+		}
+		visible = {
+			is_ai = yes
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 1000
+		}
+		complete_effect = {
+				if = { limit = { has_idea = defcon_system_5 }
+					remove_ideas = defcon_system_5
+					add_ideas = defcon_system_4
+				}
+				else_if = { limit = { has_idea = defcon_system_4 }
+					remove_ideas = defcon_system_4
+					add_ideas = defcon_system_3
+				}
+				else_if = { limit = { has_idea = defcon_system_3 }
+					remove_ideas = defcon_system_3
+					add_ideas = defcon_system_2
+				}
+				else_if = { limit = { has_idea = defcon_system_2 }
+					remove_ideas = defcon_system_2
+					add_ideas = defcon_system_1
+				}
+				else = {
+					add_ideas = defcon_system_5
+				}
+				set_variable = { DEFCON_cooldown = 1 }
+				THIS = { activate_mission = WMD_defcon_cooldown }
+		}
+	}
+	nuclear_war = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_ai = yes
+			has_war = yes
+			has_idea = defcon_system_1
+			check_variable = { var = wmd_missiles_total value = var:missile_cost compare = greater_than_or_equals }
+			OR = {
+				original_tag = USA
+				original_tag = SOV
+			}
+		}
+		visible = {
+			is_ai = yes
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 1000
+		}
+		complete_effect = {
+			wmd_select_all_enemies = yes
+			wmd_distance_calculator = yes
+			wmd_check_strike_missiles = yes
+			wmd_nuke_launch = yes
+		}
+	}
+   
+	prc_wins_CCW_debug = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			is_ai = no
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			ROC_lose_CCW = yes
+		}
+   }
+   roc_wins_CCW_debug = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			is_ai = no
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			PRC_Lose_CCW = yes
+		}
+   }
+
+    COMECON_DOCKYARD_Investment = {
+        icon = generic_operation
+
+        allowed = {
+        }
+
+        available = {
+            always = no
+        } 
+
+        days_mission_timeout = COMECON_DOCKYARD_Investment_Duration
+		days_remove = COMECON_DOCKYARD_Investment_Duration
+
+        fire_only_once = no
+
+        activation = {
+            always = no
+        }
+
+        timeout_effect = {
+            SOV = {
+                COMECON_INVESTMENT_CONSUMER_GOODS = -5
+            }
+			set_country_flag = COMECON_DOCKYARD_PROMPT
+            clr_country_flag = Soviet_Building_Dockyard
+            random_owned_controlled_state = {
+                limit = {
+                    is_coastal = yes
+                    free_building_slots = {
+                        building = dockyard
+                        size > 0
+                        include_locked = yes
+                    }
+                }
+                add_building_construction = {
+                    type = dockyard
+                    level = 1
+                    instant_build = yes
+                }
+            }
+        }
+    }
+    COMECON_FACTORY_Investment = {
+        icon = generic_operation
+
+        allowed = {
+        }
+
+        available = {
+            always = no
+        } 
+
+        days_mission_timeout = COMECON_FACTORY_Investment_Duration
+		days_remove = COMECON_FACTORY_Investment_Duration
+
+        fire_only_once = no
+
+        activation = {
+            always = no
+        }
+
+        timeout_effect = {
+            SOV = {
+                COMECON_INVESTMENT_CONSUMER_GOODS = -5
+            }
+			set_country_flag = COMECON_FACTORY_PROMPT
+            clr_country_flag = Soviet_Building_Factory
+            random_owned_controlled_state = {
+                limit = {
+                    free_building_slots = {
+                        building = industrial_complex
+                        size > 0
+                        include_locked = yes
+                    }
+                }
+                add_building_construction = {
+                    type = industrial_complex
+                    level = 1
+                    instant_build = yes
+                }
+            }
+        }
+    }
+    COMECON_FARM_Investment = {
+        icon = generic_operation
+
+        allowed = {
+        }
+
+        available = {
+            always = no
+        } 
+
+        days_mission_timeout = COMECON_FARM_Investment_Duration
+		days_remove = COMECON_FARM_Investment_Duration
+
+        fire_only_once = no
+
+        activation = {
+            always = no
+        }
+
+        timeout_effect = {
+            SOV = {
+                COMECON_INVESTMENT_CONSUMER_GOODS = -5
+            }
+			set_country_flag = COMECON_FARM_PROMPT
+            clr_country_flag = Soviet_Building_Farms
+            random_owned_controlled_state = {
+                limit = {
+                    free_building_slots = {
+                        building = agri_industrial_complex
+                        size > 0
+                        include_locked = yes
+                    }
+                }
+                add_building_construction = {
+                    type = agri_industrial_complex
+                    level = 1
+                    instant_build = yes
+                }
+            }
+        }
+    }
+    COMECON_ARMS_Investment = {
+        icon = generic_operation
+
+        allowed = {
+        }
+
+        available = {
+            always = no
+        } 
+
+        days_mission_timeout = COMECON_ARMS_Investment_Duration
+		days_remove = COMECON_ARMS_Investment_Duration
+
+        fire_only_once = no
+
+        activation = {
+            always = no
+        }
+
+        timeout_effect = {
+            SOV = {
+                COMECON_INVESTMENT_CONSUMER_GOODS = -5
+            }
+			set_country_flag = COMECON_ARMS_PROMPT
+            clr_country_flag = Soviet_Building_Arms_Factory
+            random_owned_controlled_state = {
+                limit = {
+                    free_building_slots = {
+                        building = arms_factory
+                        size > 0
+                        include_locked = yes
+                    }
+                }
+                add_building_construction = {
+                    type = arms_factory
+                    level = 1
+                    instant_build = yes
+                }
+            }
+        }
+    }
+
+	start_suez_debug = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			is_ai = no
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			EGY = {
+				country_event = suez.2
+				BAH = { country_event = Suez_Crisis_Gulf.50 }
+				QAT = { country_event = QAT_Suez_Crisis.1 }
+			}
+		}
+   }
+
+   can_build_railway_test = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			can_build_railway = {
+				start_province = 9671 ##use start_state instead if you want to check between states instead of provinces
+				target_province = 9814 ##ditto, target_state
+			}
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+		}
+   }
+   add_research_slots = {
+		icon = generic_industry
+		allowed = {
+		}
+		available = {
+			is_debug = yes
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			add_research_slot = 5
+		}
+	}
+   focus_tree = {
+		icon = generic_industry
+		allowed = {
+		}
+		available = {
+			is_debug = yes
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = PER_1973
+		}
+   }
+   focus_tree_2 = {
+		icon = generic_industry
+		allowed = {
+		}
+		available = {
+			is_debug = yes
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = UK_60_1964_Elections
+		}
+   }
+   focus_tree_3 = {
+		icon = generic_industry
+		allowed = {
+		}
+		available = {
+			is_debug = yes
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = USA_Shriver_1980_First_Term
+		}
+	}
+   form_indochina_faction = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+		}
+   }
+
+   has_railway_test = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			has_railway_connection = {
+				start_province = 9671
+				target_province = 9814
+			}
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+		}
+   }
+
+	WGR_load_tree_WGR_Starting_Tree = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_50s_Starting_Tree
+		}
+   }
+
+	 WGR_load_tree_WGR_1950s = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_1950s
+		}
+   }
+
+	WGR_load_tree_WGR_60s = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Adenauer_49
+		}
+   }
+
+   WGR_load_tree_Adenauer_49 = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Adenauer_49
+		}
+   }
+
+   WGR_load_tree_Adenauer_53 = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Adenauer_53
+		}
+   }
+
+	WGR_load_tree_Adenauer_57 = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Adenauer_57
+		}
+   }
+
+   WGR_load_tree_Franke_53 = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Franke_53
+		}
+   }
+
+   WGR_load_tree_Franke_57 = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Franke_57
+		}
+   }
+
+	WGR_load_tree_Ollenhauer_53 = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Ollenhauer_53
+		}
+   }
+
+	WGR_load_tree_Ollenhauer_57 = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Ollenhauer_57
+		}
+   }
+
+	WGR_load_tree_Reimann_49 = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Reimann_49
+		}
+   }
+
+	WGR_load_tree_Schumacher_49 = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Schumacher_49
+		}
+   }
+
+   WGR_load_tree_Gehlen_Junta = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Junta_Gehlen
+		}
+   }
+
+   WGR_load_tree_Junta_Manstein = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Junta_Manstein
+		}
+   }
+
+   WGR_load_tree_Junta_Speidel = {
+		icon = generic_industry
+		allowed = {
+		}
+
+		available = {
+			is_debug = yes
+			original_tag = WGR
+		}
+		visible = {
+			is_debug = yes
+			is_ai = no
+		}
+		cost = 0
+		ai_will_do = {
+			factor = 0
+		}
+		complete_effect = {
+			load_focus_tree = WGR_Junta_Speidel
+		}
+   }				
+}
+
+economy_decisions = {
+
+}
+
+
