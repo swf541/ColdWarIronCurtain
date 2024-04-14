@@ -637,6 +637,65 @@ PRC_50s_Vietnam_Issue_categories = {
 	}
 }
 PRC_50s_civilwar_categories = {    
+	PRC_Contact_the_three_district_government = {#中共联络三区政府
+	    allowed = {
+			original_tag = PRC
+		}
+        visible = {
+			date < 1960.01.01
+			has_completed_focus = PRC_50s_Promote_The_Peaceful_Liberation_of_Sinkiang
+			NOT = {
+				SIK = { has_cosmetic_tag = SIK_PRC_liberation }
+				country_exists = SIK
+			}
+        }
+        cost = 20
+        fire_only_once = yes
+        available = {
+            
+        }
+        complete_effect = {
+        }
+        days_remove = 5
+        remove_effect = {
+            SIK = {
+                add_popularity = {
+                    ideology = maoism
+                    popularity = 0.1
+                }
+            }
+            set_country_flag = PRC_Contact_the_three_district_government
+        }
+		ai_will_do = { 
+			factor = 100 
+			modifier = {
+				factor = 0
+				date < 1949.08.10
+			}
+		}
+    }
+    PRC_Arrest_KMT_Spies = {#杀国民党间谍
+        visible = {
+            check_variable = { CHI.cww_infiltrate > 0 }
+            tag = PRC
+        }
+        cost = 50
+        available = {
+            tag = PRC
+            check_variable = { CHI.cww_infiltrate > 0 }
+        }
+        complete_effect = {
+               
+        }
+        days_remove = 10
+        remove_effect = {
+            CHI = {
+                add_manpower = -20
+            }
+               
+            add_to_variable = { CHI.cww_infiltrate = -10 }
+        }
+    }
     PRC_50s_Battle_of_Jiangshan_Island = { 
 		allowed = { 
 			original_tag = PRC
@@ -645,25 +704,33 @@ PRC_50s_civilwar_categories = {
 		cost = 5
 
         available = {
-            custom_trigger_tooltip = {
-                tooltip = PRC_50s_Battle_of_Jiangshan_Island_trigger
-                check_variable = { num_equipment_in_armies@artillery_equipment > 250 }
-                check_variable = { num_deployed_planes_with_type@tactical_bomber > 100 }
-            }
-            has_equipment = {
-                convoy_1 > 50
-            }
-            divisions_in_state = {
-                state = 596
-                size > 2
-            }
+			has_global_flag = ROC_taiwan
+			if = {
+				limit = {
+                    NOT = {
+						is_ai =yes
+					}
+					custom_trigger_tooltip = {
+						tooltip = PRC_50s_Battle_of_Jiangshan_Island_trigger
+						check_variable = { num_equipment_in_armies@artillery_equipment > 250 }
+						check_variable = { num_deployed_planes_with_type@tactical_bomber > 100 }
+					}
+					divisions_in_state = {
+						state = 596
+						size > 2
+					}
+				}
+			}
+			has_equipment = {
+				convoy_1 > 20
+			}
         }
 
 		days_remove = 10
         fire_only_once = yes
 		
 		visible = {
-			has_completed_focus = PRC_50s_Liberate_The_Whole_of_China
+			has_completed_focus = PRC_50s_Strengthen_The_Defence_of_The_Southeast_Coast
 		}
 
 		fire_only_once = yes
@@ -673,6 +740,105 @@ PRC_50s_civilwar_categories = {
                 id = PRC_50s_Rework_event.160
                 days = 10
             }
+		}
+		ai_will_do = {
+			factor = 100
+			modifier = {
+				factor = 0
+				date < 1955.01.17
+			}
+		}
+	}
+	Liberate_Hainan = {
+
+		icon = generic_prepare_civil_war
+
+		available = {
+			tag = PRC
+			NOT = {
+				owns_state = 591
+			}
+		}
+		visible = {
+			original_tag = PRC
+			has_global_flag = ROC_taiwan
+			NOT = {
+				owns_state = 591
+			}
+		}
+
+		
+		complete_effect = {
+			activate_mission = Battle_of_Hainan
+			set_province_controller = 1038
+			set_province_controller = 16106
+			load_oob = PRC_Hainan_oob
+		}
+
+		cost = 0
+
+		fire_only_once = yes
+		selectable_mission = no
+
+		days_remove = 1
+
+
+
+		ai_will_do = {
+			factor = 100
+		}
+	}
+
+	Battle_of_Hainan = {
+
+		icon = generic_prepare_civil_war
+
+
+		available = {
+			591 = { is_fully_controlled_by = PRC  } 
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_mission_timeout = 60
+
+		complete_effect = {
+			transfer_state = 591
+			#news_event = PRC_Hainan.1
+			white_peace = CHI
+			CHI = {
+				complete_national_focus = CHI_Fall_of_Hainan
+			}
+		}
+
+		timeout_effect = {
+			if = {
+				limit = {
+					591 = { is_fully_controlled_by = PRC  } 
+				}
+				transfer_state = 591
+				#news_event = PRC_Hainan.1
+				white_peace = CHI
+				CHI = {
+					complete_national_focus = CHI_Fall_of_Hainan
+				}
+			}
+			else = {
+				CHI = {
+					complete_national_focus = CHI_Victory_in_Hainan
+				}
+				#news_event = ROC_Hainan.1
+			}
+			white_peace = CHI
+		}
+
+		ai_will_do = {
+			factor = 1
 		}
 	}
 
