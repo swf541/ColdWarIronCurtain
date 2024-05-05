@@ -2,10 +2,7 @@ focus_tree = {
 	id = KMT_1950s_Victory
 	country = {
 		factor = 0
-		modifier = {
-			add = 70 
-			tag = CHI
-		}
+		
 		
 		
 	}
@@ -1220,7 +1217,6 @@ focus_tree = {
 
 
 
-			add_stability = -0.05
 			custom_effect_tooltip = decrease_crisis_penalty_TT
 			add_to_variable = {
 				crisis_factor_neg = 0.05
@@ -1376,14 +1372,68 @@ focus_tree = {
 		icon = GFX_KMT_50s_Mainland_Implement_CCK_Reforms_Nationwide
 		cost = 5
 		
+		available = {
+			NOT = {has_country_flag = CHI_activate_Reform_Time}
+		}
+
+		bypass = {
+			has_country_flag = Shanghai_failure
+		}
+		
 		prerequisite = {
 			focus = KMT_Crackdown_on_Party_Corruption
 		}	
 		x = 14
 		y = 10
 		completion_reward = {
-			add_ideas = KMT_ching_kuo_reforms
-			
+			if = {
+				limit = {
+					has_country_flag = Shanghai_success
+				}
+				custom_effect_tooltip = KMT_institute_ching_kuo_reforms_nationwide_yes_tt
+			}
+			if = {
+				limit = {
+					has_country_flag = Shanghai_failure
+				}
+				custom_effect_tooltip = KMT_institute_ching_kuo_reforms_nationwide_no_tt
+			}
+			if = {
+				limit = {
+					NOT = {
+						has_country_flag = Shanghai_failure
+						has_country_flag = Shanghai_success
+					}
+				}
+				custom_effect_tooltip = KMT_institute_ching_kuo_reforms_nationwide_idk_tt
+			}
+			if = {
+				limit = {
+					has_country_flag = Shanghai_small_win
+				}
+				add_ideas = KMT_ching_kuo_reforms_1
+				613 = {
+					remove_dynamic_modifier = Shanghai_reformed_modifier_1
+				}
+			}
+			if = {
+				limit = {
+					has_country_flag = Shanghai_mid_win
+				}
+				add_ideas = KMT_ching_kuo_reforms_2
+				613 = {
+					remove_dynamic_modifier = Shanghai_reformed_modifier_2
+				}
+			}
+			if = {
+				limit = {
+					has_country_flag = Shanghai_big_win
+				}
+				add_ideas = KMT_ching_kuo_reforms_3
+				613 = {
+					remove_dynamic_modifier = Shanghai_reformed_modifier_3
+				}
+			}
 		}
 	}
 	
@@ -1402,6 +1452,7 @@ focus_tree = {
 				has_country_flag = YUN_INTEGRATED
 				has_country_flag = XIK_INTEGRATED
 				has_country_flag = QMC_INTEGRATED
+				has_country_flag = SHX_INTEGRATED
 			}
 		}
 		
@@ -2177,6 +2228,18 @@ focus_tree = {
 				add_war_support = -0.05
 				add_political_power = -50
 			}
+			328 = {
+				damage_building = {
+					type = industrial_complex
+					damage = 5
+				}
+			}
+			714 = {
+				damage_building = {
+					type = industrial_complex
+					damage = 5
+				}
+			}
 		}
 		icon = GFX_Launch_Full_Investigation
 		cost = 2
@@ -2197,14 +2260,28 @@ focus_tree = {
 		id = KMT_collapse_the_iron_curtain_in_north_asia
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetTag]: id = KMT_collapse_the_iron_curtain_in_north_asia"
-			custom_effect_tooltip = Unlock_anti_communist_revolt_Decisions_tt
+			country_event = KMT_50s_Mainland.21
+			custom_effect_tooltip = collapse_the_bamboo_curtain_tt
 		}
 		icon = GFX_Break_the_Iron_Curtain_in_Asia
 		cost = 2
 		x = 18
 		y = 17
 			
-		
+		available = {
+			AND = {
+				date > 1959.12.01
+				MON = {
+					exists = yes
+				}
+				SIK = {
+					exists = yes
+				}
+				PRC = {
+					exists = yes
+				}
+			}	
+		}
 		prerequisite = {
 			focus = KMT_send_spies_into_ccp_territory
 		}
@@ -4730,7 +4807,6 @@ focus_tree = {
 				category = nuclear_fission
 			}
 			add_ideas = armed_nation_nuke
-			news_event = KMT_Atoms.2
 		}
 	}
 	focus = {
@@ -5172,10 +5248,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			army_experience = 25
-			custom_effect_tooltip = decrease_military_penalty_TT
-			add_to_variable = {
-				KMT_Military_Penalty = 0.05
-			}
+			country_event = KMT_MIL.15
 		}
 	}
 	focus = {
@@ -5544,6 +5617,7 @@ focus_tree = {
 		y = 9
 		completion_reward = {
 			custom_effect_tooltip = Anger_Warlords_Major_TT
+			add_ideas = KMT_land_reform_backlash_1
 			add_to_variable = { var_warlord_loyalty_check = 1 }
 			add_to_variable = {
 				SHX_Warlord_Loyalty = -0.1
@@ -5567,6 +5641,7 @@ focus_tree = {
 				XIK_Warlord_Loyalty = -0.1
 			}
 			news_event = KMT_LAND_REFORM.1
+			set_country_flag = { flag = landreform_conservative_opposition value = 1 days = 179 }
 		}
 	}
 	focus = {
@@ -5579,6 +5654,15 @@ focus_tree = {
 		prerequisite = {
 			focus = KMT_Commit_to_Land_Reform
 		}
+		available = {
+			custom_trigger_tooltip = {
+			    tooltip = landreform_conservative_opposition_tt
+				OR = {
+			   		NOT = { has_country_flag = landreform_conservative_opposition }
+					has_completed_focus = KMT_Liquidate_Uncooperative_Landlords
+				}
+			}
+		}
 		x = 29
 		y = 10
 		completion_reward = {
@@ -5587,7 +5671,7 @@ focus_tree = {
 				add_extra_state_shared_building_slots = 1
 			}
 			add_ideas = CHI_Georgist_Taxation
-			
+			set_country_flag = { flag = landreform_conservative_opposition value = 1 days = 179 }
 		}
 	}
 	focus = {
@@ -5599,6 +5683,15 @@ focus_tree = {
 		cost = 5.2
 		prerequisite = {
 			focus = KMT_Implement_Georgist_Tax_Reforms
+		}
+		available = {
+			custom_trigger_tooltip = {
+			    tooltip = landreform_conservative_opposition_tt
+				OR = {
+			   		NOT = { has_country_flag = landreform_conservative_opposition }
+					has_completed_focus = KMT_Liquidate_Uncooperative_Landlords
+				}
+			}
 		}
 		mutually_exclusive = {
 			focus = KMT_Enforce_Reforms_in_Clique_Territory
@@ -5633,7 +5726,7 @@ focus_tree = {
 			every_owned_state = {
 				add_extra_state_shared_building_slots = 2
 			}
-			
+			set_country_flag = { flag = landreform_conservative_opposition value = 1 days = 179 }
 		}
 	}
 	focus = {
@@ -5655,6 +5748,13 @@ focus_tree = {
 					currentMoney > 100
 				}
 			}
+			custom_trigger_tooltip = {
+			    tooltip = landreform_conservative_opposition_tt
+				OR = {
+			   		NOT = { has_country_flag = landreform_conservative_opposition }
+					has_completed_focus = KMT_Liquidate_Uncooperative_Landlords
+				}
+			}
 		}
 		select_effect = {
 			add_to_variable = {
@@ -5666,6 +5766,7 @@ focus_tree = {
 				remove_idea = CHI_land_reform_issue_1
 				add_idea = CHI_land_reform_issue_2
 			}
+			set_country_flag = { flag = landreform_conservative_opposition value = 1 days = 179 }
 		}
 	}
 	focus = {
@@ -5678,6 +5779,15 @@ focus_tree = {
 		prerequisite = {
 			focus = KMT_Compensate_Landowners
 		}
+		available = {
+			custom_trigger_tooltip = {
+			    tooltip = landreform_conservative_opposition_tt
+				OR = {
+			   		NOT = { has_country_flag = landreform_conservative_opposition }
+					has_completed_focus = KMT_Liquidate_Uncooperative_Landlords
+				}
+			}
+		}
 		mutually_exclusive = {
 			focus = KMT_Attempt_to_Persuade_Reluctant_Landlords
 		}
@@ -5689,6 +5799,8 @@ focus_tree = {
 			every_owned_state = {
 				add_manpower = -2000
 			}
+			remove_ideas = KMT_land_reform_backlash_1
+			custom_effect_tooltip = destroy_landlords_tt
 		}
 	}
 	focus = {
@@ -5802,11 +5914,21 @@ focus_tree = {
 			focus = KMT_Enforce_Reforms_in_Clique_Territory
 			focus = KMT_Allow_Clique_Autonomy
 		}
+		available = {
+			custom_trigger_tooltip = {
+			    tooltip = landreform_conservative_opposition_tt
+				OR = {
+			   		NOT = { has_country_flag = landreform_conservative_opposition }
+					has_completed_focus = KMT_Liquidate_Uncooperative_Landlords
+				}
+			}
+		}
 		x = 31
 		y = 12
 		completion_reward = {
-			remove_ideas = CHI_land_reform_issue_2
 			custom_effect_tooltip = decrease_crisis_penalty_TT
+			remove_ideas = CHI_land_reform_issue_2
+			remove_ideas = KMT_land_reform_backlash_2
 			add_to_variable = {
 				crisis_factor_neg = 0.1
 			}
@@ -5834,6 +5956,13 @@ focus_tree = {
 					currentMoney > 100
 				}
 			}
+			custom_trigger_tooltip = {
+			    tooltip = landreform_conservative_opposition_tt
+				OR = {
+			   		NOT = { has_country_flag = landreform_conservative_opposition }
+					has_completed_focus = KMT_Liquidate_Uncooperative_Landlords
+				}
+			}
 		}
 		select_effect = {
 			add_to_variable = {
@@ -5842,9 +5971,14 @@ focus_tree = {
 		}
 		completion_reward = {
 			custom_effect_tooltip = decrease_crisis_penalty_TT
+			swap_ideas = {
+				remove_idea = KMT_land_reform_backlash_1
+				add_idea = KMT_land_reform_backlash_2
+			}
 			add_to_variable = {
 				crisis_factor_neg = 0.05
 			}
+			set_country_flag = { flag = landreform_conservative_opposition value = 1 days = 179 }
 		}
 	}
 	
@@ -5857,6 +5991,15 @@ focus_tree = {
 		cost = 5.2
 		prerequisite = {
 			focus = KMT_Implement_Georgist_Tax_Reforms
+		}
+		available = {
+			custom_trigger_tooltip = {
+			    tooltip = landreform_conservative_opposition_tt
+				OR = {
+			   		NOT = { has_country_flag = landreform_conservative_opposition }
+					has_completed_focus = KMT_Liquidate_Uncooperative_Landlords
+				}
+			}
 		}
 		mutually_exclusive = {
 			focus = KMT_Allow_Clique_Autonomy
@@ -5891,6 +6034,7 @@ focus_tree = {
 			every_owned_state = {
 				add_extra_state_shared_building_slots = 2
 			}
+			set_country_flag = { flag = landreform_conservative_opposition value = 1 days = 179 }
 		}
 	}
 }
