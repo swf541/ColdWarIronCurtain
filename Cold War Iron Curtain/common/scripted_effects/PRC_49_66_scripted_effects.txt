@@ -20,13 +20,6 @@ PRC_50s_gain_money_tt = {
 #######################
 
 PRC_50s_Economic_ruin_caused_by_war_ideas_swap = {
-    if = {
-        limit = { has_idea = PRC_50s_Economic_ruin_caused_by_war_0 }
-        swap_ideas = {
-            remove_idea = PRC_50s_Economic_ruin_caused_by_war_1
-            add_idea = PRC_50s_Economic_ruin_caused_by_war_2
-        }
-    }  
     else_if = {
         limit = { has_idea = PRC_50s_Economic_ruin_caused_by_war_1 }
         swap_ideas = { remove_idea = PRC_50s_Economic_ruin_caused_by_war_1 add_idea = PRC_50s_Economic_ruin_caused_by_war_2 }
@@ -892,8 +885,227 @@ PRC_Suppress_Counterrevolutionaries_update = {
 }
 
 #Land Reform
+PRC_Land_Reform_startup = {
+    every_state = {
+        limit = {
+            OR = {
+                state = 616
+                state = 1787
+                state = 1786
+                state = 607
+                state = 620
+                state = 606
+
+                state = 1785
+                state = 598
+                state = 1557
+                state = 605
+                state = 325
+                state = 603
+                state = 602
+                state = 600
+                state = 596
+                state = 595
+                state = 1569
+                state = 594
+                state = 617
+                state = 604
+            }
+        }
+        set_variable = { Land_Reform_progrss = 0 }
+        set_variable = { Land_Reform_progrss_gain = 1 }
+    }
+    PRC_Land_Reform_update = yes
+}
+PRC_Land_Reform_update = {
+    every_state = {
+        limit = {
+            OR = {
+                state = 616
+                state = 1787
+                state = 1786
+                state = 607
+                state = 620
+                state = 606
+
+                state = 1785
+                state = 598
+                state = 1557
+                state = 605
+                state = 325
+                state = 603
+                state = 602
+                state = 600
+                state = 596
+                state = 595
+                state = 1569
+                state = 594
+                state = 617
+                state = 604
+            }
+        }
+        clamp_variable = {
+            var = Land_Reform_progrss
+            min = 0
+            max = 200
+        }
+        clamp_variable = {
+            var = Land_Reform_progrss_gain
+            min = 0
+            max = 8
+        }
+        if = {
+            limit = {
+                check_variable = { Land_Reform_progrss > 180 }
+            }
+            set_variable = { Land_Reform_level = 2 }
+        }
+        if = {
+            limit = {
+                check_variable = { 
+                    var = Land_Reform_progrss 
+                    value = 180
+                    compare = less_than_or_equals
+                }
+                check_variable = { 
+                    var = Land_Reform_progrss 
+                    value = 0
+                    compare = greater_than_or_equals
+                }
+            }
+            set_variable = { Land_Reform_level = 0 }
+        }
+    }
+}
 
 #Socialist Transformation
+PRC_Socialist_Transformation_startup = {
+    #实际数值
+    set_variable = { PRC_Socialist_Transformation_agriculture_progress = 13 }
+    set_variable = { PRC_Socialist_Transformation_industry_progress = 8 }
+    set_variable = { PRC_Socialist_Transformation_commerce_progress = 51 }
+    #gui值
+    add_to_variable = { PRC_Socialist_Transformation_agriculture_progress = 14 }
+    add_to_variable = { PRC_Socialist_Transformation_industry_progress = 14 }
+    add_to_variable = { PRC_Socialist_Transformation_commerce_progress = 14 }
+    #指标数值
+    set_variable = { PRC_Socialist_Transformation_agriculture_progress_max = 90 }
+    set_variable = { PRC_Socialist_Transformation_industry_progress_max = 120 }
+    set_variable = { PRC_Socialist_Transformation_commerce_progress_max = 120 }
+    PRC_Socialist_Transformation_update = yes
+}
+PRC_Socialist_Transformation_update = {
+    clamp_variable = {
+        var = PRC_Socialist_Transformation_agriculture_progress_max
+        min = 0
+        max = 143
+    }
+    clamp_variable = {
+        var = PRC_Socialist_Transformation_industry_progress_max
+        min = 0
+        max = 143
+    }
+    clamp_variable = {
+        var = PRC_Socialist_Transformation_commerce_progress_max
+        min = 0
+        max = 143
+    }
+    clamp_variable = {
+        var = PRC_Socialist_Transformation_agriculture_progress
+        min = 0
+        max = PRC_Socialist_Transformation_agriculture_progress_max
+    }
+    clamp_variable = {
+        var = PRC_Socialist_Transformation_industry_progress
+        min = 0
+        max = PRC_Socialist_Transformation_industry_progress_max
+    }
+    clamp_variable = {
+        var = PRC_Socialist_Transformation_commerce_progress
+        min = 0
+        max = PRC_Socialist_Transformation_commerce_progress_max
+    }
+    set_variable = { PRC_Socialist_Transformation_oerall_progress = PRC_Socialist_Transformation_agriculture_progress }
+    add_to_variable = { PRC_Socialist_Transformation_oerall_progress = PRC_Socialist_Transformation_industry_progress }
+    add_to_variable = { PRC_Socialist_Transformation_oerall_progress = PRC_Socialist_Transformation_commerce_progress }
+    subtract_from_variable = { PRC_Socialist_Transformation_oerall_progress = 42 }
+    divide_variable = { PRC_Socialist_Transformation_oerall_progress = 387 }
+    set_variable = { PRC_Socialist_Transformation_oerall_progress_percent = PRC_Socialist_Transformation_oerall_progress }#实际值
+    multiply_variable = { PRC_Socialist_Transformation_oerall_progress = 293 }
+    add_to_variable = { PRC_Socialist_Transformation_oerall_progress = 4 } #gui值
+}
+PRC_transitional_period_policy_preference_update = {
+    clamp_variable = {
+        var = PRC_transitional_period_policy_preference
+        min = 0
+        max = 100
+    }
+    if = {
+        limit = {
+            check_variable = {
+                var = PRC_transitional_period_policy_preference
+                value = 20
+                compare = less_than
+            }
+        }
+        set_variable = { PRC_transitional_period_policy_preference_level = 1 } 
+    }
+    else_if = {
+        limit = {
+            check_variable = {
+                var = PRC_transitional_period_policy_preference
+                value = 20
+                compare = greater_than_or_equals
+            }
+            check_variable = {
+                var = PRC_transitional_period_policy_preference
+                value = 40
+                compare = less_than_or_equals
+            }
+        }
+        set_variable = { PRC_transitional_period_policy_preference_level = 2 } 
+    }
+    else_if = {
+        limit = {
+            check_variable = {
+                var = PRC_transitional_period_policy_preference
+                value = 40
+                compare = greater_than
+            }
+            check_variable = {
+                var = PRC_transitional_period_policy_preference
+                value = 60
+                compare = less_than
+            }
+        }
+        set_variable = { PRC_transitional_period_policy_preference_level = 3 } 
+    }
+    else_if = {
+        limit = {
+            check_variable = {
+                var = PRC_transitional_period_policy_preference
+                value = 60
+                compare = greater_than_or_equals
+            }
+            check_variable = {
+                var = PRC_transitional_period_policy_preference
+                value = 80
+                compare = less_than_or_equals
+            }
+        }
+        set_variable = { PRC_transitional_period_policy_preference_level = 4 } 
+    }
+    else_if = {
+        limit = {
+            check_variable = {
+                var = PRC_transitional_period_policy_preference
+                value = 80
+                compare = greater_than
+            }
+        }
+        set_variable = { PRC_transitional_period_policy_preference_level = 5 } 
+    }
+}
 PRC_socialist_transformation_startup = {
     set_variable = { PRC_socialist_transformation_status = 14 }
 
