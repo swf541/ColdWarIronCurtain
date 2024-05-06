@@ -1,7 +1,7 @@
 scripted_gui = {
 	#政权巩固与社会改造
 	PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui = {
-		context_type = decision_category
+		context_type = decision_category #player_context
 		window_name = "PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui"
         
 		visible = {
@@ -99,25 +99,20 @@ scripted_gui = {
 			}
 			#社会主义改造
 			Socialist_Transformation_Agriculture_progress_bar = {
-				frame = PRC_Socialist_Transformation_agriculture_progress
+				frame = PRC_Socialist_Transformation_agriculture_progress_gui
 			}
 			Socialist_Transformation_Industry_progress_bar = {
-				frame = PRC_Socialist_Transformation_industry_progress
+				frame = PRC_Socialist_Transformation_industry_progress_gui
 			}
 			Socialist_Transformation_Commerce_progress_bar = {
-				frame = PRC_Socialist_Transformation_commerce_progress
-			}
-			Socialist_Transformation_Agriculture_progress_bar_max = {
-				frame = PRC_Socialist_Transformation_agriculture_progress
-			}
-			Socialist_Transformation_Industry_progress_bar_max = {
-				frame = PRC_Socialist_Transformation_industry_progress
-			}
-			Socialist_Transformation_Commerce_progress_bar_max = {
-				frame = PRC_Socialist_Transformation_commerce_progress
+				frame = PRC_Socialist_Transformation_commerce_progress_gui
 			}
 			PRC_Socialist_Transformation_oerall_progress_bar = {
-				frame = PRC_Socialist_Transformation_oerall_progress
+				frame = PRC_Socialist_Transformation_oerall_progress_gui
+			}
+			#过渡时期政策倾向
+			transitional_period_policy_preference_needle = {
+				frame = PRC_transitional_period_policy_preference_level
 			}
 		}
         triggers = {
@@ -129,6 +124,10 @@ scripted_gui = {
 				NOT = {
 					check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
 				}
+			}
+			#土改
+			Land_Reform_progrss_display_visible = {
+				has_variable = Land_Reform_target
 			}
             #镇反
 			Northeast_China_button_visible = {
@@ -188,54 +187,192 @@ scripted_gui = {
 			Suppress_Bandits_button_visible = {
 				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 1 }
 			}
+			Suppress_Bandits_button_click_enabled = {
+				if = {
+					limit = {
+						var:Suppress_Counterrevolutionaries_target = {
+							check_variable = { Suppress_Counterrevolutionaries_Bandit = 0 }
+						}
+					}
+					custom_trigger_tooltip = {
+						tooltip = PRC_Suppress_Bandits_button_trigger
+						always = no
+					}
+				}
+				else_if = {
+					limit = {
+						var:Suppress_Counterrevolutionaries_target = {
+							check_variable = { Suppress_Counterrevolutionaries_Bandit > 0 }
+						}
+					}
+					custom_trigger_tooltip = {
+						tooltip = PRC_Suppress_Bandits_CD
+						var:Suppress_Counterrevolutionaries_target = { 
+							NOT = { has_state_flag = PRC_Suppress_Bandits_CD }
+						}
+					}
+					has_political_power > var:PRC_Suppress_Counterrevolutionaries_button_cost_1
+				}
+			}
 			Suppress_Huidaomen_button_visible = {
 				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 1 }
+			}
+			Suppress_Huidaomen_button_click_enabled = {
+				if = {
+					limit = {
+						var:Suppress_Counterrevolutionaries_target = {
+							check_variable = { Suppress_Counterrevolutionaries_Huidaomen = 0 }
+						}
+					}
+					custom_trigger_tooltip = {
+						tooltip = PRC_Suppress_Huidaomen_button_trigger
+						always = no
+					}
+				}
+				else_if = {
+					limit = {
+						var:Suppress_Counterrevolutionaries_target = {
+							check_variable = { Suppress_Counterrevolutionaries_Huidaomen > 0 }
+						}
+					}
+					custom_trigger_tooltip = {
+						tooltip = PRC_Suppress_Huidaomen_CD
+						var:Suppress_Counterrevolutionaries_target = { 
+							NOT = {has_state_flag = PRC_Suppress_Huidaomen_CD }
+						}
+					}
+					has_political_power > var:PRC_Suppress_Counterrevolutionaries_button_cost_1
+				}
 			}
 			Suppress_Kuomintang_button_visible = {
 				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 1 }
 			}
+			Suppress_Kuomintang_button_click_enabled = {
+				if = {
+					limit = {
+						var:Suppress_Counterrevolutionaries_target = {
+							check_variable = { Suppress_Counterrevolutionaries_Kuomintang = 0 }
+						}
+					}
+					custom_trigger_tooltip = {
+						tooltip = PRC_Suppress_Kuomintang_button_trigger
+						always = no
+					}
+				}
+				else_if = {
+					limit = {
+						var:Suppress_Counterrevolutionaries_target = {
+							check_variable = { Suppress_Counterrevolutionaries_Kuomintang > 0 }
+						}
+					}
+					custom_trigger_tooltip = {
+						tooltip = PRC_Suppress_Kuomintang_CD
+						var:Suppress_Counterrevolutionaries_target = { 
+							NOT = { has_state_flag = PRC_Suppress_Kuomintang_CD }
+						}
+					}
+					has_political_power > var:PRC_Suppress_Counterrevolutionaries_button_cost_1
+				}
+			}
 			#社会主义改造
 			Socialist_Transformation_Agriculture_progress_bar_visible = {
 				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
-				check_variable = {
-					var = PRC_Socialist_Transformation_agriculture_progress
-					value = PRC_Socialist_Transformation_agriculture_progress_max
-					compare = less_than
-				}
 			}
 			Socialist_Transformation_Industry_progress_bar_visible = {
 				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
-				check_variable = {
-					var = PRC_Socialist_Transformation_industry_progress
-					value = PRC_Socialist_Transformation_industry_progress_max
-					compare = less_than
-				}
 			}
 			Socialist_Transformation_Commerce_progress_bar_visible = {
 				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
-				check_variable = {
-					var = PRC_Socialist_Transformation_commerce_progress
-					value = PRC_Socialist_Transformation_commerce_progress_max
-					compare = less_than
-				}
-			}
-			Socialist_Transformation_Agriculture_progress_bar_max_visible = {
-				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
-				check_variable = { PRC_Socialist_Transformation_agriculture_progress = PRC_Socialist_Transformation_agriculture_progress_max }
-			}
-			Socialist_Transformation_Industry_progress_bar_max_visible = {
-				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
-				check_variable = { PRC_Socialist_Transformation_industry_progress = PRC_Socialist_Transformation_industry_progress_max }
-			}
-			Socialist_Transformation_Commerce_progress_bar_max_visible = {
-				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
-				check_variable = { PRC_Socialist_Transformation_commerce_progress = PRC_Socialist_Transformation_commerce_progress_max }
 			}
 			PRC_Socialist_Transformation_oerall_progress_bar_visible = {
 				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
 			}
 			PRC_Socialist_Transformation_oerall_progress_text_visible = {
 				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
+			}
+			PRC_complete_agricultural_cooperation_button_visible = {
+				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
+			}
+			PRC_complete_agricultural_cooperation_text_visible = {
+				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
+			}
+			PRC_complete_agricultural_cooperation_button_click_enabled = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = PRC_has_completed_agricultural_cooperation }
+					}
+					custom_trigger_tooltip = {
+						tooltip = PRC_complete_agricultural_cooperation_trigger
+						check_variable = { PRC_Socialist_Transformation_agriculture_progress = PRC_Socialist_Transformation_agriculture_progress_expectation }
+					}
+				}
+				else_if = {
+					limit = { 
+						has_country_flag = PRC_has_completed_agricultural_cooperation
+					}
+					custom_trigger_tooltip = {
+						tooltip = PRC_has_completed_agricultural_cooperation
+						always = no
+					}
+				}
+			}
+			PRC_complete_full_public-private_partnerships_button_visible = {
+			    check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
+			}
+			PRC_complete_full_public-private_partnerships_text_visible = {
+				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
+			}
+			PRC_complete_full_public-private_partnerships_button_click_enabled = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = PRC_has_completed_full_public-private_partnerships }
+					}
+					custom_trigger_tooltip = {
+						tooltip = PRC_full_public-private_partnerships_trigger
+						check_variable = { PRC_Socialist_Transformation_industry_progress = PRC_Socialist_Transformation_industry_progress_expectation }
+					    check_variable = { PRC_Socialist_Transformation_commerce_progress = PRC_Socialist_Transformation_commerce_progress_expectation }
+					}
+				}
+				else_if = {
+					limit = { 
+						has_country_flag = PRC_has_completed_full_public-private_partnerships
+					}
+					custom_trigger_tooltip = {
+						tooltip = PRC_has_completed_full_public-private_partnerships
+						always = no
+					}
+				}
+			}
+			#过渡时期改造倾向
+			transitional_period_policy_preference_needle_bg_visible = {
+                OR = {
+                    check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 0 }
+					check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
+				}
+			}
+			transitional_period_policy_preference_needle_visible = {
+                OR = {
+                    check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 0 }
+					check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
+				}
+			}
+			transitional_period_policy_preference_text1_visible = {
+                OR = {
+                    check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 0 }
+					check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
+				}
+			}
+			transitional_period_policy_preference_text2_visible = {
+                OR = {
+                    check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 0 }
+					check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
+				}
+			}
+			transitional_period_policy_preference_status_visible = {
+                OR = {
+                    check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 0 }
+					check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
+				}
 			}
 		}	
 		effects = {
@@ -263,6 +400,66 @@ scripted_gui = {
 			}
 			Southeast_China_button_click = {
 				set_variable = { Suppress_Counterrevolutionaries_target = 598 }
+			}
+			Suppress_Bandits_button_click = {
+				add_political_power = var:PRC_Suppress_Counterrevolutionaries_button_cost_2
+				effect_tooltip = {
+					add_to_variable = { 
+						var = temp_v
+						value = PRC_Suppress_Bandits_button_effect
+						tooltip = PRC_Suppress_Bandits_button_effect_tt 
+					}
+				}
+				hidden_effect = {
+                    var:Suppress_Counterrevolutionaries_target = {
+                        add_to_variable = { Suppress_Counterrevolutionaries_Bandit = PRC.PRC_Suppress_Bandits_button_effect }
+						set_state_flag = {
+							flag = PRC_Suppress_Bandits_CD
+							days = 30
+						}
+					}
+					PRC_Suppress_Counterrevolutionaries_update = yes
+				}
+			}
+			Suppress_Huidaomen_button_click = {
+				add_political_power = var:PRC_Suppress_Counterrevolutionaries_button_cost_2
+				effect_tooltip = {
+					add_to_variable = { 
+						var = temp_v 
+						value = PRC_Suppress_Huidaomen_button_effect
+						tooltip = PRC_Suppress_Huidaomen_button_effect_tt
+					}
+				}
+				hidden_effect = {
+				    var:Suppress_Counterrevolutionaries_target = {
+						add_to_variable = { Suppress_Counterrevolutionaries_Huidaomen = PRC.PRC_Suppress_Huidaomen_button_effect }
+						set_state_flag = {
+							flag = PRC_Suppress_Huidaomen_CD
+							days = 30 
+						}
+				    }
+					PRC_Suppress_Counterrevolutionaries_update = yes
+				}
+			}
+			Suppress_Kuomintang_button_click = {
+				add_political_power = var:PRC_Suppress_Counterrevolutionaries_button_cost_2
+				effect_tooltip = {
+					add_to_variable = { 
+						var = temp_v 
+						value = PRC_Suppress_Kuomintang_button_effect
+						tooltip = PRC_Suppress_Kuomintang_button_effect_tt
+					}
+				}
+				hidden_effect = {
+				    var:Suppress_Counterrevolutionaries_target = {
+						add_to_variable = { Suppress_Counterrevolutionaries_Kuomintang = PRC.PRC_Suppress_Kuomintang_button_effect }
+						set_state_flag = {
+							flag = PRC_Suppress_Kuomintang_CD
+							days = 30
+						}
+				    }
+					PRC_Suppress_Counterrevolutionaries_update = yes
+				}
 			}
 			#土改
 			Ningxia_button_click = {
@@ -325,66 +522,18 @@ scripted_gui = {
 			Qinghai_button_click = {
 				set_variable = { Land_Reform_target = 604 }
 			}
-		}
-
-	}
-
-	#社会主义改造
-    PRC_50s_socialist_transformation_gui = {
-		context_type = decision_category
-		window_name = "PRC_50s_socialist_transformation_gui"
-
-		triggers = {
-			PRC_50s_socialist_transformation_agricultural_cooperation_button_click_enabled = {
-				NOT = { 
-					check_variable = { PRC_socialist_transformation_Progress_of_agricultural_cooperation < 100 }
-				}
-			}
-			PRC_50s_socialist_transformation_agricultural_cooperation_button_visible = {
-				#has_completed_focus = PRC_50s_Co-operative_Transformation_of_Agriculture
-				NOT = { has_completed_focus = PRC_50s_Complete_Rural_Co-operation }
-			}
-			PRC_socialist_transformation_Progress_of_agricultural_cooperation_bar_visible = {
-				#has_completed_focus = PRC_50s_Co-operative_Transformation_of_Agriculture
-				NOT = { has_completed_focus = PRC_50s_Complete_Rural_Co-operation }
-			}
-		}
-
-		properties = {
-			PRC_50s_socialist_transformation_status_needle = {
-				frame = PRC_socialist_transformation_status_frame
-			}
-			PRC_socialist_transformation_Progress_of_agricultural_cooperation_bar = {
-				frame = PRC_socialist_transformation_Progress_of_agricultural_cooperation
-			}
-		}
-
-		effects = {
-			PRC_50s_socialist_transformation_agricultural_cooperation_button_click = {
+			#社会主义改造
+			PRC_complete_agricultural_cooperation_button_click = {
 				complete_national_focus = PRC_50s_Complete_Rural_Co-operation
-				effect_tooltip = {
-					if = {
-						limit = {
-							check_variable = { PRC_socialist_transformation_status > 10 }
-						}
-						add_ideas = PRC_50s_Complete_Rural_Co_operation_r
-					}
-					else_if = {
-						limit = {
-							check_variable = { PRC_socialist_transformation_status < 10 }
-						}
-						add_ideas = PRC_50s_Complete_Rural_Co_operation_c
-					}
-					else = {
-						add_ideas = PRC_50s_Complete_Rural_Co_operation_m
-					}
-				}
+				set_country_flag = PRC_has_completed_agricultural_cooperation
+			}
+			PRC_complete_full_public-private_partnerships_button_click = {
+				complete_national_focus = PRC_50s_Public-Private_Partnership_by_Whole_Trades
+				set_country_flag = PRC_has_completed_full_public-private_partnerships
 			}
 		}
 
 	}
-
-
 
 
 
