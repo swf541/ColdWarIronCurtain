@@ -32,14 +32,13 @@ PRC_CCCPC_gui_startup = {
 	add_to_array = { PRC_CCCPC_leaders_influence_array = 25.7 }
 	add_to_array = { PRC_CCCPC_leaders_influence_array = 5.1 }
 
-	set_variable = { PRC_party_discipline = 90 }
-	set_variable = { PRC_party_unity = 92 }
+	set_variable = { PRC_party_discipline = 92 }
+	set_variable = { PRC_party_unity = 90 }
 
 	PRC_CCCPC_gui_update = yes
 }
 PRC_CCCPC_gui_update = {
 	clear_array = PRC_CCCPC_leaders_influence_gui_array
-	
 	for_each_loop = {
         array = PRC_CCCPC_leaders_array
         index = temp_i1
@@ -58,6 +57,46 @@ PRC_CCCPC_gui_update = {
 			}
         }
     }
+    
+    #party status#
+	set_variable = { PRC_CPC_political_power_gain = 0 }
+	set_variable = { PRC_CPC_stability_factor = 0 }
+	set_variable = { PRC_CPC_drift_defence_factor = 0 }
+
+	set_temp_variable = { temp_status1 = PRC_party_unity }#
+	subtract_from_temp_variable = { temp_status1 = 60 }
+	set_temp_variable = { temp_status2 = temp_status1 }
+	if = {
+		limit = { check_variable = { temp_status2 < 0 } }
+		multiply_temp_variable = { temp_status2 = -1 }
+	}
+	add_to_temp_variable = { temp_status2 = 40 }
+	divide_temp_variable = { temp_status1 = temp_status2 }
+    
+	multiply_temp_variable = { temp_status1 = 0.8 }#
+	add_to_variable = { PRC_CPC_political_power_gain = temp_status1 }
+	multiply_temp_variable = { temp_status1 = 0.675 }
+	add_to_variable = { PRC_CPC_stability_factor = temp_status1 }
+	multiply_temp_variable = { temp_status1 = 2 }
+	add_to_variable = { PRC_CPC_drift_defence_factor = temp_status1 }
+
+	set_temp_variable = { temp_status1 = PRC_party_discipline }#
+	subtract_from_temp_variable = { temp_status1 = 60 }
+	set_temp_variable = { temp_status2 = temp_status1 }
+	if = {
+		limit = { check_variable = { temp_status2 < 0 } }
+		multiply_temp_variable = { temp_status2 = -1 }
+	}
+	add_to_temp_variable = { temp_status2 = 40 }
+	divide_temp_variable = { temp_status1 = temp_status2 }
+      
+	multiply_temp_variable = { temp_status1 = 0.8 }#
+	add_to_variable = { PRC_CPC_political_power_gain = temp_status1 }
+	multiply_temp_variable = { temp_status1 = 0.25 }
+	add_to_variable = { PRC_CPC_stability_factor = temp_status1 }
+
+	force_update_dynamic_modifier = yes
+
 }
 
 #旧政治局系统
