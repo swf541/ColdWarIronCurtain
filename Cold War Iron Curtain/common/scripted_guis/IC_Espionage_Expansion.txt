@@ -39,6 +39,9 @@ scripted_gui = {
             }
         }
     }
+#paramilitary_slot_one_bulletion_choices = 2
+#array paramilitary_slot_one_bulletion_option_choices
+
     intelligence_bulletin_slot_one = {
         context_type = player_context
         window_name = "intelligence_bulletin_slot_one"
@@ -140,7 +143,7 @@ scripted_gui = {
             black_ops_phase_title_2_picture = {
                 image = "[Phase2Picture]"
             }
-            black_ops_phase_title_3_picture = {
+            black_ops_phase_title_3_picture = { 
                 image = "[Phase3Picture]"
             }
             black_ops_target_country_flag = {
@@ -245,7 +248,7 @@ scripted_gui = {
         }
     }
 
-	paramilitary_operation_list = {
+	paramilitary_operation_list = { 
         context_type = player_context
         window_name = "paramilitary_operation_list"
 		parent_scripted_gui = "paramilitary_tab_menu_window"
@@ -256,7 +259,7 @@ scripted_gui = {
 				entry_container = BLACK_OPS_operation_entry
             }
         }
-        triggers = {
+        triggers = {   
             entry_background_completed_visible = {
                 check_variable = {
                     local_possible_operations_completed_status^i = 2
@@ -266,12 +269,12 @@ scripted_gui = {
                 check_variable = {
                     local_possible_operations_completed_status^i = 2
                 }
-            }
+            } 
             entry_button_wip_icon_visible = {
                 check_variable = {
                     local_possible_operations_completed_status^i = 1
                 }
-            }
+            } 
             entry_background_available_click_enabled = {
                 current_entry_visible_trigger = yes
             }
@@ -304,7 +307,7 @@ scripted_gui = {
                 set_variable = {
                     selected_operation_index = local_possible_operations^i
                 }
-                set_variable = {
+                set_variable = { 
                     selected_operation_index_risk = local_possible_operations_risk_level^i
                 }
                 set_variable = {
@@ -2535,6 +2538,244 @@ scripted_gui = {
             }
         }  
     }
+	black_ops_projects_gladio_desc = {
+        context_type = player_context
+        window_name = "black_ops_projects_gladio_desc"
+		parent_scripted_gui = "paramilitary_tab_menu_window"
+		ai_enabled = {
+			always = no
+		} 
+        visible = {
+            check_variable = {
+                show_gladio = 2
+            }
+        }  
+    }
+	black_ops_gladio_project_toggles_menu = { 
+        context_type = player_context
+        window_name = "black_ops_gladio_project_toggles_menu"
+		parent_scripted_gui = "black_ops_projects_gladio_desc"
+
+		ai_enabled = {
+			always = no
+		}
+        visible = {
+            check_variable = {
+                show_gladio = 2
+            }
+        }
+        dynamic_lists = {
+            blacks_ops_gladio_mission_types_toggle_listing_grid = {
+                array = ROOT.local_gladio_possible_operations_operation_type
+                change_scope = no
+				entry_container = blacks_ops_gladio_mission_types_toggle_list
+            }
+        }  
+        triggers = {
+            mission_toggle_unconfirm_visible = {
+                check_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 0
+                }
+            }
+            mission_toggle_confirm_visible = {
+                check_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 1
+                }
+            }
+        }
+        effects = { 
+             mission_toggle_unconfirm_click = { #on
+                set_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 1
+                }
+                #1 Fallback Operations
+                if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.local_gladio_possible_operations_operation_type^i = 1
+                        }
+                    }
+                    var:gladio_operations_selected_target = {
+                        add_gladio_recruitment_operations = yes
+                        add_gladio_arms_caches_operations = yes
+                        add_gladio_national_uprising_operations = yes
+                    }
+                }
+                #2 Executive Actions
+                if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.local_gladio_possible_operations_operation_type^i = 2
+                        }
+                    }
+                    var:gladio_operations_selected_target = {
+                        add_gladio_assassinate_generals_operations = yes
+                        add_gladio_assassinate_admirals_operations = yes
+                        add_gladio_assassinate_activist_operations = yes
+                    }
+                }   
+                #3 False Flag
+                if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.local_gladio_possible_operations_operation_type^i = 3
+                        }
+                    }
+                    var:gladio_operations_selected_target = {
+                        add_gladio_far_left_terrorist_attack_operations = yes
+                        add_gladio_far_right_terrorist_attack_operations = yes
+                        add_gladio_political_riot_operations = yes
+                    }
+                }
+                #4 Political Coercion
+                if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.local_gladio_possible_operations_operation_type^i = 4
+                        }
+                    } 
+                    var:gladio_operations_selected_target = {
+                        add_gladio_bankroll_party_operations = yes
+                        add_gladio_bribery_operations = yes
+                        add_gladio_approach_intelligence_officers_operations = yes
+                        add_gladio_collect_blackmail_operations = yes
+                    }
+                }
+                #5 Regime Change
+                if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.local_gladio_possible_operations_operation_type^i = 5
+                        }
+                    }
+                    var:gladio_operations_selected_target = {
+                        add_gladio_coup_preperations_operations = yes
+                        add_gladio_coup_leadership_operations = yes
+                        add_gladio_coup_increase_national_tension_operations = yes
+                        add_gladio_coup_extort_blackmail_operations = yes
+                        add_gladio_coup_launch_operations = yes
+                    }
+                }
+                #6 Special (Unusued for Now)
+                if = {
+                    limit = {
+                        check_variable = {
+                            ROOT.local_gladio_possible_operations_operation_type^i = 6
+                        }
+                    }
+                    var:gladio_operations_selected_target = {
+                    }
+                }
+             }
+             mission_toggle_confirm_click = {   #off
+                set_variable = {
+                    ROOT.current_operations_potential_toggle_enabled^i = 0
+                }
+                ROOT = {
+                    refresh_possible_gladio_missions = yes
+                }
+                
+             }
+        }
+    }
+	black_ops_projects_gladio_menu = {
+        context_type = player_context
+        window_name = "black_ops_projects_gladio"
+		parent_scripted_gui = "paramilitary_tab_menu_window"
+		ai_enabled = {
+			always = no
+		} 
+        dynamic_lists = {
+            black_ops_projects_gladio_target_listing_grid = {
+                array = USA.GLADIO_MEMBER
+                change_scope = yes
+				entry_container = black_ops_projects_gladio_target_list_entry
+            }
+        } 
+        visible = {
+            check_variable = { 
+                show_gladio = 1
+            } 
+        }   
+        effects = { 
+            gladio_menu_list_entry_button_click = {
+                set_variable = {
+                    ROOT.gladio_operations_selected_target = v
+                }
+                save_global_event_target_as = operations_selected_target
+                save_global_event_target_as = GLADIO_SELECTION_TARGET
+                set_variable = {
+                    ROOT.show_gladio = 2
+                }
+                clear_array = ROOT.local_gladio_possible_operations_operation_type 
+                add_to_array = { ROOT.local_gladio_possible_operations_operation_type = 1 }
+                add_to_array = { ROOT.local_gladio_possible_operations_operation_type = 2 }
+                add_to_array = { ROOT.local_gladio_possible_operations_operation_type = 3 }
+                add_to_array = { ROOT.local_gladio_possible_operations_operation_type = 4 }
+                add_to_array = { ROOT.local_gladio_possible_operations_operation_type = 5 }
+                add_to_array = { ROOT.local_gladio_possible_operations_operation_type = 6 }
+                set_variable = {
+                    ROOT.GLADIO_MEMBER_POSITION_CURRENT = i
+                }
+                ROOT = {
+                    generate_espionage_toggles = yes
+                }
+                set_variable = {
+                    ci_strength_temp = THIS.modifier@drift_defence_factor
+                }
+                subtract_from_variable = {
+                    ci_strength_temp = 1
+                }
+                set_variable = {
+                    ROOT.national_ci_strength^v = ci_strength_temp
+                }           
+                set_variable = {
+                    ROOT.American_Influence = 0
+                }
+                set_variable = {
+                    ROOT.Soviet_Influence = 0
+                }
+                for_each_loop = {
+                    array = influence_array
+                    value = v
+                    break = break
+                    if = {
+                        limit = {
+                            check_variable = {
+                                v = USA.id
+                            }
+                        }
+                        set_variable = {
+                            ROOT.American_Influence = influence_array_val^i
+                        }
+                    }
+                    if = {
+                        limit = {
+                            check_variable = {
+                                v = SOV.id
+                            }
+                        }
+                        set_variable = {
+                            ROOT.Soviet_Influence = influence_array_val^i
+                        }
+                    }
+                }     
+                set_variable = {
+                    ROOT.Communist_Support = party_popularity@communism
+                }
+                add_to_variable = {
+                    ROOT.Communist_Support = party_popularity@maoism
+                }
+                add_to_variable = {
+                    ROOT.Communist_Support = party_popularity@trotskyism
+                }     
+                multiply_variable = {
+                    ROOT.Communist_Support = 100
+                }
+            }
+        }
+    }
+
 	black_ops_projects_list_menu_list = {
         context_type = player_context
         window_name = "black_ops_projects_list_menu"
@@ -2795,6 +3036,20 @@ scripted_gui = {
                 }
                 
             }
+            if = {                  #GLADIO
+                limit = {
+                    check_variable = { ROOT.black_ops_project_list^i = 1000 }
+                }
+                set_variable = {
+                    show_projects = 0 
+                }
+                set_variable = {
+                    show_project_info = 1 
+                }
+                set_variable = {
+                    show_gladio = 1 
+                }
+            }
             if = {                  
                 limit = {
                     check_variable = { ROOT.black_ops_project_list^i = 500 }
@@ -3045,7 +3300,7 @@ scripted_gui = {
                 }
                 refresh_possible_generic_missions = yes
             }           
-        }
+        }  
         dynamic_lists = {
             blacks_ops_generic_mission_types_toggle_listing_grid = {
                 array = ROOT.current_operations_potential_toggle
