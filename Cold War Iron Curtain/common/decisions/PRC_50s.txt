@@ -897,6 +897,46 @@ PRC_50s_civilwar_categories = {
 
 }
 PRC_50s_The_Road_to_Socialism_categories = {
+	PRC_50s_The_Road_to_Socialism_Repairing_war_damaged_facilities = {
+		visible = {
+			has_completed_focus = PRC_50s_Heal_The_Wounds_of_War
+	   	}
+		modifier = {
+			political_power_gain = -0.05
+        }
+		available = {
+		}
+		priority = 100
+	   	remove_effect = {
+			random_owned_state = {
+				limit = {
+					infrastructure < 5
+				}
+				add_building_construction = {
+                    type = infrastructure
+                    level = 1
+                    instant_build = yes
+                }
+			}
+			random_owned_state = {
+				limit = {
+					infrastructure < 5
+				}
+				add_building_construction = {
+                    type = infrastructure
+                    level = 1
+                    instant_build = yes
+                }
+			}
+		}
+	   	cost = 20
+	   	days_remove = 50
+		fire_only_once = yes
+
+		ai_will_do = { 
+			factor = 100
+		}
+	}
 	#剿匪
 	PRC_50s_Complete_the_bandits_suppression_in_Northeast_China = {
 		visible = {
@@ -1091,8 +1131,309 @@ PRC_50s_The_Road_to_Socialism_categories = {
 		}
 	}
 	#土改
+	PRC_50s_Land_Reform_Water_conservancy_construction = {
+		visible = {
+			ROOT = {
+				has_completed_focus = PRC_50s_Promote_Water_Conservancy_Construction
+				OR = {
+					check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
+					is_ai = yes
+				}
+			}
+			
+			FROM = {
+				free_building_slots = {
+					building = industrial_complex
+					size < 15
+				}
+			}
+	   	}
+		priority = 50
+		on_map_mode = map_only
+		available = {
+			num_of_civilian_factories_available_for_projects > 1
+        }
+        modifier = {
+            civilian_factory_use = 1
+        }
+	   	remove_effect = {
+			FROM = {
+				add_extra_state_shared_building_slots = 1
+			}
+		}
+		state_target = yes
+		target_array = ROOT.owned_states
+	   	cost = 25
+	   	days_remove = 180
+		fire_only_once = yes
+
+		ai_will_do = { 
+			factor = 100
+		}
+	}
+	PRC_50s_Land_Reform_Learn_from_the_Soviet_experience_of_land_reform = {
+		visible = {
+			has_country_flag = PRC_Land_Reform_begun
+			OR = {
+				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
+				is_ai = yes
+			}
+	   	}
+		available = {
+		}
+	   	remove_effect = {
+			add_to_variable = { Land_Reform_cost = -1.5 tooltip = PRC_decrease_land_reform_cost_tt }
+
+			set_temp_variable = { temp_x = 1 }
+            set_temp_variable = { temp_y = 0.5 }
+            PRC_faction_struggle_system_faction_influence_change = yes
+			set_temp_variable = { temp_x = 2 }
+            set_temp_variable = { temp_y = 0.5 }
+            PRC_faction_struggle_system_faction_influence_change = yes
+		}
+		priority = 45
+	   	cost = 25
+	   	days_remove = 50
+		fire_only_once = yes
+
+		ai_will_do = { 
+			factor = 100
+		}
+	} 
+	PRC_50s_Land_Reform_Organize_peasant_union_activities = {
+		visible = {
+			has_country_flag = PRC_Land_Reform_begun
+			OR = {
+				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
+				is_ai = yes
+			}
+	   	}
+		modifier = {
+			political_power_gain = -0.05
+        }
+	   	remove_effect = {
+			add_political_power = 120
+			add_popularity = { ideology = maoism popularity = 0.025 }
+			add_popularity = { ideology = trotskyism popularity = 0.01 } 
+
+			set_temp_variable = { temp_x = 2 }
+            set_temp_variable = { temp_y = 0.5 }
+            PRC_faction_struggle_system_faction_influence_change = yes
+			custom_effect_tooltip = PRC_50s_socialist_transformation_effect_in
+			#set_country_flag = PRC_50s_socialist_transformation_Organize_peasant_union_activities
+		}
+		priority = 40
+	   	cost = 10
+	   	days_remove = 45
+		fire_only_once = yes
+
+		ai_will_do = { 
+			factor = 100
+		}
+	}
+	PRC_50s_Land_Reform_Classification_of_regional_land_reform_classes = {
+		visible = {
+			has_country_flag = PRC_Land_Reform_begun
+			NOT = { has_country_flag = PRC_50s_socialist_transformation_Redistribution_of_land_throughout_the_country }
+			OR = {
+				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
+				is_ai = yes
+			}
+	   	}
+		complete_effect = {
+			set_country_flag = PRC_50s_socialist_transformation_Classification_of_regional_land_reform_classes
+		}
+	   	remove_effect = {
+			add_to_variable = { Land_Reform_decison_days_remove = -5 tooltip = PRC_decrease_land_reform_days_tt }
+			add_to_variable = { Land_Reform_cost = -1 tooltip = PRC_decrease_land_reform_cost_tt }
+			
+
+			set_temp_variable = { temp_x = 1 }
+            set_temp_variable = { temp_y = 1.5 }
+            PRC_faction_struggle_system_faction_influence_change = yes
+			add_to_variable = {
+				PRC_50s_socialist_transformation_re_time1 = -30
+				tooltip = PRC_50s_socialist_transformation_re_time_de
+			}
+			add_to_variable = {
+				PRC_50s_socialist_transformation_re_time2 = -60
+			}
+			set_temp_variable = { temp_x = -1 }
+			PRC_socialist_transformation_status_change = yes
+		}
+		priority = 35
+	   	cost = 20
+	   	days_remove = 30
+		fire_only_once = yes
+
+		ai_will_do = { 
+			factor = 100
+		}
+	}
+	PRC_50s_Land_Reform_Redistribution_of_land_throughout_the_country = {
+		visible = {
+			has_country_flag = PRC_Land_Reform_begun
+			NOT = { has_country_flag = PRC_50s_socialist_transformation_Classification_of_regional_land_reform_classes }
+			OR = {
+				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
+				is_ai = yes
+			}
+	   	}
+		complete_effect = {
+			set_country_flag = PRC_50s_socialist_transformation_Redistribution_of_land_throughout_the_country
+		}
+	   	remove_effect = {
+			add_to_variable = { Land_Reform_decison_days_remove = 10 tooltip = PRC_decrease_land_reform_days_tt }
+			add_to_variable = { Land_Reform_decison_effect_factor = 0.1 tooltip = PRC_strength_land_reform_effect_tt }
+         
+			set_temp_variable = { temp_x = 2 }
+            set_temp_variable = { temp_y = 0.5 }
+            PRC_faction_struggle_system_faction_influence_change = yes
+			custom_effect_tooltip = PRC_50s_socialist_transformation_effect_in
+			set_temp_variable = { temp_x = 1 }
+			PRC_socialist_transformation_status_change = yes
+		}
+		priority = 35
+	   	cost = 35
+	   	days_remove = 30
+		fire_only_once = yes
+
+		ai_will_do = { 
+			factor = 100
+		}
+	}  
+	PRC_50s_Land_Reform_Relying_on_the_middle_peasants = {
+		visible = {
+			has_country_flag = PRC_Land_Reform_begun
+			NOT = { has_country_flag = PRC_50s_socialist_transformation_Promoting_mutual_aid_groups_in_agriculture }
+			OR = {
+				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
+				is_ai = yes
+			}
+	   	}
+		complete_effect = {
+			set_country_flag = PRC_50s_socialist_transformation_Relying_on_the_middle_peasants
+		}
+	   	remove_effect = {
+			add_to_variable = { Land_Reform_cost = -0.5 tooltip = PRC_decrease_land_reform_cost_tt }
+
+			set_temp_variable = { temp_x = 1 }
+            set_temp_variable = { temp_y = 1.5 }
+            PRC_faction_struggle_system_faction_influence_change = yes
+			add_to_variable = {
+				PRC_50s_socialist_transformation_re_time1 = -30
+				tooltip = PRC_50s_socialist_transformation_re_time_de
+			}
+			add_to_variable = {
+				PRC_50s_socialist_transformation_re_time2 = -60
+			}
+			set_temp_variable = { temp_x = -1 }
+			PRC_socialist_transformation_status_change = yes
+		}
+		priority = 30
+	   	cost = 20
+	   	days_remove = 30
+		fire_only_once = yes
+
+		ai_will_do = { 
+			factor = 100
+		}
+	} 
+	PRC_50s_Land_Reform_Promoting_mutual_aid_groups_in_agriculture = {
+		visible = {
+			has_country_flag = PRC_Land_Reform_begun
+			NOT = { has_country_flag = PRC_50s_socialist_transformation_Relying_on_the_middle_peasants }
+			OR = {
+				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
+				is_ai = yes
+			}
+	   	}
+		modifier = {
+        }
+		complete_effect = {
+			set_country_flag = PRC_50s_socialist_transformation_Promoting_mutual_aid_groups_in_agriculture
+		}
+	   	remove_effect = {
+			add_to_variable = { Land_Reform_cost = -1 tooltip = PRC_decrease_land_reform_cost_tt }
+			add_to_variable = { Land_Reform_decison_effect_factor = 0.05 tooltip = PRC_strength_land_reform_effect_tt }
+
+			set_temp_variable = { temp_x = 2 }
+            set_temp_variable = { temp_y = 0.5 }
+            PRC_faction_struggle_system_faction_influence_change = yes
+			custom_effect_tooltip = PRC_50s_socialist_transformation_effect_in
+			set_temp_variable = { temp_x = 1 }
+			PRC_socialist_transformation_status_change = yes
+		}
+		priority = 30
+	   	cost = 20
+	   	days_remove = 30
+		fire_only_once = yes
+
+		ai_will_do = { 
+			factor = 100
+		}
+	}   
+	PRC_50s_Land_Reform_Set_up_a_target_for_the_rich = {
+		visible = {
+			has_country_flag = PRC_Land_Reform_begun
+			NOT = { has_country_flag = PRC_50s_socialist_transformation_Dig_deeper_into_the_rich_elements }
+			OR = {
+				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
+				is_ai = yes
+			}
+	   	}
+		complete_effect = {
+			set_country_flag = PRC_50s_socialist_transformation_Set_up_a_target_for_the_rich
+		}
+	   	remove_effect = {
+			add_to_variable = { Land_Reform_cost = -1 tooltip = PRC_decrease_land_reform_cost_tt }
+			add_to_variable = { Land_Reform_decison_effect_factor = 0.03 tooltip = PRC_strength_land_reform_effect_tt }
+
+			set_temp_variable = { temp_x = 1 }
+            set_temp_variable = { temp_y = 2 }
+            PRC_faction_struggle_system_faction_influence_change = yes
+			set_temp_variable = { temp_x = -2 }
+			PRC_socialist_transformation_status_change = yes
+		}
+		priority = 25
+	   	cost = 20
+	   	days_remove = 60
+		fire_only_once = yes
+
+		ai_will_do = { 
+			factor = 100
+		}
+	}  
+	PRC_50s_Land_Reform_Dig_deeper_into_the_rich_elements = {
+		visible = {
+			has_country_flag = PRC_Land_Reform_begun
+			NOT = { has_country_flag = PRC_50s_socialist_transformation_Set_up_a_target_for_the_rich }
+			OR = {
+				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
+				is_ai = yes
+			}
+	   	}
+		complete_effect = {
+			set_country_flag = PRC_50s_socialist_transformation_Dig_deeper_into_the_rich_elements
+		}
+	   	remove_effect = {
+			add_to_variable = { Land_Reform_decison_days_remove = 5 tooltip = PRC_decrease_land_reform_days_tt }
+			add_to_variable = { Land_Reform_decison_effect_factor = 0.07 tooltip = PRC_strength_land_reform_effect_tt }
+
+			set_temp_variable = { temp_x = 2 }
+            set_temp_variable = { temp_y = 2 }
+            PRC_faction_struggle_system_faction_influence_change = yes
+			set_temp_variable = { temp_x = 2 }
+			PRC_socialist_transformation_status_change = yes
+		}
+		priority = 25
+	   	cost = 20
+	   	days_remove = 60
+		fire_only_once = yes
+	}
 	PRC_50s_Consolidation_of_Land_Reform_in_the_Old_Liberated_Areas = {
 		visible = {
+			has_country_flag = PRC_Land_Reform_begun
 			OR = {
 				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
 				is_ai = yes
@@ -1103,16 +1444,16 @@ PRC_50s_The_Road_to_Socialism_categories = {
 
         }
 
-		priority = 40
+		priority = 20
 
 		
         fire_only_once = no
           
 		#days_re_enable = PRC_50s_socialist_transformation_re_time1?270
-		days_re_enable = 120
-		days_remove = 40
+		days_re_enable = 40
+		days_remove = 120
 		
-		cost = 50
+		cost = 35
 
 		complete_effect = {
 			
@@ -1250,11 +1591,17 @@ PRC_50s_The_Road_to_Socialism_categories = {
 	PRC_50s_Land_Reform_decison = {
 		visible = {
 			ROOT = {
+				has_country_flag = PRC_Land_Reform_begun
 				OR = {
 					check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
 					is_ai = yes
 				}
 			}
+	   	}
+		available = {
+
+        }
+		target_trigger = {
 			FROM = {
 				OR = {
 					state = 616
@@ -1286,15 +1633,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					is_owned_by = ROOT
 				}
 			}
-	   	}
-		available = {
-
-        }
-		target_trigger = {
-			
 		}
 
-		priority = 35
+		priority = 15
 
 		state_target = yes
 		target_array = ROOT.owned_states
@@ -1313,10 +1654,10 @@ PRC_50s_The_Road_to_Socialism_categories = {
 			#PRC_50s_spend_money_tt = yes
 			random_list = {
 				50 = {
-					add_to_variable = { FROM.Land_Reform_progrss_gain = 0.6 tooltip = PRC_promote_local_land_reform_tt1 }
+					add_to_variable = { FROM.Land_Reform_progrss_gain = ROOT.Land_Reform_progrss_gain_val tooltip = PRC_promote_local_land_reform_tt1 }
 				}
 				50 = {
-					add_to_variable = { FROM.Land_Reform_progrss = 15 tooltip = PRC_promote_local_land_reform_tt2 }
+					add_to_variable = { FROM.Land_Reform_progrss = ROOT.Land_Reform_progrss_val tooltip = PRC_promote_local_land_reform_tt2 }
 				}
 			}
 			
@@ -1331,6 +1672,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					5 = {
 						612 = { add_resource = { type = rubber amount = 1 } }
 					}
+					85 = {
+						
+					}
 				}
 			}
 			else_if = {
@@ -1342,6 +1686,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					5 = {
 						283 = { add_resource = { type = rubber amount = 1 } }
 					}
+					85 = {
+
+					}
 				}
 			}
 			else_if = {
@@ -1349,6 +1696,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
                 random_list = {
 					15 = {
 						1786 = { add_resource = { type = rubber amount = 1 } }
+					}
+					85 = {
+						
 					}
 				}
 			}
@@ -1360,6 +1710,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					}
 					7 = {
 						1791 = { add_resource = { type = rubber amount = 1 } }
+					}
+					85 = {
+						
 					}
 				}
 			}
@@ -1375,6 +1728,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					3 = {
 						1793 = { add_resource = { type = rubber amount = 1 } }
 					}
+					85 = {
+						
+					}
 				}
 			}
 			else_if = {
@@ -1386,6 +1742,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					7 = {
 						1785 = { add_resource = { type = rubber amount = 1 } }
 					}
+					85 = {
+						
+					}
 				}
 			}
 			else_if = {
@@ -1394,6 +1753,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					10 = {
 						606 = { add_resource = { type = rubber amount = 1 } }
 					}
+					90 = {
+						
+					}
 				}
 			}
 			else_if = {
@@ -1401,6 +1763,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
                 random_list = {
 					10 = {
 						1785 = { add_resource = { type = rubber amount = 1 } }
+					}
+					90 = {
+						
 					}
 				}
 			}
@@ -1413,6 +1778,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					5 = {
 						613 = { add_resource = { type = rubber amount = 1 } }
 					}
+					85 = {
+						
+					}
 				}
 			}
 			else_if = {
@@ -1420,6 +1788,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
                 random_list = {
 					8 = {
 						1557 = { add_resource = { type = rubber amount = 1 } }
+					}
+					92 = {
+						
 					}
 				}
 			}
@@ -1432,16 +1803,8 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					7 = {
 						601 = { add_resource = { type = rubber amount = 1 } }
 					}
-				}
-			}
-			else_if = {
-				limit = { FROM = { state = 325 } }
-                random_list = {
-					9 = {
-						325 = { add_resource = { type = rubber amount = 1 } }
-					}
-					6 = {
-						1326 = { add_resource = { type = rubber amount = 1 } }
+					85 = {
+						
 					}
 				}
 			}
@@ -1453,6 +1816,23 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					}
 					6 = {
 						1326 = { add_resource = { type = rubber amount = 1 } }
+					}
+					85 = {
+						
+					}
+				}
+			}
+			else_if = {
+				limit = { FROM = { state = 325 } }
+                random_list = {
+					9 = {
+						325 = { add_resource = { type = rubber amount = 1 } }
+					}
+					6 = {
+						1326 = { add_resource = { type = rubber amount = 1 } }
+					}
+					85 = {
+						
 					}
 				}
 			}
@@ -1461,6 +1841,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
                 random_list = {
 					15 = {
 						603 = { add_resource = { type = rubber amount = 1 } }
+					}
+					85 = {
+						
 					}
 				}
 			}
@@ -1473,6 +1856,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					4 = {
 						1575 = { add_resource = { type = rubber amount = 1 } }
 					}
+					85 = {
+						
+					}
 				}
 			}
 			else_if = {
@@ -1483,6 +1869,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					}
 					7 = {
 						1578 = { add_resource = { type = rubber amount = 1 } }
+					}
+					85 = {
+						
 					}
 				}
 			}
@@ -1495,6 +1884,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					6 = {
 						1574 = { add_resource = { type = rubber amount = 1 } }
 					}
+					85 = {
+						
+					}
 				}
 			}
 			else_if = {
@@ -1505,6 +1897,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					}
 					5 = {
 						1576 = { add_resource = { type = rubber amount = 1 } }
+					}
+					85 = {
+						
 					}
 				}
 			}
@@ -1526,6 +1921,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					4 = {
 						591 = { add_resource = { type = rubber amount = 1 } }
 					}
+					83 = {
+						
+					}
 				}
 			}
 			else_if = {
@@ -1533,6 +1931,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
                 random_list = {
 					15 = {
 						594 = { add_resource = { type = rubber amount = 1 } }
+					}
+					85 = {
+						
 					}
 				}
 			}
@@ -1575,6 +1976,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					1 = {
 						1871 = { add_resource = { type = rubber amount = 1 } }
 					}
+					88 = {
+						
+					}
 				}
 			}
 			else_if = {
@@ -1586,6 +1990,9 @@ PRC_50s_The_Road_to_Socialism_categories = {
 					4 = {
 						1359 = { add_resource = { type = rubber amount = 1 } }
 					}
+					90 = {
+						
+					}
 				}
 			}
 		}
@@ -1594,10 +2001,19 @@ PRC_50s_The_Road_to_Socialism_categories = {
 
 		ai_will_do = { 
 			factor = 100
+			modifier = {
+				factor = 0 
+				check_variable = { Land_Reform_cost > 8.5 }
+			}
+			modifier = {
+				factor = 0.1
+				check_variable = { Land_Reform_cost > 7.5 }
+			}
 		}
 	}
 	PRC_50s_Land_Reform_Triumph_of_Stages = {
 		visible = {
+			has_country_flag = PRC_Land_Reform_begun
 			OR = {
 				check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 2 }
 				is_ai = yes
@@ -1652,16 +2068,14 @@ PRC_50s_The_Road_to_Socialism_categories = {
 			}
         }
 
-		priority = 30
+		priority = 10
 
 		
         fire_only_once = no
           
-		#days_re_enable = PRC_50s_socialist_transformation_re_time1?270
-		days_re_enable = 120
-		days_remove = 40
+		days_remove = 0
 		
-		cost = 50
+		cost = 0
 
 		complete_effect = {
 			
@@ -1687,38 +2101,37 @@ PRC_50s_The_Road_to_Socialism_categories = {
 		}
 	}
 
-	PRC_50s_socialist_transformation_Water_conservancy_construction = {
+
+    #农业合作化
+	PRC_50s_Land_Reform_Rural_rectification_work = {
 		visible = {
 			ROOT = {
-				has_completed_focus = PRC_50s_Promote_Water_Conservancy_Construction
-			}
-			FROM = {
-				free_building_slots = {
-					building = industrial_complex
-					size < 15
+				has_completed_focus = PRC_50s_Co-operative_Transformation_of_Agriculture
+				OR = {
+					check_variable = { PRC_Consolidation_of_the_Regime_and_Social_Transformation_gui_var = 3 }
+					is_ai = yes
 				}
 			}
 	   	}
 		on_map_mode = map_only
 		available = {
-			num_of_civilian_factories_available_for_projects > 1
         }
         modifier = {
-            civilian_factory_use = 1
+            political_power_gain = -0.02
         }
 	   	remove_effect = {
-			FROM = {
-				add_extra_state_shared_building_slots = 1
+			ROOT = {
+				set_temp_variable = { temp_x = 0.2 }
+				PRC_socialist_transformation_Progress_of_agricultural_cooperation_change = yes
 			}
 		}
 		state_target = yes
 		target_array = ROOT.owned_states
-	   	cost = 25
+	   	cost = 5
 	   	days_remove = 180
-		fire_only_once = yes
+		days_re_enable = PRC_50s_socialist_transformation_re_time1?270
 	}
-
-	PRC_50s_socialist_transformation_Rural_grain_sales_will_be_increased = {
+	PRC_50s_Land_Reform_Rural_grain_sales_will_be_increased = {
 		visible = {
 			ROOT = {
 				has_completed_focus = PRC_50s_Co-operative_Transformation_of_Agriculture
@@ -1742,32 +2155,6 @@ PRC_50s_The_Road_to_Socialism_categories = {
 	   	days_remove = 120
 		fire_only_once = yes
 	}
-
-	PRC_50s_socialist_transformation_Rural_rectification_work = {
-		visible = {
-			ROOT = {
-				has_completed_focus = PRC_50s_Co-operative_Transformation_of_Agriculture
-			}
-	   	}
-		on_map_mode = map_only
-		available = {
-        }
-        modifier = {
-            political_power_gain = -0.02
-        }
-	   	remove_effect = {
-			ROOT = {
-				set_temp_variable = { temp_x = 0.2 }
-				PRC_socialist_transformation_Progress_of_agricultural_cooperation_change = yes
-			}
-		}
-		state_target = yes
-		target_array = ROOT.owned_states
-	   	cost = 5
-	   	days_remove = 180
-		days_re_enable = PRC_50s_socialist_transformation_re_time1?270
-	}
-    
 	PRC_50s_socialist_transformation_Educate_farmers_on_the_advantages_of_cooperation = {
 		visible = {
 			ROOT = {
@@ -1796,9 +2183,6 @@ PRC_50s_The_Road_to_Socialism_categories = {
 	   	days_remove = 180
 		days_re_enable = PRC_50s_socialist_transformation_re_time1?270
 	}
-
-
-
 	PRC_50s_socialist_transformation_Double_the_index = {
 		visible = {
 			ROOT = {
@@ -2497,223 +2881,6 @@ PRC_50s_The_Road_to_Socialism_categories = {
 				remove_idea = PRC_50s_five_anti_movement
 				add_idea = PRC_50s_five_anti_movement2
 			}
-		}
-	   	cost = 20
-	   	days_remove = 60
-		fire_only_once = yes
-	}
-
-	PRC_50s_socialist_transformation_Repairing_war_damaged_facilities = {
-		visible = {
-			has_completed_focus = PRC_50s_Heal_The_Wounds_of_War
-	   	}
-		modifier = {
-			political_power_gain = -0.05
-        }
-		available = {
-		}
-	   	remove_effect = {
-			random_owned_state = {
-				limit = {
-					infrastructure < 5
-				}
-				add_building_construction = {
-                    type = infrastructure
-                    level = 1
-                    instant_build = yes
-                }
-			}
-			random_owned_state = {
-				limit = {
-					infrastructure < 5
-				}
-				add_building_construction = {
-                    type = infrastructure
-                    level = 1
-                    instant_build = yes
-                }
-			}
-		}
-	   	cost = 20
-	   	days_remove = 60
-		fire_only_once = yes
-	}
-
-	PRC_50s_socialist_transformation_Classification_of_regional_land_reform_classes = {
-		visible = {
-			has_completed_focus = PRC_50s_Land_Reform
-			NOT = { has_country_flag = PRC_50s_socialist_transformation_Redistribution_of_land_throughout_the_country }
-	   	}
-		complete_effect = {
-			set_country_flag = PRC_50s_socialist_transformation_Classification_of_regional_land_reform_classes
-		}
-	   	remove_effect = {
-			set_temp_variable = { temp_x = 1 }
-            set_temp_variable = { temp_y = 1.5 }
-            PRC_faction_struggle_system_faction_influence_change = yes
-			add_to_variable = {
-				PRC_50s_socialist_transformation_re_time1 = -30
-				tooltip = PRC_50s_socialist_transformation_re_time_de
-			}
-			add_to_variable = {
-				PRC_50s_socialist_transformation_re_time2 = -60
-			}
-			set_temp_variable = { temp_x = -1 }
-			PRC_socialist_transformation_status_change = yes
-		}
-	   	cost = 20
-	   	days_remove = 30
-		fire_only_once = yes
-	}
-    
-	PRC_50s_socialist_transformation_Redistribution_of_land_throughout_the_country = {
-		visible = {
-			has_completed_focus = PRC_50s_Land_Reform
-			NOT = { has_country_flag = PRC_50s_socialist_transformation_Classification_of_regional_land_reform_classes }
-	   	}
-		complete_effect = {
-			set_country_flag = PRC_50s_socialist_transformation_Redistribution_of_land_throughout_the_country
-		}
-	   	remove_effect = {
-			set_temp_variable = { temp_x = 2 }
-            set_temp_variable = { temp_y = 0.5 }
-            PRC_faction_struggle_system_faction_influence_change = yes
-			custom_effect_tooltip = PRC_50s_socialist_transformation_effect_in
-			set_temp_variable = { temp_x = 1 }
-			PRC_socialist_transformation_status_change = yes
-		}
-	   	cost = 20
-	   	days_remove = 30
-		fire_only_once = yes
-	}
-    
-	PRC_50s_socialist_transformation_Promoting_mutual_aid_groups_in_agriculture = {
-		visible = {
-			has_completed_focus = PRC_50s_Land_Reform
-			NOT = { has_country_flag = PRC_50s_socialist_transformation_Relying_on_the_middle_peasants }
-	   	}
-		modifier = {
-        }
-		complete_effect = {
-			set_country_flag = PRC_50s_socialist_transformation_Promoting_mutual_aid_groups_in_agriculture
-		}
-	   	remove_effect = {
-			set_temp_variable = { temp_x = 2 }
-            set_temp_variable = { temp_y = 0.5 }
-            PRC_faction_struggle_system_faction_influence_change = yes
-			custom_effect_tooltip = PRC_50s_socialist_transformation_effect_in
-			set_temp_variable = { temp_x = 1 }
-			PRC_socialist_transformation_status_change = yes
-		}
-	   	cost = 20
-	   	days_remove = 30
-		fire_only_once = yes
-	}
-    
-	PRC_50s_socialist_transformation_Relying_on_the_middle_peasants = {
-		visible = {
-			has_completed_focus = PRC_50s_Land_Reform
-			NOT = { has_country_flag = PRC_50s_socialist_transformation_Promoting_mutual_aid_groups_in_agriculture }
-	   	}
-		complete_effect = {
-			set_country_flag = PRC_50s_socialist_transformation_Relying_on_the_middle_peasants
-		}
-	   	remove_effect = {
-			set_temp_variable = { temp_x = 1 }
-            set_temp_variable = { temp_y = 1.5 }
-            PRC_faction_struggle_system_faction_influence_change = yes
-			add_to_variable = {
-				PRC_50s_socialist_transformation_re_time1 = -30
-				tooltip = PRC_50s_socialist_transformation_re_time_de
-			}
-			add_to_variable = {
-				PRC_50s_socialist_transformation_re_time2 = -60
-			}
-			set_temp_variable = { temp_x = -1 }
-			PRC_socialist_transformation_status_change = yes
-		}
-	   	cost = 20
-	   	days_remove = 30
-		fire_only_once = yes
-	}
-    
-	PRC_50s_socialist_transformation_Learn_from_the_Soviet_experience_of_land_reform = {
-		visible = {
-			has_completed_focus = PRC_50s_Land_Reform
-	   	}
-		available = {
-		}
-	   	remove_effect = {
-			add_to_variable = { PRC_50s_socialist_transformation_liu_cost = -5 }
-			add_to_variable = { 
-				PRC_50s_socialist_transformation_mao_cost = -5
-				tooltip = PRC_50s_socialist_transformation_cost_de
-			}
-			set_temp_variable = { temp_x = 1 }
-            set_temp_variable = { temp_y = 0.5 }
-            PRC_faction_struggle_system_faction_influence_change = yes
-			set_temp_variable = { temp_x = 2 }
-            set_temp_variable = { temp_y = 0.5 }
-            PRC_faction_struggle_system_faction_influence_change = yes
-		}
-	   	cost = 20
-	   	days_remove = 60
-		fire_only_once = yes
-	}
-    
-	PRC_50s_socialist_transformation_Set_up_a_target_for_the_rich = {
-		visible = {
-			has_completed_focus = PRC_50s_Land_Reform
-			NOT = { has_country_flag = PRC_50s_socialist_transformation_Dig_deeper_into_the_rich_elements }
-	   	}
-		complete_effect = {
-			set_country_flag = PRC_50s_socialist_transformation_Set_up_a_target_for_the_rich
-		}
-	   	remove_effect = {
-			set_temp_variable = { temp_x = 1 }
-            set_temp_variable = { temp_y = 2 }
-            PRC_faction_struggle_system_faction_influence_change = yes
-			set_temp_variable = { temp_x = -2 }
-			PRC_socialist_transformation_status_change = yes
-		}
-	   	cost = 20
-	   	days_remove = 60
-		fire_only_once = yes
-	}
-    
-	PRC_50s_socialist_transformation_Dig_deeper_into_the_rich_elements = {
-		visible = {
-			has_completed_focus = PRC_50s_Land_Reform
-			NOT = { has_country_flag = PRC_50s_socialist_transformation_Set_up_a_target_for_the_rich }
-	   	}
-		complete_effect = {
-			set_country_flag = PRC_50s_socialist_transformation_Dig_deeper_into_the_rich_elements
-		}
-	   	remove_effect = {
-			set_temp_variable = { temp_x = 2 }
-            set_temp_variable = { temp_y = 2 }
-            PRC_faction_struggle_system_faction_influence_change = yes
-			set_temp_variable = { temp_x = 2 }
-			PRC_socialist_transformation_status_change = yes
-		}
-	   	cost = 20
-	   	days_remove = 60
-		fire_only_once = yes
-	}
-    
-	PRC_50s_socialist_transformation_Organize_peasant_union_activities = {
-		visible = {
-			has_completed_focus = PRC_50s_Land_Reform
-	   	}
-		modifier = {
-			political_power_gain = -0.05
-        }
-	   	remove_effect = {
-			set_temp_variable = { temp_x = 2 }
-            set_temp_variable = { temp_y = 0.5 }
-            PRC_faction_struggle_system_faction_influence_change = yes
-			custom_effect_tooltip = PRC_50s_socialist_transformation_effect_in
-			set_country_flag = PRC_50s_socialist_transformation_Organize_peasant_union_activities
 		}
 	   	cost = 20
 	   	days_remove = 60
