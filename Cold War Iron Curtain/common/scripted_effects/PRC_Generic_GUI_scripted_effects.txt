@@ -1,4 +1,82 @@
 #新政治局系统
+PRC_CCCPC_gui_update = {
+	clear_array = PRC_CCCPC_leaders_influence_gui_array
+	for_each_loop = {
+        array = PRC_CCCPC_leaders_array
+        index = temp_i
+        
+		set_temp_variable = { PRC_CCCPC_leaders_influence_temp = PRC_CCCPC_leaders_influence_array^temp_i }
+        round_temp_variable = PRC_CCCPC_leaders_influence_temp
+         
+		for_loop_effect = {
+			start = 0
+			end = PRC_CCCPC_leaders_influence_temp
+            
+			add_to_array = { PRC_CCCPC_leaders_influence_gui_array = PRC_CCCPC_leaders_array^temp_i }
+        }
+    }
+}
+PRC_CCCPC_leaders_influence_update = {
+	custom_effect_tooltip = PRC_CCCPC_leaders_influence_change_tt
+	for_each_loop = {
+        array = PRC_CCCPC_leaders_array
+        index = temp_i
+		value = temp_v2
+        
+		if = {
+			limit = {
+				check_variable = { temp_v2 = temp_v }
+			}
+			add_to_variable = {
+				var =  PRC_CCCPC_leaders_influence_array^temp_i 
+				value = temp_influence
+			}
+		}
+    }
+    PRC_CCCPC_gui_update = yes
+}
+PRC_CCCPC_party_status_update = {
+     #party status#
+	set_variable = { PRC_CPC_political_power_gain = 0 }
+	set_variable = { PRC_CPC_stability_factor = 0 }
+	set_variable = { PRC_CPC_drift_defence_factor = 0 }
+
+	set_temp_variable = { temp_status1 = PRC_party_unity }#
+	subtract_from_temp_variable = { temp_status1 = 60 }
+	set_temp_variable = { temp_status2 = temp_status1 }
+	if = {
+		limit = { check_variable = { temp_status2 < 0 } }
+		multiply_temp_variable = { temp_status2 = -1 }
+	}
+	add_to_temp_variable = { temp_status2 = 40 }
+	divide_temp_variable = { temp_status1 = temp_status2 }
+    
+	multiply_temp_variable = { temp_status1 = 0.6 }#
+	add_to_variable = { PRC_CPC_political_power_gain = temp_status1 }
+	divide_temp_variable = { temp_status1 = 0.6 }
+	multiply_temp_variable = { temp_status1 = 0.3 }
+	add_to_variable = { PRC_CPC_stability_factor = temp_status1 }
+	divide_temp_variable = { temp_status1 = 0.3 }
+	add_to_variable = { PRC_CPC_drift_defence_factor = temp_status1 }
+
+	set_temp_variable = { temp_status1 = PRC_party_discipline }#
+	subtract_from_temp_variable = { temp_status1 = 60 }
+	set_temp_variable = { temp_status2 = temp_status1 }
+	if = {
+		limit = { check_variable = { temp_status2 < 0 } }
+		multiply_temp_variable = { temp_status2 = -1 }
+	}
+	add_to_temp_variable = { temp_status2 = 40 }
+	divide_temp_variable = { temp_status1 = temp_status2 }
+      
+	multiply_temp_variable = { temp_status1 = 0.6 }#
+	add_to_variable = { PRC_CPC_political_power_gain = temp_status1 }
+	divide_temp_variable = { temp_status1 = 0.6 }
+	multiply_temp_variable = { temp_status1 = 0.2 }
+	add_to_variable = { PRC_CPC_stability_factor = temp_status1 }
+
+	force_update_dynamic_modifier = yes
+}
 PRC_CCCPC_gui_startup = {
 	set_country_flag = PRC_Seventh_Central_Committee_of_CPC
 
@@ -36,69 +114,9 @@ PRC_CCCPC_gui_startup = {
 	set_variable = { PRC_party_unity = 90 }
 
 	PRC_CCCPC_gui_update = yes
+
+	PRC_CCCPC_party_status_update = yes
 }
-PRC_CCCPC_gui_update = {
-	clear_array = PRC_CCCPC_leaders_influence_gui_array
-	for_each_loop = {
-        array = PRC_CCCPC_leaders_array
-        index = temp_i1
-
-        add_to_array = { PRC_CCCPC_leaders_influence_gui_array = PRC_CCCPC_leaders_influence_array^temp_i1 }
-         
-		for_each_loop = {
-			array = PRC_CCCPC_leaders_array
-			index = temp_i2
-            
-			if = {
-                limit = {
-                    check_variable = { temp_i2 > temp_i1 }
-			    }
-				add_to_variable = { PRC_CCCPC_leaders_influence_gui_array^temp_i1 = PRC_CCCPC_leaders_influence_array^temp_i2 }
-			}
-        }
-    }
-    
-    #party status#
-	set_variable = { PRC_CPC_political_power_gain = 0 }
-	set_variable = { PRC_CPC_stability_factor = 0 }
-	set_variable = { PRC_CPC_drift_defence_factor = 0 }
-
-	set_temp_variable = { temp_status1 = PRC_party_unity }#
-	subtract_from_temp_variable = { temp_status1 = 60 }
-	set_temp_variable = { temp_status2 = temp_status1 }
-	if = {
-		limit = { check_variable = { temp_status2 < 0 } }
-		multiply_temp_variable = { temp_status2 = -1 }
-	}
-	add_to_temp_variable = { temp_status2 = 40 }
-	divide_temp_variable = { temp_status1 = temp_status2 }
-    
-	multiply_temp_variable = { temp_status1 = 0.8 }#
-	add_to_variable = { PRC_CPC_political_power_gain = temp_status1 }
-	multiply_temp_variable = { temp_status1 = 0.625 }
-	add_to_variable = { PRC_CPC_stability_factor = temp_status1 }
-	multiply_temp_variable = { temp_status1 = 2 }
-	add_to_variable = { PRC_CPC_drift_defence_factor = temp_status1 }
-
-	set_temp_variable = { temp_status1 = PRC_party_discipline }#
-	subtract_from_temp_variable = { temp_status1 = 60 }
-	set_temp_variable = { temp_status2 = temp_status1 }
-	if = {
-		limit = { check_variable = { temp_status2 < 0 } }
-		multiply_temp_variable = { temp_status2 = -1 }
-	}
-	add_to_temp_variable = { temp_status2 = 40 }
-	divide_temp_variable = { temp_status1 = temp_status2 }
-      
-	multiply_temp_variable = { temp_status1 = 0.8 }#
-	add_to_variable = { PRC_CPC_political_power_gain = temp_status1 }
-	multiply_temp_variable = { temp_status1 = 0.1 }
-	add_to_variable = { PRC_CPC_stability_factor = temp_status1 }
-
-	force_update_dynamic_modifier = yes
-
-}
-
 #旧政治局系统
 PRC_faction_struggle_system_startup = {
     clear_array = PRC_faction_struggle_system_faction_influence

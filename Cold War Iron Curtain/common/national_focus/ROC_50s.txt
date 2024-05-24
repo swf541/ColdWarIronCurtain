@@ -11,6 +11,7 @@ focus_tree = {
 	}
 	default = no
 	
+	shared_focus = CHI_all_is_not_yet_lost
 	
 	
 	focus = {
@@ -478,7 +479,7 @@ focus_tree = {
 			hidden_effect = {
 				decrease_us_influence = yes
 			}
-			add_political_power = 100
+			add_political_power = 150
 			army_experience = -50
 		}
 		icon = GFX_IndoctrinateArmy
@@ -550,13 +551,13 @@ focus_tree = {
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetTag]: id = CHI_further_excersises_with_us_troops"
 			add_doctrine_cost_reduction = {
-				cost_reduction = 0.15
+				cost_reduction = 0.5
 				uses = 1
 				category = land_doctrine
 			}
 			USA = {
 				add_doctrine_cost_reduction = {
-				cost_reduction = 0.15
+				cost_reduction = 0.5
 				uses = 1
 				category = land_doctrine
 				}
@@ -594,10 +595,37 @@ focus_tree = {
 	}
 	
 	focus = {
-		id = CHI_establish_a_planning_staff
+		id = CHI_amend_act_of_military_system
 		completion_reward = {
-			log = "[GetDateText]: [Root.GetTag]: id = CHI_establish_a_planning_staff"
-			country_event = KMT_Taiwan50s.12
+			log = "[GetDateText]: [Root.GetTag]: id = CHI_amend_act_of_military_system"
+			
+			if = {
+				limit = {
+					has_completed_focus = CHI_adopt_soviet_style_command_structure
+				}
+				swap_ideas = {
+					remove_idea = CHI_soviet_style_army2
+					add_idea = CHI_soviet_style_army3
+				}
+			}
+			if = {
+				limit = {
+					has_completed_focus = CHI_listen_to_Sun_li_jen
+				}
+				swap_ideas = {
+					remove_idea = CHI_usa_style_army2
+					add_idea = CHI_usa_style_army3
+				}
+			}
+			if = {
+				limit = {
+					NOT = {
+						has_completed_focus = CHI_listen_to_Sun_li_jen
+						has_completed_focus = CHI_adopt_soviet_style_command_structure
+					}
+				}
+				custom_effect_tooltip = us_Influence_dependance_tt
+			}
 		}
 		icon = GFX_Planning_Staff
 		search_filters = {
@@ -1422,11 +1450,10 @@ focus_tree = {
 		}
 		
 		bypass = {
-			NOT = {
-				KOR = {
-				has_war_with = KPA
-				}
+			USA = {
+				has_completed_focus = USA_50s_a_new_front
 			}
+
 		}
 		
 		available = {
@@ -1788,7 +1815,7 @@ focus_tree = {
 			focus = CHI_Sino_american_treaty
 		}
 		mutually_exclusive = {focus = CHI_allign_closer_to_america}
-		x = 61
+		x = 58
 		y = 11
 		
 	}
@@ -1811,7 +1838,7 @@ focus_tree = {
 		}
 		mutually_exclusive = {focus = CHI_contain_american_political_influence}
 		
-		x = 58
+		x = 60
 		y = 11
 		
 	}
@@ -1820,10 +1847,10 @@ focus_tree = {
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetTag]: id = CHI_encourage_american_investment"
 			1006 = {
-				add_extra_state_shared_building_slots = 1
+				add_extra_state_shared_building_slots = 2
 					add_building_construction = {
 						type = industrial_complex
-						level = 1
+						level = 2
 						instant_build = yes
 				}
 			}	
@@ -1835,10 +1862,12 @@ focus_tree = {
 		cost = 7
 		prerequisite = {
 			focus = CHI_allign_closer_to_america
+			focus = CHI_contain_american_political_influence
+
 		}
 		
 		
-		x = 57
+		x = 59
 		y = 12
 		
 	}
@@ -1864,7 +1893,7 @@ focus_tree = {
 		}
 		
 		
-		x = 59
+		x = 61
 		y = 12
 		completion_reward = {
 			
@@ -2430,7 +2459,13 @@ focus_tree = {
 		id = CHI_the_taiwan_strait
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetTag]: id = CHI_the_taiwan_strait"
-			hidden_effect = { PRC = {country_event = { id = KMT_Taiwan50s.46 days = 2 } } }
+			hidden_effect = { PRC = {country_event = { id = Strait_Crisis.2 days = 2 } } }
+			hidden_effect = { CHI = {country_event = { id = Strait_Crisis.5 days = 136 } } }
+		    hidden_effect = { PRC = {country_event = { id = Strait_Crisis.5 days = 136 } } }	
+			hidden_effect = { CHI = {country_event = { id = Strait_Crisis.6 days = 145 } } }
+			hidden_effect = { PRC = {country_event = { id = Strait_Crisis.6 days = 145 } } }
+			hidden_effect = { CHI = {country_event = { id = Strait_Crisis.4 days = 239 } } }
+			hidden_effect = { PRC = {country_event = { id = Strait_Crisis.4 days = 239 } } }
 			set_country_flag = First_Taiwan_strait_crisis
 		}
 		icon = GFX_KMT_50s_Taiwan_the_taiwan_strait 
@@ -2439,14 +2474,14 @@ focus_tree = {
 		}
 		cost = 2
 		prerequisite = {
-			focus = CHI_The_Fall_of_the_Mainland
+			focus = CHI_fortify_kinmen_matsu
 		}
 		available = {
 			always = no
 		}
 		
 		x = 55
-		y = 7
+		y = 8
 		
 	}
 	focus = {
@@ -2454,10 +2489,10 @@ focus_tree = {
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetTag]: id = CHI_evacuate_Dachen_islands"
 			1666 = {
-				add_manpower = -10000
+				add_manpower = -40000
 			}
 			524 = {
-				add_manpower = 10000
+				add_manpower = 40000
 			}
 			PRC = {
 				transfer_state = 1666
@@ -2471,16 +2506,65 @@ focus_tree = {
 		prerequisite = {
 			focus = CHI_Taiwan_strait_crisis_US_help
 		}
+		mutually_exclusive = {
+			focus = CHI_reject_evacuation_efforts_of_dachen
+		}
 		x = 54
-		y = 9
+		y = 10
 		
 	}
+
+	focus = {
+		id = CHI_reject_evacuation_efforts_of_dachen
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetTag]: id = CHI_reject_evacuation_efforts_of_dachen"
+			custom_effect_tooltip = keep_dachen_islands_tt
+		}
+		#icon = 
+		search_filters = {
+			IC_FILTER
+		}
+		cost = 5.2
+		prerequisite = {
+			focus = CHI_Taiwan_strait_crisis_US_help
+		}
+		mutually_exclusive = {
+			focus = CHI_evacuate_Dachen_islands
+		}
+		x = 56
+		y = 10
+		
+	}
+
+	focus = {
+		id = CHI_second_taiwan_strait
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetTag]: id = CHI_second_taiwan_strait"
+			set_country_flag = First_Taiwan_strait_crisis
+			hidden_effect = { CHI = {country_event = { id = Strait_Crisis.8 days = 5 } } } 
+		}
+		#icon = 
+		search_filters = {
+			IC_FILTER
+		}
+		available = {
+			always = no
+		}
+		cost = 5.2
+		prerequisite = {
+			focus = CHI_evacuate_Dachen_islands focus = CHI_reject_evacuation_efforts_of_dachen
+		}
+		x = 55
+		y = 11
+		
+	}
+
 	focus = {
 		id = CHI_Taiwan_strait_crisis_US_help
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetTag]: id = CHI_Taiwan_strait_crisis_US_help"
-			hidden_effect = { PRC = {country_event = { id = KMT_Taiwan50s.47 days = 2 } } }
-			hidden_effect = { CHI = {country_event = { id = KMT_Taiwan50s.47 days = 2 } } }
+			hidden_effect = { PRC = {country_event = { id = Strait_Crisis.3 days = 2 } } }
+			hidden_effect = { CHI = {country_event = { id = Strait_Crisis.3 days = 2 } } }
 			add_equipment_to_stockpile = {
 				type = convoy
 				amount = 100
@@ -2497,7 +2581,7 @@ focus_tree = {
 			focus = CHI_the_taiwan_strait
 		}
 		x = 55
-		y = 8
+		y = 9
 		
 	}
 	focus = {
@@ -2529,10 +2613,10 @@ focus_tree = {
 		}
 		cost = 5.2
 		prerequisite = {
-			focus = CHI_Taiwan_strait_crisis_US_help
+			focus = CHI_The_Fall_of_the_Mainland
 		}
-		x = 56
-		y = 9
+		x = 55
+		y = 7
 		
 	}
 	focus = {
@@ -2557,15 +2641,33 @@ focus_tree = {
 		}
 		cost = 5.2
 		prerequisite = {
-			focus = CHI_fortify_kinmen_matsu
+			focus = CHI_second_taiwan_strait
 		}
+		
+		
+		x = 54
+		y = 12
+		
+	}
+	focus = {
+		id = CHI_operation_black_magic
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetTag]: id = CHI_operation_black_magic"
+			add_ideas = CHI_operation_black_magic_idea
+			hidden_effect = {CHI = {country_event = { id = Strait_Crisis.17 days = 103} } }
+		}
+		#icon = 
+		search_filters = {
+			IC_FILTER
+		}
+		cost = 5.2
 		prerequisite = {
-			focus = CHI_evacuate_Dachen_islands
+			focus = CHI_second_taiwan_strait
 		}
 		
 		
-		x = 55
-		y = 10
+		x = 56
+		y = 12
 		
 	}
 	focus = {
@@ -3178,12 +3280,7 @@ focus_tree = {
 			log = "[GetDateText]: [Root.GetTag]: id = CHI_benevolent_leader_chiang"
 			custom_effect_tooltip = increase_kmt_influence_tiny_bit_tt
 			increase_influence_normal = yes
-			If = {
-				limit = {
-					NOT = {has_completed_focus = CHI_CIVILWAR_Central_Command_CKS}
-				}
-				add_country_leader_trait = Generalissimo
-			}
+			add_country_leader_trait = Saviour_of_the_Chinese_Nation
 		}
 		
 		cancel = {
@@ -6048,5 +6145,6 @@ focus_tree = {
 		
 		
 	}
+
 	
 }
