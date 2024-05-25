@@ -1424,10 +1424,18 @@ shared_focus = {
 	}
 	completion_reward = {
 		PRC_50s_Imperialist_forces_swap = yes
-		add_timed_idea = {
-			idea = PRC_50s_Manage_Foreign_Media_System
-			days = 365
-		}
+        swap_ideas = {
+            remove_idea = policy_media_temp_1
+            add_idea = policy_media_temp_0
+        }
+        hidden_effect = {
+            remove_ideas = {
+                policy_media_temp_1
+                policy_media_temp_2
+                policy_media_temp_3
+                policy_media_temp_3a
+            }
+        }
 	}
 	ai_will_do = {
 		factor = 10
@@ -1448,10 +1456,6 @@ shared_focus = {
 	}
 	completion_reward = {
 		PRC_50s_Imperialist_forces_swap = yes
-		add_timed_idea = {
-			idea = PRC_50s_Reclaim_Foreign_Funding_Agencies
-			days = 365
-		}
 	}
 	ai_will_do = {
 		factor = 10
@@ -1497,7 +1501,6 @@ shared_focus = {
         date > 1955.07.01
 	}
 	completion_reward = {
-		PRC_50s_Imperialist_forces_swap = yes
 		country_event = {
 			id = PRC_50s_Rework_event.6
 			days = 10
@@ -1753,7 +1756,21 @@ shared_focus = {
 
 	}
 	completion_reward = {
-		add_ideas = PRC_50s_Improvement_of_The_Status_of_Workers
+		if = {
+            limit = {
+                has_idea = PRC_50s_Improvement_of_the_Status_of_Workers
+            }
+            swap_ideas = {
+                remove_idea = PRC_50s_Improvement_of_the_Status_of_Workers
+                add_idea = PRC_50s_Improvement_of_the_Status_of_Workers2
+            }
+        }
+        if = {
+            limit = {
+                NOT = { has_idea = PRC_50s_Improvement_of_the_Status_of_Workers }
+            }
+            add_ideas = PRC_50s_Improvement_of_the_Status_of_Workers
+        }
 	}
 	ai_will_do = {
 		factor = 1
@@ -1874,12 +1891,8 @@ shared_focus = {
         has_country_flag = PRC_50s_Rework_event.67.t 
 	}
 	completion_reward = {
-		add_political_power = 25
-        add_stability = 0.025
-		add_timed_idea = {
-			idea = PRC_50s_Adopt_The_New_People_s_Constitution
-			days = 365
-		}
+		add_political_power = 50
+		add_ideas = PRC_50s_New_People_s_Constitution
 	}
 	ai_will_do = {
 		factor = 1
@@ -2099,7 +2112,6 @@ shared_focus = {
 		PRC_CCCPC_leaders_influence_update = yes
 		set_temp_variable = { temp_i = 6 }
 		set_temp_variable = { temp_y = 0.1 }
-		PRC_faction_struggle_system_faction_supporter_effect_change = yes
 	}
 	ai_will_do = {
 		factor = 1
@@ -2219,6 +2231,7 @@ shared_focus = {
 		remove_ideas = PRC_50s_Urban_and_Rural_Party_Organisations
         remove_ideas = PRC_50s_Improvement_of_The_Status_of_Workers
         remove_ideas = PRC_50s_New_Intellectuals
+        remove_ideas = PRC_50s_New_People_s_Constitution
         remove_ideas = PRC_Socialist_Economic_Foundation
         add_ideas = PRC_Socialist_System
         country_event = PRC_50s_Rework_event.25
@@ -2670,39 +2683,8 @@ shared_focus = {
 
 	}
 	completion_reward = {
-        if = {
-			limit = {
-				has_idea = PRC_50s_Food_supply_crisis
-			}
-			swap_ideas = {
-				remove_idea = PRC_50s_Food_supply_crisis
-				add_idea = PRC_50s_Food_supply_crisis_2
-			}
-		}
-		else_if = {
-			limit = {
-				has_idea = PRC_50s_Food_supply_crisis_2
-			}
-			swap_ideas = {
-				remove_idea = PRC_50s_Food_supply_crisis_2
-				add_idea = PRC_50s_Food_supply_crisis_3
-			}
-		}
-        else_if = {
-            limit = {
-                NOT = {
-                    has_idea = PRC_50s_Food_supply_crisis_3
-                }
-            }
-            remove_ideas = PRC_50s_Food_supply_crisis_3
-			add_timed_idea = {
-                idea = PRC_50s_Food_supply_crisis_4
-                days = 200
-            }
-        }
 		set_temp_variable = { temp_x = 5 }
 		PRC_50s_gain_money_tt = yes
-        PRC_50s_Economic_ruin_caused_by_war_ideas_swap = yes
 	}
 	ai_will_do = {
 		factor = 10
@@ -3280,36 +3262,60 @@ shared_focus = {
 	icon = GFX_PRC_50s_Oppose_The_Industrial_And_Commercial_Big_Bourgeoisie
 	cost = 5
 	x = -3
-	y = 1
+	y = 2
 	relative_position_id = PRC_50s_Unite_The_National_Bourgeoisie
 	prerequisite = {
-		focus = PRC_50s_Unite_The_National_Bourgeoisie
+		focus = PRC_50s_Negate_Giving_Consideration_to_Both_Public_And_Private_Interests
+        focus = PRC_50s_Reconcile_Labour_Conflicts
 	}
 	available = {
-		hidden_trigger = {
-			has_country_flag = PRC_50s_Oppose_The_Industrial_And_Commercial_Big_Bourgeoisie
-		}
-		has_completed_focus = PRC_50s_The_Campaign_to_Increase_Production_And_Practice_Economy
+		if = {
+            limit = {
+                NOT = { has_global_flag = korean_war_begun }
+            }
+            always = no
+        }
+        if = {
+            limit = {
+                has_global_flag = korean_war_begun
+                KPA = { has_war_with = KOR }
+            }
+            always = no
+        }
+        if = {
+            limit = {
+                has_global_flag = korean_war_begun
+                NOT = {
+                    KPA = { has_war_with = KOR }
+                }
+            }
+            has_completed_focus = PRC_50s_The_Campaign_to_Increase_Production_And_Practice_Economy
+        }
 	}
 	completion_reward = {
-		set_temp_variable = { temp_v = 1 }
-		set_temp_variable = { temp_influence = 0.5 }
-		PRC_CCCPC_leaders_influence_update = yes
-		country_event = {
-			id = PRC_50s_Rework_event.20
-			days = 5
+        add_timed_idea = {
+			idea = PRC_50s_five_anti_movement
+			days = 180
 		}
 
         add_to_variable = { 
             var = PRC_transitional_period_policy_preference 
-            value = 3
+            value = 5
             tooltip = PRC_transitional_period_policy_preference_tt_2
         }
         PRC_transitional_period_policy_preference_update = yes
-        news_event = PRC_Focus.6
+
+		set_temp_variable = { temp_v = 1 }
+		set_temp_variable = { temp_influence = 0.5 }
+		PRC_CCCPC_leaders_influence_update = yes
+
+        news_event = {
+            id = PRC_Focus.6
+            days = 1
+        }
 	}
 	ai_will_do = {
-		factor = 1
+		factor = 1000
 	}
 }
 shared_focus = {
@@ -3424,21 +3430,53 @@ shared_focus = {
 	icon = GFX_PRC_50s_Anti-bureaucratic_Corruption
 	cost = 5
 	x = 3
-	y = 1
+	y = 2
 	relative_position_id = PRC_50s_Unite_The_National_Bourgeoisie
 	prerequisite = {
-		focus = PRC_50s_Unite_The_National_Bourgeoisie
+		focus = PRC_50s_Negate_Giving_Consideration_to_Both_Public_And_Private_Interests
+        focus = PRC_50s_Reconcile_Labour_Conflicts
 	}
 	available = {
-		has_completed_focus = PRC_50s_The_Campaign_to_Increase_Production_And_Practice_Economy
+		if = {
+            limit = {
+                NOT = { has_global_flag = korean_war_begun }
+            }
+            always = no
+        }
+        if = {
+            limit = {
+                has_global_flag = korean_war_begun
+                KPA = { has_war_with = KOR }
+            }
+            always = no
+        }
+        if = {
+            limit = {
+                has_global_flag = korean_war_begun
+                NOT = {
+                    KPA = { has_war_with = KOR }
+                }
+            }
+            has_completed_focus = PRC_50s_The_Campaign_to_Increase_Production_And_Practice_Economy
+        }
 	}
 	completion_reward = {
+        add_timed_idea = {
+			idea = PRC_50s_three_anti_movement
+			days = 200
+		}
+
+        add_to_variable = { 
+            var = PRC_transitional_period_policy_preference 
+            value = 3
+            tooltip = PRC_transitional_period_policy_preference_tt_2
+        }
+        PRC_transitional_period_policy_preference_update = yes
+
 		set_temp_variable = { temp_v = 1 }
 		set_temp_variable = { temp_influence = 0.5 }
 		PRC_CCCPC_leaders_influence_update = yes
-		country_event = {
-			id = PRC_50s_Rework_event.21
-		}
+
 		add_to_variable = {
 			PRC_50s_Unite_The_National_Bourgeoisie_st = 0.05
 			tooltip = PRC_50s_dm_stability_in
@@ -3452,10 +3490,13 @@ shared_focus = {
 			tooltip = PRC_50s_dm_production_speed_buildings_factor_in
 		}
 
-        news_event = PRC_Focus.5
+        news_event = {
+            id = PRC_Focus.5
+            days = 1
+        }
 	}
 	ai_will_do = {
-		factor = 1
+		factor = 1000
 	}
 }
 shared_focus = {
@@ -3661,6 +3702,12 @@ shared_focus = {
 		focus = PRC_50s_Equal_Public_And_Private_Taxation
         focus = PRC_50s_Tilt_towards_Public_Ownership_in_Taxation
 	}
+    prerequisite = {
+        focus = PRC_50s_Oppose_The_Industrial_And_Commercial_Big_Bourgeoisie
+	}
+    prerequisite = {
+        focus = PRC_50s_Anti-bureaucratic_Corruption
+	}
 	available = {
 		date > 1952.11.01
 	}
@@ -3668,14 +3715,13 @@ shared_focus = {
 		set_temp_variable = { temp_v = 1 }
 		set_temp_variable = { temp_influence = 0.5 }
 		PRC_CCCPC_leaders_influence_update = yes
-		unlock_national_focus = PRC_50s_The_First_Five-year_Plan
 		country_event = {
 			id = PRC_50s_Rework_event.162
 			days = 1
 		}
 	}
 	ai_will_do = {
-		factor = 1
+		factor = 1000
 	}
 }
 shared_focus = {
@@ -3783,9 +3829,6 @@ shared_focus = {
 		set_temp_variable = { temp_v = 1 }
 		set_temp_variable = { temp_influence = 0.5 }
 		PRC_CCCPC_leaders_influence_update = yes
-		set_temp_variable = { temp_i = 3 }
-		set_temp_variable = { temp_y = 0.1 }
-		PRC_faction_struggle_system_faction_supporter_effect_change = yes
 	}
 	ai_will_do = {
 		factor = 1
@@ -4358,9 +4401,6 @@ shared_focus = {
 		set_temp_variable = { temp_v = 3 }
 		set_temp_variable = { temp_influence = 2 }
 		PRC_CCCPC_leaders_influence_update = yes
-		set_temp_variable = { temp_i = 8 }
-		set_temp_variable = { temp_y = 0.04 }
-		PRC_faction_struggle_system_faction_supporter_effect_change = yes
 	}
 	ai_will_do = {
 		factor = 1
@@ -4508,9 +4548,6 @@ shared_focus = {
 		set_temp_variable = { temp_v = 3 }
 		set_temp_variable = { temp_influence = 2 }
 		PRC_CCCPC_leaders_influence_update = yes
-		set_temp_variable = { temp_i = 8 }
-		set_temp_variable = { temp_y = 0.04 }
-		PRC_faction_struggle_system_faction_supporter_effect_change = yes
 	}
 	ai_will_do = {
 		factor = 1
@@ -6871,6 +6908,7 @@ shared_focus = {
         focus = PRC_50s_Prepare_to_Intervene_in_Korean_War
     }
     available = {
+        has_war_with = KOR
     }
     bypass = {
         KPA = {
@@ -6882,9 +6920,13 @@ shared_focus = {
     completion_reward = {
         hidden_effect = {
             country_event = {
+                id = PRC_50s_Rework_event.21
+                days = 52
+                random_days = 6
+            }
+            country_event = {
                 id = PRC_50s_Rework_event.19
-                days = 30
-                random = 15
+                days = 94
             }
         }
         add_timed_idea = {
@@ -7380,11 +7422,12 @@ shared_focus = {
         date > 1953.01.01
     }
     completion_reward = {
+        add_research_slot = 1
         activate_mission = PRC_50s_The_First_Five-year_Plan_mission
     }            
 
     ai_will_do = {
-        base = 1
+        base = 1000
     }
 }
 shared_focus = {
@@ -7404,6 +7447,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         add_to_variable = {
             currentMoney = -20
             tooltip = increase_money_tt
@@ -7460,6 +7508,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         unlock_decision_tooltip = PRC_1_FYP_infrastructure
         add_to_variable = {
             currentMoney = -8
@@ -7537,6 +7590,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         add_to_variable = {
             currentMoney = -15
             tooltip = increase_money_tt
@@ -7583,6 +7641,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         add_to_variable = {
             currentMoney = -22
             tooltip = increase_money_tt
@@ -7632,6 +7695,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         add_to_variable = {
             currentMoney = -20
             tooltip = increase_money_tt
@@ -7687,7 +7755,11 @@ shared_focus = {
         }
     }
     completion_reward = {
-
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
     }
     ai_will_do = {
         base = 1
@@ -7710,6 +7782,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         add_to_variable = {
             currentMoney = -9
             tooltip = increase_money_tt
@@ -7750,6 +7827,11 @@ shared_focus = {
         focus = PRC_50s_Construct_Chemical_Plants
     }
     available = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         custom_trigger_tooltip = {
             tooltip = PRC_50s_first_fyp_flag
             NOT = { has_country_flag = PRC_50s_first_fyp_flag }
@@ -7785,6 +7867,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         random_owned_state = {
             limit = {
                 state_population > 10000
@@ -7892,6 +7979,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         add_to_variable = {
             currentMoney = -12
             tooltip = increase_money_tt
@@ -7947,6 +8039,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         add_to_variable = {
             currentMoney = -12
             tooltip = increase_money_tt
@@ -7988,6 +8085,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         add_to_variable = {
             currentMoney = -12
             tooltip = increase_money_tt
@@ -8028,7 +8130,11 @@ shared_focus = {
         }
     }
     completion_reward = {
-
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
     }
     ai_will_do = {
         base = 1
@@ -8057,6 +8163,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         unlock_decision_tooltip = PRC_1_FYP_develop_wasteland
     }
     ai_will_do = {
@@ -8080,6 +8191,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         add_to_variable = {
             currentMoney = -12
             tooltip = increase_money_tt
@@ -8116,6 +8232,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         add_to_variable = {
             currentMoney = -12
             tooltip = increase_money_tt
@@ -8148,6 +8269,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
         add_to_variable = {
             currentMoney = -6
             tooltip = increase_money_tt
@@ -8186,6 +8312,11 @@ shared_focus = {
         }
     }
     completion_reward = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
 		unlock_decision_tooltip = PRC_1_FYP_develop_wasteland
         add_to_variable = {
             currentMoney = -5
@@ -8264,21 +8395,28 @@ shared_focus = {
         }
     }
     completion_reward = {
-        add_stability = 0.025
-        effect_tooltip = {
+        set_country_flag = {
+            flag = PRC_50s_first_fyp_flag
+            days = 50
+            value = 1
+        }
+        add_stability = 0.01
+        add_political_power = 50
+        if = {
+            limit = {
+                has_idea = PRC_50s_Improvement_of_the_Status_of_Workers
+            }
             swap_ideas = {
-                remove_idea = PRC_50s_Improve_The_Status_of_Workers
-                add_idea = PRC_50s_Improve_The_Status_of_Workers2
+                remove_idea = PRC_50s_Improvement_of_the_Status_of_Workers
+                add_idea = PRC_50s_Improvement_of_the_Status_of_Workers2
             }
         }
-        hidden_effect = {
-            remove_ideas = PRC_50s_Improve_The_Status_of_Workers
-            add_timed_idea = {
-                idea = PRC_50s_Improve_The_Status_of_Workers2
-                days = 360
+        if = {
+            limit = {
+                NOT = { has_idea = PRC_50s_Improvement_of_the_Status_of_Workers }
             }
+            add_ideas = PRC_50s_Improvement_of_the_Status_of_Workers
         }
-        
     }
     ai_will_do = {
         base = 1
