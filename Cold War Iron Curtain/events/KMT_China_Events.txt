@@ -2,6 +2,7 @@
 
 add_namespace = bss
 add_namespace = KMT_70s
+add_namespace = KMT_80s
 add_namespace = KMT_Borderconflict
 add_namespace = KMT_Taiwan50s
 add_namespace = roc
@@ -41,6 +42,65 @@ add_namespace = KMT_Civilwar
 add_namespace = KMT_Shanghai
 add_namespace = KMT_mainlandburma
 add_namespace = KMT_punishments
+add_namespace = KMT_qiaowuweiyuanhui
+add_namespace = KMT_diplomatic_report
+add_namespace = KMT_fangong_dalu
+add_namespace = Strait_Crisis
+
+
+news_event = {
+	id = KMT_70s.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_70s.1"}
+ immediate = {
+	CHI = {
+		kill_country_leader = yes
+		create_country_leader = {
+    		name = "Chiang Ching-kuo"
+    		picture = "Chiang_Ching_kuo.dds"
+    		ideology = Three_principles_of_people
+		}
+	}
+ }
+	title = "[GetNewspaperHeader]Death of Chiang Kai-Shek"
+	desc = KMT_70s.1.d
+	picture = GFX_Chiang_Senior_died
+
+	trigger = {
+		date = 1975.4.5
+	}
+	fire_only_once = yes 
+
+	option = {
+		name = "A Sad day for the people of ROC"
+	}
+}
+
+news_event = {
+	id = KMT_80s.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_80s.1"}
+ immediate = {
+	CHI = {
+		kill_country_leader = yes
+		create_country_leader = {
+    		name = "Lee Teng Hui"
+    		picture = "Lee_Teng_Hui.dds"
+    		ideology = Three_principles_of_people
+		}
+	}
+ }
+	title = "[GetNewspaperHeader]Death of Chiang Ching-Kuo"
+	desc = KMT_80s.1.d
+	picture = GFX_Chiang_Junior_died
+
+	trigger = {
+		date = 1988.1.13
+	}
+	fire_only_once = yes 
+
+	option = {
+		name = "A Sad day for the people of ROC"
+	}
+}
 
 ###Old Taiwan Events###
 
@@ -296,11 +356,16 @@ country_event = {
 
 	option = {
 		name = "The Red Tide shall be broken in Pyongyang!"
-		USA = {
-			country_event = CHI_KOR.1
-		}
+		set_country_flag = CHI_wants_to_join_korean_war
+		unlock_decision_tooltip = propose_intervention_into_korea
 	}
 
+	option = {
+		name = "Perhaps we should listen to Truman's orders"
+		CHI = {
+			complete_national_focus = CHI_Korean_War_listen_to_the_chief_of_staffs
+		}
+	}
 }
 country_event = {
 	id = CHI_KOR.1 
@@ -426,7 +491,7 @@ news_event = {
 	title = CHI_KOR.8.t
 	desc = CHI_KOR.8.d	
 	is_triggered_only = yes
-	picture = GFX
+	picture = GFX_ROC_CLIQUE_103
 	fire_only_once = yes
 	option = {
 		name = CHI_KOR.8.a
@@ -460,7 +525,7 @@ country_event = {
 	fire_only_once = yes
 	option = {
 		name = CHI_KOR.10.a
-		
+		add_ideas = chinese_advisors
 	}
 }
 
@@ -476,22 +541,20 @@ country_event = {
 	option = {
 		name = CHI_KOR.11.a
 		news_event = CHI_KOR.12
-		custom_effect_tooltip = {
+		KOR = {
 			add_opinion_modifier = {
 				target = CHI
 				modifier = large_increase
 			}
-			CHI = {
-					add_opinion_modifier = {
-						target = KOR
-						modifier = large_increase
-					}
-			}
 			give_guarantee = CHI
-			CHI = {
-				give_guarantee = KOR
-			}
 			give_military_access = CHI
+		}
+		CHI = {
+			add_opinion_modifier = {
+				target = KOR
+				modifier = large_increase
+			}
+			give_guarantee = KOR
 		}
 	}
 
@@ -512,46 +575,30 @@ country_event = {
 	}
 }
 
-###sino-korean mutual defense treaty declined###
+###sino-korean mutual defense treaty accepted###
 news_event = { 
     id = CHI_KOR.12
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_KOR.12"}
 	title = CHI_KOR.12.t
 	desc = CHI_KOR.12.d	
 	is_triggered_only = yes
-	picture = GFX_South_Korea_ROC_No_Defense_Treaty
+	picture = GFX_South_Korea_ROC_Defense_Treaty
 	fire_only_once = yes
-	immediate = { 
-		KOR = {
-			add_opinion_modifier = {
-				target = CHI
-				modifier = large_increase
-			}
-			give_guarantee = CHI
-			give_military_access = CHI
-		}
-		CHI = {
-			add_opinion_modifier = {
-				target = KOR
-				modifier = large_increase
-			}
-			give_guarantee = KOR
-		}
-	}
 	option = {
 		name = CHI_KOR.12.a
 		
 	}
 }
 
-###sino-korean mutual defense treaty accepted###
+###sino-korean mutual defense treaty declined###
 news_event = { 
     id = CHI_KOR.13
 	immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_KOR.13"}
 	title = CHI_KOR.13.t
 	desc = CHI_KOR.13.d	
 	is_triggered_only = yes
-	picture = GFX_South_Korea_ROC_Defense_Treaty
+	
+	picture = GFX_South_Korea_ROC_No_Defense_Treaty
 	fire_only_once = yes
 	option = {
 		name = CHI_KOR.13.a
@@ -1068,14 +1115,14 @@ country_event = {
 				name = "CDP"
 				long_name = "China Democratic Party"
 		}
-		custom_effect_tooltip = 50s_content_end_tt
+		custom_effect_tooltip = 50s_taiwan_content_end_tt
 	}
 	option = {
 		name = KMT_Taiwan50s.17.b
 		add_political_power = -100
 		custom_effect_tooltip = increase_kmt_influence_tiny_bit_tt
 		increase_influence_normal = yes 
-		custom_effect_tooltip = 50s_content_end_tt
+		custom_effect_tooltip = 50s_taiwan_content_end_tt
 	}
 	
 }
@@ -1798,30 +1845,30 @@ news_event = {
 
 ###PLA Bombs Quemoy#
 country_event = {
-	id = KMT_Taiwan50s.45
-	title = KMT_Taiwan50s.45.t
-	desc = KMT_Taiwan50s.45.d
+	id = Strait_Crisis.1
+	title = Strait_Crisis.1.t
+	desc = Strait_Crisis.1.d
 	is_triggered_only = yes
 	picture = GFX_PLA_shells_Kinmen_Event 
 	is_triggered_only = yes
 	fire_only_once = yes
 	option = {
-		name = KMT_Taiwan50s.45.a
+		name = Strait_Crisis.1.a
 		CHI = {complete_national_focus = CHI_the_taiwan_strait}
 	}
 }
 
 ###PLA continues Shelling#
 country_event = {
-	id = KMT_Taiwan50s.46
-	title = KMT_Taiwan50s.46.t
-	desc = KMT_Taiwan50s.46.d
+	id = Strait_Crisis.2
+	title = Strait_Crisis.2.t
+	desc = Strait_Crisis.2.d
 	is_triggered_only = yes
 	picture = GFX_PLA_shells_Kinmen_Event 
 	is_triggered_only = yes
 	fire_only_once = yes
 	option = {
-		name = KMT_Taiwan50s.46.a
+		name = Strait_Crisis.2.a
 		CHI = {
 				1006 = {
 					damage_building = {
@@ -1834,25 +1881,12 @@ country_event = {
 	}
 }
 
-###Situation calms down#
-country_event = {
-	id = KMT_Taiwan50s.48
-	title = KMT_Taiwan50s.48.t
-	desc = KMT_Taiwan50s.48.d
-	is_triggered_only = yes
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = KMT_Taiwan50s.48.a
-		CHI = {clr_country_flag = First_Taiwan_strait_crisis}
-	}
-}
 
 ###US moves in#
 country_event = {
-	id = KMT_Taiwan50s.47
-	title = KMT_Taiwan50s.47.t
-	desc = KMT_Taiwan50s.47.d
+	id = Strait_Crisis.3
+	title = Strait_Crisis.3.t
+	desc = Strait_Crisis.3.d
 	is_triggered_only = yes
 	picture = GFX_USA_helps_with_evacuations
 	is_triggered_only = yes
@@ -1862,7 +1896,7 @@ country_event = {
 		trigger = {
 			has_government = nationalist
 		}
-		name = KMT_Taiwan50s.47.a
+		name = Strait_Crisis.3.a
 		CHI = {add_war_support = 0.02}
 	}
 	option = {	
@@ -1870,10 +1904,401 @@ country_event = {
 		trigger = {
 			has_government = maoism
 		}
-		name = KMT_Taiwan50s.47.b
+		name = Strait_Crisis.3.b
+		
+	} 
+}
+
+
+###Situation calms down#
+country_event = {
+	id = Strait_Crisis.4
+	title = Strait_Crisis.4.t
+	desc = Strait_Crisis.4.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	option = {
+		name = Strait_Crisis.4.a
+		trigger = {tag = CHI}
+		CHI = {clr_country_flag = First_Taiwan_strait_crisis}
+	}
+	option = {
+		name = Strait_Crisis.4.b
+		trigger = {tag = PRC}
+		add_war_support = 0.05
+	}
+}
+
+###Battle of Yijiashan Islands#
+country_event = {
+	id = Strait_Crisis.5
+	title = Strait_Crisis.5.t
+	desc = Strait_Crisis.5.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	option = {
+		name = Strait_Crisis.5.a
+		trigger = {tag = CHI}
+		add_manpower = -1086
+	}
+	option = {
+		name = Strait_Crisis.5.b
+		trigger = {tag = PRC}
+		add_war_support = 0.05
+	}
+}
+
+###arrival of american airwings in Taiwan#
+country_event = {
+	id = Strait_Crisis.6
+	title = Strait_Crisis.6.t
+	desc = Strait_Crisis.6.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	option = {
+		name = Strait_Crisis.6.a
+		trigger = {tag = CHI}
+		add_war_support = 0.05
+	}
+	option = {
+		name = Strait_Crisis.6.b
+		trigger = {tag = PRC}
+		add_war_support = -0.05
+	}
+}
+
+###Taiwan Second Strait Crisis###
+country_event = {
+	id = Strait_Crisis.7
+	title = Strait_Crisis.7.t
+	desc = Strait_Crisis.7.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.7.a
+		add_equipment_to_stockpile = {
+			type = jet_CAS_equipment_2
+			amount = -2
+		}
 		
 	}
 }
+
+###leaflets dropped by PRC demanding for surrender###
+country_event = {
+	id = Strait_Crisis.8
+	title = Strait_Crisis.8.t
+	desc = Strait_Crisis.8.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.8.a
+		
+		
+	}
+}
+
+###Soviet support for PRC###
+country_event = {
+	id = Strait_Crisis.9
+	title = Strait_Crisis.9.t
+	desc = Strait_Crisis.9.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.9.a
+		
+		
+	}
+}
+
+###US support for ROC in 2nd strait crisis###
+country_event = {
+	id = Strait_Crisis.10
+	title = Strait_Crisis.10.t
+	desc = Strait_Crisis.10.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.10.a
+		
+		
+	}
+}
+
+###resupply attempts###
+country_event = {
+	id = Strait_Crisis.11
+	title = Strait_Crisis.11.t
+	desc = Strait_Crisis.11.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.11.a
+		
+		
+	}
+}
+
+###first Aerial Engagements###
+country_event = {
+	id = Strait_Crisis.12
+	title = Strait_Crisis.12.t
+	desc = Strait_Crisis.12.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.12.a
+		trigger = {tag = CHI}
+		add_equipment_to_stockpile = {
+			type = jet_multirole_equipment_3
+			amount = -1
+		}
+	}
+	option = {
+		name = Strait_Crisis.12.b
+		trigger = {tag = PRC}
+		add_equipment_to_stockpile = {
+			type = jet_multirole_equipment_2
+			amount = -8
+		}
+	}
+}
+
+###second Aerial Engagements###
+country_event = {
+	id = Strait_Crisis.13
+	title = Strait_Crisis.13.t
+	desc = Strait_Crisis.13.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.13.a
+		trigger = {tag = CHI}
+		add_war_support = 0.05
+	}
+	option = {
+		name = Strait_Crisis.13.b
+		trigger = {tag = PRC}
+		add_equipment_to_stockpile = {
+			type = jet_multirole_equipment_2
+			amount = -26
+		}
+	}
+}
+
+###third Aerial Engagements###
+country_event = {
+	id = Strait_Crisis.14
+	title = Strait_Crisis.14.t
+	desc = Strait_Crisis.14.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.14.a
+		trigger = {tag = CHI}
+		add_equipment_to_stockpile = {
+			type = jet_multirole_equipment_3
+			amount = -1
+		}
+	}
+	option = {
+		name = Strait_Crisis.14.b
+		trigger = {tag = PRC}
+		add_equipment_to_stockpile = {
+			type = jet_multirole_equipment_2
+			amount = -3
+		}
+	}
+}
+
+###ceasefire###
+country_event = {
+	id = Strait_Crisis.15
+	title = Strait_Crisis.15.t
+	desc = Strait_Crisis.15.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.15.a
+		trigger = {tag = CHI}
+		add_political_power = 25
+		
+		add_war_support = 0.1
+	}
+	option = {
+		name = Strait_Crisis.15.b
+		trigger = {tag = PRC}
+		add_political_power = -25
+	}
+}
+
+###ceasefire extended###
+country_event = {
+	id = Strait_Crisis.16
+	title = Strait_Crisis.16.t
+	desc = Strait_Crisis.16.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.16.a
+		trigger = {tag = CHI}
+		
+	}
+	option = {
+		name = Strait_Crisis.16.b
+		trigger = {tag = PRC}
+		
+	}
+}
+
+###real ceasefire###
+country_event = {
+	id = Strait_Crisis.17
+	title = Strait_Crisis.17.t
+	desc = Strait_Crisis.17.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.17.a
+		trigger = {tag = CHI}
+		add_political_power = 75
+		add_stability = 0.05
+	}
+	option = {
+		name = Strait_Crisis.17.b
+		trigger = {tag = PRC}
+		add_war_support = -0.05
+	}
+}
+
+###return of F86 planes###
+country_event = {
+	id = Strait_Crisis.18
+	title = Strait_Crisis.18.t
+	desc = Strait_Crisis.18.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = Strait_Crisis.18.a
+		remove_ideas = CHI_operation_black_magic_idea
+	}
+	option = {
+		name = Strait_Crisis.18.b
+		add_political_power = -25
+		add_timed_idea = {
+			idea = CHI_operation_black_magic_idea
+			days = 2555
+		}
+		set_variable = { THIS.idea_len_@token:economic_growth = 2555 }
+		set_variable = { THIS.idea_date_@token:economic_growth = global.num_days }
+		hidden_effect = {remove_ideas = CHI_operation_black_magic_idea}
+	}
+}
+
+###islands lost###
+country_event = {
+	id = Strait_Crisis.19
+	title = Strait_Crisis.19.t
+	desc = Strait_Crisis.19.d
+	is_triggered_only = yes
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	immediate = {
+		PRC = {
+			transfer_state = 1666
+			transfer_state = 1006
+		}
+	}
+	
+	 
+	option = {
+		name = Strait_Crisis.19.a
+		
+		custom_effect_tooltip = {
+			PRC = {
+				transfer_state = 1666
+				transfer_state = 1006
+			}
+		}
+		trigger = {tag = CHI}
+	}
+	option = {
+		name = Strait_Crisis.19.b
+		
+		custom_effect_tooltip = {
+			transfer_state = 1666
+			transfer_state = 1006
+		}
+		trigger = {tag = PRC}
+		add_war_support = 0.05
+	}
+}
+
 
 ###Mainland operations#
 country_event = {
@@ -2110,6 +2535,26 @@ country_event = {
 	}
 }
 
+###Fǎngōng dàlù###
+country_event = {
+	id = KMT_fangong_dalu.1
+	title = KMT_fangong_dalu.1.t
+	desc = KMT_fangong_dalu.1.d
+	#picture = 
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	
+	
+	 
+	option = {
+		name = KMT_fangong_dalu.1.a
+		add_political_power = 50
+		add_war_support = 0.05
+	}
+}
+
+
 		###################50s Mainland Stuff########################
 
 ###Republic of China introduction###
@@ -2227,6 +2672,7 @@ country_event = {
 			add_ideas = CHI_Taiwan_Japanese_remnants
 			add_ideas = CHI_government_corruption
 			add_ideas = antiquated_agricultural_sector_2
+			add_ideas = CHI_calls_for_education_reforms
 			set_political_power = 0
 			add_dynamic_modifier = { modifier = kmt_party_unity_50s_taiwan }
 			add_dynamic_modifier = { modifier = kmt_influence_50s_taiwan }
@@ -2357,11 +2803,62 @@ country_event = {
 	}
 }
 
+###White Group Baituan###
+country_event = {
+    id = bss.228
+	title = bss.228.t
+	desc = bss.228.d
+	#picture = 
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+	    name = bss.228.a
+		army_experience = 50
+		add_command_power = 30
+		add_doctrine_cost_reduction = {
+			cost_reduction = 1
+			uses = 2
+			category = land_doctrine
+		}
+		set_country_flag = accepted_baituan
+	}
 
+	option = {
+	    name = bss.228.b
+		add_stability = 0.01
+		add_war_support = 0.05
+		add_political_power = 50
+		set_country_flag = denied_baituan
+	}
+}
 
 ###Republic of China Victory Events###
 
-
+###Revolt from warlords bc low stab/big negative pp###
+country_event = {
+    id = bss.229
+	title = bss.229.t
+	desc = bss.229.d
+	#picture = 
+	
+	trigger = {
+		has_country_flag = Ihavereadtheeventandiknowimfucked
+		OR = {
+			has_stability < 0.0001
+			has_political_power < -100
+		}
+	}
+	fire_only_once = yes
+	
+	option = {
+	    name = bss.229.a
+		custom_effect_tooltip = warlord_growing_disloyal_tt
+		add_to_variable = { var_warlord_loyalty_check = 1 }
+			###for potrock to add daily variable loss###
+	}
+}
 
 country_event = {
 	id = CHI_VIN.0
@@ -2426,6 +2923,8 @@ country_event = {
 	
 	option = {
 		name = "Time for choosing"
+		custom_effect_tooltip = imtellingyouyouarefucked_tt
+		set_country_flag = Ihavereadtheeventandiknowimfucked
 	}
 }
 country_event = {
@@ -2523,6 +3022,7 @@ country_event = {
 	option = {
 		name = CHI_INDO.3.a
 		add_war_support = 0.05
+		set_country_flag = vietnam_ends_anti_chinese_sentiment
 	}
 	
 	
@@ -2549,6 +3049,7 @@ country_event = {
 		add_manpower = 40000
 		add_political_power = -100
 		add_war_support = -0.02
+		set_country_flag = vietnam_ends_anti_chinese_sentiment
 	}
 	
 	
@@ -2592,7 +3093,520 @@ country_event = {
 	
 }
 
+country_event = {
+	id = CHI_INDO.7
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.7"}
+	title = CHI_INDO.7.t
+	desc = CHI_INDO.7.d
+	#picture = 
+	is_triggered_only = yes
+	
+	option = {
+		name = CHI_INDO.7.a
+		custom_effect_tooltip = Viet_Quoc_disbanded_TT
+		CHI = {
+			diplomatic_relation = {
+				country = VIE
+				relation = non_aggression_pact
+				active = yes
+			}
+			country_event = CHI_INDO.13
+		}
+		add_popularity = {
+			ideology = nationalist 
+			popularity = -0.05
+		}
+		
+	}
 
+	option = {
+		name = CHI_INDO.7.b
+		custom_effect_tooltip = antagonize_nanjing_tt
+		CHI = {
+			add_opinion_modifier = {
+				target = VIE
+				modifier = small_decrease
+			}	
+			add_political_power = -50
+			country_event = CHI_INDO.11
+		}
+		
+	}
+
+}
+
+country_event = {
+	id = CHI_INDO.8
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.8"}
+	title = CHI_INDO.8.t
+	desc = CHI_INDO.8.d
+	#picture = 
+	is_triggered_only = yes
+	
+	option = {
+		name = CHI_INDO.8.a
+		trigger = { original_tag = CHI }
+		CHI = {
+			country_event = CHI_INDO.8
+			add_opinion_modifier = {
+					target = VIE
+					modifier = small_increase
+			}
+		}
+		VIE = {
+			country_event = CHI_INDO.8
+		}
+	}
+
+	option = {
+		name = CHI_INDO.8.ab
+		trigger = { original_tag = VIE }
+		effect_tooltip = {
+			army_experience = 30
+				add_offsite_building = {
+					type = arms_factory
+					level = 1
+				}
+		}
+		VIE = {
+				add_opinion_modifier = {
+					target = CHI
+					modifier = small_increase
+				}
+		}
+	}
+
+}
+
+country_event = {
+	id = CHI_INDO.9
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.9"}
+	title = CHI_INDO.9.t
+	desc = CHI_INDO.9.d
+	picture = GFX_VNQDD_Event
+
+	is_triggered_only = yes
+	
+	option = {
+		name = CHI_INDO.9.a
+		trigger = { 
+			NOT = {
+				tag = CHI
+			}
+		}
+	}
+	option = {
+		name = CHI_INDO.9.b
+		
+		add_political_power = -50
+		custom_effect_tooltip = Viet_Quoc_made_better_TT
+		trigger = {
+			tag = CHI
+		}
+	}
+	
+	
+}
+country_event = {
+	id = CHI_INDO.10
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.10"}
+	title = CHI_INDO.10.t
+	desc = CHI_INDO.10.d
+	picture = GFX_VNQDD_Event
+
+	is_triggered_only = yes
+	
+	option = {
+		name = CHI_INDO.10.a
+		trigger = { 
+			NOT = {
+				tag = CHI
+			}
+		}
+	}
+	option = {
+		name = CHI_INDO.10.b
+		
+		army_experience = 25
+		custom_effect_tooltip = Viet_Quoc_made_better_TT
+		trigger = {
+			tag = CHI
+		}
+	}
+}
+
+country_event = {
+	id = CHI_INDO.11
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.11"}
+	title = CHI_INDO.11.t
+	desc = CHI_INDO.11.d
+	picture = GFX_VNQDD_Event
+
+	is_triggered_only = yes
+	
+	option = {
+		name = CHI_INDO.11.a
+		effect_tooltip = {
+			add_political_power = -50
+			add_opinion_modifier = {
+				target = VIE
+				modifier = small_decrease
+			}
+		}
+		complete_national_focus = KMT_Support_The_Viet_Quoc
+		set_global_flag = CHI_change_support_for_vnqdd
+		custom_effect_tooltip = antagonize_saigon_tt
+	}
+
+	option = {
+		name = CHI_INDO.11.b
+		effect_tooltip = {
+			add_political_power = -50
+			add_opinion_modifier = {
+				target = VIE
+				modifier = small_decrease
+			}
+		}
+		custom_effect_tooltip = keep_support_for_south_vietnam_tt
+		VIE = {
+			add_opinion_modifier = {
+				target = CHI
+				modifier = small_increase
+			}
+		}
+	}
+}
+
+country_event = {
+	id = CHI_INDO.12
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.12"}
+	title = CHI_INDO.12.t
+	desc = CHI_INDO.12.d
+	#picture = 
+
+	is_triggered_only = yes 
+	
+	option = {
+		name = CHI_INDO.12.a
+		root = {
+			add_opinion_modifier = {
+				target = chi
+				modifier = small_increase
+			}	
+		}
+		add_ideas = chinese_advisors
+
+		army_experience = 30
+		add_offsite_building = {
+			type = arms_factory
+			level = 1
+		}
+	}
+
+	option = {
+		name = CHI_INDO.12.b
+		custom_effect_tooltip = antagonize_nanjing_tt
+		CHI = {
+			add_opinion_modifier = {
+				target = root
+				modifier = small_decrease
+			}	
+		}
+		
+	}
+}
+
+country_event = {
+	id = CHI_INDO.13
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.13"}
+	title = CHI_INDO.13.t
+	desc = CHI_INDO.13.d
+	#picture = 
+
+	is_triggered_only = yes 
+	fire_only_once = yes 
+
+	option = {
+		name = CHI_INDO.13.a
+		add_opinion_modifier = {
+			target = VIE
+			modifier = small_increase
+		}
+		add_political_power = 5
+	}
+}
+
+###Define Nationality Law###
+country_event = {
+	id = CHI_INDO.14
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.14"}
+	title = CHI_INDO.14.t
+	desc = CHI_INDO.14.d
+	#picture = 
+
+	is_triggered_only = yes 
+	fire_only_once = yes 
+
+	option = {
+		name = CHI_INDO.14.a
+		add_political_power = 100	
+		set_country_flag = CHI_jus_sanguini
+		set_country_flag = CHI_defined_nationality
+	}
+
+	option = {
+		name = CHI_INDO.14.b
+		add_stability = 0.01
+		set_country_flag = CHI_new_nationality_law
+		set_country_flag = CHI_defined_nationality
+	}
+}
+
+country_event = {
+	id = CHI_INDO.15
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.15"}
+	title = CHI_INDO.15.t
+	desc = CHI_INDO.15.d
+	#picture = 
+
+	is_triggered_only = yes 
+	fire_only_once = yes 
+
+	option = {
+		name = CHI_INDO.15.a
+		custom_tooltip = antagonize_nanjing_tt
+		add_opinion_modifier = {
+			target = CHI
+			modifier = small_decrease
+		}
+		CHI = {
+			country_event = CHI_INDO.16
+		}
+	}
+
+	option = {
+		name = CHI_INDO.15.b
+		add_political_power -50
+		root = {
+			add_opinion_modifier = {
+				target = SIA
+				modifier = small_increase
+			}	
+			country_event = CHI_INDO.17
+		}
+	}	
+}
+
+country_event = {
+	id = CHI_INDO.16
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.16"}
+	title = CHI_INDO.16.t
+	desc = CHI_INDO.16.d
+	#picture = 
+
+	is_triggered_only = yes 
+	fire_only_once = yes 
+
+	option = {
+		name = CHI_INDO.16.a
+		ROOT = {
+			remove_opinion_modifier = {
+				target = chi
+				modifier = small_increase
+			}	
+			if = {
+				limit = {
+					has_idea = chinese_advisors
+				}
+				SIA = {country_event = CHI_INDO.17}
+			}
+			remove_ideas = chinese_advisors
+			remove_offsite_building = {
+				type = arms_factory
+				level = 1
+			}
+			
+		}
+	}
+
+	option = {
+		name = CHI_INDO.16.b
+		add_stability = -0.01
+		add_political_power = -100
+	}
+}
+
+country_event = {
+	id = CHI_INDO.17
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.17"}
+	title = CHI_INDO.17.t
+	desc = CHI_INDO.17.d
+	#picture = 
+
+	is_triggered_only = yes 
+	fire_only_once = yes 
+
+	option = {
+		name = CHI_INDO.17.a
+		add_opinion_modifier = {
+			target = SIA 
+			modifier = small_increase
+		}
+		
+	}
+}
+
+country_event = {
+	id = CHI_INDO.18
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.18"}
+	title = CHI_INDO.18.t
+	desc = CHI_INDO.18.d
+	#picture = 
+
+	is_triggered_only = yes 
+	fire_only_once = yes 
+
+	option = {
+		name = CHI_INDO.18.a
+		
+		add_opinion_modifier = {
+			target = CHI 
+			modifier = large_decrease
+		}
+		add_political_power = 150
+	}
+}
+
+country_event = {
+	id = CHI_INDO.19
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.19"}
+	title = CHI_INDO.19.t
+	desc = CHI_INDO.19.d
+	#picture = 
+
+	is_triggered_only = yes 
+
+	option = {
+		name = CHI_INDO.19.a
+		trigger = {tag = CHI}
+	}
+
+	option = {
+		name = CHI_INDO.19.a
+		trigger = {NOT = {tag = CHI} }
+		if = {
+			limit = {
+				tag = INO
+			}
+			every_owned_state = {
+				add_manpower = -6500
+			}
+			hidden_effect = {
+				600 = {
+					add_manpower = 39000
+				}
+				1576 = {
+					add_manpower = 39000
+				}
+				1569 = {
+					add_manpower = 9750
+				}
+				1577 = {
+					add_manpower = 9750
+				}
+				591 = {
+					add_manpower = 9750
+				}
+				592 = {
+					add_manpower = 39000
+				}
+				595 = {
+					add_manpower = 58500
+				}
+				
+			}
+		}
+		if = {
+			limit = {
+				tag = SIA
+			}
+			every_owned_state = {
+				add_manpower = -56572
+			}
+			hidden_effect = {
+				592 = {
+					add_manpower = 221762
+				}
+				600 = {
+					add_manpower = 31680
+				}
+				1576 = {
+					add_manpower = 31680
+				}
+				591 = {
+					add_manpower = 43560
+				}
+				595 = {
+					add_manpower = 27720
+				}
+				1569 = {
+					add_manpower = 13860
+				}
+				1577 = {
+					add_manpower = 13860
+				}
+			}
+		}
+		if = {
+			limit = {
+				tag = MAL
+			}
+			every_owned_state = {
+				add_manpower = -1000
+			}
+			hidden_effect = {
+				595 = {
+					add_manpower = 1296
+				}
+				592 = {
+					add_manpower = 496
+				}
+				591 = {
+					add_manpower = 188
+				}
+				1569 = {
+					add_manpower = 520
+				}
+				1577 = {
+					add_manpower = 272
+				}
+				1576 = {
+					add_manpower = 440
+				}
+				600 = {
+					add_manpower = 444
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = CHI_INDO.20
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.20"}
+	title = CHI_INDO.20.t
+	desc = CHI_INDO.20.d
+	#picture = 
+
+	is_triggered_only = yes 
+
+	option = {
+		name = CHI_INDO.20.a
+		CHI = {
+			custom_tooltip = returning_nanyang_chinese_tt
+		}
+	}
+}
 
 country_event = {
 	id = KMT_MIL.2
@@ -2837,6 +3851,44 @@ country_event = {
 }
 
 country_event = {
+	id = KMT_MIL.15
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_MIL.15"}
+	title = KMT_MIL.15.t
+	desc = KMT_MIL.15.d
+	picture = GFX_Whampoa
+
+	is_triggered_only = yes
+	
+	option = {
+		name = KMT_MIL.15.a
+		army_experience = 25
+		custom_effect_tooltip = decrease_military_penalty_TT
+		add_to_variable = {
+			KMT_Military_Penalty = 0.05
+		}
+	}
+}
+
+country_event = {
+	id = KMT_MIL.16
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_MIL.16"}
+	title = KMT_MIL.16.t
+	desc = KMT_MIL.16.d
+	picture = GFX_sun_1
+
+	is_triggered_only = yes
+	
+	option = {
+		name = KMT_MIL.16.a
+		swap_ideas = {
+			remove_idea = CHI_Legacy_of_the_inadequate_US_Army_Structure_1
+			add_idea = CHI_Legacy_of_the_inadequate_US_Army_Structure_2
+		}
+		
+	}
+}
+
+country_event = {
 	id = CHI_BANDIT.0
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_BANDIT.0"}
 	title = "The Banditry Problem"
@@ -2936,6 +3988,7 @@ country_event = {
 		CHI = {
 			puppet = TIB
 			transfer_state = 867
+			transfer_state = 1877
 		}
 		set_politics = {
 			ruling_party = Social_Democratic
@@ -3163,25 +4216,11 @@ news_event = {
 	desc = KMT_SHOW_TRIALS.1.d
 	picture = GFX_KMT_SHOW_TRIALS_1
 
-	immediate = {
-		CHI = { 
-			every_owned_state = {
-				add_manpower = -15000
-			}
-		}
-	}
 	major = yes
 	is_triggered_only = yes
 
 	option = {
 		name = "Concerning"
-		custom_effect_tooltip = {
-			CHI = { 
-				every_owned_state = {
-					add_manpower = -15000
-				}
-			}
-		}
 	}
 }
 
@@ -3443,7 +4482,7 @@ news_event = {
     immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_Atoms.2"}   
 	title = "[GetNewspaperHeader]Project Blue Sky White Sun"   
 	desc = KMT_Atoms.2.d
-	picture = GFX_KMT_Atoms_1
+	#picture = 
 
 	major = yes
 	is_triggered_only = yes
@@ -3452,20 +4491,22 @@ news_event = {
 		name = "The Shackles of Imperialism in China ends now"
 	}
 }	
-news_event = {  
-	id = CHI_INDO.10
-    immediate = {log = "[GetDateText]: [Root.GetTag]: id = CHI_INDO.10"}   
-	title = "[GetNewspaperHeader]Republic of China Strikes Viet Minh Positions"   
-	desc = CHI_INDO.10.d
-	picture = GFX_CHI_INDO_10
+country_event = {  
+	id = KMT_Atoms.3
+    immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_Atoms.2"}   
+	title = "Project Blue Sky White Sun: Success "   
+	desc = KMT_Atoms.3.d
+	#picture = 
 
-	major = yes
-	is_triggered_only = yes
+	fire_only_once = yes
+	is_triggered_only = yes 
 
 	option = {
-		name = "Interesting"
+		name = "The World shall know our might!"
+		unlock_decision_tooltip = publicize_project_blue_sky_white_sun
+		set_global_flag = KMT_China_has_nukes_now
 	}
-}	
+}
 news_event = {  
 	id = ROC_VICTORY.1
     immediate = {log = "[GetDateText]: [Root.GetTag]: id = ROC_VICTORY.1"}   
@@ -3991,6 +5032,691 @@ country_event = {
 		add_stability = 0.02
 	}
 }
+
+###Jiangxinpo intro###
+country_event = {
+	id = KMT_mainlandburma.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_mainlandburma.1"}
+	title = KMT_mainlandburma.1.t
+	desc = KMT_mainlandburma.1.d
+	#picture = GFX_KMT_10
+
+
+	is_triggered_only = yes
+
+	option = {
+		name = KMT_mainlandburma.1.a
+		country_event = { id = KMT_mainlandburma.2 days = 10}
+	}
+
+	option = {
+		name = KMT_mainlandburma.1.b
+		add_political_power = 50
+		
+	}
+}
+
+###Jiangxinpo gets retaken###
+country_event = {
+	id = KMT_mainlandburma.2
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_mainlandburma.2"}
+	title = KMT_mainlandburma.2.t
+	desc = KMT_mainlandburma.2.d
+	#picture = GFX_KMT_10
+
+
+	is_triggered_only = yes
+
+	option = {
+		name = KMT_mainlandburma.2.a
+		trigger = { original_tag = CHI }
+		CHI = { 
+				transfer_state = 1817
+			}
+			army_experience = 10
+			BRM = {
+				country_event = KMT_mainlandburma.2
+			}
+	}
+
+	option = {
+		name = KMT_mainlandburma.2.b
+		trigger = { original_tag = BRM }
+		effect_tooltip = {
+			CHI = { 
+				transfer_state = 1817
+			}
+		}
+		add_political_power = -10
+	}
+}
+
+###demand for puyi extradiction###
+country_event = {
+	id = KMT_punishments.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.1"}
+	title = KMT_punishments.1.t
+	desc = KMT_punishments.1.d
+	picture = GFX_KMT_50s_Mainland_Puyi_Debate
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = KMT_punishments.1.a
+		set_global_flag = KMT_puyi
+		CHI = {
+			country_event = KMT_punishments.2
+		}
+	}
+
+	option = {
+		name = KMT_punishments.1.b
+		set_global_flag = PRC_puyi
+		CHI = {
+			country_event = KMT_punishments.2
+		}
+	}
+}
+
+###reply from the USSR###
+country_event = {
+	id = KMT_punishments.2
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.2"}
+	title = KMT_punishments.2.t
+	desc = {
+        text = KMT_punishments.2.yes 
+        trigger = {
+            has_global_flag = KMT_puyi
+        }
+    }
+    desc = {
+        text = KMT_punishments.2.no 
+        trigger = {
+            has_global_flag = PRC_puyi
+        }
+    }
+	picture = GFX_KMT_50s_Mainland_Puyi_Debate
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = KMT_punishments.2.a
+		trigger = {
+            has_global_flag = KMT_puyi
+        }
+		add_stability = 0.025
+		add_opinion_modifier = {
+			target = SOV
+			modifier = small_increase
+		}
+	}
+
+	option = {
+		name = KMT_punishments.2.b
+		trigger = {
+            has_global_flag = PRC_puyi
+        }
+		add_political_power = -50
+		add_opinion_modifier = {
+			target = SOV
+			modifier = small_decrease
+		}
+	}
+}
+
+###fate of puyi###
+country_event = {
+	id = KMT_punishments.3
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.3"}
+	title = KMT_punishments.3.t
+	desc = KMT_punishments.3.d
+    
+	picture = GFX_KMT_50s_Mainland_Puyi_Debate
+
+	fire_only_once = yes
+	trigger = {
+		tag = CHI 
+		has_global_flag = KMT_puyi 
+	}
+
+	option = {
+		name = KMT_punishments.3.a
+		
+		add_stability = 0.05
+	}
+
+	option = {
+		name = KMT_punishments.3.b
+		
+		add_political_power = 75
+	}
+}
+
+###fate of chen yi###
+country_event = {
+	id = KMT_punishments.4
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.4"}
+	title = KMT_punishments.4.t
+	desc = KMT_punishments.4.d
+    
+	picture = GFX_Chen_Yi
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_punishments.4.a
+		
+		add_stability = 0.05
+	}
+
+	option = {
+		name = KMT_punishments.4.b
+		
+		add_political_power = 75
+	}
+
+	option = {
+		name = KMT_punishments.4.c
+		add_stability = -0.05
+		add_political_power = -150
+	}
+}
+
+###fate of prince de###
+country_event = {
+	id = KMT_punishments.5
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.5"}
+	title = KMT_punishments.5.t
+	desc = KMT_punishments.5.d
+    
+	picture = GFX_Demand_Extraction_of_the_Prince
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_punishments.5.a
+		
+		add_stability = 0.05
+	}
+
+	option = {
+		name = KMT_punishments.5.b
+		
+		add_political_power = 75
+	}
+
+	option = {
+		name = KMT_punishments.5.c
+		add_stability = -0.025
+		add_political_power = -75
+	}
+}
+
+country_event = {
+	id = KMT_punishments.6
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.6"}
+	title = KMT_punishments.6.t
+	desc = KMT_punishments.6.d
+    
+	picture = GFX_Demand_Extraction_of_the_Prince
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_punishments.6.a 
+		trigger = { original_tag = CHI }
+		add_political_power = 25
+		set_global_flag = de_returns_to_china
+	}
+
+	option = {
+		name = KMT_punishments.6.b 
+		trigger = { original_tag = MON }
+		
+		add_political_power = -75
+	}
+	option = {
+		name = KMT_punishments.6.b 
+		trigger = { original_tag = MEN }
+		
+		add_political_power = -75
+	}
+}
+
+###fate of Zhang Xueliang###
+country_event = {
+	id = KMT_punishments.7
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.7"}
+	title = KMT_punishments.7.t
+	desc = KMT_punishments.7.d
+    
+	picture = GFX_Demand_Extraction_of_the_Prince
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_punishments.7.a
+		
+		add_stability = -0.05
+	}
+
+	option = {
+		name = KMT_punishments.7.b
+		
+		add_political_power = -75
+	}
+
+	option = {
+		name = KMT_punishments.7.c
+		add_political_power = -150
+	}
+}
+
+###Question of Hong Kong###
+country_event = {
+	id = KMT_50s_Mainland.13
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.13"}
+	title = KMT_50s_Mainland.13.t
+	desc = KMT_50s_Mainland.13.d
+    
+	picture = GFX_Hong_Kong
+
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_50s_Mainland.13.a 
+	}
+}
+
+###Seize Hong Kong rahhhh###
+country_event = {
+	id = KMT_50s_Mainland.14
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.14"}
+	title = KMT_50s_Mainland.14.t
+	desc = KMT_50s_Mainland.14.d
+    
+
+	picture = GFX_Hong_Kong
+
+
+	fire_only_once = yes
+	trigger = {
+		has_completed_focus = KMT_anti_colonial_rhetoric
+		has_global_flag = Suez_Crisis
+		tag = CHI
+	}
+
+	option = {
+		name = KMT_50s_Mainland.14.a 
+		add_war_support = -0.15
+	}
+
+	option = {
+		name = KMT_50s_Mainland.14.b 
+		CHI = {
+			transfer_state = 326
+		}
+		ENG = {
+			country_event = KMT_50s_Mainland.15
+		}
+		USA = {
+			country_event = KMT_50s_Mainland.15
+		}
+	}
+}
+
+###Hong Kong seized reply###
+country_event = {
+	id = KMT_50s_Mainland.15
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.15"}
+	title = KMT_50s_Mainland.15.t
+	desc = KMT_50s_Mainland.15.d
+    
+	picture = GFX_Hong_Kong
+
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_50s_Mainland.15.a 
+		trigger = { original_tag = ENG }
+		CHI = {
+			add_political_power = -50
+			add_opinion_modifier = {
+			target = ENG
+			modifier = small_decrease
+		}
+		}
+	}
+	option = {
+		name = KMT_50s_Mainland.15.b
+		
+	}
+}
+
+###Seize Macau rahhhh###
+country_event = {
+	id = KMT_50s_Mainland.16
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.16"}
+	title = KMT_50s_Mainland.16.t
+	desc = KMT_50s_Mainland.16.d
+    
+	picture = GFX_Macau
+
+	fire_only_once = yes
+	trigger = {
+		has_completed_focus = KMT_anti_colonial_rhetoric
+		has_global_flag = Suez_Crisis
+		tag = CHI
+	}
+
+	option = {
+		name = KMT_50s_Mainland.16.a 
+		add_war_support = -0.15
+	}
+
+	option = {
+		name = KMT_50s_Mainland.16.b 
+		CHI = {
+			transfer_state = 729
+		}
+		POR = {
+			country_event = KMT_50s_Mainland.17
+		}
+	}
+}
+
+###Chinese Invasion of Macau reply###
+country_event = {
+	id = KMT_50s_Mainland.17
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.17"}
+	title = KMT_50s_Mainland.17.t
+	desc = KMT_50s_Mainland.17.d
+    
+	picture = GFX_Macau
+
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_50s_Mainland.17.a 
+		CHI = {
+			add_political_power = -50
+			add_opinion_modifier = {
+			target = POR
+			modifier = small_decrease
+		}
+		}
+	}
+	option = {
+		name = KMT_50s_Mainland.17.b
+		CHI = {
+			add_political_power = 50
+			add_opinion_modifier = {
+			target = POR
+			modifier = small_increase
+		}
+		country_event = KMT_50s_Mainland.18
+		}
+		add_offsite_building = {
+				type = office_park
+				level = 2
+			}
+			add_offsite_building = {
+				type = industrial_complex
+				level = 2
+			}
+			CHI = {
+				add_offsite_building = {
+				type = industrial_complex
+				level = 4
+				}
+			}
+	}
+}
+
+###Sino-Portugese cooperation or smt###
+country_event = {
+	id = KMT_50s_Mainland.18
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.18"}
+	title = KMT_50s_Mainland.18.t
+	desc = KMT_50s_Mainland.18.d
+    
+	#picture = 
+
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_50s_Mainland.18.a
+	
+	}
+}
+
+###Bai Chongxi becomes minister of National Defense again, basically diving guangxi clique again###
+country_event = {
+	id = KMT_50s_Mainland.19
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.19"}
+	title = KMT_50s_Mainland.19.t
+	desc = KMT_50s_Mainland.19.d
+    
+	picture = GFX_Bai_Chongxi
+
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_50s_Mainland.19.a 
+		custom_effect_tooltip = Guangxi_Bribe
+		add_to_variable = {
+			GUX_Warlord_Loyalty = 0.1
+		}
+	}
+}
+
+###Reconstruction of Shanghai Region###
+country_event = {
+	id = KMT_50s_Mainland.20
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.20"}
+	title = KMT_50s_Mainland.20.t
+	desc = KMT_50s_Mainland.20.d
+    
+	picture = GFX_Shanghai_reconstruction
+
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_50s_Mainland.20.a 
+		613 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = state_infrastructure
+					level = 1
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+		}
+		
+	}
+}
+
+###Collapse of the Bamboo Curtain event###
+country_event = {
+	id = KMT_50s_Mainland.21
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.21"}
+	title = KMT_50s_Mainland.21.t
+	desc = KMT_50s_Mainland.21.d
+    
+	#picture = 
+
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_50s_Mainland.21.a 
+		custom_effect_tooltip = 50s_mainland_content_end_tt
+		
+	}
+}
+
+###National Chung-Shan Institute of Science and Technology###
+country_event = {
+	id = KMT_50s_Mainland.22
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.22"}
+	title = KMT_50s_Mainland.22.t
+	desc = KMT_50s_Mainland.22.d
+    
+	#picture = 
+
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_50s_Mainland.22.a 
+		add_tech_bonus = {
+			name = akm_bonus
+			bonus = 2.5
+			uses = 1
+			category = infantry_weapons
+		}
+		add_tech_bonus = {
+			name = modernization_bonus
+			bonus = 2.5
+			uses = 1
+			category = artillery
+		}
+		add_tech_bonus = {
+			name = modernization_bonus
+			bonus = 2.5
+			uses = 1
+			category = vehicles
+		}
+	}
+}
+
+###Private schooling###
+country_event = {
+	id = KMT_50s_Mainland.23
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.23"}
+	title = KMT_50s_Mainland.23.t
+	desc = KMT_50s_Mainland.23.d
+    
+	#picture = 
+
+	timeout_days = 100
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_50s_Mainland.23.a 
+		add_political_power = -250
+		custom_effect_tooltip = KMT_decrease_illiteracy_rate_tt
+		KMT_decrease_illiteracy_rate = yes
+	}
+	option = {
+		name = KMT_50s_Mainland.23.b 
+		add_political_power = 150
+		add_stability = -0.05
+		custom_effect_tooltip = KMT_decrease_illiteracy_rate_tt
+		KMT_decrease_illiteracy_rate = yes
+	}
+}
+
+###Compulsory Education in China###
+country_event = {
+	id = KMT_50s_Mainland.25
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.25"}
+	title = KMT_50s_Mainland.25.t
+	desc = KMT_50s_Mainland.25.d
+    
+	#picture = 
+
+	timeout_days = 100
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_50s_Mainland.25.a
+		custom_effect_tooltip = LoseMoney_tt_100
+		add_to_variable = {
+			currentMoney = -100
+		}
+		custom_effect_tooltip = KMT_decrease_illiteracy_rate_tt
+		KMT_decrease_illiteracy_rate = yes
+	}
+	option = {
+		name = KMT_50s_Mainland.25.b 
+		add_political_power = -250
+		add_stability = -0.05
+		custom_effect_tooltip = LoseMoney_tt1
+		add_to_variable = {
+			currentMoney = -500
+		}
+		custom_effect_tooltip = KMT_massive_decrease_illiteracy_rate_tt
+		KMT_massive_decrease_illiteracy_rate = yes
+	}
+	option = {
+		name = KMT_50s_Mainland.25.c 
+		custom_effect_tooltip = GetMoney_tt3
+		add_to_variable = {
+			currentMoney = 50
+		}
+	}
+}
+
+###Sanmin Zhuyi Course###
+country_event = {
+	id = KMT_50s_Mainland.26
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.26"}
+	title = KMT_50s_Mainland.26.t
+	desc = KMT_50s_Mainland.26.d
+    
+	#picture = 
+
+	timeout_days = 100
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_50s_Mainland.26.a
+		add_political_power = 120
+		custom_effect_tooltip = decrease_crisis_penalty_TT
+		add_to_variable = {
+			crisis_factor_neg = 0.05
+		}
+	}
+	option = {
+		name = KMT_50s_Mainland.26.b 
+		add_political_power = -75
+		custom_effect_tooltip = decrease_crisis_penalty_TT
+		add_to_variable = {
+			crisis_factor_neg = 0.05
+		}
+	}
+	option = {
+		name = KMT_50s_Mainland.26.c 
+		add_political_power = -140
+		custom_effect_tooltip = decrease_crisis_penalty_TT
+		add_to_variable = {
+			crisis_factor_neg = 0.05
+		}
+	}
+}
+
 
 ####Chinese Civil War events###
 ###############################
@@ -4548,8 +6274,12 @@ country_event = {
 		retire_character = CHI_an_enpu
 		effect_tooltip = {
 			PRC = { 
-					transfer_state = 325
-			        transfer_state = 1326
+				#transfer_state = 325
+			    #transfer_state = 1326
+				country_event = {
+					id = PRC_50s_Rework_event.2
+					hours = 8
+				}
 			}
 			CHI = {
                 transfer_units_fraction= {
@@ -4818,15 +6548,47 @@ country_event = {
 
 	option = {
 		name = KMT_Civilwar.28.a
-		add_political_power = -100
+		add_political_power = 100
 		custom_effect_tooltip = Li_Zongren_influence_decreases_tt
+		custom_effect_tooltip = Focus_Defend_Sichuan_tt
+		hidden_effect = {
+			605 = {
+				add_dynamic_modifier = { modifier = Fortress_Free_China }  
+			}
+			601 = {
+				add_dynamic_modifier = { modifier = Fortress_Free_China }  
+			}
+			1557 = {
+				add_dynamic_modifier = { modifier = Fortress_Free_China }  
+			}
+		}
 	}
 
 	option = {
 		name = KMT_Civilwar.28.b
-		add_political_power = 100
+		add_political_power = -100
 		custom_effect_tooltip = Li_Zongren_influence_increases_tt
-		
+		custom_effect_tooltip = Focus_Defend_Liangguang_tt
+		hidden_effect = {
+			592 = {
+				add_dynamic_modifier = { modifier = Fortress_Free_China }  
+			}
+			1569 = {
+				add_dynamic_modifier = { modifier = Fortress_Free_China }  
+			}
+			594 = {
+				add_dynamic_modifier = { modifier = Fortress_Free_China }  
+			}
+			1578 = {
+				add_dynamic_modifier = { modifier = Fortress_Free_China }  
+			}
+			1577 = {
+				add_dynamic_modifier = { modifier = Fortress_Free_China }  
+			}
+			591 = {
+				add_dynamic_modifier = { modifier = Fortress_Free_China }  
+			}
+		}
 	}
 
 	option = {
@@ -4848,492 +6610,70 @@ country_event = {
 
 	fire_only_once = yes
 	trigger = {
-		date = 1949.10.1
-		tag = CHI 
-		has_global_flag = roc_rebound_shanghai
-		NOT = {
-			has_global_flag = chinese_civil_war_over
-			has_global_flag = CHI_gxc_flees
+		OR = {
+			AND = {
+				date = 1949.10.1
+				tag = CHI 
+				NOT = {
+					has_global_flag = chinese_civil_war_over
+					has_global_flag = CHI_gxc_flees
+				}
+			}
+			AND = {
+				has_global_flag = ROC_taiwan
+				NOT = {
+					has_global_flag = CHI_gxc_flees
+				}
+			}
 		}
 	}
 
 	option = {
 		name = KMT_Civilwar.29.a
 		add_political_power = 100
+		if = {
+			limit = {
+				has_global_flag = ROC_taiwan
+				NOT = {
+					AND = {
+						has_global_flag = CHI_gxc_flees
+						has_idea = CHI_Chiang_Li_Conflict_2
+					}
+				}
+			}
+			remove_ideas = CHI_Chiang_li_Conflict_1
+		}
+		if = {
+			limit = {
+				NOT = {
+					AND = {
+						has_completed_focus = CHI_CIVILWAR_abandon_mainland
+					}
+				}
+				
+			}
+			remove_ideas = CHI_Chiang_li_Conflict_1
+		}
+		if = {
+			limit = {
+				has_global_flag = ROC_taiwan
+				has_idea = CHI_Chiang_li_conflict_2
+			}
+			remove_ideas = CHI_Chiang_li_conflict_2
+		}
 		custom_effect_tooltip = Li_Zongren_influence_decreases_tt
+		
 	}
 
 	option = {
 		name = KMT_Civilwar.29.b
 		add_war_support = 0.05
 		custom_effect_tooltip = Li_Zongren_influence_increases_tt
-		
+		trigger = { has_global_flag = roc_rebound_shanghai }
 	}
 }
 
-###Jiangxinpo gets retaken###
-country_event = {
-	id = KMT_mainlandburma.1
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_mainlandburma.1"}
-	title = KMT_mainlandburma.1.t
-	desc = KMT_mainlandburma.1.d
-	#picture = GFX_KMT_10
 
-
-	is_triggered_only = yes
-
-	option = {
-		name = KMT_mainlandburma.1.a
-		trigger = { original_tag = CHI }
-		CHI = { 
-				transfer_state = 1817
-			}
-			army_experience = 10
-			BRM = {
-				country_event = KMT_mainlandburma.1
-			}
-	}
-
-	option = {
-		name = KMT_mainlandburma.1.b
-		trigger = { original_tag = BRM }
-		effect_tooltip = {
-			CHI = { 
-				transfer_state = 1817
-			}
-		}
-		add_political_power = -10
-	}
-}
-
-###demand for puyi extradiction###
-country_event = {
-	id = KMT_punishments.1
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.1"}
-	title = KMT_punishments.1.t
-	desc = KMT_punishments.1.d
-	picture = GFX_KMT_50s_Mainland_Puyi_Debate
-
-	fire_only_once = yes
-	is_triggered_only = yes
-
-	option = {
-		name = KMT_punishments.1.a
-		set_global_flag = KMT_puyi
-		CHI = {
-			country_event = KMT_punishments.2
-		}
-	}
-
-	option = {
-		name = KMT_punishments.1.b
-		set_global_flag = PRC_puyi
-		CHI = {
-			country_event = KMT_punishments.2
-		}
-	}
-}
-
-###reply from the USSR###
-country_event = {
-	id = KMT_punishments.2
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.2"}
-	title = KMT_punishments.2.t
-	desc = {
-        text = KMT_punishments.2.yes 
-        trigger = {
-            has_global_flag = KMT_puyi
-        }
-    }
-    desc = {
-        text = KMT_punishments.2.no 
-        trigger = {
-            has_global_flag = PRC_puyi
-        }
-    }
-	picture = GFX_KMT_50s_Mainland_Puyi_Debate
-
-	fire_only_once = yes
-	is_triggered_only = yes
-
-	option = {
-		name = KMT_punishments.2.a
-		trigger = {
-            has_global_flag = KMT_puyi
-        }
-		add_stability = 0.025
-		add_opinion_modifier = {
-			target = SOV
-			modifier = small_increase
-		}
-	}
-
-	option = {
-		name = KMT_punishments.2.b
-		trigger = {
-            has_global_flag = PRC_puyi
-        }
-		add_political_power = -50
-		add_opinion_modifier = {
-			target = SOV
-			modifier = small_decrease
-		}
-	}
-}
-
-###fate of puyi###
-country_event = {
-	id = KMT_punishments.3
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.3"}
-	title = KMT_punishments.3.t
-	desc = KMT_punishments.3.d
-    
-	picture = GFX_KMT_50s_Mainland_Puyi_Debate
-
-	fire_only_once = yes
-	trigger = {
-		tag = CHI 
-		has_global_flag = KMT_puyi 
-	}
-
-	option = {
-		name = KMT_punishments.3.a
-		
-		add_stability = 0.05
-	}
-
-	option = {
-		name = KMT_punishments.3.b
-		
-		add_political_power = 75
-	}
-}
-
-###fate of chen yi###
-country_event = {
-	id = KMT_punishments.4
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.4"}
-	title = KMT_punishments.4.t
-	desc = KMT_punishments.4.d
-    
-	picture = GFX_Chen_Yi
-
-	fire_only_once = yes
-	is_triggered_only = yes 
-
-	option = {
-		name = KMT_punishments.4.a
-		
-		add_stability = 0.05
-	}
-
-	option = {
-		name = KMT_punishments.4.b
-		
-		add_political_power = 75
-	}
-
-	option = {
-		name = KMT_punishments.4.c
-		add_stability = -0.05
-		add_political_power = -150
-	}
-}
-
-###fate of prince de###
-country_event = {
-	id = KMT_punishments.5
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.5"}
-	title = KMT_punishments.5.t
-	desc = KMT_punishments.5.d
-    
-	picture = GFX_Demand_Extraction_of_the_Prince
-
-	fire_only_once = yes
-	is_triggered_only = yes 
-
-	option = {
-		name = KMT_punishments.5.a
-		
-		add_stability = 0.05
-	}
-
-	option = {
-		name = KMT_punishments.5.b
-		
-		add_political_power = 75
-	}
-
-	option = {
-		name = KMT_punishments.5.c
-		add_stability = -0.025
-		add_political_power = -75
-	}
-}
-
-country_event = {
-	id = KMT_punishments.6
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.6"}
-	title = KMT_punishments.6.t
-	desc = KMT_punishments.6.d
-    
-	picture = GFX_Demand_Extraction_of_the_Prince
-
-	fire_only_once = yes
-	is_triggered_only = yes 
-
-	option = {
-		name = KMT_punishments.6.a 
-		trigger = { original_tag = CHI }
-		add_political_power = 25
-		set_global_flag = de_returns_to_china
-	}
-
-	option = {
-		name = KMT_punishments.6.b 
-		trigger = { original_tag = MON }
-		
-		add_political_power = -75
-	}
-	option = {
-		name = KMT_punishments.6.b 
-		trigger = { original_tag = MEN }
-		
-		add_political_power = -75
-	}
-}
-
-###fate of Zhang Xueliang###
-country_event = {
-	id = KMT_punishments.7
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_punishments.7"}
-	title = KMT_punishments.7.t
-	desc = KMT_punishments.7.d
-    
-	picture = GFX_Demand_Extraction_of_the_Prince
-
-	fire_only_once = yes
-	is_triggered_only = yes 
-
-	option = {
-		name = KMT_punishments.7.a
-		
-		add_stability = -0.05
-	}
-
-	option = {
-		name = KMT_punishments.7.b
-		
-		add_political_power = -75
-	}
-
-	option = {
-		name = KMT_punishments.7.c
-		add_political_power = -150
-	}
-}
-
-###Question of Hong Kong###
-country_event = {
-	id = KMT_50s_Mainland.13
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.13"}
-	title = KMT_50s_Mainland.13.t
-	desc = KMT_50s_Mainland.13.d
-    
-	picture = GFX_Hong_Kong
-
-
-	fire_only_once = yes
-	is_triggered_only = yes 
-
-	option = {
-		name = KMT_50s_Mainland.13.a 
-	}
-}
-
-###Seize Hong Kong rahhhh###
-country_event = {
-	id = KMT_50s_Mainland.14
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.14"}
-	title = KMT_50s_Mainland.14.t
-	desc = KMT_50s_Mainland.14.d
-    
-
-	picture = GFX_Hong_Kong
-
-
-	fire_only_once = yes
-	trigger = {
-		has_completed_focus = KMT_anti_colonial_rhetoric
-		has_global_flag = Suez_Crisis
-		tag = CHI
-	}
-
-	option = {
-		name = KMT_50s_Mainland.14.a 
-		add_war_support = -0.15
-	}
-
-	option = {
-		name = KMT_50s_Mainland.14.b 
-		CHI = {
-			transfer_state = 326
-		}
-		ENG = {
-			country_event = KMT_50s_Mainland.15
-		}
-		USA = {
-			country_event = KMT_50s_Mainland.15
-		}
-	}
-}
-
-###Hong Kong seized reply###
-country_event = {
-	id = KMT_50s_Mainland.15
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.15"}
-	title = KMT_50s_Mainland.15.t
-	desc = KMT_50s_Mainland.15.d
-    
-	picture = GFX_Hong_Kong
-
-	is_triggered_only = yes 
-
-	option = {
-		name = KMT_50s_Mainland.15.a 
-		trigger = { original_tag = ENG }
-		CHI = {
-			add_political_power = -50
-			add_opinion_modifier = {
-			target = ENG
-			modifier = small_decrease
-		}
-		}
-	}
-	option = {
-		name = KMT_50s_Mainland.15.b
-		
-	}
-}
-
-###Seize Macau rahhhh###
-country_event = {
-	id = KMT_50s_Mainland.16
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.16"}
-	title = KMT_50s_Mainland.16.t
-	desc = KMT_50s_Mainland.16.d
-    
-	picture = GFX_Macau
-
-	fire_only_once = yes
-	trigger = {
-		has_completed_focus = KMT_anti_colonial_rhetoric
-		has_global_flag = Suez_Crisis
-		tag = CHI
-	}
-
-	option = {
-		name = KMT_50s_Mainland.16.a 
-		add_war_support = -0.15
-	}
-
-	option = {
-		name = KMT_50s_Mainland.16.b 
-		CHI = {
-			transfer_state = 729
-		}
-		POR = {
-			country_event = KMT_50s_Mainland.17
-		}
-	}
-}
-
-###Chinese Invasion of Macau reply###
-country_event = {
-	id = KMT_50s_Mainland.17
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.17"}
-	title = KMT_50s_Mainland.17.t
-	desc = KMT_50s_Mainland.17.d
-    
-	picture = GFX_Macau
-
-	is_triggered_only = yes 
-
-	option = {
-		name = KMT_50s_Mainland.17.a 
-		CHI = {
-			add_political_power = -50
-			add_opinion_modifier = {
-			target = POR
-			modifier = small_decrease
-		}
-		}
-	}
-	option = {
-		name = KMT_50s_Mainland.17.b
-		CHI = {
-			add_political_power = 50
-			add_opinion_modifier = {
-			target = POR
-			modifier = small_increase
-		}
-		country_event = KMT_50s_Mainland.18
-		}
-		add_offsite_building = {
-				type = office_park
-				level = 2
-			}
-			add_offsite_building = {
-				type = industrial_complex
-				level = 2
-			}
-			CHI = {
-				add_offsite_building = {
-				type = industrial_complex
-				level = 4
-				}
-			}
-	}
-}
-
-###Sino-Portugese cooperation or smt###
-country_event = {
-	id = KMT_50s_Mainland.18
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.18"}
-	title = KMT_50s_Mainland.18.t
-	desc = KMT_50s_Mainland.18.d
-    
-	#picture = 
-
-	is_triggered_only = yes 
-
-	option = {
-		name = KMT_50s_Mainland.18.a
-	
-	}
-}
-
-###Bai Chongxi becomes minister of National Defense again, basically diving guangxi clique again###
-country_event = {
-	id = KMT_50s_Mainland.19
- immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_50s_Mainland.19"}
-	title = KMT_50s_Mainland.19.t
-	desc = KMT_50s_Mainland.19.d
-    
-	picture = GFX_Bai_Chongxi
-
-
-	fire_only_once = yes
-	is_triggered_only = yes 
-
-	option = {
-		name = KMT_50s_Mainland.19.a 
-		custom_effect_tooltip = Guangxi_Bribe
-		add_to_variable = {
-			GUX_Warlord_Loyalty = 0.1
-		}
-	}
-}
 
 ###Ching-Kuo sent to Shanghai###
 country_event = {
@@ -5368,6 +6708,8 @@ country_event = {
 
 	option = {
 		name = KMT_Shanghai.2.a 
+		add_stability = 0.01
+		add_political_power = 5
 	}
 }
 
@@ -5385,9 +6727,8 @@ country_event = {
 	is_triggered_only = yes 
 
 	option = {
-		name = KMT_Shanghai.3.a #Adds 20% Chance for Success 
-		add_political_power = 25
-		add_popularity = {
+		name = KMT_Shanghai.3.a 
+			add_popularity = {
 					ideology = nationalist
 					popularity = 0.02
 			}
@@ -5403,7 +6744,36 @@ country_event = {
 					ideology = communism
 					popularity = 0.02
 			}
-		set_country_flag = Shanghai_20 
+			add_stability = -0.02
+			add_to_variable = { Shanghai_Beating_Tigers_Reform_var = 0.15 }
+		
+	}
+	option = {
+		name = KMT_Shanghai.3.b
+			add_popularity = {
+					ideology = nationalist
+					popularity = 0.05
+			}
+			add_popularity = {
+					ideology = fascism
+					popularity = 0.01
+			}
+			add_popularity = {
+					ideology = social_liberalism
+					popularity = 0.01
+			}
+			add_popularity = {
+					ideology = communism
+					popularity = 0.01
+			}
+			add_to_variable = { Shanghai_Beating_Tigers_Reform_var = 0.05 }
+		
+	}
+	option = {
+		name = KMT_Shanghai.3.c
+		add_stability = 0.02	
+			
+		
 	}
 }
 
@@ -5421,36 +6791,13 @@ country_event = {
 	is_triggered_only = yes 
 
 	option = {
-		name = KMT_Shanghai.4.a #Adds 20% Chance for Success
+		name = KMT_Shanghai.4.a 
 		add_political_power = 20 
-		if = {
-			limit = {
-				has_country_flag = Shanghai_20 
-			}
-			clr_country_flag = Shanghai_20 
-			set_country_flag = Shanghai_40
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_40 
-			}
-			clr_country_flag = Shanghai_40
-			set_country_flag = Shanghai_60
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_60
-			}
-			clr_country_flag = Shanghai_60
-			set_country_flag = Shanghai_80
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_80
-			}
-			clr_country_flag = Shanghai_80
-			set_country_flag = Shanghai_100
-		}
+		add_to_variable = { Shanghai_Beating_Tigers_Reform_var = 0.05 }
+	}
+	option = {
+		name = KMT_Shanghai.4.a 
+		add_to_variable = { Shanghai_Beating_Tigers_Reform_var = 0.2 }
 	}
 }
 
@@ -5468,37 +6815,10 @@ country_event = {
 	is_triggered_only = yes 
 
 	option = {
-		name = KMT_Shanghai.5.a #Adds 20% Chance for Success 
+		name = KMT_Shanghai.5.a
 		add_political_power = 50
 		add_stability = 0.05
-		if = {
-			limit = {
-				has_country_flag = Shanghai_20 
-			}
-			clr_country_flag = Shanghai_20 
-			set_country_flag = Shanghai_40
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_40 
-			}
-			clr_country_flag = Shanghai_40
-			set_country_flag = Shanghai_60
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_60
-			}
-			clr_country_flag = Shanghai_60
-			set_country_flag = Shanghai_80
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_80
-			}
-			clr_country_flag = Shanghai_80
-			set_country_flag = Shanghai_100
-		}
+		
 	}
 }
 
@@ -5516,36 +6836,16 @@ country_event = {
 	is_triggered_only = yes 
 
 	option = {
-		name = KMT_Shanghai.6.a #Adds 20% Chance for Success
+		name = KMT_Shanghai.6.a 
 		add_political_power -300
-		if = {
-			limit = {
-				has_country_flag = Shanghai_20 
-			}
-			clr_country_flag = Shanghai_20 
-			set_country_flag = Shanghai_40
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_40 
-			}
-			clr_country_flag = Shanghai_40
-			set_country_flag = Shanghai_60
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_60
-			}
-			clr_country_flag = Shanghai_60
-			set_country_flag = Shanghai_80
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_80
-			}
-			clr_country_flag = Shanghai_80
-			set_country_flag = Shanghai_100
-		}
+		add_war_support = 0.03
+		add_to_variable = { Shanghai_Beating_Tigers_Reform_var = 0.2 }
+	}
+	option = {
+		name = KMT_Shanghai.6.b 
+		add_political_power 50
+		add_stability = 0.02
+		add_to_variable = { Shanghai_Beating_Tigers_Reform_var = 0.1 }
 	}
 }
 
@@ -5563,41 +6863,29 @@ country_event = {
 	is_triggered_only = yes 
 
 	option = {
-		name = KMT_Shanghai.7.a #Adds 20% Chance for Success 
-		add_political_power -150
-		add_stability = -0.1
-		if = {
-			limit = {
-				has_country_flag = Shanghai_20 
-			}
-			clr_country_flag = Shanghai_20 
-			set_country_flag = Shanghai_40
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_40 
-			}
-			clr_country_flag = Shanghai_40
-			set_country_flag = Shanghai_60
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_60
-			}
-			clr_country_flag = Shanghai_60
-			set_country_flag = Shanghai_80
-		}
-		if = {
-			limit = {
-				has_country_flag = Shanghai_80
-			}
-			clr_country_flag = Shanghai_80
-			set_country_flag = Shanghai_100
-		}
+		name = KMT_Shanghai.7.a 
+		add_political_power = -150
+		add_stability = -0.75
+		add_war_support = 0.05
+		add_to_variable = { Shanghai_Beating_Tigers_Reform_var = 0.1 }
+	}
+	option = {
+		name = KMT_Shanghai.7.b 
+		add_political_power = -300
+		add_stability = -0.15
+		add_war_support = 0.2
+		add_to_variable = { Shanghai_Beating_Tigers_Reform_var = 0.3 }
+	}
+	option = {
+		name = KMT_Shanghai.7.c 
+		add_political_power = 100
+		add_stability = 0.02
+		add_war_support = -0.1
+		add_to_variable = { Shanghai_Beating_Tigers_Reform_var = -0.2 }
 	}
 }
 
-###Conclude the Campaign###
+###Failure of the Campaign###
 country_event = {
 	id = KMT_Shanghai.8
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_Shanghai.8"}
@@ -5612,51 +6900,9 @@ country_event = {
 
 	option = {
 		name = KMT_Shanghai.8.a 
-		add_political_power = 150
-		trigger = {
-			if = {
-			limit = {
-				has_country_flag = Shanghai_20 
-			}
-			random_list = {
-     			20 = {country_event = KMT_Shanghai.9 }
-     			80 = { country_event = KMT_Shanghai.10 }
-			}
-			}
-		else_if = {
-			limit = {
-				has_country_flag = Shanghai_40 
-			}
-			random_list = {
-     			40 = { country_event = KMT_Shanghai.9 }
-     			60 = { country_event = KMT_Shanghai.10 }
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = Shanghai_60
-			}
-			random_list = {
-     			60 = { country_event = KMT_Shanghai.9 }
-     			40 = { country_event = KMT_Shanghai.10 }
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = Shanghai_80
-			}
-			random_list = {
-     			80 = { country_event = KMT_Shanghai.9 }
-     			20 = { country_event = KMT_Shanghai.10 }
-			}
-		}
-		else_if = {
-			limit = {
-				has_country_flag = Shanghai_100
-			}
-			country_event = KMT_Shanghai.9
-		}
-		}
+		add_political_power = -150
+		
+		 set_country_flag = Shanghai_failure
 	}
 }
 
@@ -5676,18 +6922,15 @@ country_event = {
 	option = {
 		name = KMT_Shanghai.9.a 
 		add_political_power = 150
-
-		clr_country_flag = Shanghai_20 
-		clr_country_flag = Shanghai_40 
-		clr_country_flag = Shanghai_60 
-		clr_country_flag = Shanghai_80 
-		clr_country_flag = Shanghai_100 
-
+		613 = {
+			add_dynamic_modifier = Shanghai_reformed_modifier_3
+		}
 		set_country_flag = Shanghai_success
+		set_country_flag = Shanghai_big_win
 	}
 }
 
-###Failure ###
+###Moderate Success ###
 country_event = {
 	id = KMT_Shanghai.10
  immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_Shanghai.10"}
@@ -5702,14 +6945,285 @@ country_event = {
 
 	option = {
 		name = KMT_Shanghai.10.a 
-		add_political_power = -150
+		add_political_power = 100
+		613 = {
+			add_dynamic_modifier = Shanghai_reformed_modifier_2
+		}
+		set_country_flag = Shanghai_success
+		set_country_flag = Shanghai_mid_win
+	}
+}
 
-		clr_country_flag = Shanghai_20 
-		clr_country_flag = Shanghai_40 
-		clr_country_flag = Shanghai_60 
-		clr_country_flag = Shanghai_80 
-		clr_country_flag = Shanghai_100 
+###Small Success ###
+country_event = {
+	id = KMT_Shanghai.11
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_Shanghai.11"}
+	title = KMT_Shanghai.11.t
+	desc = KMT_Shanghai.11.d
+    
+	#picture = GFX_Hong_Kong
 
-		set_country_flag = Shanghai_failure
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_Shanghai.10.a 
+		add_political_power = 50
+		613 = {
+			add_dynamic_modifier = Shanghai_reformed_modifier_1
+		}
+		set_country_flag = Shanghai_success
+		set_country_flag = Shanghai_small_win
+	}
+}
+
+
+country_event = {
+	id = KMT_qiaowuweiyuanhui.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_qiaowuweiyuanhui.1"}
+	title = KMT_qiaowuweiyuanhui.1.t
+	desc = KMT_qiaowuweiyuanhui.1.d
+    
+	#picture = 
+
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_qiaowuweiyuanhui.1.a
+		CHI = {
+			add_opinion_modifier = {
+				target = SIA
+				modifier = large_decrease
+			}
+			add_opinion_modifier = {
+				target = VIE
+				modifier = large_decrease
+			}
+			add_opinion_modifier = {
+				target = MAL
+				modifier = large_decrease
+			}
+		}
+		trigger = { has_global_flag = ROC_Victory}
+	}
+
+	option = {
+		name = KMT_qiaowuweiyuanhui.1.b
+		add_political_power = 10
+		trigger = { has_global_flag = ROC_taiwan}
+	}
+}
+
+country_event = {
+	id = KMT_qiaowuweiyuanhui.2
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_qiaowuweiyuanhui.2"}
+	title = KMT_qiaowuweiyuanhui.2.t
+	desc = KMT_qiaowuweiyuanhui.2.d
+    
+	#picture = 
+
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_qiaowuweiyuanhui.2.a
+		VIE = {
+			set_temp_variable = { percent_change = 5 }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes  
+		}
+		SIA = {
+			set_temp_variable = { percent_change = 5 }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes  
+		}
+		MAL = {
+			set_temp_variable = { percent_change = 5 }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes  
+		}
+		LOS = {
+			set_temp_variable = { percent_change = 5 }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes  
+		}
+		PHI = {
+			set_temp_variable = { percent_change = 5 }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes  
+		}
+		INO = {
+			set_temp_variable = { percent_change = 5 }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes  
+		}
+		set_country_flag = CHI_nationality_question_arises
+	}
+}
+
+country_event = {
+	id = KMT_qiaowuweiyuanhui.3
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_qiaowuweiyuanhui.3"}
+	title = KMT_qiaowuweiyuanhui.3.t
+	desc = KMT_qiaowuweiyuanhui.3.d
+    
+	#picture = 
+
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_qiaowuweiyuanhui.3.a
+		USA = {
+			set_temp_variable = { percent_change = 5 }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes  
+		}
+		CAN = {
+			set_temp_variable = { percent_change = 5 }
+			set_temp_variable = { tag_index = ROOT.id }
+			set_temp_variable = { influence_target = THIS.id }
+			change_influence_percentage = yes  
+		}
+	}
+}
+
+
+country_event = {
+	id = KMT_diplomatic_report.1
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_diplomatic_report.1"}
+	title = KMT_diplomatic_report.1.t
+	desc = KMT_diplomatic_report.1.d
+    
+	#picture = 
+
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_diplomatic_report.1.a
+		add_opinion_modifier = {
+			target = RAJ
+			modifier = small_increase
+		}
+	}
+
+	option = {
+		name = KMT_diplomatic_report.1.b
+		add_opinion_modifier = {
+			target = PAK
+			modifier = small_increase
+		}
+		add_opinion_modifier = {
+			target = RAJ
+			modifier = small_decrease
+		}
+	}
+
+	option = {
+		name = KMT_diplomatic_report.1.c
+	}
+}
+
+country_event = {
+	id = KMT_diplomatic_report.2
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_diplomatic_report.2"}
+	title = KMT_diplomatic_report.2.t
+	desc = KMT_diplomatic_report.2.d
+    
+	#picture = 
+
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_diplomatic_report.2.a
+		JAP = {
+			add_opinion_modifier = {
+				target = CHI
+				modifier = small_increase
+			}
+		}
+	}
+
+	option = {
+		name = KMT_diplomatic_report.2.b
+
+	}
+}
+
+###Southeast ASia###
+country_event = {
+	id = KMT_diplomatic_report.3
+ immediate = {log = "[GetDateText]: [Root.GetTag]: id = KMT_diplomatic_report.3"}
+	title = KMT_diplomatic_report.3.t
+	desc = KMT_diplomatic_report.3.d
+    
+	#picture = 
+
+
+	fire_only_once = yes
+	is_triggered_only = yes 
+
+	option = {
+		name = KMT_diplomatic_report.3.a 
+		INO = {
+			add_opinion_modifier = {
+				target = CHI
+				modifier = small_increase
+			}
+		}
+		MAL = {
+			add_opinion_modifier = {
+				target = CHI
+				modifier = small_increase
+			}
+		}
+		PHI = {
+			add_opinion_modifier = {
+				target = CHI
+				modifier = small_increase
+			}
+		}
+	}
+
+	option = {
+		name = KMT_diplomatic_report.3.b
+		INO = {
+			add_opinion_modifier = {
+				target = CHI
+				modifier = small_decrease
+			}
+		}
+		MAL = {
+			add_opinion_modifier = {
+				target = CHI
+				modifier = small_decrease
+			}
+		}
+		PHI = {
+			add_opinion_modifier = {
+				target = CHI
+				modifier = small_decrease
+			}
+		}
+	}
+
+	option = {
+		name = KMT_diplomatic_report.3.c
 	}
 }
