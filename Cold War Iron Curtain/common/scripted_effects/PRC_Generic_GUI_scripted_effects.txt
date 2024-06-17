@@ -726,22 +726,22 @@ PRC_faction_struggle_system_faction_supporter_effect_change = {
 
 
 ##社会阶级                    #态度(-50，50)      #权重(0，100)
-# 1 - Senior Cadre              
-# 2 - Lower Cadre
-# 3 - Military Officer
-# 4 - Soldier
-# 5 - Landlord Rich Peasant
-# 6 - Middle Peasant
-# 7 - Poor Peasant
-# 8 - Comprador Bourgeoisie
-# 9 - National Bourgeoisie
-# 10 - Petty Bourgeoisie
-# 11 - Intellectual
-# 12 - Senior Worker
-# 13 - Middle Lower Worker
-# 14 - Priest
-# 15 - Red Nobility
-# 16 - Entrepreneur
+# 0 - Senior Cadre              
+# 1 - Lower Cadre
+# 2 - Military Officer
+# 3 - Soldier
+# 4 - Landlord Rich Peasant
+# 5 - Middle Peasant
+# 6 - Poor Peasant
+# 7 - Comprador Bourgeoisie
+# 8 - National Bourgeoisie
+# 9 - Petty Bourgeoisie
+# 10 - Intellectual
+# 11 - Senior Worker
+# 12 - Middle Lower Worker
+# 13 - Priest
+# 14 - Red Nobility
+# 15 - Entrepreneur
 PRC_Social_Class_startup = {
 	clear_array = PRC_class_array
 	clear_array = PRC_class_weight_array
@@ -800,6 +800,10 @@ PRC_class_modifier_update = {
     set_variable = { PRC_class_global_building_slots_factor = 0 }
 	set_variable = { PRC_class_conscription_factor = 0 }
 	set_variable = { PRC_class_political_power_factor = 0 }
+    set_variable = { PRC_class_maoism_drift = 0 }
+    set_variable = { PRC_class_trotskyism_drift = 0 }
+    set_variable = { PRC_class_communism_drift = 0 }
+    set_variable = { PRC_class_socialist_drift = 0 }
 	set_variable = { PRC_class_stability_factor = 0 }
 	set_variable = { PRC_class_monthly_population = 0 }
 	set_variable = { PRC_class_conscription = 0 }
@@ -829,9 +833,8 @@ PRC_class_modifier_update = {
 	set_variable = { PRC_class_mobilization_speed = 0 }
 	set_variable = { PRC_class_special_forces_cap = 0 }
 	set_variable = { PRC_class_experience_loss_factor = 0 }
-	set_variable = { PRC_class_experience_gain_army = 0 }
-	set_variable = { PRC_class_experience_gain_navy = 0 }
-	set_variable = { PRC_class_experience_gain_air = 0 }
+	set_variable = { PRC_class_military_leader_cost_factor = 0 }
+	set_variable = { PRC_class_experience_gain_army_unit_factor = 0 }
 	set_variable = { PRC_class_army_org_factor = 0 }
 	set_variable = { PRC_class_org_loss_when_moving = 0 }
 	set_variable = { PRC_class_army_attack_factor = 0 }
@@ -845,36 +848,160 @@ PRC_class_modifier_update = {
 		value = v
         
         if = {
+            limit = {
+                check_variable = { 
+                    var = PRC_class_weight_array^v
+                    value = 25 
+                    compare = less_than 
+                }
+            }
+            set_temp_variable = { PRC_temp_multiple_1 = 0.35 }
+        }
+        else_if = {
+            limit = {
+                check_variable = { 
+                    var = PRC_class_weight_array^v
+                    value = 25 
+                    compare = greater_than_or_equals 
+                }
+                check_variable = { 
+                    var = PRC_class_weight_array^v
+                    value = 70 
+                    compare = less_than 
+                }
+            }
+            set_temp_variable = { PRC_temp_multiple_1 = 0.8 }
+        }
+        else_if = {
+            limit = {
+                check_variable = { 
+                    var = PRC_class_weight_array^v
+                    value = 70 
+                    compare = greater_than_or_equals 
+                }
+            }
+            set_temp_variable = { PRC_temp_multiple_1 = 2 }
+        }
+
+        set_temp_variable = { PRC_temp_multiple_2 = PRC_class_weight_array^v }
+        divide_temp_variable = { PRC_temp_multiple_2 = 100 }
+        multiply_temp_variable = { PRC_temp_multiple_2 = PRC_class_opinion_array^v }
+        divide_temp_variable = { PRC_temp_multiple_2 = 50 }
+
+        set_temp_variable = { PRC_temp_multiple = PRC_temp_multiple_1 }
+        multiply_temp_variable = { PRC_temp_multiple = PRC_temp_multiple_2 }
+         
+        if = {
+            limit = { check_variable = { v = 0 } }
+            set_variable = { PRC_Senior_Cadre_political_power_factor = 0.05 }
+            multiply_variable = { PRC_Senior_Cadre_political_power_factor = PRC_temp_multiple }
+            set_variable = { PRC_Senior_Cadre_drift_defence_factor = 0.15 }
+            multiply_variable = { PRC_Senior_Cadre_drift_defence_factor = PRC_temp_multiple }
+            set_variable = { PRC_Senior_Cadre_ideology_drift = 0.02 }
+            multiply_variable = { PRC_Senior_Cadre_ideology_drift = PRC_temp_multiple }
+
+            add_to_variable = { PRC_class_political_power_factor = PRC_Senior_Cadre_political_power_factor }
+            add_to_variable = { PRC_class_drift_defence_factor = PRC_Senior_Cadre_drift_defence_factor }
+            if = {
+                limit = { has_government = maoism }
+                add_to_variable = { PRC_class_maoism_drift = PRC_Senior_Cadre_ideology_drift }
+            }
+            else_if = {
+                limit = { has_government = communism }
+                add_to_variable = { PRC_class_communism_drift = PRC_Senior_Cadre_ideology_drift }
+            }
+            else_if = {
+                limit = { has_government = trotskyism }
+                add_to_variable = { PRC_class_trotskyism_drift = PRC_Senior_Cadre_ideology_drift }
+            }
+            else_if = {
+                limit = { has_government = socialist }
+                add_to_variable = { PRC_class_socialist_drift = PRC_Senior_Cadre_ideology_drift }
+            }
+        }
+        else_if = {
             limit = { check_variable = { v = 1 } }
-            add_to_variable = { PRC_class_weight_array^v = temp_weight }
-            add_to_variable = { PRC_class_opinion_array^v = temp_opinion }
+            set_variable = { PRC_Lower_Cadre_mobilization_speed = 0.05 }
+            multiply_variable = { PRC_Lower_Cadre_mobilization_speed = PRC_temp_multiple }
+            set_variable = { PRC_Lower_Cadre_production_speed_buildings_factor = 0.1 }
+            multiply_variable = { PRC_Lower_Cadre_production_speed_buildings_factor = PRC_temp_multiple }
+            set_variable = { PRC_Lower_Cadre_stability_factor = 0.05 }
+            multiply_variable = { PRC_Lower_Cadre_stability_factor = PRC_temp_multiple }
+            
+            add_to_variable = { PRC_class_mobilization_speed = PRC_Lower_Cadre_mobilization_speed }
+            add_to_variable = { PRC_class_stability_factor = PRC_Lower_Cadre_stability_factor }
+            add_to_variable = { PRC_class_production_speed_buildings_factor = PRC_Lower_Cadre_production_speed_buildings_factor }
+        }
+        else_if = {
+            limit = { check_variable = { v = 2 } }
+            set_variable = { PRC_Military_Officer_mobilization_speed = 0.1 }
+            multiply_variable = { PRC_Military_Officer_mobilization_speed = PRC_temp_multiple }
+            set_variable = { PRC_Military_Officer_army_org_factor = 0.06 }
+            multiply_variable = { PRC_Military_Officer_army_org_factor = PRC_temp_multiple }
+            #set_variable = { PRC_Military_Officer_military_leader_cost_factor = -0.2 }
+            #multiply_variable = { PRC_Military_Officer_military_leader_cost_factor = PRC_temp_multiple }
+            set_variable = { PRC_Military_Officer_experience_gain_army_unit_factor = 0.15 }
+            multiply_variable = { PRC_Military_Officer_experience_gain_army_unit_factor = PRC_temp_multiple }
+            set_variable = { PRC_Military_Officer_einitiative_factor = 0.1 }
+            multiply_variable = { PRC_Military_Officer_einitiative_factor = PRC_temp_multiple }
+            
+            add_to_variable = { PRC_class_mobilization_speed = PRC_Military_Officer_mobilization_speed }
+            add_to_variable = { PRC_class_army_org_factor = PRC_Military_Officer_army_org_factor }
+            add_to_variable = { PRC_class_experience_gain_army_unit_factor = PRC_Military_Officer_experience_gain_army_unit_factor }
+            add_to_variable = { PRC_class_Officer_einitiative_factor = PRC_Military_Officer_einitiative_factor }
+        }
+        else_if = {
+            limit = { check_variable = { v = 3 } }
+            set_variable = { PRC_Soldier_army_org_regain = 0.1 }
+            multiply_variable = { PRC_Soldier_army_org_regain = PRC_temp_multiple }
+            set_variable = { PRC_Soldier_experience_loss_factor = -0.1 }
+            multiply_variable = { PRC_Soldier_experience_loss_factor = PRC_temp_multiple }
+            set_variable = { PRC_Soldier_army_attack_factor = 0.05 }
+            multiply_variable = { PRC_Soldier_army_attack_factor = PRC_temp_multiple }
+            set_variable = { PRC_Soldier_army_defence_factor = 0.05 }
+            multiply_variable = { PRC_Soldier_army_defence_factor = PRC_temp_multiple }
+            set_variable = { PRC_Soldier_attrition = -0.1 }
+            multiply_variable = { PRC_Soldier_attrition = PRC_temp_multiple }
+            
+            add_to_variable = { PRC_class_army_org_regain = PRC_Soldier_army_org_regain }
+            add_to_variable = { PRC_class_experience_loss_factor = PRC_Soldier_experience_loss_factor }
+            add_to_variable = { PRC_class_army_attack_factor = PRC_Soldier_army_attack_factor }
+            add_to_variable = { PRC_class_army_defence_factor = PRC_Soldier_army_defence_factor }
+            add_to_variable = { PRC_class_army_attrition = PRC_Soldier_attrition }
+        }
+        else_if = {
+            limit = { check_variable = { v = 10 } }
+            set_variable = { PRC_Intellectual_political_power_factor = -0.1 }
+            multiply_variable = { PRC_Intellectual_political_power_factor = PRC_temp_multiple }
+            set_variable = { PRC_Intellectual_research_speed_factor = 0.1 }
+            multiply_variable = { PRC_Intellectual_research_speed_factor = PRC_temp_multiple }
+            set_variable = { PRC_Intellectual_foreign_subversive_activites = -0.15 }
+            multiply_variable = { PRC_Intellectual_foreign_subversive_activites = PRC_temp_multiple }
+             
+            clamp_variable = {
+                var = PRC_Intellectual_political_power_factor
+                max = 0
+                min = -0.1
+            }
+            add_to_variable = { PRC_class_political_power_factor = PRC_Intellectual_political_power_factor }
+            add_to_variable = { PRC_class_research_speed_factor = PRC_Intellectual_research_speed_factor }
+            add_to_variable = { PRC_class_foreign_subversive_activites = PRC_Intellectual_foreign_subversive_activites }
         }
     }
 }
 PRC_class_status_change = {
     set_temp_variable = { temp_v = temp_class }
-    for_each_loop = {
-        array = PRC_class_array
-        #index = i
-		value = v
-        
-        if = {
-            limit = {
-                check_variable = { v = temp_class }
-            }
-            add_to_variable = { PRC_class_weight_array^v = temp_weight }
-            add_to_variable = { PRC_class_opinion_array^v = temp_opinion }
-        }
-        clamp_variable = {
-            var = PRC_class_weight_array^v
-            min = 0
-            max = 100
-        }
-        clamp_variable = {
-            var = PRC_class_opinion_array^v
-            min = -50
-            max = 50
-        }
+    add_to_variable = { PRC_class_weight_array^v = temp_weight }
+    add_to_variable = { PRC_class_opinion_array^v = temp_opinion }
+    clamp_variable = {
+        var = PRC_class_weight_array^v
+        min = 0
+        max = 100
+    }
+    clamp_variable = {
+        var = PRC_class_opinion_array^v
+        min = -50
+        max = 50
     }
     custom_effect_tooltip = PRC_class_weight_change_tt
     custom_effect_tooltip = PRC_class_opinion_change_tt
