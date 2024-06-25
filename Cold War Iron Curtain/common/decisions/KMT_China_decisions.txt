@@ -89,7 +89,7 @@ Chinese_Civil_War_missions_category = {
 				}
 			}
 	    }
-		days_mission_timeout = 50
+		days_mission_timeout = 7
 
 		complete_effect = {
 			news_event = Shanghai_Campaign.1
@@ -123,10 +123,19 @@ Chinese_Civil_War_missions_category = {
 			else = {
 				news_event = Shanghai_Campaign.2 
 				set_global_flag = roc_rebound_shanghai
-				add_days_mission_timeout = {
-					mission = The_Chinese_Civil_war
-					days = 300
+				CHI = {
+					add_political_power = 125
+					add_war_support = 0.05
+					add_equipment_to_stockpile = {
+						type = infantry_equipment_0
+						amount = 1000
+						producer = CHI
+					}
 				}
+				#add_days_mission_timeout = {
+				#	mission = The_Chinese_Civil_war
+				#	days = 300
+				#}
 				hidden_effect = {
 						USA = {
 							country_event = { id = KMT_Civilwar.8 days = 1}
@@ -153,7 +162,7 @@ Chinese_Civil_War_missions_category = {
 	    }
     }
 	
-	The_Hunan_Campaign = {
+	Defense_of_the_southwest = {
 
 		icon = generic_prepare_civil_war
 		priority = 9
@@ -162,8 +171,7 @@ Chinese_Civil_War_missions_category = {
 		}
 
 		available = {
-			#602 = { is_fully_controlled_by = PRC  } 
-			PRC = { controls_state = 602 }
+			602 = { is_fully_controlled_by = PRC  } 
 		}
 		activation = {
 			always = no
@@ -183,7 +191,7 @@ Chinese_Civil_War_missions_category = {
 		fire_only_once = yes
 		selectable_mission = yes
 
-		days_mission_timeout = 60
+		days_mission_timeout = 120
 
 		complete_effect = {
 			if = {
@@ -193,8 +201,7 @@ Chinese_Civil_War_missions_category = {
 								option = New_Chinese_Civil_War
 						}
 					}
-					Defense_weaken_chi_hunan = yes
-					Defense_conquered_prc_hunan = yes
+					
 					CHI = {country_event = KMT_Civilwar.19}
 			}
 		}
@@ -202,8 +209,9 @@ Chinese_Civil_War_missions_category = {
 		timeout_effect = {
 			if = {
 				limit = {
-					PRC = { controls_state = 602 }
+					613 = { is_controlled_by = PRC  } 
 				}
+				news_event = Shanghai_Campaign.1
 				if = {
 					limit = {
 						has_game_rule = {
@@ -211,14 +219,26 @@ Chinese_Civil_War_missions_category = {
 								option = New_Chinese_Civil_War
 						}
 					}
-					Defense_conquered_prc_hunan = yes 
-					Defense_weaken_chi_hunan = yes
-					CHI = {country_event = KMT_Civilwar.19}
-				}
-				
-	
+					CHI_new_major_defense = yes 
+				} 
 			}
 			else = {
+				
+				
+				add_days_mission_timeout = {
+					mission = The_Chinese_Civil_war
+					days = 300
+				}
+				hidden_effect = {
+						USA = {
+							country_event = { id = KMT_Civilwar.8 days = 1}
+						}
+					CHI = {	
+						activate_mission = CHI_recapture_nanjing
+						activate_mission = CHI_recapture_wuhan
+						activate_mission = CHI_recapture_beiping
+					}	
+				}
 				if = {
 					limit = {
 						has_game_rule = {
@@ -226,17 +246,43 @@ Chinese_Civil_War_missions_category = {
 								option = New_Chinese_Civil_War
 						}
 					}
-					Defense_weaken_prc_hunan = yes
-					Defense_buff_chi_hunan = yes
-				}	
-					 
+					CHI_new_major_defense = yes 
+				}
+				if = {
+			limit = {
+				tag = PRC
+			}
+			remove_ideas = civil_war_fervor
+		}
+		if = { 
+			limit = {
+				AND = {
+					tag = PRC
+					has_game_rule = {
+						rule = chinese_civil_war_mode
+						option = Old_Chinese_Civil_War
+					}
+				}
+			}
+			remove_ideas = PRC_peoples_army_old
+			}
+				if = {
+					limit = {
+						AND = {
+							tag = CHI
+							has_game_rule = {
+								rule = chinese_civil_war_mode
+								option = Old_Chinese_Civil_War
+							}
+						}	
+					}
+					major_CCW_KMT_defense = yes 
+				}
 		    }
-
-		  
 	    }
     }
 	
-	The_Sichuan_Campaign = {
+	Defense_of_Liangguang = {
 
 		icon = generic_prepare_civil_war
 		priority = 8
@@ -246,7 +292,14 @@ Chinese_Civil_War_missions_category = {
 
 		available = {
 			#601 = { is_fully_controlled_by = PRC  } 
-			PRC = { controls_state = 601 }
+			OR = {
+				PRC = { controls_state = 601 }
+				PRC = { controls_state = 605}
+				PRC = { controls_state = 1557}
+				PRC = { controls_state = 603 }
+				PRC = { controls_state = 325}
+				PRC = { controls_state = 1327}
+			}
 		}
 		activation = {
 			always = no
@@ -276,8 +329,7 @@ Chinese_Civil_War_missions_category = {
 								option = New_Chinese_Civil_War
 						}
 					}
-					Defense_weaken_chi_Sichuan = yes
-					Defense_conquered_prc_Sichuan = yes
+					CHI_new_major_loss = yes 
 					CHI = {country_event = KMT_Civilwar.20}
 			}
 			
@@ -286,8 +338,14 @@ Chinese_Civil_War_missions_category = {
 		timeout_effect = {
 			if = {
 				limit = {
-
-					PRC = { controls_state = 601 }
+					OR = {
+						PRC = { controls_state = 601 }
+						PRC = { controls_state = 605}
+						PRC = { controls_state = 1557}
+						PRC = { controls_state = 603 }
+						PRC = { controls_state = 325}
+						PRC = { controls_state = 1327}
+					}
 				}
 				if = {
 					limit = {
@@ -296,26 +354,41 @@ Chinese_Civil_War_missions_category = {
 								option = New_Chinese_Civil_War
 						}
 					}
-					Defense_conquered_prc_Sichuan = yes 
-					Defense_weaken_chi_Sichuan = yes
-					CHI = {country_event = KMT_Civilwar.20}
-				}
-
+					CHI_new_major_defense = yes 
+				} 
 			}
 			else = {
 				if = {
 					limit = {
-						has_game_rule = {
+						tag = PRC
+					}
+					remove_ideas = civil_war_fervor
+				}
+				if = { 
+					limit = {
+						AND = {
+							tag = PRC
+							has_game_rule = {
 								rule = chinese_civil_war_mode
-								option = New_Chinese_Civil_War
+								option = Old_Chinese_Civil_War
+							}
 						}
 					}
-					Defense_weaken_prc_Sichuan = yes
-					Defense_buff_chi_Sichuan = yes
-				}						 
+					remove_ideas = PRC_peoples_army_old
+				}
+				if = {
+					limit = {
+						AND = {
+							tag = CHI
+							has_game_rule = {
+								rule = chinese_civil_war_mode
+								option = Old_Chinese_Civil_War
+							}
+						}	
+					}
+					major_CCW_KMT_defense = yes 
+				}
 		    }
-
-		 
 	    }
     }
 	
@@ -460,11 +533,7 @@ Chinese_Civil_War_missions_category = {
 		icon = soldierly_discipline
         available = {                           
             CHI = {
-				OR = {
-					NOT = {
-						has_war_with = PRC
-					}
-				}
+				has_completed_focus = CHI_CIVILWAR_form_the_national_security_bureau
 			}
 			NOT = {
 				has_game_rule = {
@@ -513,9 +582,58 @@ Chinese_Civil_War_missions_category = {
 			custom_effect_tooltip = warlord_defection_warning_tt
         }
         complete_effect = {                    
-          
+          CHI = {
+				country_event = KMT_Civilwar.30
+			}
         }
     }
+
+	CHI_the_grand_counterattack = {
+          visible = {
+			AND = {
+               PRC= {
+                   has_war_with = CHI
+               }
+               tag = CHI
+			   NOT = {has_global_flag = chinese_civil_war_over}
+			   has_global_flag = roc_rebound_shanghai
+			}   
+          }
+          cost = 50
+		  
+		  cancel_trigger = {
+		    OR = {
+				has_global_flag = chinese_civil_war_over
+				PRC = {
+					NOT = {
+						has_war_with = CHI
+					}
+				}
+			}
+	      }
+		  
+          available = {
+               tag = CHI
+               PRC= {
+                   has_war_with = CHI
+               }
+			   CHI = {
+				has_global_flag = KMT_hold_southwest
+			   }
+          }
+
+		  fire_only_once = yes 
+
+          complete_effect = {
+          }
+          days_remove = 10
+		  priority = 6
+		  icon = lkmt_flag
+          remove_effect = {
+			news_event = Shanghai_Campaign.2 
+			set_global_flag = roc_counteroffensive
+		 }				
+	}
 
 	CHI_move_capital_back_to_nanjing = {
           visible = {
@@ -3199,6 +3317,7 @@ education_reform_category = {
 			set_country_flag = KMT_centralized_schools
 			custom_effect_tooltip = KMT_decrease_illiteracy_rate_tt
 			KMT_decrease_illiteracy_rate = yes
+			increase_education_rate = yes 
 		}
 			
 	}
