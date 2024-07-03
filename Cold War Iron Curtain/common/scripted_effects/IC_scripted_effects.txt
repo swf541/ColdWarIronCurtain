@@ -89,27 +89,47 @@ ic_pulse = {
 			}
 			CHI = {country_event = KMT_Taiwan50s.1}
 	}		
-	
-	
+
+	if = { 
+		limit = {
+			tag = FRA
+			check_variable = { parliamentary_support < 50 } #If parliamentary support is under 50
+			check_variable = { government_strength > 0 } #and If government strength is superior to 0
+			NOT = { has_country_flag = no_more_pm }
+		}
+		subtract_from_variable = { government_strength = 5 } #decrease government strength until 0
+		clamp_variable = {
+			var = government_strength
+			min = 0
+			max = 100
+		}
+	}
 	if = {
 		limit = {
-			tag = SOV
-			OR = {
-				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline
-				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline_Improved
-				has_idea = SOV_Campaign_on_Strengthening_Labour_Discipline_Improved_again
-			}
-			NOT = {
-				has_country_flag = disciplined_labor_strength
-			}
+			tag = FRA
+			check_variable = { parliamentary_support > 50 } #If Parliamentary support is above 50
+			check_variable = { government_strength < 100 } #and If government strength is under 100
+			NOT = { has_country_flag = no_more_pm }
 		}
-		set_country_flag = {
-			flag = disciplined_labor_strength
-			days = 30
+		add_to_variable = { government_strength = 5 } #increase government strength until 100
+		clamp_variable = {
+			var = government_strength
+			min = 0
+			max = 100
+		}
+	}
+	if = {
+		limit = {
+			tag = FRA
+			check_variable = { government_strength = 0 } #if government strength reach 0
+			NOT = { has_country_flag = recently_changed_PM }
+			NOT = { has_country_flag = no_more_pm }
+		}
+		country_event = French_PMFall.1 #Fall of the french PM
+		set_country_flag = {	
+			flag = recently_changed_PM
+			days = 93
 			value = 1
-		}
-		add_to_variable = {
-			LaborDiscipline = 1
 		}
 	}
 	if = {
