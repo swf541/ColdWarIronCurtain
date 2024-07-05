@@ -1,5 +1,65 @@
 #REDO DESC
-
+clear_all_pms = {
+	clr_country_flag = PM_Auguste_Leceur
+	clr_country_flag = PM_Portrait_Salan
+	clr_country_flag = PM_Portrait_France_Valery_Giscard_dEstaing
+	clr_country_flag = PM_Portrait_France_Georges_Pompidou
+	clr_country_flag = PM_Portrait_FRA_Pierre_Pfimlin
+	clr_country_flag = PM_Portrait_FRA_Mendes_France_60
+	clr_country_flag = PM_Portrait_FRA_Mendes_France
+	clr_country_flag = PM_Portrait_FRA_Maurice_Bourgès
+	clr_country_flag = PM_Portrait_FRA_Marcel_Cachin
+	clr_country_flag = PM_Portrait_FRA_Alain_Poher
+	clr_country_flag = PM_Jean_Lecanuet_1970s
+	clr_country_flag = PM_Jean_Lecanuet_1960s
+	clr_country_flag = PM_Henri_Queuille
+	clr_country_flag = PM_Georges_Bidault
+	clr_country_flag = PM_Francois_Mitterand_70s
+	clr_country_flag = PM_Francois_Mitterand_60s
+	clr_country_flag = PM_Francois_Mitterand_50s
+	clr_country_flag = PM_jean_paul_sartre_ic
+	clr_country_flag = PM_Roger_Blaizot
+	clr_country_flag = PM_Rene_Pleven
+	clr_country_flag = PM_Raoul_Salan
+	clr_country_flag = PM_Protrait_Alain_Poher
+	clr_country_flag = PM_Portrait_France_Vincent_Auriol
+	clr_country_flag = PM_Portrait_France_Paul_Aussaresses
+	clr_country_flag = PM_Portrait_France_Jean_de_Lattre_de_Tassigny
+	clr_country_flag = PM_Portrait_France_Jacques_Massu
+	clr_country_flag = PM_Portrait_France_Jacques_Duclos
+	clr_country_flag = PM_Portrait_France_Jacques_Chaban-Delmas
+	clr_country_flag = PM_Portrait_France_Guy_Mollet
+	clr_country_flag = PM_Portrait_France_Gaston_Monnerville
+	clr_country_flag = PM_Portrait_France_Francois_Mitterrand
+	clr_country_flag = PM_Portrait_France_Fernand_Gambiez
+	clr_country_flag = PM_Portrait_France_Alphonse_Juin
+	clr_country_flag = PM_Portrait_FRA_Mayer
+	clr_country_flag = PM_Portrait_FRA_Laniel
+	clr_country_flag = PM_Portrait_FRA_Jacques_Soustelle
+	clr_country_flag = PM_Portrait_FRA_Edgar_Faure
+	clr_country_flag = PM_Portrait_Challe
+	clr_country_flag = PM_Pierre_Mendes_Old
+	clr_country_flag = PM_Paul_Ely
+	clr_country_flag = PM_Maurice_Thorez
+	clr_country_flag = PM_Marcel_Carpentier
+	clr_country_flag = PM_Marcel_Bigeard
+	clr_country_flag = PM_Joseph_Roger
+	clr_country_flag = PM_Jean-Paul_Sartre
+	clr_country_flag = PM_Jacques_Duclos
+	clr_country_flag = PM_Jacques_Allard
+	clr_country_flag = PM_Henri_Navarre
+	clr_country_flag = PM_Guy_Mollet
+	clr_country_flag = PM_Georges_Marchais
+	clr_country_flag = PM_Georges_DArgenlieu
+	clr_country_flag = PM_Gaston_Venot
+	clr_country_flag = PM_Gabriel_Sabattier
+	clr_country_flag = PM_Edmond_Jouhaud
+	clr_country_flag = PM_Comite_du_Salut
+	clr_country_flag = PM_Charles_de_Gaulle
+	clr_country_flag = PM_Antoine_Pinay
+	clr_country_flag = PM_Andre_Zeller
+	clr_country_flag = PM_Felix_Gaillard
+}
 eu_gdp_goal_calc = {
 	set_variable = {
 		eu_gdp = FRA.grossdomesticproduct
@@ -24,5 +84,82 @@ eu_gdp_goal_calc = {
 	}
 	multiply_variable = {
 		eu_gdp_goal = 1.1
+	}
+}
+refresh_french_gui = {
+	set_variable = { french_core_population = 0 }
+	for_each_loop = {
+		array = core_states
+		value = vtest
+		index = itest
+		var:vtest = {
+			add_to_variable = { ROOT.french_core_population = state_population_k }
+		}
+	}
+
+	set_variable = { Party_pop_RPR = party_popularity@conservative }
+	multiply_variable = { Party_pop_RPR = ROOT.french_core_population }
+	round_variable = Party_pop_RPR
+
+	set_variable = { Party_pop_RAD = party_popularity@Social_Liberalism }
+	multiply_variable = { Party_pop_RAD = ROOT.french_core_population }
+	round_variable = Party_pop_RAD
+
+	set_variable = { Party_pop_MRP = party_popularity@Christian_Democratic }
+	multiply_variable = { Party_pop_MRP = ROOT.french_core_population }
+	round_variable = Party_pop_MRP
+
+	set_variable = { Party_pop_SFIO = party_popularity@socialist }
+	multiply_variable = { Party_pop_SFIO = ROOT.french_core_population }
+	round_variable = Party_pop_SFIO
+
+	set_variable = { Party_pop_CNIP = party_popularity@Liberal_Conservatism }
+	multiply_variable = { Party_pop_CNIP = ROOT.french_core_population }
+	round_variable = Party_pop_CNIP
+
+	set_variable = { Party_pop_UDSR = party_popularity@Social_Democratic }
+	multiply_variable = { Party_pop_UDSR = ROOT.french_core_population }
+	round_variable = Party_pop_UDSR
+
+	set_variable = { Party_pop_PCF = party_popularity@communism }
+	multiply_variable = { Party_pop_PCF = ROOT.french_core_population }
+	round_variable = Party_pop_PCF
+	if = {
+		limit = {
+			has_country_flag = Troisieme_Force_Coalition
+		}
+		set_variable = { ROOT.parliamentary_support = party_popularity@socialist }
+		add_to_variable = { ROOT.parliamentary_support = party_popularity@Social_Liberalism }
+		add_to_variable = { ROOT.parliamentary_support = party_popularity@Christian_Democratic }
+		add_to_variable = { ROOT.parliamentary_support = party_popularity@Liberal_Conservatism }
+		add_to_variable = { ROOT.parliamentary_support = party_popularity@Social_Democratic }
+		multiply_variable = { ROOT.parliamentary_support = 100 }
+	}
+	if = {
+		limit = {
+			has_country_flag = Gaullist_Coalition
+		}
+		set_variable = { ROOT.parliamentary_support = party_popularity@conservative }
+		add_to_variable = { ROOT.parliamentary_support = party_popularity@Christian_Democratic }
+		add_to_variable = { ROOT.parliamentary_support = party_popularity@Liberal_Conservatism }
+		multiply_variable = { ROOT.parliamentary_support = 100 }
+	}
+	if = {
+		limit = {
+			has_country_flag = Communist_Coalition
+		}
+		set_variable = { ROOT.parliamentary_support = party_popularity@communism }
+		add_to_variable = { ROOT.parliamentary_support = party_popularity@socialist }
+		add_to_variable = { ROOT.parliamentary_support = party_popularity@Social_Democratic }
+		multiply_variable = { ROOT.parliamentary_support = 100 }
+	}
+	if = {
+		limit = {
+			check_variable = { ROOT.refresh_show_french_gui = 1 }
+		}
+		set_variable = { ROOT.refresh_show_french_gui = 0 }
+	}
+	else = {
+		set_variable = { ROOT.refresh_show_french_gui = 1 }
 	}
 }
