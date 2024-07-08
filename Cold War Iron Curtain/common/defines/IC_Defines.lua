@@ -43,7 +43,7 @@ NDefines.NAir.AIR_WING_AVERAGE_SIZE = 50 						-- Eyeballed average amount of ai
 
 NDefines.NBuildings.AIRBASE_CAPACITY_MULT = 50 -- Each level of airbase building multiplied by this, gives capacity (max operational value). Value is int. 1 for each airplane.
 NDefines.NBuildings.ANTI_AIR_SUPERIORITY_MULT = 100.0 -- How much air superiority reduction to the enemy does our AA guns? Normally each building level = -1 reduction. With this multiplier.
-NDefines.NBuildings.INFRASTRUCTURE_RESOURCE_BONUS= 0.0
+NDefines.NBuildings.INFRASTRUCTURE_RESOURCE_BONUS= 0.2
 NDefines.NBuildings.MAX_BUILDING_LEVELS = 200
 NDefines.NBuildings.MAX_SHARED_SLOTS = 42
 NDefines.NBuildings.RADAR_RANGE_MAX = 400 -- Range is interpolated between building levels 1-15.
