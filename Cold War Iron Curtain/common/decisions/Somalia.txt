@@ -1,0 +1,417 @@
+SOM_ogaden_war = {
+    #
+    Onwards_to_Mogadishu = { 
+
+		icon = generic_prepare_civil_war
+        allowed = {
+            tag = ETH
+        }
+		available = {
+            has_full_control_of_state = 1095
+            has_full_control_of_state = 1881
+            has_full_control_of_state = 871
+            controls_state = 954
+            controls_state = 269
+		}
+		visible = {
+            NOT = {
+                has_global_flag = ogaden_war_over
+            }
+            tag = ETH
+            has_war_with = SOM
+            has_global_flag = ogaden_war
+            is_ai = no
+		}
+
+		complete_effect = {
+            add_days_mission_timeout = {
+                mission = SOM_Ogaden_War
+                days = 100
+            }
+            add_days_mission_timeout = {
+                mission = ETH_Ogaden_War
+                days = 100
+            }
+            add_ideas = the_march_to_Mogadishu
+		}
+
+		cost = 0
+
+		fire_only_once = yes
+		selectable_mission = no
+
+		days_remove = 1
+
+		ai_will_do = {
+			factor = 0
+		}
+	}
+    Onwards_to_Addis_Ababa = { 
+
+		icon = generic_prepare_civil_war
+        allowed = {
+            tag = SOM
+        }
+		available = {
+            has_full_control_of_state = 1095
+            has_full_control_of_state = 1881
+            has_full_control_of_state = 871
+		}
+		visible = {
+            NOT = {
+                has_global_flag = ogaden_war_over
+            }
+            tag = SOM
+            has_war_with = ETH
+            has_global_flag = ogaden_war
+            is_ai = no
+		}
+
+		complete_effect = {
+            add_days_mission_timeout = {
+                mission = SOM_Ogaden_War
+                days = 100
+            }
+            add_days_mission_timeout = {
+                mission = ETH_Ogaden_War
+                days = 100
+            }
+            add_ideas = the_march_to_addis_abeba
+		}
+
+		cost = 0
+
+		fire_only_once = yes
+		selectable_mission = no
+
+		days_remove = 1
+
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	Integrate_the_WSLF = { #Integrate the Western Somali Liberation Front (30k Fighters)
+
+		icon = generic_prepare_civil_war
+        allowed = {
+            tag = SOM
+        }
+		available = {
+            tag = SOM
+            has_war_with = ETH
+            has_global_flag = ogaden_war
+            NOT = {
+                has_global_flag = ogaden_war_over
+            }
+		}
+		visible = {
+
+		}
+
+		complete_effect = {
+			load_oob = WSLF_Ogaden
+		}
+
+		cost = 0
+
+		fire_only_once = yes
+		selectable_mission = no
+
+		days_remove = 1
+
+		ai_will_do = {
+			factor = 100
+		}
+	}
+
+    ETH_Ogaden_Counter_Offensive = {
+        allowed = {
+            tag = ETH
+        }
+        activation = {
+           always = no
+        }
+        available = {
+            always = no
+        }
+        cancel_trigger = {
+            has_war = no
+        }
+       
+        #icon = mission_icon     
+        
+        is_good = yes
+        
+        days_mission_timeout = 90
+
+        complete_effect = { }
+        timeout_effect = {
+            set_global_flag = initial_ogaden_offensive_over
+            remove_ideas = the_ogaden_counteroffensive
+        }
+    }
+    SOM_Ogaden_Initial_Offensive = {
+        allowed = {
+            tag = SOM
+        }
+        activation = {
+            tag = SOM
+             has_war_with = ETH
+            
+            has_global_flag = ogaden_war
+            NOT = {
+                has_global_flag = initial_ogaden_offensive_over
+            }
+            NOT = {
+                has_global_flag = ogaden_war_over
+            }
+        }
+        available = {
+            NOT = {
+                has_war_with = ETH
+            }
+        }
+        cancel_trigger = {
+            has_war = no
+        }
+       
+        #icon = mission_icon     
+        
+        is_good = yes
+        
+        days_mission_timeout = 60
+
+        complete_effect = { }
+        timeout_effect = {
+            set_global_flag = initial_ogaden_offensive_over
+            remove_ideas = the_ogaden_offensive
+            ETH = {
+                activate_mission = ETH_Ogaden_Counter_Offensive
+                add_ideas = the_ogaden_counteroffensive
+            }
+        }
+    }
+    SOM_Ogaden_War = {
+        allowed = {
+            tag = SOM
+        }
+        activation = {
+            tag = sOM
+            has_war_with = ETH
+            has_global_flag = ogaden_war
+            NOT = {
+                has_global_flag = ogaden_war_over
+            }
+        }
+        
+        available = {
+            has_war = yes
+            has_global_flag = ogaden_war
+            has_full_control_of_state = 1095
+            has_full_control_of_state = 1881
+            has_full_control_of_state = 871
+        }
+        
+        cancel_trigger = {
+            has_war = no
+        }
+       
+        #icon = mission_icon     
+        
+        is_good = yes
+        
+        days_mission_timeout = 245
+		ai_will_do = { 
+			factor = 100 
+		}
+        complete_effect = {
+            hidden_effect = {
+                remove_ideas = the_march_to_addis_abeba
+            }
+            set_global_flag = ogaden_war_over
+            if = {
+                limit = {
+                    has_full_control_of_state = 1095
+                    has_full_control_of_state = 1881
+                }
+            }
+            SOM ={ 
+                transfer_state = 1095
+                transfer_state = 1881
+                white_peace = ETH
+                news_event = ogaden_war_news.9
+            }
+            else_if = {
+                limit = {
+                    has_full_control_of_state = 1881
+                }
+                transfer_state = 1881
+                white_peace = ETH
+                news_event = ogaden_war_news.10
+            }
+            else = {}
+        }
+        
+        timeout_effect = {
+            set_global_flag = ogaden_war_over
+            hidden_effect = {
+                remove_ideas = the_march_to_addis_abeba
+            }
+            if = {
+                limit = {
+                    has_full_control_of_state = 1095
+                    has_full_control_of_state = 1881
+                }
+            }
+            SOM ={ 
+                transfer_state = 1095
+                transfer_state = 1881
+                white_peace = ETH
+                news_event = ogaden_war_news.9
+            }
+            else_if = {
+                limit = {
+                    has_full_control_of_state = 1881
+                }
+                transfer_state = 1881
+                white_peace = ETH
+                news_event = ogaden_war_news.10
+            }
+            else = {}
+        }
+    }
+    ETH_Ogaden_War = {
+        allowed = {
+            tag = ETH
+        }
+        activation = {
+            tag = ETH
+            has_war_with = SOM
+            has_global_flag = ogaden_war
+            NOT = {
+                has_global_flag = ogaden_war_over
+            }
+        }
+        
+        available = {
+            has_war = yes
+            has_global_flag = ogaden_war
+            has_full_control_of_state = 1095
+            has_full_control_of_state = 1881
+            has_full_control_of_state = 871
+
+            OR = {
+                controls_state = 954
+                controls_state = 269
+            }
+        }
+        
+        cancel_trigger = {
+            has_war = no
+        }
+       
+        #icon = mission_icon     
+        
+        is_good = yes
+        
+        days_mission_timeout = 245
+		ai_will_do = { 
+			factor = 100 
+		}
+        complete_effect = {
+            hidden_effect = {
+                remove_ideas = the_march_to_Mogadishu
+            }
+            set_global_flag = ogaden_war_over
+            if = {
+                limit = {
+                    has_full_control_of_state = 1095
+                    has_full_control_of_state = 1881
+                    has_full_control_of_state = 871  
+                    controls_state = 954
+                    controls_state = 269
+                }
+                news_event = ogaden_war_news.12
+                SOM = {
+                    release = SML
+                }
+                puppet = SML
+                SML = {
+                    set_politics = {
+                        ruling_party = nationalist
+                        elections_allowed = no
+                    }
+                }
+            }
+            else_if = {
+                limit = {
+                    has_full_control_of_state = 1095
+                    has_full_control_of_state = 1881
+                    has_full_control_of_state = 871
+                }
+                white_peace = SOM
+                news_event = ogaden_war_news.8
+            }
+            else_if = {
+                limit = {
+                    has_full_control_of_state = 1095
+                    has_full_control_of_state = 871
+                }
+                SOM = {
+                    transfer_state = 1881
+                }
+                white_peace = SOM
+                news_event = ogaden_war_news.10
+            }
+        }
+        
+        timeout_effect = {
+            hidden_effect = {
+                remove_ideas = the_march_to_Mogadishu
+            }
+            set_global_flag = ogaden_war_over
+            if = {
+                limit = {
+                    has_full_control_of_state = 1095
+                    has_full_control_of_state = 1881
+                    has_full_control_of_state = 871  
+                    controls_state = 954
+                    controls_state = 269
+                }
+                news_event = ogaden_war_news.12
+                SOM = {
+                    release = SML
+                }
+                puppet = SML
+                SML = {
+                    set_politics = {
+                        ruling_party = nationalist
+                        elections_allowed = no
+                    }
+                }
+            }
+            else_if = {
+                limit = {
+                    has_full_control_of_state = 1095
+                    has_full_control_of_state = 1881
+                    has_full_control_of_state = 871
+                }
+                white_peace = SOM
+                news_event = ogaden_war_news.8
+            }
+            else_if = {
+                limit = {
+                    has_full_control_of_state = 1095
+                    has_full_control_of_state = 871
+                }
+                SOM = {
+                    transfer_state = 1881
+                }
+                white_peace = SOM
+                news_event = ogaden_war_news.10
+            }
+            else = { }
+        }
+    }
+}
+
