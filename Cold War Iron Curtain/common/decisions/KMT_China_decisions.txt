@@ -142,6 +142,110 @@ Chinese_Civil_War_missions_category = {
 		   
 	    }
     }
+
+	Changheng_campaign = {
+
+		icon = generic_prepare_civil_war
+		priority = 8
+		allowed = {
+			tag = CHI
+		}
+
+		available = {
+			#601 = { is_fully_controlled_by = PRC  } 
+			OR = {
+				PRC = { controls_state = 602 }
+				PRC = { controls_state = 1575}
+			}
+		}
+		activation = {
+			always = no
+		}
+		cost = 0
+		
+		cancel_trigger = {
+		    OR = {
+				has_global_flag = chinese_civil_war_over
+				PRC = {
+					NOT = {
+						has_war_with = CHI
+					}
+				}
+			}
+	    }
+		fire_only_once = yes
+		selectable_mission = yes
+
+		days_mission_timeout = 152
+
+		complete_effect = {
+			if = {
+					limit = {
+						has_game_rule = {
+								rule = chinese_civil_war_mode
+								option = New_Chinese_Civil_War
+						}
+					}
+					CHI_new_major_loss = yes 
+					CHI = {country_event = KMT_Civilwar.20}
+			}
+			
+		}
+
+		timeout_effect = {
+			if = {
+				limit = {
+					OR = {
+				
+						PRC = { controls_state = 602 }
+						PRC = { controls_state = 1575}
+			
+					}
+				}
+				if = {
+					limit = {
+						has_game_rule = {
+								rule = chinese_civil_war_mode
+								option = New_Chinese_Civil_War
+						}
+					}
+					CHI_new_major_defense = yes 
+				} 
+			}
+			else = {
+				if = {
+					limit = {
+						tag = PRC
+					}
+					remove_ideas = civil_war_fervor
+				}
+				if = { 
+					limit = {
+						AND = {
+							tag = PRC
+							has_game_rule = {
+								rule = chinese_civil_war_mode
+								option = Old_Chinese_Civil_War
+							}
+						}
+					}
+					remove_ideas = PRC_peoples_army_old
+				}
+				if = {
+					limit = {
+						AND = {
+							tag = CHI
+							has_game_rule = {
+								rule = chinese_civil_war_mode
+								option = Old_Chinese_Civil_War
+							}
+						}	
+					}
+					major_CCW_KMT_defense = yes 
+				}
+		    }
+	    }
+    }
 	
 	Defense_of_the_southwest = {
 
@@ -222,32 +326,22 @@ Chinese_Civil_War_missions_category = {
 				}
 				if = {
 					limit = {
-						has_game_rule = {
+						tag = PRC
+					}
+					remove_ideas = civil_war_fervor
+				}
+				if = { 
+					limit = {
+						AND = {
+							tag = PRC
+							has_game_rule = {
 								rule = chinese_civil_war_mode
-								option = New_Chinese_Civil_War
+								option = Old_Chinese_Civil_War
+							}
 						}
 					}
-					CHI_new_major_defense = yes 
+					remove_ideas = PRC_peoples_army_old
 				}
-				
-				if = {
-			limit = {
-				tag = PRC
-			}
-			remove_ideas = civil_war_fervor
-		}
-		if = { 
-			limit = {
-				AND = {
-					tag = PRC
-					has_game_rule = {
-						rule = chinese_civil_war_mode
-						option = Old_Chinese_Civil_War
-					}
-				}
-			}
-			remove_ideas = PRC_peoples_army_old
-			}
 				if = {
 					limit = {
 						AND = {
@@ -260,8 +354,8 @@ Chinese_Civil_War_missions_category = {
 					}
 					major_CCW_KMT_defense = yes 
 				}
-		    }
-	    }
+			}
+		}
     }
 	
 	Defense_of_Liangguang = {
@@ -825,12 +919,11 @@ Chinese_Civil_War_missions_category = {
             CHI = {
 				country_event = KMT_Civilwar.25
             }
-			hidden_effect = {
-				
-			}
         }
         complete_effect = {                    
-          
+          hidden_effect = {
+				set_country_flag = sun_li_jen_out_taiwan
+			}
         }
     }
 	
