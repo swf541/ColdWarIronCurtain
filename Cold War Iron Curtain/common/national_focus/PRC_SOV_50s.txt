@@ -15,7 +15,14 @@ focus_tree = {
 			remove_ideas = PRC_50s_People_s_War_of_Liberation
 			add_ideas = PRC_SOV_50s_Retreat_to_Dongbei
 			add_political_power = -58
-                        country_event = PRC_SOV_50s_Dongbei_Retreat
+            country_event = PRC_SOV_50s_Dongbei_Retreat
+			SOV = {
+				set_autonomy = {
+					target = PRC
+					autonomous_state = autonomy_easternbloc
+					freedom_level = 0.4
+				}
+			}
 		}
 		cost = 2
 		x = 35
@@ -1043,8 +1050,6 @@ focus_tree = {
 		}
 		prerequisite = {
 			focus = PRC_SOV_Director_Chen_Boda_Political_Research
-		}
-		prerequisite = {
 			focus = PRC_SOV_Director_Kei_Feng_Political_Research
 		}
 		x = 45
@@ -1061,8 +1066,6 @@ focus_tree = {
 		}
 		prerequisite = {
 			focus = PRC_SOV_Approuve_Mao_Zedong_New_Democracy
-		}
-		prerequisite = {
 			focus = PRC_SOV_Li_Lisan_Worker_Representation_Plan
 		}
 		x = 35
@@ -1157,8 +1160,6 @@ focus_tree = {
 		cost = 0
 		prerequisite = {
 			focus = PRC_SOV_Form_Zhongyang_Diaocha_Bu
-		}
-		prerequisite = {
 			focus = PRC_SOV_Joint_Operation_with_NKVD
 		}
 		x = 25
@@ -1939,4 +1940,167 @@ focus_tree = {
 		}
 	}
 
+
+
+
+
+
+
+	focus = {
+		id = PRC_SOV_Begin_Preparations_for_the_Asian_Liberation_War
+		icon = GFX_
+		cost = 5
+		available = {
+			NOT = {
+				country_exists = KOR
+			}
+			has_completed_focus = PRC_SOV_Propose_the_North_Asian_Defense_Treaty
+		}
+		x = 67
+		y = 19
+		completion_reward = {
+			army_experience = 25
+			navy_experience = 25
+			air_experience = 25
+		}
+	}
+	focus = {
+		id = PRC_SOV_Support_Communist_Insurgents_in_Southern_China
+		icon = GFX_
+		cost = 5
+		prerequisite = {
+			focus = PRC_SOV_Begin_Preparations_for_the_Asian_Liberation_War
+		}
+		x = 65
+		y = 20
+		completion_reward = {
+			CHI = {
+				add_stability = -0.05
+				add_war_support = -0.05
+				add_timed_idea = {
+					idea = communist_partisans_recruiting
+					days = 365
+				}
+			}
+		}
+	}
+	focus = {
+		id = PRC_SOV_Form_the_Northern_Liberation_Front
+		icon = GFX_
+		cost = 5
+		prerequisite = {
+			focus = PRC_SOV_Begin_Preparations_for_the_Asian_Liberation_War
+		}
+		x = 69
+		y = 20
+		completion_reward = { 
+			create_faction = "Northern Liberation Front"
+			SOV = {
+				set_autonomy = {
+					target = PRC
+					autonomy_state = autonomy_free
+				}
+			}
+			if = {
+				limit = {
+					SIK = {
+						has_government = communism
+					}
+				}
+				country_event = PRC_SOV.30
+			}
+			MON = {
+				country_event = PRC_SOV.31
+			}
+			KPA = {
+				country_event = PRC_SOV.32
+			}
+		}
+	}
+	focus = {
+		id = PRC_SOV_Launch_the_Asian_Liberation_War
+		icon = GFX_
+		cost = 5
+		prerequisite = {
+			focus = PRC_SOV_Support_Communist_Insurgents_in_Southern_China
+		}
+		prerequisite = {
+			focus = PRC_SOV_Form_the_Northern_Liberation_Front
+		}
+		x = 67
+		y = 21
+		completion_reward = { 
+			set_global_flag = asian_liberation_war
+			every_country = {
+				limit = {
+					is_in_faction_with = PRC
+				}
+				declare_war_on = {
+					target = CHI
+					type = annex_everything
+				}
+			}
+		}
+	}
+	focus = {
+		id = PRC_SOV_Adopt_Order_227_in_the_PLA
+		icon = GFX_
+		cost = 5
+		available = {
+			surrender_progress > 0.50
+		}
+		prerequisite = {
+			focus = PRC_SOV_Launch_the_Asian_Liberation_War
+		}
+		bypass = {
+			NOT = {
+				has_global_flag = asian_liberation_war
+			}
+		}
+		x = 64
+		y = 22
+		completion_reward = {
+			add_ideas = defensive_military_strategy
+		}
+	}
+	focus = {
+		id = PRC_SOV_Request_Greater_Soviet_Commitment
+		icon = GFX_
+		cost = 5
+		available = {
+			surrender_progress > 0.10
+		}
+		bypass = {
+			NOT = {
+				has_global_flag = asian_liberation_war
+			}
+		}
+		prerequisite = {
+			focus = PRC_SOV_Launch_the_Asian_Liberation_War
+		}
+		x = 70
+		y = 22
+		completion_reward = { }
+	}
+	focus = {
+		id = PRC_SOV_Re-Introduce_Peoples_War_Doctrine
+		icon = GFX_
+		cost = 5
+		bypass = {
+			NOT = {
+				has_global_flag = asian_liberation_war
+			}
+		}
+		prerequisite = {
+			focus = PRC_SOV_Launch_the_Asian_Liberation_War
+		}
+		x = 67
+		y = 22
+		completion_reward = { 
+			add_timed_idea = {
+				idea = VIN_peoples_army
+				days = 365
+			}
+		}
+	}
 }
