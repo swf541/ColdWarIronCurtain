@@ -209,7 +209,10 @@ check_buildings = {
 		}
 		add_to_temp_variable = {
 			powerplants_sum = building_level@nuclear_reactor
-		}		
+		}	
+		add_to_temp_variable = {
+			powerplants_sum = building_level@refinery
+		}					
 		add_to_array = {
 			array = THIS.buildings
 			index = 7
@@ -785,6 +788,10 @@ calculate_conversion_lwa_capitalist_and_bureaucrat = {
 	every_owned_state = {
 		set_temp_variable = { economic_x_axis_minus_1 = PREV.economic_x_axis }
 		add_to_temp_variable = { economic_x_axis_minus_1 = -1 }
+		if = {
+			limit = { check_temp_variable = { economic_x_axis_minus_1 < 0 }}
+			add_to_temp_variable = { economic_x_axis_minus_1 = 1 }
+		}
 
 		set_variable = { theoretical_capitalist_sum = 0 }	
 
@@ -1249,7 +1256,6 @@ calculate_net_poptype_earnings = {
 		#log = "[?THIS.GetID.GetName]: Substinents Earning: [?pop_substinents_gross_wage], Artisan Earning: [?pop_artisan_gross_wage]^^"
 
 	}
-	calculate_sum_up_total = yes	
 }
 
 testing = {
@@ -1281,10 +1287,10 @@ calculate_take_taxes_from_people = {
 	set_variable = { pop_upperclass_tax_rate = effective_tax_rate }
 	set_variable = { pop_corporateclass_tax_rate = effective_tax_rate }
 
-	multiply_variable = { pop_lowerclass_tax_rate = owner:modifier@tax_rate_lower_class }
-	multiply_variable = { pop_middleclass_tax_rate = owner:modifier@tax_rate_middle_class }
-	multiply_variable = { pop_upperclass_tax_rate = owner:modifier@tax_rate_upper_class }
-	multiply_variable = { pop_corporateclass_tax_rate = owner:modifier@tax_rate_corporate }
+	multiply_variable = { pop_lowerclass_tax_rate = modifier@tax_rate_lower_class }
+	multiply_variable = { pop_middleclass_tax_rate = modifier@tax_rate_middle_class }
+	multiply_variable = { pop_upperclass_tax_rate = modifier@tax_rate_upper_class }
+	multiply_variable = { pop_corporateclass_tax_rate = modifier@tax_rate_corporate }
 
 	every_owned_state = {
 		set_temp_variable = { pop_lowerclass_taken_wage = pop_lowerclass_gross_wage }
@@ -1319,7 +1325,7 @@ calculate_take_taxes_from_people = {
 			multiply_temp_variable = { net_factory_taxed_earnings = owner:pop_corporateclass_tax_rate }
 			add_to_variable = { PREV.IncomeTotal = net_factory_taxed_earnings }			
 		}
-		#log = "[?pop_middleclass_tax_rate]"
+		#log = "[?owner:pop_middleclass_tax_rate]"
 	}	
 	divide_variable = { IncomeTotal = 100 }
 	set_variable = {
@@ -1342,6 +1348,7 @@ calculate_sum_up_total = {
 	set_temp_variable = { finance_extra_gdp = grossdomesticproduct }
 	divide_temp_variable = { finance_extra_gdp = 24 }
 	add_to_variable = { IncomeCheck = finance_extra_gdp }
+	add_to_variable = { IncomeCheck = IncomeTotal }
 
 
 	#log = "[?grossdomesticproduct]"
