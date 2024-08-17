@@ -1353,7 +1353,105 @@ calculate_sum_up_total = {
 
 	#log = "[?grossdomesticproduct]"
 }
+#Tax Debug
+give_everyone_base_tax = {
+	every_country = {
+		add_ideas = {
+			policy_taxrate_lower_temp_1
+			policy_taxrate_lower_middle_temp_1
+			policy_taxrate_corporate_temp_1
+			policy_taxrate_temp_1
+		}
+	}
+}
 
+#Expenses
+get_average_development = {
+	set_variable = { average_development = 1 }
+	every_owned_state = {
+		add_to_variable = { PREV.average_development = THIS.state_development}
+	}
+	divide_variable = { average_development = num_owned_states }
+}
+
+get_total_infrastructure = {
+	set_variable = { total_infrastructure = 1 }
+	every_owned_state = { 
+		add_to_variable = { PREV.total_infrastructure = building_level@state_infrastructure }
+		add_to_variable = { PREV.total_infrastructure = building_level@infrastructure }
+		add_to_variable = { PREV.total_infrastructure = building_level@water_infrastructure }		
+	}
+}
+
+calc_public_services_expenditure = {
+	#gives out expenditure at 50%
+	set_variable = { public_services_expenditure = total_infrastructure }
+	multiply_variable = { public_services_expenditure = 0.01 }	
+	multiply_variable = { public_services_expenditure = max_manpower_k }
+
+	#reduce it more
+	divide_variable = { public_services_expenditure = 100000 }	
+
+	#now apply multiplier of idea
+}
+
+calc_land_army_expenditure = {
+	set_variable = { land_army_expenditure = average_development }
+	multiply_variable = { land_army_expenditure = deployed_army_manpower_k }
+	multiply_variable = { land_army_expenditure = 2 }
+
+	set_temp_variable = { land_army_deployment_expenditure = average_development}
+	multiply_temp_variable = { land_army_deployment_expenditure = amount_manpower_in_deployment_queue }
+	divide_temp_variable = {land_army_deployment_expenditure = 1000 }
+
+	add_to_variable = { land_army_expenditure = land_army_deployment_expenditure}
+	divide_variable = { land_army_expenditure = 10000}
+}
+
+calc_air_army_expenditure = {
+	set_variable = { air_army_expenditure = average_development }
+	multiply_variable = { air_army_expenditure = deployed_airforce_manpower_k }
+	multiply_variable = { air_army_expenditure = 4 }
+
+	divide_variable = { air_army_expenditure = 10000}
+}
+
+calc_navy_army_expenditure = {
+	set_variable = { navy_army_expenditure = average_development }
+	multiply_variable = { navy_army_expenditure = deployed_navy_manpower_k }
+	multiply_variable = { navy_army_expenditure = 4 }
+
+	divide_variable = { navy_army_expenditure = 10000}
+}
+
+calc_nuke_army_expenditure = {
+	set_variable = { nuke_army_expenditure = average_development }
+	every_owned_state = {
+		add_to_variable = { PREV.nuke_army_expenditure = building_level@nuclear_reactor }
+	}
+
+	multiply_variable = { nuke_army_expenditure = 100 }
+
+	set_temp_variable = { srbm_expenditure = num_equipment@srbm }
+	multiply_temp_variable = { srbm_expenditure = 5 }
+	set_temp_variable = { irbm_expenditure = num_equipment@irbm }
+	multiply_temp_variable = { irbm_expenditure = 30 }
+	set_temp_variable = { icbm_expenditure = num_equipment@icbm }
+	multiply_temp_variable = { icbm_expenditure = 75 }
+	set_temp_variable = { slbm_expenditure = num_equipment@slbm }
+	multiply_temp_variable = { slbm_expenditure = 20 }
+
+	set_temp_variable = { nuke_expenditure = num_of_nukes }
+	multiply_temp_variable { num_of_nukes = 10 }
+
+	add_to_variable = { nuke_army_expenditure = srbm_expenditure }
+	add_to_variable = { nuke_army_expenditure = irbm_expenditure }
+	add_to_variable = { nuke_army_expenditure = icbm_expenditure }
+	add_to_variable = { nuke_army_expenditure = slbm_expenditure }
+	add_to_variable = { nuke_army_expenditure = nuke_expenditure }
+
+	divide_variable = { nuke_army_expenditure = 10000}
+}
 
 #SWF Stuff
 get_technology_building_bonuses = {

@@ -106,7 +106,21 @@ focus_tree = {
 			focus = TUR_Prioritize_Trade_With_United_States
 		}
 		completion_reward = {
-			#buy guns from usa, cheaper than normal method
+			#tba
+			add_to_variable = {
+				currentMoney = -10
+				tooltip = decrease_money_tt
+			}
+			add_equipment_to_stockpile = {
+				type = infantry_equipment_0
+				amount = 2000
+				producer = USA
+			}
+			add_equipment_to_stockpile = {
+				type = light_artillery_equipment_1
+				amount = 500
+				producer = USA
+			}
 		}
 	}
 	
@@ -125,7 +139,13 @@ focus_tree = {
 			focus = TUR_Prioritize_Trade_With_United_States
 		}
 		completion_reward = {
-			#energy building, alternatively research bonus
+			#energy building/more petro extraction
+			add_tech_bonus = {
+				name = material_sciences_chemistry_bonus
+				bonus = 1
+				uses = 1
+				category = chemistry
+			}
 		}
 	}
 	
@@ -147,7 +167,11 @@ focus_tree = {
 			focus = TUR_Increase_Productivity_in_Coal_Mines
 		}
 		completion_reward = {
-			#spending money
+			#tba
+			add_to_variable = {
+				currentMoney = -1
+				tooltip = decrease_money_tt
+			}
 		}
 	}
 	
@@ -181,7 +205,10 @@ focus_tree = {
 		completion_reward = {
 			country_event = TUR_Gunaltay.4
 			add_stability = 0.05
-			#stab and popularity and shit
+			add_popularity = {
+				ideology = Social_Democratic
+				popularity = 0.025
+			}
 			set_country_flag = TUR_lightened_secular_laws
 		}
 	}
@@ -198,7 +225,11 @@ focus_tree = {
 			focus = TUR_Preparations_for_1950_Elections
 		}
 		completion_reward = {
-			#ditto
+			add_stability = 0.05
+			add_popularity = {
+				ideology = Social_Democratic
+				popularity = 0.025
+			}
 			set_country_flag = TUR_electoral_reform
 		}
 	}
@@ -211,7 +242,7 @@ focus_tree = {
 		x = 18
 		y = 0
 		search_filters = { IC_FILTER }
-		available = { has_country_flag = cyprus_emergency }
+		available = { has_global_flag = cyprus_emergency }
 		completion_reward = {
 			#autocomplete maybe? cyprus needs work before this
 		}
@@ -229,7 +260,18 @@ focus_tree = {
 			focus = TUR_Cyprus_Emergency
 		}
 		completion_reward = {
-			#increase uk relations and strength in cyrpus insurgency
+			#increase uk strength in cyrpus insurgency
+			add_to_variable = { ENG.eoka_insurgency = -5 }
+			add_opinion_modifier = {
+				target = ENG
+				modifier = medium_increase
+			}
+			ENG = {
+				add_opinion_modifier = {
+					target = TUR
+					modifier = medium_increase
+				}
+			}
 		}
 	}
 	
@@ -246,6 +288,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			#increase TMT strength in cyrpus insurgency
+			add_to_variable = { ENG.tmt_insurgency = 5 }
 		}
 	}
 	
@@ -262,6 +305,11 @@ focus_tree = {
 		}
 		completion_reward = {
 			#only chp can get success, blocks turkey and greece from the decisions for 5 years
+			if = {
+				limit = { ruling_party = Social_Democratic }
+				GRE = { country_event = CYP_noninvolvement.1 }
+			}
+			else = { GRE = { country_event = CYP_noninvolvement.2 } }
 		}
 	}
 	
@@ -277,7 +325,8 @@ focus_tree = {
 			focus = TUR_Aid_The_United_Kingdom
 		}
 		completion_reward = {
-			#stops social democrats getting killed, allows a possible victory in NCY later
+			#stops social democrats getting killed, allows election victory in NCY later
+			set_global_flag = ncy_leftintact
 		}
 	}
 	
@@ -294,6 +343,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			#increase uk strenght
+			add_to_variable = { ENG.eoka_insurgency = -5 }
 		}
 	}
 	
@@ -310,6 +360,14 @@ focus_tree = {
 		}
 		completion_reward = {
 			#increase TMT strength, add guns to NCY stockpile
+			add_to_variable = { ENG.tmt_insurgency = 5 }
+			NCY = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_0
+					amount = 2000
+					producer = TUR
+				}
+			}
 		}
 	}
 	
@@ -326,6 +384,9 @@ focus_tree = {
 		}
 		completion_reward = {
 			#increase TMT strength, add xp to NCY maybe increase experience in their OOB?
+			add_to_variable = { ENG.tmt_insurgency = 5 }
+			custom_effect_tooltip = AID_TMT_TT
+			NCY = { army_experience = 30 }
 		}
 	}
 	
@@ -346,6 +407,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			#decrease EOKA strenght
+			add_to_variable = { ENG.eoka_insurgency = -5 }
 		}
 	}
 	
@@ -383,6 +445,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			#respond to treaty of guarantee
+			country_event = TUR_CYPRUS.2
 		}
 	}
 	
@@ -403,6 +466,8 @@ focus_tree = {
 		}
 		completion_reward = {
 			#title
+			news_event = THIRD_BALKAN_WAR.0
+			set_global_flag = Third_Balkan_War
 		}
 	}
 	
@@ -450,6 +515,10 @@ focus_tree = {
 		completion_reward = {
 			#autocomplete through event
 			#declares war on syria
+			declare_war_on = {
+				target = SYR
+				type = annex_everything
+			}
 		}
 	}
 	
@@ -467,6 +536,40 @@ focus_tree = {
 		completion_reward = {
 			#gives ALW all syria cores and releases as a special puppet
 			#ALW is just an alternate tag since iraq might puppet syria beforehand
+			custom_effect_tooltip = TUR_establish_junta_TT
+			hidden_effect = {
+				SYR = { every_core_state = { add_core_of = ALW } }
+				every_owned_state = {
+					limit = {
+						is_core_of = SYR
+						NOT = { is_core_of = TUR }
+					}
+					transfer_state_to = ALW
+				}
+				set_autonomy = {
+					target = ALW
+					autonomy_state = autonomy_puppet
+				}
+				ALW = {
+					set_cosmetic_tag = SYR_TUR
+					set_popularities = { neutrality = 100 }
+					set_politics = {
+						ruling_party = neutrality
+						elections_allowed = no
+					}
+					create_country_leader = {
+						name = "Rustu Erdelhun"
+						picture = "gfx/leaders/TUR/Rustu_Erdelhun.dds"
+						ideology = military_junta
+					}
+					set_party_name = { 
+						ideology = neutrality
+						name = "Turkish 2nd Army"
+						long_name = "Turkish 2nd Army"
+					}
+					set_capital = { state = 554 }
+				}
+			}
 		}
 	}
 	
@@ -483,6 +586,39 @@ focus_tree = {
 		}
 		completion_reward = {
 			#builds forts along the syrian border
+			905 = {
+				add_building_construction = {
+					type = bunker
+					level = 5
+					instant_build = yes
+					province = {
+						all_provinces = yes
+						limit_to_border = yes
+					}
+				}
+			}
+			1168 = {
+				add_building_construction = {
+					type = bunker
+					level = 3
+					instant_build = yes
+					province = {
+						all_provinces = yes
+						limit_to_border = yes
+					}
+				}
+			}
+			1816 = {
+				add_building_construction = {
+					type = bunker
+					level = 3
+					instant_build = yes
+					province = {
+						all_provinces = yes
+						limit_to_border = yes
+					}
+				}
+			}
 		}
 	}
 	
@@ -499,6 +635,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			#asks america/un to tell syria give hatay back
+			USA = { country_event = syriancrisis_syria_victory.1 }
 		}
 	}
 	
@@ -669,6 +806,7 @@ focus_tree = {
 		available = { has_completed_focus = TUR_The_Shift_Towards_Center }
 		completion_reward = {
 			#chp only, stability and debuff
+			add_ideas = TUR_political_army
 		}
 	}
 	
@@ -686,6 +824,7 @@ focus_tree = {
 		available = { has_completed_focus = TUR_The_White_Revolution }
 		completion_reward = {
 			#dp only, loses stability for buff
+			add_ideas = TUR_politicsfree_army
 		}
 	}
 	
@@ -702,7 +841,7 @@ focus_tree = {
 			focus = TUR_Depoliticize_The_Army
 		}
 		completion_reward = {
-			#army xp
+			army_experience = 50
 		}
 	}
 	
@@ -719,6 +858,28 @@ focus_tree = {
 		}
 		completion_reward = {
 			#forts along soviet border
+			793 = {
+				add_building_construction = {
+					type = bunker
+					level = 3
+					instant_build = yes
+					province = {
+						all_provinces = yes
+						limit_to_border = yes
+					}
+				}
+			}
+			1671 = {
+				add_building_construction = {
+					type = bunker
+					level = 3
+					instant_build = yes
+					province = {
+						all_provinces = yes
+						limit_to_border = yes
+					}
+				}
+			}
 		}
 	}
 	
@@ -735,6 +896,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			#research slot
+			add_research_slot = 1
 		}
 	}
 	
@@ -754,6 +916,11 @@ focus_tree = {
 		}
 		completion_reward = {
 			#buy guns from usa for a lot cheaper
+			add_equipment_to_stockpile = {
+				type = infantry_equipment_0
+				amount = 2000
+				producer = USA
+			}
 		}
 	}
 	
@@ -770,6 +937,12 @@ focus_tree = {
 		}
 		completion_reward = {
 			#doctrine bonus
+			add_doctrine_cost_reduction = {
+				name = land_doctrine_bonus
+				cost_reduction = 0.5
+				uses = 1
+				category = land_doctrine
+			}
 		}
 	}
 	
@@ -787,6 +960,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			#air xp
+			air_experience = 50
 		}
 	}
 	
@@ -803,6 +977,13 @@ focus_tree = {
 		}
 		completion_reward = {
 			#air xp, doctrine bonus
+			air_experience = 25
+			add_doctrine_cost_reduction = {
+				name = air_doctrine_bonus
+				cost_reduction = 0.5
+				uses = 1
+				category = air_doctrine
+			}
 		}
 	}
 	
@@ -818,7 +999,14 @@ focus_tree = {
 			focus = TUR_Expand_Turkish_Air_Force
 		}
 		completion_reward = {
-			#air base in historical state
+			#air base in balikesir
+			340 = {
+				add_building_construction = {
+					type = air_base
+					level = 2
+					instant_build = yes
+				}
+			}
 		}
 	}
 	
@@ -838,6 +1026,11 @@ focus_tree = {
 		}
 		completion_reward = {
 			#buy jets for cheap
+			add_equipment_to_stockpile = {
+				type = jet_multirole_equipment_1
+				amount = 200
+				producer = USA	
+			}
 		}
 	}
 	
@@ -854,6 +1047,12 @@ focus_tree = {
 		}
 		completion_reward = {
 			#air research bonus
+			add_tech_bonus = {
+				name = jet_technology_bonus
+				bonus = 1.25
+				uses = 1
+				category = jet_multirole2
+			}
 		}
 	}
 	
@@ -871,6 +1070,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			#navy xp
+			navy_experience = 50
 		}
 	}
 	
@@ -887,6 +1087,14 @@ focus_tree = {
 		}
 		completion_reward = {
 			#add dockyards to izmir
+			339 = {
+				add_extra_state_shared_building_slots = 2
+				add_building_construction = {
+					type = dockyard
+					level = 2
+					instant_build = yes
+				}
+			}
 		}
 	}
 	
@@ -903,6 +1111,14 @@ focus_tree = {
 		}
 		completion_reward = {
 			#add naval base to trabzon, maybe tourism too
+			354 = {
+				add_building_construction = {
+					type = naval_base
+					level = 3
+					instant_build = yes
+					province = 9932
+				}
+			}
 		}
 	}
 	
@@ -922,6 +1138,21 @@ focus_tree = {
 		}
 		completion_reward = {
 			#add forts and naval forts in and around istanbul
+			#if greece is red more forts
+			341 = {
+				add_building_construction = {
+					type = coastal_bunker
+					level = 3
+					instant_build = yes
+					province = 16360
+				}
+				add_building_construction = {
+					type = coastal_bunker
+					level = 3
+					instant_build = yes
+					province = 16362
+				}
+			}
 		}
 	}
 	
@@ -938,6 +1169,12 @@ focus_tree = {
 		}
 		completion_reward = {
 			#navy doctrine bonus
+			add_doctrine_cost_reduction = {
+				name = naval_doctrine_bonus
+				cost_reduction = 0.5
+				uses = 1
+				category = naval_doctrine
+			}
 		}
 	}
 	
@@ -952,6 +1189,7 @@ focus_tree = {
 		available = { has_country_flag = CHP_victory_1950 }
 		completion_reward = {
 			#start balance of power, for now just a simple event
+			country_event = TUR_CHP_1950.1
 		}
 	}
 	
@@ -968,6 +1206,9 @@ focus_tree = {
 		}
 		completion_reward = {
 			#increase literacy in rural anatolia, give research buff
+			all_owned_state = {
+				add_to_variable = { literate_educated = 15 }
+			}
 		}
 	}
 	
@@ -1000,6 +1241,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			#stability
+			add_stability = 0.02
 		}
 	}
 	
@@ -1105,6 +1347,11 @@ focus_tree = {
 		}
 		completion_reward = {
 			#boost to stability, huge party popularity
+			add_stability = 0.02
+			add_popularity = { 
+				ideology = Social_Democratic 
+				popularity = 0.15
+			}
 		}
 	}
 
@@ -1132,6 +1379,7 @@ focus_tree = {
 			focus = TUR_Barutcu_In_Charge
 		}
 		completion_reward = {
+			#college education boost
 		}
 	}
 
@@ -1243,6 +1491,7 @@ focus_tree = {
 			focus = TUR_Right_To_Strike
 		}
 		completion_reward = {
+			#weekly boost to non DP parties
 		}
 	}
 
