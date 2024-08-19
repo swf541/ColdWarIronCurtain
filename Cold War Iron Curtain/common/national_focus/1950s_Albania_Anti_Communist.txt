@@ -325,6 +325,8 @@ focus_tree = {
 		y = 1
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetName]: Focus ALB_religious_revival"
+			set_temp_variable = { tempvar = 15 }
+			increase_orthodox_in_state = yes
 		}
 		relative_position_id = ALB_monarchist_propaganda
 		prerequisite = { focus = ALB_monarchist_propaganda }
@@ -372,6 +374,8 @@ focus_tree = {
 		y = 1
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetName]: Focus ALB_egalitarist_policies"
+			set_temp_variable = { tempvar = 5 }
+			increase_atheism_in_state = yes
 		}
 		relative_position_id = ALB_outlaw_political_extremists
 		prerequisite = { focus = ALB_outlaw_political_extremists }
@@ -651,6 +655,68 @@ focus_tree = {
 	}
 
 	focus = {
+		id = ALB_from_the_other_side_of_the_curtain
+		icon = GFX_generic_suspend_constitution
+		cost = 7
+		x = 27
+		y = 5
+		available = {
+			has_completed_focus = ALB_albanian_free_elections
+		}
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus ALB_from_the_other_side_of_the_curtain"
+			add_to_variable = {
+				bonus_fpp_modifier = 0.25
+				tooltip = bonus_fpp_modifier_tt
+			}
+		}
+	}
+
+	focus = {
+		id = ALB_send_kompania_4000_to_korea
+		icon = GFX_generic_suspend_constitution
+		cost = 7
+		x = -7
+		y = 1
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus ALB_send_kompania_4000_to_korea"
+            set_variable = {
+                Volunteer_Allowance^KOR = 1
+            }
+			custom_effect_tooltip = Enable_Korean_War_Volunteers_TT
+			add_ai_strategy = {
+				type = send_volunteers_desire
+				id = "KOR"
+				value = 400
+			}
+		}
+		relative_position_id = ALB_from_the_other_side_of_the_curtain
+		prerequisite = { focus = ALB_from_the_other_side_of_the_curtain }
+	}
+
+	focus = {
+		id = ALB_albaniangreekturkish_military_axis
+		icon = GFX_generic_suspend_constitution
+		cost = 7
+		x = 0
+		y = 1
+		available = {
+			NOT = {
+				has_completed_focus = ALB_side_with_non_aligned_movement
+			}
+			is_in_faction_with = GRE
+			is_in_faction_with = TUR
+		}
+		completion_reward = {
+			log = "[GetDateText]: [Root.GetName]: Focus ALB_albaniangreekturkish_military_axis"
+			add_ideas = Albanian_Greek_Turkish_military_axis
+			news_event = AGT_axis.1
+		}
+		relative_position_id = ALB_send_kompania_4000_to_korea
+		prerequisite = { focus = ALB_send_kompania_4000_to_korea }
+	}
+	
+	focus = {
 		id = ALB_mi6cia_collaboration
 		icon = GFX_generic_suspend_constitution
 		cost = 7
@@ -658,6 +724,7 @@ focus_tree = {
 		y = 1
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetName]: Focus ALB_mi6cia_collaboration"
+			add_ideas = MI6_CIA_Collaboration
 		}
 		relative_position_id = ALB_from_the_other_side_of_the_curtain
 		prerequisite = { focus = ALB_from_the_other_side_of_the_curtain }
@@ -671,36 +738,17 @@ focus_tree = {
 		y = 1
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetName]: Focus ALB_national_inteligence_service"
+			swap_ideas = {
+				remove_idea = MI6_CIA_Collaboration
+				add_idea = Albanian_NIS
+			}
+			create_intelligence_agency = {
+				name = "SHISH"
+				icon = GFX_intelligence_agency_logo_agency
+			}
 		}
 		relative_position_id = ALB_mi6cia_collaboration
 		prerequisite = { focus = ALB_mi6cia_collaboration }
-	}
-
-	focus = {
-		id = ALB_greater_albania_reclaimations
-		icon = GFX_generic_suspend_constitution
-		cost = 7
-		x = 2
-		y = 1
-		completion_reward = {
-			log = "[GetDateText]: [Root.GetName]: Focus ALB_greater_albania_reclaimations"
-		}
-		relative_position_id = ALB_from_the_other_side_of_the_curtain
-		prerequisite = { focus = ALB_from_the_other_side_of_the_curtain }
-		mutually_exclusive = { focus = ALB_the_new_balkan_pact }
-	}
-
-	focus = {
-		id = ALB_territorial_claims_in_greece
-		icon = GFX_generic_suspend_constitution
-		cost = 7
-		x = 0
-		y = 1
-		completion_reward = {
-			log = "[GetDateText]: [Root.GetName]: Focus ALB_territorial_claims_in_greece"
-		}
-		relative_position_id = ALB_greater_albania_reclaimations
-		prerequisite = { focus = ALB_greater_albania_reclaimations }
 	}
 
 	focus = {
@@ -711,6 +759,30 @@ focus_tree = {
 		y = 1
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetName]: Focus ALB_the_new_balkan_pact"
+			add_opinion_modifier = {
+				target = YUG
+				modifier = small_increase
+			}
+			add_opinion_modifier = {
+				target = GRE
+				modifier = small_increase
+			}
+			give_guarantee = YUG
+			give_guarantee = GRE
+			YUG = {
+				give_guarantee = ROOT
+				add_opinion_modifier = {
+					target = ROOT
+					modifier = small_increase
+				}
+			}
+			GRE = {
+				give_guarantee = ROOT
+				add_opinion_modifier = {
+					target = ROOT
+					modifier = small_increase
+				}
+			}
 		}
 		relative_position_id = ALB_from_the_other_side_of_the_curtain
 		prerequisite = { focus = ALB_from_the_other_side_of_the_curtain }
@@ -725,49 +797,50 @@ focus_tree = {
 		y = 1
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetName]: Focus ALB_italoalbanian_investment"
+			add_ideas = Italian_investments
+			1480 = {
+				add_building_construction = {
+					type = industrial_complex
+					level = 1
+					instant_build = yes
+				}
+			}
 		}
 		relative_position_id = ALB_the_new_balkan_pact
 		prerequisite = { focus = ALB_the_new_balkan_pact }
 	}
 
 	focus = {
-		id = ALB_from_the_other_side_of_the_curtain
+		id = ALB_greater_albania_reclaimations
 		icon = GFX_generic_suspend_constitution
 		cost = 7
-		x = 27
-		y = 5
-		available = {
-			has_completed_focus = ALB_albanian_free_elections
-		}
-		completion_reward = {
-			log = "[GetDateText]: [Root.GetName]: Focus ALB_from_the_other_side_of_the_curtain"
-		}
-	}
-
-	focus = {
-		id = ALB_send_kompania_4000_to_korea
-		icon = GFX_generic_suspend_constitution
-		cost = 7
-		x = -7
+		x = 2
 		y = 1
 		completion_reward = {
-			log = "[GetDateText]: [Root.GetName]: Focus ALB_send_kompania_4000_to_korea"
+			log = "[GetDateText]: [Root.GetName]: Focus ALB_greater_albania_reclaimations"
+			add_war_support = 0.05
+			add_state_core = 1483
+			add_state_core = 1482
+			add_state_core = 1065
 		}
 		relative_position_id = ALB_from_the_other_side_of_the_curtain
 		prerequisite = { focus = ALB_from_the_other_side_of_the_curtain }
+		mutually_exclusive = { focus = ALB_the_new_balkan_pact }
 	}
 
 	focus = {
-		id = ALB_albaniangreekturkish_military_axis
+		id = ALB_territorial_claims_in_greece
 		icon = GFX_generic_suspend_constitution
 		cost = 7
 		x = 0
 		y = 1
 		completion_reward = {
-			log = "[GetDateText]: [Root.GetName]: Focus ALB_albaniangreekturkish_military_axis"
+			log = "[GetDateText]: [Root.GetName]: Focus ALB_territorial_claims_in_greece"
+			add_state_claim = 1248
+			add_state_claim = 185
 		}
-		relative_position_id = ALB_send_kompania_4000_to_korea
-		prerequisite = { focus = ALB_send_kompania_4000_to_korea }
+		relative_position_id = ALB_greater_albania_reclaimations
+		prerequisite = { focus = ALB_greater_albania_reclaimations }
 	}
 
 	focus = {
@@ -776,8 +849,16 @@ focus_tree = {
 		cost = 7
 		x = 5
 		y = 1
+		available = {
+			NOT = {
+				has_completed_focus = ALB_albaniangreekturkish_military_axis
+			}
+		}
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetName]: Focus ALB_side_with_non_aligned_movement"
+			leave_faction = yes
+			remove_ideas = nato_member
+			news_event = Nato_expansion.14
 		}
 		relative_position_id = ALB_from_the_other_side_of_the_curtain
 		prerequisite = { focus = ALB_from_the_other_side_of_the_curtain }
@@ -791,6 +872,7 @@ focus_tree = {
 		y = 1
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetName]: Focus ALB_military_cooperation_with_yugoslavia"
+			add_ideas = Military_Cooperation_with_Yugoslavia
 		}
 		relative_position_id = ALB_side_with_non_aligned_movement
 		prerequisite = { focus = ALB_side_with_non_aligned_movement }
@@ -1016,6 +1098,7 @@ focus_tree = {
 		y = 1
 		completion_reward = {
 			log = "[GetDateText]: [Root.GetName]: Focus ALB_fourth_albanian_republic"
+			news_event = Albanian_Republic.1
 		}
 		relative_position_id = ALB_a_new_constitution
 		prerequisite = { focus = ALB_a_new_constitution }
