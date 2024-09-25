@@ -61,7 +61,6 @@ NDefines.NCountry.STATE_VALUE_NON_CORE_STATE_FRACTION = 1
 NDefines.NCountry.POPULATION_YEARLY_GROWTH_BASE = 0.008
 NDefines.NCountry.MIN_COUP_SUCCESS_STABILITY = -2 -- NO COUPS ALLOWED!!!!
 NDefines.NCountry.BASE_FUEL_GAIN_PER_OIL = 4 -- VANILLA 2
-NDefines.NCountry.DAYS_OF_WAR_BEFORE_SURRENDER = 70 -- VANILLA 7
 
 NDefines.NCountry.AIR_VOLUNTEER_PLANES_LIMIT = 0.5	-- Ratio for volunteer planes available for sending in relation to sender air force
 NDefines.NCountry.AIR_VOLUNTEER_BASES_CAPACITY_LIMIT = 0.5	-- Ratio for volunteer planes available for sending in relation to receiver air base capacity
