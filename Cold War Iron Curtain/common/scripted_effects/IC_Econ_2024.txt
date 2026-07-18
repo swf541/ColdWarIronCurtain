@@ -1563,51 +1563,52 @@ calc_welfare_expenditure = {
 		welfare_expenditure = middle_welfare
 	}
 	#reduce it more
-	divide_variable = { welfare_expenditure = 100000 }	
+	divide_variable = { welfare_expenditure = 200 }	
 	multiply_variable = { welfare_expenditure = average_development }
 
 	#now apply multiplier of idea
+	set_variable = { welfare_expenditure = { value = lower_welfare_pop add = middle_welfare } }
 	multiply_variable = { welfare_expenditure = 1 }
-
-	set_variable = {
-		welfare_cost_adjustment_policy = welfare_expenditure
-	}
 	multiply_variable = {
-		welfare_cost_adjustment_policy = modifier@modifier_welfare_spending 
+		welfare_expenditure = modifier@modifier_welfare_spending 
 	}
-	add_to_variable = {
-		welfare_expenditure = welfare_cost_adjustment_policy
+	clamp_variable = {
+		var = welfare_expenditure
+		min = 0
 	}
-	multiply_variable = { welfare_expenditure = 0.1 }
 }
 calc_healthcare_expenditure = {
 	#gives out expenditure at 50%
-	set_variable = { healthcare_expenditure = max_manpower_k }
-	multiply_variable = { healthcare_expenditure = 0.1 }	
+	set_variable = { healthcare_expenditure = max_manpower }
+	multiply_variable = { healthcare_expenditure = 0.001 }	
 
 	#reduce it more
-	divide_variable = { healthcare_expenditure = 10000 }	
+	divide_variable = { healthcare_expenditure = 30000 }	
 	multiply_variable = { healthcare_expenditure = average_development }
 
 	#now apply multiplier of idea
 	multiply_variable = { healthcare_expenditure = modifier@healthcare_spending_modifier }
-	multiply_variable = { healthcare_expenditure = 0.1 }
+	clamp_variable = {
+		var = healthcare_expenditure
+		min = 0
+	}
 }
 calc_policing_expenditure = {
 	#gives out expenditure at 50%
-	set_variable = { policing_expenditure = max_manpower }
-	multiply_variable = { policing_expenditure = 0.001 }	
-	#reduce it more
-	divide_variable = { policing_expenditure = 10000 }	
-	multiply_variable = { policing_expenditure = average_development }
-
-	#now apply multiplier of idea
-	multiply_variable = { policing_expenditure = modifier@policing_spending_modifier }
-	add_to_variable = {	#Note to Connect to Black Ops
-		policing_expenditure = black_ops_expedntiture
+	set_variable = { 
+		policing_expenditure = {
+			value = max_manpower
+			multiply = 0.001
+			divide = 25000
+			multiply = average_development
+			multiply = modifier@policing_spending_modifier
+			add = black_ops_expedntiture
+		}
 	}
-	multiply_variable = { policing_expenditure = 0.1 }
-
+	clamp_variable = {
+		var = policing_expenditure
+		min = 0
+	}
 }
 calc_education_expenditure = {
 	#gives out expenditure at 50%
@@ -1625,23 +1626,30 @@ calc_education_expenditure = {
 	multiply_variable = {
 		education_expenditure = modifier@education_spending_modifier 
 	}
-	multiply_variable = { education_expenditure = 0.1 }
+	multiply_variable = { education_expenditure = 0.05 }
+	clamp_variable = {
+		var = education_expenditure
+		min = 0
+	}
 }
 
 calc_public_services_expenditure = {
 	#gives out expenditure at 50%
-	set_variable = { public_services_expenditure = total_infrastructure }
-	multiply_variable = { public_services_expenditure = 0.001 }	
-	multiply_variable = { public_services_expenditure = max_manpower_k }
-
+	set_variable = { public_services_expenditure = max_manpower }
+	divide_variable = { public_services_expenditure = 10000 }	
+	divide_variable = { public_services_expenditure = 100 }	
+	add_to_variable = { public_services_expenditure = total_infrastructure }
+	multiply_variable = { public_services_expenditure = 0.01 }	
 	#reduce it more
-	divide_variable = { public_services_expenditure = 1000 }	
 
 	#now apply multiplier of idea
 	multiply_variable = {
 		public_services_expenditure = modifier@public_services_spending_modifier 
 	}
-	multiply_variable = { public_services_expenditure = 0.1 }
+	clamp_variable = {
+		var = public_services_expenditure
+		min = 0
+	}
 }
 
 calc_land_army_expenditure = {
@@ -1724,6 +1732,10 @@ calc_land_army_expenditure = {
 	}
 	set_variable = { land_army_expenditure_actual_land = land_army_expenditure}
 	set_variable = { mil_test = land_army_expenditure }
+	clamp_variable = {
+		var = land_army_expenditure
+		min = 0
+	}
 }
 
 calc_air_army_expenditure = {
@@ -1848,6 +1860,10 @@ calc_air_army_expenditure = {
 	}
 	multiply_variable = { air_army_expenditure = 0.5 }
 	multiply_variable = { air_army_expenditure = modifier@air_spending_modifier }
+	clamp_variable = {
+		var = air_army_expenditure
+		min = 0
+	}
 }
 
 calc_navy_army_expenditure = {
@@ -1924,6 +1940,10 @@ calc_navy_army_expenditure = {
 	}
 	multiply_variable = { navy_army_expenditure = 0.5 }
 	multiply_variable = { navy_army_expenditure = modifier@navy_spending_modifier }
+	clamp_variable = {
+		var = air_army_expenditure
+		min = 0
+	}
 }
 
 calc_nuke_army_expenditure = {
@@ -1954,6 +1974,10 @@ calc_nuke_army_expenditure = {
 	divide_variable = { nuke_army_expenditure = 10000}
 	
 	multiply_variable = { nuke_army_expenditure = modifier@strategic_forces_spending_modifier }
+	clamp_variable = {
+		var = nuke_army_expenditure
+		min = 0
+	}
 }
 calc_space_expenditure = {
 	if = {
@@ -1967,9 +1991,12 @@ calc_space_expenditure = {
 			space_expenditure = 5
 		}
 		multiply_variable = { space_expenditure = modifier@space_spending_modifier }
+		clamp_variable = {
+			var = space_expenditure
+			min = 0
+		}
 		add_to_variable = { space_budget = space_expenditure }
 	}
-
 }
 #SWF Stuff
 calculate_employment_data_for_gui = {
@@ -2665,4 +2692,3 @@ calculate_national_take_taxes_from_people = {
 	# log = "tpi [?total_personal_income_tax]"
 
 }
-
