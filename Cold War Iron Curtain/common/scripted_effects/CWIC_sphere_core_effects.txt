@@ -1,0 +1,392 @@
+# ============================================================
+# CWIC Sphere of Influence — core effects (accord model)
+# 2026-07-20
+#
+# Model:
+#   Spend an INFLUENCE SLOT to influence a country; each active target gains a
+#   flat amount every WEEK (0-100 influence score per GP-target pair).
+#   Progression is by ACCORDS (Crisis in the Kremlin style):
+#     stage 0 = no accords
+#     stage 1 = Economic Accord   (needs 50 influence, spends 50)
+#     stage 2 = Military Accord   (needs 50 influence, spends 50, needs stage 1)
+#     sphere  = Add to Sphere     (needs 100 influence, spends 100, needs stage 2)
+#   Sphere leadership uses the mod's EXISTING `Sphere_Leader` variable, so the
+#   diplomacy sphere panel / shield icon / GetSphereName update automatically.
+#
+# Data:
+#   Target: sph_gp_ids[] | sph_gp_score[] (0-100) | sph_gp_stage[] (0-2) | Sphere_Leader
+#           flags sph_econ_accord_<TAG> / sph_mil_accord_<TAG>  (for focuses)
+#   GP:     sph_active_ids[] | sph_slots | sph_members[] | sphere_tag_list[] (canonical)
+# ============================================================
+
+# =============================================================
+# Slots — how many countries you can influence at once. GP scope.
+# =============================================================
+sph_calc_slots = {
+	set_variable = { sph_slots = 2 }
+	set_temp_variable = { sph_slot_fac = num_of_factories }
+	divide_temp_variable = { sph_slot_fac = 120 }
+	add_to_variable = { sph_slots = sph_slot_fac }
+	round_variable = sph_slots
+	clamp_variable = { var = sph_slots min = 2 max = 5 }
+}
+
+# =============================================================
+# Pair helpers — TARGET scope, temp sph_from = GP id
+# =============================================================
+sph_get_pair_index = {
+	set_temp_variable = { sph_idx = -1 }
+	for_loop_effect = {
+		end = sph_gp_ids^num
+		value = v
+		if = { limit = { check_variable = { sph_gp_ids^v = sph_from } } set_temp_variable = { sph_idx = v } }
+	}
+}
+sph_ensure_pair = {
+	sph_get_pair_index = yes
+	if = {
+		limit = { check_variable = { sph_idx = -1 } }
+		add_to_array = { sph_gp_ids = sph_from }
+		add_to_array = { sph_gp_score = 0 }
+		add_to_array = { sph_gp_stage = 0 }   # no accords
+		set_temp_variable = { sph_idx = sph_gp_ids^num }
+		subtract_from_temp_variable = { sph_idx = 1 }
+	}
+}
+sph_add_influence = {
+	sph_ensure_pair = yes
+	add_to_variable = { sph_gp_score^sph_idx = sph_amount }
+	clamp_variable = { var = sph_gp_score^sph_idx min = 0 max = 100 }
+}
+
+# =============================================================
+# Opinion refresh per accord stage. TARGET scope, temp sph_from.
+# =============================================================
+sph_refresh_stage_opinion = {
+	sph_get_pair_index = yes
+	if = {
+		limit = { check_variable = { sph_idx > -1 } country_exists = var:sph_from }
+		var:sph_from = { save_event_target_as = sph_gp_scope }
+		remove_opinion_modifier = { target = event_target:sph_gp_scope modifier = sph_econ_accord_op }
+		remove_opinion_modifier = { target = event_target:sph_gp_scope modifier = sph_mil_accord_op }
+		if = { limit = { check_variable = { sph_gp_stage^sph_idx = 1 } } add_opinion_modifier = { target = event_target:sph_gp_scope modifier = sph_econ_accord_op } }
+		else_if = { limit = { check_variable = { sph_gp_stage^sph_idx = 2 } } add_opinion_modifier = { target = event_target:sph_gp_scope modifier = sph_mil_accord_op } }
+	}
+}
+
+# =============================================================
+# Sign ECONOMIC ACCORD: needs 50 influence + no accords yet.
+# TARGET scope, temp sph_from = GP id.
+# =============================================================
+sph_sign_econ_accord = {
+	sph_get_pair_index = yes
+	if = {
+		limit = {
+			check_variable = { sph_idx > -1 }
+			check_variable = { sph_gp_score^sph_idx > 49 }
+			check_variable = { sph_gp_stage^sph_idx = 0 }
+		}
+		subtract_from_variable = { sph_gp_score^sph_idx = 50 }
+		clamp_variable = { var = sph_gp_score^sph_idx min = 0 max = 100 }
+		add_to_variable = { sph_gp_stage^sph_idx = 1 }
+		add_ideas = sph_econ_accord_idea
+		# trackable flag for focuses: sph_econ_accord_<LEADERTAG>
+		meta_effect = {
+			text = { set_country_flag = sph_econ_accord_[LEADER] }
+			LEADER = "[?var:sph_from.GetTag]"
+		}
+		# The accord bundles the trade agreement (replaces the old Start Trade Agreement
+		# action). sign_trade_agreement grants ROOT the trade_treaty idea for this country;
+		# ROOT is the accord leader when signed via the diplomatic action.
+		sign_trade_agreement = yes
+		sph_refresh_stage_opinion = yes
+	}
+}
+
+# =============================================================
+# Sign MILITARY ACCORD: needs 50 influence + economic accord.
+# TARGET scope, temp sph_from = GP id.
+# =============================================================
+sph_sign_mil_accord = {
+	sph_get_pair_index = yes
+	if = {
+		limit = {
+			check_variable = { sph_idx > -1 }
+			check_variable = { sph_gp_score^sph_idx > 49 }
+			check_variable = { sph_gp_stage^sph_idx = 1 }
+		}
+		subtract_from_variable = { sph_gp_score^sph_idx = 50 }
+		clamp_variable = { var = sph_gp_score^sph_idx min = 0 max = 100 }
+		add_to_variable = { sph_gp_stage^sph_idx = 1 }
+		add_ideas = sph_mil_accord_idea
+		meta_effect = {
+			text = { set_country_flag = sph_mil_accord_[LEADER] }
+			LEADER = "[?var:sph_from.GetTag]"
+		}
+		# The accord bundles mutual access rights + guarantees (replaces the separate
+		# vanilla asks AND the old Mutual Defense Agreement action).
+		var:sph_from = {
+			save_event_target_as = sph_gp_scope
+			give_guarantee = PREV
+			diplomatic_relation = {
+				country = PREV
+				relation = military_access
+				active = yes
+			}
+			diplomatic_relation = {
+				country = PREV
+				relation = docking_rights
+				active = yes
+			}
+			diplomatic_relation = {
+				country = PREV
+				relation = air_base_access
+				active = yes
+			}
+		}
+		give_guarantee = event_target:sph_gp_scope
+		diplomatic_relation = {
+			country = event_target:sph_gp_scope
+			relation = military_access
+			active = yes
+		}
+		diplomatic_relation = {
+			country = event_target:sph_gp_scope
+			relation = docking_rights
+			active = yes
+		}
+		diplomatic_relation = {
+			country = event_target:sph_gp_scope
+			relation = air_base_access
+			active = yes
+		}
+		sph_refresh_stage_opinion = yes
+	}
+}
+
+# Lower one accord stage (for hostile events/content). TARGET scope, temp sph_from.
+sph_lower_accord = {
+	sph_get_pair_index = yes
+	if = {
+		limit = { check_variable = { sph_idx > -1 } check_variable = { sph_gp_stage^sph_idx > 0 } }
+		if = {
+			limit = { check_variable = { sph_gp_stage^sph_idx = 2 } }
+			remove_ideas = sph_mil_accord_idea
+			meta_effect = {
+				text = { clr_country_flag = sph_mil_accord_[LEADER] }
+				LEADER = "[?var:sph_from.GetTag]"
+			}
+		}
+		else = {
+			remove_ideas = sph_econ_accord_idea
+			meta_effect = {
+				text = { clr_country_flag = sph_econ_accord_[LEADER] }
+				LEADER = "[?var:sph_from.GetTag]"
+			}
+		}
+		subtract_from_variable = { sph_gp_stage^sph_idx = 1 }
+		sph_refresh_stage_opinion = yes
+	}
+}
+
+# =============================================================
+# ADD TO SPHERE: needs Military Accord + 100 influence. Spends 100.
+# Uses the mod's canonical Sphere_Leader variable.
+# TARGET scope, temp sph_from = new leader id.
+# =============================================================
+sph_add_to_sphere = {
+	sph_get_pair_index = yes
+	if = {
+		limit = {
+			check_variable = { sph_idx > -1 }
+			check_variable = { sph_gp_stage^sph_idx = 2 }
+			check_variable = { sph_gp_score^sph_idx > 99 }
+		}
+		if = { limit = { has_variable = Sphere_Leader NOT = { check_variable = { Sphere_Leader = 0 } } } sph_remove_from_sphere = yes }
+		subtract_from_variable = { sph_gp_score^sph_idx = 100 }
+		clamp_variable = { var = sph_gp_score^sph_idx min = 0 max = 100 }
+		set_variable = { Sphere_Leader = sph_from }
+		add_ideas = sphere_member_trade
+		var:sph_from = {
+			save_event_target_as = sph_gp_scope
+			add_to_array = { sph_members = PREV.id }
+			if = { limit = { NOT = { is_in_array = { sphere_tag_list = PREV.id } } } add_to_array = { sphere_tag_list = PREV.id } }
+			# Sphere membership includes military subsidies (replaces the old subsidy action)
+			if = { limit = { NOT = { is_in_array = { military_subsidies = PREV.id } } } add_to_array = { military_subsidies = PREV.id } }
+		}
+		set_country_flag = military_subsidized
+		set_variable = { mil_subsidy_id = sph_from }
+		add_opinion_modifier = { target = event_target:sph_gp_scope modifier = sph_sphere_member }
+	}
+}
+sph_remove_from_sphere = {
+	if = {
+		limit = { has_variable = Sphere_Leader NOT = { check_variable = { Sphere_Leader = 0 } } }
+		set_temp_variable = { sph_oldleader = Sphere_Leader }
+		remove_ideas = sphere_member_trade
+		var:sph_oldleader = {
+			save_event_target_as = sph_oldleader_scope
+			set_temp_variable = { sph_rmid = PREV.id }
+			for_loop_effect = { end = sph_members^num value = v
+				if = { limit = { check_variable = { sph_members^v = sph_rmid } } remove_from_array = { array = sph_members index = v } } }
+			for_loop_effect = { end = sphere_tag_list^num value = v
+				if = { limit = { check_variable = { sphere_tag_list^v = sph_rmid } } remove_from_array = { array = sphere_tag_list index = v } } }
+			# end the bundled military subsidies
+			for_loop_effect = { end = military_subsidies^num value = v
+				if = { limit = { check_variable = { military_subsidies^v = sph_rmid } } remove_from_array = { array = military_subsidies index = v } } }
+		}
+		clr_country_flag = military_subsidized
+		clear_variable = mil_subsidy_id
+		remove_opinion_modifier = { target = event_target:sph_oldleader_scope modifier = sph_sphere_member }
+		set_variable = { Sphere_Leader = 0 }
+	}
+}
+
+# HOSTILE: a rival GP rips this country out of another power's sphere.
+# Needs 100 influence on the target; spends it. TARGET scope, temp sph_from = rival GP id.
+# Consequences: the OLD leader's accords with the target are annulled (no cheap
+# re-sphere), the ripper gains infamy, and the old leader despises the ripper.
+sph_rip_from_sphere = {
+	sph_get_pair_index = yes
+	if = {
+		limit = {
+			check_variable = { sph_idx > -1 }
+			check_variable = { sph_gp_score^sph_idx > 99 }
+			has_variable = Sphere_Leader
+			NOT = { check_variable = { Sphere_Leader = 0 } }
+			NOT = { check_variable = { Sphere_Leader = sph_from } }
+		}
+		set_temp_variable = { sph_ripper = sph_from }
+		set_temp_variable = { sph_ripped_leader = Sphere_Leader }
+		subtract_from_variable = { sph_gp_score^sph_idx = 100 }
+		clamp_variable = { var = sph_gp_score^sph_idx min = 0 max = 100 }
+		sph_remove_from_sphere = yes
+		# annul the old leader's accords with this country
+		set_temp_variable = { sph_from = sph_ripped_leader }
+		sph_get_pair_index = yes
+		if = {
+			limit = { check_variable = { sph_idx > -1 } }
+			set_temp_variable = { sph_stage_neg = sph_gp_stage^sph_idx }
+			multiply_temp_variable = { sph_stage_neg = -1 }
+			add_to_variable = { sph_gp_stage^sph_idx = sph_stage_neg }
+			remove_ideas = sph_econ_accord_idea
+			remove_ideas = sph_mil_accord_idea
+			meta_effect = {
+				text = {
+					clr_country_flag = sph_econ_accord_[LEADER]
+					clr_country_flag = sph_mil_accord_[LEADER]
+				}
+				LEADER = "[?var:sph_ripped_leader.GetTag]"
+			}
+			sph_refresh_stage_opinion = yes
+		}
+		# diplomatic fallout
+		if = {
+			limit = { country_exists = var:sph_ripper }
+			var:sph_ripper = {
+				save_event_target_as = sph_ripper_scope
+				add_to_variable = { badboy = 5 }   # infamy
+			}
+			if = {
+				limit = { country_exists = var:sph_ripped_leader }
+				var:sph_ripped_leader = {
+					add_opinion_modifier = { target = event_target:sph_ripper_scope modifier = sph_sphere_ripper }
+				}
+			}
+		}
+		# restore caller temp
+		set_temp_variable = { sph_from = sph_ripper }
+	}
+}
+
+# =============================================================
+# Toggle influencing a target. GP scope, temp sph_ptarget = target id.
+# =============================================================
+sph_toggle_influence = {
+	set_temp_variable = { sph_found = 0 }
+	for_each_loop = {
+		array = sph_active_ids
+		value = v
+		index = i
+		if = { limit = { check_variable = { v = sph_ptarget } } set_temp_variable = { sph_found = 1 } set_temp_variable = { sph_rm_i = i } }
+	}
+	if = {
+		limit = { check_variable = { sph_found = 1 } }
+		remove_from_array = { array = sph_active_ids index = sph_rm_i }
+		if = { limit = { country_exists = var:sph_ptarget } var:sph_ptarget = { set_variable = { sph_disp_active = 0 } } }
+	}
+	else = {
+		sph_calc_slots = yes
+		if = {
+			limit = { check_variable = { sph_active_ids^num < sph_slots } }
+			add_to_array = { sph_active_ids = sph_ptarget }
+			if = { limit = { country_exists = var:sph_ptarget } var:sph_ptarget = { set_variable = { sph_disp_active = 1 } } }
+		}
+	}
+}
+
+# =============================================================
+# Weekly accrual — GP scope (sphere-capable only). Flat 4/week per target,
+# scaled by foreign_influence_modifier (yours) and the target's defense.
+# =============================================================
+sph_weekly_tick = {
+	set_temp_variable = { sph_leader_id = THIS.id }
+	save_event_target_as = sph_influencer
+	set_temp_variable = { sph_out_mult = 1 }
+	add_to_temp_variable = { sph_out_mult = modifier@foreign_influence_modifier }
+	for_each_loop = {
+		array = sph_active_ids
+		value = tgt
+		if = {
+			limit = { country_exists = var:tgt }
+			set_temp_variable = { sph_rate = 4 }
+			multiply_temp_variable = { sph_rate = sph_out_mult }
+			var:tgt = {
+				if = {
+					limit = { NOT = { has_war_with = event_target:sph_influencer } }
+					set_temp_variable = { sph_def_mult = 1 }
+					subtract_from_temp_variable = { sph_def_mult = modifier@foreign_influence_defense_modifier }
+					multiply_temp_variable = { sph_rate = sph_def_mult }
+					set_temp_variable = { sph_from = sph_leader_id }
+					set_temp_variable = { sph_amount = sph_rate }
+					sph_add_influence = yes
+				}
+			}
+		}
+	}
+}
+
+# =============================================================
+# Init / capability / cleanup
+# =============================================================
+sph_init_country = {
+	if = { limit = { NOT = { has_variable = Sphere_Leader } } set_variable = { Sphere_Leader = 0 } }
+}
+sph_grant_capability = {
+	if = { limit = { NOT = { check_variable = { sphere_tag_list^num > 0 } } } add_to_array = { sphere_tag_list = THIS.id } }
+}
+sph_revoke_capability = {
+	for_each_loop = { array = sph_members value = v
+		if = { limit = { country_exists = var:v } var:v = { sph_remove_from_sphere = yes } } }
+	clear_array = sph_members
+	clear_array = sphere_tag_list
+	clear_array = sph_active_ids
+}
+sph_monthly_validate = {
+	# leader ceased to exist -> free
+	if = {
+		limit = { has_variable = Sphere_Leader NOT = { check_variable = { Sphere_Leader = 0 } } NOT = { country_exists = var:Sphere_Leader } }
+		set_variable = { Sphere_Leader = 0 }
+		remove_ideas = sphere_member_trade
+	}
+	# at war with our own sphere leader -> the sphere is broken
+	if = {
+		limit = {
+			has_variable = Sphere_Leader
+			NOT = { check_variable = { Sphere_Leader = 0 } }
+			country_exists = var:Sphere_Leader
+			has_war_with = var:Sphere_Leader
+		}
+		sph_remove_from_sphere = yes
+	}
+}

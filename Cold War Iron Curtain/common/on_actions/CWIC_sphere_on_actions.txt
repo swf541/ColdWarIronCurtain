@@ -1,0 +1,95 @@
+# ============================================================
+# CWIC Sphere of Influence — on_actions (accord model)
+# 2026-07-20
+# ============================================================
+on_actions = {
+
+	# ---- one-time migration: existing sphere memberships -> new model; influence starts at 0 ----
+	on_startup = {
+		effect = {
+			if = {
+				limit = { NOT = { has_global_flag = sph_migrated } }
+				set_global_flag = sph_migrated
+
+				every_country = { sph_init_country = yes }
+
+				# Countries already in a sphere_tag_list become full members
+				# (Sphere_Leader + both accords implied at stage 2).
+				every_country = {
+					limit = { is_sphere_capable = yes }
+					set_variable = { sph_leader_id = THIS.id }
+					for_each_loop = {
+						array = sphere_tag_list
+						value = memberid
+						if = {
+							limit = {
+								NOT = { check_variable = { memberid = sph_leader_id } }
+								country_exists = var:memberid
+							}
+							if = {
+								limit = { NOT = { is_in_array = { sph_members = memberid } } }
+								add_to_array = { sph_members = memberid }
+							}
+							var:memberid = {
+								if = { limit = { OR = { NOT = { has_variable = Sphere_Leader } check_variable = { Sphere_Leader = 0 } } }
+									set_variable = { Sphere_Leader = PREV.sph_leader_id }
+									add_ideas = sphere_member_trade
+									set_temp_variable = { sph_from = PREV.sph_leader_id }
+									sph_ensure_pair = yes
+									add_to_variable = { sph_gp_stage^sph_idx = 2 }   # accords implied
+									var:sph_from = { save_event_target_as = sph_mig_leader }
+									add_opinion_modifier = { target = event_target:sph_mig_leader modifier = sph_sphere_member }
+								}
+							}
+						}
+					}
+				}
+				# Old influence_array values are intentionally NOT imported — influence
+				# starts at 0 everywhere so progress only reflects player actions.
+			}
+		}
+	}
+
+	# ---- weekly accrual ----
+	on_weekly = {
+		effect = {
+			if = {
+				limit = { is_sphere_capable = yes }
+				sph_weekly_tick = yes
+			}
+			sph_monthly_validate = yes
+		}
+	}
+
+	# ---- daily readout refresh (only the human's active targets) ----
+	on_daily = {
+		effect = {
+			if = {
+				limit = { is_ai = no }
+				set_temp_variable = { sph_human_temp = THIS.id }
+				sph_calc_slots = yes   # keep ROOT.sph_slots current for the readout
+				for_each_loop = {
+					array = sph_active_ids
+					value = tid
+					if = {
+						limit = { country_exists = var:tid }
+						var:tid = {
+							set_variable = { sph_disp_active = 1 }
+							set_temp_variable = { sph_from = sph_human_temp }
+							sph_get_pair_index = yes
+							if = {
+								limit = { check_variable = { sph_idx > -1 } }
+								set_variable = { sph_disp_score = sph_gp_score^sph_idx }
+								set_variable = { sph_disp_stage = sph_gp_stage^sph_idx }
+							}
+							else = {
+								set_variable = { sph_disp_score = 0 }
+								set_variable = { sph_disp_stage = 0 }
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,33 @@
+# ============================================================
+# CWIC Sphere of Influence — scripted triggers (accord model)
+#
+# TRACKABLES FOR FOCUSES / EVENTS:
+#   - In target scope:  check_variable = { Sphere_Leader = USA.id }      (who owns their sphere)
+#   - Flags on target:  has_country_flag = sph_econ_accord_USA           (economic accord with USA)
+#                       has_country_flag = sph_mil_accord_USA            (military accord with USA)
+#   - Ideas on target:  has_idea = sph_econ_accord_idea / sph_mil_accord_idea / sphere_member_trade
+#   - Leader arrays:    sph_members (ids), sphere_tag_list (canonical, legacy-compatible)
+#   - Pair influence:   sph_gp_score/sph_gp_stage arrays (use sph_get_pair_index with temp sph_from)
+# ============================================================
+
+# A country is sphere-capable (can influence others) if it owns a non-empty sphere_tag_list.
+is_sphere_capable = {
+	check_variable = { sphere_tag_list^num > 0 }
+}
+
+# Is this country in ANY sphere?
+sph_is_sphered = {
+	has_variable = Sphere_Leader
+	NOT = { check_variable = { Sphere_Leader = 0 } }
+}
+
+# Target scope: is ROOT my sphere leader? (usable in focus available/bypass from the member side)
+sph_root_is_my_leader = {
+	has_variable = Sphere_Leader
+	check_variable = { Sphere_Leader = ROOT.id }
+}
+
+# GP scope: do I have any sphere members?
+sph_has_members = {
+	check_variable = { sph_members^num > 0 }
+}

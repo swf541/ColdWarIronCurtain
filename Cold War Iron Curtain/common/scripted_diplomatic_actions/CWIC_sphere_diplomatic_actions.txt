@@ -1,0 +1,227 @@
+# ============================================================
+# CWIC Sphere of Influence — native diplomatic actions (accord model)
+# ROOT = sender (Great Power) ; THIS = target country.
+# ============================================================
+scripted_diplomatic_actions = {
+
+	# Start influencing (uses one influence slot)
+	opt_sphere_influence = {
+		allowed = {}
+		visible = {
+			ROOT = { is_sphere_capable = yes }
+			NOT = { is_sphere_capable = yes }
+			NOT = { check_variable = { sph_disp_active = 1 } }
+			NOT = { check_variable = { Sphere_Leader = ROOT } }
+		}
+		selectable = {
+			NOT = { has_war_with = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = sph_dip_need_slot_TT
+				ROOT = { check_variable = { sph_active_ids^num < sph_slots } }
+			}
+		}
+		requires_acceptance = no
+		cost = 0
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		complete_effect = {
+			set_temp_variable = { sph_tid2 = THIS.id }
+			ROOT = { set_temp_variable = { sph_ptarget = sph_tid2 } sph_toggle_influence = yes }
+		}
+		reject_effect = {}
+		can_be_sent = {}
+		send_description = sph_dip_influence_send
+		reset_receive_effect = {}
+		can_be_accepted = { always = no }
+		receive_description = sph_dip_generic_receive
+		ai_desire = { base = 0 }
+	}
+
+	# Stop influencing (frees the slot; progress kept)
+	opt_sphere_stop = {
+		allowed = {}
+		visible = {
+			ROOT = { is_sphere_capable = yes }
+			check_variable = { sph_disp_active = 1 }
+		}
+		selectable = {}
+		requires_acceptance = no
+		cost = 0
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		complete_effect = {
+			set_temp_variable = { sph_tid2 = THIS.id }
+			ROOT = { set_temp_variable = { sph_ptarget = sph_tid2 } sph_toggle_influence = yes }
+		}
+		reject_effect = {}
+		can_be_sent = {}
+		send_description = sph_dip_stop_send
+		reset_receive_effect = {}
+		can_be_accepted = { always = no }
+		receive_description = sph_dip_generic_receive
+		ai_desire = { base = 0 }
+	}
+
+	# Sign Economic Accord (50 influence, first accord)
+	opt_sphere_econ_accord = {
+		allowed = {}
+		visible = {
+			# hard gates: not in another power's sphere, not in a rival faction, not a foreign subject
+			OR = {
+				NOT = { has_variable = Sphere_Leader }
+				check_variable = { Sphere_Leader = 0 }
+			}
+			OR = {
+				NOT = { is_in_faction = yes }
+				is_in_faction_with = ROOT
+			}
+			OR = {
+				NOT = { is_subject = yes }
+				is_subject_of = ROOT
+			}
+			ROOT = { is_sphere_capable = yes }
+			NOT = { is_sphere_capable = yes }
+			check_variable = { sph_disp_stage = 0 }
+			check_variable = { sph_disp_score > 49 }
+			NOT = { check_variable = { Sphere_Leader = ROOT } }
+		}
+		selectable = { NOT = { has_war_with = ROOT } }
+		requires_acceptance = no
+		cost = 25
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		complete_effect = {
+			set_temp_variable = { sph_from = ROOT.id }
+			THIS = { sph_sign_econ_accord = yes }
+		}
+		reject_effect = {}
+		can_be_sent = {}
+		send_description = sph_dip_econ_accord_send
+		reset_receive_effect = {}
+		can_be_accepted = { always = no }
+		receive_description = sph_dip_generic_receive
+		ai_desire = { base = 0 }
+	}
+
+	# Sign Military Accord (50 influence, needs Economic Accord)
+	opt_sphere_mil_accord = {
+		allowed = {}
+		visible = {
+			# hard gates: not in another power's sphere, not in a rival faction, not a foreign subject
+			OR = {
+				NOT = { has_variable = Sphere_Leader }
+				check_variable = { Sphere_Leader = 0 }
+			}
+			OR = {
+				NOT = { is_in_faction = yes }
+				is_in_faction_with = ROOT
+			}
+			OR = {
+				NOT = { is_subject = yes }
+				is_subject_of = ROOT
+			}
+			ROOT = { is_sphere_capable = yes }
+			NOT = { is_sphere_capable = yes }
+			check_variable = { sph_disp_stage = 1 }
+			check_variable = { sph_disp_score > 49 }
+			NOT = { check_variable = { Sphere_Leader = ROOT } }
+		}
+		selectable = { NOT = { has_war_with = ROOT } }
+		requires_acceptance = no
+		cost = 25
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		complete_effect = {
+			set_temp_variable = { sph_from = ROOT.id }
+			THIS = { sph_sign_mil_accord = yes }
+		}
+		reject_effect = {}
+		can_be_sent = {}
+		send_description = sph_dip_mil_accord_send
+		reset_receive_effect = {}
+		can_be_accepted = { always = no }
+		receive_description = sph_dip_generic_receive
+		ai_desire = { base = 0 }
+	}
+
+	# Add to Sphere (100 influence, needs Military Accord)
+	opt_sphere_add_to_sphere = {
+		allowed = {}
+		visible = {
+			# hard gates: not in another power's sphere, not in a rival faction, not a foreign subject
+			OR = {
+				NOT = { has_variable = Sphere_Leader }
+				check_variable = { Sphere_Leader = 0 }
+			}
+			OR = {
+				NOT = { is_in_faction = yes }
+				is_in_faction_with = ROOT
+			}
+			OR = {
+				NOT = { is_subject = yes }
+				is_subject_of = ROOT
+			}
+			ROOT = { is_sphere_capable = yes }
+			NOT = { is_sphere_capable = yes }
+			check_variable = { sph_disp_stage = 2 }
+			check_variable = { sph_disp_score > 99 }
+			NOT = { check_variable = { Sphere_Leader = ROOT } }
+		}
+		selectable = { NOT = { has_war_with = ROOT } }
+		requires_acceptance = no
+		cost = 50
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		complete_effect = {
+			set_temp_variable = { sph_from = ROOT.id }
+			THIS = { sph_add_to_sphere = yes }
+		}
+		reject_effect = {}
+		can_be_sent = {}
+		send_description = sph_dip_add_to_sphere_send
+		reset_receive_effect = {}
+		can_be_accepted = { always = no }
+		receive_description = sph_dip_generic_receive
+		ai_desire = { base = 0 }
+	}
+
+	# HOSTILE: rip this country out of a RIVAL power's sphere (needs 100 influence)
+	opt_sphere_release = {
+		allowed = {}
+		visible = {
+			ROOT = { is_sphere_capable = yes }
+			has_variable = Sphere_Leader
+			NOT = { check_variable = { Sphere_Leader = 0 } }
+			NOT = { check_variable = { Sphere_Leader = ROOT } }
+			check_variable = { sph_disp_score > 99 }
+		}
+		selectable = { NOT = { has_war_with = ROOT } }
+		requires_acceptance = no
+		cost = 50
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		complete_effect = {
+			set_temp_variable = { sph_from = ROOT.id }
+			THIS = { sph_rip_from_sphere = yes }
+		}
+		reject_effect = {}
+		can_be_sent = {}
+		send_description = sph_dip_release_send
+		reset_receive_effect = {}
+		can_be_accepted = { always = no }
+		receive_description = sph_dip_generic_receive
+		ai_desire = { base = 0 }
+	}
+}

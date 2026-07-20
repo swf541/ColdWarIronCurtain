@@ -1852,30 +1852,7 @@ delete_influencer_check = {
 # The Boost Domestic Influence is a macro function
 # set_temp_variable = { percent_change = +-x }
 change_domestic_influence_percentage = {
-	# Creates the summation of all array calculations
-	set_temp_variable = { influence_outlook_amount = 0 }
-	for_each_loop = {
-		array = influence_array_val
-		value = v
-		index = i
-		add_to_temp_variable = { influence_outlook_amount = v }
-	}
-
-	add_to_variable = { domestic_influence_amount = percent_change }
-	set_temp_variable = { temp_total = 100 }
-	subtract_from_temp_variable = { temp_total = domestic_influence_amount }
-
-	divide_temp_variable = { temp_total = influence_outlook_amount }
-	for_each_loop = {
-		array = influence_array_val
-		value = v
-		index = i
-
-		multiply_variable = { influence_array_val^i = temp_total }
-	}
-	recalculate_influence = yes
-
-	custom_effect_tooltip = change_domestic_influence_percentage_tt
+	# COMPAT SHIM: domestic-pie concept retired in the sphere rework; no-op.
 }
 
 # Change Influencer Effect:
@@ -1885,37 +1862,7 @@ change_domestic_influence_percentage = {
 # set_temp_variable = { percent_change = +-x }
 # set_temp_variable = { influencer_index = 0-6 }
 change_current_influencer_index_percentage = {
-	set_temp_variable = { influence_outlook_amount = 0 }
-	add_to_temp_variable = { influence_outlook_amount = domestic_influence_amount }
-
-	for_each_loop = {
-		array = influence_array_val
-		value = v
-		index = i
-
-		add_to_temp_variable = { influence_outlook_amount = v }
-	}
-	clamp_variable = { var = influence_outlook_amount max = 100 min = 0 }
-	subtract_from_temp_variable = { influence_outlook_amount = influence_array_val^influencer_index }
-
-	add_to_variable = { influence_array_val^influencer_index = percent_change }
-	set_temp_variable = { temp_total = 100 }
-	subtract_from_temp_variable = { temp_total = influence_array_val^influencer_index }
-
-	divide_temp_variable = { temp_total = influence_outlook_amount }
-	multiply_variable = { domestic_influence_amount = temp_total }
-	for_each_loop = {
-		array = influence_array_val
-		value = v
-		index = i
-
-		if = { limit = { NOT = { check_variable = { i = 0 } } }
-			multiply_variable = { influence_array_val^i = temp_total }
-		}
-	}
-	recalculate_influence = yes
-
-	custom_effect_tooltip = change_influencer_tt
+	# COMPAT SHIM: domestic-pie concept retired in the sphere rework; no-op.
 }
 
 # USAGE:
@@ -1925,188 +1872,17 @@ change_current_influencer_index_percentage = {
 # set_temp_variable = { influence_target = SCOPE }
 # Supported Scope: FROM, ROOT, PREV, TAG
 change_influence_percentage = {
-
-	set_temp_variable = { percent_change_temp = percent_change }
-	var:influence_target = {
-		for_loop_effect = {
-			end = influence_array^num
-			value = v
-			if = {
-				limit = {
-					check_variable = { influence_array^v = var:tag_index }
-				}
-				set_temp_variable = { influencer_index = v }
-				set_country_flag = found
-			}
-		}
-		if = { limit = { NOT = { has_country_flag = found } }
-			add_to_array = { influence_array = var:tag_index }
-			add_to_array = { influence_array_val = 0 }
-
-			for_loop_effect = {
-				end = influence_array^num
-				value = v
-				if = {
-					limit = {
-						check_variable = { influence_array^v = var:tag_index }
-					}
-					set_temp_variable = { influencer_index = v }
-				}
-			}
-		}
-
-		# Apply multiplier in positive interaction
-		# You shouldn't lose more because you are a bigger power
-		if = { limit = { check_variable = { percent_change > 0 } }
-
-			var:tag_index = {
-				set_temp_variable = { influence_change = modifier@foreign_influence_modifier }
-			}
-
-			set_temp_variable = { influence_defense_change = modifier@foreign_influence_defense_modifier }
-			subtract_from_temp_variable = { influence_change = influence_defense_change }
-
-			add_to_temp_variable = { influence_change = 1 }
-			multiply_temp_variable = { percent_change = influence_change }
-		}
-
-
-		if = {
-			limit = {
-				check_variable = { influence_array_val^6 > 0 }
-				NOT = { check_variable = { influence_array^0 = var:tag_index } }
-				NOT = { check_variable = { influence_array^1 = var:tag_index } }
-				NOT = { check_variable = { influence_array^2 = var:tag_index } }
-				NOT = { check_variable = { influence_array^3 = var:tag_index } }
-				NOT = { check_variable = { influence_array^5 = var:tag_index } }
-				NOT = { check_variable = { influence_array^6 = var:tag_index } }
-			}
-			if = {
-				limit = { check_variable = { percent_change > influence_array_val^6 } }
-				set_variable = { influence_array^6 = var:tag_index }
-				set_variable = { influence_array_val^6 = percent_change }
-				set_temp_variable = { influencer_index = 6 }
-
-				set_temp_variable = { influence_outlook_amount = 0 }
-				add_to_temp_variable = { influence_outlook_amount = domestic_influence_amount }
-
-				for_each_loop = {
-					array = influence_array_val
-					value = v
-					index = i
-
-					add_to_temp_variable = { influence_outlook_amount = v }
-				}
-				subtract_from_temp_variable = { influence_outlook_amount = influence_array_val^influencer_index }
-
-				add_to_variable = { influence_array_val^influencer_index = percent_change }
-				set_temp_variable = { temp_total = 100 }
-				subtract_from_temp_variable = { temp_total = influence_array_val^influencer_index }
-
-				divide_temp_variable = { temp_total = influence_outlook_amount }
-				multiply_variable = { domestic_influence_amount = temp_total }
-				for_each_loop = {
-					array = influence_array_val
-					value = v
-					index = i
-
-					if = { limit = { NOT = { check_variable = { i = 0 } } }
-						multiply_variable = { influence_array_val^i = temp_total }
-					}
-				}
-				recalculate_influence = yes
-
-				custom_effect_tooltip = change_influencer_tt
-			}
-			else = {
-				# Creates the summation of all array calculations
-				set_temp_variable = { influence_outlook_amount = 0 }
-				for_each_loop = {
-					array = influence_array_val
-					value = v
-					index = i
-					add_to_temp_variable = { influence_outlook_amount = v }
-				}
-
-				add_to_variable = { domestic_influence_amount = percent_change }
-				set_temp_variable = { temp_total = 100 }
-				subtract_from_temp_variable = { temp_total = domestic_influence_amount }
-
-				divide_temp_variable = { temp_total = influence_outlook_amount }
-				for_each_loop = {
-					array = influence_array_val
-					value = v
-					index = i
-
-					multiply_variable = { influence_array_val^i = temp_total }
-				}
-				recalculate_influence = yes
-
-				custom_effect_tooltip = change_domestic_influence_percentage_tt
-			}
-		}
-		else = {
-			for_loop_effect = {
-				end = influence_array^num
-				value = v
-				if = {
-					limit = {
-						check_variable = { influence_array^v = var:tag_index }
-					}
-					set_temp_variable = { influencer_index = v }
-					set_country_flag = found
-				}
-			}
-			if = {
-				limit = { NOT = { has_country_flag = found } }
-				add_to_array = { influence_array = var:tag_index }
-				add_to_array = { influence_array_val = 0 }
-
-				for_loop_effect = {
-					end = influence_array^num
-					value = v
-					if = {
-						limit = {
-							check_variable = { influence_array^v = var:tag_index }
-						}
-						set_temp_variable = { influencer_index = v }
-					}
-				}
-			}
-			clr_country_flag = found
-
-			set_temp_variable = { influence_outlook_amount = 0 }
-			add_to_temp_variable = { influence_outlook_amount = domestic_influence_amount }
-
-			for_each_loop = {
-				array = influence_array_val
-				value = v
-				index = i
-
-				add_to_temp_variable = { influence_outlook_amount = v }
-			}
-			subtract_from_temp_variable = { influence_outlook_amount = influence_array_val^influencer_index }
-
-			add_to_variable = { influence_array_val^influencer_index = percent_change }
-			set_temp_variable = { temp_total = 100 }
-			subtract_from_temp_variable = { temp_total = influence_array_val^influencer_index }
-
-			divide_temp_variable = { temp_total = influence_outlook_amount }
-			multiply_variable = { domestic_influence_amount = temp_total }
-			for_each_loop = {
-				array = influence_array_val
-				value = v
-				index = i
-
-				if = { limit = { NOT = { check_variable = { i = 0 } } }
-					multiply_variable = { influence_array_val^i = temp_total }
-				}
-			}
-			recalculate_influence = yes
-			custom_effect_tooltip = change_influencer_tt
+	# COMPAT SHIM (2026-07-19): reroutes legacy calls into the new sphere system.
+	# Inputs (temp vars set by caller): percent_change, tag_index (influencer id), influence_target (target id)
+	if = {
+		limit = { country_exists = var:influence_target }
+		var:influence_target = {
+			set_temp_variable = { sph_from = tag_index }
+			set_temp_variable = { sph_amount = percent_change }
+			sph_add_influence = yes
 		}
 	}
-	set_temp_variable = { percent_change = percent_change_temp }
+	set_temp_variable = { percent_change = percent_change }
 }
 ##Boost Domestic Influence
 boost_domestic_influence_1_percent = {
