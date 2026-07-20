@@ -207,8 +207,22 @@ sph_add_to_sphere = {
 		clamp_variable = { var = sph_gp_score^sph_idx min = 0 max = 100 }
 		set_variable = { Sphere_Leader = sph_from }
 		add_ideas = sphere_member_trade
+		set_variable = { sph_disp_active = 0 }
 		var:sph_from = {
 			save_event_target_as = sph_gp_scope
+			# free the influence slot (we no longer need to court a member)
+			set_temp_variable = { sph_stop_id = PREV.id }
+			set_temp_variable = { sph_stop_found = 0 }
+			for_each_loop = {
+				array = sph_active_ids
+				value = v
+				index = i
+				if = { limit = { check_variable = { v = sph_stop_id } } set_temp_variable = { sph_stop_found = 1 } set_temp_variable = { sph_stop_i = i } }
+			}
+			if = {
+				limit = { check_variable = { sph_stop_found = 1 } }
+				remove_from_array = { array = sph_active_ids index = sph_stop_i }
+			}
 			add_to_array = { sph_members = PREV.id }
 			if = { limit = { NOT = { is_in_array = { sphere_tag_list = PREV.id } } } add_to_array = { sphere_tag_list = PREV.id } }
 			# Sphere membership includes military subsidies (replaces the old subsidy action)
@@ -260,6 +274,7 @@ sph_rip_from_sphere = {
 		set_temp_variable = { sph_ripped_leader = Sphere_Leader }
 		subtract_from_variable = { sph_gp_score^sph_idx = 100 }
 		clamp_variable = { var = sph_gp_score^sph_idx min = 0 max = 100 }
+		set_country_flag = { flag = sph_rip_cooldown value = 1 days = 180 }
 		sph_remove_from_sphere = yes
 		# annul the old leader's accords with this country
 		set_temp_variable = { sph_from = sph_ripped_leader }
@@ -283,14 +298,17 @@ sph_rip_from_sphere = {
 		# diplomatic fallout
 		if = {
 			limit = { country_exists = var:sph_ripper }
+			save_global_event_target_as = sph_news_target
 			var:sph_ripper = {
 				save_event_target_as = sph_ripper_scope
+				save_global_event_target_as = sph_news_ripper
 				add_to_variable = { badboy = 5 }   # infamy
 			}
 			if = {
 				limit = { country_exists = var:sph_ripped_leader }
 				var:sph_ripped_leader = {
 					add_opinion_modifier = { target = event_target:sph_ripper_scope modifier = sph_sphere_ripper }
+					country_event = { id = cwic_sphere.1 }
 				}
 			}
 		}
@@ -388,5 +406,141 @@ sph_monthly_validate = {
 			has_war_with = var:Sphere_Leader
 		}
 		sph_remove_from_sphere = yes
+	}
+}
+
+# =============================================================
+# AI actor — run monthly in AI GP scope. Mirrors the player's gates.
+# =============================================================
+sph_ai_monthly = {
+	sph_calc_slots = yes
+	set_temp_variable = { sph_me = THIS.id }
+	save_event_target_as = sph_ai_me
+	# 1) act on current targets: accords -> sphere -> rip
+	for_each_loop = {
+		array = sph_active_ids
+		value = tgt
+		if = {
+			limit = { country_exists = var:tgt }
+			var:tgt = {
+				set_temp_variable = { sph_from = sph_me }
+				sph_get_pair_index = yes
+				if = {
+					limit = { check_variable = { sph_idx > -1 } }
+					# gates shared with the player actions
+					set_temp_variable = { sph_gate_ok = 1 }
+					if = {
+						limit = {
+							has_variable = Sphere_Leader
+							NOT = { check_variable = { Sphere_Leader = 0 } }
+							NOT = { check_variable = { Sphere_Leader = sph_me } }
+						}
+						set_temp_variable = { sph_gate_ok = 0 }
+					}
+					if = {
+						limit = { is_in_faction = yes NOT = { is_in_faction_with = event_target:sph_ai_me } }
+						set_temp_variable = { sph_gate_ok = 0 }
+					}
+					if = {
+						limit = { is_subject = yes NOT = { is_subject_of = event_target:sph_ai_me } }
+						set_temp_variable = { sph_gate_ok = 0 }
+					}
+					if = {
+						limit = { check_variable = { sph_gate_ok = 1 } }
+						if = {
+							limit = { check_variable = { sph_gp_stage^sph_idx = 0 } check_variable = { sph_gp_score^sph_idx > 49 } }
+							sph_sign_econ_accord = yes
+						}
+						else_if = {
+							limit = { check_variable = { sph_gp_stage^sph_idx = 1 } check_variable = { sph_gp_score^sph_idx > 49 } }
+							sph_sign_mil_accord = yes
+						}
+						else_if = {
+							limit = {
+								check_variable = { sph_gp_stage^sph_idx = 2 }
+								check_variable = { sph_gp_score^sph_idx > 99 }
+								NOT = { has_country_flag = sph_rip_cooldown }
+								OR = {
+									NOT = { has_variable = Sphere_Leader }
+									check_variable = { Sphere_Leader = 0 }
+								}
+							}
+							sph_add_to_sphere = yes
+						}
+					}
+					# hostile rip: target is in a rival sphere and we have banked 100
+					else_if = {
+						limit = {
+							check_variable = { sph_gp_score^sph_idx > 99 }
+							has_variable = Sphere_Leader
+							NOT = { check_variable = { Sphere_Leader = 0 } }
+							NOT = { check_variable = { Sphere_Leader = sph_me } }
+							NOT = { has_country_flag = sph_rip_cooldown }
+						}
+						sph_rip_from_sphere = yes
+					}
+				}
+			}
+		}
+	}
+	# 2) fill one free slot per month with a plausible target
+	if = {
+		limit = { check_variable = { sph_active_ids^num < sph_slots } }
+		random_country = {
+			limit = {
+				NOT = { is_sphere_capable = yes }
+				NOT = { tag = PREV }
+				NOT = { is_subject = yes }
+				OR = {
+					NOT = { has_variable = Sphere_Leader }
+					check_variable = { Sphere_Leader = 0 }
+				}
+				OR = {
+					NOT = { is_in_faction = yes }
+					is_in_faction_with = PREV
+				}
+				NOT = { has_war_with = PREV }
+				NOT = { is_in_array = { PREV.sph_active_ids = THIS.id } }
+				check_variable = { grossdomesticproduct_fake > 0.5 }
+			}
+			set_temp_variable = { sph_new_tgt = THIS.id }
+			PREV = {
+				add_to_array = { sph_active_ids = sph_new_tgt }
+			}
+		}
+	}
+}
+
+# =============================================================
+# Discredit — spend 25 of MY influence to knock 40 off the TOP rival's
+# track on this target. TARGET scope, temp sph_from = my id.
+# =============================================================
+sph_discredit = {
+	sph_get_pair_index = yes
+	if = {
+		limit = { check_variable = { sph_idx > -1 } check_variable = { sph_gp_score^sph_idx > 24 } }
+		set_temp_variable = { sph_my_idx = sph_idx }
+		# find the strongest rival track
+		set_temp_variable = { sph_r_idx = -1 }
+		set_temp_variable = { sph_r_best = 0 }
+		for_loop_effect = {
+			end = sph_gp_ids^num
+			value = v
+			if = {
+				limit = {
+					NOT = { check_variable = { sph_gp_ids^v = sph_from } }
+					check_variable = { sph_gp_score^v > sph_r_best }
+				}
+				set_temp_variable = { sph_r_idx = v }
+				set_temp_variable = { sph_r_best = sph_gp_score^v }
+			}
+		}
+		if = {
+			limit = { check_variable = { sph_r_idx > -1 } }
+			subtract_from_variable = { sph_gp_score^sph_my_idx = 25 }
+			clamp_variable = { var = sph_gp_score^sph_my_idx min = 0 max = 100 }
+			subtract_from_variable = { sph_gp_score^sph_r_idx = 40 }
+			clamp_variable = { var = sph_gp_score^sph_r_idx min = 0 max = 100 }
+		}
 	}
 }

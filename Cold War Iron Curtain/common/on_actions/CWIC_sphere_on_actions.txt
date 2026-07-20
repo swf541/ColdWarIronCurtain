@@ -61,6 +61,45 @@ on_actions = {
 		}
 	}
 
+	# ---- monthly: AI actors, leader economics, embargo sync ----
+	on_monthly = {
+		effect = {
+			if = {
+				limit = { is_sphere_capable = yes }
+				# AI Great Powers play the influence game
+				if = {
+					limit = { is_ai = yes }
+					sph_ai_monthly = yes
+				}
+				# leader economics: flat monthly income per sphere member
+				if = {
+					limit = { check_variable = { sph_members^num > 0 } }
+					set_temp_variable = { sph_income = sph_members^num }
+					multiply_temp_variable = { sph_income = 0.01 }
+					add_to_variable = { currentMoney = sph_income }
+				}
+				# embargo sync: members adopt the leader's embargoes
+				every_country = {
+					limit = {
+						check_variable = { PREV.trade_embargo_check^THIS = 1 }
+						NOT = { is_in_array = { PREV.sph_members = THIS.id } }
+						NOT = { tag = PREV }
+					}
+					for_each_loop = {
+						array = PREV.sph_members
+						value = mid
+						if = {
+							limit = { country_exists = var:mid }
+							var:mid = {
+								set_variable = { trade_embargo_check^PREV = 1 }
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	# ---- daily readout refresh (only the human's active targets) ----
 	on_daily = {
 		effect = {
@@ -85,6 +124,19 @@ on_actions = {
 							else = {
 								set_variable = { sph_disp_score = 0 }
 								set_variable = { sph_disp_stage = 0 }
+							}
+							# strongest rival track on this target (for the readout)
+							set_variable = { sph_disp_rival_score = 0 }
+							for_loop_effect = {
+								end = sph_gp_ids^num
+								value = v
+								if = {
+									limit = {
+										NOT = { check_variable = { sph_gp_ids^v = sph_from } }
+										check_variable = { sph_gp_score^v > sph_disp_rival_score }
+									}
+									set_variable = { sph_disp_rival_score = sph_gp_score^v }
+								}
 							}
 						}
 					}
