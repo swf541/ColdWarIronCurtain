@@ -2035,57 +2035,10 @@ decrease_domestic_influence_10_percent = {
 	}
 }
 
-#Script to run after any change to influence
+# RETIRED: FPP (foreignPowerProjection) is gone — replaced by the Sphere of Influence
+# system (slots + weekly per-target influence). This is now a no-op so existing callers
+# (on_actions/decisions) don't error. Do not add FPP logic back here.
 monthly_power_projection_gain = {
-	set_variable = { foreignPowerProjection_Factories = num_of_factories }
-	divide_variable = { foreignPowerProjection_Factories = 100 }
-	set_variable = { foreignPowerProjectionMonth = foreignPowerProjection_Factories }
-
-	set_variable = { foreignPowerProjection_Subjects = 0 }
-	if = {
-		limit = { num_subjects > 0 }
-		for_each_scope_loop = {
-			array = subjects
-			add_to_variable = { ROOT.foreignPowerProjection_Subjects = grossdomesticproduct_fake }
-			#log = "[Root.GetTag]: Puppet: [This.GetTag] / GDP: [?grossdomesticproduct_fake]"
-		}
-	}
-	add_to_variable = { var = foreignPowerProjectionMonth value = foreignPowerProjection_Subjects }
-
-	set_variable = { foreignPowerProjection_GDP = grossdomesticproduct_fake }
-	add_to_variable = { var = foreignPowerProjectionMonth value = foreignPowerProjection_GDP }
-	#log = "[Root.GetTag]: States: [?num_owned_controlled_states] / GDP: [?grossdomesticproduct_fake]"
-
-	if = {
-		limit = {
-			tag = USA
-			has_idea = foriegn_assistance_act
-		}
-		multiply_variable = { foreignPowerProjectionMonth = 1.25 }
-	}
-	if = {
-		limit = {
-			tag = USA
-			has_idea = Mutual_Development_and_Cooperation_Act
-		}
-		multiply_variable = { foreignPowerProjectionMonth = 1.25 }
-	}
-	if = {
-		limit = {
-			tag = USA
-			has_idea = Foriegn_Aid_Reduction_Act
-		}
-		multiply_variable = { foreignPowerProjectionMonth = 0.75 }
-	}
-	if = {
-		limit = {
-			has_idea = influence_increase_cost
-		}
-		multiply_variable = { influence_increase_cost = 0.5 }
-	}
-	#log = "[Root.GetTag]: (factories: [?foreignPowerProjection_Factories] + subjects: [?foreignPowerProjection_Subjects] + GDP: [?foreignPowerProjection_GDP]) = [?foreignPowerProjectionMonth]"
-	add_to_variable = { foreignPowerProjection = foreignPowerProjectionMonth }
-	
 }
 
 monthly_set_fpp = {

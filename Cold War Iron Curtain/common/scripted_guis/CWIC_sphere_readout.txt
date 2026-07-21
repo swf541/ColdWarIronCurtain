@@ -1,9 +1,11 @@
 # ============================================================
-# CWIC Sphere of Influence — small always-on readout in the diplomacy view.
-# Just a text line (no buttons); the actions are native diplomatic actions.
-# Scope = selected country (target); ROOT = viewing player.
+# CWIC Sphere of Influence — readouts (graphical slot pips) + lists.
+# Scope = selected country; ROOT = viewing player.
+# Pips: one shield per slot. Used = filled shield, Free = empty shield.
 # ============================================================
 scripted_gui = {
+
+	# YOUR influence line + YOUR slot pips (on a non-power you can influence)
 	CWIC_sphere_readout = {
 		context_type = selected_country_context
 		parent_window_token = selected_country_view_diplomacy
@@ -13,6 +15,97 @@ scripted_gui = {
 			NOT = { is_sphere_capable = yes }
 			NOT = { tag = ROOT }
 		}
-		effects = {}
+		effects = {
+			sph_open_list_click = { ROOT = { set_country_flag = sph_show_list clr_country_flag = sph_show_gp_list } }
+		}
+		triggers = {
+			sph_pip_used_0_visible = { check_variable = { ROOT.sph_active_ids^num > 0 } }
+			sph_pip_free_0_visible = { check_variable = { ROOT.sph_slots > 0 } NOT = { check_variable = { ROOT.sph_active_ids^num > 0 } } }
+			sph_pip_used_1_visible = { check_variable = { ROOT.sph_active_ids^num > 1 } }
+			sph_pip_free_1_visible = { check_variable = { ROOT.sph_slots > 1 } NOT = { check_variable = { ROOT.sph_active_ids^num > 1 } } }
+			sph_pip_used_2_visible = { check_variable = { ROOT.sph_active_ids^num > 2 } }
+			sph_pip_free_2_visible = { check_variable = { ROOT.sph_slots > 2 } NOT = { check_variable = { ROOT.sph_active_ids^num > 2 } } }
+			sph_pip_used_3_visible = { check_variable = { ROOT.sph_active_ids^num > 3 } }
+			sph_pip_free_3_visible = { check_variable = { ROOT.sph_slots > 3 } NOT = { check_variable = { ROOT.sph_active_ids^num > 3 } } }
+			sph_pip_used_4_visible = { check_variable = { ROOT.sph_active_ids^num > 4 } }
+			sph_pip_free_4_visible = { check_variable = { ROOT.sph_slots > 4 } NOT = { check_variable = { ROOT.sph_active_ids^num > 4 } } }
+			sph_pip_used_5_visible = { check_variable = { ROOT.sph_active_ids^num > 5 } }
+			sph_pip_free_5_visible = { check_variable = { ROOT.sph_slots > 5 } NOT = { check_variable = { ROOT.sph_active_ids^num > 5 } } }
+		}
+	}
+
+	# THEIR slot pips + magnifier (when the selected country is a Great Power)
+	CWIC_sphere_gp_readout = {
+		context_type = selected_country_context
+		parent_window_token = selected_country_view_diplomacy
+		window_name = "CWIC_sphere_gp_readout"
+		visible = {
+			is_sphere_capable = yes
+			NOT = { tag = ROOT }
+		}
+		effects = {
+			sph_open_gp_list_click = { ROOT = { set_country_flag = sph_show_gp_list clr_country_flag = sph_show_list } }
+		}
+		triggers = {
+			sph_gp_pip_used_0_visible = { check_variable = { sph_active_ids^num > 0 } }
+			sph_gp_pip_free_0_visible = { check_variable = { sph_slots > 0 } NOT = { check_variable = { sph_active_ids^num > 0 } } }
+			sph_gp_pip_used_1_visible = { check_variable = { sph_active_ids^num > 1 } }
+			sph_gp_pip_free_1_visible = { check_variable = { sph_slots > 1 } NOT = { check_variable = { sph_active_ids^num > 1 } } }
+			sph_gp_pip_used_2_visible = { check_variable = { sph_active_ids^num > 2 } }
+			sph_gp_pip_free_2_visible = { check_variable = { sph_slots > 2 } NOT = { check_variable = { sph_active_ids^num > 2 } } }
+			sph_gp_pip_used_3_visible = { check_variable = { sph_active_ids^num > 3 } }
+			sph_gp_pip_free_3_visible = { check_variable = { sph_slots > 3 } NOT = { check_variable = { sph_active_ids^num > 3 } } }
+			sph_gp_pip_used_4_visible = { check_variable = { sph_active_ids^num > 4 } }
+			sph_gp_pip_free_4_visible = { check_variable = { sph_slots > 4 } NOT = { check_variable = { sph_active_ids^num > 4 } } }
+			sph_gp_pip_used_5_visible = { check_variable = { sph_active_ids^num > 5 } }
+			sph_gp_pip_free_5_visible = { check_variable = { sph_slots > 5 } NOT = { check_variable = { sph_active_ids^num > 5 } } }
+		}
+	}
+
+	# Popup: who is influencing the selected (non-power) country
+	CWIC_sphere_list = {
+		context_type = selected_country_context
+		parent_window_token = selected_country_view_diplomacy
+		window_name = "CWIC_sphere_list"
+		visible = {
+			ROOT = { has_country_flag = sph_show_list }
+			NOT = { is_sphere_capable = yes }
+			NOT = { tag = ROOT }
+		}
+		effects = {
+			sph_list_close_click = { ROOT = { clr_country_flag = sph_show_list } }
+		}
+		triggers = {
+			sph_list_row0_visible = { check_variable = { sph_gp_ids^num > 0 } }
+			sph_list_row1_visible = { check_variable = { sph_gp_ids^num > 1 } }
+			sph_list_row2_visible = { check_variable = { sph_gp_ids^num > 2 } }
+			sph_list_row3_visible = { check_variable = { sph_gp_ids^num > 3 } }
+			sph_list_row4_visible = { check_variable = { sph_gp_ids^num > 4 } }
+			sph_list_row5_visible = { check_variable = { sph_gp_ids^num > 5 } }
+			sph_list_empty_visible = { check_variable = { sph_gp_ids^num < 1 } }
+		}
+	}
+
+	# Popup: who the selected Great Power is influencing
+	CWIC_sphere_gp_list = {
+		context_type = selected_country_context
+		parent_window_token = selected_country_view_diplomacy
+		window_name = "CWIC_sphere_gp_list"
+		visible = {
+			ROOT = { has_country_flag = sph_show_gp_list }
+			is_sphere_capable = yes
+			NOT = { tag = ROOT }
+		}
+		effects = {
+			sph_gp_list_close_click = { ROOT = { clr_country_flag = sph_show_gp_list } }
+		}
+		triggers = {
+			sph_gp_list_row0_visible = { check_variable = { sph_active_ids^num > 0 } }
+			sph_gp_list_row1_visible = { check_variable = { sph_active_ids^num > 1 } }
+			sph_gp_list_row2_visible = { check_variable = { sph_active_ids^num > 2 } }
+			sph_gp_list_row3_visible = { check_variable = { sph_active_ids^num > 3 } }
+			sph_gp_list_row4_visible = { check_variable = { sph_active_ids^num > 4 } }
+			sph_gp_list_empty_visible = { check_variable = { sph_active_ids^num < 1 } }
+		}
 	}
 }

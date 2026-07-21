@@ -23,12 +23,12 @@
 # Slots — how many countries you can influence at once. GP scope.
 # =============================================================
 sph_calc_slots = {
+	# Base 2 + the influence_slots custom modifier (granted by national spirits,
+	# e.g. Leader of the Free World / Victors of the Great Patriotic War: +2 each).
 	set_variable = { sph_slots = 2 }
-	set_temp_variable = { sph_slot_fac = num_of_factories }
-	divide_temp_variable = { sph_slot_fac = 120 }
-	add_to_variable = { sph_slots = sph_slot_fac }
+	add_to_variable = { sph_slots = modifier@influence_slots }
 	round_variable = sph_slots
-	clamp_variable = { var = sph_slots min = 2 max = 5 }
+	clamp_variable = { var = sph_slots min = 1 max = 10 }
 }
 
 # =============================================================
@@ -357,7 +357,11 @@ sph_weekly_tick = {
 		value = tgt
 		if = {
 			limit = { country_exists = var:tgt }
+			# Weekly gain = (base 4 + influence_gain_flat) x (1 + foreign_influence_modifier)
+			#                                              x (1 - target foreign_influence_defense_modifier)
+			# All three are custom modifiers a content creator can grant via ideas/focuses.
 			set_temp_variable = { sph_rate = 4 }
+			add_to_temp_variable = { sph_rate = modifier@influence_gain_flat }
 			multiply_temp_variable = { sph_rate = sph_out_mult }
 			var:tgt = {
 				if = {
@@ -412,6 +416,48 @@ sph_monthly_validate = {
 # =============================================================
 # AI actor — run monthly in AI GP scope. Mirrors the player's gates.
 # =============================================================
+# Finds the most valuable eligible target for event_target:sph_ai_me.
+# In:  temp sph_require_uncontested (1 = only countries no one influences yet).
+# Out: temp sph_best_id (target id, or -1) and sph_best_val.
+# Value = num_of_factories + sphere_strategic_value modifier.
+sph_ai_find_best_target = {
+	set_temp_variable = { sph_best_val = -1 }
+	set_temp_variable = { sph_best_id = -1 }
+	every_country = {
+		limit = {
+			sph_ai_eligible_target = yes
+			OR = {
+				check_variable = { sph_require_uncontested = 0 }
+				check_variable = { sph_gp_ids^num = 0 }
+			}
+		}
+		set_temp_variable = { sph_cand_val = num_of_factories }
+		add_to_temp_variable = { sph_cand_val = modifier@sphere_strategic_value }
+		# +border: candidate touches the GP or any of the GP's sphere members
+		if = {
+			limit = {
+				any_neighbor_country = {
+					OR = {
+						tag = event_target:sph_ai_me
+						is_in_array = { event_target:sph_ai_me.sph_members = THIS.id }
+					}
+				}
+			}
+			add_to_temp_variable = { sph_cand_val = 40 }
+		}
+		# +ideology: candidate shares the GP's government type
+		if = {
+			limit = { has_government = event_target:sph_ai_me }
+			add_to_temp_variable = { sph_cand_val = 30 }
+		}
+		if = {
+			limit = { check_variable = { sph_cand_val > sph_best_val } }
+			set_temp_variable = { sph_best_val = sph_cand_val }
+			set_temp_variable = { sph_best_id = THIS.id }
+		}
+	}
+}
+
 sph_ai_monthly = {
 	sph_calc_slots = yes
 	set_temp_variable = { sph_me = THIS.id }
@@ -483,29 +529,31 @@ sph_ai_monthly = {
 			}
 		}
 	}
-	# 2) fill one free slot per month with a plausible target
+	# 2) fill one free slot per month. Rank candidates by STRATEGIC VALUE
+	#    (num_of_factories + the sphere_strategic_value modifier) and take the best
+	#    UNCONTESTED one; claiming it immediately marks it contested so other powers
+	#    this month move on to the next-best — powers spread by importance instead
+	#    of dogpiling one neutral.
 	if = {
 		limit = { check_variable = { sph_active_ids^num < sph_slots } }
-		random_country = {
-			limit = {
-				NOT = { is_sphere_capable = yes }
-				NOT = { tag = PREV }
-				NOT = { is_subject = yes }
-				OR = {
-					NOT = { has_variable = Sphere_Leader }
-					check_variable = { Sphere_Leader = 0 }
+		set_temp_variable = { sph_require_uncontested = 1 }
+		sph_ai_find_best_target = yes
+		if = {
+			limit = { NOT = { check_variable = { sph_best_id > -1 } } }
+			# nothing uncontested left -> allow contesting the most valuable target
+			set_temp_variable = { sph_require_uncontested = 0 }
+			sph_ai_find_best_target = yes
+		}
+		if = {
+			limit = { check_variable = { sph_best_id > -1 } }
+			set_temp_variable = { sph_claim_id = sph_best_id }
+			event_target:sph_ai_me = { add_to_array = { sph_active_ids = sph_claim_id } }
+			if = {
+				limit = { country_exists = var:sph_claim_id }
+				var:sph_claim_id = {
+					set_temp_variable = { sph_from = sph_me }
+					sph_ensure_pair = yes   # register a 0-score track now = "contested"
 				}
-				OR = {
-					NOT = { is_in_faction = yes }
-					is_in_faction_with = PREV
-				}
-				NOT = { has_war_with = PREV }
-				NOT = { is_in_array = { PREV.sph_active_ids = THIS.id } }
-				check_variable = { grossdomesticproduct_fake > 0.5 }
-			}
-			set_temp_variable = { sph_new_tgt = THIS.id }
-			PREV = {
-				add_to_array = { sph_active_ids = sph_new_tgt }
 			}
 		}
 	}
@@ -542,5 +590,134 @@ sph_discredit = {
 			subtract_from_variable = { sph_gp_score^sph_r_idx = 40 }
 			clamp_variable = { var = sph_gp_score^sph_r_idx min = 0 max = 100 }
 		}
+	}
+}
+
+# ============================================================
+# CONTENT-CREATOR API — effects for focus trees / events / decisions
+# ------------------------------------------------------------
+# CONVENTION: call these INSIDE the TARGET country's scope, with ROOT (or the
+# saved scope) as the LEADER/influencer. Example, a USA focus courting Spain:
+#   completion_reward = {
+#       set_temp_variable = { sph_ce_amount = 40 }
+#       SPA = { sph_ce_give_influence = yes }
+#   }
+# (ROOT stays USA inside the SPA scope, so USA is credited as the influencer.)
+#
+# NOTE: dynamic-index set_variable crashes the game, so these use add/subtract.
+# ============================================================
+
+# Give (or, with a negative value, remove) influence. temp sph_ce_amount.
+sph_ce_give_influence = {
+	set_temp_variable = { sph_from = ROOT.id }
+	set_temp_variable = { sph_amount = sph_ce_amount }
+	sph_add_influence = yes
+}
+
+# Set the leader's influence over this country to an exact value. temp sph_ce_amount.
+sph_ce_set_influence = {
+	set_temp_variable = { sph_from = ROOT.id }
+	sph_ensure_pair = yes
+	set_temp_variable = { sph_ce_delta = sph_gp_score^sph_idx }
+	multiply_temp_variable = { sph_ce_delta = -1 }
+	add_to_temp_variable = { sph_ce_delta = sph_ce_amount }
+	add_to_variable = { sph_gp_score^sph_idx = sph_ce_delta }
+	clamp_variable = { var = sph_gp_score^sph_idx min = 0 max = 100 }
+}
+
+# Instantly bring this country into ROOT's sphere (skips the influence/accord build).
+sph_ce_force_sphere = {
+	set_temp_variable = { sph_from = ROOT.id }
+	sph_ensure_pair = yes
+	# force stage -> 2 and score -> 100 (add/subtract only), then run the real effect
+	set_temp_variable = { sph_ce_st = sph_gp_stage^sph_idx }
+	multiply_temp_variable = { sph_ce_st = -1 }
+	add_to_temp_variable = { sph_ce_st = 2 }
+	add_to_variable = { sph_gp_stage^sph_idx = sph_ce_st }
+	set_temp_variable = { sph_ce_sc = sph_gp_score^sph_idx }
+	multiply_temp_variable = { sph_ce_sc = -1 }
+	add_to_temp_variable = { sph_ce_sc = 100 }
+	add_to_variable = { sph_gp_score^sph_idx = sph_ce_sc }
+	sph_add_to_sphere = yes
+}
+
+# Free this country from whatever sphere it's in.
+sph_ce_free_sphere = {
+	sph_remove_from_sphere = yes
+}
+
+# Force the Economic Accord between ROOT and this country (skips influence cost).
+sph_ce_force_econ_accord = {
+	set_temp_variable = { sph_from = ROOT.id }
+	sph_ensure_pair = yes
+	if = {
+		limit = { check_variable = { sph_gp_stage^sph_idx = 0 } }
+		set_temp_variable = { sph_ce_sc = sph_gp_score^sph_idx }
+		multiply_temp_variable = { sph_ce_sc = -1 }
+		add_to_temp_variable = { sph_ce_sc = 50 }
+		add_to_variable = { sph_gp_score^sph_idx = sph_ce_sc }   # ensure >= 50 to pass
+		sph_sign_econ_accord = yes
+	}
+}
+
+# Force the Military Accord between ROOT and this country (requires the econ accord).
+sph_ce_force_mil_accord = {
+	set_temp_variable = { sph_from = ROOT.id }
+	sph_ensure_pair = yes
+	if = {
+		limit = { check_variable = { sph_gp_stage^sph_idx = 1 } }
+		set_temp_variable = { sph_ce_sc = sph_gp_score^sph_idx }
+		multiply_temp_variable = { sph_ce_sc = -1 }
+		add_to_temp_variable = { sph_ce_sc = 50 }
+		add_to_variable = { sph_gp_score^sph_idx = sph_ce_sc }
+		sph_sign_mil_accord = yes
+	}
+}
+
+# Make ROOT (a Great Power) START seeking to influence this country — an ongoing
+# directive: ROOT will accrue influence here every week until it stops or spheres it.
+# Call inside the TARGET's scope, ROOT = the influencing power. Ignores slot limits.
+#   completion_reward = { FRA = { sph_ce_seek_influence = yes } }   # ROOT courts France
+sph_ce_seek_influence = {
+	set_temp_variable = { sph_ce_seek_tid = THIS.id }
+	ROOT = {
+		if = {
+			limit = { NOT = { is_in_array = { sph_active_ids = sph_ce_seek_tid } } }
+			add_to_array = { sph_active_ids = sph_ce_seek_tid }
+		}
+	}
+	set_variable = { sph_disp_active = 1 }
+}
+
+# Stop ROOT from seeking to influence this country (frees the effort). Target scope.
+sph_ce_stop_seeking = {
+	set_temp_variable = { sph_ce_seek_tid = THIS.id }
+	ROOT = {
+		set_temp_variable = { sph_ce_rm_found = 0 }
+		for_each_loop = {
+			array = sph_active_ids
+			value = v
+			index = i
+			if = { limit = { check_variable = { v = sph_ce_seek_tid } } set_temp_variable = { sph_ce_rm_found = 1 } set_temp_variable = { sph_ce_rm_i = i } }
+		}
+		if = { limit = { check_variable = { sph_ce_rm_found = 1 } } remove_from_array = { array = sph_active_ids index = sph_ce_rm_i } }
+	}
+	set_variable = { sph_disp_active = 0 }
+}
+
+# Write ROOT's influence over this country into a variable you can read/branch on:
+#   sph_query_influence (0-100) and sph_query_stage (0 none / 1 econ / 2 mil).
+# Call in an effect block, then check_variable = { sph_query_influence > 50 } etc.
+sph_ce_store_influence = {
+	set_temp_variable = { sph_from = ROOT.id }
+	sph_get_pair_index = yes
+	if = {
+		limit = { check_variable = { sph_idx > -1 } }
+		set_variable = { sph_query_influence = sph_gp_score^sph_idx }
+		set_variable = { sph_query_stage = sph_gp_stage^sph_idx }
+	}
+	else = {
+		set_variable = { sph_query_influence = 0 }
+		set_variable = { sph_query_stage = 0 }
 	}
 }
