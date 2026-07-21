@@ -44,7 +44,9 @@ food_negative_in_capital = {	#Food Calculation
 }
 
 resource_consumption = {
-	enable = { always = yes }
+	enable = {
+		NOT = { has_country_flag = active_insurgency }
+	}
 	icon = GFX_modifiers_resource_consumption
 	country_resource_cost_steel = steel_consumption
 	country_resource_cost_oil = oil_consumption
@@ -59,8 +61,11 @@ resource_consumption = {
 	country_resource_chromium =  nuclear_resource_bonus
 	country_resource_tungsten = rare_earth_bonus
 
-	stability_factor = food_penalty
-	war_support_factor = food_penalty
+	# Food shortages previously passed the full deficit ratio through to these
+	# modifiers, allowing a one-unit shortage to erase all stability and war
+	# support. Political penalties are now capped to ten percent of that ratio.
+	stability_factor = food_penalty_political
+	war_support_factor = food_penalty_political
 	production_factory_max_efficiency_factor = food_penalty_production
 	production_speed_buildings_factor = food_penalty_construction
 
@@ -69,7 +74,9 @@ resource_consumption = {
 
 # split from resource_consumption: same modifier keys cannot repeat within one dynamic modifier
 resource_trade = {
-	enable = { always = yes }
+	enable = {
+		NOT = { has_country_flag = active_insurgency }
+	}
 	icon = GFX_modifiers_resource_consumption
 	country_resource_cost_oil = oilExport
 	country_resource_cost_rubber = foodExport
