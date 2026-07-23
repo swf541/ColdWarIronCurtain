@@ -1,0 +1,438 @@
+scripted_gui = {
+	special_operations_recruitment_replacement_target_list = {
+        context_type = player_context
+        window_name = "special_operations_recruitment_replacement_target_list_menu"
+        dynamic_lists = {
+            special_operations_recruitment_replacement_target_list_menu_grid = {
+                array = espionage_paramilitary_operative_type
+                change_scope = no
+				entry_container = special_operations_recruitment_replacement_target_list_entry
+            }
+        }
+        properties = {
+            operative_portrait = {
+                image = "[RecruitmentPortraits]"
+            }
+        }
+        triggers = {
+            special_operations_recruitment_target_entry_button_active_visible = {
+                check_variable = {
+                    espionage_paramilitary_operative_type_selection^i = 1
+                }
+            }
+            special_operations_recruitment_target_entry_button_visible = {
+                check_variable = {
+                    espionage_paramilitary_operative_type_selection^i = 0
+                }
+            }
+            special_operations_recruitment_target_entry_button_click_enabled = {
+                NOT = {
+                    check_variable = {
+                        confirmation_check = 1
+                    }
+                    is_in_array = {
+                        array = ROOT.blacks_ops_team_current_traits
+                        value = espionage_paramilitary_operative_type^i
+                    }
+                }
+            }
+            create_group_click_enabled = {
+                check_variable = {
+                    confirmation_check = 1
+                }
+            }
+        }
+
+
+		visible = {
+			check_variable = {
+				paramilitary_recruit_toggle = 2 
+			}
+		}
+		effects = {
+			special_operations_recruitment_target_entry_button_click = {
+                set_variable = {
+                    selected = i
+                }
+                set_variable = {
+                  temp_build_espionage_paramilitary_operative_type_1 = espionage_paramilitary_operative_type^i
+                }
+                set_variable = {
+                  temp_build_espionage_paramilitary_operative_name_type_1 = espionage_paramilitary_operative_name_type^i
+                }
+                set_variable = {
+                  temp_build_first_name_1 = first_name^i
+                }
+                set_variable = {
+                  temp_build_surname_1 = surname^i
+                }
+                set_variable = {
+                    temp_build_portrait_1 = portrait^i
+                }
+            }
+            close_button_click = {
+                set_variable = {
+                    confirmation_check = 0
+                }
+                set_variable = {
+                    paramilitary_recruit_toggle = 0
+                }
+                set_variable = {
+                    operative_number_step = 0
+                }
+
+                clear_array = espionage_paramilitary_operative_type_selection
+                clear_array = temp_build_espionage_paramilitary_operative_type
+                clear_array = temp_build_espionage_paramilitary_operative_name_type
+                clear_array = temp_build_first_name
+                clear_array = temp_build_surname
+                clear_array = temp_build_portrait
+                for_each_loop = {
+                    array = espionage_paramilitary_operative_type
+                    set_variable = {
+                        espionage_paramilitary_operative_type_selection^i = 0
+                    }
+                }
+            }
+            next_button_click = {
+                set_variable = {
+                    confirmation_check = 1
+                }
+                set_variable = {
+                    espionage_paramilitary_operative_type_selection^selected = 1
+                }
+                add_to_array = {
+                  temp_build_espionage_paramilitary_operative_type = temp_build_espionage_paramilitary_operative_type_1
+                }
+                add_to_array = {
+                  temp_build_espionage_paramilitary_operative_name_type = temp_build_espionage_paramilitary_operative_name_type_1
+                }
+                add_to_array = {
+                  temp_build_first_name = temp_build_first_name_1
+                }
+                add_to_array = {
+                  temp_build_surname = temp_build_surname_1
+                }
+                add_to_array = {
+                  temp_build_portrait = temp_build_portrait_1
+                }
+                set_variable = {
+                   selected = 0
+                }
+                set_variable = { temp_build_espionage_paramilitary_operative_type_1 = 0 }
+                set_variable = { temp_build_espionage_paramilitary_operative_name_type_1 = 0 }
+                set_variable = { temp_build_first_name_1 = 0 }
+                set_variable = { temp_build_surname_1 = 0 }
+            }
+            create_group_click = {
+                #startup_squad_creation_trait_modifiers = yes   #Needs Adjusted to Individual If Blocks
+                #SET NAME ARRAY
+                if = {
+                    limit = {
+                        check_variable = {
+                            squad_replacement_select = 1
+                        }  
+                    }
+                    #Squad Leader 
+                    set_variable = {
+                        paramilitary_operative_squad_unit_1_level^current_page = 1
+                    }   
+                    set_variable = {
+                        paramilitary_operative_squad_leader_type^current_page = temp_build_espionage_paramilitary_operative_type^0
+                    }
+
+                    set_variable = {
+                        paramilitary_operative_squad_leader_name_type^current_page = temp_build_espionage_paramilitary_operative_name_type^0
+                    }
+                    set_variable = {
+                    paramilitary_operative_squad_leader_first_name^current_page = temp_build_first_name^0
+                    }
+                    set_variable = {
+                    paramilitary_operative_squad_leader_surname^current_page = temp_build_surname^0
+                    }       
+                    set_variable = {
+                        paramilitary_operative_squad_leader_portrait^current_page = temp_build_portrait^0 
+                    }
+                    set_variable = {
+                        paramilitary_operative_squad_leader_loyalty^current_page = 100
+                    }
+                    
+                    set_variable = {
+                        ROOT.operative_number = 1
+                    } 
+                    meta_effect = { 
+                        text = {
+                            generate_character = { #create + recruit
+                                token_base = [TAG]_Operative_[OPERATIVE] 
+                            }   
+                            add_to_array = {
+                                array = paramilitary_operative_squad_leader
+                                value = token:[TAG]_Operative_[OPERATIVE] 
+                            }
+                            add_to_array = {
+                                array = operative_tokens
+                                value = token:[TAG]_Operative_[OPERATIVE] 
+                            }
+                            set_variable = {
+                                black_ops_group_[ARRAY_NUMBER]_traits^0 = temp_build_espionage_paramilitary_operative_type^0
+                            }
+                        }
+                        TAG = "[?ROOT.GetTag]"
+                        OPERATIVE = "[?operative_number]"
+                        ARRAY_NUMBER = "[?current_page]"
+                    }    
+                    add_to_array = {
+                        operative_leader_firstname_selection = temp_build_first_name^0
+                    }
+                    add_to_array = {
+                    operative_leader_surname_selection = temp_build_surname^0
+                    }       
+                    add_to_array = { operative_leader_portrait_tokens = temp_build_portrait^0 }
+                    add_to_array = { operative_portrait_tokens = temp_build_portrait^0 }
+                    add_to_array = { paramilitary_squad_id = current_page }    #Same As Page Number
+                    add_to_array = { paramilitary_squad_id_status = 1 }    #Same As Page Number
+
+                    generate_skill_traits_default_member_1 = yes
+                }
+                if = {
+                    limit = {
+                        check_variable = {
+                            squad_replacement_select = 2
+                        }  
+                    }
+                    #Member 2
+                    set_variable = {
+                        paramilitary_operative_squad_unit_2_level^current_page = 1
+                    }   
+                    set_variable = {
+                        paramilitary_operative_squad_unit_2_type^current_page = temp_build_espionage_paramilitary_operative_type^0
+                    }
+                    set_variable = {
+                        paramilitary_operative_squad_unit_2_name_type^current_page = temp_build_espionage_paramilitary_operative_name_type^0
+                    }
+                    set_variable = {
+                    paramilitary_operative_squad_unit_2_first_name^current_page = temp_build_first_name^0
+                    }
+                    set_variable = {
+                    paramilitary_operative_squad_unit_2_surname^current_page = temp_build_surname^0
+                    }      
+                    set_variable = {
+                        paramilitary_operative_squad_unit_2_portrait^current_page = temp_build_portrait^0
+                    }
+                    set_variable = {
+                        paramilitary_operative_squad_unit_2_loyalty^current_page = 100
+                    }
+                    set_variable = {
+                        ROOT.operative_number = 2
+                    }
+                    meta_effect = { 
+                        text = {
+                            generate_character = { #create + recruit
+                                token_base = [TAG]_Operative_[OPERATIVE] 
+                            }   
+                            add_to_array = {
+                                array = paramilitary_operative_squad_unit_2
+                                value = token:[TAG]_Operative_[OPERATIVE] 
+                            }
+                            add_to_array = {
+                                array = operative_tokens
+                                value = token:[TAG]_Operative_[OPERATIVE] 
+                            }
+                            set_variable = {
+                                black_ops_group_[ARRAY_NUMBER]_traits^1 = temp_build_espionage_paramilitary_operative_type^0
+                            }
+                        }
+                        TAG = "[?ROOT.GetTag]"
+                        OPERATIVE = "[?operative_number]"
+                        ARRAY_NUMBER = "[?current_page]"
+                    }    
+                    add_to_array = { operative_portrait_tokens = temp_build_portrait^0 }
+
+                    generate_skill_traits_default_member_2 = yes
+                }
+                if = {
+                    limit = {
+                        check_variable = {
+                            squad_replacement_select = 3
+                        }  
+                    }              
+                    #Member 3
+                    set_variable = {
+                        paramilitary_operative_squad_unit_3_level^current_page = 1
+                    }   
+                    set_variable = {
+                        paramilitary_operative_squad_unit_3_type^current_page = temp_build_espionage_paramilitary_operative_type^0
+                    }
+                    set_variable = {
+                        paramilitary_operative_squad_unit_3_name_type^current_page = temp_build_espionage_paramilitary_operative_name_type^0
+                    }
+                    set_variable = {
+                    paramilitary_operative_squad_unit_3_first_name^current_page = temp_build_first_name^0
+                    }
+                    set_variable = {
+                    paramilitary_operative_squad_unit_3_surname^current_page = temp_build_surname^0
+                    }      
+                    set_variable = {
+                        paramilitary_operative_squad_unit_3_portrait^current_page = temp_build_portrait^0
+                    }
+                    set_variable = {
+                        paramilitary_operative_squad_unit_3_loyalty^current_page = 100
+                    }
+                    set_variable = {
+                        ROOT.operative_number = 3
+                    }
+                    meta_effect = { 
+                        text = {
+                            generate_character = { #create + recruit
+                                token_base = [TAG]_Operative_[OPERATIVE] 
+                            }   
+                            add_to_array = {
+                                array = paramilitary_operative_squad_unit_3
+                                value = token:[TAG]_Operative_[OPERATIVE] 
+                            }
+                            add_to_array = {
+                                array = operative_tokens
+                                value = token:[TAG]_Operative_[OPERATIVE] 
+                            }
+                            set_variable = {
+                                black_ops_group_[ARRAY_NUMBER]_traits^2 = temp_build_espionage_paramilitary_operative_type^0
+                            }
+                        }
+                        TAG = "[?ROOT.GetTag]"
+                        OPERATIVE = "[?operative_number]"
+                        ARRAY_NUMBER = "[?current_page]"
+                    }    
+                    add_to_array = { operative_portrait_tokens = temp_build_portrait^0 }
+
+                    generate_skill_traits_default_member_3 = yes
+                }
+                #Member 4
+                if = {
+                    limit = {
+                        check_variable = {
+                            squad_replacement_select = 4
+                        }  
+                    }
+                    set_variable = {
+                        paramilitary_operative_squad_unit_4_level^current_page = 1
+                    }   
+                    set_variable = {
+                        paramilitary_operative_squad_unit_4_type^current_page = temp_build_espionage_paramilitary_operative_type^0
+                    }
+                    set_variable = {
+                        paramilitary_operative_squad_unit_4_name_type^current_page = temp_build_espionage_paramilitary_operative_name_type^0
+                    }
+                    set_variable = {
+                    paramilitary_operative_squad_unit_4_first_name^current_page = temp_build_first_name^0
+                    }
+                    set_variable = {
+                    paramilitary_operative_squad_unit_4_surname^current_page = temp_build_surname^0
+                    }     
+                    set_variable = {
+                        paramilitary_operative_squad_unit_4_portrait^current_page = temp_build_portrait^0
+                    } 
+                    set_variable = {
+                        paramilitary_operative_squad_unit_4_loyalty^current_page = 100
+                    }
+                    set_variable = {
+                        ROOT.operative_number = 4
+                    }
+                    meta_effect = { 
+                        text = {
+                            generate_character = { #create + recruit
+                                token_base = [TAG]_Operative_[OPERATIVE] 
+                            }   
+                            add_to_array = {
+                                array = paramilitary_operative_squad_unit_4
+                                value = token:[TAG]_Operative_[OPERATIVE] 
+                            }
+                            add_to_array = {
+                                array = operative_tokens
+                                value = token:[TAG]_Operative_[OPERATIVE] 
+                            }
+                            set_variable = {
+                                black_ops_group_[ARRAY_NUMBER]_traits^3 = temp_build_espionage_paramilitary_operative_type^0
+                            }
+                        }
+                        TAG = "[?ROOT.GetTag]"
+                        OPERATIVE = "[?operative_number]"
+                        ARRAY_NUMBER = "[?current_page]"
+                    }    
+                    add_to_array = { operative_portrait_tokens = temp_build_portrait^0 }
+
+                    generate_skill_traits_default_member_4 = yes
+                }
+                #Member 5
+                if = {
+                    limit = {
+                        check_variable = {
+                            squad_replacement_select = 5
+                        }  
+                    }
+                    set_variable = {
+                        paramilitary_operative_squad_unit_5_level^current_page = 1
+                    }   
+                    set_variable = {
+                        paramilitary_operative_squad_unit_5_type^current_page = temp_build_espionage_paramilitary_operative_type^0
+                    }
+                    set_variable = {
+                        paramilitary_operative_squad_unit_5_name_type^current_page = temp_build_espionage_paramilitary_operative_name_type^0
+                    }
+                    set_variable = {
+                    paramilitary_operative_squad_unit_5_first_name^current_page = temp_build_first_name^0
+                    }
+                    set_variable = {
+                    paramilitary_operative_squad_unit_5_surname^current_page = temp_build_surname^0
+                    }      
+                    set_variable = {
+                        paramilitary_operative_squad_unit_5_portrait^current_page = temp_build_portrait^0
+                    }
+                    set_variable = {
+                        paramilitary_operative_squad_unit_5_loyalty^current_page = 100
+                    }
+
+                    set_variable = {
+                        ROOT.operative_number = 5
+                    }
+                    meta_effect = { 
+                        text = {
+                            generate_character = { #create + recruit
+                                token_base = [TAG]_Operative_[OPERATIVE] 
+                            }   
+                            add_to_array = {
+                                array = paramilitary_operative_squad_unit_5
+                                value = token:[TAG]_Operative_[OPERATIVE] 
+                            }
+                            add_to_array = {
+                                array = operative_tokens
+                                value = token:[TAG]_Operative_[OPERATIVE] 
+                            }
+                            set_variable = {
+                                black_ops_group_[ARRAY_NUMBER]_traits^4 = temp_build_espionage_paramilitary_operative_type^0
+                            }
+                        }
+                        TAG = "[?ROOT.GetTag]"
+                        OPERATIVE = "[?operative_number]"
+                        ARRAY_NUMBER = "[?current_page]"
+                    }    
+                    add_to_array = { operative_portrait_tokens = temp_build_portrait^0 }
+                    generate_skill_traits_default_member_5 = yes
+                }
+                set_variable = {
+                    paramilitary_recruit_toggle = 0
+                }
+                set_variable = {
+                    operative_number_step = 0
+                }
+                #CLEARING OLD DATA
+                clear_array = espionage_paramilitary_operative_type_selection
+                clear_array = temp_build_espionage_paramilitary_operative_type
+                clear_array = temp_build_espionage_paramilitary_operative_name_type
+                clear_array = temp_build_first_name
+                clear_array = temp_build_surname
+                clear_array = temp_build_portrait
+            }
+        }
+    }
+
+}
