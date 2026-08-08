@@ -1,0 +1,473 @@
+##############################################################################
+# USSR DEBUG BREAK-UP TOOLS
+#
+# Scenario tools for testing the Soviet collapse. Nothing here fires on its
+# own and no AI will ever take these (ai_will_do = 0 everywhere).
+#
+# Enable with the toggle in Political Actions, then use the "USSR Debug"
+# category. Every decision is repeatable and costs nothing.
+#
+# Relies on cores set in history/states:
+#   RUS = 103 RSFSR states   TTR BSK KOM CHV MRD MRI KLY = the seven ASSRs
+#   GSR / KSR have no cores at start - their decisions grant them first.
+##############################################################################
+
+debug_decisions = {
+
+	ussr_debug_enable_tools = {
+		icon = generic_political_actions
+
+		allowed = { original_tag = SOV }
+		visible = {
+			NOT = { has_country_flag = ussr_debug_tools_enabled }
+		}
+		available = { always = yes }
+		cost = 0
+		fire_only_once = no
+
+		complete_effect = {
+			set_country_flag = ussr_debug_tools_enabled
+		}
+		ai_will_do = { factor = 0 }
+	}
+
+	ussr_debug_disable_tools = {
+		icon = generic_political_actions
+
+		allowed = { original_tag = SOV }
+		visible = { has_country_flag = ussr_debug_tools_enabled }
+		available = { always = yes }
+		cost = 0
+		fire_only_once = no
+
+		complete_effect = {
+			clr_country_flag = ussr_debug_tools_enabled
+		}
+		ai_will_do = { factor = 0 }
+	}
+}
+
+ussr_debug_breakup_category = {
+
+	#--------------------------------------------------------------------------
+	# 1. HISTORICAL - the 1991 dissolution into the fifteen union republics
+	#--------------------------------------------------------------------------
+	ussr_debug_break_historical = {
+		icon = generic_independence
+
+		available = { always = yes }
+		visible = { always = yes }
+		cost = 0
+		fire_only_once = no
+		days_re_enable = 1
+
+		complete_effect = {
+			custom_effect_tooltip = ussr_debug_break_historical_tt
+			release = RUS
+			release = UKR
+			release = BLR
+			release = MOL
+			release = EST
+			release = LAT
+			release = LIT
+			release = GEO
+			release = ARM
+			release = AZR
+			release = KAZ
+			release = UZB
+			release = TMS
+			release = KYR
+			release = TAJ
+		}
+		ai_will_do = { factor = 0 }
+	}
+
+	#--------------------------------------------------------------------------
+	# 2. FULL BREAKDOWN - union republics + every ASSR + every separatist
+	#--------------------------------------------------------------------------
+	ussr_debug_break_full = {
+		icon = generic_prepare_civil_war
+
+		available = { always = yes }
+		visible = { always = yes }
+		cost = 0
+		fire_only_once = no
+		days_re_enable = 1
+
+		complete_effect = {
+			custom_effect_tooltip = ussr_debug_break_full_tt
+
+			# --- autonomous republics inside Russia (release first, they are
+			#     carved out of the RSFSR and would otherwise go to RUS) ---
+			release = TTR
+			release = BSK
+			release = KOM
+			release = CHV
+			release = MRD
+			release = MRI
+			release = KLY
+			release = TAN
+			release = KRL
+			release = CHE
+
+			# --- autonomous republics ---
+			release = BUR
+			release = DAG
+			release = KAB
+			release = NOS
+			release = UDM
+			release = YAK
+			release = CRI
+			release = ADJ
+			release = NAK
+			release = KKP
+			# --- autonomous oblasts ---
+			release = ADY
+			release = ALT
+			release = JEW
+			release = KHK
+			release = CHR
+			release = BDK
+			# --- Caucasus autonomies ---
+			release = ING
+			release = TLM
+			release = JAV
+			# --- Caucasus national movements ---
+			release = LEZ
+			release = AVR
+			# --- national okrugs ---
+			release = NEN
+			release = HMA
+			release = YAM
+			release = TAY
+			release = EVE
+			release = UOB
+			release = AGA
+			release = CKT
+			release = KRY
+
+			# --- separatists and breakaway regions ---
+			release = ABK
+			release = SOS
+			release = NGK
+			release = PMR
+			release = GAG
+			release = UIA
+
+			# --- then the union republics ---
+			release = UKR
+			release = BLR
+			release = MOL
+			release = EST
+			release = LAT
+			release = LIT
+			release = GEO
+			release = ARM
+			release = AZR
+			release = KAZ
+			release = UZB
+			release = TMS
+			release = KYR
+			release = TAJ
+			release = RUS
+		}
+		ai_will_do = { factor = 0 }
+	}
+
+	#--------------------------------------------------------------------------
+	# 3. ASSRs ONLY - the autonomous republics break away, Union survives
+	#--------------------------------------------------------------------------
+	ussr_debug_break_assr_only = {
+		icon = generic_civil_support
+
+		available = { always = yes }
+		visible = { always = yes }
+		cost = 0
+		fire_only_once = no
+		days_re_enable = 1
+
+		complete_effect = {
+			custom_effect_tooltip = ussr_debug_break_assr_only_tt
+			release = TTR
+			release = BSK
+			release = KOM
+			release = CHV
+			release = MRD
+			release = MRI
+			release = KLY
+			release = TAN
+			release = KRL
+			release = CHE
+			release = BUR
+			release = DAG
+			release = KAB
+			release = NOS
+			release = UDM
+			release = YAK
+			release = CRI
+			release = ADJ
+			release = NAK
+			release = KKP
+			release = ADY
+			release = ALT
+			release = JEW
+			release = KHK
+			release = CHR
+			release = BDK
+			release = ING
+			release = TLM
+			release = JAV
+			release = LEZ
+			release = AVR
+			release = ABK
+			release = SOS
+			release = NGK
+		}
+		ai_will_do = { factor = 0 }
+	}
+
+	#--------------------------------------------------------------------------
+	# 4. SEPARATISTS ONLY - insurgents and breakaway regions
+	#--------------------------------------------------------------------------
+	ussr_debug_break_separatists = {
+		icon = generic_operation
+
+		available = { always = yes }
+		visible = { always = yes }
+		cost = 0
+		fire_only_once = no
+		days_re_enable = 1
+
+		complete_effect = {
+			custom_effect_tooltip = ussr_debug_break_separatists_tt
+			release = EST
+			release = LAT
+			release = LIT
+			release = UIA
+			release = CHE
+			release = ABK
+			release = SOS
+			release = NGK
+			release = PMR
+			release = GAG
+			release = ING
+			release = TLM
+			release = JAV
+			release = LEZ
+			release = AVR
+		}
+		ai_will_do = { factor = 0 }
+	}
+
+
+	#--------------------------------------------------------------------------
+	# 4b. NATIONAL OKRUGS ONLY - the thinly-populated Arctic and Siberian
+	#     okrugs break away. They are otherwise only in the Total Breakdown.
+	#--------------------------------------------------------------------------
+	ussr_debug_break_okrugs = {
+		icon = generic_civil_support
+
+		available = { always = yes }
+		visible = { always = yes }
+		cost = 0
+		fire_only_once = no
+		days_re_enable = 1
+
+		complete_effect = {
+			custom_effect_tooltip = ussr_debug_break_okrugs_tt
+			release = NEN
+			release = HMA
+			release = YAM
+			release = TAY
+			release = EVE
+			release = UOB
+			release = AGA
+			release = CKT
+			release = KRY
+		}
+		ai_will_do = { factor = 0 }
+	}
+
+	#--------------------------------------------------------------------------
+	# 5. GERMAN ASSR - restored on its historical Volga lands
+	#    Volga German ASSR (1924-1941), capital Pokrovsk/Engels.
+	#    State 2085 is the Trans-Volga steppe where the colonies actually sat.
+	#--------------------------------------------------------------------------
+	ussr_debug_german_assr_volga = {
+		icon = generic_civil_support
+
+		available = {
+			NOT = { has_country_flag = ussr_debug_gsr_placed }
+		}
+		visible = { always = yes }
+		cost = 0
+		fire_only_once = no
+
+		complete_effect = {
+			custom_effect_tooltip = ussr_debug_german_assr_volga_tt
+			set_country_flag = ussr_debug_gsr_placed
+			2085 = { add_core_of = GSR }
+			release = GSR
+		}
+		ai_will_do = { factor = 0 }
+	}
+
+	#--------------------------------------------------------------------------
+	# 6. GERMAN ASSR - in North Kazakhstan, matching the Stalin focus tree
+	#    (that tree cores states 576 and 590 for GSR)
+	#--------------------------------------------------------------------------
+	ussr_debug_german_assr_kazakhstan = {
+		icon = generic_civil_support
+
+		available = {
+			NOT = { has_country_flag = ussr_debug_gsr_placed }
+		}
+		visible = { always = yes }
+		cost = 0
+		fire_only_once = no
+
+		complete_effect = {
+			custom_effect_tooltip = ussr_debug_german_assr_kazakhstan_tt
+			set_country_flag = ussr_debug_gsr_placed
+			576 = { add_core_of = GSR }
+			590 = { add_core_of = GSR }
+			release = GSR
+		}
+		ai_will_do = { factor = 0 }
+	}
+
+	#--------------------------------------------------------------------------
+	# 7. KOREAN ASSR - in Kazakhstan south of Lake Balkhash (state 2092).
+	#    The Stalin focus tree instead cores state 573 (Pavlodar); the
+	#    second decision below reproduces that placement.
+	#--------------------------------------------------------------------------
+	ussr_debug_korean_assr_balkhash = {
+		icon = generic_civil_support
+
+		available = {
+			NOT = { has_country_flag = ussr_debug_ksr_placed }
+		}
+		visible = { always = yes }
+		cost = 0
+		fire_only_once = no
+
+		complete_effect = {
+			custom_effect_tooltip = ussr_debug_korean_assr_balkhash_tt
+			set_country_flag = ussr_debug_ksr_placed
+			2092 = { add_core_of = KSR }
+			release = KSR
+		}
+		ai_will_do = { factor = 0 }
+	}
+
+	ussr_debug_korean_assr_pavlodar = {
+		icon = generic_civil_support
+
+		available = {
+			NOT = { has_country_flag = ussr_debug_ksr_placed }
+		}
+		visible = { always = yes }
+		cost = 0
+		fire_only_once = no
+
+		complete_effect = {
+			custom_effect_tooltip = ussr_debug_korean_assr_pavlodar_tt
+			set_country_flag = ussr_debug_ksr_placed
+			573 = { add_core_of = KSR }
+			release = KSR
+		}
+		ai_will_do = { factor = 0 }
+	}
+
+	#--------------------------------------------------------------------------
+	# 8. RESTORE THE UNION - annex everything back into the SOV
+	#--------------------------------------------------------------------------
+	ussr_debug_restore_union = {
+		icon = generic_political_actions
+
+		available = { always = yes }
+		visible = { always = yes }
+		cost = 0
+		fire_only_once = no
+		days_re_enable = 1
+
+		complete_effect = {
+			custom_effect_tooltip = ussr_debug_restore_union_tt
+			clr_country_flag = ussr_debug_gsr_placed
+			clr_country_flag = ussr_debug_ksr_placed
+			every_country = {
+				limit = {
+					OR = {
+						tag = RUS
+						tag = UKR
+						tag = BLR
+						tag = MOL
+						tag = EST
+						tag = LAT
+						tag = LIT
+						tag = GEO
+						tag = ARM
+						tag = AZR
+						tag = KAZ
+						tag = UZB
+						tag = TMS
+						tag = KYR
+						tag = TAJ
+						tag = TTR
+						tag = BSK
+						tag = KOM
+						tag = CHV
+						tag = MRD
+						tag = MRI
+						tag = KLY
+						tag = TAN
+						tag = KRL
+						tag = CHE
+						tag = ABK
+						tag = SOS
+						tag = NGK
+						tag = PMR
+						tag = GAG
+						tag = FBK
+						tag = UIA
+						tag = GSR
+						tag = KSR
+						tag = BUR
+						tag = DAG
+						tag = KAB
+						tag = NOS
+						tag = UDM
+						tag = YAK
+						tag = CRI
+						tag = ADJ
+						tag = NAK
+						tag = KKP
+						tag = ADY
+						tag = ALT
+						tag = JEW
+						tag = KHK
+						tag = CHR
+						tag = BDK
+						tag = NEN
+						tag = HMA
+						tag = YAM
+						tag = TAY
+						tag = EVE
+						tag = UOB
+						tag = AGA
+						tag = CKT
+						tag = KRY
+						tag = ING
+						tag = TLM
+						tag = JAV
+						tag = AVR
+						tag = LEZ
+					}
+					exists = yes
+				}
+				ROOT = { annex_country = { target = PREV } }
+			}
+		}
+		ai_will_do = { factor = 0 }
+	}
+}
