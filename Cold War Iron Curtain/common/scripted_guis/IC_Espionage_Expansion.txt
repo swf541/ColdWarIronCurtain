@@ -546,22 +546,25 @@ scripted_gui = {
             operative_exp_fg_5_mid_level_3 = {
                 frame = operative_5_current_experience^current_page
             }
+            synergy_container_selection = {
+                image = "[SYNERGY_LIST_GUI_PICTURE]"
+            }
         }
         triggers = {
             unit_leader_mia_visible = {
-                check_variable = { operative_1_mia^current_page > 0 }
+                NOT = { check_variable = { operative_1_mia^current_page = 0 } }
             }
             unit_leader_2_mia_visible = {
-                check_variable = { operative_2_mia^current_page > 0 }
+                NOT = { check_variable = { operative_2_mia^current_page = 0 } }
             }
             unit_leader_3_mia_visible = {
-                check_variable = { operative_3_mia^current_page > 0 }
+                NOT = { check_variable = { operative_3_mia^current_page = 0 } }
             }
             unit_leader_4_mia_visible = {
-                check_variable = { operative_4_mia^current_page > 0 }
+                NOT = { check_variable = { operative_4_mia^current_page = 0 } }
             }
             unit_leader_5_mia_visible = {
-                check_variable = { operative_5_mia^current_page > 0 }
+                NOT = { check_variable = { operative_5_mia^current_page = 0 } }
             }
 
             unit_leader_wia_visible = {
@@ -702,6 +705,21 @@ scripted_gui = {
 			}
 		}
         effects = { 
+            unit_leader_mia_click = {
+                set_variable = { squad_mia_select = 1 }  
+            }
+            unit_leader_2_mia_click = {
+                set_variable = { squad_mia_select = 2 }  
+            }
+            unit_leader_3_mia_click = {
+                set_variable = { squad_mia_select = 3 }  
+            }
+            unit_leader_4_mia_click = {
+                set_variable = { squad_mia_select = 4 }  
+            }
+            unit_leader_5_mia_click = {
+                set_variable = { squad_mia_select = 5 }  
+            }
             unit_leader_kia_click = {
                 espionage_recruitment_generation = yes
                 set_variable = { paramilitary_recruit_toggle = 2 }
@@ -813,6 +831,7 @@ scripted_gui = {
                     OPERATIVE = "[?operative_number]"
                     ARRAY_NUMBER = "[?current_page]"
                 }    
+                calculate_group_experience = yes
             }
             prior_squad_button_click = {
                 set_variable = {
@@ -862,6 +881,7 @@ scripted_gui = {
                     OPERATIVE = "[?operative_number]"
                     ARRAY_NUMBER = "[?current_page]"
                 }    
+                calculate_group_experience = yes
             }
             history_display_button_click = {
                 set_variable = {
@@ -887,25 +907,65 @@ scripted_gui = {
                 set_variable = {
                     squad_position = 1
                 }
+                if = {
+                    limit = {
+                        check_variable = { paramilitary_operative_squad_unit_5_name_type^current_page < 0 }
+                    }
+                    espionage_recruitment_generation = yes
+                    set_variable = { paramilitary_recruit_toggle = 2 }
+                    set_variable = { squad_replacement_select = 1 }  
+                }
             }
             unit_leader_2_click = {
                 set_variable = {
                     squad_position = 2
+                }
+                if = {
+                    limit = {
+                        check_variable = { paramilitary_operative_squad_unit_5_name_type^current_page < 0 }
+                    }
+                    espionage_recruitment_generation = yes
+                    set_variable = { paramilitary_recruit_toggle = 2 }
+                    set_variable = { squad_replacement_select = 2 }  
                 }
             }
             unit_leader_3_click = {
                 set_variable = {
                     squad_position = 3
                 }
+                if = {
+                    limit = {
+                        check_variable = { paramilitary_operative_squad_unit_5_name_type^current_page < 0 }
+                    }
+                    espionage_recruitment_generation = yes
+                    set_variable = { paramilitary_recruit_toggle = 2 }
+                    set_variable = { squad_replacement_select = 3 }  
+                }
             }
             unit_leader_4_click = {
                 set_variable = {
                     squad_position = 4
                 }
+                if = {
+                    limit = {
+                        check_variable = { paramilitary_operative_squad_unit_5_name_type^current_page < 0 }
+                    }
+                    espionage_recruitment_generation = yes
+                    set_variable = { paramilitary_recruit_toggle = 2 }
+                    set_variable = { squad_replacement_select = 4 }  
+                }
             }
             unit_leader_5_click = {
                 set_variable = {
                     squad_position = 5
+                }
+                if = {
+                    limit = {
+                        check_variable = { paramilitary_operative_squad_unit_5_name_type^current_page < 0 }
+                    }
+                    espionage_recruitment_generation = yes
+                    set_variable = { paramilitary_recruit_toggle = 2 }
+                    set_variable = { squad_replacement_select = 5 }  
                 }
             }
             close_button_click = {
@@ -993,16 +1053,25 @@ scripted_gui = {
                 tier_0_espionage_skill_check_trigger = yes
             }
             picked_bg_visible = {
-                tier_0_espionage_skill_check_complete = yes
+                tier_0_espionage_skill_check_complete = yes 
             }
-            #End of Tier 0
+            #End of Tier 0 
             tier_1_slot_1_disabled_bg_visible = {
-                tier_1_espionage_skill_check_option_1_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 1 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_1_espionage_skill_check_option_1_trigger = no
+                }
+
             }
             tier_1_slot_1_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 2 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 2 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1013,12 +1082,20 @@ scripted_gui = {
             }
 
             tier_1_slot_2_disabled_bg_visible = {
-                tier_1_espionage_skill_check_option_2_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 1 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_1_espionage_skill_check_option_2_trigger = no
+                }
             }
             tier_1_slot_2_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 2 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 2 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1027,14 +1104,21 @@ scripted_gui = {
             tier_1_slot_2_picked_bg_visible = {
                 tier_1_espionage_skill_check_option_2_complete = yes
             }
-
             tier_1_slot_3_disabled_bg_visible = {
-                tier_1_espionage_skill_check_option_3_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 1 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_1_espionage_skill_check_option_3_trigger = no
+                }
             }
             tier_1_slot_3_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 2 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 2 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1045,12 +1129,20 @@ scripted_gui = {
             }
 
             tier_1_slot_4_disabled_bg_visible = {
-                tier_1_espionage_skill_check_option_4_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 1 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_1_espionage_skill_check_option_4_trigger = no
+                }
             }
             tier_1_slot_4_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 2 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 2 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1061,12 +1153,20 @@ scripted_gui = {
             }
             #Tier 2
             tier_2_slot_1_disabled_bg_visible = {
-                tier_2_espionage_skill_check_option_1_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page > 3 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_2_espionage_skill_check_option_1_trigger = no
+                }
             }
             tier_2_slot_1_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 3 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 3 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1077,12 +1177,20 @@ scripted_gui = {
             }
 
             tier_2_slot_2_disabled_bg_visible = {
-                tier_2_espionage_skill_check_option_2_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page > 3 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_2_espionage_skill_check_option_2_trigger = no
+                }
             }
             tier_2_slot_2_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 3 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 3 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1093,12 +1201,20 @@ scripted_gui = {
             }
 
             tier_2_slot_3_disabled_bg_visible = {
-                tier_2_espionage_skill_check_option_3_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page > 3 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_2_espionage_skill_check_option_3_trigger = no
+                }
             }
             tier_2_slot_3_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 3 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 3 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1109,12 +1225,20 @@ scripted_gui = {
             }
 
             tier_2_slot_4_disabled_bg_visible = {
-                tier_2_espionage_skill_check_option_4_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page > 3 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_2_espionage_skill_check_option_4_trigger = no
+                }
             }
             tier_2_slot_4_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 3 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 3 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1125,12 +1249,20 @@ scripted_gui = {
             }
 
             tier_2_slot_5_disabled_bg_visible = {
-                tier_2_espionage_skill_check_option_5_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page > 3 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_2_espionage_skill_check_option_5_trigger = no
+                }
             }
             tier_2_slot_5_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 3 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 3 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1141,12 +1273,20 @@ scripted_gui = {
             }
 
             tier_2_slot_6_disabled_bg_visible = {
-                tier_2_espionage_skill_check_option_6_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page > 3 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_2_espionage_skill_check_option_6_trigger = no
+                }
             }
             tier_2_slot_6_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 3 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 3 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1157,12 +1297,20 @@ scripted_gui = {
             }
 
             tier_2_slot_7_disabled_bg_visible = {
-                tier_2_espionage_skill_check_option_7_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page > 3 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_2_espionage_skill_check_option_7_trigger = no
+                }
             }
             tier_2_slot_7_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 3 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 3 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1171,7 +1319,7 @@ scripted_gui = {
             tier_2_slot_7_picked_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 3 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 3 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1179,12 +1327,20 @@ scripted_gui = {
             }
 
             tier_2_slot_8_disabled_bg_visible = {
-                tier_2_espionage_skill_check_option_8_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page > 3 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_2_espionage_skill_check_option_8_trigger = no
+                }
             }
             tier_2_slot_8_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 3 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 3 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1195,12 +1351,20 @@ scripted_gui = {
             }
             #Tier 3
             tier_3_slot_1_disabled_bg_visible = {
-                tier_3_espionage_skill_check_option_1_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page > 4 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_3_espionage_skill_check_option_1_trigger = no
+                }
             }
             tier_3_slot_1_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 4 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 4 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1211,12 +1375,20 @@ scripted_gui = {
             }
 
             tier_3_slot_2_disabled_bg_visible = {
-                tier_3_espionage_skill_check_option_2_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page > 4 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_3_espionage_skill_check_option_2_trigger = no
+                }
             }
             tier_3_slot_2_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 4 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 4 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1227,12 +1399,20 @@ scripted_gui = {
             }
 
             tier_3_slot_3_disabled_bg_visible = {
-                tier_3_espionage_skill_check_option_3_trigger = no
+                OR = {
+                    meta_trigger = { 
+                        text = {
+                            check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page > 4 }
+                        }
+                        SQUAD_POSITION = "[?squad_position]"
+                    }    
+                    tier_3_espionage_skill_check_option_3_trigger = no
+                }
             }
             tier_3_slot_3_pickable_bg_visible = {
                 meta_trigger = { 
                     text = {
-                        check_variable = { operative_[SQUAD_POSITION]_current_experience^current_page = 4 }
+                        check_variable = { paramilitary_operative_squad_unit_[SQUAD_POSITION]_level^current_page = 4 }
                     }
                     SQUAD_POSITION = "[?squad_position]"
                 }    
@@ -1792,6 +1972,7 @@ scripted_gui = {
                 clear_array = black_ops_team_history_entries_flags
                 clear_array = black_ops_team_history_entries_target 
                 clear_array = black_ops_team_history_entry_status
+                calculate_group_experience = yes
                 meta_effect = { 
                     text = {
                         for_each_loop = {
@@ -1841,7 +2022,7 @@ scripted_gui = {
             create_special_operations_team_start_click = {
                 espionage_recruitment_generation = yes
             }
-        }
+        }  
     }
 	synergy_menu = {
         context_type = player_context
@@ -1849,14 +2030,430 @@ scripted_gui = {
         visible = {
             check_variable = { show_synergy_menu = 1 }
         }
-        dynamic_lists = {
+        dynamic_lists = { 
             synergy_list_gridbox = {
                 array = global.espionage_squad_synergy_options
                 change_scope = no
 				entry_container = synergy_list_entry
             }
         }
+        properties = { 
+            Synergy_Icon = {
+                image = "[SYNERGY_LIST_ENTRY_PICTURE]"
+            }
+        }  
+        triggers = {
+            Synergy_Button_click_enabled = {
+                NOT = {
+                    check_variable = { global.espionage_squad_synergy_options^i = paramilitary_operative_squad_synergy_active^current_page }
+                }
+                synergy_selection_trigger_check = yes
+            }
+        }
         effects = {
+            Synergy_Button_click = {
+                reset_synergy_bonus_to_zero = yes
+                if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 1
+                        }
+                    }
+                    add_damage_reconnaissance_group_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 2
+                        }
+                    }
+                    add_counter_infiltration_doctrine_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 3
+                        }
+                    }
+                    add_deep_cover_liaison_protocol_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 4
+                        }
+                    }
+                    add_tactical_deception_taskforce_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 5
+                        }
+                    }
+                    add_local_stability_operations_manual_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 6
+                        }
+                    }
+                    add_operational_relay_network_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 7
+                        }
+                    }
+                    add_covert_engineering_detachment_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 8
+                        }
+                    }
+                    add_rapid_mobilization_command_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 9
+                        }
+                    }
+                    add_subversion_mapping_cell_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 10
+                        }
+                    }
+                    add_civilian_intelligence_overlay_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 11
+                        }
+                    }
+                    add_urban_pursuit_unit_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 12
+                        }
+                    }
+                    add_crisis_extraction_doctrine_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 13
+                        }
+                    }
+                    add_shadow_operations_cell_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 14
+                        }
+                    }
+                    add_interrogation_logistics_bureau_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 15
+                        }
+                    }
+                    add_disruption_and_penetration_order_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 16
+                        }
+                    }
+                    add_insurgent_neutralization_group_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 17
+                        }
+                    }
+                    add_compartmentalized_resistance_network_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 18
+                        }
+                    }
+                    add_force_projection_unit_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 19
+                        }
+                    }
+                    add_information_denial_subdivision_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 20
+                        }
+                    }
+                    add_embedded_support_doctrine_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 21
+                        }
+                    }
+                    add_integrated_clandestine_warfare_command_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 22
+                        }
+                    }
+                    add_silent_penetration_directive_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 23
+                        }
+                    }
+                    add_ideological_disruption_framework_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 24
+                        }
+                    }
+                    add_redundancy_security_grid_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 25
+                        }
+                    }
+                    add_foreign_revolutionary_export_doctrine_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 26
+                        }
+                    }
+                    add_urban_denial_operations_plan_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 27
+                        }
+                    }
+                    add_electronic_subversion_protocol_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 28
+                        }
+                    }
+                    add_combat_denial_integration_model_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 29
+                        }
+                    }
+                    add_zero_footprint_operations_charter_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 30
+                        }
+                    }
+                    add_strategic_destabilization_corps_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 31
+                        }
+                    }
+                    add_black_communications_authority_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 32
+                        }
+                    }
+                    add_psycho_economic_war_board_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 33
+                        }
+                    }
+                    add_agent_preparation_bureau_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 34
+                        }
+                    }
+                    add_internal_threats_coordination_cell_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 35
+                        }
+                    }
+                    add_ethnic_subversion_operations_group_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 36
+                        }
+                    }
+                    add_territorial_denial_division_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 37
+                        }
+                    }
+                    add_decentralized_espionage_syndicate_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 38
+                        }
+                    }
+                    add_insurgency_amplification_bureau_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 39
+                        }
+                    }
+                    add_wartime_disruption_directorate_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 40
+                        }
+                    }
+                    add_long_range_penetration_taskforce_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 41
+                        }
+                    }
+                    add_usa_strategic_communications_working_group_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 42
+                        }
+                    }
+                    add_usa_covert_action_command_authority_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 43
+                        }
+                    }
+                    add_usa_langley_deep_access_division_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 44
+                        }
+                    }
+                    add_usa_national_influence_expansion_office_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 45
+                        }
+                    }
+                    add_usa_multi_theater_operations_framework_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 46
+                        }
+                    }
+                    add_sov_active_measures_bureau_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 47
+                        }
+                    }
+                    add_sov_illegal_operations_directorate_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 48
+                        }
+                    }
+                    add_sov_red_cultural_committee_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 49
+                        }
+                    }
+                    add_sov_internal_stability_enforcement_program_synergy = yes
+                }
+                else_if = {
+                    limit = {
+                        check_variable = {
+                            global.espionage_squad_synergy_options^i = 50
+                        }
+                    }
+                    add_sov_tricontinental_revolutionary_support_unit_synergy = yes
+                }
+            }
             close_click = {
                 set_variable = {
                     show_synergy_menu = 0
