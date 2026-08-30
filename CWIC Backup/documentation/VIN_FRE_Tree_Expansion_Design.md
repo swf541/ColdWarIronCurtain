@@ -990,3 +990,14 @@ run. The expanded GUI exposes exact standings and leverage for that test.
 Engine acceptance is intentionally pending. The next sequence is a targeted
 smoke pass for parser/event/mission/Geneva and operation contracts, followed by
 the unified historical-AI run already requested in this specification.
+
+## 2026-08-29 combined engine-acceptance protocol
+
+Limited tester availability combines the targeted smoke pass and historical-AI
+run into one fresh 1949-to-Geneva game. The authoritative procedure and
+checkoff are in `CWIC Backup/documentation/Indochina_AFK_Playtest.md`. Parser,
+telemetry, stuck-lifecycle, premature peace-conference, and post-Dien Bien Phu
+choice-bypass defects are early-stop regressions. AI allocation, pacing,
+force-health, and score problems are recorded and carried through the complete
+run so the next fix pass has comparable evidence. Engine acceptance remains
+pending review of both preserved logs and the completed checkoff.

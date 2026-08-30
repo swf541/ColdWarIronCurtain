@@ -3,11 +3,11 @@
 Generated from `events/VIE_Events.txt` cross-referenced against `interface/*.gfx` and the files on disk.
 364 events total. Sorted by how badly each case needs art.
 
-Last verified 2026-08-05, after the first art import (see *Delivered* at the bottom).
+Last verified 2026-08-28, after the second art import (see *Delivered* at the bottom).
 
 ---
 
-## 1. Broken now - sprite referenced but never defined (7)
+## 1. Broken now - sprite referenced but never defined (4)
 
 These events have a `picture = GFX_X` line pointing at a sprite name that no `.gfx` file defines.
 The game logs an error and falls back to a default frame. Fixing these needs both an image *and* a
@@ -15,13 +15,15 @@ The game logs an error and falls back to a default frame. Fixing these needs bot
 
 | Event | Missing sprite |
 |---|---|
-| `VNA.3` | `GFX_VNA.3` |
 | `VNA.4` | `GFX_VNA.4` |
 | `VNA.5` | `GFX_VNA.5` |
-| `VNA.6` | `GFX_VNA.6` |
 | `VNA.7` | `GFX_VNA.7` |
 | `VNG.0` | `GFX_VNG.0` |
-| `USA_VIE_CuongDe_Installation.1` | `GFX_USA_VIE_CuongDe_Installation.1` |
+
+`VNA.3`, `VNA.6`, and `USA_VIE_CuongDe_Installation.1` came off this list in the 2026-08-28 import.
+`VNA.4`/`.5`/`.7` are the same Bao Dai / Vietnamese National Army sub-chain as the two that were
+just done - one archival source set covers all of them. `VNG.0` is a `NO_DATELINE` news event
+(185x460) and is also flagged `UNFIRED` in the audit, so confirm it still wants art before drawing.
 
 ## 2. Broken now - sprite defined but the texture file is absent (2)
 
@@ -80,7 +82,12 @@ the sprite would need naming as well as drawing.
 | `DaLat_Question.7` | `DaLat_Question.7` |
 | `Autonomous_FUL_Republic.0` | `GFX_Autonomous_FUL_Republic.0` |
 
-## 4. Borrowing another event's art (33)
+## 4. Borrowing another event's art (28)
+
+The 2026-08-28 import cleared five borrowers that the table below never enumerated individually:
+`Diem.1` (was `GFX_BaoDai.13`), `Diem.6` (`GFX_BaoDai.9`), `Diem.61` (`GFX_BaoDai.11`),
+`Can_Lao.1` (`GFX_BaoDai.100`), and `VIE_PMs.9` (`GFX_VIE_PMs.5`) - the placeholder set tracked
+in `LogDocs/VIE_DIEM_ART_REQUESTS.md`. The eight in the table below are untouched.
 
 These render fine but reuse a picture that belongs to a different event. Some are deliberate and
 fine (a chain sharing one frame); some are clearly stand-ins.
@@ -142,12 +149,35 @@ and the `USA_VIE` American-engagement chain (9). Those are the highest-traffic u
 
 ## Summary
 
-- Events with no working picture: **123** of 364
-  - 7 reference an undefined sprite (error in log)
+- Events with no working picture: **120** of 364
+  - 4 reference an undefined sprite (error in log)
   - 2 reference a missing file (error in log)
   - 32 have the line commented out
   - 82 have no line at all
-- Events reusing another event's art: **33**
+- Events reusing another event's art: **28**
+
+---
+
+## Delivered - 2026-08-28 import (9, commit `d27729a`)
+
+First batch through the `eventpic` generator (`CWIC Backup/tools/EventPicGenerator`), manifest
+`batches/indochina_2026-08.yml`, sources from `~/Pictures/Event Pictures/`. Nine PNGs plus nine
+`spriteType` entries appended to the VIE block of `interface/eventpictures.gfx`; each event's
+`picture =` line was repointed off its placeholder.
+
+| Event | New sprite | File | Was |
+|---|---|---|---|
+| `VNA.3` | `GFX_VNA.3` | `VIE/VNA.3.png` | undefined sprite (section 1) |
+| `VNA.6` | `GFX_VNA.6` | `VIE/VNA.6.png` | undefined sprite (section 1) |
+| `USA_VIE_CuongDe_Installation.1` | `GFX_USA_VIE_CuongDe_Installation.1` | `VIE/USA_VIE_CuongDe_Installation.1.png` | undefined sprite (section 1) |
+| `Diem.1` | `GFX_Diem.1` | `VIE/Diem.1.png` | borrowed `GFX_BaoDai.13` |
+| `Diem.6` | `GFX_Diem.6` | `VIE/Diem.6.png` | borrowed `GFX_BaoDai.9` |
+| `Diem.61` | `GFX_Diem.61` | `VIE/Diem.61.png` | borrowed `GFX_BaoDai.11` |
+| `Can_Lao.1` | `GFX_Can_Lao.1` | `VIE/Can_Lao.1.png` | borrowed `GFX_BaoDai.100` |
+| `VIE_PMs.9` | `GFX_VIE_PMs.9` | `VIE/VIE_PMs.9.png` | borrowed `GFX_VIE_PMs.5` |
+| `FRE_Dien_Bien.1` | `GFX_FRE_Dien_Bien.1` | `FRE/FRE_Dien_Bien.1.png` | vanilla `GFX_report_event_generic_soldiers` (not a VIE event) |
+
+`Can_Lao.1` is the only news picture in the batch (185x460); the rest are 210x176 country frames.
 
 ---
 
