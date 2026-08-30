@@ -15881,3 +15881,58 @@ VIE_diem_run_summary = {
 	}
 	custom_effect_tooltip = VIE_50s_content_end_tt
 }
+
+VIE_cuong_de_death_check = {
+	if = {
+		limit = {
+			NOT = { has_country_flag = VIE_CuongDe_Death_Resolved }
+			has_character = VIE_Cuong_De
+			date > 1950.11.1
+		}
+		if = {
+			limit = {
+				has_country_flag = VIE_CuongDe_Succeeds
+				date > 1952.1.1
+				NOT = {
+					has_country_flag = Nhiep_Successor
+					has_country_flag = Diem_Successor
+					has_country_flag = Hung_Successor
+					has_country_flag = Vinh_Successor
+				}
+			}
+			if = {
+				limit = { date > 1955.1.1 }
+				VIE_cuong_de_dies = yes
+			}
+			else = {
+				random = {
+					chance = 8
+					VIE_cuong_de_dies = yes
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_country_flag = VIE_CuongDe_Lost1
+					AND = {
+						date > 1956.1.1
+						NOT = { has_country_flag = VIE_CuongDe_Succeeds }
+					}
+				}
+			}
+			VIE_cuong_de_dies = yes
+		}
+	}
+}
+
+VIE_cuong_de_dies = {
+	set_country_flag = VIE_CuongDe_Death_Resolved
+	if = {
+		limit = { has_country_flag = VIE_CuongDe_Succeeds }
+		country_event = { id = CuongDe.17 hours = 6 }
+	}
+	else = {
+		country_event = { id = BaoDai.16 hours = 6 }
+	}
+}
