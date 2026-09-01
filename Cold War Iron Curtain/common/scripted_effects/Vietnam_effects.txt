@@ -1066,6 +1066,101 @@ VIE_binh_xuyen_driven_from_saigon = {
 	custom_effect_tooltip = VIE_binh_xuyen_rung_sac_tt
 }
 
+VIE_binh_xuyen_revolt_shell = {
+	if = {
+		limit = { has_character = VIE_Le_Van_Vien }
+		VIE_Le_Van_Vien = { set_nationality = CCC }
+	}
+	CCC = {
+		set_country_flag = CCC_Binh_Xuyen_Revolt
+		set_cosmetic_tag = CCC_Binh_Xuyen
+		set_politics = {
+			ruling_party = neutrality
+			elections_allowed = no
+		}
+		# The revolt is not the Cochinchina state, so strip its institutions.
+		if = {
+			limit = { has_dynamic_modifier = { modifier = CCC_cochinchina_nam_viet_guard } }
+			remove_dynamic_modifier = { modifier = CCC_cochinchina_nam_viet_guard }
+		}
+		if = {
+			limit = { has_dynamic_modifier = { modifier = CCC_cochinchina_viet_binh_doan } }
+			remove_dynamic_modifier = { modifier = CCC_cochinchina_viet_binh_doan }
+		}
+		if = {
+			limit = { has_dynamic_modifier = { modifier = CCC_cochinchina_sect_militaries } }
+			remove_dynamic_modifier = { modifier = CCC_cochinchina_sect_militaries }
+		}
+		if = {
+			limit = { has_character = VIE_Le_Van_Vien }
+			add_country_leader_role = {
+				character = VIE_Le_Van_Vien
+				promote_leader = yes
+				country_leader = {
+					ideology = stratocracy
+				}
+			}
+		}
+	}
+	set_variable = { VIE_Warlord_Status_2 = 2 }	# hostile
+}
+
+VIE_spawn_binh_xuyen_revolt = {
+	VIE_binh_xuyen_revolt_shell = yes
+	CCC = {
+		transfer_state = 1754
+		set_province_controller = 13709	# Cholon
+		load_oob = CCC_Binh_Xuyen_Cholon
+	}
+	declare_war_on = {
+		target = CCC
+		type = annex_everything
+	}
+	custom_effect_tooltip = VIE_binh_xuyen_revolt_tt
+}
+
+VIE_spawn_binh_xuyen_revolt_full = {
+	VIE_binh_xuyen_revolt_shell = yes
+	CCC = {
+		transfer_state = 1754
+		set_province_controller = 13707	# Rung-Sac
+		set_province_controller = 13709	# Cholon
+		load_oob = CCC_Binh_Xuyen
+	}
+	declare_war_on = {
+		target = CCC
+		type = annex_everything
+	}
+	custom_effect_tooltip = VIE_binh_xuyen_revolt_tt
+}
+
+VIE_binh_xuyen_retreat_to_rung_sac = {
+	VIE_binh_xuyen_driven_from_saigon = yes
+	if = {
+		limit = { country_exists = CCC }
+		CCC = {
+			set_province_controller = 13707	# Rung-Sac
+			load_oob = CCC_Binh_Xuyen_RungSac
+		}
+	}
+}
+
+VIE_binh_xuyen_revolt_watcher = {
+	if = {
+		limit = {
+			country_exists = CCC
+			has_war_with = CCC
+			CCC = {
+				has_country_flag = CCC_Binh_Xuyen_Revolt
+				NOT = { controls_province = 13709 }
+			}
+			NOT = { has_country_flag = VIE_Binh_Xuyen_Rung_Sac }
+			NOT = { has_country_flag = VIE_Hoang_Dieu_Complete }
+		}
+		country_event = { id = Diem.42 hours = 6 }
+	}
+}
+
 VIE_finish_the_binh_xuyen = {
 	set_temp_variable = { binh_xuyen_annihilation_change = Binh_Xuyen_Annihilation }
 	multiply_temp_variable = { binh_xuyen_annihilation_change = -1 }
@@ -1073,6 +1168,21 @@ VIE_finish_the_binh_xuyen = {
 	clr_country_flag = VIE_Binh_Xuyen_Rung_Sac
 	set_country_flag = VIE_Hoang_Dieu_Complete
 	VIE_dismantle_binh_xuyen = yes
+	if = {
+		limit = {
+			country_exists = CCC
+			CCC = { has_country_flag = CCC_Binh_Xuyen_Revolt }
+		}
+		if = {
+			limit = { CCC = { has_character = VIE_Le_Van_Vien } }
+			VIE_Le_Van_Vien = {
+				remove_country_leader_role = { ideology = stratocracy }
+				set_nationality = VIE
+			}
+		}
+		CCC = { clr_country_flag = CCC_Binh_Xuyen_Revolt }
+		annex_country = { target = CCC }
+	}
 }
 
 binh_xuyen_loyalty_change_tt = {
@@ -15880,4 +15990,59 @@ VIE_diem_run_summary = {
 		custom_effect_tooltip = VIE_summary_reject_geneva_tt
 	}
 	custom_effect_tooltip = VIE_50s_content_end_tt
+}
+
+VIE_cuong_de_death_check = {
+	if = {
+		limit = {
+			NOT = { has_country_flag = VIE_CuongDe_Death_Resolved }
+			has_character = VIE_Cuong_De
+			date > 1950.11.1
+		}
+		if = {
+			limit = {
+				has_country_flag = VIE_CuongDe_Succeeds
+				date > 1952.1.1
+				NOT = {
+					has_country_flag = Nhiep_Successor
+					has_country_flag = Diem_Successor
+					has_country_flag = Hung_Successor
+					has_country_flag = Vinh_Successor
+				}
+			}
+			if = {
+				limit = { date > 1955.1.1 }
+				VIE_cuong_de_dies = yes
+			}
+			else = {
+				random = {
+					chance = 8
+					VIE_cuong_de_dies = yes
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_country_flag = VIE_CuongDe_Lost1
+					AND = {
+						date > 1956.1.1
+						NOT = { has_country_flag = VIE_CuongDe_Succeeds }
+					}
+				}
+			}
+			VIE_cuong_de_dies = yes
+		}
+	}
+}
+
+VIE_cuong_de_dies = {
+	set_country_flag = VIE_CuongDe_Death_Resolved
+	if = {
+		limit = { has_country_flag = VIE_CuongDe_Succeeds }
+		country_event = { id = CuongDe.17 hours = 6 }
+	}
+	else = {
+		country_event = { id = BaoDai.16 hours = 6 }
+	}
 }
