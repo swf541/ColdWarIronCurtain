@@ -3,45 +3,35 @@
 Generated from `events/VIE_Events.txt` cross-referenced against `interface/*.gfx` and the files on disk.
 364 events total. Sorted by how badly each case needs art.
 
-Last verified 2026-08-28, after the second art import (see *Delivered* at the bottom).
+Last verified 2026-08-31, after the third art import (see *Delivered* at the bottom).
 
 ---
 
-## 1. Broken now - sprite referenced but never defined (4)
+## 1. Broken now - sprite referenced but never defined (0)
 
 These events have a `picture = GFX_X` line pointing at a sprite name that no `.gfx` file defines.
 The game logs an error and falls back to a default frame. Fixing these needs both an image *and* a
 `spriteType` entry.
 
-| Event | Missing sprite |
-|---|---|
-| `VNA.4` | `GFX_VNA.4` |
-| `VNA.5` | `GFX_VNA.5` |
-| `VNA.7` | `GFX_VNA.7` |
-| `VNG.0` | `GFX_VNG.0` |
+This list is now empty. `VNA.4`, `VNA.5`, `VNA.7`, and `VNG.0` came off it in the 2026-08-31
+import; `VNA.3`, `VNA.6`, and `USA_VIE_CuongDe_Installation.1` in the 2026-08-28 import.
 
-`VNA.3`, `VNA.6`, and `USA_VIE_CuongDe_Installation.1` came off this list in the 2026-08-28 import.
-`VNA.4`/`.5`/`.7` are the same Bao Dai / Vietnamese National Army sub-chain as the two that were
-just done - one archival source set covers all of them. `VNG.0` is a `NO_DATELINE` news event
-(185x460) and is also flagged `UNFIRED` in the audit, so confirm it still wants art before drawing.
-
-## 2. Broken now - sprite defined but the texture file is absent (2)
+## 2. Broken now - sprite defined but the texture file is absent (0)
 
 The `.gfx` entry exists and points at a path with nothing at it. Dropping the image in at the named
 path is the whole fix - no script change needed.
 
-| Event | Sprite | Expected file |
-|---|---|---|
-| `VIE_Historical.4` | `GFX_VIE_Historical.4` | `gfx/event_pictures/VIE/VIE_Historical_4.png` |
-| `VIE_PQC_Mil.2` | `GFX_VIE_PQC_Mil.2` | `gfx/event_pictures/VIE/VIE_PQC_Mil.2.png` |
+This list is now empty. `VIE_Historical.4` (sprite repointed from the legacy `VIE_Historical_4.png`
+underscore path to `VIE_Historical.4.png`) and `VIE_PQC_Mil.2` were both delivered in the
+2026-08-31 import.
 
 `VIE_Historical.6` used to sit in this list. It was never missing art - `GFX_VIE_Historical.6` was
 defined twice, once at the top of `eventpictures.gfx` pointing at an underscore path that does not
 exist and once further down pointing at `VIE_Historical.6.png`, which does. The stale duplicate has
-been removed. `GFX_VIE_Historical.5` still points at a nonexistent `VIE_Historical_5.png`, but no
-event references it, so it is dead weight rather than a visible bug.
+been removed. `GFX_VIE_Historical.5`, which pointed at a nonexistent `VIE_Historical_5.png` and was
+referenced by no event, was likewise dropped from `eventpictures.gfx` in the 2026-08-31 pass.
 
-## 3. Art was planned then disabled - commented-out `picture` line (32)
+## 3. Art was planned then disabled - commented-out `picture` line (31)
 
 Someone wrote the `picture =` line and commented it out, which almost always means the art was
 specced but never delivered. Note that 11 of these comment a bare id rather than a `GFX_` name, so
@@ -56,7 +46,6 @@ the sprite would need naming as well as drawing.
 | `Montagnard_Administrative.1` | `Montagnard_Administrative.1` |
 | `Du_So_21.1` | `Du_So_21.1` |
 | `Du_So_21.2` | `Du_So_21.2` |
-| `Autonomous_FUL_Republic.1` | `GFX_Autonomous_FUL_Republic.1` |
 | `Autonomous_FUL_Republic.2` | `GFX_Autonomous_FUL_Republic.2` |
 | `FUL_DanVuong_Model.1` | `FUL_DanVuong_Model.1` |
 | `FUL_DanVuong_Model.2` | `FUL_DanVuong_Model.2` |
@@ -149,14 +138,35 @@ and the `USA_VIE` American-engagement chain (9). Those are the highest-traffic u
 
 ## Summary
 
-- Events with no working picture: **120** of 364
-  - 4 reference an undefined sprite (error in log)
-  - 2 reference a missing file (error in log)
-  - 32 have the line commented out
+- Events with no working picture: **113** of 364
+  - 0 reference an undefined sprite (error in log)
+  - 0 reference a missing file (error in log)
+  - 31 have the line commented out
   - 82 have no line at all
 - Events reusing another event's art: **28**
 
 ---
+
+## Delivered - 2026-08-31 import (7)
+
+Third batch, researched through `tools/indochina_event_pictures/catalog.py` and cropped by the
+event-picture maker. Seven PNGs landed in `gfx/event_pictures/VIE/` with matching `spriteType`
+entries; each event's `picture =` line now resolves. This clears sections 1 and 2 entirely and
+takes one event off section 3.
+
+| Event | Sprite | File | Was |
+|---|---|---|---|
+| `VNA.4` | `GFX_VNA.4` | `VIE/VNA.4.png` | undefined sprite (section 1) |
+| `VNA.5` | `GFX_VNA.5` | `VIE/VNA.5.png` | undefined sprite (section 1) |
+| `VNA.7` | `GFX_VNA.7` | `VIE/VNA.7.png` | undefined sprite (section 1) |
+| `VNG.0` | `GFX_VNG.0` | `VIE/VNG.0.png` | undefined sprite (section 1) |
+| `VIE_Historical.4` | `GFX_VIE_Historical.4` | `VIE/VIE_Historical.4.png` | missing texture file (section 2); sprite repointed off the legacy `VIE_Historical_4.png` path |
+| `VIE_PQC_Mil.2` | `GFX_VIE_PQC_Mil.2` | `VIE/VIE_PQC_Mil.2.png` | missing texture file (section 2) |
+| `Autonomous_FUL_Republic.1` | `GFX_Autonomous_FUL_Republic.1` | `VIE/Autonomous_FUL_Republic.1.png` | commented-out `picture` line (section 3); line uncommented and sprite added |
+
+`VNG.0` is the only news picture in the batch (185x460); the rest are 210x176 country frames.
+The stale `GFX_VIE_Historical.5` sprite (pointed at a nonexistent `VIE_Historical_5.png`, unreferenced)
+was dropped from `eventpictures.gfx` in the same pass.
 
 ## Delivered - 2026-08-28 import (9, commit `d27729a`)
 
