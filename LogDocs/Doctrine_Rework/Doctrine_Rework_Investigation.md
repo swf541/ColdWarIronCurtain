@@ -185,3 +185,35 @@ Suggested first-session order:
 - country history, focuses, events, decisions, and AI scripts that reference doctrine technologies or categories
 
 No gameplay files were changed as part of this investigation document.
+
+## Implementation outcome (2026-09-04)
+
+Implemented on branch `tank-designer-and-doctrine-rework-test`. This section records the architecture decision and the verified result; the sections above remain the original investigation.
+
+### Architecture decision
+
+The branch deliberately retains the **legacy doctrine technology model** and keeps the incomplete DLC-era track/grand-doctrine framework suppressed.
+
+- The land, air, and naval doctrine technology files were moved out of the parked `common/technologies/doctrine rework/` path into the active technology root, so the roughly 19,850 lines of custom content now load.
+- The DLC doctrine framework stays disabled through the exact zero-byte override set under `common/doctrines/`. The missing special-forces track override was added so the vanilla track cannot leak into the retained legacy model.
+
+This is a decision to ship one architecture, not a judgement that the DLC framework is unworkable. Finishing it later means removing the zero-byte overrides and re-parking the legacy technology files, in that order.
+
+### Content fixes applied
+
+- All `category = air_doctrine` references corrected to `cat_air_doctrine`.
+- BRA's invalid `light_tank_chassis` category corrected to `armor_light`.
+- The NATO transitional combined-arms technology-path typo corrected, and the duplicate cross-decade path from `cw_nato_1950s_tactical_nuclear_fire_planning` to `cw_nato_1960s_transitional_combined_arms_cohesion` removed. The target keeps its prerequisite and its internal 1960s path.
+- Conservative gameplay effects added to all 528 land-doctrine nodes.
+- All 51 rejected `defence = 0.01` effects corrected to `defense = 0.01`.
+- The missing Cuban capstone localization added.
+
+### Verified runtime results
+
+Full 35-DLC `-debug -ai_testing` runs of the 1949 and 1980 bookmarks report none of the doctrine signatures this investigation opened with: no multiple-potential-grid-box errors, no unknown `air_doctrine` category, no `Unexpected token: defence`, and no parser errors attributed to the doctrine files.
+
+Acceptance criteria 4 and 5 from the checklist above are met. Criteria 1 to 3 — tab population, a full player branch unlock through the XP/mastery flow, and AI branch advancement — were not exercised interactively and still need a manual pass.
+
+### Shared validation
+
+`tools/validate_military_reworks.py` covers both reworks. Its doctrine checks assert that the doctrine technology files load from the active root, that the DLC framework overrides stay empty, and that technology paths, categories, localization, and effects remain valid.

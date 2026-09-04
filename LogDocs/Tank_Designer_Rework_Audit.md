@@ -383,3 +383,60 @@ The audit deliberately distinguishes “missing” from “intentionally redesig
 - Representative NSB OOB: `history/units/USA_1949_nsb.txt:1550-1800`
 - Orphan MIO/faction references: `common/equipment_groups/mio_equipment_groups.txt:115-148`, `common/factions/goals/faction_goals_medium_term.txt:1265-1290`
 - Runtime evidence: repository-root `error.log`, `error_1.log`, and `error_2.log`
+
+## Implementation outcome (2026-09-04)
+
+Implemented on branch `tank-designer-and-doctrine-rework-test`. This section records what was actually built and verified; the sections above remain the original audit.
+
+### Supported role contract
+
+The designer supports light, medium, and heavy chassis in five roles: base tank, tank destroyer, self-propelled artillery, self-propelled anti-air, and flame. The rocket, amphibious-designer, modern-designer, super-heavy-designer, and medium-heavy-artillery roles were removed rather than finished, together with their GUI files, aliases, and generated enums. Every retained role has an archetype, enabling technology, usable modules, a consuming subunit, an AI recipe, and OOB integration. The designer view provides all 15 declared slot positions.
+
+### Bookmark variant bootstrap
+
+Each NSB bookmark OOB names an explicit variant on every version-sensitive request. Those variants come from one shared creator, `cwic_create_starting_tank_variants`, which builds 30 conservative five-module designs, each guarded by its own chassis technology.
+
+The ordering rule that this depends on: an OOB-local `instant_effect` runs *after* that OOB's own production, stockpile, and forced-variant requests are resolved, so a variant created there is always too late. The bootstrap therefore runs in country history immediately before `set_oob`:
+
+```text
+country scope
+  -> set_technology for exactly the chassis technologies this bookmark needs
+  -> cwic_create_starting_tank_variants = yes
+  -> set_oob = <bookmark NSB OOB>
+```
+
+Two further rules were established by runtime testing:
+
+- A tank bought from or designed by another tag is looked up on *that* tag. `producer` on a stockpile or production request and `creator` on a forced variant both name the country whose designer must already hold the variant, so the chassis technology belongs in that country's bootstrap, not the loading country's. This is what made FRA, ENG, and the `CAP`/`CUM` manufacturer bloc tags fail.
+- Those tech sets are scoped per bookmark. A 1949 bootstrap must not preload the 1970s chassis its country only sells in 1980.
+- `CAP` and `CUM` sell tanks but never load an OOB, so they call the creator directly from their own history.
+
+`RAJ_1980_nsb` asked for a `light_tank_chassis_3` variant named `AMX-13/75`. That name only exists as a legacy `lt_equipment_3` variant in FRA's history and no designer bootstrap creates it, so those six requests were retargeted to the generic `Standard Light Tank 1950`.
+
+### Pre-existing OOB defects repaired while testing
+
+Four owned NSB OOBs failed to parse and silently dropped content:
+
+- `IRQ_1980_nsb.txt` and `PER_1980_nsb.txt`: `marine { ... }` was missing its `=`, breaking the Marine Brigade template.
+- `CUB_1980_nsb.txt` and `NOR_1980_nsb.txt`: an uncommented section label inside `units = { ... }`.
+
+### Verified runtime results
+
+Full 35-DLC `-debug -ai_testing` runs of both bookmarks:
+
+| Bookmark | Tank variant lookup failures | Doctrine/enum/creator errors |
+| --- | --- | --- |
+| 1949 | 0 | 0 |
+| 1980 | 0 | 0 |
+
+Remaining `does not have any equipment variant` entries in both logs belong to unrelated systems: legacy infantry and artillery equipment, MTG naval hulls, jet and transport aircraft, and the legacy `lt_`/`mbt_`/`ht_` equipment sold by the weapon-purchasing decisions. None involve a designer chassis type.
+
+`-ai_testing` starts the default bookmark and does not accept a start-date argument, so the 1980 runs were produced by temporarily dating the gathering-storm bookmark to `1980.1.1.12`. That edit was reverted; the bookmark files are unchanged on this branch.
+
+### Regression validation
+
+`tools/validate_military_reworks.py` is the static gate. It checks doctrine loading and content, technology paths, localization and effects, tank modules, unlocks and categories, the supported role set, AI recipes, enum cleanup, OOB types and named requests, that every requested variant name is one a bootstrap actually creates, that no OOB bootstraps its own variants, that every country-history bootstrap precedes its `set_oob` with exactly the required technologies, and the 15 designer slots.
+
+### Not covered automatically
+
+The designer UI at multiple resolutions and UI scales, save/load, and multiplayer synchronization were not exercised. They still need a manual pass.
