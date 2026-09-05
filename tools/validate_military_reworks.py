@@ -357,6 +357,23 @@ for name, block, path in technology_blocks:
 # Tank module definition/unlock/category contract.
 module_blocks = top_level_blocks(text(MODULE_FILE), "equipment_modules")
 module_ids = {name for name, _ in module_blocks if name != "limit"}
+module_definitions = dict(module_blocks)
+ammo_categories = {"tank_ammo_kinetic", "tank_ammo_he"}
+
+
+def module_category(module: str) -> str:
+    match = re.search(r"\bcategory\s*=\s*(\w+)", module_definitions.get(module, ""))
+    return match.group(1) if match else ""
+
+
+def needs_ammunition(module: str) -> bool:
+    # Conventional guns multiply attack supplied by ammunition. AA guns and
+    # flamethrowers supply their own attack and do not need shell modules.
+    return any(
+        re.search(r"\b(?:soft_attack|hard_attack|ap_attack)\s*=", block)
+        for block in keyed_blocks(module_definitions.get(module, ""), "multiply_stats")
+    )
+
 module_categories = {
     match.group(1)
     for _, block in module_blocks
@@ -589,13 +606,13 @@ for block in variant_blocks:
         )
     slots = set(
         re.findall(
-            r"^\s*([A-Za-z0-9_]+_slot)\s*=\s*([A-Za-z0-9_]+)",
+            r"^\s*([A-Za-z0-9_]+_slot(?:_[0-9]+)?)\s*=\s*([A-Za-z0-9_]+)",
             block,
             re.MULTILINE,
         )
     )
     slot_names = {slot for slot, _ in slots}
-    if slot_names != REQUIRED_VARIANT_SLOTS:
+    if not REQUIRED_VARIANT_SLOTS <= slot_names:
         fail(
             f"starting variant {variant_type} has wrong required slots: "
             f"{sorted(slot_names)}"
@@ -603,6 +620,10 @@ for block in variant_blocks:
     for _, module in slots:
         if module not in module_ids:
             fail(f"starting variant {variant_type} uses undefined module {module}")
+    if needs_ammunition(dict(slots).get("main_armament_slot", "")):
+        installed_categories = {module_category(module) for _, module in slots}
+        if not ammo_categories <= installed_categories:
+            fail(f"starting variant {variant_type} lacks attack-producing AP/HE ammunition")
     variant_techs = variant_guard_techs.get(variant_type, [])
     if variant_techs != [BOOKMARK_VARIANT_TECHS.get(variant_type)]:
         fail(f"starting variant {variant_type} has the wrong chassis technology guard")
@@ -636,6 +657,23 @@ if missing_ai:
     fail(f"tank types without a generic historical AI design: {sorted(missing_ai)}")
 if len(re.findall(r"^\s*history\s*=\s*yes\b", ai_text, re.MULTILINE)) != len(expected_types):
     fail("generic tank AI file must contain one historical recipe per supported tank type")
+for recipe in keyed_blocks(ai_text, "target_variant"):
+    type_match = re.search(r"\btype\s*=\s*(\w+)", recipe)
+    if not type_match:
+        continue
+    equipment_type = type_match.group(1)
+    if re.search(r"_(?:aa|flame)_chassis_", equipment_type):
+        continue
+    for category in ammo_categories:
+        if not re.search(rf"\bspecial_type_slot_\d+\s*=\s*{category}\b", recipe):
+            fail(f"AI recipe {equipment_type} lacks attack-producing {category}")
+for enable in keyed_blocks(ai_text, "enable"):
+    # Every cannon recipe must wait for the two ammunition research unlocks.
+    # AA/flame recipes share the same chassis gates, so check the count below.
+    if "nsb_ammo" in enable and "nsb_he_ammo0" not in enable:
+        fail("AI ammunition prerequisite omits HE research")
+if len(re.findall(r"\bhas_tech\s*=\s*nsb_he_ammo0\b", ai_text)) != 75:
+    fail("all 75 conventional-gun AI recipes must require ammunition research")
 
 active_roots = [MOD / "common", MOD / "interface"]
 for path_root in active_roots:
