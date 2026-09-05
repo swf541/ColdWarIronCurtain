@@ -158,6 +158,12 @@ Verified statically:
 
 `old_naval_doctrine_folder` and `old_air_doctrine_folder` remain `doctrine = yes` with no GUI container, so land doctrine is now the odd one out. That is deliberate: the doctrine grid view has no room for 17 blocs across six decades.
 
+### Runtime check after both changes
+
+A full 35-DLC `-debug -ai_testing` 1949 run reaches `1949.05.23` with a 681 KB `error.log`, matching the healthy baseline. Zero tank chassis variant failures, zero doctrine, folder, `countrytechtreeview` or grid-box errors, and zero errors naming the new ammunition modules. The only remaining variant failures are the same three unrelated pre-existing families: legacy light artillery, an MTG naval hull, and infantry equipment.
+
+This proves both changes **load** cleanly. It does not prove either one **looks** right: nothing has opened the land doctrine tab or read a tank's attack stats in the designer.
+
 ## Runtime environment and commands
 
 Installed game:
