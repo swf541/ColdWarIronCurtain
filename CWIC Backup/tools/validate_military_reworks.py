@@ -2246,7 +2246,7 @@ def validate_tank_rework() -> None:
         slots = [
             slot
             for index in range(1, 11)
-            for slot in keyed_blocks(block, f"special_type_slot_{index}")
+            for slot in keyed_blocks(block, f"tank_special_slot_{index}")
         ]
         if len(slots) != 10:
             fail(f"{archetype} must retain ten specialized special slots")
@@ -2538,11 +2538,11 @@ def validate_tank_qa_contracts(tank_techs: dict[str, str]) -> None:
             fail(f"export setup helper {helper[0]} must hide internal variant creation")
     for name, recipe in _variant_recipes().items():
         for slot, module in recipe["slots"]:
-            match = re.fullmatch(r"special_type_slot_(\d+)", slot)
+            match = re.fullmatch(r"tank_special_slot_(\d+)", slot)
             if match and module_category(module) not in TANK_SPECIAL_SLOT_CATEGORIES.get(int(match[1]), set()):
                 fail(f"{name} places {module} in incompatible {slot}")
     for recipe in keyed_blocks(text(AI_FILE), "target_variant"):
-        for slot, value in re.findall(r"(?m)^\s*(special_type_slot_\d+)\s*=\s*(\w+)\s*$", recipe):
+        for slot, value in re.findall(r"(?m)^\s*(tank_special_slot_\d+)\s*=\s*(\w+)\s*$", recipe):
             if value == "empty":
                 continue
             index = int(slot.rsplit("_", 1)[1])
@@ -2554,7 +2554,7 @@ def validate_tank_qa_contracts(tank_techs: dict[str, str]) -> None:
 def tank_slot_layout_errors(block: str) -> list[str]:
     errors = []
     for index, expected in TANK_SPECIAL_SLOT_CATEGORIES.items():
-        slots = keyed_blocks(block, f"special_type_slot_{index}")
+        slots = keyed_blocks(block, f"tank_special_slot_{index}")
         if len(slots) != 1:
             errors.append(f"slot {index} must occur exactly once")
             continue
@@ -2568,7 +2568,7 @@ def tank_slot_layout_errors(block: str) -> list[str]:
 def run_tank_negative_fixtures() -> None:
     """Exercise the tank contract's failure shapes without touching files."""
     slots = "\n".join(
-        f"special_type_slot_{i} = {{ allowed_module_categories = {{ {' '.join(sorted(categories))} }} }}"
+        f"tank_special_slot_{i} = {{ allowed_module_categories = {{ {' '.join(sorted(categories))} }} }}"
         for i, categories in TANK_SPECIAL_SLOT_CATEGORIES.items()
     )
     if tank_slot_layout_errors(slots):
@@ -3169,7 +3169,7 @@ for recipe in keyed_blocks(ai_text, "target_variant"):
     if re.search(r"_(?:aa|flame)_chassis_", equipment_type):
         continue
     for category in ammo_categories:
-        if not re.search(rf"\bspecial_type_slot_\d+\s*=\s*{category}\b", recipe):
+        if not re.search(rf"\btank_special_slot_\d+\s*=\s*{category}\b", recipe):
             fail(f"AI recipe {equipment_type} lacks attack-producing {category}")
 for enable in keyed_blocks(ai_text, "enable"):
     # Every cannon recipe must wait for the two ammunition research unlocks.
