@@ -54,13 +54,18 @@ occupied the *same cell* as a heavy tank (`amphibious1`/`nsb_heavy_tanks0` at y=
 `amphibious2`/`nsb_heavy_tanks2` at y=4). Both folders now resolve to zero coordinate collisions with
 year anchors expanded. The legacy `armour_folder` was already collision-free and was left untouched.
 
-3D entities: `gfx/entities/zz_CWIC_armor_level0_entities.asset` adds 62 clone aliases so every
-`<TAG>_<light|medium|heavy>_armor_0_entity` the equipment graphic database derives now resolves to
-that country's existing base armor entity. Only 29 of 67 tag/class combinations defined a `_0` entity,
-which is why opening the production tab on armor and hovering designer modules spammed
-`equipment_model_util` at roughly one line per hover. The filename is `zz_`-prefixed deliberately: it
-must load after every other `.asset`, because all 278 existing clones in the mod resolve backward and
-none forward. This closes the reported symptom; the separate `*_brigade` entity gap is unaffected.
+3D entities: `gfx/entities/zz_CWIC_armor_entity_aliases.asset` adds 3,019 clone aliases so every
+`<TAG>_<sub_unit>_<visual_level>_entity` the equipment graphic database derives now resolves. It
+supersedes `zz_CWIC_armor_level0_entities.asset`, which covered only `_0` on the three base armor
+sub-units and so left the `*_brigade` roles and every level above 0 spamming `equipment_model_util`
+at roughly one line per hover. The file now spans the base armor, tank destroyer, SP artillery, SP
+anti-air and flame sub-units across levels 0-9 (light, medium) and 0-4 (heavy), for all 75 tag/class
+combinations that define a base armor entity; flame aliases clone the shared `<class>_flame_tank_entity`
+so the flame art survives. GER light, GER heavy, ITA heavy and JAP light are dropped: the mod's
+`units_tanks.asset` replaces vanilla's, and those four have no base entity to clone, which is what
+the old file's four `Couldn't find parent clone entity` errors were. The filename is `zz_`-prefixed
+deliberately: it must load after every other `.asset`, because all existing clones in the mod resolve
+backward and none forward.
 
 Localisation: `nsb_optics7` no longer duplicates `nsb_optics5`; nine over-long names shortened. The
 `nsb_ap_du_ammo` family uses "DU Long-Rod APFSDS" - dropping "Elongated Projectile" outright would
