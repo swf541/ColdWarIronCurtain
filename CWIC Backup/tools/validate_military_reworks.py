@@ -37,6 +37,18 @@ MOD = ROOT / "Cold War Iron Curtain"
 TECH_DIR = MOD / "common/technologies"
 MODULE_FILE = MOD / "common/units/equipment/modules/00_tank_modules.txt"
 CHASSIS_FILE = MOD / "common/units/equipment/tank_chassis.txt"
+TANK_SPECIAL_SLOT_CATEGORIES = {
+    1: {"tank_ammo_kinetic", "tank_ammo_chemical", "tank_ammo_missile", "tank_ammo_he"},
+    2: {"tank_ammo_kinetic", "tank_ammo_chemical", "tank_ammo_missile", "tank_ammo_he"},
+    3: {"tank_fcs_aiming"},
+    4: {"tank_fcs_optics"},
+    5: {"tank_fcs_computer", "tank_fcs_radar"},
+    6: {"tank_loader_manual_assist", "tank_loader_autoloader", "tank_loader_artillery"},
+    7: {"tank_protection_passive", "tank_protection_reactive"},
+    8: {"tank_protection_passive", "tank_protection_reactive", "tank_protection_active"},
+    9: {"tank_survivability", "tank_mobility_auxiliary", "tank_smoke"},
+    10: {"tank_secondary_turret", "tank_survivability", "tank_mobility_auxiliary", "tank_smoke"},
+}
 AI_FILE = MOD / "common/ai_equipment/generic_tank.txt"
 ENUM_FILE = MOD / "common/script_enums.txt"
 VARIANT_EFFECT_FILE = MOD / "common/scripted_effects/CWIC_tank_designer_effects.txt"
@@ -1839,7 +1851,17 @@ def tank_module_balance_report() -> str:
         for source, rows in (("CSV", csv_rows), ("Minimal", minimal), ("Master", master)):
             if module not in rows:
                 continue
-            row_checked, row_populated = _compare_module_row(module, rows[module], record, source)
+            source_record = record
+            # The workbook is immutable. The reviewed QA turret change lives in
+            # the CSV and script; still verify the old source cells explicitly.
+            # See Deferred_Design_Decisions.md, conventional turret balance.
+            if module == "conventional_turret" and source != "CSV":
+                source_record = record | {
+                    "add": {"build_cost_ic": 1.0, "reliability": 0.15},
+                    "multiply": {},
+                    "dismantle": 0.5,
+                }
+            row_checked, row_populated = _compare_module_row(module, rows[module], source_record, source)
             checked += row_checked
             populated += row_populated
             if source in {"Minimal", "Master"}:
@@ -1847,6 +1869,8 @@ def tank_module_balance_report() -> str:
                 other = csv_rows.get(module)
                 if other:
                     for metric, (column, csv_index, multiply_column, multiply_index) in MODULE_BALANCE_COLUMNS.items():
+                        if module == "conventional_turret" and metric in {"build_cost_ic", "breakthrough"}:
+                            continue  # Explicit source-to-live deviation, checked above and by turret_contract.
                         for workbook_column, csv_column in ((column, csv_index), (multiply_column, multiply_index)):
                             if workbook_column is None:
                                 continue
@@ -1876,7 +1900,8 @@ def tank_module_balance_report() -> str:
         f"Tank module balance report: {len(module_ids)} IDs reconciled across CSV, "
         f"Total Balance Sheet Minimal, and Total Balance Sheet; {checked} populated "
         f"stat/resource cells checked; operation/provenance metadata {metadata_count}/{len(SCRIPT_OWNED_MODULES)}; "
-        f"22 script-owned IDs reconciled; explicit exclusions cover eligibility, display, conversion, and XP fields "
+        f"22 script-owned IDs reconciled; 1 reviewed turret source-to-live override; "
+        f"explicit exclusions cover eligibility, display, conversion, and XP fields "
         f"(the manual's 23 count has no additional module ID)."
     )
 
@@ -2223,9 +2248,10 @@ def validate_tank_rework() -> None:
             for index in range(1, 11)
             for slot in keyed_blocks(block, f"special_type_slot_{index}")
         ]
-        exposed = sum("tank_secondary_turret" in slot for slot in slots)
-        if len(slots) != 10 or exposed != 10:
-            fail(f"{archetype} must expose tank_secondary_turret in all 10 special slots")
+        if len(slots) != 10:
+            fail(f"{archetype} must retain ten specialized special slots")
+        for message in tank_slot_layout_errors(block):
+            fail(f"{archetype}: {message}")
         limits = re.findall(r"module_count_limit\s*=\s*\{([^{}]*)\}", block, re.DOTALL)
         if sum("category = tank_secondary_turret" in limit for limit in limits) != 1:
             fail(f"{archetype} must retain one secondary turret count limit")
@@ -2243,7 +2269,7 @@ def validate_tank_rework() -> None:
         "light_lp_turret": (1.25, 0.10, 0.0, 0.05),
         "light_turret": (1.0, 0.15, 0.0, 0.0),
         "lp_turret": (1.5, 0.10, 0.0, 0.10),
-        "conventional_turret": (1.0, 0.15, 0.0, 0.0),
+        "conventional_turret": (1.5, 0.15, 0.05, 0.0),
         "oscillating_turret": (1.75, 0.05, 0.10, 0.0),
         "open_gun": (0.5, 0.10, -0.20, -0.10),
         "medium_open_gun": (0.75, 0.10, -0.20, -0.10),
@@ -2267,7 +2293,7 @@ def validate_tank_rework() -> None:
             stat_value(multiply_stats, "defense"),
         )
         if actual != expected:
-            fail(f"{module} turret stats differ from the Luna contract: {actual} != {expected}")
+            fail(f"{module} turret stats differ from the reviewed contract: {actual} != {expected}")
     superheavy = definitions.get("tank_super_heavy_cannon", "")
     if module_category("tank_super_heavy_cannon") != "tank_heavy_main_armament":
         fail("tank_super_heavy_cannon must use the heavy main armament category")
@@ -2343,15 +2369,31 @@ def validate_tank_rework() -> None:
             )
         positions[folder_name[0]][coordinate] = owner
     expected_years = {
+        # QA 2026-09-06: raw GUI rows had hidden 1940/1942 research dates.
+        "nsb_gt_engines0": ("1965", "@1965"),
+        "nsb_gt_engines1": ("1975", "@1975"),
+        "nsb_gt_engines2": ("1985", "@1985"),
+        "nsb_gt_engines3": ("2005", "@2005"),
+        "nsb_heavy_guns5": ("1985", "@1985"),
+        "nsb_heavy_guns6": ("1995", "@1995"),
+        "nsb_heavy_guns7": ("2010", "@2010"),
+        "nsb_superheavy_guns1": ("1955", "@1955"),
+        "nsb_heat_mp_ammo0": ("1985", "@1985"),
+        "nsb_heat_mp_ammo1": ("1995", "@1995"),
+        "nsb_heat_mp_ammo2": ("2005", "@2005"),
+        "nsb_heat_du_ammo0": ("1985", "@1985"),
+        "nsb_heat_du_ammo1": ("1995", "@1995"),
+        "nsb_heat_du_ammo2": ("2005", "@2005"),
         "nsb_al_armor0": ("1955", "@1955"),
         "nsb_al_armor1": ("1965", "@1965"),
         "nsb_addon_armor0": ("1995", "@1995"),
         "nsb_addon_armor1": ("2005", "@2005"),
     }
     for owner, (year, y_position) in expected_years.items():
-        block = armor_techs.get(owner, "")
+        block = all_tank_techs.get(owner, "")
         if direct_values(block, "start_year") != [year] or y_position not in block:
             fail(f"{owner} has the wrong start year or tree row")
+    validate_tank_qa_contracts(all_tank_techs)
 
     role_ui = text(MOD / "interface/tank_designer_view.gui")
     if not re.search(r"name\s*=\s*\"dropdown_tank_roles\"[\s\S]*?size\s*=\s*\{\s*width\s*=\s*285\s+height\s*=\s*40", role_ui):
@@ -2379,6 +2421,8 @@ def validate_tank_rework() -> None:
         name_match = re.search(r"(?m)^\s*name\s*=\s*\"([^\"]+)\"", block)
         if name_match and ("allow_without_tech = yes" not in block or "parent_version = 0" not in block):
             fail(f"export variant {name_match.group(1)} lacks the stable no-tech contract")
+        if name_match and "obsolete = yes" not in block:
+            fail(f"export variant {name_match.group(1)} must be archived in its producer's production list")
     if variants != EXPORT_VARIANTS:
         fail(f"export variant map differs from contract: {variants}")
     for helper in EXPORT_VARIANTS:
@@ -2416,6 +2460,16 @@ def validate_tank_rework() -> None:
             if focus not in focus_blocks:
                 continue
             block = focus_blocks[focus]
+            reward = next((reward for reward in keyed_blocks(block, "completion_reward") if "add_equipment_to_stockpile" in reward), "")
+            nsb_branches = top_level_named_blocks(reward, "if", focus)
+            legacy_branches = top_level_named_blocks(reward, "else_if", focus)
+            if len(nsb_branches) != 1 or len(legacy_branches) != 1:
+                fail(f"{focus} must have sibling designer and legacy reward branches")
+            else:
+                nsb_limit = top_level_named_blocks(nsb_branches[0], "limit", focus)[0]
+                legacy_limit = top_level_named_blocks(legacy_branches[0], "limit", focus)[0]
+                if 'has_dlc = "No Step Back"' not in nsb_limit or 'NOT = { has_dlc = "No Step Back" }' not in legacy_limit:
+                    fail(f"{focus} rewards lack mutually exclusive DLC conditions")
             if technology not in block or chassis not in block or variant not in block:
                 fail(f"{focus} lacks its NSB technology, chassis, or export variant branch")
             stockpile_blocks = keyed_blocks(block, "add_equipment_to_stockpile")
@@ -2437,8 +2491,92 @@ def validate_tank_rework() -> None:
                 fail(f"{focus} no longer retains its legacy branch")
 
 
+def validate_tank_qa_contracts(tank_techs: dict[str, str]) -> None:
+    path = MOD / "common/scripted_effects/CWIC_tank_bookmark_research.txt"
+    brace_balance(path)
+    effect = text(path)
+    grants = keyed_blocks(effect, "set_technology")
+    expected_nsb = {
+        name for name, block in tank_techs.items()
+        if name != "nsb_superheavy_guns1"
+        and direct_values(block, "start_year")
+        and int(direct_values(block, "start_year")[0]) <= 1980
+    }
+    legacy = dict(top_level_blocks(text(TECH_DIR / "armor.txt"), "technologies"))
+    expected_legacy = {
+        name for name, block in legacy.items()
+        if re.fullmatch(r"iw_armored_vehicles|main_battle_tanks(?:_\d+)?|light_tanks_\d+|heavy_tanks_\d+", name)
+        and direct_values(block, "start_year")
+        and int(direct_values(block, "start_year")[0]) <= 1980
+    }
+    if len(grants) != 2 or 'limit = { has_dlc = "No Step Back" }' not in effect:
+        fail("1980 major tank research must have two DLC-separated grant blocks")
+    else:
+        for grant, expected in zip(grants, (expected_nsb, expected_legacy)):
+            actual = set(re.findall(r"(?m)^\s*(\w+)\s*=\s*1\s*$", grant))
+            if actual != expected:
+                fail(f"1980 tank research coverage differs: {sorted(actual ^ expected)}")
+    for filename in ("USA - United States.txt", "SOV - Soviet union.txt"):
+        history = text(HISTORY_DIR / filename)
+        calls = "cwic_major_tank_research_1980 = yes"
+        if history.count(calls) != 1 or not any(calls in block for block in keyed_blocks(history, "1980.1.1")):
+            fail(f"{filename} must apply its tank research once in 1980 history")
+
+    focus = named_focus_blocks(text(MOD / "common/national_focus/50s_FIN.txt"))["FIN_Acquire_Soviet_T55s"]
+    available = keyed_blocks(focus, "available")[0]
+    for pattern in (
+        r'AND\s*=\s*\{\s*NOT\s*=\s*\{\s*has_dlc\s*=\s*"No Step Back"\s*\}\s*SOV\s*=\s*\{\s*has_tech\s*=\s*main_battle_tanks_3',
+        r'AND\s*=\s*\{\s*has_dlc\s*=\s*"No Step Back"\s*SOV\s*=\s*\{\s*has_tech\s*=\s*nsb_main_battle_tanks2',
+    ):
+        if not re.search(pattern, available):
+            fail("Finnish tank focus availability must pair producer research with the DLC profile")
+    limits = keyed_blocks(focus, "limit")
+    if len(limits) != 2 or 'has_dlc = "No Step Back"' not in limits[0] or 'NOT = { has_dlc = "No Step Back" }' not in limits[1]:
+        fail("Finnish tank focus rewards must select mutually exclusive DLC branches")
+    for helper in top_level_blocks("effects = {\n" + text(FOCUS_EFFECT_FILE) + "\n}", "effects"):
+        if not top_level_named_blocks(helper[1], "hidden_effect", helper[0]):
+            fail(f"export setup helper {helper[0]} must hide internal variant creation")
+    for name, recipe in _variant_recipes().items():
+        for slot, module in recipe["slots"]:
+            match = re.fullmatch(r"special_type_slot_(\d+)", slot)
+            if match and module_category(module) not in TANK_SPECIAL_SLOT_CATEGORIES.get(int(match[1]), set()):
+                fail(f"{name} places {module} in incompatible {slot}")
+    for recipe in keyed_blocks(text(AI_FILE), "target_variant"):
+        for slot, value in re.findall(r"(?m)^\s*(special_type_slot_\d+)\s*=\s*(\w+)\s*$", recipe):
+            if value == "empty":
+                continue
+            index = int(slot.rsplit("_", 1)[1])
+            category = value if value in module_categories else module_category(value)
+            if category not in TANK_SPECIAL_SLOT_CATEGORIES.get(index, set()):
+                fail(f"AI recipe places {value} in incompatible {slot}")
+
+
+def tank_slot_layout_errors(block: str) -> list[str]:
+    errors = []
+    for index, expected in TANK_SPECIAL_SLOT_CATEGORIES.items():
+        slots = keyed_blocks(block, f"special_type_slot_{index}")
+        if len(slots) != 1:
+            errors.append(f"slot {index} must occur exactly once")
+            continue
+        categories = keyed_blocks(slots[0], "allowed_module_categories")
+        actual = set(re.findall(r"\btank_[a-z_]+\b", " ".join(categories)))
+        if actual != expected:
+            errors.append(f"slot {index} category mismatch: {sorted(actual ^ expected)}")
+    return errors
+
+
 def run_tank_negative_fixtures() -> None:
     """Exercise the tank contract's failure shapes without touching files."""
+    slots = "\n".join(
+        f"special_type_slot_{i} = {{ allowed_module_categories = {{ {' '.join(sorted(categories))} }} }}"
+        for i, categories in TANK_SPECIAL_SLOT_CATEGORIES.items()
+    )
+    if tank_slot_layout_errors(slots):
+        raise AssertionError("valid specialized slot layout rejected")
+    if not tank_slot_layout_errors(slots.replace("tank_fcs_aiming", "tank_fcs_radar")):
+        raise AssertionError("radar accepted in aiming slot")
+    if not tank_slot_layout_errors(slots.replace("tank_protection_active", "")):
+        raise AssertionError("unreachable active protection was accepted")
     parser_fixture = 'root = { child = { label = "quoted { brace }" } # ignored { }\n }'
     parsed = top_level_named_blocks(parser_fixture, "child", "fixture")
     if len(parsed) != 1 or 'label = "quoted { brace }"' not in parsed[0]:
