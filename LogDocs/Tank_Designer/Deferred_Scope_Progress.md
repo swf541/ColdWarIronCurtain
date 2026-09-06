@@ -1,5 +1,27 @@
 # Deferred designer progress
 
+## 2026-09-06: national presets and module-estimator correction
+
+Implemented 14 USA/SOV medium-tank bookmark presets with producer-aware OOB
+names, distinct loadouts, explicit empty slots and per-chassis duplicate guards.
+The 1980 research helper refreshes newly unlocked NSB presets. Generic designs
+remain the fallback for other producers; existing equipment quantities and
+non-NSB files are unchanged. See `National_Tank_Presets.md` and its JSON manifest
+for tier mappings, design judgments and fresh-game acceptance checks.
+
+The diagnostic stat estimator no longer stacks module upgrade predecessors.
+Radar II fuel 1.2 and GL ATGM III hard attack 95 are regression anchors, not
+full-design calibration. Workbook, module balance CSV, Claude's tank slot
+namespace and the new entity aliases remain untouched. The owner confirmed
+that the previous QA issues are already fixed.
+
+Validation passed: military contracts and tank self-tests, balance/module/
+envelope reports (49 shipped recipes), 14 national preset contracts and
+producer/slot/duplicate-guard rejection fixtures, the 22-file SEA localisation
+audit and `git diff --check`. Full-design runtime calibration and this batch's
+fresh-game acceptance remain pending. APC/IFV conversion is the next major
+implementation batch; no mechanized equipment was converted here.
+
 ## 2026-09-06: owner QA fixes and specialized slots
 
 The owner supplied QA results and Section 8 choices in `TankQANotes.txt` after

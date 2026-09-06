@@ -10,6 +10,7 @@ from __future__ import annotations
 import re
 import sys
 import csv
+import json
 from collections import Counter
 from hashlib import sha256
 from pathlib import Path
@@ -53,6 +54,9 @@ AI_FILE = MOD / "common/ai_equipment/generic_tank.txt"
 ENUM_FILE = MOD / "common/script_enums.txt"
 VARIANT_EFFECT_FILE = MOD / "common/scripted_effects/CWIC_tank_designer_effects.txt"
 FOCUS_EFFECT_FILE = MOD / "common/scripted_effects/CWIC_tank_focus_effects.txt"
+NATIONAL_EFFECT_FILE = MOD / "common/scripted_effects/CWIC_national_tank_presets.txt"
+NATIONAL_MANIFEST_FILE = ROOT / "LogDocs/Tank_Designer/National_Tank_Preset_Manifest.json"
+NATIONAL_PRESETS = json.loads(NATIONAL_MANIFEST_FILE.read_text(encoding="utf-8"))["presets"]
 FOCUS_FILES = (
     MOD / "common/national_focus/60s_Generic.txt",
     MOD / "common/national_focus/GRE_military_shared_1950s.txt",
@@ -295,6 +299,18 @@ UNSUPPORTED_IDS = {
     "amphibious_mechanized_infantry",
     "category_amphibious_tanks",
 }
+
+
+def bookmark_variant_name(equipment_type: str, producer: str) -> str:
+    for preset in NATIONAL_PRESETS:
+        if (preset["type"], preset["producer"]) == (equipment_type, producer):
+            return preset["name"]
+    return BOOKMARK_VARIANT_NAMES[equipment_type]
+
+
+def oob_variant_producer(block: str, default_tag: str) -> str:
+    match = re.search(r'\b(?:owner|producer|creator)\s*=\s*"?([A-Z]{3})"?', code_only(block))
+    return match[1] if match else default_tag
 
 errors: list[str] = []
 
@@ -1936,7 +1952,7 @@ ENVELOPE_RECIPE_MAP = {
 
 def _variant_recipes() -> dict[str, dict[str, object]]:
     recipes: dict[str, dict[str, object]] = {}
-    for path in (VARIANT_EFFECT_FILE, FOCUS_EFFECT_FILE):
+    for path in (VARIANT_EFFECT_FILE, FOCUS_EFFECT_FILE, NATIONAL_EFFECT_FILE):
         for block in keyed_blocks(text(path), "create_equipment_variant"):
             name_match = re.search(r'(?m)^\s*name\s*=\s*"([^"]+)"', block)
             type_match = re.search(r"(?m)^\s*type\s*=\s*([A-Za-z0-9_]+)", block)
@@ -1955,7 +1971,8 @@ def _variant_recipes() -> dict[str, dict[str, object]]:
                 r"(?m)^\s*([A-Za-z0-9_]+)\s*=\s*([A-Za-z0-9_]+)\s*$",
                 module_body[opening + 1 : ending],
             ):
-                slots.append((match.group(1), match.group(2)))
+                if match.group(2) != "empty":
+                    slots.append((match.group(1), match.group(2)))
             name = name_match.group(1)
             if name in recipes:
                 fail(f"duplicate tank recipe name: {name}")
@@ -1969,22 +1986,11 @@ def _effective_module_operations(module: str, trail: tuple[str, ...] = ()) -> tu
     if module in trail:
         return {}, {}, {f"module parent cycle at {module}"}
     record = module_balance_record(module)
-    adds: dict[str, float] = {}
-    multipliers: dict[str, float] = {}
-    unknown: set[str] = set()
-    parent = record["parent"]
-    if parent != "none":
-        parent_adds, parent_multipliers, parent_unknown = _effective_module_operations(
-            parent, trail + (module,)
-        )
-        adds.update(parent_adds)
-        multipliers.update(parent_multipliers)
-        unknown.update(parent_unknown)
-    for field, value in record["add"].items():
-        adds[field] = adds.get(field, 0.0) + value
-    for field, value in record["multiply"].items():
-        multipliers[field] = multipliers.get(field, 0.0) + value
-    return adds, multipliers, unknown
+    # A module parent identifies the preceding upgrade, not another installed
+    # module. Summing it made Radar II consume 2.2 fuel instead of the observed
+    # 1.2 and GL ATGM III supply 255 hard attack instead of the observed 95.
+    # Parent validity/cycles remain checked separately by module_parent_errors.
+    return dict(record["add"]), dict(record["multiply"]), set()
 
 
 def _direct_chassis_numbers(block: str) -> dict[str, float]:
@@ -2065,7 +2071,7 @@ def tank_envelope_report() -> str:
     lines = [
         f"Tank envelope report: {len(manifest)} tank targets; {len(selected)} explicitly mapped recipes; "
         f"{len(recipes)} shipped recipes parsed.",
-        "Static estimates are diagnostic only: parent inheritance is expanded, repeated slots are counted, "
+        "Static estimates are diagnostic only: module upgrade parents are not stacked, repeated slots are counted, "
         "and unknown engine order/caps/role bonuses remain annotated rather than treated as zero.",
     ]
     role_counts = Counter()
@@ -2492,6 +2498,7 @@ def validate_tank_rework() -> None:
 
 
 def validate_tank_qa_contracts(tank_techs: dict[str, str]) -> None:
+    validate_national_tank_presets()
     path = MOD / "common/scripted_effects/CWIC_tank_bookmark_research.txt"
     brace_balance(path)
     effect = text(path)
@@ -2551,6 +2558,56 @@ def validate_tank_qa_contracts(tank_techs: dict[str, str]) -> None:
                 fail(f"AI recipe places {value} in incompatible {slot}")
 
 
+def validate_national_tank_presets(national_override: str | None = None, generic_override: str | None = None) -> None:
+    """Keep the named producer designs, bootstrap guards and manifest in sync."""
+    brace_balance(NATIONAL_EFFECT_FILE)
+    national = text(NATIONAL_EFFECT_FILE) if national_override is None else national_override
+    generic = text(VARIANT_EFFECT_FILE) if generic_override is None else generic_override
+    expected_pairs = {(tag, f"medium_tank_chassis_{tier}") for tag in ("USA", "SOV") for tier in range(7)}
+    pairs = {(p["producer"], p["type"]) for p in NATIONAL_PRESETS}
+    if len(NATIONAL_PRESETS) != 14 or pairs != expected_pairs:
+        fail("national presets must cover exactly USA/SOV medium tiers 0-6")
+    guards = keyed_blocks(national, "if")
+    if len(guards) != len(NATIONAL_PRESETS):
+        fail("national preset guard count differs from manifest")
+    legacy_loc = text(MOD / "localisation/english/equipment_country_l_english.yml")
+    for preset in NATIONAL_PRESETS:
+        name, kind, tag = preset["name"], preset["type"], preset["producer"]
+        matches = [g for g in guards if f'name = "{name}"' in g]
+        if len(matches) != 1:
+            fail(f"national preset {name} must occur exactly once")
+            continue
+        guard = matches[0]
+        flag = f"cwic_starting_{kind}_created"
+        for required in (f"tag = {tag}", f"has_tech = {preset['technology']}",
+                         'has_dlc = "No Step Back"', f"NOT = {{ has_country_flag = {flag} }}",
+                         f"set_country_flag = {flag}", f"type = {kind}",
+                         "allow_without_tech = yes", "parent_version = 0",
+                         "tank_engine_upgrade = 0", "tank_armor_upgrade = 0"):
+            if required not in guard:
+                fail(f"national preset {name} missing contract: {required}")
+        blocks = keyed_blocks(guard, "modules")
+        actual = re.findall(r"(?m)^\s*(\w+)\s*=\s*(\w+)\s*$", blocks[0]) if len(blocks) == 1 else []
+        expected = {f"tank_special_slot_{i}": "empty" for i in range(1, 11)}
+        expected.update(preset["modules"])
+        if dict(actual) != expected or len(actual) != 15:
+            fail(f"national preset {name} must match its manifest and explicitly fill/clear all 15 slots")
+        if not re.search(rf'(?m)^\s*{re.escape(preset["legacy_name_key"])}:\d*\s*"{re.escape(name)}"', legacy_loc):
+            fail(f"national preset {name} differs from existing country equipment name")
+    for guard in keyed_blocks(generic, "if"):
+        types = re.findall(r"\btype\s*=\s*(\w+)", guard)
+        if len(types) != 1:
+            continue
+        kind = types[0]
+        flag = f"cwic_starting_{kind}_created"
+        if f"NOT = {{ has_country_flag = {flag} }}" not in guard or f"set_country_flag = {flag}" not in guard:
+            fail(f"generic preset {kind} is not idempotent")
+        if ("USA", kind) in pairs and "NOT = { OR = { tag = USA tag = SOV } }" not in guard:
+            fail(f"generic preset {kind} must exclude national preset producers")
+    if generic.find("cwic_create_national_tank_variants = yes") < 0 or generic.find("cwic_create_national_tank_variants = yes") > generic.find("create_equipment_variant ="):
+        fail("national presets must bootstrap before generic presets")
+
+
 def tank_slot_layout_errors(block: str) -> list[str]:
     errors = []
     for index, expected in TANK_SPECIAL_SLOT_CATEGORIES.items():
@@ -2567,6 +2624,28 @@ def tank_slot_layout_errors(block: str) -> list[str]:
 
 def run_tank_negative_fixtures() -> None:
     """Exercise the tank contract's failure shapes without touching files."""
+    for module, metric, expected in (("Radar_1", "fuel_consumption", 1.2), ("gl_atgm_2p", "hard_attack", 95)):
+        adds, _, unknown = _effective_module_operations(module)
+        if unknown or adds.get(metric) != expected:
+            raise AssertionError(f"upgrade parent stats stacked for {module}")
+    if bookmark_variant_name("medium_tank_chassis_3", "SOV") != "T-55":
+        raise AssertionError("Soviet named preset lookup failed")
+    if bookmark_variant_name("medium_tank_chassis_3", "FIN") != BOOKMARK_VARIANT_NAMES["medium_tank_chassis_3"]:
+        raise AssertionError("national preset leaked into another producer")
+    national = text(NATIONAL_EFFECT_FILE)
+    generic = text(VARIANT_EFFECT_FILE)
+    for label, mutated_national, mutated_generic in (
+        ("wrong producer", national.replace("tag = USA", "tag = FIN", 1), generic),
+        ("stale slot", national.replace("tank_special_slot_1 =", "special_type_slot_1 =", 1), generic),
+        ("missing guard", national.replace("NOT = { has_country_flag", "NOT = { wrong_flag", 1), generic),
+        ("duplicate generic", national, generic.replace("NOT = { OR = { tag = USA tag = SOV } }", "", 1)),
+    ):
+        previous_errors = len(errors)
+        validate_national_tank_presets(mutated_national, mutated_generic)
+        rejected_mutation = len(errors) > previous_errors
+        del errors[previous_errors:]
+        if not rejected_mutation:
+            raise AssertionError(f"national preset mutation accepted: {label}")
     slots = "\n".join(
         f"tank_special_slot_{i} = {{ allowed_module_categories = {{ {' '.join(sorted(categories))} }} }}"
         for i, categories in TANK_SPECIAL_SLOT_CATEGORIES.items()
@@ -2989,7 +3068,7 @@ for path in sorted(OOB_DIR.glob("*_nsb.txt")):
                     f"{path.name} {effect} request for {tank_type} does not select "
                     f"an explicit variant with {field}"
                 )
-            elif name_match.group(1) != BOOKMARK_VARIANT_NAMES[tank_type]:
+            elif name_match.group(1) != bookmark_variant_name(tank_type, oob_variant_producer(block, path.stem[:3])):
                 fail(
                     f"{path.name} {effect} request asks for {tank_type} variant "
                     f"{name_match.group(1)!r}, which no bootstrap creates"
@@ -3008,7 +3087,7 @@ for path in sorted(OOB_DIR.glob("*_nsb.txt")):
                         f"{path.name} forced variant request for {tank_type} does not "
                         "select an explicit version_name"
                     )
-                elif name_match.group(1) != BOOKMARK_VARIANT_NAMES[tank_type]:
+                elif name_match.group(1) != bookmark_variant_name(tank_type, oob_variant_producer(variant_request, path.stem[:3])):
                     fail(
                         f"{path.name} forced variant request asks for {tank_type} "
                         f"variant {name_match.group(1)!r}, which no bootstrap creates"
@@ -3253,7 +3332,8 @@ if errors:
 print(
     "Military rework validation passed: "
     f"{len(technology_set)} technologies, {len(module_ids)} tank modules, "
-    f"{len(expected_types)} historical tank designs, {len(oob_refs)} bookmark variants "
+    f"{len(expected_types)} historical tank designs, {len(oob_refs)} generic bookmark variants, "
+    f"{len(NATIONAL_PRESETS)} national presets "
     f"and {versioned_oob_requests} named OOB requests across "
     f"{len(oob_files_with_tanks)} NSB OOBs, {history_bootstrap_sites} country-history "
     "bootstrap sites, and 15 designer slots checked."
