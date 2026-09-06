@@ -6,7 +6,7 @@
 - Branch: `tank-designer-and-doctrine-rework-test`
 - Base: `development-branch` at `4a999ae3f3`
 - Current HEAD: `38e6ec8e02`
-- Date of handoff: 2026-09-04
+- Date of handoff: 2026-09-04 (balance sources appended same day)
 - Goal: bugfix, sanitize, complete, and polish the Tank Designer and Doctrine reworks without merging into `development-branch`.
 - Status: script work complete and verified at runtime on both bookmarks. The interactive designer UI pass is **partly done and was stopped mid-way**; see `## Designer UI pass` for exactly where it got to and what is left.
 
@@ -14,6 +14,7 @@ Read these investigations before making broad design changes:
 
 - `LogDocs/Doctrine_Rework/Doctrine_Rework_Investigation.md`
 - `LogDocs/Tank_Designer_Rework_Audit.md`
+- `LogDocs/Tank_Designer_Balance_Sources.md`
 
 Do not restart the completed audit work. Continue from the commits below; the remaining work is the unfinished half of the designer UI pass.
 
@@ -111,7 +112,7 @@ Lesson for the next session: on this panel, "it still responds to clicks" does n
 1. **UI-scale extremes.** UI scaling was raised to its maximum, 2.4x at 3840x2160, but HOI4 requires a restart to apply it, and the restart was not done. `settings.txt` has been restored to the user's original 3840x2160 / 1.4x, so the next session must set it again.
 2. **A second resolution.** The audit asks for 1920x1080 and 2560x1440. Neither was exercised. The resolution dropdown was being stepped down to 1920x1080 when work stopped.
 3. **The blueprint area now carries two overlays.** The fifteenth module slot sits at container `(439,150)` and the role selector now sits at panel `(465,212)`; both are drawn over `equipment_preview` (container x 3..511, y 50..298). Neither overlaps the other or the module rows, and at 1.0x the blueprint tank is drawn far enough left that both are clear of it. **This still needs a judgement call at other scales and for wider chassis art** — if either covers the tank, move it or shrink the preview.
-4. **The land doctrine tree has never been looked at in-game.** It was switched to a classic tech tree this session (see below) and the layout is entirely unverified.
+4. **The land doctrine tab has never been looked at in-game.** It should return with the revert described below, but nobody has confirmed the 78-cell layout actually reads well.
 5. **The ammunition fix has not been seen in-game.** Confirm a starting tank now shows non-zero soft/hard attack and piercing in the designer; before the fix the designer read `0.0` for all three.
 
 ### How to run the interactive pass
@@ -130,7 +131,7 @@ The pointer and screenshot rig used here is worth reusing.
 
 Loading the pre-branch save `ENG_1951_08_07_01.hoi4` and opening the Production tab produced an immediate SIGSEGV (`crashes/hoi4_20260904_181831`, stripped stack). A fresh 1949 campaign opens Production fine, so this is old-save incompatibility, not a live defect — expected, because earlier commits on this branch removed tank roles and their generated enums. **Treat this branch as save-incompatible with pre-branch saves** and do not test it with them.
 
-## Tank ammunition and the land doctrine tree
+## Tank ammunition and the doctrine tabs
 
 Two further changes landed after the UI pass.
 
@@ -142,27 +143,128 @@ Every conventional-gun tank design left `special_type_slot_1` and `special_type_
 - The AI recipes now request `tank_ammo_kinetic` and `tank_ammo_he`, and their `enable` blocks gate on `has_tech = nsb_ammo` and `has_tech = nsb_he_ammo0` so the AI cannot pick a design it cannot build.
 - The validator enforces both. It decides which guns need ammunition by looking for `soft_attack`/`hard_attack`/`ap_attack` in the module's `multiply_stats`, so AA and flame modules are exempt automatically rather than by name.
 
-### Land doctrine moved to a classic tech tree
+### Doctrines: why none of them appeared, and what is staged now
 
-`old_land_doctrine_folder` changed from `doctrine = yes` to `doctrine = no`, and `countrytechtreeview.gui` gained a folder container of about 3,175 lines.
+**Symptom.** No land, naval or air doctrine is reachable anywhere. The only thing visible is a special-forces doctrine box that does nothing when clicked. Verified in-game: the research ledger has no doctrine tab at all, and the Officer Corps window does not open.
 
-The layout is a bloc x decade grid: bloc columns at `x = 80 + 480n`, decade rows at `y = 172, 790, 1420, 2050, 2680, 3310`, one `<tech>_tree` anchor plus a title and description textbox per cell, 78 cells in total.
+**The commit that did it** is `b3d3a53c48` "I love doctrines" (Canthonk, 2025-12-07). It renamed the three doctrine technology folders:
 
-Verified statically:
+- `land_doctrine_folder` -> `old_land_doctrine_folder`
+- `naval_doctrine_folder` -> `old_naval_doctrine_folder`
+- `air_doctrine_folder` -> `old_air_doctrine_folder`
 
-- All 78 anchors resolve to real technologies, and all 528 land doctrine technologies are reachable from an anchor through `leads_to_tech`.
-- All 156 title/description localisation keys exist in English.
-- All sprites referenced by the block are defined.
+and added `special_forces_doctrine_folder`. It updated `countrydoctrinetreeview.gui` to match but nothing else, so every other consumer of those names went stale. The one folder it did **not** rename, `special_forces_doctrine_folder`, is the one box still visible — a clean natural experiment. That box does nothing because no technology anywhere is assigned to that folder.
 
-**How this file works, because it is easy to misread.** A `<tech>_tree` `containerWindowType` is a *branch anchor* placed at an absolute pixel position; the technologies below it are auto-placed from their own `folder = { position = { x y } }`, which are small grid units *relative to that anchor*. That is why 476 technologies share only 7 distinct coordinates — `(0,0)`, `(-2,2)`, `(2,2)`, `(-2,4)`, `(2,4)`, `(0,6)`, `(-3,6)` — and it is correct, not a collision. Vanilla does the same: `infantry_folder` has 9 anchors for 67 technologies. Do not "fix" the shared coordinates and do not add an anchor per technology.
+**The deeper problem is that the legacy path is dead on this engine version.** Vanilla 1.19 declares `land_doctrine_folder`, `naval_doctrine_folder`, `air_doctrine_folder` and `special_forces_doctrine_folder` with `doctrine = yes`, and assigns **zero technologies to any of them**. Paradox moved doctrines to the grand-doctrine system under `common/doctrines/`, which this mod deliberately keeps switched off through zero-byte overrides. So a `doctrine = yes` folder routes to a UI the mod has gutted, and nothing can render no matter how the names line up. Renaming the Officer Corps `X_doctrine_button` containers to match the folders was tried and did not help.
 
-`old_naval_doctrine_folder` and `old_air_doctrine_folder` remain `doctrine = yes` with no GUI container, so land doctrine is now the odd one out. That is deliberate: the doctrine grid view has no room for 17 blocs across six decades.
+**What is staged instead: treat them as ordinary technology folders.** `xp_research_type` and `xp_unlock_cost` do not depend on the doctrine flag — vanilla's MTG naval technologies use XP unlocks inside ordinary tech-tree folders — so the doctrine feel survives the move.
 
-### Runtime check after both changes
+A technology folder needs **four** pieces to render, and a folder missing any one of them draws nothing **and logs no error**:
 
-A full 35-DLC `-debug -ai_testing` 1949 run reaches `1949.05.23` with a 681 KB `error.log`, matching the healthy baseline. Zero tank chassis variant failures, zero doctrine, folder, `countrytechtreeview` or grid-box errors, and zero errors naming the new ammunition modules. The only remaining variant failures are the same three unrelated pre-existing families: legacy light artillery, an MTG naval hull, and infantry equipment.
+1. `doctrine = no` in `common/technology_tags/00_technology.txt`
+2. a `<folder>` `containerWindowType` in `interface/countrytechtreeview.gui`
+3. a `<folder>_tab` button inside that file's `folder_tabs`
+4. `techtree_<folder>_item` **and** `techtree_<folder>_small_item` node templates
 
-This proves both changes **load** cleanly. It does not prove either one **looks** right: nothing has opened the land doctrine tab or read a tank's attack stats in the designer.
+An earlier attempt supplied only 1-3 for land doctrine and was reverted when it did not work; the missing node template was the reason. All four are now present for all three folders. The folder containers were copied from `countrydoctrinetreeview.gui`, which already held complete layouts (land 78 branch anchors, naval 3, air 3), and the node templates were cloned from `mtgnavalfolder` because that is vanilla's closest analogue: XP-researched technologies in an ordinary folder. Tabs sit at x=410, 650 and 970, the free slots in the strip.
+
+`countryofficercorpview.gui` is back to its committed state; with `doctrine = no` those doctrine buttons are no longer the route in.
+
+**If this still does not work**, the remaining options are, in order of cost: check whether `special_forces_doctrine_folder` should be deleted from `technology_folders` (it has no technologies and only contributes the dead box); or port the 646 doctrine technologies to the grand-doctrine system under `common/doctrines/`, which is the only path vanilla 1.19 actually uses.
+
+### Doctrine icons
+
+Confirmed working: the doctrine folders now appear in the technologies section alongside industry and military, and researching one does not consume a research slot. That last part is correct rather than a bug — these nodes carry `xp_research_type` and `xp_unlock_cost`, so they are XP unlocks, not slot research. Say so if slot consumption is actually wanted.
+
+Icon state before this pass: air 73/73 and naval 45/45 fully illustrated; land 53/528, all of them NATO.
+
+- 27 land nodes already had art sitting in `gfx/interface/doctrines/Technology/` that was never declared in `interface/CWIC_Doctrines.gfx`. Now declared.
+- The remaining 448 now declare the base game's 64x64 `doctrine_placeholder.dds`, which matches the art's own 64x64, so the tree reads consistently instead of falling back.
+
+`LogDocs/Doctrine_Rework/Doctrine_Icon_Art_Requests.md` lists all 448 by bloc and decade. To promote one: drop `<technology>.png` into `gfx/interface/doctrines/Technology/` and repoint that entry's `texturefile`. **Do not point an entry at art that does not exist yet** — a missing texture logs an error on every load, which is how the two blank doctrine icons fixed earlier in this branch were found.
+
+The bloc and decade banner art is fine: 78 of 79 PNGs in `gfx/interface/doctrines/` are declared, the odd one out being an unused `Doctrine_Overlay`.
+
+### Land doctrine tree structure is only half-wired
+
+Full analysis in `LogDocs/Doctrine_Rework/Land_Doctrine_Tree_Structure.md`.
+
+The grid in `countrytechtreeview.gui` is the design, not just layout: columns are
+blocs, rows are decades, and a column that starts partway down does so because that
+doctrine arrives later in Cold War history. Each cell has one root header and one
+capstone terminal.
+
+Decade chaining is already implemented, through `allow = { has_tech = ... }` rather
+than `path`. **The file writes `allow  = {` with two spaces**, which is why an earlier
+pass in this branch reported "no gating at all" — a `grep 'allow = '` misses all 60 of
+them. That claim was wrong.
+
+Seven of those gates are cross-bloc and encode real lineage: `sadf` continues `nato`,
+`dprk` continues `warsaw`, `cuba` branches off `foco`, and `maoist`, `foco`,
+`hybrid_ins` and `islamist_ins` all descend from the `ins` column's 1950s capstone.
+So there are 11 independent roots, not 17.
+
+Four gaps, in the order worth fixing:
+
+1. **Gates sit on capstones, never on headers.** This is the reported bug. Gating the
+   capstone leaves the header and the rest of that cell freely purchasable, so a
+   country with no 1940s progress still buys most of a 1960s cell. Gate the header
+   instead — it is the cell's only root, so that locks the whole cell. 61 headers need
+   it.
+2. **Nothing enforces one bloc.** No exclusivity between the 11 independent roots,
+   which is why one country researches NATO and Warsaw side by side. Continuation
+   columns inherit exclusivity through their parent's lineage gate.
+3. **Eight 1940s-to-1950s gates were never written.** Every column starting in the
+   1940s is missing its first transition; the pattern is otherwise complete.
+4. **No date gating anywhere.** Not one date condition in the file.
+
+`himalayan` and `iran` start mid-war with no lineage parent, so they are reachable
+from turn one. That is a design decision — genuinely independent and date-gated, or
+missing a parent — not a mechanical fix.
+
+An earlier commit on this branch, `7b50137918`, removed a cross-decade `path` from
+`cw_nato_1950s_tactical_nuclear_fire_planning` as a "duplicate". It was not a
+duplicate; it was the one place the vertical intent was expressed as a `path` rather
+than an `allow`.
+
+### Caution about verification
+
+A folder that fails to render logs nothing. Several earlier "clean `error.log`" results in this document were taken as evidence that a doctrine change worked; they were not. Only looking at the ledger settles it.
+
+## The Lead Dev balance sources
+
+Two 2023 design artifacts arrived on 2026-09-04 and sit untracked in the repository root:
+`2023 - CWIC Tank Rework Balance.xlsx` (module balance master, 15 tabs) and
+`Tank_Designer_Slimemix (1).drawio` (design tree, 11 pages). Full analysis in
+`LogDocs/Tank_Designer_Balance_Sources.md`.
+
+**They are reference, not backlog.** The workbook's `Total Balance Sheet` tab is the exact
+source of the numbers already in `00_tank_modules.txt` and `tank_chassis.txt`: a
+field-by-field comparison of all 224 modules the two share found zero real differences,
+guns and ammunition included. Nothing on this branch needs its numbers re-entered.
+
+Three things in them that change how the remaining work should be judged:
+
+1. **The `[DONE]` tags in both files are stale and contradict each other.** The workbook
+   leaves every gun and ammunition category untagged although those values shipped; the
+   diagram marks its guns page `[DONE]` and its armour page not, although both shipped.
+   Judge completeness from the mod.
+2. **The workbook states target stat envelopes for 41 finished vehicle generations**
+   (Light Tank I-VI, WWII Tank 1-2, MBT I-VIII, Heavy Tank I-V, Light/Heavy Mech I-VIII),
+   giving hard, soft, breakthrough, defence, armor, piercing, speed, fuel and cost per
+   generation. Nothing in the repository checks bootstrap variants or the 125 AI recipes
+   against those targets. `tools/validate_military_reworks.py` is the natural home for
+   that check, and it is now writable because the targets exist on paper.
+3. **The scope the sources define but the mod never built** is larger than anything left on
+   this branch: the artillery and AA designer ladders (page 6, still legacy five-step
+   equipment techs in `common/technologies/artillery.txt`), the page 2 special modules
+   (blow-out panels, unmanned compartment, dozer and mine plows, RWS, external fuel, log,
+   amphibious drive), the night and thermal vision line, the mechanized APC/IFV ladder, and
+   trucks/amphibious. Treat all of that as post-branch scope; **this branch is a bugfix and
+   completion pass, not the place to start it.**
+
+When two workbook tabs disagree, `Total Balance Sheet` wins - the `(DONE) ...` tabs are
+earlier drafts and the `Gun Modules` tab is a rough draft with mixed decimal conventions.
 
 ## Runtime environment and commands
 
@@ -215,6 +317,8 @@ These were already untracked before this task and must not be staged, edited, or
 - root `error_1.log`
 - root `error_2.log`
 - root `game.log`
+- root `2023 - CWIC Tank Rework Balance.xlsx`
+- root `Tank_Designer_Slimemix (1).drawio`
 
 ## Useful inspection points
 
@@ -225,6 +329,23 @@ These were already untracked before this task and must not be staged, edited, or
 - Manufacturer bloc tags with no OOB: `Cold War Iron Curtain/history/countries/CAP - WP Western Manufacturers.txt`, `CUM - WP Communist Manufacturers.txt`
 - Technology/type unlock mapping: `Cold War Iron Curtain/common/technologies/NSB_armor.txt`
 - Regression validator and authoritative 30-type maps: `tools/validate_military_reworks.py`
+- Balance provenance for every module and chassis number: `LogDocs/Tank_Designer_Balance_Sources.md`
 - Pointer rig for interactive UI testing: `tools/hyprland_uimouse.py` (QA only, not mod content; drop it if unwanted)
 
 The bootstrap is generated, not hand-maintained. If OOB tank references change, recompute the per-country technology sets from the OOB `producer`/`creator` attributions rather than editing individual history files; the validator enforces that the two stay in sync.
+
+### Doctrine completion correction (2026-09-05)
+
+The doctrine progression pass is implemented in the retained legacy technology trees.
+The reviewed manifest covers 78 land cells and 528 nodes: 67 header lineage gates, 70
+inclusive decade gates, and 11 independent roots. The apparent 13-node regional
+Islamist cell and singleton alternative are prefix-grouping artifacts; the alternative
+header owns seven existing `cw_islamist_ins_1990s_*` nodes.
+
+The prior 60 terminal gates were replaced by header gates using each graph cell's
+actual terminal, including Foco's terminal for Cuba. The alternative Islamist terminal
+no longer requires regional Islamist ownership or `X_TESt`. Air retains its three root
+exclusions and five reciprocal internal pairs; naval now has symmetric exclusions on
+its three roots. `tools/validate_military_reworks.py --doctrine-self-test` covers the
+balanced parser and negative graph/allow mutations. Static validation passes; fresh
+game, UI, AI, save/load, and multiplayer acceptance remain to be exercised.
