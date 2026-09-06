@@ -1,0 +1,86 @@
+# QA harness for the Malayan Emergency. Run from the console with `e <effect_name>`.
+
+# Puts the MNLA one point short of the General Uprising threshold so the gate can be checked.
+test_mla_momentum_near_win = {
+    MLA = {
+        set_variable = { emergency_momentum = 249 }
+        set_country_flag = active_insurgency
+    }
+}
+
+# Puts the MNLA at the General Uprising threshold.
+test_mla_momentum_win = {
+    MLA = {
+        set_variable = { emergency_momentum = 250 }
+        set_country_flag = active_insurgency
+    }
+}
+
+# Puts the MNLA at the Final Sweep threshold.
+test_mla_momentum_loss = {
+    MLA = {
+        set_variable = { emergency_momentum = -250 }
+        set_country_flag = active_insurgency
+    }
+}
+
+# Seeds cells across the peninsula so the uprising's set_state_controller sweep has targets.
+test_mla_seed_cells = {
+    every_state = {
+        limit = {
+            is_core_of = MLA
+            owner = { OR = { tag = MAL tag = ENG } }
+        }
+        set_state_flag = MLA_cell_present
+    }
+}
+
+# Full MNLA path: seed cells, bank a plausible operation record, then declare the war.
+test_mla_launch_uprising = {
+    test_mla_seed_cells = yes
+    MLA = { set_variable = { MLA_operations_won = 8 } }
+    MLA_Launch_General_Uprising = yes
+}
+
+# Resolves the uprising in the MNLA's favour without fighting it out.
+test_mla_win_war = {
+    Fall_Of_Malaya = yes
+}
+
+# Full government path: declare the war of annihilation.
+test_mal_final_sweep = {
+    MAL_Launch_Final_Sweep = yes
+}
+
+# Resolves the final sweep in the government's favour without fighting it out.
+test_mal_win_war = {
+    Exile_Of_The_MNLA = yes
+}
+
+# Clears the war layer so a save can be replayed from the Emergency phase.
+test_mla_reset_emergency = {
+    clr_global_flag = MAL_EMERGENCY_GENERAL_UPRISING
+    clr_global_flag = MAL_EMERGENCY_MLA_Victory
+    clr_global_flag = MAL_EMERGENCY_MAL_Victory
+    MLA = {
+        set_country_flag = active_insurgency
+        clr_country_flag = MLA_general_uprising
+        clr_country_flag = Victory_in_Malaysian_Emergency
+        remove_ideas = MLA_general_uprising_idea
+        remove_ideas = MLA_encirclement
+        set_variable = { emergency_momentum = -40 }
+        set_variable = { MLA_emergency_win_streak = 0 }
+        set_variable = { MLA_emergency_lose_streak = 0 }
+        set_variable = { MLA_operations_won = 0 }
+    }
+    MAL = {
+        clr_country_flag = MAL_final_sweep
+        clr_country_flag = Victory_in_Malaysian_Emergency
+        remove_ideas = MAL_emergency_collapse
+        remove_ideas = MAL_final_sweep_idea
+    }
+    every_state = {
+        limit = { has_state_flag = MLA_cell_present }
+        clr_state_flag = MLA_cell_present
+    }
+}

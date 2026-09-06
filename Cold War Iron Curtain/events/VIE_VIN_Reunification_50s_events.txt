@@ -1,13 +1,6 @@
 add_namespace = VIE_VIN_Reunification_50s
 
-# ------------------------------------------------------------------
-# Reunification and the 1950s national-election crisis
-# Called from VIN_50s after the Geneva settlement.
-# ------------------------------------------------------------------
 
-# ------------------------------------------------------------------
-# VIN — preparations for the all-Vietnam election
-# ------------------------------------------------------------------
 country_event = {
 	id = VIE_VIN_Reunification_50s.1
 	title = VIE_VIN_Reunification_50s.1.t
@@ -27,9 +20,6 @@ country_event = {
 }
 
 
-# ------------------------------------------------------------------
-# VIE — whether the southern government permits the election
-# ------------------------------------------------------------------
 country_event = {
 	id = VIE_VIN_Reunification_50s.2
 	title = VIE_VIN_Reunification_50s.2.t
@@ -64,6 +54,7 @@ country_event = {
 		ai_chance = { base = 85 }
 
 		set_country_flag = VIE_reunification_election_refused
+		VIE_diem_autocomplete_ballot_refusal = yes
 		add_stability = 0.02
 		add_opinion_modifier = {
 			target = VIN
@@ -81,9 +72,6 @@ country_event = {
 }
 
 
-# ------------------------------------------------------------------
-# VIN — the election has formally been cancelled
-# ------------------------------------------------------------------
 country_event = {
 	id = VIE_VIN_Reunification_50s.3
 	title = VIE_VIN_Reunification_50s.3.t
@@ -103,9 +91,6 @@ country_event = {
 }
 
 
-# ------------------------------------------------------------------
-# VIN — diplomatic route after the election crisis
-# ------------------------------------------------------------------
 country_event = {
 	id = VIE_VIN_Reunification_50s.4
 	title = VIE_VIN_Reunification_50s.4.t
@@ -136,9 +121,6 @@ country_event = {
 }
 
 
-# ------------------------------------------------------------------
-# VIN — armed-liberation route after the election crisis
-# ------------------------------------------------------------------
 country_event = {
 	id = VIE_VIN_Reunification_50s.5
 	title = VIE_VIN_Reunification_50s.5.t
@@ -161,9 +143,318 @@ country_event = {
 }
 
 
-# ------------------------------------------------------------------
-# Global result — fired by VIN_Reunification_of_Vietnams after annexation
-# ------------------------------------------------------------------
+country_event = {
+	id = VIE_VIN_Reunification_50s.6
+	title = VIE_VIN_Reunification_50s.6.t
+	desc = VIE_VIN_Reunification_50s.6.d
+	picture = GFX_report_event_vietnam_reunification
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		geneva_election_pending_trigger = yes
+	}
+
+	option = {
+		name = VIE_VIN_Reunification_50s.6.a
+
+		ai_chance = {
+			base = 75
+			modifier = {
+				factor = 1.5
+				is_historical_focus_on = yes
+			}
+			modifier = {
+				factor = 1.4
+				has_opinion = { target = USA value > 40 }
+			}
+			modifier = {
+				factor = 0.4
+				geneva_vie_side_dominant_trigger = yes
+			}
+		}
+
+		set_country_flag = VIE_reunification_election_refused
+		VIE_diem_autocomplete_ballot_refusal = yes
+		add_opinion_modifier = {
+			target = USA
+			modifier = USA_VIE_Ballot_Compliance
+		}
+		reverse_add_opinion_modifier = {
+			target = USA
+			modifier = USA_VIE_Ballot_Compliance
+		}
+		set_temp_variable = { percent_change = 15 }
+		set_temp_variable = { tag_index = USA.id }
+		set_temp_variable = { influence_target = VIE.id }
+		change_influence_percentage = yes
+		if = {
+			limit = { country_exists = VIN }
+			VIN = {
+				set_country_flag = VIN_reunification_election_cancelled
+				country_event = { id = VIE_VIN_Reunification_50s.3 days = 3 }
+				add_opinion_modifier = {
+					target = VIE
+					modifier = medium_decrease
+				}
+			}
+		}
+		if = {
+			limit = { country_exists = USA }
+			USA = { country_event = { id = VIE_VIN_Reunification_50s.8 days = 2 } }
+		}
+	}
+
+	option = {
+		name = VIE_VIN_Reunification_50s.6.b
+
+		ai_chance = {
+			base = 25
+			modifier = {
+				factor = 0.3
+				is_historical_focus_on = yes
+			}
+			modifier = {
+				factor = 2
+				geneva_vie_side_dominant_trigger = yes
+			}
+			modifier = {
+				factor = 0.4
+				has_opinion = { target = USA value > 60 }
+			}
+		}
+
+		set_country_flag = VIE_reunification_election_accepted
+		add_opinion_modifier = {
+			target = USA
+			modifier = USA_VIE_Ballot_Defiance
+		}
+		reverse_add_opinion_modifier = {
+			target = USA
+			modifier = USA_VIE_Ballot_Defiance
+		}
+		set_temp_variable = { percent_change = -20 }
+		set_temp_variable = { tag_index = USA.id }
+		set_temp_variable = { influence_target = VIE.id }
+		change_influence_percentage = yes
+		if = {
+			limit = { country_exists = VIN }
+			VIN = {
+				set_country_flag = VIN_reunification_election_approved
+				add_opinion_modifier = {
+					target = VIE
+					modifier = medium_increase
+				}
+			}
+		}
+		if = {
+			limit = { country_exists = USA }
+			USA = { country_event = { id = VIE_VIN_Reunification_50s.8 days = 2 } }
+		}
+	}
+}
+
+country_event = {
+	id = VIE_VIN_Reunification_50s.7
+	title = VIE_VIN_Reunification_50s.7.t
+	desc = VIE_VIN_Reunification_50s.7.d
+	picture = GFX_report_event_vietnam_reunification
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		geneva_election_pending_trigger = yes
+	}
+
+	option = {
+		name = VIE_VIN_Reunification_50s.7.a
+
+		ai_chance = {
+			base = 50
+			modifier = {
+				factor = 1.6
+				geneva_vie_side_dominant_trigger = yes
+			}
+			modifier = {
+				factor = 1.3
+				has_opinion = { target = USA value > 40 }
+			}
+			modifier = {
+				factor = 0.5
+				geneva_vie_side_losing_trigger = yes
+			}
+		}
+
+		set_country_flag = VIE_reunification_election_accepted
+		add_opinion_modifier = {
+			target = USA
+			modifier = USA_VIE_Ballot_Compliance
+		}
+		reverse_add_opinion_modifier = {
+			target = USA
+			modifier = USA_VIE_Ballot_Compliance
+		}
+		set_temp_variable = { percent_change = 10 }
+		set_temp_variable = { tag_index = USA.id }
+		set_temp_variable = { influence_target = VIE.id }
+		change_influence_percentage = yes
+		if = {
+			limit = { country_exists = VIN }
+			VIN = {
+				set_country_flag = VIN_reunification_election_approved
+				add_opinion_modifier = {
+					target = VIE
+					modifier = medium_increase
+				}
+			}
+		}
+		if = {
+			limit = { country_exists = USA }
+			USA = { country_event = { id = VIE_VIN_Reunification_50s.9 days = 2 } }
+		}
+	}
+
+	option = {
+		name = VIE_VIN_Reunification_50s.7.b
+
+		ai_chance = {
+			base = 50
+			modifier = {
+				factor = 1.8
+				geneva_vie_side_losing_trigger = yes
+			}
+			modifier = {
+				factor = 0.4
+				geneva_vie_side_dominant_trigger = yes
+			}
+		}
+
+		set_country_flag = VIE_reunification_election_refused
+		VIE_diem_autocomplete_ballot_refusal = yes
+		add_opinion_modifier = {
+			target = USA
+			modifier = USA_VIE_Ballot_Defiance
+		}
+		reverse_add_opinion_modifier = {
+			target = USA
+			modifier = USA_VIE_Ballot_Defiance
+		}
+		set_temp_variable = { percent_change = -15 }
+		set_temp_variable = { tag_index = USA.id }
+		set_temp_variable = { influence_target = VIE.id }
+		change_influence_percentage = yes
+		add_stability = 0.03
+		if = {
+			limit = { country_exists = VIN }
+			VIN = {
+				set_country_flag = VIN_reunification_election_cancelled
+				country_event = { id = VIE_VIN_Reunification_50s.3 days = 3 }
+				add_opinion_modifier = {
+					target = VIE
+					modifier = large_decrease
+				}
+			}
+		}
+		if = {
+			limit = { country_exists = USA }
+			USA = { country_event = { id = VIE_VIN_Reunification_50s.9 days = 2 } }
+		}
+	}
+}
+
+country_event = {
+	id = VIE_VIN_Reunification_50s.8
+	title = VIE_VIN_Reunification_50s.8.t
+	desc = {
+		text = VIE_VIN_Reunification_50s.8.d_complied
+		trigger = {
+			VIE = { has_country_flag = VIE_reunification_election_refused }
+		}
+	}
+	desc = {
+		text = VIE_VIN_Reunification_50s.8.d_defied
+		trigger = {
+			VIE = { NOT = { has_country_flag = VIE_reunification_election_refused } }
+		}
+	}
+	picture = GFX_USA_VIE.3
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = VIE_VIN_Reunification_50s.8.a
+		trigger = {
+			VIE = { has_country_flag = VIE_reunification_election_refused }
+		}
+	}
+
+	option = {
+		name = VIE_VIN_Reunification_50s.8.b
+		trigger = {
+			VIE = { NOT = { has_country_flag = VIE_reunification_election_refused } }
+		}
+
+		clr_country_flag = USA_Tampered_With_VIE
+	}
+}
+
+country_event = {
+	id = VIE_VIN_Reunification_50s.9
+	title = VIE_VIN_Reunification_50s.9.t
+	desc = {
+		text = VIE_VIN_Reunification_50s.9.d_proceeded
+		trigger = {
+			VIE = { has_country_flag = VIE_reunification_election_accepted }
+		}
+	}
+	desc = {
+		text = VIE_VIN_Reunification_50s.9.d_cancelled
+		trigger = {
+			VIE = { NOT = { has_country_flag = VIE_reunification_election_accepted } }
+		}
+	}
+	picture = GFX_USA_VIE.3
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = VIE_VIN_Reunification_50s.9.a
+		trigger = {
+			VIE = { has_country_flag = VIE_reunification_election_accepted }
+		}
+	}
+
+	option = {
+		name = VIE_VIN_Reunification_50s.9.b
+		trigger = {
+			VIE = { NOT = { has_country_flag = VIE_reunification_election_accepted } }
+		}
+	}
+}
+
+country_event = {
+	id = VIE_VIN_Reunification_50s.10
+	title = VIE_VIN_Reunification_50s.10.t
+	desc = VIE_VIN_Reunification_50s.10.d
+	picture = GFX_report_event_vietnam_reunification
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		geneva_election_pending_trigger = yes
+	}
+
+	option = {
+		name = VIE_VIN_Reunification_50s.10.a
+	}
+}
+
+
 news_event = {
 	id = VIE_VIN_Reunification_50s.100
 	title = VIE_VIN_Reunification_50s.100.t

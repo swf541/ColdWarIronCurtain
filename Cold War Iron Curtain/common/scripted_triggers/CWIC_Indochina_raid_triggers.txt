@@ -1,12 +1,7 @@
 # ROOT = the raiding country, FROM = the country that owns the raid target.
-# Guards the generic Indochina insurgency raids against friendly or neutral targets -
-# e.g. the State of Vietnam must not be able to raid France while both fight the Viet Minh.
 INDO_raid_valid_target_allegiance_trigger = {
 	OR = {
-		# An open war with the target always justifies raids (e.g. VIE vs CCC reunification war)
 		has_war_with = FROM
-		# Communist insurgents wage the guerrilla war without a declared war,
-		# but never against their own side, faction, overlord or co-belligerents
 		AND = {
 			is_in_array = {
 				FRA.StruggleInvolvedNationsIndochinaCommunist = ROOT.id
@@ -25,5 +20,35 @@ INDO_raid_valid_target_allegiance_trigger = {
 			}
 			NOT = { has_war_together_with = FROM }
 		}
+	}
+}
+
+INDO_raid_not_own_side_trigger = {
+	NOT = { FROM = { tag = ROOT } }
+	NOT = { FROM = { is_subject_of = ROOT } }
+	NOT = { ROOT = { is_subject_of = FROM } }
+	NOT = { ROOT = { is_in_faction_with = FROM } }
+	NOT = { ROOT = { has_war_together_with = FROM } }
+	NOT = {
+		AND = {
+			ROOT = { tag = VIN }
+			FROM = { vin_aligned_country_trigger = yes }
+		}
+	}
+}
+
+VIN_ai_raids_suspended_trigger = {
+	tag = VIN
+	OR = {
+	    NOT = { VIN_no_campaign_running_trigger = yes }
+	    has_war = yes
+	}
+}
+
+FRE_ai_raids_suspended_trigger = {
+	tag = FRE
+	OR = {
+	    NOT = { FRE_no_operation_running_trigger = yes }
+	    has_war = yes
 	}
 }

@@ -1,0 +1,63 @@
+VIN_dak_doa_campaign_terminal_trigger = {
+	OR = {
+		has_country_flag = VIN_Campaign_Dak_Doa_Result_Clean
+		has_country_flag = VIN_Campaign_Dak_Doa_Result_Costly
+		has_country_flag = VIN_Campaign_Dak_Doa_Result_Aborted
+		has_country_flag = VIN_Campaign_Dak_Doa_Result_Failure
+		has_country_flag = VIN_Campaign_Dak_Doa_Result_Superseded
+	}
+}
+
+FRE_dak_doa_response_terminal_trigger = {
+	OR = {
+		has_country_flag = FRE_Dak_Doa_Result_Held
+		has_country_flag = FRE_Dak_Doa_Result_Relief_Successful
+		has_country_flag = FRE_Dak_Doa_Result_Post_Overrun
+		has_country_flag = FRE_Dak_Doa_Result_Relief_Force_Mauled
+		has_country_flag = FRE_Dak_Doa_Result_Evacuated
+		has_country_flag = FRE_Dak_Doa_Result_Superseded
+	}
+}
+
+NLF_dak_doa_wider_southern_war_trigger = {
+	OR = {
+		AND = { country_exists = VIE has_war_with = VIE }
+		AND = { country_exists = FRE has_war_with = FRE }
+		AND = { country_exists = FRA has_war_with = FRA }
+	}
+}
+
+VIN_dak_doa_available_trigger = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	NOT = { has_global_flag = geneva_conference_concluded }
+	check_variable = { global.Indochina_War_Active_Phase < 9 }
+	country_exists = NLF
+	country_exists = FUL
+	country_exists = FRE
+	NLF = {
+		NLF_dak_doa_wider_southern_war_trigger = yes
+		controls_province = 10180
+		NOT = { has_country_flag = VIN_Campaign_Dak_Doa_Active }
+		NOT = { VIN_dak_doa_campaign_terminal_trigger = yes }
+	}
+}
+
+NLF_dak_doa_objective_held_trigger = {
+	controls_province = 1328
+}
+
+NLF_dak_doa_superseded_trigger = {
+	OR = {
+		has_global_flag = Indochina_War_Over
+		has_global_flag = geneva_conference_concluded
+		check_variable = { global.Indochina_War_Active_Phase > 8 }
+		NOT = { country_exists = FUL }
+		NOT = { country_exists = FRE }
+	}
+}
+
+NLF_dak_doa_war_abandoned_trigger = {
+	NOT = { check_variable = { NLF_Dak_Doa_Hold_Days > 6 } }
+	NOT = { has_war_with = FUL }
+	check_variable = { NLF_Dak_Doa_Days_Elapsed > 0 }
+}

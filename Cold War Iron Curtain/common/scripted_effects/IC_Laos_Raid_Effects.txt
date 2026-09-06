@@ -1,0 +1,768 @@
+ic_laos_raid_release_pathet_lao = {
+	set_global_flag = Laos_Pathet_Released
+	if = {
+		limit = { country_exists = LOS }
+		LOS = { add_ideas = LOS_French_Airlift }
+	}
+	every_state = {
+		limit = {
+			OR = {
+				is_owned_by = LOS
+				is_core_of = LOS
+			}
+		}
+		add_core_of = LAO
+	}
+    1295 = {
+        transfer_state_to = LAO
+    }
+   	LAO = {
+  		set_capital = { state = 1295 }
+  		hidden_effect = { keep_current_politics = yes }
+		if = { limit = { NOT = { has_idea = Pathet_Lao_Faction } } add_ideas = Pathet_Lao_Faction }
+   	}
+	if = {
+		limit = { NOT = { is_in_array = { FRA.StruggleInvolvedNationsIndochinaCommunist = LAO.id } } }
+		add_to_array = { FRA.StruggleInvolvedNationsIndochinaCommunist = LAO.id }
+		LAO = { indochina_struggle_starting_idea_setup = yes }
+   	}
+	lao_deploy_field_force = yes
+	VIN = {
+	    country_event = VINLAO.1
+		set_autonomy = {
+			target = LAO
+			autonomy_state = autonomy_easternbloc
+		}
+	}
+}
+
+
+lao_ensure_templates = {
+	if = {
+		limit = {
+			country_exists = LAO
+			LAO = { NOT = { has_template = "Kong Phan" } }
+		}
+		LAO = {
+			# The regular battalion's artillery train requests trucks while the
+			# template is instantiated; seed a valid variant before loading it.
+			add_equipment_to_stockpile = { type = motorized_equipment_1 amount = 100 producer = VIN }
+			load_oob = "LAO_field_force"
+		}
+	}
+}
+
+lao_deploy_field_force = {
+	if = {
+		limit = { country_exists = LAO }
+		lao_ensure_templates = yes
+		set_temp_variable = { lao_force_tier = 1 }
+		if = {
+			limit = {
+				OR = {
+					NOT = { country_exists = FRE }
+					FRE = { check_variable = { FRE_Metropole_Patience < 33 } }
+				}
+			}
+			set_temp_variable = { lao_force_tier = 2 }
+		}
+		else_if = {
+			limit = {
+				country_exists = FRE
+				FRE = { check_variable = { FRE_Metropole_Patience > 65 } }
+			}
+			set_temp_variable = { lao_force_tier = 0 }
+		}
+
+		if = {
+			limit = { check_variable = { lao_force_tier > 0 } }
+			1295 = {
+				create_unit = {
+					division = "name = \"Kong Phan 3\" division_template = \"Kong Phan\" start_experience_factor = 0.3 start_equipment_factor = 0.8"
+					owner = LAO
+					allow_spawning_on_enemy_provs = yes
+				}
+				create_unit = {
+					division = "name = \"Kong Pathom 2\" division_template = \"Kong Pathom\" start_experience_factor = 0.35 start_equipment_factor = 0.9"
+					owner = LAO
+					allow_spawning_on_enemy_provs = yes
+				}
+			}
+		}
+		if = {
+			limit = { check_variable = { lao_force_tier > 1 } }
+			1295 = {
+				create_unit = {
+					division = "name = \"Kong Phan 4\" division_template = \"Kong Phan\" start_experience_factor = 0.3 start_equipment_factor = 0.8"
+					owner = LAO
+					allow_spawning_on_enemy_provs = yes
+				}
+			}
+		}
+		LAO = {
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 2500 producer = VIN }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 200 producer = VIN }
+		}
+	}
+}
+
+
+lao_deploy_frontier_garrison = {
+	if = {
+		limit = { country_exists = LAO }
+		lao_ensure_templates = yes
+		if = {
+			limit = { LAO = { controls_state = 841 } }
+			841 = {
+				create_unit = {
+					division = "name = \"Kong Phan Phongsaly\" division_template = \"Kong Phan\" start_experience_factor = 0.35 start_equipment_factor = 0.8"
+					owner = LAO
+				}
+				create_unit = {
+					division = "name = \"Kong Pathom Phongsaly\" division_template = \"Kong Pathom\" start_experience_factor = 0.4 start_equipment_factor = 0.9"
+					owner = LAO
+				}
+			}
+		}
+		if = {
+			limit = { LAO = { controls_state = 1295 } }
+			1295 = {
+				create_unit = {
+					division = "name = \"Kong Phan Sam Neua\" division_template = \"Kong Phan\" start_experience_factor = 0.35 start_equipment_factor = 0.8"
+					owner = LAO
+				}
+				create_unit = {
+					division = "name = \"Kong Pathom Sam Neua\" division_template = \"Kong Pathom\" start_experience_factor = 0.4 start_equipment_factor = 0.9"
+					owner = LAO
+				}
+			}
+		}
+		if = {
+			limit = { LAO = { controls_state = 670 } }
+			670 = {
+				create_unit = {
+					division = "name = \"Kong Pathom Vientiane\" division_template = \"Kong Pathom\" start_experience_factor = 0.4 start_equipment_factor = 0.9"
+					owner = LAO
+				}
+			}
+		}
+		if = {
+			limit = { LAO = { controls_state = 1198 } }
+			1198 = {
+				create_unit = {
+					division = "name = \"Kong Phan Luang Prabang\" division_template = \"Kong Phan\" start_experience_factor = 0.35 start_equipment_factor = 0.8"
+					owner = LAO
+				}
+			}
+		}
+		LAO = {
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 3000 producer = VIN }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 300 producer = VIN }
+		}
+	}
+}
+
+lao_join_the_battle_of_dien_bien_phu = {
+	if = {
+		limit = {
+			country_exists = LAO
+			NOT = { has_global_flag = Laos_Pathet_Lao_At_Dien_Bien }
+			LAO = {
+				is_subject_of = VIN
+				any_owned_state = { is_controlled_by = LAO }
+			}
+		}
+		set_global_flag = Laos_Pathet_Lao_At_Dien_Bien
+		lao_ensure_templates = yes
+
+		set_temp_variable = { lao_dbp_tier = 0 }
+		if = {
+			limit = { LAO = { OR = { controls_state = 670  controls_state = 1198 } } }
+			set_temp_variable = { lao_dbp_tier = 1 }
+		}
+		if = {
+			limit = { NOT = { country_exists = LOS } }
+			set_temp_variable = { lao_dbp_tier = 2 }
+		}
+
+		if = {
+			limit = {
+				country_exists = TAI
+				has_war_with = TAI
+				LAO = { NOT = { has_war_with = TAI } }
+			}
+			LAO = { add_to_war = { targeted_alliance = VIN  enemy = TAI } }
+		}
+		if = {
+			limit = {
+				country_exists = FRE
+				has_war_with = FRE
+				LAO = { NOT = { has_war_with = FRE } }
+			}
+			LAO = { add_to_war = { targeted_alliance = VIN  enemy = FRE } }
+		}
+
+		LAO = {
+			random_owned_controlled_state = {
+				prioritize = { 841 1295 }
+				create_unit = {
+					division = "name = \"Kong Pathom Sop Nao\" division_template = \"Kong Pathom\" start_experience_factor = 0.45 start_equipment_factor = 0.9"
+					owner = LAO
+					allow_spawning_on_enemy_provs = yes
+				}
+				create_unit = {
+					division = "name = \"Kong Phan Muang Khoua\" division_template = \"Kong Phan\" start_experience_factor = 0.4 start_equipment_factor = 0.85"
+					owner = LAO
+					allow_spawning_on_enemy_provs = yes
+				}
+			}
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 2000 producer = VIN }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 150 producer = VIN }
+			add_manpower = 8000
+		}
+		if = {
+			limit = { check_variable = { lao_dbp_tier > 0 } }
+			LAO = {
+				random_owned_controlled_state = {
+					prioritize = { 841 1295 }
+					create_unit = {
+						division = "name = \"Kong Pathom Nam Bac\" division_template = \"Kong Pathom\" start_experience_factor = 0.45 start_equipment_factor = 0.9"
+						owner = LAO
+						allow_spawning_on_enemy_provs = yes
+					}
+				}
+				add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1500 producer = VIN }
+			}
+		}
+		if = {
+			limit = { check_variable = { lao_dbp_tier > 1 } }
+			LAO = {
+				random_owned_controlled_state = {
+					prioritize = { 841 1295 }
+					create_unit = {
+						division = "name = \"Kong Phan Ban Namone\" division_template = \"Kong Phan\" start_experience_factor = 0.4 start_equipment_factor = 0.85"
+						owner = LAO
+						allow_spawning_on_enemy_provs = yes
+					}
+				}
+				add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 150 producer = VIN }
+				add_manpower = 6000
+			}
+		}
+
+		add_manpower = 6000
+		add_command_power = 25
+		country_event = { id = VINLAO.13 hours = 4 }
+		if = {
+			limit = { LAO = { is_ai = no } }
+			LAO = { country_event = { id = VINLAO.13 hours = 4 } }
+		}
+	}
+}
+
+# --- Launch (called from Phase3, ROOT = VIN; all tags named explicitly) ------
+
+ic_laos_raid_launch = {
+	if = {
+		limit = {
+			OR = {
+				has_global_flag = Laos_Raid_Launched
+				has_global_flag = Laos_Raid_Active
+			}
+		}
+		log = "[GetDateText]: ic_laos_raid_launch re-entered and refused - the relief column already exists"
+	}
+	else = {
+		set_global_flag = Laos_Raid_Launched
+		set_global_flag = Laos_Raid_Active
+		clr_global_flag = Laos_Raid_Resolved
+		clr_global_flag = Laos_Raid_Last_Chance
+		clr_global_flag = Laos_Raid_Timer_Expired
+		clr_global_flag = Laos_Raid_Stalemate
+		clr_global_flag = Laos_Raid_Total_Failure
+		set_variable = { global.Laos_Raid_Days_Elapsed = 0 }
+		set_variable = { global.Laos_Raid_Last_Duration = 0 }
+
+		LOS = {
+			add_ideas = LOS_French_Airlift
+			add_ideas = extensive_conscription
+			activate_mission = Laos_Raid_Defence
+			country_event = laos_raid.7
+		}
+		VIN = {
+			add_dynamic_modifier = { modifier = laos_raid_overextension }
+			activate_mission = Laos_Raid_Offensive
+			set_country_flag = LAOS_BORDER_UNLOCKED
+		}
+		if = { limit = { country_exists = LAO } LAO = { activate_mission = Laos_Raid_Offensive } }
+
+		# tier 0 = token garrison, 1 = reduced, 2 = full airlift.
+		set_temp_variable = { laos_relief_tier = 1 }
+		if = {
+			limit = { country_exists = FRE FRE = { check_variable = { FRE_Metropole_Patience > 65 } } }
+			set_temp_variable = { laos_relief_tier = 2 }
+		}
+		else_if = {
+			limit = {
+				OR = {
+					NOT = { country_exists = FRE }
+					FRE = { check_variable = { FRE_Metropole_Patience < 33 } }
+				}
+			}
+			set_temp_variable = { laos_relief_tier = 0 }
+		}
+
+		670 = {
+			create_unit = {
+				division = "name = \"9e Bataillon de Chasseurs Laotiens\" division_template = \"Bataillon de Chasseurs Laotiens\" start_experience_factor = 0.3 start_equipment_factor = 0.9"
+				owner = LOS
+				allow_spawning_on_enemy_provs = yes
+				prioritize_location = 1464
+			}
+			create_unit = {
+				division = "name = \"11e Bataillon de Chasseurs Laotiens\" division_template = \"Bataillon de Chasseurs Laotiens\" start_experience_factor = 0.3 start_equipment_factor = 0.9"
+				owner = LOS
+				allow_spawning_on_enemy_provs = yes
+				prioritize_location = 1464
+			}
+			create_unit = {
+				division = "name = \"3e Forces Terrestres du Laos\" division_template = \"Forces Terrestres du Laos\" start_experience_factor = 0.25 start_equipment_factor = 0.8"
+				owner = LOS
+				allow_spawning_on_enemy_provs = yes
+				prioritize_location = 1464
+			}
+			create_unit = {
+				division = "name = \"4e Forces Terrestres du Laos\" division_template = \"Forces Terrestres du Laos\" start_experience_factor = 0.25 start_equipment_factor = 0.8"
+				owner = LOS
+				allow_spawning_on_enemy_provs = yes
+				prioritize_location = 1464
+			}
+			create_unit = {
+				division = "name = \"Groupement de Marche du Laos\" division_template = \"Corps Expeditionnaire Francais\" start_experience_factor = 0.4 start_equipment_factor = 1.0"
+				owner = LOS
+				allow_spawning_on_enemy_provs = yes
+				prioritize_location = 1464
+			}
+		}
+		1198 = {
+			create_unit = {
+				division = "name = \"10e Bataillon de Chasseurs Laotiens\" division_template = \"Bataillon de Chasseurs Laotiens\" start_experience_factor = 0.3 start_equipment_factor = 0.9"
+				owner = LOS
+				allow_spawning_on_enemy_provs = yes
+				prioritize_location = 4613
+			}
+			create_unit = {
+				division = "name = \"12e Bataillon de Chasseurs Laotiens\" division_template = \"Bataillon de Chasseurs Laotiens\" start_experience_factor = 0.3 start_equipment_factor = 0.9"
+				owner = LOS
+				allow_spawning_on_enemy_provs = yes
+				prioritize_location = 4613
+			}
+			create_unit = {
+				division = "name = \"5e Forces Terrestres du Laos\" division_template = \"Forces Terrestres du Laos\" start_experience_factor = 0.25 start_equipment_factor = 0.8"
+				owner = LOS
+				allow_spawning_on_enemy_provs = yes
+				prioritize_location = 4613
+			}
+			create_unit = {
+				division = "name = \"Defense de Luang Prabang\" division_template = \"Corps Expeditionnaire Francais\" start_experience_factor = 0.4 start_equipment_factor = 1.0"
+				owner = LOS
+				allow_spawning_on_enemy_provs = yes
+				prioritize_location = 4613
+			}
+		}
+		LOS = {
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1500 producer = FRA }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 150 producer = FRA }
+		}
+
+		if = {
+			limit = { check_variable = { laos_relief_tier > 0 } }
+			670 = {
+				create_unit = {
+					division = "name = \"1er Regiment de Chasseurs Laotiens\" division_template = \"Corps Expeditionnaire Francais\" start_experience_factor = 0.35 start_equipment_factor = 1.0"
+					owner = LOS
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 1464
+				}
+				create_unit = {
+					division = "name = \"6e Bataillon de Parachutistes Coloniaux\" division_template = \"Corps Expeditionnaire Francais\" start_experience_factor = 0.35 start_equipment_factor = 1.0"
+					owner = LOS
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 1464
+				}
+				create_unit = {
+					division = "name = \"13e Bataillon de Chasseurs Laotiens\" division_template = \"Bataillon de Chasseurs Laotiens\" start_experience_factor = 0.3 start_equipment_factor = 0.9"
+					owner = LOS
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 1464
+				}
+			}
+			1198 = {
+				create_unit = {
+					division = "name = \"2e Regiment de Chasseurs Laotiens\" division_template = \"Corps Expeditionnaire Francais\" start_experience_factor = 0.35 start_equipment_factor = 1.0"
+					owner = LOS
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 4613
+				}
+				create_unit = {
+					division = "name = \"14e Bataillon de Chasseurs Laotiens\" division_template = \"Bataillon de Chasseurs Laotiens\" start_experience_factor = 0.3 start_equipment_factor = 0.9"
+					owner = LOS
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 4613
+				}
+			}
+			LOS = {
+				add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1500 producer = FRA }
+				add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 200 producer = FRA }
+			}
+		}
+
+		if = {
+			limit = { check_variable = { laos_relief_tier > 1 } }
+			1198 = {
+				create_unit = {
+					division = "name = \"2e Groupement Aeroporte\" division_template = \"Corps Expeditionnaire Francais\" start_experience_factor = 0.45 start_equipment_factor = 1.0"
+					owner = LOS
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 4613
+				}
+				create_unit = {
+					division = "name = \"Groupe Mobile 2\" division_template = \"Corps Expeditionnaire Francais\" start_experience_factor = 0.4 start_equipment_factor = 1.0"
+					owner = LOS
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 4613
+				}
+			}
+			670 = {
+				create_unit = {
+					division = "name = \"3e Groupement de Marche\" division_template = \"Corps Expeditionnaire Francais\" start_experience_factor = 0.4 start_equipment_factor = 1.0"
+					owner = LOS
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 1464
+				}
+				create_unit = {
+					division = "name = \"Groupe Mobile 1\" division_template = \"Corps Expeditionnaire Francais\" start_experience_factor = 0.4 start_equipment_factor = 1.0"
+					owner = LOS
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 1464
+				}
+				create_unit = {
+					division = "name = \"Groupe Mobile 3\" division_template = \"Corps Expeditionnaire Francais\" start_experience_factor = 0.4 start_equipment_factor = 1.0"
+					owner = LOS
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 1464
+				}
+			}
+			LOS = {
+				add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 2000 producer = FRA }
+				add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 300 producer = FRA }
+			}
+		}
+	}
+}
+
+
+ic_laos_raid_resolve = {
+	if = {
+		limit = { has_global_flag = Laos_Raid_Active }
+		if = {
+			limit = { laos_raid_attacker_holds_capital = yes }
+			ic_laos_raid_attacker_victory = yes
+		}
+		else_if = {
+			limit = {
+				laos_raid_attacker_is_human = yes
+				NOT = { has_global_flag = Laos_Raid_Last_Chance }
+			}
+			set_global_flag = Laos_Raid_Timer_Expired
+			if = { limit = { country_exists = VIN VIN = { is_ai = no } } VIN = { country_event = laos_raid.1 } }
+			if = { limit = { country_exists = LAO LAO = { is_ai = no } } LAO = { country_event = laos_raid.1 } }
+		}
+		else = {
+			ic_laos_raid_end_raid = yes
+		}
+	}
+}
+
+ic_laos_raid_daily_check = {
+	if = {
+		limit = {
+			has_global_flag = Laos_Raid_Active
+			laos_raid_attacker_victory_now_trigger = yes
+		}
+		ic_laos_raid_attacker_victory = yes
+	}
+	if = {
+		limit = { has_global_flag = Laos_Raid_Active }
+		add_to_variable = { global.Laos_Raid_Days_Elapsed = 1 }
+		if = {
+			limit = {
+				NOT = { has_global_flag = Laos_Raid_Last_Chance }
+				check_variable = { global.Laos_Raid_Days_Elapsed > 89 }
+			}
+			log = "IC_LAOS_RAID|DAILY_BACKSTOP|date=[GetDateText]|stage=initial|day=[?global.Laos_Raid_Days_Elapsed|0]"
+			ic_laos_raid_resolve = yes
+		}
+		else_if = {
+			limit = {
+				has_global_flag = Laos_Raid_Last_Chance
+				check_variable = { global.Laos_Raid_Days_Elapsed > 44 }
+			}
+			log = "IC_LAOS_RAID|DAILY_BACKSTOP|date=[GetDateText]|stage=last_chance|day=[?global.Laos_Raid_Days_Elapsed|0]"
+			ic_laos_raid_end_raid = yes
+		}
+	}
+	lao_check_postwar_economy = yes
+}
+
+
+ic_laos_raid_press = {
+	if = {
+		limit = { has_global_flag = Laos_Raid_Active NOT = { has_global_flag = Laos_Raid_Last_Chance } }
+		set_global_flag = Laos_Raid_Last_Chance
+		clr_global_flag = Laos_Raid_Timer_Expired
+		set_variable = { global.Laos_Raid_Days_Elapsed = 0 }
+		VIN = {
+			remove_dynamic_modifier = { modifier = laos_raid_overextension }
+			add_dynamic_modifier = { modifier = laos_raid_overextension_severe }
+		}
+		if = { limit = { country_exists = LOS } LOS = { activate_mission = Laos_Raid_Defence_LastChance } }
+		if = { limit = { country_exists = VIN } VIN = { activate_mission = Laos_Raid_Offensive_LastChance } }
+		if = { limit = { country_exists = LAO } LAO = { activate_mission = Laos_Raid_Offensive_LastChance } }
+	}
+}
+
+
+ic_laos_raid_end_raid = {
+	if = {
+		limit = { has_global_flag = Laos_Raid_Active }
+		if = {
+			limit = { laos_raid_complete_failure = yes }
+			ic_laos_raid_total_failure = yes
+		}
+		else = {
+			ic_laos_raid_stalemate = yes
+		}
+	}
+}
+
+ic_laos_raid_stalemate = {
+	set_global_flag = Laos_Raid_Stalemate
+	if = {
+		limit = { country_exists = LAO country_exists = VIN }
+		LAO = {
+			transfer_state = 841
+			transfer_state = 1295
+			keep_current_politics = yes
+		}
+		VIN = {
+			set_autonomy = {
+				target = LAO
+				autonomy_state = autonomy_easternbloc
+				end_wars = no
+				end_civil_wars = no
+			}
+		}
+	}
+	add_to_variable = { FRA.StruggleInvolvedNationsIndochinaCommunistScore = 25 }
+	subtract_from_variable = { FRA.StruggleInvolvedNationsIndochinaProFranceScore = 10 }
+	FRA = { indochina_struggle_recalculate_total_anti_communist_score = yes }
+	add_to_variable = { global.Indochina_War_Next_Phase_A_Points = 50 }
+	ic_laos_raid_ceasefire = yes
+	news_event = laos_raid.2
+	ic_laos_raid_cleanup = yes
+}
+
+ic_laos_raid_total_failure = {
+	set_global_flag = Laos_Raid_Total_Failure
+	add_to_variable = { FRA.StruggleInvolvedNationsIndochinaProFranceScore = 50 }
+	subtract_from_variable = { FRA.StruggleInvolvedNationsIndochinaCommunistScore = 25 }
+	FRA = { indochina_struggle_recalculate_total_anti_communist_score = yes }
+	add_to_variable = { global.Indochina_War_Next_Phase_B_Points = 50 }
+	if = {
+		limit = { country_exists = LOS }
+		LOS = { country_event = laos_raid.3 }
+	}
+	else = {
+		ic_laos_raid_dissolve_lao = yes
+		ic_laos_raid_ceasefire = yes
+		ic_laos_raid_cleanup = yes
+	}
+}
+
+ic_laos_raid_attacker_victory = {
+	set_global_flag = Laos_Raid_Attacker_Won
+	add_to_variable = { FRA.StruggleInvolvedNationsIndochinaCommunistScore = 50 }
+	subtract_from_variable = { FRA.StruggleInvolvedNationsIndochinaProFranceScore = 25 }
+	FRA = { indochina_struggle_recalculate_total_anti_communist_score = yes }
+	add_to_variable = { global.Indochina_War_Next_Phase_A_Points = 100 }
+	news_event = laos_raid.6
+	ic_laos_raid_cleanup = yes
+}
+
+ic_laos_raid_total_war = {
+	set_global_flag = Laos_Total_War
+	add_to_variable = { global.Indochina_War_Next_Phase_A_Points = 100 }
+	ic_laos_raid_dissolve_lao = yes
+	news_event = laos_raid.5
+	ic_laos_raid_cleanup = yes
+}
+
+
+ic_laos_raid_ceasefire = {
+	if = {
+		limit = { country_exists = LOS }
+		LOS = {
+			if = { limit = { country_exists = VIN has_war_with = VIN } white_peace = VIN }
+			if = { limit = { country_exists = LAO has_war_with = LAO } white_peace = LAO }
+			if = { limit = { country_exists = NLF has_war_with = NLF } white_peace = NLF }
+		}
+	}
+	ic_laos_raid_remove_relief = yes
+}
+
+ic_laos_raid_remove_relief = {
+	if = {
+		limit = { country_exists = LOS }
+		LOS = {
+			delete_unit_template_and_units = { division_template = "Corps Expeditionnaire Francais" }
+		}
+	}
+}
+
+ic_laos_raid_dissolve_lao = {
+	if = {
+		limit = { country_exists = LAO country_exists = LOS }
+		LOS = { annex_country = { target = LAO } }
+	}
+}
+
+
+lao_convert_to_normal_economy = {
+	if = {
+		limit = { has_country_flag = active_insurgency }
+		clr_country_flag = active_insurgency
+		drop_cosmetic_tag = yes
+		if = { limit = { has_idea = closed_economy } remove_ideas = closed_economy }
+		if = { limit = { has_idea = unrecognized_state } remove_ideas = unrecognized_state }
+		set_variable = { show_finance = 0 }
+		set_variable = { currentMoney = 5 }
+		set_variable = { currentDebt = 0 }
+		set_variable = { currentDebtPayments = 0 }
+		clear_current_economic_modifiers = yes
+		set_variable = { economic_x_axis = 22 }
+		startup_economics = yes
+
+		cwic_clear_insurgent_conventional_policies = yes
+		set_variable = { army_level_value = 4 }
+		set_variable = { navy_level_value = 0 }
+		set_variable = { air_level_value = 1 }
+		set_variable = { strategic_forces_level_value = 0 }
+		set_variable = { space_level_value = 0 }
+		set_variable = { healthcare_level_value = 2 }
+		set_variable = { welfare_level_value = 2 }
+		set_variable = { education_level_value = 2 }
+		set_variable = { public_services_level_value = 2 }
+		set_variable = { policing_level_value = 4 }
+		refresh_army_policy_rate = yes
+		refresh_navy_policy_rate = yes
+		refresh_air_policy_rate = yes
+		refresh_strategic_forces_policy_rate = yes
+		refresh_space_policy_rate = yes
+		refresh_healthcare_policy_rate = yes
+		refresh_welfare_policy_rate = yes
+		refresh_education_policy_rate = yes
+		refresh_services_policy_rate = yes
+		refresh_policing_policy_rate = yes
+		resource_bonus_script = yes
+		industrial_pulse = yes
+
+		lao_deploy_frontier_garrison = yes
+	}
+}
+
+lao_check_postwar_economy = {
+	if = {
+		limit = {
+			country_exists = LAO
+			NOT = { country_exists = LOS }
+			LAO = { has_country_flag = active_insurgency }
+		}
+		LAO = { lao_convert_to_normal_economy = yes }
+	}
+}
+
+ic_laos_raid_cleanup = {
+	clr_global_flag = Laos_Raid_Active
+	clr_global_flag = Laos_Raid_Timer_Expired
+	set_global_flag = Laos_Raid_Resolved
+	set_variable = { global.Laos_Raid_Last_Duration = global.Laos_Raid_Days_Elapsed }
+	set_variable = { global.Laos_Raid_Days_Elapsed = 0 }
+	if = { limit = { country_exists = LOS } LOS = { remove_mission = Laos_Raid_Defence remove_mission = Laos_Raid_Defence_LastChance } }
+	if = { limit = { country_exists = VIN } VIN = { remove_mission = Laos_Raid_Offensive remove_mission = Laos_Raid_Offensive_LastChance } }
+	if = { limit = { country_exists = LAO } LAO = { remove_mission = Laos_Raid_Offensive remove_mission = Laos_Raid_Offensive_LastChance } }
+	if = {
+		limit = { country_exists = LOS LOS = { has_idea = LOS_French_Airlift } }
+		LOS = { remove_ideas = LOS_French_Airlift }
+	}
+	if = {
+		limit = { country_exists = VIN VIN = { has_dynamic_modifier = { modifier = laos_raid_overextension } } }
+		VIN = { remove_dynamic_modifier = { modifier = laos_raid_overextension } }
+	}
+	if = {
+		limit = { country_exists = VIN VIN = { has_dynamic_modifier = { modifier = laos_raid_overextension_severe } } }
+		VIN = { remove_dynamic_modifier = { modifier = laos_raid_overextension_severe } }
+	}
+}
+
+test_laos_raid_launch = { ic_laos_raid_launch = yes }
+test_lao_field_force = { lao_deploy_field_force = yes }
+test_lao_frontier = { lao_deploy_frontier_garrison = yes }
+test_lao_dien_bien = {
+	clr_global_flag = Laos_Pathet_Lao_At_Dien_Bien
+	lao_join_the_battle_of_dien_bien_phu = yes
+}
+test_lao_postwar_economy = {
+	if = {
+		limit = { country_exists = LAO }
+		LAO = { lao_convert_to_normal_economy = yes }
+	}
+}
+
+test_lao_status = {
+	if = { limit = { country_exists = LAO } log = "LAO STATUS: Pathet Lao exist" }
+	else = { log = "LAO STATUS: Pathet Lao are gone" }
+	if = { limit = { country_exists = LOS } log = "  Kingdom of Laos: still standing" }
+	else = { log = "  Kingdom of Laos: annexed" }
+	if = { limit = { LAO = { controls_state = 841 } } log = "  841 Phongsaly: LAO" }
+	if = { limit = { LAO = { controls_state = 1295 } } log = "  1295 Sam Neua: LAO" }
+	if = { limit = { LAO = { controls_state = 670 } } log = "  670 Vientiane: LAO" }
+	if = { limit = { LAO = { controls_state = 1198 } } log = "  1198 Luang Prabang: LAO" }
+	if = { limit = { LAO = { has_template = "Kong Phan" } } log = "  templates: loaded" }
+	else = { log = "  templates: MISSING - lao_ensure_templates never ran, or LAO_field_force.txt failed to load" }
+}
+test_laos_raid_resolve = { ic_laos_raid_resolve = yes }
+test_laos_raid_press = { ic_laos_raid_press = yes }
+test_laos_raid_end = { ic_laos_raid_end_raid = yes }
+test_laos_raid_cleanup = { ic_laos_raid_cleanup = yes }
+
+test_laos_choice = {
+	if = {
+		limit = { country_exists = VIN }
+		VIN = { country_event = { id = VINLAO.10 hours = 1 } }
+	}
+}
+
+test_laos_consolidate = {
+	if = {
+		limit = { country_exists = VIN }
+		VIN = { country_event = { id = VINLAO.11 hours = 1 } }
+	}
+}
+
+test_laos_deferred = {
+	if = {
+		limit = { country_exists = VIN }
+		VIN = { country_event = { id = VINLAO.12 hours = 1 } }
+	}
+}

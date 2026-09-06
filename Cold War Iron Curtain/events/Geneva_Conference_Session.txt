@@ -1,0 +1,363 @@
+# ============================================================================
+# Geneva Conference Session events
+# Fired by the round-based conference system in
+# common/scripted_effects/CWIC_Geneva_Conference_Effects.txt.
+#   .1  - the conference convenes (world reaction)
+#   .2  - a delegation walks out (uses the Geneva_Wrecker event target)
+#   .3  - acrimonious collapse -> never-ending conflict ending follows
+#   .4  - exhausted collapse -> failed-state ending follows
+#   .5  - the accords are signed (lists the agreed terms)
+#   .10 - "The Road to Geneva" heads-up to every prospective delegation
+#   .11 - hidden: opens the session six days after the announcement
+#   .20 - interim arrangements: the all-Vietnam election is scheduled
+#   .21 - hidden arbiter at VIN: resolves the all-Vietnam election when it
+#         falls due (stands down if the VIN focus-tree election crisis has
+#         already settled the question, or if the war has resumed)
+#   .22 - news: Ho Chi Minh's list wins the election
+#   .23 - news: the State of Vietnam's list wins the election
+#   .24 - hidden at VIN: annexes the South after .22
+#   .25 - hidden at VIE: annexes the North after .23
+#   .26 - campaign trail: fired at both VIE and VIN before .21 resolves the
+#         vote; desc variants read the war's final balance so both capitals
+#         see which list is favored to win
+# News events here deliberately have no fire_only_once: they are broadcast
+# to every human player and the system flags already prevent re-firing.
+# ============================================================================
+add_namespace = Geneva_Conference_Session
+
+news_event = {
+	id = Geneva_Conference_Session.1
+	title = Geneva_Conference_Session.1.t
+	desc = Geneva_Conference_Session.1.d
+	picture = GFX_Geneva_Conference_Invitation
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Geneva_Conference_Session.1.a
+	}
+}
+
+news_event = {
+	id = Geneva_Conference_Session.2
+	title = Geneva_Conference_Session.2.t
+	desc = Geneva_Conference_Session.2.d
+	picture = GFX_Geneva_Conference_Outcome_Failure
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Geneva_Conference_Session.2.a
+	}
+}
+
+news_event = {
+	id = Geneva_Conference_Session.3
+	title = Geneva_Conference_Session.3.t
+	desc = Geneva_Conference_Session.3.d
+	picture = GFX_Geneva_Conference_Outcome_Failure
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Geneva_Conference_Session.3.a
+	}
+}
+
+news_event = {
+	id = Geneva_Conference_Session.4
+	title = Geneva_Conference_Session.4.t
+	desc = Geneva_Conference_Session.4.d
+	picture = GFX_Geneva_Conference_Outcome_Failure
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Geneva_Conference_Session.4.a
+	}
+}
+
+news_event = {
+	id = Geneva_Conference_Session.5
+	title = Geneva_Conference_Session.5.t
+	desc = Geneva_Conference_Session.5.d
+	picture = GFX_Geneva_Conference_Outcome_Success
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Geneva_Conference_Session.5.a
+	}
+}
+
+# "The Road to Geneva" - fired to every prospective delegation the day the
+# conference is agreed, six days before the session opens.
+country_event = {
+	id = Geneva_Conference_Session.10
+	title = Geneva_Conference_Session.10.t
+	desc = Geneva_Conference_Session.10.d
+	picture = GFX_Geneva_Conference_Invitation
+
+	is_triggered_only = yes
+
+	option = {
+		name = Geneva_Conference_Session.10.a
+	}
+}
+
+# Hidden: actually opens the session (fired at FRA six days after the
+# announcement; guarded inside geneva_conf_initialize).
+country_event = {
+	id = Geneva_Conference_Session.11
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		geneva_conf_initialize = yes
+	}
+}
+
+# Back-channel contact: fired at the counterpart when Saigon or Hanoi opens
+# quiet corridor talks (geneva_action_backchannel).
+country_event = {
+	id = Geneva_Conference_Session.12
+	title = Geneva_Conference_Session.12.t
+	desc = Geneva_Conference_Session.12.d
+	picture = GFX_Geneva_Conference_Negotiations_Reunification
+
+	is_triggered_only = yes
+
+	option = {
+		name = Geneva_Conference_Session.12.a
+	}
+}
+
+# Interim arrangements: fired to every human player when the accords have
+# scheduled a reunification vote (or drew no partition line at all).
+news_event = {
+	id = Geneva_Conference_Session.20
+	title = Geneva_Conference_Session.20.t
+	desc = Geneva_Conference_Session.20.d
+	picture = GFX_Geneva_Conference_Outcome_Reunification
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Geneva_Conference_Session.20.a
+	}
+}
+
+# Hidden arbiter: resolves the all-Vietnam election scheduled by the accords.
+# Fired at VIN by geneva_conf_compile_settlement; every guard is re-checked
+# here because months pass between scheduling and resolution.
+country_event = {
+	id = Geneva_Conference_Session.21
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				has_global_flag = geneva_interim_government_period
+				NOT = { has_global_flag = geneva_election_resolved }
+				country_exists = VIE
+				country_exists = VIN
+				NOT = { has_war_with = VIE }
+				NOT = { has_country_flag = VIN_reunification_election_cancelled }
+				NOT = { has_country_flag = VIN_liberation_of_the_south_prepared }
+				VIE = { NOT = { has_country_flag = VIE_reunification_election_refused } }
+			}
+			set_global_flag = geneva_election_resolved
+			random_list = {
+				55 = {
+					# Ho Chi Minh's list carries the country.
+					modifier = {
+						factor = 1.8
+						check_variable = { global.geneva_final_comm_score > global.geneva_final_anticomm_score }
+					}
+					modifier = {
+						factor = 1.3
+						has_country_leader = { character = VIN_Ho_Chi_Minh ruling_only = yes }
+					}
+					modifier = {
+						factor = 0.6
+						country_exists = USA
+						USA = { has_country_flag = USA_Tampered_With_VIE }
+					}
+					every_country = {
+						limit = { is_ai = no }
+						news_event = Geneva_Conference_Session.22
+					}
+					country_event = { id = Geneva_Conference_Session.24 days = 3 }
+				}
+				45 = {
+					# The State of Vietnam's list holds the South and takes the cities.
+					modifier = {
+						factor = 1.8
+						check_variable = { global.geneva_final_anticomm_score > global.geneva_final_comm_score }
+					}
+					modifier = {
+						factor = 1.3
+						VIE = { has_stability > 0.55 }
+					}
+					modifier = {
+						factor = 1.4
+						country_exists = USA
+						USA = { has_country_flag = USA_Tampered_With_VIE }
+					}
+					every_country = {
+						limit = { is_ai = no }
+						news_event = Geneva_Conference_Session.23
+					}
+					VIE = { country_event = { id = Geneva_Conference_Session.25 days = 3 } }
+				}
+			}
+		}
+	}
+}
+
+news_event = {
+	id = Geneva_Conference_Session.22
+	title = Geneva_Conference_Session.22.t
+	desc = Geneva_Conference_Session.22.d
+	picture = GFX_Geneva_Conference_Outcome_Success
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Geneva_Conference_Session.22.a
+	}
+}
+
+news_event = {
+	id = Geneva_Conference_Session.23
+	title = Geneva_Conference_Session.23.t
+	desc = Geneva_Conference_Session.23.d
+	picture = GFX_Geneva_Conference_Outcome_Success
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Geneva_Conference_Session.23.a
+	}
+}
+
+# Hidden: Hanoi absorbs the South after winning the election (.22).
+country_event = {
+	id = Geneva_Conference_Session.24
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				country_exists = VIE
+				NOT = { has_war_with = VIE }
+			}
+			annex_country = { target = VIE transfer_troops = yes }
+		}
+	}
+}
+
+# Campaign trail: fired at both Saigon and Hanoi in the run-up to the
+# all-Vietnam election. The desc variants read the final struggle balance
+# snapshotted by the settlement compiler, so both capitals see the same
+# front-runner the electorate does. The trigger re-checks the arbiter's own
+# guards: if the vote has been cancelled or resolved by the time this fires,
+# the report is silently dropped.
+country_event = {
+	id = Geneva_Conference_Session.26
+	title = Geneva_Conference_Session.26.t
+	desc = {
+		text = Geneva_Conference_Session.26.d_comm
+		trigger = {
+			check_variable = { global.geneva_final_comm_score > global.geneva_final_anticomm_score }
+		}
+	}
+	desc = {
+		text = Geneva_Conference_Session.26.d_anti
+		trigger = {
+			check_variable = { global.geneva_final_anticomm_score > global.geneva_final_comm_score }
+		}
+	}
+	desc = {
+		text = Geneva_Conference_Session.26.d_tie
+		trigger = {
+			NOT = { check_variable = { global.geneva_final_comm_score > global.geneva_final_anticomm_score } }
+			NOT = { check_variable = { global.geneva_final_anticomm_score > global.geneva_final_comm_score } }
+		}
+	}
+	picture = GFX_Geneva_Conference_Negotiations_Reunification
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_global_flag = geneva_interim_government_period
+		NOT = { has_global_flag = geneva_election_resolved }
+		country_exists = VIE
+		country_exists = VIN
+		VIE = { NOT = { has_war_with = VIN } }
+		VIN = { NOT = { has_country_flag = VIN_reunification_election_cancelled } }
+		VIN = { NOT = { has_country_flag = VIN_liberation_of_the_south_prepared } }
+		VIE = { NOT = { has_country_flag = VIE_reunification_election_refused } }
+	}
+
+	option = {
+		name = Geneva_Conference_Session.26.a
+	}
+}
+
+# Hidden twin of .26: opens the election-campaign window a little ahead of the
+# campaign-trail event itself, so nothing hangs off the signing ceremony.
+# Deliberately carries no trigger of its own - .26 can be suppressed by a renewed
+# war or a cancelled ballot, but the window it gates must still open.
+country_event = {
+	id = Geneva_Conference_Session.27
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_global_flag = geneva_election_campaign_open
+	}
+}
+
+# Hidden: Saigon absorbs the North after winning the election (.23).
+country_event = {
+	id = Geneva_Conference_Session.25
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				country_exists = VIN
+				NOT = { has_war_with = VIN }
+			}
+			annex_country = { target = VIN transfer_troops = yes }
+		}
+	}
+}
+
+# Scandal: American pressure on Saigon exposed through the VIE-VIN
+# back-channel (geneva_action_lean_on_saigon with rapprochement 50+).
+news_event = {
+	id = Geneva_Conference_Session.13
+	title = Geneva_Conference_Session.13.t
+	desc = Geneva_Conference_Session.13.d
+	picture = GFX_Geneva_Conference_Negotiations_USA_Intervention
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Geneva_Conference_Session.13.a
+	}
+}

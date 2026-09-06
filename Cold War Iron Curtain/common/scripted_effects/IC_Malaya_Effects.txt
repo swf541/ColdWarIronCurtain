@@ -952,9 +952,10 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = sabotaged_plantations
 			days = 30
 		}
-		add_resistance = 5
-		add_resistance_target = 3
+		owner = { add_political_power = -15 }
+		add_to_variable = { MLA.currentMoney = 1.5 }	# plantation revenue diverted to the Min Yuen
 		subtract_from_variable = { ROOT.currentMoney = 3.0 }
+        if = { limit = { ROOT = { tag = MLA has_country_flag = active_insurgency } } add_to_variable = { ROOT.emergency_momentum = 2 } ROOT = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1000_Completed
             days = 30
@@ -968,8 +969,9 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = jungle_cell_present
 			days = 90
 		}
-		add_resistance = 3
+		set_state_flag = MLA_cell_present	# the General Uprising seizes control of every state holding a cell
 		subtract_from_variable = { ROOT.currentMoney = 2.0 }
+        if = { limit = { ROOT = { tag = MLA has_country_flag = active_insurgency } } add_to_variable = { ROOT.emergency_momentum = 2 } ROOT = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1001_Completed
             days = 90
@@ -979,9 +981,10 @@ mla_malaya_state_pseudo_decision_effect = {
 	# 1002 - Recruit from Tin Miners
 	if = {
 		limit = { check_variable = { ROOT.malaya_gui_decisions_list^i = 1002 } }
-		add_resistance = 4
-		add_resistance_target = 2
+		owner = { add_manpower = -2500 }
+		MLA = { add_manpower = 2000 }
 		subtract_from_variable = { ROOT.currentMoney = 4.0 }
+        if = { limit = { ROOT = { tag = MLA has_country_flag = active_insurgency } } add_to_variable = { ROOT.emergency_momentum = 2 } ROOT = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1002_Completed
             days = 90
@@ -991,8 +994,13 @@ mla_malaya_state_pseudo_decision_effect = {
 	# 1003 - Distribute Propaganda Leaflets
 	if = {
 		limit = { check_variable = { ROOT.malaya_gui_decisions_list^i = 1003 } }
-		add_resistance = 2
+		owner = {
+			add_war_support = -0.01
+			add_political_power = -10
+		}
+		MLA = { add_war_support = 0.01 }
 		subtract_from_variable = { ROOT.currentMoney = 1.0 }
+        if = { limit = { ROOT = { tag = MLA has_country_flag = active_insurgency } } add_to_variable = { ROOT.emergency_momentum = 2 } ROOT = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1003_Completed
             days = 45
@@ -1003,8 +1011,10 @@ mla_malaya_state_pseudo_decision_effect = {
 	if = {
 		limit = { check_variable = { ROOT.malaya_gui_decisions_list^i = 1004 } }
 		damage_building = { type = infrastructure damage = 1 }
-		add_resistance = 4
+		owner = { add_equipment_to_stockpile = { type = infantry_equipment_0 amount = -150 } }
+		MLA = { add_equipment_to_stockpile = { type = infantry_equipment_0 amount = 150 producer = ENG } }
 		subtract_from_variable = { ROOT.currentMoney = 3.0 }
+        if = { limit = { ROOT = { tag = MLA has_country_flag = active_insurgency } } add_to_variable = { ROOT.emergency_momentum = 2 } ROOT = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1004_Completed
             days = 45
@@ -1018,8 +1028,17 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = village_soviet_cells
 			days = 180
 		}
-		add_resistance = 3
+		damage_building = { type = industrial_complex damage = 1 }
+		791 = {	# the expropriated plant is re-erected in the liberated zone
+			add_extra_state_shared_building_slots = 1
+			add_building_construction = {
+				type = industrial_complex
+				level = 1
+				instant_build = yes
+			}
+		}
 		subtract_from_variable = { ROOT.currentMoney = 2.2 }
+        if = { limit = { ROOT = { tag = MLA has_country_flag = active_insurgency } } add_to_variable = { ROOT.emergency_momentum = 2 } ROOT = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1005_Completed
             days = 180
@@ -1033,8 +1052,9 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = undermined_clerical_influence
 			days = 120
 		}
-		add_resistance = 2
+		owner = { add_stability = -0.02 }
 		subtract_from_variable = { ROOT.currentMoney = 1.5 }
+        if = { limit = { ROOT = { tag = MLA has_country_flag = active_insurgency } } add_to_variable = { ROOT.emergency_momentum = 2 } ROOT = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1006_Completed
             days = 120
@@ -1048,9 +1068,12 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = red_guard_militia_present
 			days = 150
 		}
-		add_resistance = 5
-		add_resistance_target = 3
+		MLA = {
+			add_manpower = 1500
+			add_equipment_to_stockpile = { type = infantry_equipment_0 amount = 100 producer = ENG }
+		}
 		subtract_from_variable = { ROOT.currentMoney = 3.5 }
+        if = { limit = { ROOT = { tag = MLA has_country_flag = active_insurgency } } add_to_variable = { ROOT.emergency_momentum = 2 } ROOT = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1007_Completed
             days = 150
@@ -1060,12 +1083,22 @@ mla_malaya_state_pseudo_decision_effect = {
 	# 1008 - Coordinate Cross-State Uprising
 	if = {
 		limit = { check_variable = { ROOT.malaya_gui_decisions_list^i = 1008 } }
-		add_dynamic_modifier = {
-			modifier = coordinated_insurgency
-			days = 60
+		every_state = {	# the whole peninsula rises at once, not just the state that paid for it
+			limit = {
+				is_core_of = MLA
+				owner = { OR = { tag = MAL tag = ENG } }
+			}
+			add_dynamic_modifier = {
+				modifier = coordinated_insurgency
+				days = 60
+			}
 		}
-		add_resistance = 4
+		MAL = {
+			add_political_power = -40
+			add_stability = -0.03
+		}
 		subtract_from_variable = { ROOT.currentMoney = 5.0 }
+        if = { limit = { ROOT = { tag = MLA has_country_flag = active_insurgency } } add_to_variable = { ROOT.emergency_momentum = 2 } ROOT = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1008_Completed
             days = 60
@@ -1079,9 +1112,13 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = armed_militia_cache
 			days = 180
 		}
-		add_resistance = 4
-		add_resistance_target = 2
+		MLA = {
+			add_equipment_to_stockpile = { type = infantry_equipment_0 amount = 250 producer = CUM }
+			add_equipment_to_stockpile = { type = support_equipment_1 amount = 15 producer = CUM }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 5 producer = CUM }
+		}
 		subtract_from_variable = { ROOT.currentMoney = 2.8 }
+        if = { limit = { ROOT = { tag = MLA has_country_flag = active_insurgency } } add_to_variable = { ROOT.emergency_momentum = 2 } ROOT = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1009_Completed
             days = 180
@@ -1094,9 +1131,12 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = emergency_resettlement_program
 			days = 180
 		}
-		add_resistance = -3
-		add_resistance_target = -2
+		remove_dynamic_modifier = { modifier = village_soviet_cells }
+		remove_dynamic_modifier = { modifier = jungle_cell_present }
+		clr_state_flag = MLA_cell_present	# the New Villages break the cell's grip on this state
+		MLA = { add_manpower = -1500 }
 		subtract_from_variable = { ROOT.currentMoney = 3.0 }
+        if = { limit = { MLA = { has_country_flag = active_insurgency } } subtract_from_variable = { MLA.emergency_momentum = 2 } MLA = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1100_Completed
             days = 180
@@ -1110,8 +1150,10 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = psyops_influence
 			days = 60
 		}
-		add_resistance = -1
+		owner = { add_war_support = 0.01 }
+		MLA = { add_war_support = -0.01 }
 		subtract_from_variable = { ROOT.currentMoney = 2.5 }
+        if = { limit = { MLA = { has_country_flag = active_insurgency } } subtract_from_variable = { MLA.emergency_momentum = 2 } MLA = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1101_Completed
             days = 60
@@ -1125,8 +1167,10 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = gurkha_outpost_present
 			days = 120
 		}
-		add_resistance_target = -3
+		remove_dynamic_modifier = { modifier = armed_militia_cache }
+		MLA = { add_equipment_to_stockpile = { type = infantry_equipment_0 amount = -150 } }
 		subtract_from_variable = { ROOT.currentMoney = 4.0 }
+        if = { limit = { MLA = { has_country_flag = active_insurgency } } subtract_from_variable = { MLA.emergency_momentum = 2 } MLA = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1102_Completed
             days = 120
@@ -1140,8 +1184,10 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = local_intelligence_network
 			days = 90
 		}
-		add_resistance = -2
+		clr_state_flag = MLA_cell_present
+		MLA = { add_manpower = -750 }
 		subtract_from_variable = { ROOT.currentMoney = 1.5 }
+        if = { limit = { MLA = { has_country_flag = active_insurgency } } subtract_from_variable = { MLA.emergency_momentum = 2 } MLA = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1103_Completed
             days = 90
@@ -1155,9 +1201,10 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = economic_sites_secured
 			days = 60
 		}
-		add_resistance = -2
-		add_resistance_target = -2
+		remove_dynamic_modifier = { modifier = sabotaged_plantations }
+		subtract_from_variable = { MLA.currentMoney = 2.0 }	# the plantation levy dries up
 		subtract_from_variable = { ROOT.currentMoney = 3.0 }
+        if = { limit = { MLA = { has_country_flag = active_insurgency } } subtract_from_variable = { MLA.emergency_momentum = 2 } MLA = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1104_Completed
             days = 60
@@ -1171,9 +1218,9 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = curfew_enforced
 			days = 45
 		}
-		add_resistance = -1
-		add_resistance_target = -1
+		MLA = { add_manpower = -500 }
 		subtract_from_variable = { ROOT.currentMoney = 1.0 }
+        if = { limit = { MLA = { has_country_flag = active_insurgency } } subtract_from_variable = { MLA.emergency_momentum = 2 } MLA = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1105_Completed
             days = 45
@@ -1187,8 +1234,10 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = orang_asli_scouts
 			days = 150
 		}
-		add_resistance_target = -2
+		remove_dynamic_modifier = { modifier = jungle_cell_present }
+		clr_state_flag = MLA_cell_present
 		subtract_from_variable = { ROOT.currentMoney = 2.0 }
+        if = { limit = { MLA = { has_country_flag = active_insurgency } } subtract_from_variable = { MLA.emergency_momentum = 2 } MLA = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1106_Completed
             days = 150
@@ -1202,8 +1251,10 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = home_guard_active
 			days = 90
 		}
-		add_resistance = -3
+		remove_dynamic_modifier = { modifier = red_guard_militia_present }
+		owner = { add_manpower = 1000 }
 		subtract_from_variable = { ROOT.currentMoney = 2.8 }
+        if = { limit = { MLA = { has_country_flag = active_insurgency } } subtract_from_variable = { MLA.emergency_momentum = 2 } MLA = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1107_Completed
             days = 90
@@ -1217,8 +1268,13 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = special_branch_ops
 			days = 120
 		}
-		add_resistance = -3
+		remove_dynamic_modifier = { modifier = coordinated_insurgency }
+		MLA = {
+			add_manpower = -1000
+			add_political_power = -25
+		}
 		subtract_from_variable = { ROOT.currentMoney = 3.2 }
+        if = { limit = { MLA = { has_country_flag = active_insurgency } } subtract_from_variable = { MLA.emergency_momentum = 2 } MLA = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1108_Completed
             days = 120
@@ -1232,8 +1288,9 @@ mla_malaya_state_pseudo_decision_effect = {
 			modifier = aerial_recon_support
 			days = 45
 		}
-		add_resistance_target = -1
+		MLA = { add_equipment_to_stockpile = { type = infantry_equipment_0 amount = -100 } }
 		subtract_from_variable = { ROOT.currentMoney = 1.8 }
+        if = { limit = { MLA = { has_country_flag = active_insurgency } } subtract_from_variable = { MLA.emergency_momentum = 2 } MLA = { MLA_clamp_emergency_momentum = yes } }
         set_state_flag = {
             flag = Decision_1109_Completed
             days = 45

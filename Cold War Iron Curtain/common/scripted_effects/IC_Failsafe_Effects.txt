@@ -1,0 +1,899 @@
+# ============================================================================
+# Indochina Struggle failsafe layer
+# ----------------------------------------------------------------------------
+# The struggle has ten endings and five entry points, and every one of them
+# assumes the theatre is still shaped the way the script left it. When something
+# outside the system decides the war instead - a capitulation the hooks do not
+# cover, a vanilla peace conference, an annexation, France dying in Europe - the
+# endings either no-op on their country_exists guards or never fire at all, and
+# Indochina_War_Over never gets set. Everything gated on that flag then stays
+# frozen for the rest of the campaign.
+#
+# This file is the contingency layer. It is built out of three pieces:
+#
+#   preflight   normalises the map so the ending effect that is about to run
+#               will actually find the countries its payload is guarded on
+#   router      reads the map and dispatches to the correct existing ending
+#   postflight  cleans up what the endings do not cover, and guarantees that
+#               Indochina_War_Over is set no matter which branch ran
+#
+# Nothing here adds an eleventh ending. The router only ever calls the ten that
+# already exist in CWIC_Struggle_Effects.txt.
+#
+# Entry points are all in IC_Failsafe_on_actions.txt: Tier 1 is the structural
+# breaks (capitulation, annex, puppet, peace conference), which route at once;
+# Tier 2 is indochina_failsafe_watchdog_tick, a set of day counters for the soft
+# stalls. No branch anywhere in this file is date locked.
+# ============================================================================
+
+# The six struggle scores live on FRA and the heartbeat is on_daily_FRA. If
+# France is annexed, every check_variable = { FRA.Struggle... } in the ending
+# triggers reads a dead scope. Mirroring them onto globals is what lets the
+# whole failsafe keep working with no France on the map.
+indochina_failsafe_mirror_scores = {
+	if = {
+		limit = { country_exists = FRA }
+		set_variable = { global.ic_score_comm = FRA.StruggleInvolvedNationsIndochinaCommunistScore }
+		set_variable = { global.ic_score_profr = FRA.StruggleInvolvedNationsIndochinaProFranceScore }
+		set_variable = { global.ic_score_proind = FRA.StruggleInvolvedNationsIndochinaProIndependenceScore }
+		set_variable = { global.ic_score_proeth = FRA.StruggleInvolvedNationsIndochinaProEthnicScore }
+		set_variable = { global.ic_score_kmt = FRA.StruggleInvolvedNationsIndochinaKuomintangScore }
+		set_variable = { global.ic_score_anticomm = FRA.StruggleInvolvedNationsIndochinaTotalAntiCommunistScore }
+	}
+}
+
+# Who inherits Vietnamese ground that has to be pulled back out of the wrong
+# hands. Picked before anything moves, because the repatriation sweeps need a
+# destination and the ending effect that follows will redistribute properly
+# anyway. Saved as a global event target so the whole route shares one answer.
+indochina_failsafe_set_receiver = {
+	set_variable = { global.ic_receiver_ok = 0 }	# every branch below raises this; the sweeps refuse to move anything while it is 0
+	if = {
+		limit = {
+			country_exists = VIE
+			VIE = { NOT = { has_government = communism } }
+			OR = {
+				NOT = { country_exists = VIN }
+				VIN = { has_capitulated = yes }
+			}
+		}
+		VIE = { save_global_event_target_as = ic_receiver }
+		set_variable = { global.ic_receiver_ok = 1 }
+	}
+	else_if = {
+		limit = {
+			country_exists = VIN
+			OR = {
+				NOT = { country_exists = VIE }
+				VIE = { has_capitulated = yes }
+			}
+		}
+		VIN = { save_global_event_target_as = ic_receiver }
+		set_variable = { global.ic_receiver_ok = 1 }
+	}
+	else_if = {
+		limit = {
+			286 = {
+				owner = {
+					OR = {
+						tag = VIE
+						tag = VIN
+						tag = CCC
+						tag = PQC
+					}
+				}
+			}
+		}
+		286 = { owner = { save_global_event_target_as = ic_receiver } }
+		set_variable = { global.ic_receiver_ok = 1 }
+	}
+	else_if = {
+		limit = { country_exists = VIE }
+		VIE = { save_global_event_target_as = ic_receiver }
+		set_variable = { global.ic_receiver_ok = 1 }
+	}
+	else_if = {
+		limit = { country_exists = VIN }
+		VIN = { save_global_event_target_as = ic_receiver }
+		set_variable = { global.ic_receiver_ok = 1 }
+	}
+	else_if = {
+		limit = { country_exists = FRA }
+		FRA = { save_global_event_target_as = ic_receiver }
+		set_variable = { global.ic_receiver_ok = 1 }
+	}
+	else_if = {
+		limit = { country_exists = FRE }
+		FRE = { save_global_event_target_as = ic_receiver }
+		set_variable = { global.ic_receiver_ok = 1 }
+	}
+}
+
+# Geneva_Conference has no production clearer, and seven of the ten ending gates
+# refuse to pass while it is set. A conference that is actually running is left
+# alone; a latch with nothing behind it is the softlock and gets cut.
+indochina_failsafe_geneva_abort = {
+	if = {
+		limit = { ic_failsafe_geneva_latched_dead_trigger = yes }
+		clr_global_flag = Geneva_Conference
+		clr_global_flag = Geneva_Conference_Preparations
+		clr_global_flag = Indochina_Geneva_Pursuit
+		clr_global_flag = Indochina_Geneva_Panic
+		set_global_flag = ic_failsafe_geneva_aborted
+		indochina_failsafe_geneva_teardown_gui = yes
+		log = "[GetDateText]: Indochina failsafe - cleared a dead Geneva_Conference latch"
+	}
+}
+
+# Only geneva_conf_compile_settlement takes the conference window and its
+# political-tab button down, and it is gated on geneva_conference_in_session. Any
+# path that clears that flag without going through the compiler - an ending
+# landing mid-conference, or the watchdog cutting a conference that would not
+# close - has to do the teardown itself or the tab outlives the conference with
+# nothing left that can ever remove it.
+indochina_failsafe_geneva_teardown_gui = {
+	every_country = {
+		set_variable = { View_Geneva_Conference = 0 }
+		if = {
+			limit = { is_in_array = { array = country_politics_list value = 29 } }
+			remove_from_array = { array = country_politics_list value = 29 }
+		}
+	}
+}
+
+# The half of the reported bug that left two French-aligned Vietnams: a peace
+# conference had made VIN somebody's puppet. Any theatre tag held by an overlord
+# that has no business holding it is cut loose.
+indochina_failsafe_break_bad_subjects = {
+	every_country = {
+		limit = {
+			ic_failsafe_theatre_tag_trigger = yes
+			is_subject = yes
+			NOT = { overlord = { ic_failsafe_legitimate_overlord_trigger = yes } }
+		}
+		save_event_target_as = ic_bad_subject
+		overlord = {
+			set_autonomy = {
+				target = event_target:ic_bad_subject
+				autonomy_state = autonomy_free
+				end_wars = no
+				end_civil_wars = no
+			}
+		}
+	}
+}
+
+# Indochinese ground sitting in the hands of somebody with no stake in the war -
+# a peace-conference beneficiary, most likely - goes back where it belongs.
+# Laos and Cambodia are repatriated to their own governments rather than to the
+# Vietnamese receiver.
+indochina_failsafe_repatriate_theatre_states = {
+	if = {
+		limit = { check_variable = { global.ic_receiver_ok = 1 } }	# with every candidate dead there is nobody to hand Vietnamese ground to; leave it and let the ladder reach R7
+		every_state = {
+			limit = {
+				ic_failsafe_vietnam_state_trigger = yes
+				NOT = { owner = { ic_failsafe_theatre_tag_trigger = yes } }
+			}
+			transfer_state_to = event_target:ic_receiver
+		}
+	}
+	every_state = {
+		limit = {
+			ic_failsafe_laos_state_trigger = yes
+			NOT = {
+				owner = {
+					OR = {
+						tag = LOS
+						tag = LAO
+						tag = FRA
+						tag = FRE
+						tag = VIN
+						tag = VIE
+					}
+				}
+			}
+		}
+		if = { limit = { country_exists = LOS } transfer_state_to = LOS }
+		else_if = { limit = { country_exists = LAO } transfer_state_to = LAO }
+	}
+	every_state = {
+		limit = {
+			ic_failsafe_cambodia_state_trigger = yes
+			NOT = {
+				owner = {
+					OR = {
+						tag = CAM
+						tag = KMP
+						tag = KHR
+						tag = FRA
+						tag = FRE
+						tag = VIN
+						tag = VIE
+					}
+				}
+			}
+		}
+		if = { limit = { country_exists = CAM } transfer_state_to = CAM }
+	}
+}
+
+# The other half of the reported bug: TAI came out of the conference holding
+# ground it has no claim to. Each minority tag keeps its homeland and nothing
+# else. MEO keeps 671 as well because the highland settlement legitimately gives
+# it that state; THO keeps the Viet Bac set the autonomy zone hands it.
+indochina_failsafe_enforce_minority_homelands = {
+	if = {
+		limit = { check_variable = { global.ic_receiver_ok = 1 } }
+		if = {
+			limit = { country_exists = TAI }
+			TAI = {
+				every_owned_state = {
+					limit = {
+						ic_failsafe_theatre_state_trigger = yes
+						NOT = { state = 671 }
+						NOT = { state = 1761 }
+					}
+					transfer_state_to = event_target:ic_receiver
+				}
+			}
+		}
+		if = {
+			limit = { country_exists = TAM }
+			TAM = {
+				every_owned_state = {
+					limit = {
+						ic_failsafe_theatre_state_trigger = yes
+						NOT = { state = 1766 }
+					}
+					transfer_state_to = event_target:ic_receiver
+				}
+			}
+		}
+		if = {
+			limit = { country_exists = NUN }
+			NUN = {
+				every_owned_state = {
+					limit = {
+						ic_failsafe_theatre_state_trigger = yes
+						NOT = { state = 1281 }
+					}
+					transfer_state_to = event_target:ic_receiver
+				}
+			}
+		}
+		if = {
+			limit = { country_exists = THO }
+			THO = {
+				every_owned_state = {
+					limit = {
+						ic_failsafe_theatre_state_trigger = yes
+						NOT = { state = 1280 }
+						NOT = { state = 1768 }
+						NOT = { state = 881 }
+						NOT = { state = 1767 }
+					}
+					transfer_state_to = event_target:ic_receiver
+				}
+			}
+		}
+		if = {
+			limit = { country_exists = MEO }
+			MEO = {
+				every_owned_state = {
+					limit = {
+						ic_failsafe_theatre_state_trigger = yes
+						NOT = { state = 1767 }
+						NOT = { state = 671 }
+					}
+					transfer_state_to = event_target:ic_receiver
+				}
+			}
+		}
+	}
+}
+
+# Balkanized rebuilds the map by annexing everything into Paris and releasing
+# nine tags back out, and release_autonomy only hands back states France owns
+# that are cores of the target. If the ground is scattered when it runs, the
+# releases produce rumps. This puts the theatre in France's hands first and
+# re-lays the minority cores the endings may have stripped.
+indochina_failsafe_consolidate_theatre_to_fra = {
+	if = {
+		limit = { country_exists = FRA }
+		671 = { add_core_of = TAI }
+		1761 = { add_core_of = TAI }
+		1766 = { add_core_of = TAM }
+		1281 = { add_core_of = NUN }
+		1280 = { add_core_of = THO }
+		1768 = { add_core_of = THO }
+		1767 = { add_core_of = MEO }
+		every_state = {
+			limit = {
+				ic_failsafe_vietnam_state_trigger = yes
+				NOT = { is_owned_by = FRA }
+			}
+			transfer_state_to = FRA
+		}
+	}
+}
+
+# Only called when the ladder has nowhere else to go: rebuild a dead principal
+# from whoever is sitting on its capital. Guarded on cores, because a release
+# with no cored ground produces a one-state ghost rather than a country.
+indochina_failsafe_resurrect_principal_vie = {
+	if = {
+		limit = {
+			NOT = { country_exists = VIE }
+			286 = { owner = { any_owned_state = { is_core_of = VIE } } }
+		}
+		286 = { owner = { release = VIE } }
+		log = "[GetDateText]: Indochina failsafe - released VIE to carry an ending that needs it"
+	}
+}
+
+indochina_failsafe_resurrect_principal_vin = {
+	if = {
+		limit = {
+			NOT = { country_exists = VIN }
+			1760 = { owner = { any_owned_state = { is_core_of = VIN } } }
+		}
+		1760 = { owner = { release = VIN } }
+		log = "[GetDateText]: Indochina failsafe - released VIN to carry an ending that needs it"
+	}
+}
+
+indochina_failsafe_preflight = {
+	indochina_failsafe_set_receiver = yes
+	indochina_failsafe_geneva_abort = yes
+	indochina_failsafe_break_bad_subjects = yes
+	indochina_failsafe_repatriate_theatre_states = yes
+	# TAI/TAM can legitimately hold captured ground during a VIN campaign. Do
+	# not strip it during the protected arc merely because an eager callback
+	# reached preflight; a completed ending will enforce the allow-list again in
+	# postflight.
+	if = {
+		limit = { NOT = { ic_failsafe_theatre_unfinished_trigger = yes } }
+		indochina_failsafe_enforce_minority_homelands = yes
+	}
+}
+
+# The endings white-peace the FRA/VIN/VIE/LAO/NLF pairs and nothing else, so a
+# FRE-VIN or TAI-VIN war can outlive the war it belonged to. Both sides are
+# guarded on is_major = no: white_peace ends an entire war, and an unguarded
+# sweep here could reach into a great-power conflict and end that too.
+indochina_failsafe_white_peace_theatre = {
+	every_country = {
+		limit = {
+			ic_failsafe_theatre_tag_trigger = yes
+			is_major = no
+		}
+		save_event_target_as = ic_wp_a
+		every_country = {
+			limit = {
+				ic_failsafe_theatre_tag_trigger = yes
+				is_major = no
+				NOT = { tag = event_target:ic_wp_a }
+				has_war_with = event_target:ic_wp_a
+			}
+			white_peace = event_target:ic_wp_a
+		}
+	}
+}
+
+# Five of the ten endings leave the corps standing. Hand it to whoever actually
+# holds Tonkin rather than letting fre_dissolve_cefeo_auto read the war flags,
+# which would give Hanoi to the Viet Minh even on a French victory.
+indochina_failsafe_normalize_subjects = {
+	indochina_failsafe_break_bad_subjects = yes
+	if = {
+		limit = { country_exists = FRE }
+		if = {
+			limit = {
+				country_exists = VIE
+				1760 = { is_owned_by = VIE }
+			}
+			fre_dissolve_cefeo_to_vie = yes
+		}
+		else_if = {
+			limit = {
+				country_exists = VIN
+				1760 = { is_owned_by = VIN }
+			}
+			fre_dissolve_cefeo_to_vin = yes
+		}
+		else = {
+			fre_dissolve_cefeo_auto = yes
+		}
+	}
+}
+
+# Balkanized's release_autonomy can over-award, so the allow-list is enforced
+# again after the ending as well as before it.
+indochina_failsafe_enforce_state_allow_list = {
+	indochina_failsafe_set_receiver = yes
+	indochina_failsafe_repatriate_theatre_states = yes
+	indochina_failsafe_enforce_minority_homelands = yes
+}
+
+# The guarantee, and the one place the layer could do real damage if it were
+# unconditional. If a rung ran but its payload no-opped on a country_exists
+# guard, the war has to be closed anyway - never_ending_conflict calls
+# indochina_struggle_ending_cleanup unconditionally, so nothing survives it.
+#
+# But a router call that matched no rung at all is not evidence of a broken war.
+# It is usually evidence that the caller was over-eager, and terminating there
+# would end a perfectly live campaign. So the terminator only fires when the
+# theatre is genuinely past saving: a principal is out, nobody is fighting, or
+# the Geneva track had to be cut. Otherwise the router backs out quietly and the
+# war carries on.
+indochina_failsafe_force_cleanup_if_needed = {
+	if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+			ic_failsafe_theatre_unfinished_trigger = yes
+		}
+		log = "[GetDateText]: Indochina failsafe - the scripted arc still has content pending, leaving the war running"
+	}
+	else_if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+			OR = {
+				ic_failsafe_militarily_decided_trigger = yes
+				ic_failsafe_no_theatre_war_trigger = yes
+				has_global_flag = ic_failsafe_geneva_aborted
+			}
+		}
+		log = "[GetDateText]: Indochina failsafe - no ending payload landed on a war that cannot continue, forcing the terminator"
+		indochina_struggle_run_never_ending_conflict_ending_effect = yes
+	}
+	else_if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		log = "[GetDateText]: Indochina failsafe - nothing decisive to settle, leaving the war running"
+	}
+}
+
+# Only ever run behind indochina_failsafe_postflight_if_settled: white_peace_
+# theatre ends every theatre war it can see, so running this on a war that is
+# still live both wrecks the campaign and makes ic_failsafe_no_theatre_war_
+# trigger true, which would then hand the terminator a war it just stopped.
+indochina_failsafe_postflight = {
+	indochina_failsafe_white_peace_theatre = yes
+	indochina_failsafe_normalize_subjects = yes
+	indochina_failsafe_enforce_state_allow_list = yes
+	indochina_failsafe_force_cleanup_if_needed = yes
+	every_country = {
+		limit = { is_in_array = { array = country_politics_list value = 27 } }
+		remove_from_array = { array = country_politics_list value = 27 }
+	}
+	set_global_flag = ic_failsafe_fired
+}
+
+# The postflight gate. An ending actually landed, or the theatre is past saving
+# by a test taken before anything in the postflight has had a chance to make it
+# true. The unfinished-arc check must precede every fallback predicate: a normal
+# campaign cooldown satisfies no_theatre_war, but that is not permission to
+# white-peace the theatre or dissolve CEFEO. Anything else backs out and the war
+# carries on.
+indochina_failsafe_postflight_if_settled = {
+	if = {
+		limit = { has_global_flag = Indochina_War_Over }
+		indochina_failsafe_postflight = yes
+	}
+	else_if = {
+		limit = { ic_failsafe_theatre_unfinished_trigger = yes }
+		log = "[GetDateText]: Indochina failsafe - no ending landed and the scripted arc is unfinished, backing out before postflight"
+	}
+	else_if = {
+		limit = {
+			OR = {
+				ic_failsafe_militarily_decided_trigger = yes
+				ic_failsafe_no_theatre_war_trigger = yes
+				has_global_flag = ic_failsafe_geneva_aborted
+			}
+		}
+		indochina_failsafe_postflight = yes
+	}
+	else = {
+		log = "[GetDateText]: Indochina failsafe - no rung matched and the war is still live, backing out"
+	}
+}
+
+# ============================================================================
+# The router
+# ----------------------------------------------------------------------------
+# Reads the map and dispatches to the correct existing ending. Scope
+# independent: every rung re-scopes explicitly, so it can be called from an
+# on_action, a mission timeout or the console.
+#
+# The rungs run in order and each is skipped once something has set
+# Indochina_War_Over, so the first one that matches wins:
+#
+#   R0  a completed USA-DRV reunification track outranks the map
+#   R1  an ending the struggle has already earned on its own terms
+#   R2  one power holds both Hanoi and Saigon
+#   R3  the Viet Minh is out and the State of Vietnam is standing
+#   R4  the State of Vietnam is out and the Viet Minh is standing
+#   R5  both Vietnams are gone and Paris can rebuild the map
+#   R6  both Vietnams are gone, Paris too, but the corps is still there
+#   R7  nothing is left to settle with
+#
+# ic_failsafe_routing is the reentrancy latch: the ending payloads annex and
+# white-peace, which re-fires the very on_actions that called us.
+# ============================================================================
+indochina_failsafe_route_decisive_result = {
+	if = {
+		limit = {
+			has_global_flag = indochina_struggle_initialized
+			NOT = { has_global_flag = Indochina_War_Over }
+			NOT = { has_global_flag = ic_failsafe_routing }
+		}
+		set_global_flag = ic_failsafe_routing
+		log = "[GetDateText]: Indochina failsafe - checking for a decisive result"
+		indochina_failsafe_mirror_scores = yes
+		if = {
+			limit = { ic_failsafe_route_may_mutate_trigger = yes }
+			log = "[GetDateText]: Indochina failsafe - decisive evidence found, entering the mutating route"
+			indochina_failsafe_preflight = yes
+
+			if = {	# R0
+			limit = {
+				OR = {
+					has_global_flag = USA_VIN_Reunification_Complete
+					ic_ending_amnv_ok = yes
+				}
+			}
+			indochina_struggle_american_north_vietnam = yes
+		}
+
+		if = {	# R1
+			limit = { NOT = { has_global_flag = Indochina_War_Over } }
+			indochina_struggle_resolve_best_available_ending = yes
+		}
+
+		if = {	# R2
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				1760 = { owner = { owns_state = 286 } }
+			}
+			1760 = { owner = { save_global_event_target_as = ic_both_capitals } }
+			if = {	# R2a
+				limit = { event_target:ic_both_capitals = { tag = VIN } }
+				indochina_struggle_communist_victory = yes
+			}
+			else_if = {	# R2b
+				limit = {
+					event_target:ic_both_capitals = {
+						tag = VIE
+						NOT = { has_government = communism }
+					}
+				}
+				indochina_struggle_southern_victory = yes
+			}
+			else_if = {	# R2c
+				limit = { event_target:ic_both_capitals = { tag = PQC } }
+				indochina_struggle_kuomintang_victory = yes
+			}
+			else_if = {	# R2d - the reported bug: the corps took Hanoi and holds the south too
+				limit = {
+					event_target:ic_both_capitals = {
+						OR = {
+							tag = FRE
+							tag = FRA
+						}
+					}
+					country_exists = VIE
+				}
+				if = {
+					limit = {
+						country_exists = FRA
+						NOT = { check_variable = { global.ic_score_profr < global.ic_score_proind } }	# ties go to Paris: the French won the battle
+					}
+					indochina_struggle_federal_vietnam = yes
+				}
+				else = {
+					indochina_struggle_southern_victory = yes
+				}
+			}
+			else_if = {	# R2e
+				limit = {
+					event_target:ic_both_capitals = {
+						OR = {
+							tag = FRE
+							tag = FRA
+						}
+					}
+					country_exists = FRA
+				}
+				indochina_failsafe_consolidate_theatre_to_fra = yes
+				indochina_struggle_balkanized_vietnam = yes
+			}
+		}
+
+		if = {	# R3 - the reported bug when the south never changed hands
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				OR = {
+					NOT = { country_exists = VIN }
+					VIN = { has_capitulated = yes }
+				}
+				country_exists = VIE
+				VIE = { NOT = { has_government = communism } }
+			}
+			if = {
+				limit = {
+					country_exists = FRA
+					NOT = { check_variable = { global.ic_score_profr < global.ic_score_proind } }	# ties go to Paris: the French won the battle
+				}
+				indochina_struggle_federal_vietnam = yes
+			}
+			else = {
+				indochina_struggle_southern_victory = yes
+			}
+		}
+
+		if = {	# R4 - the communist mirror the on_capitulation hooks never had
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				OR = {
+					NOT = { country_exists = VIE }
+					VIE = { has_capitulated = yes }
+				}
+				country_exists = VIN
+			}
+			indochina_struggle_communist_victory = yes
+		}
+
+		if = {	# R5
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				NOT = { country_exists = VIN }
+				NOT = { country_exists = VIE }
+				country_exists = FRA
+			}
+			indochina_failsafe_consolidate_theatre_to_fra = yes
+			indochina_struggle_balkanized_vietnam = yes
+		}
+
+		if = {	# R6
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				NOT = { country_exists = VIN }
+				NOT = { country_exists = VIE }
+				NOT = { country_exists = FRA }
+				country_exists = FRE
+			}
+			indochina_failsafe_resurrect_principal_vie = yes
+			if = {
+				limit = { country_exists = VIE }
+				indochina_struggle_federal_vietnam = yes
+			}
+		}
+
+		if = {	# R7
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				NOT = { country_exists = VIN }
+				NOT = { country_exists = VIE }
+			}
+			indochina_struggle_run_failed_state_ending_effect = yes
+		}
+
+			indochina_failsafe_postflight_if_settled = yes
+		}
+		else = {
+			log = "[GetDateText]: Indochina failsafe - scripted content is pending and no decisive condition exists, skipping mutating preflight"
+		}
+		clr_global_flag = ic_failsafe_routing
+	}
+}
+
+# ============================================================================
+# Tier 2: the stall watchdog
+# ----------------------------------------------------------------------------
+# Tier 1 catches the structural breaks the moment they happen. This catches the
+# soft stalls - a war that is decided but that nobody can or will close out.
+# Every threshold is a day count, never a date, so it patches an edge case
+# wherever in the campaign it turns up.
+#
+# The caller sets ic_tick_days before calling, so the same thresholds mean the
+# same thing whether the carrier is daily, weekly or monthly. Counters reset the
+# moment their condition stops holding, so a transient never accumulates.
+# ============================================================================
+indochina_failsafe_watchdog_tick = {
+	if = {
+		limit = { NOT = { check_variable = { ic_tick_days > 0 } } }
+		set_temp_variable = { ic_tick_days = 1 }
+	}
+	if = {
+		limit = { ic_failsafe_active_trigger = yes }
+
+		if = {	# France is gone: the struggle heartbeat and the FRA-scope scores went with it
+			limit = { ic_failsafe_carrier_lost_trigger = yes }
+			add_to_variable = { global.ic_stall_carrier_days = ic_tick_days }
+			if = {
+				limit = { check_variable = { global.ic_stall_carrier_days > 13 } }
+				log = "[GetDateText]: Indochina failsafe - France has been gone 14 days, resolving the struggle"
+				set_variable = { global.ic_stall_carrier_days = 0 }	# a route that backs out re-arms the counter; without this a permanent condition routes every single tick
+				indochina_failsafe_route_decisive_result = yes
+			}
+		}
+		else = { set_variable = { global.ic_stall_carrier_days = 0 } }
+
+		if = {
+			limit = { ic_failsafe_militarily_decided_trigger = yes }
+			add_to_variable = { global.ic_stall_decided_days = ic_tick_days }
+			if = {
+				limit = { check_variable = { global.ic_stall_decided_days > 29 } }
+				log = "[GetDateText]: Indochina failsafe - the war has been decided on the map for 30 days with no ending taken"
+				set_variable = { global.ic_stall_decided_days = 0 }
+				indochina_failsafe_route_decisive_result = yes
+			}
+		}
+		else = { set_variable = { global.ic_stall_decided_days = 0 } }
+
+		if = {	# a conference that sat down and never got up again
+			limit = { has_global_flag = geneva_conference_in_session }
+			add_to_variable = { global.ic_stall_geneva_days = ic_tick_days }
+			if = {
+				limit = { check_variable = { global.ic_stall_geneva_days > 149 } }
+				log = "[GetDateText]: Indochina failsafe - the conference would not conclude, cutting it short"
+				set_variable = { global.ic_stall_geneva_days = 0 }
+				clr_global_flag = geneva_conference_in_session	# geneva_abort only cuts a dead latch, and an in-session flag is by definition not one
+				indochina_failsafe_geneva_abort = yes
+				indochina_failsafe_route_decisive_result = yes
+			}
+			else_if = {
+				limit = { check_variable = { global.ic_stall_geneva_days > 119 } }
+				log = "[GetDateText]: Indochina failsafe - forcing the conference to compile its settlement"
+				if = {
+					limit = { country_exists = FRA }
+					FRA = { geneva_conf_compile_settlement = yes }
+				}
+				else = { geneva_conf_compile_settlement = yes }
+			}
+		}
+		else = { set_variable = { global.ic_stall_geneva_days = 0 } }
+
+		if = {	# the latch is set with nothing behind it, or we cut it and the war still has not closed
+			limit = {
+				OR = {
+					ic_failsafe_geneva_latched_dead_trigger = yes
+					AND = {
+						has_global_flag = ic_failsafe_geneva_aborted
+						NOT = { ic_failsafe_geneva_live_trigger = yes }
+					}
+				}
+			}
+			add_to_variable = { global.ic_stall_latch_days = ic_tick_days }
+			if = {
+				limit = { check_variable = { global.ic_stall_latch_days > 89 } }
+				log = "[GetDateText]: Indochina failsafe - the Geneva track never recovered, resolving the struggle"
+				set_variable = { global.ic_stall_latch_days = 0 }
+				indochina_failsafe_route_decisive_result = yes
+			}
+			else_if = {
+				limit = { check_variable = { global.ic_stall_latch_days > 59 } }
+				indochina_failsafe_geneva_abort = yes	# hands the war back to the normal endings for another thirty days
+			}
+		}
+		else = { set_variable = { global.ic_stall_latch_days = 0 } }
+
+		if = {	# an ending is on the table and nobody is taking it
+			limit = { ic_failsafe_ending_unclicked_trigger = yes }
+			add_to_variable = { global.ic_stall_unclicked_days = ic_tick_days }
+			if = {
+				limit = { NOT = { ic_failsafe_ending_owner_is_human_trigger = yes } }
+				if = {
+					limit = { check_variable = { global.ic_stall_unclicked_days > 59 } }
+					log = "[GetDateText]: Indochina failsafe - an ending sat unavailable to any player for 60 days"
+					set_variable = { global.ic_stall_unclicked_days = 0 }
+					indochina_failsafe_route_decisive_result = yes
+				}
+			}
+			else_if = {
+				limit = { check_variable = { global.ic_stall_unclicked_days > 89 } }
+				log = "[GetDateText]: Indochina failsafe - the ending went untaken for 90 days, settling it"
+				set_variable = { global.ic_stall_unclicked_days = 0 }
+				indochina_failsafe_route_decisive_result = yes
+			}
+			else_if = {
+				limit = {
+					check_variable = { global.ic_stall_unclicked_days > 59 }
+					NOT = { has_global_flag = ic_failsafe_warning_sent }
+				}
+				set_global_flag = ic_failsafe_warning_sent
+				every_country = {
+					limit = {
+						is_ai = no
+						ic_failsafe_theatre_tag_trigger = yes
+					}
+					country_event = { id = Indochina_Struggle_Ending.20 hours = 6 }
+				}
+			}
+		}
+		else = {
+			set_variable = { global.ic_stall_unclicked_days = 0 }
+			clr_global_flag = ic_failsafe_warning_sent
+		}
+
+		if = {	# the shooting stopped without anything settling it
+			limit = {
+				has_global_flag = ic_theatre_war_seen
+				NOT = { ic_failsafe_theatre_unfinished_trigger = yes }
+				ic_failsafe_no_theatre_war_trigger = yes
+			}
+			add_to_variable = { global.ic_stall_nowar_days = ic_tick_days }
+			if = {
+				limit = { check_variable = { global.ic_stall_nowar_days > 89 } }
+				log = "[GetDateText]: Indochina failsafe - nobody has been at war in Indochina for 90 days"
+				set_variable = { global.ic_stall_nowar_days = 0 }
+				indochina_failsafe_route_decisive_result = yes
+			}
+		}
+		else = {
+			set_variable = { global.ic_stall_nowar_days = 0 }
+			if = {
+				limit = { NOT = { ic_failsafe_no_theatre_war_trigger = yes } }
+				set_global_flag = ic_theatre_war_seen
+			}
+		}
+	}
+}
+
+# ============================================================================
+# Save repair
+# ----------------------------------------------------------------------------
+# One shot on load, behind its own done flag. Seeds the counters and the score
+# mirrors, then either repairs a save that ended incoherently or resolves one
+# that is already stuck. A healthy save comes out of this unchanged.
+# ============================================================================
+indochina_failsafe_save_repair = {
+	set_variable = { global.ic_stall_carrier_days = 0 }
+	set_variable = { global.ic_stall_decided_days = 0 }
+	set_variable = { global.ic_stall_geneva_days = 0 }
+	set_variable = { global.ic_stall_latch_days = 0 }
+	set_variable = { global.ic_stall_unclicked_days = 0 }
+	set_variable = { global.ic_stall_nowar_days = 0 }
+	indochina_failsafe_mirror_scores = yes
+	if = {
+		# A save made before this layer existed never got the arming flag from the
+		# struggle's own on_startup, so seed it here from the same evidence.
+		limit = {
+			has_global_flag = indochina_struggle_initialized
+			NOT = { has_global_flag = ic_failsafe_theatre_present }
+			OR = {
+				country_exists = FRE
+				has_global_flag = Indochina_War_Escalated
+				has_global_flag = Geneva_Conference
+				AND = {
+					country_exists = VIN
+					country_exists = VIE
+					VIE = { has_war_with = VIN }
+				}
+			}
+		}
+		set_global_flag = ic_failsafe_theatre_present
+	}
+	if = {
+		limit = { has_global_flag = Indochina_War_Over }
+		indochina_failsafe_set_receiver = yes
+		indochina_failsafe_break_bad_subjects = yes
+		indochina_failsafe_enforce_state_allow_list = yes
+		every_country = {
+			limit = { is_in_array = { array = country_politics_list value = 27 } }
+			remove_from_array = { array = country_politics_list value = 27 }
+		}
+	}
+	else_if = {
+		limit = {
+			has_global_flag = indochina_struggle_initialized
+			OR = {
+				ic_failsafe_militarily_decided_trigger = yes
+				ic_failsafe_geneva_latched_dead_trigger = yes
+			}
+		}
+		log = "[GetDateText]: Indochina failsafe - repairing a save that loaded into an unresolvable Indochina War"
+		indochina_failsafe_route_decisive_result = yes
+	}
+}

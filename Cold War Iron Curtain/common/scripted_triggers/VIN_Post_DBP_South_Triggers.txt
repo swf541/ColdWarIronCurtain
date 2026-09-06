@@ -1,0 +1,58 @@
+# A viable southern resistance is reported separately from the strategic fork.
+vin_post_dbp_southern_war_active_trigger = {
+	has_global_flag = geneva_dbp_outcome_applied
+	check_variable = { global.geneva_outcome_dbp = 2 }
+	NOT = { has_global_flag = Indochina_War_Over }
+	NOT = { has_global_flag = geneva_conference_in_session }
+	NOT = { has_global_flag = geneva_conference_concluded }
+	country_exists = NLF
+	NLF = {
+		has_capitulated = no
+		num_of_controlled_states > 0
+		num_divisions > 0
+	}
+	OR = {
+		AND = { country_exists = VIE  VIE = { has_war_with = NLF } }
+		AND = { country_exists = FRE  FRE = { has_war_with = NLF } }
+		AND = { country_exists = FRA  FRA = { has_war_with = NLF } }
+	}
+}
+
+vin_post_dbp_southern_resistance_defeated_trigger = {
+	OR = {
+		NOT = { country_exists = NLF }
+		NLF = { has_capitulated = yes }
+		NLF = { num_of_controlled_states < 1 }
+		NLF = { num_divisions < 1 }
+	}
+}
+
+# Both post-DBP choices use this gate. The old decisions cannot reopen it.
+vin_post_dbp_strategy_focus_available_trigger = {
+	has_completed_focus = VIN_Prepare_Dien
+	has_global_flag = geneva_dbp_outcome_applied
+	check_variable = { global.geneva_outcome_dbp = 2 }
+	VIN_no_campaign_running_trigger = yes
+	NOT = { has_global_flag = Indochina_War_Over }
+	NOT = { has_global_flag = geneva_conference_announced }
+	NOT = { has_global_flag = geneva_conference_in_session }
+	NOT = { has_global_flag = geneva_conference_concluded }
+	NOT = { has_global_flag = Geneva_Conference_Preparations }
+	NOT = { has_country_flag = VIN_Post_DBP_Southern_Response_Chosen }
+}
+
+# Central Geneva callers use this to yield to Hanoi's explicit post-Dien Bien
+# Phu strategy fork. It is deliberately narrow: every non-DBP route retains its
+# existing conference behavior.
+vin_post_dbp_strategy_unresolved_trigger = {
+	has_completed_focus = VIN_Prepare_Dien
+	has_global_flag = geneva_dbp_outcome_applied
+	check_variable = { global.geneva_outcome_dbp = 2 }
+	NOT = { has_country_flag = VIN_Post_DBP_Southern_Response_Chosen }
+	NOT = { has_country_flag = VIN_Post_DBP_Negotiations_Chosen }
+	NOT = { has_country_flag = VIN_Post_DBP_Escalation_Chosen }
+	NOT = { has_global_flag = Indochina_War_Over }
+	NOT = { has_global_flag = geneva_conference_announced }
+	NOT = { has_global_flag = geneva_conference_in_session }
+	NOT = { has_global_flag = geneva_conference_concluded }
+}

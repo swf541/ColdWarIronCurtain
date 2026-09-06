@@ -1,7 +1,7 @@
 ﻿set_war_support = 0.65
 set_stability = 0.70
 add_to_variable = {
-	currentMoney = 29.6
+	currentMoney = 129.6
 }
 capital = 1760
 #TECH CULTURE#
@@ -25,6 +25,12 @@ if = {
 #	}
 #}
 set_air_oob = "FRE_1949_air"
+
+# Workshops and depots maintained through the French metropolitan supply line.
+# These are off-map so the CEFEO does not lose all of its industry with Hanoi.
+add_offsite_building = { type = arms_factory level = 2 }
+add_offsite_building = { type = industrial_complex level = 1 }
+
 if = {
 	limit = {
 		not = {
@@ -169,7 +175,7 @@ set_technology = {
 	cv_CAS1 = 1
 	cv_CAS2 = 1
 	cv_CAS3 = 1
-	#cv_CAS4 = 1	
+	#cv_CAS4 = 1
 	cv_jet_cas1 = 1
 	cv_jet_cas2 = 1
 	##Air##
@@ -269,8 +275,11 @@ add_dynamic_modifier = {
 	modifier = War_Exhaustion_Modifier
 }
 
+# FRE gets its own, lighter exhaustion values than FRA: the CEFEO is a
+# professional expeditionary command, not a war-weary metropole. The FRA-grade
+# values (-0.75 PP etc.) made the tag unplayable.
 set_variable = {
-	War_Exhaustion_Building_Speed = -0.45
+	War_Exhaustion_Building_Speed = -0.25
 }
 
 set_variable = {
@@ -278,15 +287,15 @@ set_variable = {
 }
 
 set_variable = {
-	War_Exhaustion_Stability = -0.25
+	War_Exhaustion_Stability = -0.05
 }
 
 set_variable = {
-	War_Exhaustion_War_Support = -0.3
+	War_Exhaustion_War_Support = -0.05
 }
 
 set_variable = {
-	War_Exhaustion_Political_Power = -0.75
+	War_Exhaustion_Political_Power = -0.10
 }
 
 set_variable = {
@@ -294,21 +303,25 @@ set_variable = {
 }
 
 set_variable = {
-	War_Exhaustion_CG = 0.4
+	War_Exhaustion_CG = 0.05
 }
 
 set_variable = {
-	War_Exhaustion_Production = -0.2
+	War_Exhaustion_Production = -0.1
 }
 
 set_variable = {
 	War_Exhaustion_Forced_Surrender = 1
 }
 
+add_political_power = 150
+
 add_ideas = {
 	extensive_conscription
-	tot_economic_mobilisation
-	unrecognized_state
+	war_economy
+	FRE_Expeditionary_Command
+	FRE_Metropole_Subsidies_Full
+	FRE_Command_Carpentier
 	cold_war_civil_war_ideological_idea
 	policy_education_temp_0
 	policy_services_temp_1
@@ -426,6 +439,8 @@ recruit_character = FRE_Jacques_Vaubois
 recruit_character = FRE_Joseph_Bosvieux
 recruit_character = FRE_Helie_Saint_Marc
 recruit_character = FRE_Christian_de_Castries
+recruit_character = FRE_Jean_de_Lattre_de_Tassigny
+recruit_character = FRE_Henri_Navarre
 init_influence = yes
 set_variable = {
 	var = domestic_influence_amount
@@ -490,3 +505,49 @@ set_variable = {
 }
 
 startup_economics = yes
+
+# =============================================================================
+# The northern crown domains answer to the CEFEO, not to Paris.
+# -----------------------------------------------------------------------------
+# The corps is deliberately not a French puppet: if it were, a war against one of
+# these domains would walk the subject chain up to FRA and hand NATO a call to
+# arms in Indochina. Paris's authority over the corps is carried entirely by the
+# Metropole Patience system, the subsidy tiers and the lifeline decisions.
+# =============================================================================
+if = {
+	limit = { has_dlc = "Together for Victory" }
+	set_autonomy = {
+		target = TAI
+		autonomy_state = autonomy_crown_domain
+		freedom_level = 0.4
+	}
+	set_autonomy = {
+		target = NUN
+		autonomy_state = autonomy_crown_domain
+		freedom_level = 0.4
+	}
+	set_autonomy = {
+		target = TAM
+		autonomy_state = autonomy_crown_domain
+		freedom_level = 0.4
+	}
+	set_autonomy = {
+		target = THO
+		autonomy_state = autonomy_crown_domain
+		freedom_level = 0.4
+	}
+	else = {
+		puppet = TAI
+		puppet = NUN
+		puppet = TAM
+		puppet = THO
+	}
+}
+
+# Paris keeps free passage through the theatre and the corps keeps its lines
+# home. A guarantee is deliberately avoided: it would re-open the call-to-arms
+# path this arrangement exists to close.
+FRA = { diplomatic_relation = { country = FRE relation = military_access active = yes } }
+diplomatic_relation = { country = FRA relation = military_access active = yes }
+add_opinion_modifier = { target = FRA modifier = FRE_Metropole_Command }
+FRA = { add_opinion_modifier = { target = FRE modifier = FRE_Metropole_Command } }

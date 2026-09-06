@@ -1,0 +1,499 @@
+# ============================================================================
+
+test_tho_startup_check = {
+	if = { limit = { NOT = { country_exists = THO } } log = "THO STARTUP: FAIL - THO does not exist" }
+	if = { limit = { NOT = { 1280 = { is_owned_by = THO } } } log = "THO STARTUP: FAIL - Cao Bang is not THO-owned" }
+	if = { limit = { NOT = { 1768 = { is_owned_by = THO } } } log = "THO STARTUP: FAIL - Lang Son is not THO-owned" }
+	if = { limit = { NOT = { 881 = { is_owned_by = VIN } } } log = "THO STARTUP: FAIL - Dong Bac Bo is not VIN-owned" }
+	if = { limit = { NOT = { capital_scope = { state = 881 } } } log = "THO STARTUP: FAIL - VIN capital is not Dong Bac Bo" }
+	if = {
+		limit = {
+			country_exists = FRE
+			NOT = { THO = { is_subject_of = FRE } }
+		}
+		log = "THO STARTUP: FAIL - THO is not a CEFEO subject"
+	}
+	if = {
+		limit = {
+			has_dlc = "Together for Victory"
+			THO = { NOT = { has_autonomy_state = autonomy_crown_domain } }
+		}
+		log = "THO STARTUP: FAIL - THO is not a crown domain with Together for Victory"
+	}
+	if = { limit = { THO = { NOT = { has_cosmetic_tag = THO_FRA } } } log = "THO STARTUP: FAIL - colonial cosmetic tag missing" }
+	if = { limit = { THO = { check_variable = { num_divisions < 2 } } } log = "THO STARTUP: FAIL - fewer than two defensive units" }
+	if = { limit = { THO = { check_variable = { num_divisions > 2 } } } log = "THO STARTUP: FAIL - more than two starting units" }
+	log = "THO STARTUP: check complete"
+}
+# VIN campaign lifecycle QA effects
+# ----------------------------------------------------------------------------
+# Console use: tag VIN, then `e <effect_name>`. Boundary effects classify the
+# current map state without advancing a day; arrange objective control first.
+# ============================================================================
+
+test_vin_campaign_status = {
+	log = "VIN CAMPAIGN: id [?VIN_camp_current|0], day [?VIN_camp_days_elapsed|0], clean [?VIN_camp_deadline_x|0], final [?VIN_camp_deadline_y|0], last outcome [?VIN_camp_last_outcome|0]"
+	if = { limit = { VIN_no_campaign_running_trigger = yes } log = "VIN CAMPAIGN: no active campaign" }
+	else = { log = "VIN CAMPAIGN: active campaign found" }
+	if = { limit = { vin_campaign_objective_met_trigger = yes } log = "VIN CAMPAIGN: objective met" }
+	else = { log = "VIN CAMPAIGN: objective not met" }
+	if = { limit = { vin_campaign_superseded_trigger = yes } log = "VIN CAMPAIGN: theatre/target supersession detected" }
+	if = { limit = { vin_campaign_war_abandoned_trigger = yes } log = "VIN CAMPAIGN: absent-war abort detected" }
+}
+
+test_vin_campaign_overextension_status = {
+	vin_campaign_update_overextension = yes
+	if = {
+		limit = { vin_campaign_vin_overextended_trigger = yes }
+		log = "VIN OVEREXTENSION: off-envelope foreign ground detected"
+		if = { limit = { NOT = { has_idea = VIN_Campaign_Overextension } } log = "VIN OVEREXTENSION: FAIL - VIN penalty missing" }
+	}
+	else = {
+		log = "VIN OVEREXTENSION: VIN remains inside its operational envelope"
+		if = { limit = { has_idea = VIN_Campaign_Overextension } log = "VIN OVEREXTENSION: FAIL - VIN penalty did not clear" }
+	}
+	if = {
+		limit = { vin_campaign_french_overextended_trigger = yes }
+		log = "FRENCH OVEREXTENSION: a CEFEO-aligned tag controls VIN rear-area ground"
+	}
+	else = {
+		log = "FRENCH OVEREXTENSION: defensive side remains inside its envelope"
+	}
+	if = { limit = { country_exists = FRE FRE = { indochina_french_aligned_controls_vin_rear_trigger = yes NOT = { has_idea = FRE_Campaign_Overextension } } } log = "FRENCH OVEREXTENSION: FAIL - offending FRE command lacks penalty" }
+	if = { limit = { country_exists = TAI TAI = { indochina_french_aligned_controls_vin_rear_trigger = yes NOT = { has_idea = FRE_Campaign_Overextension } } } log = "FRENCH OVEREXTENSION: FAIL - offending TAI command lacks penalty" }
+	if = { limit = { country_exists = TAM TAM = { indochina_french_aligned_controls_vin_rear_trigger = yes NOT = { has_idea = FRE_Campaign_Overextension } } } log = "FRENCH OVEREXTENSION: FAIL - offending TAM command lacks penalty" }
+	if = { limit = { country_exists = NUN NUN = { indochina_french_aligned_controls_vin_rear_trigger = yes NOT = { has_idea = FRE_Campaign_Overextension } } } log = "FRENCH OVEREXTENSION: FAIL - offending NUN command lacks penalty" }
+	if = { limit = { country_exists = THO THO = { indochina_french_aligned_controls_vin_rear_trigger = yes NOT = { has_idea = FRE_Campaign_Overextension } } } log = "FRENCH OVEREXTENSION: FAIL - offending THO command lacks penalty" }
+	if = { limit = { country_exists = VIE VIE = { indochina_french_aligned_controls_vin_rear_trigger = yes NOT = { has_idea = FRE_Campaign_Overextension } } } log = "FRENCH OVEREXTENSION: FAIL - offending VIE command lacks penalty" }
+}
+
+# Repairs old saves, reapplies the current operation's planned ground, and then
+# reports the state-policy invariants which caused the 2026-08-09 playtest
+# failure. Run once immediately after every campaign starts.
+test_vin_campaign_state_policy_status = {
+	vin_campaign_sync_objective_modifiers = yes
+	if = {
+		limit = { VIN_no_campaign_running_trigger = yes }
+		log = "VIN STATE POLICY: no campaign; checking restored theatre baseline"
+		every_state = {
+			limit = {
+				has_state_flag = VIN_unplanned_offensive_flag
+				NOT = { has_dynamic_modifier = { modifier = unplanned_offensive } }
+			}
+			log = "VIN STATE POLICY: FAIL - a marked theatre state is missing unplanned_offensive"
+		}
+	}
+	else_if = {
+		limit = { check_variable = { VIN_camp_current = 1 } }
+		if = { limit = { 1761 = { has_dynamic_modifier = { modifier = unplanned_offensive } } } log = "VIN STATE POLICY: FAIL - Tay Bac objective 1761 is still unplanned" }
+		if = { limit = { 671 = { NOT = { has_dynamic_modifier = { modifier = unplanned_offensive } } } } log = "VIN STATE POLICY: FAIL - Tay Bac exterior 671 is open" }
+		log = "VIN STATE POLICY: Tay Bac planned=1761; protected exterior includes 671"
+	}
+	else_if = {
+		limit = { check_variable = { VIN_camp_current = 2 } }
+		if = { limit = { 1761 = { has_dynamic_modifier = { modifier = unplanned_offensive } } } log = "VIN STATE POLICY: FAIL - Hoa Binh approach 1761 is still unplanned" }
+		if = { limit = { 1766 = { has_dynamic_modifier = { modifier = unplanned_offensive } } } log = "VIN STATE POLICY: FAIL - Hoa Binh objective 1766 is still unplanned" }
+		if = { limit = { 671 = { NOT = { has_dynamic_modifier = { modifier = unplanned_offensive } } } } log = "VIN STATE POLICY: FAIL - Hoa Binh exterior 671 is open" }
+		log = "VIN STATE POLICY: Hoa Binh planned=1761/1766; protected exterior includes 671"
+	}
+	else_if = {
+		limit = { check_variable = { VIN_camp_current = 3 } }
+		if = { limit = { 1761 = { has_dynamic_modifier = { modifier = unplanned_offensive } } } log = "VIN STATE POLICY: FAIL - Dien Bien approach 1761 is still unplanned" }
+		if = { limit = { 671 = { has_dynamic_modifier = { modifier = unplanned_offensive } } } log = "VIN STATE POLICY: FAIL - Dien Bien objective 671 is still unplanned" }
+		log = "VIN STATE POLICY: Dien Bien planned=1761/671"
+	}
+	else_if = {
+		limit = { check_variable = { VIN_camp_current = 4 } }
+		if = { limit = { 1280 = { has_dynamic_modifier = { modifier = unplanned_offensive } } } log = "VIN STATE POLICY: FAIL - Cao Bang 1280 is still unplanned" }
+		if = { limit = { 1768 = { has_dynamic_modifier = { modifier = unplanned_offensive } } } log = "VIN STATE POLICY: FAIL - Lang Son 1768 is still unplanned" }
+		if = { limit = { 881 = { NOT = { has_dynamic_modifier = { modifier = unplanned_offensive } } } } log = "VIN STATE POLICY: FAIL - Dong Bac Bo 881 is open" }
+		if = { limit = { 1761 = { NOT = { has_dynamic_modifier = { modifier = unplanned_offensive } } } } log = "VIN STATE POLICY: FAIL - TAI state 1761 is open during Cao-Bac" }
+		if = { limit = { 1766 = { NOT = { has_dynamic_modifier = { modifier = unplanned_offensive } } } } log = "VIN STATE POLICY: FAIL - Hoa Binh 1766 is open during Cao-Bac" }
+		log = "VIN STATE POLICY: Cao-Bac planned=1280/1768; Dong Bac/TAI/Hoa Binh protected"
+	}
+	if = {
+		limit = { NOT = { VIN_no_campaign_running_trigger = yes } }
+		if = { limit = { 1762 = { is_controlled_by = VIN NOT = { has_dynamic_modifier = { modifier = VIN_campaign_rear_supply_network } } } } log = "VIN STATE POLICY: FAIL - VIN-controlled Thanh Hoa lacks dispersed supply" }
+		if = { limit = { 1763 = { is_controlled_by = VIN NOT = { has_dynamic_modifier = { modifier = VIN_campaign_rear_supply_network } } } } log = "VIN STATE POLICY: FAIL - VIN-controlled Nghe-Tinh lacks dispersed supply" }
+		if = { limit = { 838 = { is_controlled_by = VIN NOT = { has_dynamic_modifier = { modifier = VIN_campaign_rear_supply_network } } } } log = "VIN STATE POLICY: FAIL - VIN-controlled Quang Binh lacks dispersed supply" }
+	}
+	else = {
+		if = { limit = { 1762 = { has_dynamic_modifier = { modifier = VIN_campaign_rear_supply_network } } } log = "VIN STATE POLICY: FAIL - Thanh Hoa supply leaked past campaign cleanup" }
+		if = { limit = { 1763 = { has_dynamic_modifier = { modifier = VIN_campaign_rear_supply_network } } } log = "VIN STATE POLICY: FAIL - Nghe-Tinh supply leaked past campaign cleanup" }
+		if = { limit = { 838 = { has_dynamic_modifier = { modifier = VIN_campaign_rear_supply_network } } } log = "VIN STATE POLICY: FAIL - Quang Binh supply leaked past campaign cleanup" }
+	}
+	log = "VIN STATE POLICY: check complete"
+}
+
+test_vin_campaign_front_restoration = {
+	if = {
+		limit = { VIN_no_campaign_running_trigger = yes }
+		vin_campaign_restore_unplanned_offensive = yes
+		every_state = {
+			limit = {
+				has_state_flag = VIN_unplanned_offensive_flag
+				NOT = { has_dynamic_modifier = { modifier = unplanned_offensive } }
+			}
+			log = "VIN FRONT RESTORATION: FAIL - a marked theatre state remains open"
+		}
+		log = "VIN FRONT RESTORATION: baseline check complete"
+	}
+	else = { log = "VIN FRONT RESTORATION: refused - run this only after campaign cleanup" }
+}
+
+test_vin_campaign_dbp_investment_status = {
+	if = { limit = { vin_dbp_valley_invested_trigger = yes } log = "DIEN BIEN PHU: valid approach-plus-ring investment established" }
+	else = { log = "DIEN BIEN PHU: siege investment incomplete (requires an eastern/northern approach plus a separate ring province)" }
+}
+
+test_vin_campaign_overextension_cleanup_check = {
+	if = { limit = { has_idea = VIN_Campaign_Overextension } log = "OVEREXTENSION CLEANUP: FAIL - VIN penalty remains" }
+	if = { limit = { country_exists = FRE  FRE = { has_idea = FRE_Campaign_Overextension } } log = "OVEREXTENSION CLEANUP: FAIL - FRE penalty remains" }
+	if = { limit = { country_exists = TAI  TAI = { has_idea = FRE_Campaign_Overextension } } log = "OVEREXTENSION CLEANUP: FAIL - TAI penalty remains" }
+	if = { limit = { country_exists = TAM  TAM = { has_idea = FRE_Campaign_Overextension } } log = "OVEREXTENSION CLEANUP: FAIL - TAM penalty remains" }
+	if = { limit = { country_exists = NUN  NUN = { has_idea = FRE_Campaign_Overextension } } log = "OVEREXTENSION CLEANUP: FAIL - NUN penalty remains" }
+	if = { limit = { country_exists = THO  THO = { has_idea = FRE_Campaign_Overextension } } log = "OVEREXTENSION CLEANUP: FAIL - THO penalty remains" }
+	if = { limit = { country_exists = VIE  VIE = { has_idea = FRE_Campaign_Overextension } } log = "OVEREXTENSION CLEANUP: FAIL - VIE penalty remains" }
+	if = { limit = { country_exists = FRE  FRE = { has_idea = FRE_Highland_Overextension } } log = "OVEREXTENSION CLEANUP: FAIL - FRE campaign-command spirit remains" }
+	if = { limit = { country_exists = TAI  TAI = { has_idea = FRE_Highland_Overextension } } log = "OVEREXTENSION CLEANUP: FAIL - TAI campaign-command spirit remains" }
+	if = { limit = { country_exists = TAM  TAM = { has_idea = FRE_Highland_Overextension } } log = "OVEREXTENSION CLEANUP: FAIL - TAM campaign-command spirit remains" }
+	if = { limit = { country_exists = NUN  NUN = { has_idea = FRE_Highland_Overextension } } log = "OVEREXTENSION CLEANUP: FAIL - NUN campaign-command spirit remains" }
+	if = { limit = { country_exists = THO  THO = { has_idea = FRE_Highland_Overextension } } log = "OVEREXTENSION CLEANUP: FAIL - THO campaign-command spirit remains" }
+	log = "OVEREXTENSION CLEANUP: check complete"
+}
+
+test_vin_campaign_cao_bac_start = {
+	if = {
+		limit = {
+			country_exists = THO
+			VIN_no_campaign_running_trigger = yes
+		}
+		set_country_flag = VIN_Campaign_Cao_Bac_Active
+		set_temp_variable = { vin_camp_id = 4 }
+		vin_campaign_begin = yes
+		vin_campaign_declare_war = yes
+		log = "VIN CAMPAIGN: Cao-Bac started; save now for the save/load test"
+	}
+	else = { log = "VIN CAMPAIGN: FAIL - Cao-Bac needs a living THO and no active campaign" }
+}
+
+test_vin_campaign_boundary_clean = {
+	set_variable = { VIN_camp_days_elapsed = VIN_camp_deadline_x }
+	vin_campaign_check_resolution = yes
+}
+
+test_vin_campaign_boundary_costly = {
+	set_variable = { VIN_camp_days_elapsed = VIN_camp_deadline_x }
+	add_to_variable = { VIN_camp_days_elapsed = 1 }
+	vin_campaign_check_resolution = yes
+}
+
+test_vin_campaign_boundary_final = {
+	set_variable = { VIN_camp_days_elapsed = VIN_camp_deadline_y }
+	vin_campaign_check_resolution = yes
+	log = "VIN CAMPAIGN: final inclusive day checked; an unmet objective should remain active"
+}
+
+test_vin_campaign_boundary_failure = {
+	set_variable = { VIN_camp_days_elapsed = VIN_camp_deadline_y }
+	add_to_variable = { VIN_camp_days_elapsed = 1 }
+	vin_campaign_check_resolution = yes
+}
+
+test_vin_campaign_abort = {
+	if = {
+		limit = { NOT = { VIN_no_campaign_running_trigger = yes } }
+		set_temp_variable = { vin_camp_outcome = 3 }
+		vin_campaign_resolve = yes
+	}
+}
+
+test_vin_campaign_supersede = {
+	if = {
+		limit = { NOT = { VIN_no_campaign_running_trigger = yes } }
+		set_temp_variable = { vin_camp_outcome = 5 }
+		vin_campaign_resolve = yes
+	}
+}
+
+test_vin_campaign_cleanup = {
+	vin_campaign_finish = yes
+	log = "VIN CAMPAIGN: forced cleanup complete; no result flag was created"
+}
+
+# Run as VIN when the target accepted the armistice but a French tag stayed at war.
+test_vin_campaign_armistice_cleanup = {
+	set_country_flag = VIN_Limited_Campaign_Armistice_Pending
+	vin_limited_campaign_close_spillover_wars = yes
+	if = {
+		limit = {
+			OR = {
+				AND = { country_exists = FRE  has_war_with = FRE }
+				AND = { country_exists = FRA  has_war_with = FRA }
+				AND = { country_exists = TAI  has_war_with = TAI }
+				AND = { country_exists = TAM  has_war_with = TAM }
+				AND = { country_exists = THO  has_war_with = THO }
+				AND = { country_exists = VIE  has_war_with = VIE }
+				AND = { country_exists = NUN  has_war_with = NUN }
+			}
+		}
+		log = "VIN ARMISTICE: a French-aligned belligerent remains; the daily retry is armed"
+	}
+	else = { log = "VIN ARMISTICE: all campaign belligerents removed" }
+}
+
+test_vin_campaign_save_checkpoint = {
+	set_country_flag = VIN_Campaign_Save_Load_Checkpoint
+	set_variable = { VIN_camp_save_id = VIN_camp_current }
+	set_variable = { VIN_camp_save_day = VIN_camp_days_elapsed }
+	log = "VIN CAMPAIGN: checkpoint stored at id [?VIN_camp_save_id|0], day [?VIN_camp_save_day|0]; save and reload"
+}
+
+test_vin_campaign_save_verify = {
+	if = {
+		limit = { NOT = { has_country_flag = VIN_Campaign_Save_Load_Checkpoint } }
+		log = "VIN CAMPAIGN: FAIL - save/load checkpoint flag missing"
+	}
+	if = {
+		limit = { NOT = { check_variable = { VIN_camp_current = VIN_camp_save_id } } }
+		log = "VIN CAMPAIGN: FAIL - campaign id changed across save/load"
+	}
+	if = {
+		limit = { check_variable = { VIN_camp_days_elapsed < VIN_camp_save_day } }
+		log = "VIN CAMPAIGN: FAIL - elapsed day moved backward across save/load"
+	}
+	log = "VIN CAMPAIGN: save/load verification complete"
+}
+
+test_vin_campaign_cao_bac_check = {
+	set_temp_variable = { vin_test_result_count = 0 }
+	if = { limit = { has_country_flag = VIN_Campaign_Cao_Bac_Result_Clean } add_to_temp_variable = { vin_test_result_count = 1 } }
+	if = { limit = { has_country_flag = VIN_Campaign_Cao_Bac_Result_Costly } add_to_temp_variable = { vin_test_result_count = 1 } }
+	if = { limit = { has_country_flag = VIN_Campaign_Cao_Bac_Result_Aborted } add_to_temp_variable = { vin_test_result_count = 1 } }
+	if = { limit = { has_country_flag = VIN_Campaign_Cao_Bac_Result_Failure } add_to_temp_variable = { vin_test_result_count = 1 } }
+	if = { limit = { has_country_flag = VIN_Campaign_Cao_Bac_Result_Superseded } add_to_temp_variable = { vin_test_result_count = 1 } }
+	if = { limit = { NOT = { check_variable = { vin_test_result_count = 1 } } } log = "VIN CAO-BAC: FAIL - expected exactly one result flag" }
+	if = { limit = { has_country_flag = VIN_Campaign_Cao_Bac_Active } log = "VIN CAO-BAC: FAIL - active flag remains" }
+	if = { limit = { NOT = { has_country_flag = VIN_Campaign_Cooldown_Cao_Bac } } log = "VIN CAO-BAC: FAIL - cooldown missing" }
+	if = { limit = { has_country_flag = VIN_Campaign_Resolving } log = "VIN CAO-BAC: FAIL - resolver lock remains" }
+	if = { limit = { has_idea = VIN_Campaign_Mobilization } log = "VIN CAO-BAC: FAIL - VIN campaign spirit remains" }
+	if = { limit = { has_idea = VIN_Campaign_Overextension } log = "VIN CAO-BAC: FAIL - VIN overextension remains" }
+	if = { limit = { country_exists = FRE  FRE = { has_idea = FRE_Campaign_Overextension } } log = "VIN CAO-BAC: FAIL - FRE overextension remains" }
+	if = { limit = { country_exists = FRE  FRE = { has_idea = FRE_Highland_Overextension } } log = "VIN CAO-BAC: FAIL - FRE campaign-command spirit remains" }
+	if = { limit = { country_exists = THO  THO = { has_idea = FRE_Campaign_Overextension } } log = "VIN CAO-BAC: FAIL - THO overextension remains" }
+	if = { limit = { country_exists = THO  THO = { has_idea = FRE_Highland_Overextension } } log = "VIN CAO-BAC: FAIL - THO campaign-command spirit remains" }
+	if = {
+		limit = {
+			OR = {
+				AND = { country_exists = THO  has_war_with = THO }
+				AND = { country_exists = FRE  has_war_with = FRE }
+			}
+		}
+		log = "VIN CAO-BAC: FAIL - campaign war remains"
+	}
+	if = {
+		limit = { check_variable = { VIN_camp_last_outcome < 3 } }
+		if = { limit = { country_exists = THO } log = "VIN CAO-BAC: FAIL - THO survived a successful campaign" }
+		if = { limit = { NOT = { owns_state = 1280 } } log = "VIN CAO-BAC: FAIL - VIN does not own Cao Bang" }
+		if = { limit = { NOT = { owns_state = 1768 } } log = "VIN CAO-BAC: FAIL - VIN does not own Lang Son" }
+		if = { limit = { NOT = { has_country_flag = Enable_Air_Base_Raids } } log = "VIN CAO-BAC: FAIL - air-base raids were not unlocked" }
+	}
+	else_if = {
+		limit = {
+			OR = {
+				check_variable = { VIN_camp_last_outcome = 3 }
+				check_variable = { VIN_camp_last_outcome = 4 }
+			}
+		}
+		if = { limit = { NOT = { country_exists = THO } } log = "VIN CAO-BAC: FAIL - THO vanished after abort/failure" }
+		if = { limit = { NOT = { 1280 = { is_owned_by = THO } } } log = "VIN CAO-BAC: FAIL - abort/failure changed Cao Bang ownership" }
+		if = { limit = { NOT = { 1768 = { is_owned_by = THO } } } log = "VIN CAO-BAC: FAIL - abort/failure changed Lang Son ownership" }
+	}
+	log = "VIN CAO-BAC: result check complete"
+}
+
+# Post-DBP QA: status is read-only; focus_geneva_check advances the live checks;
+# response_reset preserves the Dien Bien Phu recorder and current map state.
+test_vin_post_dbp_southern_war_status = {
+	log = "[VIN SOUTH] dbp=[?global.geneva_outcome_dbp|0] phase=[?global.Indochina_War_Active_Phase|0] A=[?global.Indochina_War_Next_Phase_A_Points|0] B=[?global.Indochina_War_Next_Phase_B_Points|0]"
+	set_temp_variable = { vin_post_dbp_strategy_choice_count = 0 }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Negotiations_Chosen } add_to_temp_variable = { vin_post_dbp_strategy_choice_count = 1 } }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Escalation_Chosen } add_to_temp_variable = { vin_post_dbp_strategy_choice_count = 1 } }
+	log = "[VIN SOUTH] strategic choice count=[?vin_post_dbp_strategy_choice_count|0] (expected 0 before choice, exactly 1 afterward)"
+	if = { limit = { has_global_flag = geneva_dbp_outcome_applied } log = "[VIN SOUTH] Dien Bien Phu outcome recorded" }
+	else = { log = "[VIN SOUTH] BLOCKED - Dien Bien Phu outcome not recorded" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Southern_War_Recognized } log = "[VIN SOUTH] Continued southern war recognized" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Funded_NLF } log = "[VIN SOUTH] Funding response chosen" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Pressed_For_Geneva } log = "[VIN SOUTH] Geneva response chosen" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Southern_War_Ended } log = "[VIN SOUTH] Southern response ended" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Funded_NLF_Defeated } log = "[VIN SOUTH] Funded resistance was defeated" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Funded_NLF_Ceasefire } log = "[VIN SOUTH] Funded resistance reached a ceasefire" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Focus_Geneva_Queued } log = "[VIN SOUTH] Focus-owned Geneva is queued behind the peace gate" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Focus_Geneva_Launched } log = "[VIN SOUTH] Focus-owned Geneva invitation launched" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Auto_Geneva_Queued } log = "[VIN SOUTH] FAIL - legacy autonomous Geneva queue remains" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Disarmed_NLF_Armistice } log = "[VIN SOUTH] A disarmed southern resistance received the automatic armistice" }
+	if = { limit = { has_global_flag = Indochina_Geneva_Pursuit } log = "[VIN SOUTH] Geneva pursuit is active" }
+	if = {
+		limit = { country_exists = NLF }
+		log = "[VIN SOUTH] Southern resistance country exists"
+		if = { limit = { NLF = { has_capitulated = yes } } log = "[VIN SOUTH] Southern resistance has capitulated" }
+		else = { log = "[VIN SOUTH] Southern resistance has not capitulated" }
+		if = { limit = { NLF = { num_of_controlled_states > 0 } } log = "[VIN SOUTH] Southern resistance still controls at least one state" }
+		else = { log = "[VIN SOUTH] Southern resistance controls no states" }
+		if = { limit = { NLF = { num_divisions > 0 } } log = "[VIN SOUTH] Southern resistance still fields divisions" }
+		else = { log = "[VIN SOUTH] Southern resistance fields no divisions" }
+		if = { limit = { country_exists = VIE VIE = { has_war_with = NLF } } log = "[VIN SOUTH] Saigon remains at war with the southern resistance" }
+		if = { limit = { country_exists = FRE FRE = { has_war_with = NLF } } log = "[VIN SOUTH] CEFEO remains at war with the southern resistance" }
+		if = { limit = { country_exists = FRA FRA = { has_war_with = NLF } } log = "[VIN SOUTH] France remains at war with the southern resistance" }
+	}
+	else = { log = "[VIN SOUTH] Southern resistance country no longer exists" }
+	if = { limit = { country_exists = NLF NLF = { is_subject = no } } log = "[VIN SOUTH] NLF remains independent" }
+	else_if = { limit = { country_exists = NLF } log = "[VIN SOUTH] WARNING - NLF is no longer independent" }
+	if = {
+		limit = { vin_post_dbp_southern_war_active_trigger = yes }
+		log = "[VIN SOUTH] The NLF is alive in a post-DBP war; the response category should be visible"
+	}
+	else = { log = "[VIN SOUTH] No live post-DBP NLF war is currently detected" }
+	if = { limit = { has_war = yes } log = "[VIN SOUTH] BLOCKED - Hanoi is still at war" }
+	else = { log = "[VIN SOUTH] Hanoi is at peace" }
+	if = {
+		limit = { country_exists = VIE }
+		if = { limit = { VIE = { has_war = yes } } log = "[VIN SOUTH] BLOCKED - Saigon is still at war" }
+		else = { log = "[VIN SOUTH] Saigon is at peace" }
+	}
+	else = { log = "[VIN SOUTH] Saigon no longer exists; its peace clause passes" }
+	if = { limit = { geneva_conference_vietnam_at_peace_trigger = yes } log = "[VIN SOUTH] Vietnamese peace gate passes" }
+	else = { log = "[VIN SOUTH] BLOCKED - Vietnamese peace gate fails" }
+	if = { limit = { vin_post_dbp_southern_resistance_defeated_trigger = yes } log = "[VIN SOUTH] Southern resistance defeat predicate passes" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Panic_Geneva_Suppressed } log = "[VIN SOUTH] Panic Geneva is suppressed by Hanoi's escalation choice" }
+	if = { limit = { has_idea = VIN_National_Reunification_Preparation } log = "[VIN SOUTH] 180-day reunification preparation spirit is active" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Preparation_Cleaned NOT = { has_idea = VIN_National_Reunification_Preparation } } log = "[VIN SOUTH] Reunification preparation cleanup passed" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_Invasion_Declared country_exists = VIE has_war_with = VIE } log = "[VIN SOUTH] Direct VIN-VIE invasion declaration passed" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_General_Offensive_Terminal NOT = { has_global_flag = Vietnam_War } } log = "[VIN SOUTH] General offensive did not activate the 1960s Vietnam War system" }
+	if = { limit = { has_country_flag = VIN_Post_DBP_General_Offensive_Terminal } log = "[VIN SOUTH] Declaration owner contract: VIE only; no explicit FRE/FRA call exists in the post-DBP effect" }
+	if = { limit = { has_global_flag = geneva_conference_announced } log = "[VIN SOUTH] Geneva has been announced" }
+	if = { limit = { has_global_flag = Geneva_Conference_Preparations } log = "[VIN SOUTH] Geneva preparations are active" }
+	if = { limit = { has_global_flag = geneva_conference_in_session } log = "[VIN SOUTH] Geneva is in session" }
+	if = { limit = { has_global_flag = geneva_conference_concluded } log = "[VIN SOUTH] Geneva has concluded" }
+	if = {
+		limit = {
+			has_country_flag = VIN_Post_DBP_Funded_NLF
+			country_exists = NLF
+			NLF = { NOT = { has_idea = NLF_Northern_Supply_Line } }
+			vin_post_dbp_southern_war_active_trigger = yes
+		}
+		log = "[VIN SOUTH] FAIL - funding chosen but the live NLF lacks Northern Supply Line"
+	}
+}
+
+test_vin_post_dbp_focus_geneva_check = {
+	vin_post_dbp_southern_war_check = yes
+	vin_post_dbp_focus_geneva_queue_tick = yes
+	test_vin_post_dbp_southern_war_status = yes
+}
+
+# Console compatibility for old test notes; production has no autonomous queue.
+test_vin_post_dbp_auto_geneva_check = { test_vin_post_dbp_focus_geneva_check = yes }
+
+test_vin_post_dbp_response_reset = {
+	clr_country_flag = VIN_Post_DBP_Southern_War_Recognized
+	clr_country_flag = VIN_Post_DBP_Southern_War_Ended
+	clr_country_flag = VIN_Post_DBP_Southern_Response_Chosen
+	clr_country_flag = VIN_Post_DBP_Funded_NLF
+	clr_country_flag = VIN_Post_DBP_Pressed_For_Geneva
+	clr_country_flag = VIN_Post_DBP_Funded_NLF_Defeated
+	clr_country_flag = VIN_Post_DBP_Funded_NLF_Ceasefire
+	clr_country_flag = VIN_Post_DBP_Settlement_After_South
+	clr_country_flag = VIN_Post_DBP_Southern_Conclusion_Reported
+	clr_country_flag = VIN_Post_DBP_Auto_Geneva_Queued
+	clr_country_flag = VIN_Post_DBP_Auto_Geneva_Launched
+	clr_country_flag = VIN_Post_DBP_Focus_Geneva_Queued
+	clr_country_flag = VIN_Post_DBP_Focus_Geneva_Launched
+	clr_country_flag = VIN_Post_DBP_Negotiations_Chosen
+	clr_country_flag = VIN_Post_DBP_Escalation_Chosen
+	clr_country_flag = VIN_Post_DBP_Panic_Geneva_Suppressed
+	clr_country_flag = VIN_Post_DBP_Reunification_AI_Active
+	clr_country_flag = VIN_Post_DBP_Preparation_Cleaned
+	clr_country_flag = VIN_Post_DBP_General_Offensive_Terminal
+	clr_country_flag = VIN_Post_DBP_Invasion_Declared
+	clr_country_flag = VIN_Post_DBP_Invasion_Already_Active
+	clr_country_flag = VIN_Post_DBP_Strategy_Focus_Superseded
+	clr_country_flag = VIN_Post_DBP_Mobilization_Superseded
+	clr_country_flag = VIN_Post_DBP_General_Offensive_Superseded
+	clr_country_flag = VIN_Post_DBP_Strategy_Briefed
+	clr_country_flag = VIN_Post_DBP_Strategy_Compatibility_Checked
+	clr_country_flag = VIN_Post_DBP_Disarmed_NLF_Armistice
+	clr_global_flag = Indochina_Geneva_Pursuit
+	if = {
+		limit = { country_exists = NLF }
+		NLF = { remove_ideas = NLF_Northern_Supply_Line }
+	}
+	if = { limit = { has_idea = VIN_National_Reunification_Preparation } remove_ideas = VIN_National_Reunification_Preparation }
+	log = "[VIN SOUTH] Response flags reset; the Dien Bien Phu recorder and map state were preserved"
+}
+
+# ---------------------------------------------------------------------------
+# Dien Bien Phu defensive-response diagnostics (run from FRE scope).
+# These report or advance only the attached response; the primary VIN campaign
+# remains responsible for its own objective, outcome, transfer, and peace.
+
+test_fre_dbp_response_status = {
+	log = "[FRE DBP] credits=[?FRE_War_Credits|0] patience=[?FRE_Metropole_Patience|0] condor_days=[?FRE_DBP_Condor_Hold_Days|0] siege_days=[?global.VIN_dbp_siege_days|0] fort_level=[?global.VIN_dbp_fort_level|0]"
+	if = { limit = { has_country_flag = FRE_DBP_Response_Active } log = "[FRE DBP] response active" }
+	else = { log = "[FRE DBP] response inactive" }
+	if = { limit = { has_country_flag = FRE_DBP_Response_Choice_Pending } log = "[FRE DBP] response choice pending" }
+	if = { limit = { has_country_flag = FRE_DBP_Posture_Standard } log = "[FRE DBP] posture: standard hold" }
+	if = { limit = { has_country_flag = FRE_DBP_Posture_Maximum } log = "[FRE DBP] posture: maximum reinforcement" }
+	if = { limit = { has_country_flag = FRE_DBP_Posture_Condor } log = "[FRE DBP] posture: Operation Condor" }
+	if = { limit = { has_country_flag = FRE_DBP_Posture_Vulture } log = "[FRE DBP] posture: Operation Vulture request" }
+	if = { limit = { has_country_flag = FRE_DBP_Condor_Window_Open } log = "[FRE DBP] Condor window is open after a recorded investment" }
+	if = { limit = { fre_dbp_condor_corridor_open_trigger = yes } log = "[FRE DBP] Condor map corridor currently passes" }
+	else = { log = "[FRE DBP] Condor map corridor currently fails" }
+	if = { limit = { has_country_flag = FRE_DBP_Condor_Objective_Achieved } log = "[FRE DBP] Condor seven-day objective achieved" }
+	if = { limit = { has_country_flag = FRE_DBP_Vulture_Request_Pending } log = "[FRE DBP] Vulture request pending in Washington" }
+	if = { limit = { has_country_flag = FRE_DBP_Vulture_Support_Approved } log = "[FRE DBP] Vulture air support approved/applied" }
+	if = { limit = { has_country_flag = FRE_DBP_Vulture_Support_Refused } log = "[FRE DBP] Vulture request refused" }
+	if = { limit = { has_country_flag = FRE_DBP_Vulture_Direct_Intervention } log = "[FRE DBP] USA focus produced direct intervention" }
+	if = { limit = { has_country_flag = FRE_DBP_Response_Result_Held } log = "[FRE DBP] permanent result: standard/unsupported hold" }
+	if = { limit = { has_country_flag = FRE_DBP_Response_Result_Reinforced } log = "[FRE DBP] permanent result: reinforced hold" }
+	if = { limit = { has_country_flag = FRE_DBP_Response_Result_Condor } log = "[FRE DBP] permanent result: Condor-backed hold" }
+	if = { limit = { has_country_flag = FRE_DBP_Response_Result_Vulture } log = "[FRE DBP] permanent result: Vulture-backed hold" }
+	if = { limit = { has_country_flag = FRE_DBP_Response_Result_Fall } log = "[FRE DBP] permanent result: camp lost" }
+	if = { limit = { has_country_flag = FRE_DBP_Response_Result_Inconclusive } log = "[FRE DBP] permanent result: inconclusive/aborted" }
+	if = { limit = { has_country_flag = FRE_DBP_Response_Result_Superseded } log = "[FRE DBP] permanent result: theatre superseded" }
+	if = {
+		limit = { country_exists = VIN }
+		VIN = {
+			if = { limit = { has_country_flag = VIN_Campaign_Dien_Bien_Active } log = "[FRE DBP] parent campaign is live" }
+			else = { log = "[FRE DBP] parent campaign is not live" }
+			if = { limit = { vin_dbp_valley_invested_trigger = yes } log = "[FRE DBP] Viet Minh investment prerequisite passes" }
+			else = { log = "[FRE DBP] Viet Minh investment prerequisite fails" }
+			if = { limit = { controls_province = 4529 } log = "[FRE DBP] WARNING - Viet Minh currently control the camp objective" }
+		}
+	}
+}
+
+test_fre_dbp_response_daily_check = {
+	fre_dbp_response_daily_tick = yes
+	test_fre_dbp_response_status = yes
+}
+
+test_fre_dbp_response_reset = {
+	fre_dbp_response_cleanup = yes
+	clr_country_flag = FRE_DBP_Response_Resolved
+	clr_country_flag = FRE_DBP_Response_Result_Held
+	clr_country_flag = FRE_DBP_Response_Result_Reinforced
+	clr_country_flag = FRE_DBP_Response_Result_Condor
+	clr_country_flag = FRE_DBP_Response_Result_Vulture
+	clr_country_flag = FRE_DBP_Response_Result_Fall
+	clr_country_flag = FRE_DBP_Response_Result_Inconclusive
+	clr_country_flag = FRE_DBP_Response_Result_Superseded
+	clr_country_flag = FRE_DBP_Response_Loss_Standard
+	clr_country_flag = FRE_DBP_Response_Loss_Maximum
+	clr_country_flag = FRE_DBP_Response_Loss_Condor
+	clr_country_flag = FRE_DBP_Response_Loss_Vulture
+	clr_country_flag = FRE_DBP_Condor_Result_Failed
+	clr_country_flag = FRE_DBP_Vulture_Result_Refused
+	clr_country_flag = FRE_DBP_Garrison_Preserved
+	log = "[FRE DBP] response-only state reset; parent campaign, map, and Geneva recorder preserved"
+}

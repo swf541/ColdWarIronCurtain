@@ -1,0 +1,134 @@
+# Nguyen Binh recall and southern command QA
+# Console use from any tag: e test_binh_status
+# Route setters must run before the 1951.9.28 resolver window opens.
+
+test_binh_route_overland = {
+	VIN = {
+		set_variable = { VIN_Binh_Route = 1 }
+		set_country_flag = VIN_Binh_Route_Set
+		set_country_flag = VIN_Binh_Recall_Asked
+		clr_country_flag = VIN_Binh_Escort_Committed
+	}
+}
+
+test_binh_route_sea = {
+	VIN = {
+		set_variable = { VIN_Binh_Route = 2 }
+		set_country_flag = VIN_Binh_Route_Set
+		set_country_flag = VIN_Binh_Recall_Asked
+		clr_country_flag = VIN_Binh_Escort_Committed
+	}
+}
+
+test_binh_route_escort = {
+	VIN = {
+		set_variable = { VIN_Binh_Route = 1 }
+		set_country_flag = VIN_Binh_Route_Set
+		set_country_flag = VIN_Binh_Recall_Asked
+		set_country_flag = VIN_Binh_Escort_Committed
+	}
+}
+
+test_binh_route_stay = {
+	VIN = { vin_binh_keep_in_nam_bo = yes }
+}
+
+test_binh_force_death = {
+	VIN = {
+		set_country_flag = Binh_Outcome
+		complete_national_focus = VIN_Nguyen_Binh_Ambush
+		vin_binh_recall_death = yes
+	}
+}
+
+test_binh_force_survival = {
+	VIN = {
+		set_country_flag = Binh_Outcome
+		complete_national_focus = VIN_Nguyen_Binh_Ambush
+		vin_binh_recall_survival = yes
+	}
+}
+
+test_binh_command_binh = {
+	NLF = {
+		set_temp_variable = { nlf_command_choice = 1 }
+		nlf_set_southern_command = yes
+	}
+}
+
+test_binh_command_duan = {
+	NLF = {
+		set_temp_variable = { nlf_command_choice = 2 }
+		nlf_set_southern_command = yes
+	}
+}
+
+test_binh_command_tho = {
+	NLF = {
+		set_temp_variable = { nlf_command_choice = 3 }
+		nlf_set_southern_command = yes
+	}
+}
+
+test_binh_command_buu = {
+	NLF = {
+		set_temp_variable = { nlf_command_choice = 4 }
+		nlf_set_southern_command = yes
+	}
+}
+
+test_binh_command_cung = {
+	NLF = {
+		set_temp_variable = { nlf_command_choice = 5 }
+		nlf_set_southern_command = yes
+	}
+}
+
+test_binh_handover_1953 = {
+	VIN = {
+		set_country_flag = VIN_Binh_Cosvn_Handover
+		country_event = Binh_Cung_Leadership.20
+	}
+}
+
+test_binh_cung_defects = {
+	NLF = {
+		clr_country_flag = NLF_Cung_Displaced
+		nlf_displace_kieu_cong_cung = yes
+	}
+}
+
+test_binh_buu_defects = {
+	NLF = {
+		clr_country_flag = NLF_Buu_Displaced
+		nlf_displace_tran_quoc_buu = yes
+	}
+}
+
+test_binh_status = {
+	if = { limit = { NOT = { country_exists = VIN } } log = "BINH: FAIL - Hanoi does not exist" }
+	if = { limit = { NOT = { country_exists = NLF } } log = "BINH: southern resistance is gone; the recall chain is inert" }
+	if = { limit = { country_exists = VIN } log = "BINH|route=[?VIN.VIN_Binh_Route|0]|date=[GetDateText]" }
+	if = { limit = { country_exists = VIN VIN = { has_country_flag = VIN_Binh_Censured } } log = "BINH: Hanoi censured him" }
+	if = { limit = { country_exists = VIN VIN = { has_country_flag = VIN_Binh_Defended } } log = "BINH: Hanoi defended him" }
+	if = { limit = { country_exists = VIN VIN = { has_country_flag = VIN_Binh_Escort_Committed } } log = "BINH: escort committed" }
+	if = { limit = { country_exists = VIN VIN = { has_country_flag = Binh_Outcome } } log = "BINH: outcome recorded" }
+	if = { limit = { any_country = { has_country_flag = FRE_Binh_Corridor_Interdiction } } log = "BINH: the Cambodian corridor is interdicted" }
+
+	if = { limit = { country_exists = NLF NLF = { has_country_flag = NLF_Binh_Killed } } log = "BINH: killed in the ambush" }
+	if = { limit = { country_exists = NLF NLF = { NOT = { NLF_southern_command_settled_trigger = yes } } } log = "BINH: FAIL - no southern command flag is set" }
+	if = { limit = { country_exists = NLF NLF = { has_country_flag = Nguyen_Binh_Leader } } log = "BINH: command = Nguyen Binh" }
+	if = { limit = { country_exists = NLF NLF = { has_country_flag = Le_Duan_Leader } } log = "BINH: command = Le Duan" }
+	if = { limit = { country_exists = NLF NLF = { has_country_flag = Le_Duc_Tho_Leader } } log = "BINH: command = Le Duc Tho" }
+	if = { limit = { country_exists = NLF NLF = { has_country_flag = Tran_quoc_Buu_Leader } } log = "BINH: command = Tran Quoc Buu" }
+	if = { limit = { country_exists = NLF NLF = { has_country_flag = Kieu_Cong_Cung_Leader } } log = "BINH: command = Kieu Cong Cung" }
+
+	if = { limit = { country_exists = NLF NLF = { has_idea = NLF_vietminh_disarray } } log = "BINH: NLF holds vietminh_disarray" }
+	if = { limit = { country_exists = NLF NLF = { has_idea = NLF_post_binh_disorganization } } log = "BINH: NLF holds post_binh_disorganization" }
+	if = { limit = { country_exists = NLF NLF = { has_idea = NLF_fractured_command_structure } } log = "BINH: NLF holds fractured_command_structure" }
+
+	if = { limit = { country_exists = NLF NLF = { has_country_flag = NLF_Cung_Displaced } } log = "BINH: Cung displaced from the southern command" }
+	if = { limit = { country_exists = NLF NLF = { has_country_flag = NLF_Buu_Displaced } } log = "BINH: Buu displaced from the southern command" }
+	if = { limit = { country_exists = VIE VIE = { has_country_flag = Cung_Defection } } log = "BINH: Cung has rallied to Saigon" }
+	if = { limit = { country_exists = VIE VIE = { has_character = NLF_Kieu_Cong_Cung } } log = "BINH: Cung is on Saigon's roster" }
+}

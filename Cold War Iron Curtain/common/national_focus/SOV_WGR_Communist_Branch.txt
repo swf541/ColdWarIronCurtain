@@ -1,0 +1,302 @@
+# ============================================================================
+#  A RED BONN - 1949 West German election side branch for the SOV (Stalin) tree.
+#
+#  Entry chain:
+#    SOV_Stalin_The_Zhdanov_Doctrine -> sov_german_question.1
+#      -> SOV_WGR.1   (Moscow: interfere or stay out)
+#         -> SOV_WGR.2   (Bonn/occupation authorities: expose or dismiss)
+#            -> WGRElection.1 option c   (KPD victory, loads WGR_Reimann_49)
+#               -> sets SOV_WGR49_kpd_victory on SOV, which reveals this branch.
+#
+#  If the KPD does not win, the flag is never set and nothing here appears.
+#
+#  This branch shares its coordinates with the Stalin Notes branch
+#  (SOV_Stalin_Notes_Branch.txt). They can never both be active: a KPD victory
+#  in 1949 suppresses germanquestion.1 in ic_pulse, so the 1952 Notes arc never
+#  starts, and the Notes root additionally checks NOT = SOV_WGR49_kpd_victory.
+#  This branch does no election work of its own - it exists purely to hook a
+#  communist West Germany into the Soviet foreign-policy systems: the sphere
+#  (add_to_sphere / sphere_tag_list), influence percentages, FPP power
+#  projection (bonus_fpp_modifier), the budget (money_to_gain), market access
+#  and the faction.
+#
+#  Shared focuses; only the root is listed in the SOV_Stalin focus_tree header.
+# ============================================================================
+
+# ---- ROOT -------------------------------------------------------------------
+shared_focus = {
+	id = SOV_wge_a_red_bonn
+	icon = GFX_Dream_of_United_Germany
+	text_icon = Soviet_focus_style
+	cost = 3
+	# Sits in the same region as the Stalin Notes branch, which it is mutually
+	# exclusive with. Root at 42 puts this branch's leftmost column at 40 - the
+	# same column the Notes branch starts at, and two columns clear of the main
+	# tree's right edge (x = 37), so the player barely has to scroll.
+	x = 42
+	y = 0
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	allow_branch = { has_country_flag = SOV_WGR49_kpd_victory }
+	available = { has_country_flag = SOV_WGR49_kpd_victory }
+
+	completion_reward = {
+		add_political_power = 50
+		add_to_variable = { bonus_fpp_modifier = 0.5 tooltip = bonus_fpp_modifier_tt }
+		custom_effect_tooltip = SOV_wge_a_red_bonn_tt
+	}
+}
+
+# ---- RECOGNITION ------------------------------------------------------------
+shared_focus = {
+	id = SOV_wge_recognize_the_reimann_government
+	icon = GFX_Erection_Problem
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_wge_a_red_bonn
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_wge_a_red_bonn }
+	available = { country_exists = WGR }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 40
+		if = {
+			limit = { country_exists = WGR }
+			WGR = {
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+				set_temp_variable = { percent_change = -15 }
+				set_temp_variable = { tag_index = USA.id }
+				set_temp_variable = { influence_target = THIS.id }
+				change_influence_percentage = yes
+				set_temp_variable = { percent_change = 15 }
+				set_temp_variable = { tag_index = SOV.id }
+				set_temp_variable = { influence_target = THIS.id }
+				change_influence_percentage = yes
+				WGR_Increase_KPD_Approval = yes
+			}
+			add_opinion_modifier = { target = WGR modifier = large_increase }
+		}
+		news_event = sov_german_question.4
+		custom_effect_tooltip = SOV_wge_recognize_the_reimann_government_tt
+	}
+}
+
+# ---- (i) THE SPHERE ---------------------------------------------------------
+shared_focus = {
+	id = SOV_wge_bonn_into_the_sphere
+	icon = GFX_Warsaw_Pact
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_wge_recognize_the_reimann_government
+	x = -2
+	y = 1
+	prerequisite = { focus = SOV_wge_recognize_the_reimann_government }
+	available = { country_exists = WGR }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_to_variable = { bonus_fpp_modifier = 1 tooltip = bonus_fpp_modifier_tt }
+		if = {
+			limit = { country_exists = WGR }
+			WGR = {
+				set_temp_variable = { New_sphere_leader = SOV }
+				add_to_sphere = yes
+				WGR_Increase_KPD_State_Control = yes
+				WGR_Increase_Communist_Influence = yes
+			}
+		}
+		if = {
+			limit = {
+				is_faction_leader = yes
+				country_exists = WGR
+				NOT = { is_in_faction_with = WGR }
+			}
+			add_to_faction = WGR
+		}
+		custom_effect_tooltip = SOV_wge_bonn_into_the_sphere_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_wge_arm_the_west_german_workers
+	icon = GFX_Share_intel_with_the_DDR
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_wge_bonn_into_the_sphere
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_wge_bonn_into_the_sphere }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	completion_reward = {
+		add_war_support = 0.05
+		if = {
+			limit = { country_exists = WGR }
+			WGR = {
+				WGR_Increase_BGS_Performance = yes
+				WGR_Increase_KPD_State_Control = yes
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = 2000
+					producer = SOV
+				}
+				add_equipment_to_stockpile = {
+					type = support_equipment
+					amount = 600
+					producer = SOV
+				}
+			}
+		}
+		custom_effect_tooltip = SOV_wge_arm_the_west_german_workers_tt
+	}
+}
+
+# ---- (ii) THE ECONOMY -------------------------------------------------------
+shared_focus = {
+	id = SOV_wge_comecon_for_the_ruhr
+	icon = GFX_Coal_East_Germany
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_wge_recognize_the_reimann_government
+	x = 2
+	y = 1
+	prerequisite = { focus = SOV_wge_recognize_the_reimann_government }
+	available = { country_exists = WGR }
+	search_filters = { FOCUS_FILTER_INDUSTRY }
+
+	completion_reward = {
+		set_temp_variable = { money_to_gain = 50 }
+		add_money_with_tooltip_effect = yes
+		if = {
+			limit = { country_exists = WGR }
+			give_market_access = WGR
+			WGR = {
+				give_market_access = SOV
+				WGR_Increase_Wirtschaftswunder = yes
+				add_opinion_modifier = { target = SOV modifier = medium_increase_trade }
+			}
+			add_opinion_modifier = { target = WGR modifier = medium_increase_trade }
+		}
+		custom_effect_tooltip = SOV_wge_comecon_for_the_ruhr_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_wge_the_ruhr_arsenal
+	icon = GFX_German_Nuclear_Program
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_wge_comecon_for_the_ruhr
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_wge_comecon_for_the_ruhr }
+	search_filters = { FOCUS_FILTER_INDUSTRY }
+
+	completion_reward = {
+		set_temp_variable = { money_to_gain = 75 }
+		add_money_with_tooltip_effect = yes
+		random_owned_state = {
+			add_extra_state_shared_building_slots = 2
+			add_building_construction = {
+				type = arms_factory
+				level = 2
+				instant_build = yes
+			}
+		}
+		custom_effect_tooltip = SOV_wge_the_ruhr_arsenal_tt
+	}
+}
+
+# ---- (iii) THE TWO GERMANIES ------------------------------------------------
+shared_focus = {
+	id = SOV_wge_two_states_one_road
+	icon = GFX_The_Unification_of_Germany
+	text_icon = Soviet_focus_style
+	cost = 10
+	relative_position_id = SOV_wge_recognize_the_reimann_government
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_wge_bonn_into_the_sphere }
+	prerequisite = { focus = SOV_wge_comecon_for_the_ruhr }
+	available = {
+		country_exists = WGR
+		country_exists = DDR
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 75
+		add_to_variable = { bonus_fpp_modifier = 0.5 tooltip = bonus_fpp_modifier_tt }
+		if = {
+			limit = { country_exists = DDR }
+			DDR = {
+				increase_SED_party_power = yes
+				increase_party_legitimacy = yes
+				decrease_public_discontent = yes
+				if = {
+					limit = { country_exists = WGR }
+					add_opinion_modifier = { target = WGR modifier = large_increase }
+				}
+			}
+		}
+		if = {
+			limit = { country_exists = WGR }
+			WGR = {
+				add_opinion_modifier = { target = DDR modifier = large_increase }
+				WGR_Increase_KPD_Approval = yes
+			}
+		}
+		news_event = sov_german_question.5
+		custom_effect_tooltip = SOV_wge_two_states_one_road_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_wge_the_atlantic_recoils
+	icon = GFX_usa_50_expanding_nato
+	text_icon = Soviet_focus_style
+	cost = 10
+	relative_position_id = SOV_wge_two_states_one_road
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_wge_two_states_one_road }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 50
+		add_named_threat = { threat = 10 name = SOV_wge_atlantic_recoils_threat }
+		add_to_variable = { bonus_fpp_modifier = 1 tooltip = bonus_fpp_modifier_tt }
+		if = {
+			limit = { country_exists = FRA }
+			FRA = {
+				add_popularity = { ideology = communism popularity = 0.10 }
+				set_temp_variable = { percent_change = -5 }
+				set_temp_variable = { tag_index = USA.id }
+				set_temp_variable = { influence_target = THIS.id }
+				change_influence_percentage = yes
+				set_temp_variable = { percent_change = 5 }
+				set_temp_variable = { tag_index = SOV.id }
+				set_temp_variable = { influence_target = THIS.id }
+				change_influence_percentage = yes
+			}
+		}
+		if = {
+			limit = { country_exists = ITA }
+			ITA = {
+				add_popularity = { ideology = communism popularity = 0.10 }
+				set_temp_variable = { percent_change = -5 }
+				set_temp_variable = { tag_index = USA.id }
+				set_temp_variable = { influence_target = THIS.id }
+				change_influence_percentage = yes
+				set_temp_variable = { percent_change = 5 }
+				set_temp_variable = { tag_index = SOV.id }
+				set_temp_variable = { influence_target = THIS.id }
+				change_influence_percentage = yes
+			}
+		}
+		news_event = sov_german_question.6
+		custom_effect_tooltip = SOV_wge_the_atlantic_recoils_tt
+	}
+}

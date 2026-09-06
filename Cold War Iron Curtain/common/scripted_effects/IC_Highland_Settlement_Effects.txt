@@ -1,0 +1,120 @@
+# =============================================================================
+# Highland Settlement payoffs (Viet Bac / Tai-Meo)
+# =============================================================================
+# Hanoi answers the autonomy question twice: the Tay and Nung marches (THO.1) and
+# the Tai-Meo highlands (MEO.27).
+#   direct rule - national spirit plus a resentment modifier on every state taken
+#   autonomy    - national spirit plus a development modifier on the zone's states
+# Both spirits have two tiers; tier 2 fires when both regions are settled the same
+# way. Every effect here runs in VIN scope. State lists match
+# vin_establish_viet_bac_zone and the Tai-Meo focuses.
+# =============================================================================
+
+vin_highland_direct_rule_spirit = {
+	add_to_variable = { VIN_highland_direct_rule_regions = 1 }
+	if = {
+		limit = {
+			has_idea = VIN_highland_direct_rule
+			check_variable = { VIN_highland_direct_rule_regions > 1 }
+		}
+		swap_ideas = { remove_idea = VIN_highland_direct_rule add_idea = VIN_highland_direct_rule_2 }
+	}
+	else_if = {
+		limit = {
+			NOT = { has_idea = VIN_highland_direct_rule }
+			NOT = { has_idea = VIN_highland_direct_rule_2 }
+		}
+		add_ideas = VIN_highland_direct_rule
+	}
+}
+
+vin_highland_autonomy_spirit = {
+	add_to_variable = { VIN_highland_autonomy_regions = 1 }
+	if = {
+		limit = {
+			has_idea = VIN_highland_autonomy_compact
+			check_variable = { VIN_highland_autonomy_regions > 1 }
+		}
+		swap_ideas = { remove_idea = VIN_highland_autonomy_compact add_idea = VIN_highland_autonomy_compact_2 }
+	}
+	else_if = {
+		limit = {
+			NOT = { has_idea = VIN_highland_autonomy_compact }
+			NOT = { has_idea = VIN_highland_autonomy_compact_2 }
+		}
+		add_ideas = VIN_highland_autonomy_compact
+	}
+}
+
+# Runs in state scope. Guarded so a state caught by both regions is not doubled.
+vin_highland_mark_direct_rule = {
+	if = {
+		limit = { NOT = { has_dynamic_modifier = { modifier = VIN_highland_direct_rule_state } } }
+		add_dynamic_modifier = { modifier = VIN_highland_direct_rule_state }
+	}
+}
+
+vin_highland_mark_zone = {
+	if = {
+		limit = { NOT = { has_dynamic_modifier = { modifier = VIN_highland_zone_state } } }
+		add_dynamic_modifier = { modifier = VIN_highland_zone_state }
+	}
+}
+
+vin_integrate_viet_bac_directly = {
+	vin_highland_direct_rule_spirit = yes
+	1280 = { vin_highland_mark_direct_rule = yes }	# Cao Bang
+	1768 = { vin_highland_mark_direct_rule = yes }	# Lang Son
+	if = {
+		limit = { 881 = { is_owned_by = VIN } }
+		881 = { vin_highland_mark_direct_rule = yes }	# Dong Bac Bo - the tungsten and steel
+	}
+	if = {
+		limit = { 1767 = { is_owned_by = VIN } }
+		1767 = { vin_highland_mark_direct_rule = yes }	# Ha Giang, if the Tai-Meo zone never took it
+	}
+}
+
+vin_integrate_tai_meo_directly = {
+	vin_highland_direct_rule_spirit = yes
+	if = {
+		limit = { 671 = { is_owned_by = VIN } }
+		671 = { vin_highland_mark_direct_rule = yes }	# Tay Bac Bo - the chromium and tungsten
+	}
+	if = {
+		limit = { 1767 = { is_owned_by = VIN } }
+		1767 = { vin_highland_mark_direct_rule = yes }
+	}
+}
+
+vin_grant_viet_bac_autonomy_bonus = {
+	vin_highland_autonomy_spirit = yes
+	if = {
+		limit = { 1280 = { is_owned_by = THO } }
+		1280 = { vin_highland_mark_zone = yes }
+	}
+	if = {
+		limit = { 1768 = { is_owned_by = THO } }
+		1768 = { vin_highland_mark_zone = yes }
+	}
+	if = {
+		limit = { 881 = { is_owned_by = THO } }
+		881 = { vin_highland_mark_zone = yes }
+	}
+	if = {
+		limit = { 1767 = { is_owned_by = THO } }
+		1767 = { vin_highland_mark_zone = yes }
+	}
+}
+
+vin_grant_tai_meo_autonomy_bonus = {
+	vin_highland_autonomy_spirit = yes
+	if = {
+		limit = { 671 = { is_owned_by = MEO } }
+		671 = { vin_highland_mark_zone = yes }
+	}
+	if = {
+		limit = { 1767 = { is_owned_by = MEO } }
+		1767 = { vin_highland_mark_zone = yes }
+	}
+}

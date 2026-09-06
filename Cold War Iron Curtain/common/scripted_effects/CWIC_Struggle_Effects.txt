@@ -1,4 +1,3 @@
-
 indochina_struggle_auto_trigger_communist_victory_preparation = {
 	if = {
 		limit = {
@@ -28,8 +27,9 @@ indochina_struggle_auto_trigger_communist_victory_preparation = {
 		VIN = {
 			set_country_flag = VIN_Communist_Victory_Preparation_Triggered
 		}
-		add_to_variable = { FRA.StruggleInvolvedNationsIndochinaCommunistScore = 1500 }
-		add_to_variable = { global.Indochina_War_Next_Phase_A_Points = 200 }
+		log = "IC_AFK|SCORE_AWARD|date=[GetDateText]|source=communist_victory_preparation|communist_delta=350|phase_delta=175|communist_before=[?FRA.StruggleInvolvedNationsIndochinaCommunistScore|0]"
+		add_to_variable = { FRA.StruggleInvolvedNationsIndochinaCommunistScore = 350 }
+		add_to_variable = { global.Indochina_War_Next_Phase_A_Points = 175 }
 	}
 }
 
@@ -48,60 +48,177 @@ indochina_struggle_starting_idea_setup = {
     }
 }
 
-indochina_struggle_bypass_geneva_conference_focuses = {
+indochina_struggle_invite_countries_to_geneva = {
 	if = {
-		limit = { country_exists = FRA }
-		FRA = {
-			if = {
-				limit = { has_focus_tree = FRA_1950s }
-				# unlock_national_focus = FRA_Geneva_Peace_Conference
-			}
+		limit = {
+			country_exists = VIN
+			VIN = { vin_post_dbp_strategy_unresolved_trigger = yes }
+		}
+		if = {
+			limit = { check_variable = { global.Indochina_Geneva_Pursuit_Source < 1 } }
+			set_variable = { global.Indochina_Geneva_Pursuit_Source = 4 }
+		}
+		set_global_flag = Indochina_Geneva_Pursuit
+		clr_global_flag = Geneva_Conference_Preparations
+		log = "GENEVA_SOURCE|DEFERRED|date=[GetDateText]|source=[?global.Indochina_Geneva_Pursuit_Source|0]|reason=VIN_post_DBP_choice_unresolved"
+	}
+	else = {
+		if = {
+			limit = { check_variable = { global.Indochina_Geneva_Pursuit_Source < 1 } }
+			set_variable = { global.Indochina_Geneva_Pursuit_Source = 4 }
+		}
+		log = "GENEVA_SOURCE|INVITE|date=[GetDateText]|source=[?global.Indochina_Geneva_Pursuit_Source|0]"
+		geneva_conf_announce = yes
+		clr_global_flag = Indochina_Geneva_Pursuit
+		set_variable = { global.Indochina_Geneva_Pursuit_Source = 0 }
+	}
+}
+
+indochina_tai_federation_collapses = {
+	if = {
+		limit = {
+			country_exists = TAI
+		}
+		TAI = {
+			fre_tai_highlands_relief_disband = yes
 		}
 	}
+	fre_dbp_disband_gono = yes
 	if = {
-		limit = { country_exists = VIN }
+		limit = {
+			country_exists = TAI
+			country_exists = VIN
+			NOT = { has_global_flag = Indochina_War_Over }
+			VIN = { NOT = { has_country_flag = VIN_Campaign_Dien_Bien_Active } }
+		}
 		VIN = {
-			if = {
-				limit = { has_focus_tree = VIN_50s }
-				# unlock_national_focus = VIN_The_Geneva_Peace_Conference
+			annex_country = {
+				target = TAI
+				transfer_troops = no
 			}
-		}
-	}
-	if = {
-		limit = { country_exists = USA }
-		USA = {
-			unlock_national_focus = USA_50s_The_Geneva_Conferece
+			country_event = { id = SWF_Indochina_War.18 days = 1 }	# "The Tai Federation Collapses"
 		}
 	}
 }
 
-indochina_struggle_invite_countries_to_geneva = {
-	indochina_struggle_bypass_geneva_conference_focuses = yes
+fre_tai_highlands_relief = {
+	if = {
+		limit = {
+			country_exists = TAI
+		}
+		TAI = {
+			division_template = {
+				name = "Groupement Mobile du Haut-Tonkin"
+				division_names_group = VIE_INF_01
+				regiments = {
+					militia = { x = 0 y = 0 }
+					militia = { x = 0 y = 1 }
+					infantry = { x = 1 y = 0 }
+					infantry = { x = 1 y = 1 }
+					artillery = { x = 2 y = 0 }
+				}
+				support = {
+					recon = { x = 0 y = 0 }
+				}
+				priority = 0
+			}
+		}
+		set_temp_variable = { tai_relief_tier = 1 }
+		if = {
+			limit = {
+				country_exists = FRE
+				FRE = { check_variable = { FRE_Metropole_Patience > 65 } }
+			}
+			set_temp_variable = { tai_relief_tier = 2 }
+		}
+		else_if = {
+			limit = {
+				OR = {
+					NOT = { country_exists = FRE }
+					FRE = { check_variable = { FRE_Metropole_Patience < 33 } }
+				}
+			}
+			set_temp_variable = { tai_relief_tier = 0 }
+		}
+		if = {
+			limit = {
+				TAI = { owns_state = 1761 }
+			}
+			1761 = {
+				create_unit = {
+					division = "name = \"Groupement Mobile 1\" division_template = \"Groupement Mobile du Haut-Tonkin\" start_experience_factor = 0.4 start_equipment_factor = 1.0"
+					owner = TAI
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 10075
+				}
+			}
+			if = {
+				limit = { check_variable = { tai_relief_tier > 0 } }
+				1761 = {
+					create_unit = {
+						division = "name = \"Groupement Mobile 2\" division_template = \"Groupement Mobile du Haut-Tonkin\" start_experience_factor = 0.35 start_equipment_factor = 1.0"
+						owner = TAI
+						allow_spawning_on_enemy_provs = yes
+						prioritize_location = 10075
+					}
+				}
+			}
+			if = {
+				limit = { check_variable = { tai_relief_tier > 1 } }
+				1761 = {
+					create_unit = {
+						division = "name = \"Bataillon de Marche Thai\" division_template = \"Groupement Mobile du Haut-Tonkin\" start_experience_factor = 0.45 start_equipment_factor = 1.0"
+						owner = TAI
+						allow_spawning_on_enemy_provs = yes
+						prioritize_location = 10075
+					}
+				}
+			}
+		}
+		else = {
+			671 = {
+				create_unit = {
+					division = "name = \"Groupement Mobile 1\" division_template = \"Groupement Mobile du Haut-Tonkin\" start_experience_factor = 0.4 start_equipment_factor = 1.0"
+					owner = TAI
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 4529
+				}
+			}
+			if = {
+				limit = { check_variable = { tai_relief_tier > 0 } }
+				671 = {
+					create_unit = {
+						division = "name = \"Groupement Mobile 2\" division_template = \"Groupement Mobile du Haut-Tonkin\" start_experience_factor = 0.35 start_equipment_factor = 1.0"
+						owner = TAI
+						allow_spawning_on_enemy_provs = yes
+						prioritize_location = 4529
+					}
+				}
+			}
+			if = {
+				limit = { check_variable = { tai_relief_tier > 1 } }
+				671 = {
+					create_unit = {
+						division = "name = \"Bataillon de Marche Thai\" division_template = \"Groupement Mobile du Haut-Tonkin\" start_experience_factor = 0.45 start_equipment_factor = 1.0"
+						owner = TAI
+						allow_spawning_on_enemy_provs = yes
+						prioritize_location = 4529
+					}
+				}
+			}
+		}
+		if = {
+			limit = { check_variable = { tai_relief_tier > 1 } }
+			TAI = {
+				add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1500 producer = FRA }
+				add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 200 producer = FRA }
+			}
+		}
+	}
+}
 
-    if = {
-        limit = { country_exists = FRA }
-        FRA = {
-            country_event = { id = Geneva_Conference_Invitation.1 days = 1 }
-        }
-    }
-    if = {
-        limit = { country_exists = VIN }
-        VIN = {
-            country_event = { id = Geneva_Conference_Invitation.2 days = 1 }
-        }
-    }
-    if = {
-        limit = { country_exists = USA }
-        USA = {
-            country_event = { id = Geneva_Conference_Invitation.3 days = 1 }
-        }
-    }
-    if = {
-        limit = { country_exists = VIE }
-        VIE = {
-            country_event = { id = Geneva_Conference_Invitation.4 days = 1 }
-        }
-    }
+fre_tai_highlands_relief_disband = {
+	delete_unit_template_and_units = { division_template = "Groupement Mobile du Haut-Tonkin" }
 }
 
 indochina_struggle_check_geneva_negotiations_complete = {
@@ -192,6 +309,13 @@ indochina_struggle_clamp_scores = {
             set_variable = { StruggleInvolvedNationsIndochinaTotalAntiCommunistScore = 0 }
         }
     }
+    if = {
+        limit = {
+            check_variable = { global.Indochina_War_Active_Phase = 3 }
+            check_variable = { global.Indochina_War_Next_Phase_A_Points > 499 }
+        }
+        set_variable = { global.Indochina_War_Next_Phase_A_Points = 499 }	# the bar reads full and stays there
+    }
 }
 
 indochina_struggle_recalculate_total_anti_communist_score = {
@@ -204,6 +328,13 @@ indochina_struggle_recalculate_total_anti_communist_score = {
 }
 
 indochina_struggle_update_phase_transitions = {
+    if = {
+        limit = { check_variable = { global.Indochina_War_Active_Phase = 3 } }
+        set_global_flag = Indochina_War_Escalated
+    }
+    else = {
+        clr_global_flag = Indochina_War_Escalated
+    }
     if = {
         limit = { check_variable = { global.Indochina_War_Active_Phase = 3 } }
         if = {
@@ -289,205 +420,6 @@ indochina_border_war_start_gui_prompt_display = {
         save_global_event_target_as = Defending_STATE
     }
 }
-indochina_struggle_diplomacy_idea_display = {
-    set_variable = {
-        View_Indochina_Struggle_Startup = 1
-    }
-    if = {
-        limit = {
-            has_idea = STRUGGLE_INDO_DIPL_LEVEL_3
-        }
-        add_ideas = STRUGGLE_INDO_DIPL_LEVEL_3
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_DIPL_LEVEL_4
-            }
-            add_ideas = STRUGGLE_INDO_DIPL_LEVEL_4
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_DIPL_LEVEL_5
-            }
-            add_ideas = STRUGGLE_INDO_DIPL_LEVEL_5
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_DIPL_LEVEL_6
-            }
-            add_ideas = STRUGGLE_INDO_DIPL_LEVEL_6
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_DIPL_LEVEL_7
-            }
-            add_ideas = STRUGGLE_INDO_DIPL_LEVEL_7
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_DIPL_LEVEL_8
-            }
-            add_ideas = STRUGGLE_INDO_DIPL_LEVEL_8
-        }
-    }
-    else = { }
-}
-indochina_struggle_army_idea_display = {
-    if = {
-        limit = {
-            has_idea = STRUGGLE_INDO_ARMY_LEVEL_3
-        }
-        add_ideas = STRUGGLE_INDO_ARMY_LEVEL_3
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_ARMY_LEVEL_4
-            }
-            add_ideas = STRUGGLE_INDO_ARMY_LEVEL_4
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_ARMY_LEVEL_5
-            }
-            add_ideas = STRUGGLE_INDO_ARMY_LEVEL_5
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_ARMY_LEVEL_6
-            }
-            add_ideas = STRUGGLE_INDO_ARMY_LEVEL_6
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_ARMY_LEVEL_7
-            }
-            add_ideas = STRUGGLE_INDO_ARMY_LEVEL_7
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_ARMY_LEVEL_8
-            }
-            add_ideas = STRUGGLE_INDO_ARMY_LEVEL_8
-        }
-    }
-    else = { }
-}
-indochina_struggle_government_idea_display = {
-    if = {
-        limit = {
-            has_idea = STRUGGLE_INDO_GOVT_LEVEL_3
-        }
-        add_ideas = STRUGGLE_INDO_GOVT_LEVEL_3
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_GOVT_LEVEL_4
-            }
-            add_ideas = STRUGGLE_INDO_GOVT_LEVEL_4
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_GOVT_LEVEL_5
-            }
-            add_ideas = STRUGGLE_INDO_GOVT_LEVEL_5
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_GOVT_LEVEL_6
-            }
-            add_ideas = STRUGGLE_INDO_GOVT_LEVEL_6
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_GOVT_LEVEL_7
-            }
-            add_ideas = STRUGGLE_INDO_GOVT_LEVEL_7
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_GOVT_LEVEL_8
-            }
-            add_ideas = STRUGGLE_INDO_GOVT_LEVEL_8
-        }
-    }
-    else = { }
-}
-indochina_struggle_economic_idea_display = {
-    if = {
-        limit = {
-            has_idea = STRUGGLE_INDO_ECON_LEVEL_3
-        }
-        add_ideas = STRUGGLE_INDO_ECON_LEVEL_3
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_ECON_LEVEL_4
-            }
-            add_ideas = STRUGGLE_INDO_ECON_LEVEL_4
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_ECON_LEVEL_5
-            }
-            add_ideas = STRUGGLE_INDO_ECON_LEVEL_5
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_ECON_LEVEL_6
-            }
-            add_ideas = STRUGGLE_INDO_ECON_LEVEL_6
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_ECON_LEVEL_7
-            }
-            add_ideas = STRUGGLE_INDO_ECON_LEVEL_7
-        }
-    }
-    else_if = {
-        if = {
-            limit = {
-                has_idea = STRUGGLE_INDO_ECON_LEVEL_8
-            }
-            add_ideas = STRUGGLE_INDO_ECON_LEVEL_8
-        }
-    }
-    else = { }
-}
 indochina_struggle_ending_cleanup = {
     every_country = {
 		limit = {
@@ -496,6 +428,7 @@ indochina_struggle_ending_cleanup = {
 		remove_from_array = { array = country_politics_list value = 27 }
     }
 	every_country = {
+		if = { limit = { has_idea = French_Indochina_Faction } remove_ideas = French_Indochina_Faction }
 		if = { limit = { has_idea = STRUGGLE_INDO_ECON_LEVEL_8 } remove_ideas = STRUGGLE_INDO_ECON_LEVEL_8 }
 		if = { limit = { has_idea = STRUGGLE_INDO_ECON_LEVEL_7 } remove_ideas = STRUGGLE_INDO_ECON_LEVEL_7 }
 		if = { limit = { has_idea = STRUGGLE_INDO_ECON_LEVEL_6 } remove_ideas = STRUGGLE_INDO_ECON_LEVEL_6 }
@@ -521,12 +454,103 @@ indochina_struggle_ending_cleanup = {
 		if = { limit = { has_idea = STRUGGLE_INDO_ARMY_LEVEL_4 } remove_ideas = STRUGGLE_INDO_ARMY_LEVEL_4 }
 		if = { limit = { has_idea = STRUGGLE_INDO_ARMY_LEVEL_3 } remove_ideas = STRUGGLE_INDO_ARMY_LEVEL_3 }
 	}
+	if = {
+		limit = { country_exists = VIN }
+		VIN = {
+			clr_country_flag = VIN_Post_DBP_Auto_Geneva_Queued
+			clr_country_flag = VIN_Post_DBP_Focus_Geneva_Queued
+			clr_country_flag = VIN_Post_DBP_Reunification_AI_Active
+			if = {
+				limit = { NOT = { VIN_no_campaign_running_trigger = yes } }
+				set_temp_variable = { vin_camp_outcome = 5 }
+				vin_campaign_resolve = yes
+			}
+			vin_campaign_remove_war_spirits = yes
+			if = { limit = { has_idea = VIN_Resistance_War_Economy } remove_ideas = VIN_Resistance_War_Economy }
+			if = { limit = { has_idea = VIN_Indochina_AI_Support } remove_ideas = VIN_Indochina_AI_Support }
+			if = { limit = { has_idea = paramilitarism_focus } remove_ideas = paramilitarism_focus }
+			if = { limit = { has_idea = cold_war_civil_war_ideological_idea } remove_ideas = cold_war_civil_war_ideological_idea }
+			if = { limit = { has_idea = VIN_peoples_army } remove_ideas = VIN_peoples_army }
+			if = { limit = { has_idea = VIN_National_Reunification_Preparation } remove_ideas = VIN_National_Reunification_Preparation }
+		}
+	}
+	if = {
+		limit = { country_exists = NLF }
+		NLF = { remove_ideas = NLF_Northern_Supply_Line }
+	}
+	if = {
+		limit = { country_exists = FRE }
+		FRE = {
+			fre_castor_force_superseded_cleanup = yes
+			fre_pollux_force_superseded_cleanup = yes
+			fre_atlante_force_superseded_cleanup = yes
+			fre_dbp_disband_gono = yes
+		}
+	}
+	vin_cefeo_intel_clear_all = yes
     set_global_flag = Indochina_War_Over
     set_variable = { global.Indochina_War_Active_Phase = 100 }
+    clr_global_flag = geneva_conference_in_session	# the conference GUI must not outlive the war it was called to settle
+    indochina_failsafe_geneva_teardown_gui = yes	# and neither must its political-tab button: only the compiler removes it, and clearing the flag above has just locked the compiler out
+    clr_global_flag = Indochina_Geneva_Pursuit
+	set_variable = { global.Indochina_Geneva_Pursuit_Source = 0 }
+    set_variable = { global.indochina_ending_available_check = 0 }
     every_country = {
         set_variable = { View_Indochina_Struggle = 0 }
         set_variable = { View_Indochina_Struggle_Startup = 0 }
     }
+}
+
+indochina_struggle_resolve_best_available_ending = {
+	if = {
+		limit = { NOT = { ic_failsafe_geneva_live_trigger = yes } }
+		if = {
+			limit = { has_global_flag = USA_VIN_Reunification_Complete }
+			indochina_struggle_american_north_vietnam = yes
+		}
+		else_if = {
+			limit = {
+				country_exists = VIN
+				VIN = { ic_ending_communist_ok = yes }
+			}
+			indochina_struggle_communist_victory = yes
+		}
+		else_if = {
+			limit = {
+				country_exists = VIE
+				VIE = { ic_ending_southern_ok = yes }
+			}
+			indochina_struggle_southern_victory = yes
+		}
+		else_if = {
+			limit = {
+				country_exists = PQC
+				PQC = { ic_ending_kmt_ok = yes }
+			}
+			indochina_struggle_kuomintang_victory = yes
+		}
+		else_if = {
+			limit = {
+				country_exists = VIE
+				VIE = { ic_ending_dan_quoc_ok = yes }
+			}
+			indochina_struggle_dan_quoc_peace = yes
+		}
+		else_if = {
+			limit = {
+				country_exists = FRA
+				FRA = { ic_ending_federal_ok = yes }
+			}
+			indochina_struggle_federal_vietnam = yes
+		}
+		else_if = {
+			limit = {
+				country_exists = FRA
+				FRA = { ic_ending_balkanized_ok = yes }
+			}
+			indochina_struggle_balkanized_vietnam = yes
+		}
+	}
 }
 
 indochina_struggle_communist_victory = {
@@ -556,8 +580,14 @@ indochina_struggle_communist_victory = {
 				set_capital = { state = 1760 }
 			}
 			drop_cosmetic_tag = yes
+			set_cosmetic_tag = DRV
 			dismantle_faction = yes
 		}
+	}
+
+	if = {
+		limit = { country_exists = FRE }
+		fre_dissolve_cefeo_to_vin = yes
 	}
 
 	if = {
@@ -604,6 +634,7 @@ indochina_struggle_communist_victory = {
 	every_state = {
 		limit = {
 			OR = {
+				has_state_flag = VIN_unplanned_offensive_flag
 				is_core_of = VIN
 				is_core_of = VIE
 			}
@@ -630,6 +661,17 @@ indochina_struggle_communist_victory = {
 		LOS = {
 			remove_ideas = State_of_Vietnam_Faction
 		}
+	}
+
+	if = {
+		limit = {
+			country_exists = VIN
+			VIN = {
+				has_focus_tree = VIN_1950s
+				NOT = { has_completed_focus = VIN_Total_Victory }
+			}
+		}
+		VIN = { complete_national_focus = VIN_Total_Victory }
 	}
 
     if = {
@@ -728,12 +770,27 @@ indochina_struggle_southern_victory = {
 			set_politics = {
 				ruling_party = neutrality
 				elections_allowed = no
-				long_name = "Local Government Under Vietnamese Supervision"
-				name = "Local Government Under Vietnamese Supervision"
+				long_name = VIE_PARTY_LOCAL_GOV_VIET_SUPERVISION_long
+				name = VIE_PARTY_LOCAL_GOV_VIET_SUPERVISION
 			}
 			set_popularities = {
 				neutrality = 100
 			}
+		}
+	}
+
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			if = {
+				limit = { country_exists = FRE }
+				FRE = { fre_dissolution_cleanup = yes }
+				annex_country = { target = FRE }
+			}
+			if = { limit = { country_exists = TAM } annex_country = { target = TAM } }
+			if = { limit = { country_exists = TAI } annex_country = { target = TAI } }
+			if = { limit = { country_exists = NUN } annex_country = { target = NUN } }
+			if = { limit = { country_exists = THO } annex_country = { target = THO } }
 		}
 	}
 
@@ -748,8 +805,9 @@ indochina_struggle_southern_victory = {
 	every_state = {
 		limit = {
 			OR = {
-				is_core_of = VIE
+				has_state_flag = VIN_unplanned_offensive_flag
 				is_core_of = VIN
+				is_core_of = VIE
 			}
 		}
 		clr_state_flag = VIN_unplanned_offensive_flag
@@ -773,10 +831,21 @@ indochina_struggle_southern_victory = {
 		limit = { country_exists = VIE }
 		VIE = {
 			if = {
-				limit = { has_focus_tree = VIE_50s_Bao_Dai }
+				limit = { has_focus_tree = VIE_Bao_Dai_50 }	# the tree id is VIE_Bao_Dai_50; the old guard named the filename and so never passed
 				complete_national_focus = VIE_BaoDai_Liberator_of_Vietnam
 			}
-			set_country_flag = VIE_Can_Integrate_VIN
+			every_owned_state = {
+				limit = {
+					is_core_of = VIN
+					NOT = { is_core_of = VIE }
+				}
+				add_compliance = 30
+				add_resistance_target = {
+					id = 124
+					amount = -50
+					tooltip = VIE_Pacifying_BacPhan_tt
+				}
+			}
 			country_event = BaoDai.10
 			remove_ideas = State_of_Vietnam_Faction
 			remove_ideas = Viet_Minh_Faction
@@ -787,7 +856,7 @@ indochina_struggle_southern_victory = {
 		limit = { country_exists = USA }
 		USA = {
 			if = {
-				limit = { has_focus_tree = USA_50s }
+				limit = { USA_has_1950s_focus_tree_trigger = yes }	# there is no tree id "USA_50s"; the old guard never passed
 				complete_national_focus = USA_50s_The_Fall_of_the_Viet_Minh
 			}
 		}
@@ -840,6 +909,7 @@ indochina_struggle_federal_vietnam = {
 			}
 			if = {
 				limit = { country_exists = FRE }
+				FRE = { fre_dissolution_cleanup = yes }
 				annex_country = { target = FRE }
 			}
 			if = {
@@ -920,6 +990,7 @@ indochina_struggle_federal_vietnam = {
 				}
 			}
 			set_cosmetic_tag = VIE_FRA_FED
+			VIE_sync_faction_name = yes
 			retire_country_leader = yes
 			add_country_leader_role = {
 				character = VIE_Federal_Vietnam_Government
@@ -931,8 +1002,8 @@ indochina_struggle_federal_vietnam = {
 			set_politics = {
 				ruling_party = neutrality
 				elections_allowed = no
-				long_name = "Coalition Government of Federal Vietnam"
-				name = "Coalition Government of Federal Vietnam"
+				long_name = VIE_PARTY_COALITION_GOV_FED_VIETNAM_long
+				name = VIE_PARTY_COALITION_GOV_FED_VIETNAM
 			}
 			set_popularities = {
 				neutrality = 64
@@ -942,24 +1013,27 @@ indochina_struggle_federal_vietnam = {
 			}
 			set_party_name = {
 				ideology = nationalist
-				long_name = "Coalition Government of Federal Vietnam"
-				name = "Coalition Government of Federal Vietnam"
+				long_name = VIE_PARTY_COALITION_GOV_FED_VIETNAM_long
+				name = VIE_PARTY_COALITION_GOV_FED_VIETNAM
 			}
 			set_party_name = {
 				ideology = democratic
-				long_name = "Coalition Government of Federal Vietnam"
-				name = "Coalition Government of Federal Vietnam"
+				long_name = VIE_PARTY_COALITION_GOV_FED_VIETNAM_long
+				name = VIE_PARTY_COALITION_GOV_FED_VIETNAM
 			}
 			set_party_name = {
 				ideology = communism
-				long_name = "Coalition Government of Federal Vietnam"
-				name = "Coalition Government of Federal Vietnam"
+				long_name = VIE_PARTY_COALITION_GOV_FED_VIETNAM_long
+				name = VIE_PARTY_COALITION_GOV_FED_VIETNAM
 			}
 			every_controlled_state = {
 				add_core_of = VIE
 			}
 			remove_ideas = State_of_Vietnam_Faction
 			dismantle_faction = yes
+			hidden_effect = {
+				load_focus_tree = empty_focus
+			}
 		}
 	}
 
@@ -977,7 +1051,7 @@ indochina_struggle_federal_vietnam = {
 		limit = { country_exists = USA }
 		USA = {
 			if = {
-				limit = { has_focus_tree = USA_50s }
+				limit = { USA_has_1950s_focus_tree_trigger = yes }	# there is no tree id "USA_50s"; the old guard never passed
 				complete_national_focus = USA_50s_The_Fall_of_the_Viet_Minh
 			}
 		}
@@ -993,7 +1067,10 @@ indochina_struggle_federal_vietnam = {
 
 	every_state = {
 		limit = {
-			is_core_of = VIN
+			OR = {
+				has_state_flag = VIN_unplanned_offensive_flag
+				is_core_of = VIN
+			}
 		}
 		clr_state_flag = VIN_unplanned_offensive_flag
 		remove_dynamic_modifier = { modifier = unplanned_offensive }
@@ -1010,6 +1087,17 @@ indochina_struggle_federal_vietnam = {
 		LOS = {
 			remove_ideas = State_of_Vietnam_Faction
 		}
+	}
+
+	if = {
+		limit = {
+			country_exists = VIN
+			VIN = {
+				has_focus_tree = VIN_1950s
+				NOT = { has_completed_focus = VIN_Accept_French_Three_Vietnam_Federal_Scheme }
+			}
+		}
+		VIN = { complete_national_focus = VIN_Accept_French_Three_Vietnam_Federal_Scheme }
 	}
 
     indochina_struggle_ending_cleanup = yes
@@ -1057,6 +1145,7 @@ indochina_struggle_balkanized_vietnam = {
 			}
 			if = {
 				limit = { country_exists = FRE }
+				FRE = { fre_dissolution_cleanup = yes }
 				annex_country = { target = FRE }
 			}
 			if = {
@@ -1128,8 +1217,8 @@ indochina_struggle_balkanized_vietnam = {
 					ruling_party = neutrality
 					elections_allowed = no
 					election_frequency = 48
-					long_name = "Local Government Under French Supervision"
-					name = "Local Government Under French Supervision"
+					long_name = VIE_PARTY_LOCAL_GOV_FRENCH_SUPERVISION_long
+					name = VIE_PARTY_LOCAL_GOV_FRENCH_SUPERVISION
 				}
 				set_popularities = {
 					neutrality = 100
@@ -1273,8 +1362,9 @@ indochina_struggle_dan_quoc_peace = {
 	every_state = {
 		limit = {
 			OR = {
-				is_core_of = VIE
+				has_state_flag = VIN_unplanned_offensive_flag
 				is_core_of = VIN
+				is_core_of = VIE
 			}
 		}
 		clr_state_flag = VIN_unplanned_offensive_flag
@@ -1291,6 +1381,11 @@ indochina_struggle_dan_quoc_peace = {
 		LOS = {
 			remove_ideas = State_of_Vietnam_Faction
 		}
+	}
+
+	if = {
+		limit = { country_exists = FRE }
+		fre_dissolve_cefeo_auto = yes
 	}
 
     indochina_struggle_ending_cleanup = yes
@@ -1390,6 +1485,7 @@ indochina_struggle_american_north_vietnam = {
 	every_state = {
 		limit = {
 			OR = {
+				has_state_flag = VIN_unplanned_offensive_flag
 				is_core_of = VIN
 				is_core_of = VIE
 			}
@@ -1426,6 +1522,10 @@ indochina_struggle_american_north_vietnam = {
 		limit = { country_exists = USA }
 		USA = {
 		}
+	}
+	if = {
+		limit = { country_exists = FRE }
+		fre_dissolve_cefeo_auto = yes
 	}
 	indochina_struggle_ending_cleanup = yes
 	news_event = Indochina_Struggle_Ending.6
@@ -1536,6 +1636,7 @@ indochina_struggle_kuomintang_victory = {
 	every_state = {
 		limit = {
 			OR = {
+				has_state_flag = VIN_unplanned_offensive_flag
 				is_core_of = PQC
 				is_core_of = VIN
 				is_core_of = VIE
@@ -1570,6 +1671,10 @@ indochina_struggle_kuomintang_victory = {
 			# country_event = PQC_Victory_Over_Vietnam.1
 		}
 	}
+	if = {
+		limit = { country_exists = FRE }
+		fre_dissolve_cefeo_auto = yes
+	}
 	indochina_struggle_ending_cleanup = yes
 	news_event = Indochina_Struggle_Ending.7
 }
@@ -1577,29 +1682,96 @@ indochina_struggle_unlock_geneva_conference = {
 	set_global_flag = Geneva_Conference
 }
 
+indochina_geneva_panic_force_conference = {
+	set_global_flag = Indochina_Geneva_Panic
+	set_variable = { global.Indochina_Geneva_Pursuit_Source = 5 }
+	set_variable = { global.Indochina_War_Active_Phase = 11 }
+	indochina_struggle_unlock_geneva_conference = yes
+	clr_global_flag = Indochina_Geneva_Pursuit
+	if = {
+		limit = { country_exists = USA }
+		USA = { country_event = { id = USA_INDO.4 hours = 6 } }
+	}
+	if = {
+		limit = { country_exists = FRA }
+		FRA = { country_event = { id = USA_INDO.5 days = 1 } }
+	}
+	indochina_struggle_invite_countries_to_geneva = yes
+}
+
 indochina_struggle_run_geneva_ending_effect = {
 	if = {
 		limit = { geneva_conference_complete_failure_trigger = yes }
-		news_event = Geneva_Conference_Outcome.3
+		every_country = {
+			limit = { is_ai = no }
+			news_event = Geneva_Conference_Outcome.3
+		}
 		set_variable = { global.Indochina_War_Active_Phase = 10 }
+		set_global_flag = Indochina_Ending_Failed_State
+		if = {
+			limit = {
+				country_exists = VIN
+				VIN = {
+					has_focus_tree = VIN_1950s
+					NOT = { has_completed_focus = VIN_A_Failed_State }
+				}
+			}
+			VIN = { complete_national_focus = VIN_A_Failed_State }
+		}
 		indochina_struggle_ending_cleanup = yes
-		news_event = { id = Indochina_Struggle_Ending.10 days = 3 }
+		every_country = {
+			limit = { is_ai = no }
+			news_event = { id = Indochina_Struggle_Ending.10 days = 3 }
+		}
 	}
 	else = {
 		indochina_struggle_unlock_geneva_conference = yes
 		set_variable = { global.Indochina_War_Active_Phase = 11 }
-		# France's peace-outs and subject releases must run in FRA scope: this
-		# effect can be executed by the wrap-up mission (FRA) or by any player
-		# clicking the ending in the struggle GUI.
 		if = {
 			limit = { country_exists = FRA }
 			FRA = {
 				if = { limit = { country_exists = VIN has_war_with = VIN } white_peace = VIN }
 				if = { limit = { country_exists = NLF has_war_with = NLF } white_peace = NLF }
 				if = { limit = { country_exists = LAO has_war_with = LAO } white_peace = LAO }
-				if = { limit = { country_exists = CAM } set_autonomy = { target = CAM autonomy_state = autonomy_free } }
-				if = { limit = { country_exists = VIE } set_autonomy = { target = VIE autonomy_state = autonomy_free } }
-				if = { limit = { country_exists = LOS } set_autonomy = { target = LOS autonomy_state = autonomy_free } }
+				if = {
+					limit = {
+						country_exists = CAM
+						has_global_flag = geneva_conference_concluded
+						check_variable = { global.geneva_laos_cambodia_term = 0 }
+						CAM = { is_subject_of = FRA }
+					}
+					set_autonomy = { target = CAM autonomy_state = autonomy_associated_state }
+				}
+				else_if = {
+					limit = { country_exists = CAM }
+					set_autonomy = { target = CAM autonomy_state = autonomy_free }
+				}
+				if = {
+					limit = {
+						country_exists = LOS
+						has_global_flag = geneva_conference_concluded
+						check_variable = { global.geneva_laos_cambodia_term = 0 }
+						LOS = { is_subject_of = FRA }
+					}
+					set_autonomy = { target = LOS autonomy_state = autonomy_associated_state }
+				}
+				else_if = {
+					limit = { country_exists = LOS }
+					set_autonomy = { target = LOS autonomy_state = autonomy_free }
+				}
+				if = {
+					limit = {
+						country_exists = VIE
+						has_global_flag = geneva_conference_concluded
+						check_variable = { global.geneva_withdrawal_term = 0 }
+						VIE = { is_subject_of = FRA }
+					}
+					set_autonomy = { target = VIE autonomy_state = autonomy_associated_state }
+				}
+				else_if = {
+					limit = { country_exists = VIE }
+					set_autonomy = { target = VIE autonomy_state = autonomy_free }
+				}
 			}
 		}
 		if = {
@@ -1610,13 +1782,57 @@ indochina_struggle_run_geneva_ending_effect = {
 				if = { limit = { country_exists = NLF } white_peace = NLF }
 				if = { limit = { country_exists = NLF } annex_country = { target = NLF } }
 				if = { limit = { country_exists = CCC } annex_country = { target = CCC } }
-				if = { limit = { country_exists = FUL } annex_country = { target = FUL } }
-				transfer_state = 757
-				transfer_state = 982
-				transfer_state = 286
-				transfer_state = 1287
-				transfer_state = 983
-				leave_faction = yes
+				if = {
+					limit = {
+						country_exists = FUL
+						has_global_flag = geneva_conference_concluded
+						check_variable = { global.geneva_minorities_term = 1 }
+					}
+					set_autonomy = {
+						target = FUL
+						autonomy_state = autonomy_associated_state
+					}
+				}
+				else_if = {
+					limit = { country_exists = FUL }
+					annex_country = { target = FUL }
+				}
+				if = {
+					limit = { has_global_flag = geneva_unified_settlement }
+				}
+				else_if = {
+					limit = { check_variable = { global.geneva_partition_line = 1 } }
+					transfer_state = 982
+					transfer_state = 286
+					transfer_state = 983
+				}
+				else_if = {
+					limit = { check_variable = { global.geneva_partition_line = 3 } }
+					transfer_state = 757
+					transfer_state = 982
+					transfer_state = 286
+					transfer_state = 1287
+					transfer_state = 983
+					transfer_state = 838
+					transfer_state = 1763
+					transfer_state = 1875
+				}
+				else = {
+					transfer_state = 757
+					transfer_state = 982
+					transfer_state = 286
+					transfer_state = 1287
+					transfer_state = 983
+				}
+				if = {
+					limit = {
+						OR = {
+							NOT = { has_global_flag = geneva_conference_concluded }
+							check_variable = { global.geneva_alignment_term = 1 }
+						}
+					}
+					leave_faction = yes
+				}
 			}
 		}
 		if = {
@@ -1629,13 +1845,14 @@ indochina_struggle_run_geneva_ending_effect = {
 				leave_faction = yes
 			}
 		}
-		# Pathet Lao keep their OTL regroupment zones (Phongsaly & Sam Neua) as
-		# a VIN satellite. This must run before LOS absorbs LAO, or the rump
-		# state would be annexed away.
 		if = {
 			limit = {
 				country_exists = VIN
 				country_exists = LAO
+				OR = {
+					NOT = { has_global_flag = geneva_conference_concluded }
+					check_variable = { global.geneva_laos_cambodia_term = 2 }
+				}
 			}
 			LAO = {
 				transfer_state = 841
@@ -1662,27 +1879,97 @@ indochina_struggle_run_geneva_ending_effect = {
 				if = {
 					limit = {
 						country_exists = LAO
-						NOT = { country_exists = VIN }
+						OR = {
+							NOT = { country_exists = VIN }
+							AND = {
+								has_global_flag = geneva_conference_concluded
+								NOT = { check_variable = { global.geneva_laos_cambodia_term = 2 } }
+							}
+						}
 					}
 					annex_country = { target = LAO }
 				}
 			}
 		}
 		if = {
+			limit = { country_exists = FRE }
+			FRE = { fre_dissolution_cleanup = yes }
+		}
+		if = {
 			limit = { country_exists = VIN }
 			VIN = {
-				transfer_state = 838
-				transfer_state = 786
-				transfer_state = 671
+				transfer_state = 786	# Dong Bang Song Hong, the delta
+				transfer_state = 1760	# Hanoi, the CEFEO's seat
+				if = {
+					limit = { NOT = { 671 = { is_owned_by = MEO } } }
+					transfer_state = 671
+				}
+				transfer_state = 1761	# Hoang Lien Son
+				transfer_state = 1766	# Hoa Binh
+				transfer_state = 1281	# Van Don-Quang Ninh, the Nung marches
 				transfer_state = 881
-				transfer_state = 1280
-				transfer_state = 1281
-				transfer_state = 1760
-				transfer_state = 1761
-				transfer_state = 1766
+				if = {
+					limit = { NOT = { country_exists = THO } }
+					transfer_state = 1280
+					transfer_state = 1768	# Lang Son, a VIN and THO core exactly like Cao Bang
+				}
+				if = {
+					limit = { country_exists = MEO }
+					if = {
+						limit = {
+							has_global_flag = geneva_conference_concluded
+							check_variable = { global.geneva_minorities_term = 1 }
+						}
+						set_autonomy = {
+							target = MEO
+							autonomy_state = autonomy_easternbloc
+							end_wars = no
+							end_civil_wars = no
+						}
+					}
+					else = {
+						set_autonomy = {
+							target = MEO
+							autonomy_state = autonomy_integrated_puppet
+							end_wars = no
+							end_civil_wars = no
+						}
+					}
+				}
+				else = {
+					transfer_state = 1767
+				}
+				if = {
+					limit = { has_global_flag = geneva_unified_settlement }
+					transfer_state = 838
+				}
+				else_if = {
+					limit = { check_variable = { global.geneva_partition_line = 1 } }
+					transfer_state = 838
+					transfer_state = 1758
+					transfer_state = 757
+					transfer_state = 1287
+					transfer_state = 1286
+					transfer_state = 1759
+				}
+				else_if = {
+					limit = { check_variable = { global.geneva_partition_line = 3 } }
+				}
+				else = {
+					transfer_state = 838
+				}
 				set_capital = { state = 1760 }
-				dismantle_faction = yes
+				if = {
+					limit = {
+						OR = {
+							NOT = { has_global_flag = geneva_conference_concluded }
+							check_variable = { global.geneva_alignment_term = 1 }
+						}
+					}
+					dismantle_faction = yes
+				}
 				drop_cosmetic_tag = yes
+				set_cosmetic_tag = DRV
 			}
 		}
 		if = { limit = { country_exists = NLF } NLF = { drop_cosmetic_tag = yes } }
@@ -1705,7 +1992,12 @@ indochina_struggle_run_geneva_ending_effect = {
 			}
 		}
 		every_state = {
-			limit = { is_core_of = VIN }
+			limit = {
+				OR = {
+					has_state_flag = VIN_unplanned_offensive_flag
+					is_core_of = VIN
+				}
+			}
 			clr_state_flag = VIN_unplanned_offensive_flag
 			remove_dynamic_modifier = { modifier = unplanned_offensive }
 		}
@@ -1721,28 +2013,53 @@ indochina_struggle_run_geneva_ending_effect = {
 				remove_ideas = State_of_Vietnam_Faction
 			}
 		}
+		if = {
+			limit = {
+				country_exists = VIN
+				VIN = {
+					has_focus_tree = VIN_1950s
+					NOT = { has_completed_focus = VIN_Accept_Temporary_Partitions }
+				}
+			}
+			VIN = { complete_national_focus = VIN_Accept_Temporary_Partitions }
+		}
 		indochina_struggle_geneva_ending_wrapup = yes
 	}
 }
 indochina_struggle_geneva_ending_wrapup = {
 	indochina_struggle_ending_cleanup = yes
 	if = {
+		limit = { NOT = { has_global_flag = geneva_conference_concluded } }
+	if = {
 		limit = { geneva_conference_complete_success_trigger = yes }
-		news_event = Geneva_Conference_Outcome.1
+		every_country = {
+			limit = { is_ai = no }
+			news_event = Geneva_Conference_Outcome.1
+		}
 	}
 	else_if = {
 		limit = { geneva_conference_otl_success_trigger = yes }
-		news_event = Indochina_Struggle_Ending.8
+		every_country = {
+			limit = { is_ai = no }
+			news_event = Indochina_Struggle_Ending.8
+		}
 	}
 	else = {
 		if = {
 			limit = { country_exists = PQC }
-			news_event = Indochina_Struggle_Ending.11
+			every_country = {
+				limit = { is_ai = no }
+				news_event = Indochina_Struggle_Ending.11
+			}
 		}
 		else = {
-			news_event = Indochina_Struggle_Ending.8
+			every_country = {
+				limit = { is_ai = no }
+				news_event = Indochina_Struggle_Ending.8
+			}
 		}
 	}
+}
 }
 indochina_struggle_run_geneva_ending_alternate_effect = {
     if = {
@@ -1759,21 +2076,13 @@ indochina_struggle_run_geneva_ending_alternate_effect = {
 }
 indochina_struggle_run_never_ending_conflict_ending_effect = {
 	set_variable = { global.Indochina_War_Active_Phase = 9 }
-    if = {
-        limit = { country_exists = FRA }
-        FRA = {
-            indochina_struggle_ending_cleanup = yes
-            news_event = Indochina_Struggle_Ending.9
-        }
-    }
-    else = {
-        indochina_struggle_ending_cleanup = yes
-        news_event = Indochina_Struggle_Ending.9
-    }
+	indochina_struggle_ending_cleanup = yes
+	news_event = { id = Indochina_Struggle_Ending.9 days = 1  }
 }
 
 indochina_struggle_run_failed_state_ending_effect = {
 	set_variable = { global.Indochina_War_Active_Phase = 10 }
+	set_global_flag = Indochina_Ending_Failed_State
 	if = {
 		limit = { country_exists = VIE }
 		VIE = {
@@ -1800,17 +2109,42 @@ indochina_struggle_run_failed_state_ending_effect = {
 		}
 	}
 
-    if = {
-        limit = { country_exists = FRA }
-        FRA = {
-            indochina_struggle_ending_cleanup = yes
-            news_event = Indochina_Struggle_Ending.10
-        }
-    }
-    else = {
-        indochina_struggle_ending_cleanup = yes
-        news_event = Indochina_Struggle_Ending.10
-    }
+	if = {
+		limit = {
+			country_exists = VIN
+			VIN = {
+				has_focus_tree = VIN_1950s
+				NOT = { has_completed_focus = VIN_A_Failed_State }
+			}
+		}
+		VIN = { complete_national_focus = VIN_A_Failed_State }
+	}
+
+	indochina_struggle_ending_cleanup = yes
+	every_country = {
+		limit = { is_ai = no }
+		news_event = { id = Indochina_Struggle_Ending.10 days = 3 }	# same spacing as the never-ending-conflict twin above
+	}
+}
+
+indochina_struggle_escalate = {
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		add_to_variable = {
+			global.Indochina_War_Next_Phase_A_Points = indochina_phase_amount
+			tooltip = Add_to_Escalation_Phase_TT
+		}
+	}
+}
+
+indochina_struggle_deescalate = {
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		add_to_variable = {
+			global.Indochina_War_Next_Phase_B_Points = indochina_phase_amount
+			tooltip = Add_to_De_Escalation_Phase_TT
+		}
+	}
 }
 
 indochina_struggle_add_communist_military_points = {
@@ -1819,15 +2153,11 @@ indochina_struggle_add_communist_military_points = {
 			NOT = { has_global_flag = Indochina_War_Over }
 		}
 		add_to_variable = {
-			global.Indochina_War_Next_Phase_A_Points = 75
+			global.Indochina_War_Next_Phase_A_Points = 50
 			tooltip = Add_to_Escalation_Phase_TT
 		}
-		FRA = {
-			add_to_variable = {
-				StruggleInvolvedNationsIndochinaCommunistScore = 75
-				tooltip = Add_to_Communist_Victory_Points_TT
-			}
-		}
+		set_temp_variable = { ic_award = 15 }
+		indochina_struggle_award_communist = yes
 	}
 }
 
@@ -1837,15 +2167,11 @@ indochina_struggle_add_communist_diplomatic_points = {
 			NOT = { has_global_flag = Indochina_War_Over }
 		}
 		add_to_variable = {
-			global.Indochina_War_Next_Phase_B_Points = 75
+			global.Indochina_War_Next_Phase_B_Points = 50
 			tooltip = Add_to_De_Escalation_Phase_TT
 		}
-		FRA = {
-			add_to_variable = {
-				StruggleInvolvedNationsIndochinaCommunistScore = 75
-				tooltip = Add_to_Communist_Victory_Points_TT
-			}
-		}
+		set_temp_variable = { ic_award = 15 }
+		indochina_struggle_award_communist = yes
 	}
 }
 
@@ -1855,16 +2181,11 @@ indochina_struggle_add_pro_independence_military_points = {
 			NOT = { has_global_flag = Indochina_War_Over }
 		}
 		add_to_variable = {
-			global.Indochina_War_Next_Phase_A_Points = 75
+			global.Indochina_War_Next_Phase_A_Points = 50
 			tooltip = Add_to_Escalation_Phase_TT
 		}
-		FRA = {
-			add_to_variable = {
-				StruggleInvolvedNationsIndochinaProIndependenceScore = 75
-				tooltip = Add_to_Independent_Victory_Points_TT
-			}
-			indochina_struggle_recalculate_total_anti_communist_score = yes
-		}
+		set_temp_variable = { ic_award = 15 }
+		indochina_struggle_award_pro_independence = yes
 	}
 }
 
@@ -1874,16 +2195,11 @@ indochina_struggle_add_pro_independence_diplomatic_points = {
 			NOT = { has_global_flag = Indochina_War_Over }
 		}
 		add_to_variable = {
-			global.Indochina_War_Next_Phase_B_Points = 75
+			global.Indochina_War_Next_Phase_B_Points = 50
 			tooltip = Add_to_De_Escalation_Phase_TT
 		}
-		FRA = {
-			add_to_variable = {
-				StruggleInvolvedNationsIndochinaProIndependenceScore = 75
-				tooltip = Add_to_Independent_Victory_Points_TT
-			}
-			indochina_struggle_recalculate_total_anti_communist_score = yes
-		}
+		set_temp_variable = { ic_award = 15 }
+		indochina_struggle_award_pro_independence = yes
 	}
 }
 
@@ -1893,16 +2209,11 @@ indochina_struggle_add_pro_france_military_points = {
 			NOT = { has_global_flag = Indochina_War_Over }
 		}
 		add_to_variable = {
-			global.Indochina_War_Next_Phase_A_Points = 75
+			global.Indochina_War_Next_Phase_A_Points = 50
 			tooltip = Add_to_Escalation_Phase_TT
 		}
-		FRA = {
-			add_to_variable = {
-				StruggleInvolvedNationsIndochinaProFranceScore = 75
-				tooltip = Add_to_French_Victory_Points_TT
-			}
-			indochina_struggle_recalculate_total_anti_communist_score = yes
-		}
+		set_temp_variable = { ic_award = 15 }
+		indochina_struggle_award_pro_france = yes
 	}
 }
 
@@ -1912,12 +2223,156 @@ indochina_struggle_add_pro_france_diplomatic_points = {
 			NOT = { has_global_flag = Indochina_War_Over }
 		}
 		add_to_variable = {
-			global.Indochina_War_Next_Phase_B_Points = 75
+			global.Indochina_War_Next_Phase_B_Points = 50
 			tooltip = Add_to_De_Escalation_Phase_TT
 		}
+		set_temp_variable = { ic_award = 15 }
+		indochina_struggle_award_pro_france = yes
+	}
+}
+
+indochina_struggle_add_pro_ethnic_military_points = {
+	if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+		}
+		add_to_variable = {
+			global.Indochina_War_Next_Phase_A_Points = 50
+			tooltip = Add_to_Escalation_Phase_TT
+		}
+		set_temp_variable = { ic_award = 15 }
+		indochina_struggle_award_pro_ethnic = yes
+	}
+}
+
+indochina_struggle_add_pro_ethnic_diplomatic_points = {
+	if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+		}
+		add_to_variable = {
+			global.Indochina_War_Next_Phase_B_Points = 50
+			tooltip = Add_to_De_Escalation_Phase_TT
+		}
+		set_temp_variable = { ic_award = 15 }
+		indochina_struggle_award_pro_ethnic = yes
+	}
+}
+
+indochina_struggle_add_kuomintang_military_points = {
+	if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+		}
+		add_to_variable = {
+			global.Indochina_War_Next_Phase_A_Points = 50
+			tooltip = Add_to_Escalation_Phase_TT
+		}
+		set_temp_variable = { ic_award = 15 }
+		indochina_struggle_award_kuomintang = yes
+	}
+}
+
+indochina_struggle_add_kuomintang_diplomatic_points = {
+	if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+		}
+		add_to_variable = {
+			global.Indochina_War_Next_Phase_B_Points = 50
+			tooltip = Add_to_De_Escalation_Phase_TT
+		}
+		set_temp_variable = { ic_award = 15 }
+		indochina_struggle_award_kuomintang = yes
+	}
+}
+
+indochina_struggle_award_communist = {
+	FRA = {
+		add_to_variable = {
+			StruggleInvolvedNationsIndochinaCommunistScore = ic_award
+			tooltip = Add_to_Communist_Victory_Points_TT
+		}
+	}
+}
+
+indochina_struggle_award_pro_france = {
+	FRA = {
+		add_to_variable = {
+			StruggleInvolvedNationsIndochinaProFranceScore = ic_award
+			tooltip = Add_to_French_Victory_Points_TT
+		}
+		indochina_struggle_recalculate_total_anti_communist_score = yes
+	}
+}
+
+indochina_struggle_award_pro_independence = {
+	FRA = {
+		add_to_variable = {
+			StruggleInvolvedNationsIndochinaProIndependenceScore = ic_award
+			tooltip = Add_to_Independent_Victory_Points_TT
+		}
+		indochina_struggle_recalculate_total_anti_communist_score = yes
+	}
+}
+
+indochina_struggle_award_pro_ethnic = {
+	FRA = {
+		add_to_variable = {
+			StruggleInvolvedNationsIndochinaProEthnicScore = ic_award
+			tooltip = Add_to_Ethnic_Victory_Points_TT
+		}
+		indochina_struggle_recalculate_total_anti_communist_score = yes
+	}
+}
+
+indochina_struggle_award_kuomintang = {
+	FRA = {
+		add_to_variable = {
+			StruggleInvolvedNationsIndochinaKuomintangScore = ic_award
+			tooltip = Add_to_Kuomintang_Victory_Points_TT
+		}
+	}
+}
+
+indochina_struggle_vin_focus_standard = {
+	set_temp_variable = { ic_award = 25 }
+	indochina_struggle_grant_communist = yes
+}
+
+indochina_struggle_vin_focus_major = {
+	set_temp_variable = { ic_award = 50 }
+	indochina_struggle_grant_communist = yes
+}
+
+indochina_struggle_vin_focus_breakthrough = {
+	set_temp_variable = { ic_award = 75 }
+	indochina_struggle_grant_communist = yes
+}
+
+indochina_struggle_vin_focus_capstone = {
+	set_temp_variable = { ic_award = 100 }
+	indochina_struggle_grant_communist = yes
+}
+
+indochina_struggle_grant_communist = {
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
 		FRA = {
 			add_to_variable = {
-				StruggleInvolvedNationsIndochinaProFranceScore = 75
+				StruggleInvolvedNationsIndochinaCommunistScore = ic_award
+				tooltip = Add_to_Communist_Victory_Points_TT
+			}
+		}
+	}
+}
+
+indochina_struggle_grant_pro_france = {
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = {
+				StruggleInvolvedNationsIndochinaProFranceScore = ic_award
 				tooltip = Add_to_French_Victory_Points_TT
 			}
 			indochina_struggle_recalculate_total_anti_communist_score = yes
@@ -1925,8 +2380,216 @@ indochina_struggle_add_pro_france_diplomatic_points = {
 	}
 }
 
+indochina_struggle_grant_pro_independence = {
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = {
+				StruggleInvolvedNationsIndochinaProIndependenceScore = ic_award
+				tooltip = Add_to_Independent_Victory_Points_TT
+			}
+			indochina_struggle_recalculate_total_anti_communist_score = yes
+		}
+	}
+}
+
+indochina_struggle_grant_pro_ethnic = {
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = {
+				StruggleInvolvedNationsIndochinaProEthnicScore = ic_award
+				tooltip = Add_to_Ethnic_Victory_Points_TT
+			}
+			indochina_struggle_recalculate_total_anti_communist_score = yes
+		}
+	}
+}
+
+indochina_struggle_grant_kuomintang = {
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = {
+				StruggleInvolvedNationsIndochinaKuomintangScore = ic_award
+				tooltip = Add_to_Kuomintang_Victory_Points_TT
+			}
+		}
+	}
+}
+
+indochina_raid_award_actor = {
+	set_temp_variable = { FRA.ic_raid_award_transfer = ic_award }
+	var:actor_country = {
+		set_temp_variable = { ic_award = FRA.ic_raid_award_transfer }
+		if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaCommunist = THIS.id }
+			}
+			indochina_struggle_award_communist = yes
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaProFrance = THIS.id }
+			}
+			indochina_struggle_award_pro_france = yes
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.ic_award = THIS.id }
+			}
+			indochina_struggle_award_pro_independence = yes
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaProEthnic = THIS.id }
+			}
+			indochina_struggle_award_pro_ethnic = yes
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaKuomintang = THIS.id }
+			}
+			indochina_struggle_award_kuomintang = yes
+		}
+	}
+}
+
+indochina_raid_award_victim = {
+	set_temp_variable = { FRA.ic_raid_award_transfer = ic_award }
+	var:victim_country = {
+		set_temp_variable = { ic_award = FRA.ic_raid_award_transfer }
+		if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaCommunist = THIS.id }
+			}
+			indochina_struggle_award_communist = yes
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaProFrance = THIS.id }
+			}
+			indochina_struggle_award_pro_france = yes
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaProIndependence = THIS.id }
+			}
+			indochina_struggle_award_pro_independence = yes
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaProEthnic = THIS.id }
+			}
+			indochina_struggle_award_pro_ethnic = yes
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaKuomintang = THIS.id }
+			}
+			indochina_struggle_award_kuomintang = yes
+		}
+	}
+}
+
+indochina_raid_penalise_victim = {
+	set_temp_variable = { FRA.ic_raid_award_transfer = ic_award }
+	var:victim_country = {
+		set_temp_variable = { ic_award = FRA.ic_raid_award_transfer }
+		if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaCommunist = THIS.id }
+			}
+			FRA = {
+				subtract_from_variable = {
+					StruggleInvolvedNationsIndochinaCommunistScore = ic_award
+					tooltip = Add_to_Communist_Victory_Points_TT
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaProFrance = THIS.id }
+			}
+			FRA = {
+				subtract_from_variable = {
+					StruggleInvolvedNationsIndochinaProFranceScore = ic_award
+					tooltip = Add_to_French_Victory_Points_TT
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaProIndependence = THIS.id }
+			}
+			FRA = {
+				subtract_from_variable = {
+					StruggleInvolvedNationsIndochinaProIndependenceScore = ic_award
+					tooltip = Add_to_Independent_Victory_Points_TT
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaProEthnic = THIS.id }
+			}
+			FRA = {
+				subtract_from_variable = {
+					StruggleInvolvedNationsIndochinaProEthnicScore = ic_award
+					tooltip = Add_to_Ethnic_Victory_Points_TT
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaKuomintang = THIS.id }
+			}
+			FRA = {
+				subtract_from_variable = {
+					StruggleInvolvedNationsIndochinaKuomintangScore = ic_award
+					tooltip = Add_to_Kuomintang_Victory_Points_TT
+				}
+			}
+		}
+	}
+}
+
+indochina_raid_escalate = {
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		add_to_variable = {
+			global.Indochina_War_Next_Phase_A_Points = ic_phase
+			tooltip = Add_to_Escalation_Phase_TT
+		}
+	}
+}
+
+indochina_raid_deescalate = {
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		add_to_variable = {
+			global.Indochina_War_Next_Phase_B_Points = ic_phase
+			tooltip = Add_to_De_Escalation_Phase_TT
+		}
+	}
+}
+
 indochina_struggle_check_vp_captures = {
-	# Disabled until province VP capture logic is rebuilt with a valid iterator.
 	if = {
 		limit = {
 			NOT = { has_global_flag = Indochina_War_Over }

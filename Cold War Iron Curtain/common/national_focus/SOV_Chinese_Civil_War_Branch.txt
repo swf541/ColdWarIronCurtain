@@ -1,0 +1,977 @@
+# ============================================================================
+#  THE CHINESE QUESTION - Chinese Civil War side branch for the SOV (Stalin) tree.
+#
+#  The civil war is already running at game start (global flag CCW_Started), so
+#  this branch is visible immediately - no entry event. The root and the wartime
+#  focus are available while the war is on; the two outcome arms unlock once it
+#  resolves.
+#
+#  OUTCOME DETECTION - no new resolution event is needed. The war is already
+#  resolved in common/on_actions/wars_on_actions.txt on capitulation:
+#    CHI capitulates -> ROC_lose_CCW = yes  -> ROC_taiwan + CCW_Over.
+#                       The PRC wins. Historical.
+#    PRC capitulates -> PRC_Lose_CCW = yes  -> ROC_Victory + CCW_Over, and
+#                       SOV gets the country flag SOV_PRC_Losing_CCW.
+#                       Every PRC state that is not a MAN core goes to CHI, the
+#                       rump becomes a Soviet autonomy_easternbloc subject with
+#                       soviet_client and soviet_repression, and it loads the
+#                       PRC_SOV_50s tree. The communists have retreated into
+#                       Manchuria.
+#  So the two arms simply read SOV_PRC_Losing_CCW, exactly as the six focuses
+#  they replace did.
+#
+#  Replaces six focuses removed from SOV_Stalin.txt:
+#    SOV_Stalin_Save_Northwestern_China
+#    SOV_Stalin_Military_Bases_in_East_Turkestan
+#    SOV_Stalin_Provide_Guns_To_the_Military_Cliques
+#    SOV_Integrate_Asia_into_the_Eastern_Bloc
+#    SOV_Stalin_Recognize_the_Peoples_Republic_of_China
+#    SOV_Stalin_Soviet_Loan_to_China
+#  All six reward payloads are carried forward verbatim.
+#
+#  The PRC-victory arm deliberately ends at the 1956 Twentieth Congress - the
+#  moment the relationship starts to go wrong. The Sino-Soviet split itself is
+#  out of scope.
+#
+#  Shared focuses; only the root is listed in the SOV_Stalin focus_tree header.
+# ============================================================================
+
+# ---- ROOT (visible from game start) -----------------------------------------
+shared_focus = {
+	id = SOV_ccw_the_chinese_civil_war
+	icon = GFX_Sino_Soviet_Friendship
+	text_icon = Soviet_focus_style
+	cost = 3
+	x = 64
+	y = 0
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 40
+		custom_effect_tooltip = SOV_ccw_the_chinese_civil_war_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_arm_the_peoples_liberation_army
+	icon = GFX_usa_50_light_tanks
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_ccw_the_chinese_civil_war
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_ccw_the_chinese_civil_war }
+	available = {
+		country_exists = PRC
+		has_global_flag = CCW_Started
+	}
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	completion_reward = {
+		add_to_variable = {
+			bonus_fpp_modifier = -0.25
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_1
+					amount = 12000
+					producer = CUM
+				}
+				add_equipment_to_stockpile = {
+					type = support_equipment
+					amount = 2000
+					producer = CUM
+				}
+				add_manpower = 25000
+				army_experience = 25
+				add_opinion_modifier = { target = SOV modifier = medium_increase }
+			}
+		}
+		custom_effect_tooltip = SOV_ccw_arm_the_peoples_liberation_army_tt
+	}
+}
+
+
+# ############################################################################
+#  ARM A - THE PRC WINS (historical). Runs to the 1956 Twentieth Congress.
+# ############################################################################
+
+shared_focus = {
+	id = SOV_ccw_recognize_the_peoples_republic
+	icon = GFX_Recognize_the_PRC
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_ccw_arm_the_peoples_liberation_army
+	x = -3
+	y = 1
+	prerequisite = { focus = SOV_ccw_arm_the_peoples_liberation_army }
+	available = {
+		AND = {
+			has_global_flag = CCW_Over
+			has_global_flag = ROC_taiwan
+		}
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	# Carries the old SOV_Stalin_Recognize_the_Peoples_Republic_of_China payload.
+	completion_reward = {
+		SOV = {
+			give_military_access = PRC
+			add_opinion_modifier = {
+				target = PRC
+				modifier = large_increase
+			}
+		}
+		PRC = {
+			give_military_access = SOV
+			add_opinion_modifier = {
+				target = SOV
+				modifier = large_increase
+			}
+			set_country_flag = Is_In_Sphere
+            set_variable = {
+	            Sphere_Leader = SOV.id
+            }
+		}
+	}
+}
+
+# The February 1950 Treaty. Moved here from SOV_Stalin.txt, where it hung off
+# SOV_Arrange_Meeting_With_Ho (the Vietnam focus) and was reachable even in
+# timelines where the PRC lost the civil war. ID and localisation keys kept so
+# the AI plans and loc continue to work.
+shared_focus = {
+	id = SOV_Stalin_The_Sino_Soviet_Treaty_of_Friendship_Alliance_and_Mutual_Assistance
+	icon = GFX_Sino_Soviet_Treaty_of_Friendship_Alliance_and_Mutual_Assistance
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_ccw_recognize_the_peoples_republic
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_ccw_recognize_the_peoples_republic }
+	available = { date > 1950.2.14 }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		news_event = SOV_PRC_Treaty.1
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_soviet_loan_to_china
+	icon = GFX_generic_seize_money
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_Stalin_The_Sino_Soviet_Treaty_of_Friendship_Alliance_and_Mutual_Assistance
+	x = -1
+	y = 1
+	prerequisite = { focus = SOV_Stalin_The_Sino_Soviet_Treaty_of_Friendship_Alliance_and_Mutual_Assistance }
+	search_filters = { FOCUS_FILTER_INDUSTRY }
+
+	# Carries the old SOV_Stalin_Soviet_Loan_to_China payload.
+	completion_reward = {
+		SOV = {
+			set_temp_variable = { money_change_temp = -0.300 }
+                cwic_change_money = yes
+		}
+		PRC = {
+			set_temp_variable = { money_change_temp = 0.300 }
+		}
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_the_156_projects
+	icon = GFX_Comecon_Aid
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_Stalin_The_Sino_Soviet_Treaty_of_Friendship_Alliance_and_Mutual_Assistance
+	x = 1
+	y = 1
+	prerequisite = { focus = SOV_Stalin_The_Sino_Soviet_Treaty_of_Friendship_Alliance_and_Mutual_Assistance }
+	available = { date > 1950.2.14 }
+	search_filters = { FOCUS_FILTER_INDUSTRY }
+
+	completion_reward = {
+		set_temp_variable = { money_to_gain = -60 }
+		add_money_with_tooltip_effect = yes
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				set_temp_variable = { money_to_gain = 120 }
+				add_money_with_tooltip_effect = yes
+				random_owned_controlled_state = {
+					add_extra_state_shared_building_slots = 2
+					add_building_construction = {
+						type = industrial_complex
+						level = 2
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state = {
+					add_extra_state_shared_building_slots = 2
+					add_building_construction = {
+						type = arms_factory
+						level = 2
+						instant_build = yes
+					}
+				}
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+		}
+		news_event = sov_china_branch.1
+		custom_effect_tooltip = SOV_ccw_the_156_projects_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_soviet_advisors_in_china
+	icon = GFX_Share_intel_with_the_DDR
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_Stalin_The_Sino_Soviet_Treaty_of_Friendship_Alliance_and_Mutual_Assistance
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_ccw_soviet_loan_to_china }
+	prerequisite = { focus = SOV_ccw_the_156_projects }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 40
+		add_to_variable = {
+			bonus_fpp_modifier = 0.5
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				give_military_access = SOV
+				army_experience = 25
+				air_experience = 25
+				navy_experience = 15
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+			give_military_access = PRC
+			add_opinion_modifier = { target = PRC modifier = large_increase }
+		}
+		custom_effect_tooltip = SOV_ccw_soviet_advisors_in_china_tt
+	}
+}
+
+# Khrushchev's 1954 visit to Peking. Moved here from SOV_Stalin.txt, where it
+# hung off the Sino-Soviet Treaty in the Vietnam cluster. ID and localisation
+# keys kept so the Khrushchev-era AI plan continues to work. This is the
+# high-water mark of the alliance; everything after it heads downhill.
+shared_focus = {
+	id = SOV_krushchev_visit_china
+	icon = GFX_Beijing_Spring
+	text_icon = Soviet_focus_style
+	dynamic = yes
+	cost = 5
+	relative_position_id = SOV_ccw_soviet_advisors_in_china
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_ccw_soviet_advisors_in_china }
+	available = {
+		has_global_flag = stalin_dead
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	ai_will_do = {
+		factor = 1
+	}
+
+	completion_reward = {
+		news_event = SOV_STL.7
+		PRC = {
+			add_opinion_modifier = {
+				target = SOV
+				modifier = small_increase
+			}
+		}
+		add_opinion_modifier = {
+			target = PRC
+			modifier = small_increase
+		}
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_return_port_arthur
+	icon = GFX_Military_Bases_in_Greece
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_krushchev_visit_china
+	x = -1
+	y = 1
+	prerequisite = { focus = SOV_krushchev_visit_china }
+	available = { date > 1954.10.1 }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 50
+		add_named_threat = { threat = -5 name = SOV_ccw_port_arthur_threat }
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+				add_stability = 0.05
+			}
+			add_opinion_modifier = { target = PRC modifier = large_increase }
+		}
+		news_event = sov_china_branch.2
+		custom_effect_tooltip = SOV_ccw_return_port_arthur_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_technical_assistance
+	icon = GFX_German_Nuclear_Program
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_krushchev_visit_china
+	x = 1
+	y = 1
+	prerequisite = { focus = SOV_krushchev_visit_china }
+	available = { date > 1955.1.1 }
+	search_filters = { FOCUS_FILTER_INDUSTRY }
+
+	completion_reward = {
+		add_to_variable = {
+			bonus_fpp_modifier = 0.25
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				add_research_slot = 1
+				add_tech_bonus = {
+					name = SOV_ccw_technical_assistance
+					bonus = 0.5
+					uses = 2
+					category = electronics
+				}
+				add_opinion_modifier = { target = SOV modifier = medium_increase }
+			}
+		}
+		custom_effect_tooltip = SOV_ccw_technical_assistance_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_the_twentieth_congress_in_peking
+	icon = GFX_twentieth_congress_of_the_cpsu
+	text_icon = Soviet_focus_style
+	cost = 10
+	relative_position_id = SOV_krushchev_visit_china
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_ccw_return_port_arthur }
+	prerequisite = { focus = SOV_ccw_technical_assistance }
+	available = {
+		date > 1956.2.25
+		has_global_flag = stalin_dead
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 50
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				add_opinion_modifier = { target = SOV modifier = medium_decrease }
+			}
+			add_opinion_modifier = { target = PRC modifier = small_decrease }
+		}
+		news_event = sov_china_branch.3
+		custom_effect_tooltip = SOV_ccw_the_twentieth_congress_in_peking_tt
+	}
+}
+
+
+# ############################################################################
+#  ARM B - THE NATIONALISTS WIN. The CCP is driven back into Manchuria and
+#  survives only as a Soviet client (see PRC_Lose_CCW / PRC_SOV_50s).
+# ############################################################################
+
+shared_focus = {
+	id = SOV_ccw_save_northwestern_china
+	icon = GFX_Manchurian_Republic
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_ccw_arm_the_peoples_liberation_army
+	x = 3
+	y = 1
+	prerequisite = { focus = SOV_ccw_arm_the_peoples_liberation_army }
+	available = {
+		has_country_flag = SOV_PRC_Losing_CCW
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	# Carries the old SOV_Stalin_Save_Northwestern_China payload.
+	completion_reward = {
+		
+		add_to_array = { sphere_tag_list = PRC.id }
+		PRC = { 
+			set_country_flag = Is_In_Sphere
+			set_variable = {
+				Sphere_Leader = SOV.id
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_military_bases_in_east_turkestan
+	icon = GFX_Military_Bases_in_East_Turkestan
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_ccw_save_northwestern_china
+	x = -1
+	y = 1
+	prerequisite = { focus = SOV_ccw_save_northwestern_china }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	# Carries the old SOV_Stalin_Military_Bases_in_East_Turkestan payload.
+	completion_reward = {
+		SIK = {
+			give_military_access = SOV
+			589 = {
+				add_building_construction = {
+					type = bunker
+					province = 4651
+					level = 1
+					instant_build = yes
+				}
+				 add_building_construction = {
+					type = air_base
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_provide_guns_to_the_military_cliques
+	icon = GFX_Guns_for_PDG
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_ccw_save_northwestern_china
+	x = 1
+	y = 1
+	prerequisite = { focus = SOV_ccw_save_northwestern_china }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	# Carries the old SOV_Stalin_Provide_Guns_To_the_Military_Cliques payload.
+	completion_reward = {
+		CHI = {
+			add_stability = -0.075
+			add_war_support = -0.03
+		}
+		PRC = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment_1
+				amount = 10000
+				producer = SOV
+			}
+		}
+		MON = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment_1
+				amount = 4000
+				producer = SOV
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_the_manchurian_redoubt
+	icon = GFX_Deport_to_DDR
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_ccw_save_northwestern_china
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_ccw_military_bases_in_east_turkestan }
+	prerequisite = { focus = SOV_ccw_provide_guns_to_the_military_cliques }
+	available = {
+		country_exists = PRC
+		has_global_flag = CCW_Over
+	}
+	search_filters = { FOCUS_FILTER_INDUSTRY }
+
+	completion_reward = {
+		add_political_power = 40
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				set_temp_variable = { money_to_gain = 90 }
+				add_money_with_tooltip_effect = yes
+				add_stability = 0.10
+				add_war_support = 0.05
+				random_owned_controlled_state = {
+					add_extra_state_shared_building_slots = 2
+					add_building_construction = {
+						type = industrial_complex
+						level = 2
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state = {
+					add_building_construction = {
+						type = arms_factory
+						level = 2
+						instant_build = yes
+					}
+				}
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_1
+					amount = 10000
+					producer = CUM
+				}
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+		}
+		news_event = sov_china_branch.4
+		custom_effect_tooltip = SOV_ccw_the_manchurian_redoubt_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_rebuild_the_northeast
+	icon = GFX_Comecon_Aid
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_ccw_the_manchurian_redoubt
+	x = -1
+	y = 1
+	prerequisite = { focus = SOV_ccw_the_manchurian_redoubt }
+	search_filters = { FOCUS_FILTER_INDUSTRY }
+
+	completion_reward = {
+		set_temp_variable = { money_to_gain = -50 }
+		add_money_with_tooltip_effect = yes
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				set_temp_variable = { money_to_gain = 100 }
+				add_money_with_tooltip_effect = yes
+				random_owned_controlled_state = {
+					add_extra_state_shared_building_slots = 3
+					add_building_construction = {
+						type = industrial_complex
+						level = 3
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state = {
+					add_extra_state_shared_building_slots = 2
+					add_building_construction = {
+						type = infrastructure
+						level = 2
+						instant_build = yes
+					}
+				}
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+		}
+		custom_effect_tooltip = SOV_ccw_rebuild_the_northeast_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_shelter_the_chinese_party
+	icon = GFX_Deport_to_DDR
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_ccw_the_manchurian_redoubt
+	x = 1
+	y = 1
+	prerequisite = { focus = SOV_ccw_the_manchurian_redoubt }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 50
+		add_manpower = 25000
+		add_stability = -0.02
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				add_stability = 0.05
+				add_war_support = 0.05
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+		}
+		news_event = sov_china_branch.5
+		custom_effect_tooltip = SOV_ccw_shelter_the_chinese_party_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_the_manchurian_peoples_army
+	icon = GFX_usa_50_light_tanks
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_ccw_the_manchurian_redoubt
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_ccw_rebuild_the_northeast }
+	prerequisite = { focus = SOV_ccw_shelter_the_chinese_party }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	completion_reward = {
+		add_war_support = 0.05
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				give_military_access = SOV
+				army_experience = 40
+				air_experience = 20
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_1
+					amount = 12000
+					producer = CUM
+				}
+				add_equipment_to_stockpile = {
+					type = mbt_equipment_1
+					amount = 300
+					producer = CUM
+				}
+				random_owned_controlled_state = {
+					add_building_construction = {
+						type = air_base
+						level = 3
+						instant_build = yes
+					}
+				}
+			}
+			give_military_access = PRC
+		}
+		custom_effect_tooltip = SOV_ccw_the_manchurian_peoples_army_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_the_southern_insurgency
+	icon = GFX_Deport_Traitorous_Elements_in_Germany
+	text_icon = Soviet_focus_style
+	cost = 10
+	relative_position_id = SOV_ccw_the_manchurian_peoples_army
+	x = -1
+	y = 1
+	prerequisite = { focus = SOV_ccw_the_manchurian_peoples_army }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 25
+		add_named_threat = { threat = 5 name = SOV_ccw_southern_insurgency_threat }
+		if = {
+			limit = { country_exists = CHI }
+			CHI = {
+				add_stability = -0.10
+				add_war_support = -0.05
+				add_popularity = { ideology = communism popularity = 0.10 }
+			}
+		}
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				set_variable = {
+					Volunteer_Allowance^CHI = 5
+				}
+			}
+		}
+		news_event = sov_china_branch.6
+		custom_effect_tooltip = SOV_ccw_the_southern_insurgency_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_isolate_the_kuomintang
+	icon = GFX_Debate_Allied_Forces_in_West_Germany
+	text_icon = Soviet_focus_style
+	cost = 10
+	relative_position_id = SOV_ccw_the_manchurian_peoples_army
+	x = 1
+	y = 1
+	prerequisite = { focus = SOV_ccw_the_manchurian_peoples_army }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 50
+		add_to_variable = {
+			bonus_fpp_modifier = 0.5
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = CHI }
+			CHI = {
+				add_opinion_modifier = { target = SOV modifier = large_decrease }
+				set_temp_variable = { percent_change = 5 }
+				set_temp_variable = { tag_index = USA.id }
+				set_temp_variable = { influence_target = THIS.id }
+				change_influence_percentage = yes
+			}
+			add_opinion_modifier = { target = CHI modifier = large_decrease }
+		}
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+		}
+		custom_effect_tooltip = SOV_ccw_isolate_the_kuomintang_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_ccw_integrate_asia_into_the_eastern_bloc
+	icon = GFX_Comecon_Aid
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_ccw_the_manchurian_peoples_army
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_ccw_the_southern_insurgency }
+	prerequisite = { focus = SOV_ccw_isolate_the_kuomintang }
+	available = {
+		PRC = {
+			has_war = no
+		}
+		KPA = {
+			has_war = no
+		}
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	# Carries the old SOV_Integrate_Asia_into_the_Eastern_Bloc payload.
+	completion_reward = {
+		set_autonomy = {
+			target = PRC
+			autonomy_state = autonomy_easternbloc
+			freedom_level = 0.5
+		}
+		PRC = {
+			add_popularity = {
+				ideology = communism
+				popularity = 1.00
+			}
+		}
+		set_autonomy = {
+			target = MON
+			autonomy_state = autonomy_easternbloc
+			freedom_level = 0.5
+		}
+		MON = {
+			add_popularity = {
+				ideology = communism
+				popularity = 1.00
+			}
+		}
+		set_autonomy = {
+			target = SIK
+			autonomy_state = autonomy_easternbloc
+			freedom_level = 0.5
+		}
+		SIK = {
+			add_popularity = {
+				ideology = communism
+				popularity = 1.00
+			}
+		}
+		set_autonomy = {
+			target = KPA
+			autonomy_state = autonomy_easternbloc
+			freedom_level = 0.5
+		}
+		KPA = {
+			add_popularity = {
+				ideology = communism
+				popularity = 1.00
+			}
+		}
+		if = {
+			limit = {
+				BCP = {
+					is_in_faction_with = PRC
+				}
+			}
+			set_autonomy = {
+				target = BCP
+				autonomy_state = autonomy_easternbloc
+				freedom_level = 0.5
+			}
+			set_autonomy = {
+				target = BCP
+				autonomy_state = autonomy_easternbloc
+				freedom_level = 0.5
+			}
+			BCP = {
+				add_popularity = {
+					ideology = communism
+					popularity = 1.00
+				}
+			}
+		}
+		if = {
+			limit = {
+				MLA = {
+					is_in_faction_with = PRC
+				}
+			}
+			set_autonomy = {
+				target = MLA
+				autonomy_state = autonomy_easternbloc
+				freedom_level = 0.5
+			}
+			MLA = {
+				add_popularity = {
+					ideology = communism
+					popularity = 1.00
+				}
+			}
+		}
+		if = {
+			limit = {
+				LAO = {
+					controls_state = 670
+				}
+			}
+			set_autonomy = {
+				target = LAO
+				autonomy_state = autonomy_easternbloc
+				freedom_level = 0.5
+			}
+			LAO = {
+				add_popularity = {
+					ideology = communism
+					popularity = 1.00
+				}
+			}
+		}
+		if = {
+			limit = {
+				CAM = {
+					is_in_faction_with = PRC
+				}
+			}
+			984 = {
+				add_core_of = KMP
+			}
+			840 = {
+				add_core_of = KMP
+			}
+			985 = {
+				add_core_of = KMP
+			}
+			741 = {
+				add_core_of = KMP
+			}
+			KMP = {
+				annex_country = {
+					target = CAM
+					transfer_troops = yes
+				}
+			}
+			set_autonomy = {
+				target = KMP
+				autonomy_state = autonomy_easternbloc
+				freedom_level = 0.5
+			}
+			KMP = {
+				add_popularity = {
+					ideology = communism
+					popularity = 1.00
+				}
+			}
+		}
+		if = {
+			limit = {
+				CAM = {
+					is_in_faction_with = SOV
+				}
+			}
+			984 = {
+				add_core_of = KMP
+			}
+			840 = {
+				add_core_of = KMP
+			}
+			985 = {
+				add_core_of = KMP
+			}
+			741 = {
+				add_core_of = KMP
+			}
+			KMP = {
+				annex_country = {
+					target = CAM
+					transfer_troops = yes
+				}
+			}
+			set_autonomy = {
+				target = KMP
+				autonomy_state = autonomy_easternbloc
+				freedom_level = 0.5
+			}
+			KMP = {
+				add_popularity = {
+					ideology = communism
+					popularity = 1.00
+				}
+			}
+		}
+		if = {
+			limit = {
+				PHI = {
+					is_in_faction_with = PRC
+				}
+			}
+			set_autonomy = {
+				target = PHI
+				autonomy_state = autonomy_easternbloc
+				freedom_level = 0.5
+			}
+			PHI = {
+				add_popularity = {
+					ideology = communism
+					popularity = 1.00
+				}
+			}
+			PHI = {
+				remove_ideas = banana_republic
+				remove_ideas = communism_banned
+				load_focus_tree = generic_focus
+			}
+		}	
+		if = {
+			limit = {
+				PHI = {
+					is_in_faction_with = SOV
+				}
+			}
+			set_autonomy = {
+				target = PHI
+				autonomy_state = autonomy_easternbloc
+				freedom_level = 0.5
+			}
+			PHI = {
+				add_popularity = {
+					ideology = communism
+					popularity = 1.00
+				}
+			}
+			PHI = {
+				remove_ideas = banana_republic
+				remove_ideas = communism_banned
+				load_focus_tree = generic_focus
+			}
+		}	
+	}
+}

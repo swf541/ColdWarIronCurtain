@@ -1,0 +1,421 @@
+# Southern command contract. Call in NLF scope after setting nlf_command_choice:
+# 1 Nguyen Binh, 2 Le Duan, 3 Le Duc Tho, 4 Tran Quoc Buu, 5 Kieu Cong Cung.
+# This is the only writer of the five command flags.
+nlf_set_southern_command = {
+	clr_country_flag = Nguyen_Binh_Leader
+	clr_country_flag = Le_Duan_Leader
+	clr_country_flag = Le_Duc_Tho_Leader
+	clr_country_flag = Tran_quoc_Buu_Leader
+	clr_country_flag = Kieu_Cong_Cung_Leader
+	if = {
+		limit = { check_variable = { nlf_command_choice = 1 } }
+		set_country_flag = Nguyen_Binh_Leader
+		if = {
+			limit = { has_character = NLF_Nguyen_Binh }
+			promote_character = NLF_Nguyen_Binh
+		}
+	}
+	else_if = {
+		limit = { check_variable = { nlf_command_choice = 2 } }
+		set_country_flag = Le_Duan_Leader
+		nlf_call_up_le_duan = yes
+	}
+	else_if = {
+		limit = { check_variable = { nlf_command_choice = 3 } }
+		set_country_flag = Le_Duc_Tho_Leader
+		if = {
+			limit = { has_character = NLF_Le_Duc_Tho }
+			promote_character = NLF_Le_Duc_Tho
+		}
+	}
+	else_if = {
+		limit = { check_variable = { nlf_command_choice = 4 } }
+		set_country_flag = Tran_quoc_Buu_Leader
+		if = {
+			limit = { has_character = NLF_Tran_Quoc_Buu }
+			promote_character = NLF_Tran_Quoc_Buu
+		}
+	}
+	else_if = {
+		limit = { check_variable = { nlf_command_choice = 5 } }
+		set_country_flag = Kieu_Cong_Cung_Leader
+		if = {
+			limit = { has_character = NLF_Kieu_Cong_Cung }
+			promote_character = NLF_Kieu_Cong_Cung
+		}
+	}
+	if = {
+		limit = {
+			has_country_flag = NLF_Binh_Killed
+			NOT = { has_country_flag = Nguyen_Binh_Leader }
+			has_character = NLF_Nguyen_Binh
+		}
+		retire_character = NLF_Nguyen_Binh
+	}
+	if = {
+		limit = {
+			NOT = { has_country_flag = Le_Duan_Leader }
+			has_character = VIN_Le_Duan
+		}
+		nlf_return_le_duan_north = yes
+	}
+	nlf_route_displaced_southern_cadres = yes
+}
+
+nlf_call_up_le_duan = {
+	if = {
+		limit = {
+			NOT = { has_character = VIN_Le_Duan }
+			country_exists = VIN
+			VIN = { has_character = VIN_Le_Duan }
+		}
+		VIN = {
+			set_nationality = {
+				target_country = NLF
+				character = VIN_Le_Duan
+			}
+		}
+	}
+	if = {
+		limit = { has_character = VIN_Le_Duan }
+		VIN_Le_Duan = {
+			set_portraits = {
+				civilian = { large = "gfx/leaders/VIN/Le_Duan_50s.dds" }
+			}
+		}
+		if = {
+			limit = { NOT = { has_country_flag = NLF_Le_Duan_Cosvn_Role } }
+			set_country_flag = NLF_Le_Duan_Cosvn_Role
+			add_country_leader_role = {
+				character = VIN_Le_Duan
+				promote_leader = yes
+				country_leader = {
+					ideology = ho_chi_minh_thought_revsoc
+				}
+			}
+		}
+		else = {
+			promote_character = VIN_Le_Duan
+		}
+	}
+}
+
+nlf_return_le_duan_north = {
+	if = {
+		limit = { country_exists = VIN }
+		if = {
+			limit = { has_country_flag = NLF_Le_Duan_Cosvn_Role }
+			clr_country_flag = NLF_Le_Duan_Cosvn_Role
+			VIN_Le_Duan = {
+				remove_country_leader_role = {
+					ideology = ho_chi_minh_thought_revsoc
+				}
+			}
+		}
+		VIN_Le_Duan = {
+			set_portraits = {
+				civilian = { large = GFX_Le_Duan }
+			}
+		}
+		set_nationality = {
+			target_country = VIN
+			character = VIN_Le_Duan
+		}
+	}
+}
+
+# Whoever loses the command question leaves the southern movement.
+nlf_route_displaced_southern_cadres = {
+	if = {
+		limit = {
+			NLF_orthodox_southern_command_trigger = yes
+			NOT = { has_country_flag = NLF_Southern_Purge_Done }
+		}
+		set_country_flag = NLF_Southern_Purge_Done
+		news_event = { id = Binh_Cung_Leadership.7 days = 3 }
+		nlf_displace_kieu_cong_cung = yes
+		nlf_displace_tran_quoc_buu = yes
+	}
+	if = {
+		limit = { has_country_flag = Tran_quoc_Buu_Leader }
+		nlf_displace_kieu_cong_cung = yes
+	}
+}
+
+nlf_displace_kieu_cong_cung = {
+	if = {
+		limit = {
+			NOT = { has_country_flag = NLF_Cung_Displaced }
+			has_character = NLF_Kieu_Cong_Cung
+			country_exists = VIE
+		}
+		set_country_flag = NLF_Cung_Displaced
+		VIE = { country_event = { id = Binh_Cung_Leadership.5 days = 90 } }
+	}
+}
+
+nlf_displace_tran_quoc_buu = {
+	if = {
+		limit = {
+			NOT = { has_country_flag = NLF_Buu_Displaced }
+			has_character = NLF_Tran_Quoc_Buu
+		}
+		set_country_flag = NLF_Buu_Displaced
+		country_event = { id = Binh_Cung_Leadership.8 days = 60 }
+		if = {
+			limit = { country_exists = VIN }
+			VIN = { country_event = { id = Binh_Cung_Leadership.8 days = 60 } }
+		}
+		if = {
+			limit = { country_exists = FRA }
+			FRA = { country_event = { id = Binh_Cung_Leadership.9 days = 400 } }
+		}
+	}
+}
+
+# Binh's death costs the south its cohesion regardless of who succeeds him.
+nlf_apply_binh_death = {
+	set_country_flag = NLF_Binh_Killed
+	if = {
+		limit = { has_idea = NLF_rev_cohesion }
+		swap_ideas = {
+			remove_idea = NLF_rev_cohesion
+			add_idea = NLF_vietminh_disarray
+		}
+	}
+	if = {
+		limit = { has_idea = NLF_nguyen_binh_command }
+		swap_ideas = {
+			remove_idea = NLF_nguyen_binh_command
+			add_idea = NLF_post_binh_disorganization
+		}
+	}
+	if = {
+		limit = { has_idea = NLF_guerilla_network }
+		swap_ideas = {
+			remove_idea = NLF_guerilla_network
+			add_idea = NLF_fractured_command_structure
+		}
+	}
+}
+
+nlf_apply_binh_survival = {
+	army_experience = 5
+	if = {
+		limit = { has_character = NLF_Nguyen_Binh }
+		NLF_Nguyen_Binh = {
+			set_portraits = {
+				army = { large = "gfx/leaders/NLF/1949/FIELD_MARSHALS/Nguyen_Binh_NLF.dds" }
+			}
+		}
+	}
+	set_temp_variable = { nlf_command_choice = 1 }
+	nlf_set_southern_command = yes
+}
+
+# The 1951 recall: Hanoi's verdict, the travel route, the ambush, and the 1953 handover.
+vin_binh_course_pulse = {
+	if = {
+		limit = {
+			VIN_binh_course_live_trigger = yes
+			date > 1951.4.15
+			date < 1951.6.15
+			NOT = { has_country_flag = VIN_Binh_Course_Opened }
+		}
+		set_country_flag = VIN_Binh_Course_Opened
+		country_event = Binh_Cung_Leadership.10
+	}
+	if = {
+		limit = {
+			VIN_binh_course_live_trigger = yes
+			date > 1951.7.20
+			date < 1951.9.20
+			NOT = { has_country_flag = VIN_Binh_Route_Set }
+			NOT = { has_country_flag = VIN_Binh_Recall_Asked }
+		}
+		set_country_flag = VIN_Binh_Recall_Asked
+		country_event = Binh_Cung_Leadership.11
+	}
+	if = {
+		limit = {
+			date > 1951.9.28
+			date < 1951.10.29
+			NOT = { VIN_binh_outcome_recorded_trigger = yes }
+		}
+		vin_binh_resolve_recall = yes
+	}
+	if = {
+		limit = {
+			date > 1951.12.01
+			country_exists = NLF
+			NLF = { has_country_flag = NLF_Binh_Killed }
+			NLF = { NOT = { NLF_southern_command_settled_trigger = yes } }
+		}
+		NLF = {
+			set_temp_variable = { nlf_command_choice = 2 }
+			nlf_set_southern_command = yes
+		}
+	}
+	if = {
+		limit = {
+			date > 1953.3.01
+			date < 1953.4.01
+			country_exists = NLF
+			NLF = { has_country_flag = Le_Duan_Leader }
+			NOT = { has_country_flag = VIN_Binh_Cosvn_Handover }
+		}
+		set_country_flag = VIN_Binh_Cosvn_Handover
+		country_event = Binh_Cung_Leadership.20
+	}
+}
+
+vin_binh_resolve_recall = {
+	set_country_flag = Binh_Outcome
+	if = {
+		limit = { country_exists = NLF }
+		NLF = { set_country_flag = Binh_Outcome }
+	}
+	if = {
+		limit = {
+			country_exists = NLF
+			NOT = { check_variable = { VIN_Binh_Route = 3 } }
+		}
+		complete_national_focus = VIN_Nguyen_Binh_Ambush
+		random_list = {
+			30 = {
+				modifier = {
+					factor = 1.4
+					has_country_flag = VIN_Binh_Censured
+				}
+				modifier = {
+					factor = 1.6
+					any_country = { has_country_flag = FRE_Binh_Corridor_Interdiction }
+				}
+				vin_binh_recall_death = yes
+			}
+			20 = {
+				modifier = {
+					factor = 14
+					840 = {
+						OR = {
+							is_controlled_by = NLF
+							is_controlled_by = VIN
+						}
+					}
+				}
+				modifier = {
+					factor = 4
+					check_variable = { VIN_Binh_Route = 2 }
+				}
+				modifier = {
+					factor = 2.5
+					has_country_flag = VIN_Binh_Escort_Committed
+				}
+				modifier = {
+					factor = 1.5
+					has_country_flag = VIN_Binh_Defended
+				}
+				vin_binh_recall_survival = yes
+			}
+		}
+	}
+}
+
+vin_binh_recall_death = {
+	NLF = { nlf_apply_binh_death = yes }
+	country_event = Binh_Cung_Leadership.1
+	NLF = { country_event = Binh_Cung_Leadership.1 }
+	if = {
+		limit = { country_exists = VIE }
+		VIE = { country_event = Binh_Cung_Leadership.2 }
+	}
+	if = {
+		limit = { country_exists = FRA }
+		FRA = { country_event = Binh_Cung_Leadership.2 }
+	}
+	if = {
+		limit = { country_exists = FRE }
+		FRE = { country_event = Binh_Cung_Leadership.2 }
+	}
+	complete_national_focus = VIN_Death_of_Nguyen_Binh
+}
+
+vin_binh_recall_survival = {
+	NLF = { nlf_apply_binh_survival = yes }
+	country_event = Binh_Cung_Leadership.3
+	NLF = { country_event = Binh_Cung_Leadership.3 }
+	if = {
+		limit = { country_exists = VIE }
+		VIE = { country_event = Binh_Cung_Leadership.4 }
+	}
+	if = {
+		limit = { country_exists = FRA }
+		FRA = { country_event = Binh_Cung_Leadership.4 }
+	}
+	if = {
+		limit = { country_exists = FRE }
+		FRE = { country_event = Binh_Cung_Leadership.4 }
+	}
+	complete_national_focus = VIN_Nguyen_Binh_Survives
+}
+
+# Binh is never recalled: no corridor, no ambush, and Hanoi's trust is spent instead.
+vin_binh_keep_in_nam_bo = {
+	set_variable = { VIN_Binh_Route = 3 }
+	set_country_flag = VIN_Binh_Route_Set
+	add_political_power = -75
+	add_stability = -0.05
+	if = {
+		limit = { country_exists = NLF }
+		NLF = {
+			add_war_support = 0.10
+			add_manpower = 10000
+			set_temp_variable = { nlf_command_choice = 1 }
+			nlf_set_southern_command = yes
+			country_event = Binh_Cung_Leadership.12
+		}
+	}
+	country_event = Binh_Cung_Leadership.12
+}
+
+# Route mirror to Paris: the Deuxieme Bureau is offered the Stung Treng corridor.
+vin_binh_offer_corridor_to_france = {
+	if = {
+		limit = {
+			country_exists = FRA
+			OR = {
+				FRA = { has_war_with = VIN }
+				AND = {
+					country_exists = NLF
+					FRA = { has_war_with = NLF }
+				}
+			}
+		}
+		FRA = { country_event = Binh_Cung_Leadership.13 }
+	}
+	else_if = {
+		limit = {
+			country_exists = FRE
+			OR = {
+				FRE = { has_war_with = VIN }
+				AND = {
+					country_exists = NLF
+					FRE = { has_war_with = NLF }
+				}
+			}
+		}
+		FRE = { country_event = Binh_Cung_Leadership.13 }
+	}
+}
+
+fre_binh_commit_corridor_interdiction = {
+	set_country_flag = FRE_Binh_Corridor_Interdiction
+	if = {
+		limit = { country_exists = FRE }
+		FRE = { set_country_flag = FRE_Binh_Corridor_Interdiction }
+	}
+	if = {
+		limit = { country_exists = FRA }
+		FRA = { set_country_flag = FRE_Binh_Corridor_Interdiction }
+	}
+}

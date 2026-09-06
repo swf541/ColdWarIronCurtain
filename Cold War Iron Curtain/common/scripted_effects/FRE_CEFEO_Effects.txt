@@ -1,0 +1,235 @@
+# =============================================================================
+# CEFEO (FRE) core systems: Metropole Patience
+# =============================================================================
+# FRE_Metropole_Patience (0-100, country-scoped on FRE) represents Paris's
+# political will to keep bankrolling the Indochina war. It drives:
+#   - the subsidy tier ideas (FRE_Metropole_Subsidies_Full/Reduced/Cut)
+#   - FRA's generosity when answering lifeline requests (FRE_Metropole events)
+#   - the forced wind-down of the corps when it hits 0
+# All patience changes must go through fre_metropole_patience_change so tier
+# swaps and milestone events can never be skipped.
+# =============================================================================
+
+# Swap the subsidy tier idea to match the current patience value.
+fre_update_metropole_tier = {
+	hidden_effect = {
+		if = {
+			limit = { check_variable = { FRE_Metropole_Patience > 65.99 } }
+			if = {
+				limit = { NOT = { has_idea = FRE_Metropole_Subsidies_Full } }
+				remove_ideas = FRE_Metropole_Subsidies_Reduced
+				remove_ideas = FRE_Metropole_Subsidies_Cut
+				add_ideas = FRE_Metropole_Subsidies_Full
+			}
+		}
+		else_if = {
+			limit = { check_variable = { FRE_Metropole_Patience > 32.99 } }
+			if = {
+				limit = { NOT = { has_idea = FRE_Metropole_Subsidies_Reduced } }
+				remove_ideas = FRE_Metropole_Subsidies_Full
+				remove_ideas = FRE_Metropole_Subsidies_Cut
+				add_ideas = FRE_Metropole_Subsidies_Reduced
+			}
+		}
+		else_if = {
+			# FRE_The_Expeditionary_Budget focus floors the tier at Reduced
+			limit = { has_country_flag = FRE_Budget_Secured }
+			if = {
+				limit = { NOT = { has_idea = FRE_Metropole_Subsidies_Reduced } }
+				remove_ideas = FRE_Metropole_Subsidies_Full
+				remove_ideas = FRE_Metropole_Subsidies_Cut
+				add_ideas = FRE_Metropole_Subsidies_Reduced
+			}
+		}
+		else = {
+			if = {
+				limit = { NOT = { has_idea = FRE_Metropole_Subsidies_Cut } }
+				remove_ideas = FRE_Metropole_Subsidies_Full
+				remove_ideas = FRE_Metropole_Subsidies_Reduced
+				add_ideas = FRE_Metropole_Subsidies_Cut
+			}
+		}
+	}
+}
+
+# Change patience by temp.fre_patience_delta (set it before calling).
+# Clamps to [0, 100], swaps the tier idea, and fires milestone events when a
+# threshold is crossed.
+fre_metropole_patience_change = {
+	custom_effect_tooltip = FRE_Patience_Change_tt
+	hidden_effect = {
+		set_temp_variable = { fre_patience_old = FRE_Metropole_Patience }
+		add_to_variable = { FRE_Metropole_Patience = fre_patience_delta }
+		clamp_variable = {
+			var = FRE_Metropole_Patience
+			min = 0
+			max = 100
+		}
+		fre_update_metropole_tier = yes
+		# Milestones (each fires once per crossing direction, events re-armable)
+		if = {
+			limit = {
+				check_variable = { fre_patience_old > 65.99 }
+				check_variable = { FRE_Metropole_Patience < 66 }
+			}
+			country_event = { id = FRE_Metropole.10 days = 1 }
+		}
+		if = {
+			limit = {
+				check_variable = { fre_patience_old > 32.99 }
+				check_variable = { FRE_Metropole_Patience < 33 }
+			}
+			country_event = { id = FRE_Metropole.11 days = 1 }
+		}
+		if = {
+			limit = {
+				check_variable = { fre_patience_old > 0.01 }
+				check_variable = { FRE_Metropole_Patience < 0.01 }
+			}
+			country_event = { id = FRE_Metropole.12 days = 1 }
+		}
+		if = {
+			limit = {
+				check_variable = { fre_patience_old < 66 }
+				check_variable = { FRE_Metropole_Patience > 65.99 }
+			}
+			country_event = { id = FRE_Metropole.13 days = 1 }
+		}
+	}
+}
+
+# One-time initialisation; idempotent so save-loads can't double-apply.
+fre_cefeo_initialize = {
+	if = {
+		limit = { NOT = { has_variable = FRE_Metropole_Patience } }
+		set_variable = { FRE_Metropole_Patience = 75 }
+		set_variable = { FRE_Patience_Decay_Counter = 0 }
+		set_variable = { FRE_Commander_Mission_Bonus = 0 }
+		set_variable = { FRE_GCMA_Network = 0 }
+		set_variable = { FRE_VNA_Coordination = 0 }
+		fre_update_metropole_tier = yes
+	}
+	if = {
+		limit = { NOT = { has_variable = FRE_War_Credits } }	# separate guard so saves made before the credits existed still pick them up
+		set_variable = { FRE_War_Credits = 150 }
+		set_variable = { FRE_Credit_Accrual_Counter = 0 }
+	}
+	if = {
+		limit = { NOT = { has_idea = FRE_Indochina_War_Credits } }
+		add_ideas = FRE_Indochina_War_Credits
+	}
+	if = {
+		limit = { NOT = { has_idea = FRE_Under_Metropole_Command } }	# the corps stopped being a French puppet; this carries what that used to imply
+		add_ideas = FRE_Under_Metropole_Command
+	}
+}
+
+# --- War Credits ------------------------------------------------------------
+# The corps pays for its own war in Credits; political power is left for
+# politics. Credits accrue monthly at a rate set by the subsidy tier, and can
+# be topped up out of turn by FRE_Request_Extraordinary_Credits at the cost of
+# Metropole Patience. Callers set temp.fre_credit_amount (signed) first.
+fre_change_war_credits = {
+	add_to_variable = { FRE_War_Credits = fre_credit_amount }
+	clamp_variable = {
+		var = FRE_War_Credits
+		min = 0
+		max = 2000
+	}
+	custom_effect_tooltip = FRE_War_Credits_Change_tt
+}
+
+# Monthly accrual, called from fre_weekly_pulse every fourth week.
+fre_accrue_monthly_credits = {
+	set_temp_variable = { fre_credit_amount = 10 }	# Cut tier
+	if = {
+		limit = { check_variable = { FRE_Metropole_Patience > 65.99 } }
+		set_temp_variable = { fre_credit_amount = 40 }
+	}
+	else_if = {
+		limit = { check_variable = { FRE_Metropole_Patience > 32.99 } }
+		set_temp_variable = { fre_credit_amount = 25 }
+	}
+	hidden_effect = { fre_change_war_credits = yes }
+}
+
+# Grow the GCMA auxiliary network by one level (max 4). Each level adds +3 to
+# every CEFEO mission success roll (see fre_mission_calculate_* effects).
+# Fires the Trinquier dilemma event the first time the network reaches 2.
+fre_gcma_expand_network = {
+	add_to_variable = { FRE_GCMA_Network = 1 }
+	clamp_variable = {
+		var = FRE_GCMA_Network
+		min = 0
+		max = 4
+	}
+	custom_effect_tooltip = FRE_GCMA_Network_Grows_tt
+	hidden_effect = {
+		if = {
+			limit = {
+				check_variable = { FRE_GCMA_Network > 1.9 }
+				NOT = { has_country_flag = FRE_Trinquier_Dilemma_Fired }
+			}
+			set_country_flag = FRE_Trinquier_Dilemma_Fired
+			country_event = { id = FRE_Allies.10 days = 5 }
+		}
+	}
+}
+
+# Weekly pulse (called from on_weekly_FRE):
+#   - monthly patience decay while the war runs (faster in intense phases;
+#     struggle phase numbers RISE as tension falls, so 3-4 = intense)
+#   - starts the wind-down chain once the Indochina War is over
+fre_weekly_pulse = {
+	fre_castor_orphan_check = yes
+	fre_pollux_orphan_check = yes
+	fre_atlante_orphan_check = yes
+	fre_lorraine_response_orphan_check = yes
+	fre_hoa_binh_response_orphan_check = yes
+	fre_dbp_response_orphan_check = yes
+	if = {
+		limit = { has_country_flag = FRE_CEFEO_Dissolved }
+	}
+	else_if = {
+		limit = {
+			has_global_flag = Indochina_War_Over
+			NOT = { has_country_flag = FRE_Winddown_Started }
+		}
+		add_to_variable = { FRE_Winddown_Grace_Weeks = 1 }
+		if = {
+			limit = { check_variable = { FRE_Winddown_Grace_Weeks > 3.9 } }
+			set_country_flag = FRE_Winddown_Started
+			country_event = { id = FRE_Winddown.1 days = 2 }
+		}
+	}
+	else_if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		fre_operation_watchdog = yes	# nothing may leave an operation flag standing forever
+		add_to_variable = { FRE_Credit_Accrual_Counter = 1 }
+		if = {
+			limit = { check_variable = { FRE_Credit_Accrual_Counter > 3.9 } }	# monthly
+			set_variable = { FRE_Credit_Accrual_Counter = 0 }
+			fre_accrue_monthly_credits = yes
+		}
+		add_to_variable = { FRE_Patience_Decay_Counter = 1 }
+		# FRE_Manage_the_Press_Corps stretches the decay interval 4 -> 6 weeks
+		set_temp_variable = { fre_decay_interval = 3.9 }
+		if = {
+			limit = { has_country_flag = FRE_Press_Managed }
+			set_temp_variable = { fre_decay_interval = 5.9 }
+		}
+		if = {
+			limit = { check_variable = { FRE_Patience_Decay_Counter > fre_decay_interval } }
+			set_variable = { FRE_Patience_Decay_Counter = 0 }
+			set_temp_variable = { fre_patience_delta = -1 }
+			if = {
+				limit = {
+					check_variable = { global.Indochina_War_Active_Phase > 2.9 }
+					check_variable = { global.Indochina_War_Active_Phase < 4.1 }
+				}
+				set_temp_variable = { fre_patience_delta = -2 }
+			}
+			fre_metropole_patience_change = yes
+		}
+	}
+}

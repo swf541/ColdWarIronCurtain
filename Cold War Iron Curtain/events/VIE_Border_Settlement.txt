@@ -1,0 +1,511 @@
+####################################################
+# VIE 1950s Indochina border settlement
+# Escalation ladder driven by the VIE_Border_Settlement
+# decision category. See
+# common/scripted_effects/VIE_Border_Settlement_Effects.txt
+# for the stage model.
+####################################################
+
+add_namespace = VIE_Border_Settlement
+
+country_event = {	# fires to the owner of the disputed state
+	id = VIE_Border_Settlement.1
+	title = VIE_Border_Settlement.1.t
+	desc = VIE_Border_Settlement.1.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {	# cede the province
+		name = VIE_Border_Settlement.1.a
+
+		ai_chance = {
+			base = 10
+			modifier = {
+				factor = 3
+				has_opinion = { target = VIE value > 25 }
+			}
+			modifier = {
+				factor = 4
+				strength_ratio = { tag = VIE ratio < 0.4 }
+			}
+			modifier = {
+				factor = 2
+				has_war = yes
+			}
+			modifier = {	# a long campaign of pressure wears the frontier down
+				factor = 2
+				check_variable = { event_target:VIE_border_demand_target.VIE_border_pressure > 74 }
+			}
+			modifier = {
+				factor = 0.2
+				strength_ratio = { tag = VIE ratio > 0.9 }
+			}
+			modifier = {
+				factor = 0.25
+				is_subject = yes	# a patron will not let us give ground away
+			}
+		}
+		VIE = { country_event = { id = VIE_Border_Settlement.2 days = 1 } }
+	}
+
+	option = {	# refuse
+		name = VIE_Border_Settlement.1.b
+
+		ai_chance = {
+			base = 90
+			modifier = {
+				factor = 0.3
+				has_opinion = { target = VIE value > 50 }
+			}
+			modifier = {
+				factor = 0.4
+				check_variable = { event_target:VIE_border_demand_target.VIE_border_pressure > 74 }
+			}
+		}
+		VIE = { country_event = { id = VIE_Border_Settlement.3 days = 1 } }
+	}
+}
+
+country_event = {	# the frontier is ceded at the table
+	id = VIE_Border_Settlement.2
+	title = VIE_Border_Settlement.2.t
+	desc = VIE_Border_Settlement.2.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.2.a
+
+		clr_country_flag = VIE_Border_Demand_Pending
+		add_stability = 0.03
+		add_political_power = 25
+		var:VIE_border_demand_state = {	# resolve the owner before the state changes hands
+			owner = {
+				add_opinion_modifier = {
+					target = VIE
+					modifier = VIE_Border_Ceded_Peacefully
+				}
+				reverse_add_opinion_modifier = {
+					target = VIE
+					modifier = VIE_Border_Ceded_Peacefully
+				}
+			}
+		}
+		set_temp_variable = { vie_border_settle_state = VIE_border_demand_state }
+		VIE_border_settle_target_state = yes
+	}
+}
+
+country_event = {	# the demand is rejected
+	id = VIE_Border_Settlement.3
+	title = VIE_Border_Settlement.3.t
+	desc = VIE_Border_Settlement.3.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.3.a
+
+		clr_country_flag = VIE_Border_Demand_Pending
+		var:VIE_border_demand_state = {
+			set_variable = { VIE_border_stage = 2 }
+		}
+	}
+}
+
+country_event = {	# the demand lapsed unanswered - failsafe so the ladder can never lock
+	id = VIE_Border_Settlement.4
+	title = VIE_Border_Settlement.4.t
+	desc = VIE_Border_Settlement.4.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	trigger = {	# no-ops if the owner already answered with .2 or .3
+		has_country_flag = VIE_Border_Demand_Pending
+		var:VIE_border_demand_state = { check_variable = { VIE_border_stage = 1 } }
+	}
+
+	option = {
+		name = VIE_Border_Settlement.4.a
+
+		clr_country_flag = VIE_Border_Demand_Pending
+		var:VIE_border_demand_state = {	# silence is a refusal
+			set_variable = { VIE_border_stage = 2 }
+		}
+	}
+}
+
+country_event = {	# an incident goes badly for us
+	id = VIE_Border_Settlement.10
+	title = VIE_Border_Settlement.10.t
+	desc = VIE_Border_Settlement.10.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.10.a
+
+		add_equipment_to_stockpile = {
+			type = infantry_equipment
+			amount = -150
+		}
+		army_experience = 5
+	}
+}
+
+country_event = {	# the frontier hardens against us
+	id = VIE_Border_Settlement.11
+	title = VIE_Border_Settlement.11.t
+	desc = VIE_Border_Settlement.11.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.11.a
+
+		event_target:VIE_border_incident_owner = {
+			add_opinion_modifier = {
+				target = VIE
+				modifier = VIE_Border_Demand_Pressed
+			}
+		}
+		add_political_power = -15
+	}
+}
+
+country_event = {	# the neighbours take notice
+	id = VIE_Border_Settlement.12
+	title = VIE_Border_Settlement.12.t
+	desc = VIE_Border_Settlement.12.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.12.a
+
+		every_country = {
+			limit = {
+				OR = {
+					original_tag = CAM
+					original_tag = LOS
+					original_tag = LAO
+				}
+				exists = yes
+			}
+			add_opinion_modifier = {
+				target = VIE
+				modifier = VIE_Border_Demand_Pressed
+			}
+		}
+	}
+}
+
+country_event = {	# the quiet outcome - the pressure told, and nothing else did
+	id = VIE_Border_Settlement.13
+	title = VIE_Border_Settlement.13.t
+	desc = VIE_Border_Settlement.13.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.13.a
+
+		army_experience = 3
+	}
+}
+
+country_event = {	# Washington reacts to an open casus belli
+	id = VIE_Border_Settlement.20
+	title = VIE_Border_Settlement.20.t
+	desc = VIE_Border_Settlement.20.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {	# warn Saigon off
+		name = VIE_Border_Settlement.20.a
+
+		ai_chance = {
+			base = 75
+		}
+		VIE = {
+			add_opinion_modifier = {
+				target = USA
+				modifier = VIE_American_Displeasure
+			}
+			reverse_add_opinion_modifier = {
+				target = USA
+				modifier = VIE_American_Displeasure
+			}
+		}
+	}
+
+	option = {	# an anti-communist bulwark is worth the embarrassment
+		name = VIE_Border_Settlement.20.b
+
+		ai_chance = {
+			base = 25
+			modifier = {
+				factor = 3
+				has_government = fascism
+			}
+		}
+		every_country = {
+			limit = {
+				OR = {
+					original_tag = CAM
+					original_tag = LOS
+				}
+				exists = yes
+			}
+			add_opinion_modifier = {
+				target = USA
+				modifier = small_decrease
+			}
+		}
+	}
+}
+
+country_event = {	# Paris protests
+	id = VIE_Border_Settlement.21
+	title = VIE_Border_Settlement.21.t
+	desc = VIE_Border_Settlement.21.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.21.a
+
+		VIE = {
+			add_opinion_modifier = {
+				target = FRA
+				modifier = medium_decrease
+			}
+			reverse_add_opinion_modifier = {
+				target = FRA
+				modifier = medium_decrease
+			}
+		}
+	}
+}
+
+country_event = {	# clash won - fires to VIE
+	id = VIE_Border_Settlement.30
+	title = VIE_Border_Settlement.30.t
+	desc = VIE_Border_Settlement.30.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.30.a
+
+		clr_country_flag = VIE_Border_Clash_Active
+		add_war_support = 0.05
+		var:VIE_border_clash_state = {	# resolve the owner before the state changes hands
+			owner = {
+				add_opinion_modifier = {
+					target = VIE
+					modifier = VIE_Border_War_Aggression
+				}
+			}
+		}
+		set_temp_variable = { vie_border_settle_state = VIE_border_clash_state }
+		VIE_border_settle_target_state = yes
+		VIE_border_mark_hegemon = yes
+		every_country = {
+			limit = {
+				OR = {
+					original_tag = CAM
+					original_tag = LOS
+					original_tag = LAO
+				}
+				exists = yes
+			}
+			add_opinion_modifier = {
+				target = VIE
+				modifier = VIE_Border_Demand_Pressed
+			}
+		}
+		add_named_threat = {
+			threat = 5
+			name = VIE_border_clash_threat
+		}
+	}
+}
+
+country_event = {	# clash lost - fires to VIE
+	id = VIE_Border_Settlement.31
+	title = VIE_Border_Settlement.31.t
+	desc = VIE_Border_Settlement.31.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.31.a
+
+		clr_country_flag = VIE_Border_Clash_Active
+		add_political_power = -100
+		add_stability = -0.10
+		add_war_support = -0.05
+		var:VIE_border_clash_state = {	# back to "refused" so the ladder stays alive; the marker is what unlocks the casus belli
+			set_variable = { VIE_border_stage = 2 }
+			set_variable = { VIE_border_clash_failed = 1 }
+		}
+	}
+}
+
+country_event = {	# clash won - fires to the defending owner
+	id = VIE_Border_Settlement.32
+	title = VIE_Border_Settlement.32.t
+	desc = VIE_Border_Settlement.32.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.32.a
+
+		add_political_power = 50
+		add_stability = 0.05
+		add_war_support = 0.05
+	}
+}
+
+country_event = {	# clash lost - fires to the defending owner
+	id = VIE_Border_Settlement.33
+	title = VIE_Border_Settlement.33.t
+	desc = VIE_Border_Settlement.33.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.33.a
+
+		add_political_power = -50
+		add_stability = -0.10
+	}
+}
+
+country_event = {	# clash cancelled - fires to both sides
+	id = VIE_Border_Settlement.34
+	title = VIE_Border_Settlement.34.t
+	desc = VIE_Border_Settlement.34.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.34.a
+
+		if = {
+			limit = { tag = VIE }
+			clr_country_flag = VIE_Border_Clash_Active
+			var:VIE_border_clash_state = {	# back to "refused", so the clash can be tried again
+				set_variable = { VIE_border_stage = 2 }
+			}
+		}
+	}
+}
+
+country_event = {	# the province was already under our occupation, so there was no clash to fight - fires to VIE
+	id = VIE_Border_Settlement.35
+	title = VIE_Border_Settlement.35.t
+	desc = VIE_Border_Settlement.35.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = VIE_Border_Settlement.35.a
+
+		clr_country_flag = VIE_Border_Clash_Active
+		add_war_support = 0.05
+		var:VIE_border_clash_state = {	# resolve the owner before the state changes hands
+			owner = {
+				add_opinion_modifier = {
+					target = VIE
+					modifier = VIE_Border_War_Aggression
+				}
+			}
+		}
+		set_temp_variable = { vie_border_settle_state = VIE_border_clash_state }
+		VIE_border_settle_target_state = yes
+		VIE_border_mark_hegemon = yes
+		every_country = {
+			limit = {
+				OR = {
+					original_tag = CAM
+					original_tag = LOS
+					original_tag = LAO
+				}
+				exists = yes
+			}
+			add_opinion_modifier = {
+				target = VIE
+				modifier = VIE_Border_Demand_Pressed
+			}
+		}
+		add_named_threat = {
+			threat = 5
+			name = VIE_border_clash_threat
+		}
+	}
+}
+
+country_event = {	# Hanoi backs its Pathet Lao client
+	id = VIE_Border_Settlement.40
+	title = VIE_Border_Settlement.40.t
+	desc = VIE_Border_Settlement.40.d
+	picture = GFX_French_Drawn_Borders.1
+
+	is_triggered_only = yes
+
+	option = {	# guarantee the Pathet Lao
+		name = VIE_Border_Settlement.40.a
+
+		ai_chance = {
+			base = 70
+		}
+		give_guarantee = event_target:VIE_border_clash_owner
+		VIE = {
+			add_opinion_modifier = {
+				target = VIN
+				modifier = VIE_Border_War_Aggression
+			}
+			reverse_add_opinion_modifier = {
+				target = VIN
+				modifier = VIE_Border_War_Aggression
+			}
+		}
+	}
+
+	option = {	# protest and no more
+		name = VIE_Border_Settlement.40.b
+
+		ai_chance = {
+			base = 30
+			modifier = {
+				factor = 3
+				has_war = yes
+			}
+		}
+		VIE = {
+			add_opinion_modifier = {
+				target = VIN
+				modifier = VIE_Border_Demand_Pressed
+			}
+		}
+	}
+}

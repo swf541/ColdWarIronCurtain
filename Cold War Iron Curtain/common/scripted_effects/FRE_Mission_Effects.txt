@@ -1,20 +1,33 @@
 # FRE Mission Success Calculation Effects
 
+# Shared bonuses applied to every mission roll:
+#   FRE_Commander_Mission_Bonus - set by the FRE_Command rotation events
+#     (Carpentier 0, de Lattre 10, Salan 7, Navarre 8)
+#   FRE_GCMA_Network (0-4)      - +3 per auxiliary network level
+#   FRE_VNA_Coordination        - +10 once the Joint General Staff stands up
+fre_mission_apply_modifier_bonuses = {
+	add_to_temp_variable = { mission_success_chance = FRE_Commander_Mission_Bonus }
+	set_temp_variable = { fre_gcma_bonus = FRE_GCMA_Network }
+	multiply_temp_variable = { fre_gcma_bonus = 3 }
+	add_to_temp_variable = { mission_success_chance = fre_gcma_bonus }
+	add_to_temp_variable = { mission_success_chance = FRE_VNA_Coordination }
+}
+
 fre_mission_calculate_rc4_success = {
 	# Base chance: 50% (reasonable starting point for FRE)
 	set_temp_variable = { mission_success_chance = 50 }
 	
-	# Political power helps (up to +15%)
+	# War Credits committed to preparation help (up to +15%)
 	if = {
-		limit = { check_variable = { political_power > 50 } }
+		limit = { check_variable = { FRE_War_Credits > 60 } }
 		add_to_temp_variable = { mission_success_chance = 5 }
 	}
 	if = {
-		limit = { check_variable = { political_power > 100 } }
+		limit = { check_variable = { FRE_War_Credits > 120 } }
 		add_to_temp_variable = { mission_success_chance = 5 }
 	}
 	if = {
-		limit = { check_variable = { political_power > 150 } }
+		limit = { check_variable = { FRE_War_Credits > 200 } }
 		add_to_temp_variable = { mission_success_chance = 5 }
 	}
 	
@@ -60,6 +73,8 @@ fre_mission_calculate_rc4_success = {
 		add_to_temp_variable = { mission_success_chance = 4 }
 	}
 	
+	fre_mission_apply_modifier_bonuses = yes
+
 	# Clamp to 0-100
 	if = {
 		limit = { check_variable = { temp.mission_success_chance > 100 } }
@@ -75,17 +90,17 @@ fre_mission_calculate_revers_report_success = {
 	# Base chance: 45% (political crisis, but achievable)
 	set_temp_variable = { mission_success_chance = 45 }
 	
-	# Political power helps (up to +20%)
+	# War Credits committed to preparation help (up to +20%)
 	if = {
-		limit = { check_variable = { political_power > 50 } }
+		limit = { check_variable = { FRE_War_Credits > 60 } }
 		add_to_temp_variable = { mission_success_chance = 5 }
 	}
 	if = {
-		limit = { check_variable = { political_power > 100 } }
+		limit = { check_variable = { FRE_War_Credits > 120 } }
 		add_to_temp_variable = { mission_success_chance = 7 }
 	}
 	if = {
-		limit = { check_variable = { political_power > 150 } }
+		limit = { check_variable = { FRE_War_Credits > 200 } }
 		add_to_temp_variable = { mission_success_chance = 8 }
 	}
 	
@@ -117,6 +132,8 @@ fre_mission_calculate_revers_report_success = {
 		add_to_temp_variable = { mission_success_chance = 3 }
 	}
 	
+	fre_mission_apply_modifier_bonuses = yes
+
 	# Clamp to 0-100
 	if = {
 		limit = { check_variable = { temp.mission_success_chance > 100 } }
@@ -132,17 +149,17 @@ fre_mission_calculate_de_lattre_success = {
 	# Base chance: 55% (de Lattre is strong, transition should succeed)
 	set_temp_variable = { mission_success_chance = 55 }
 	
-	# Political power helps (up to +18%)
+	# War Credits committed to preparation help (up to +18%)
 	if = {
-		limit = { check_variable = { political_power > 50 } }
+		limit = { check_variable = { FRE_War_Credits > 60 } }
 		add_to_temp_variable = { mission_success_chance = 6 }
 	}
 	if = {
-		limit = { check_variable = { political_power > 100 } }
+		limit = { check_variable = { FRE_War_Credits > 120 } }
 		add_to_temp_variable = { mission_success_chance = 6 }
 	}
 	if = {
-		limit = { check_variable = { political_power > 150 } }
+		limit = { check_variable = { FRE_War_Credits > 200 } }
 		add_to_temp_variable = { mission_success_chance = 6 }
 	}
 	
@@ -174,6 +191,8 @@ fre_mission_calculate_de_lattre_success = {
 		add_to_temp_variable = { mission_success_chance = 3 }
 	}
 	
+	fre_mission_apply_modifier_bonuses = yes
+
 	# Clamp to 0-100
 	if = {
 		limit = { check_variable = { temp.mission_success_chance > 100 } }
@@ -189,17 +208,17 @@ fre_mission_calculate_battle_prep_success = {
 	# Base chance: 50% (battle preparation should be achievable)
 	set_temp_variable = { mission_success_chance = 50 }
 	
-	# Political power helps (up to +15%)
+	# War Credits committed to preparation help (up to +15%)
 	if = {
-		limit = { check_variable = { political_power > 50 } }
+		limit = { check_variable = { FRE_War_Credits > 60 } }
 		add_to_temp_variable = { mission_success_chance = 5 }
 	}
 	if = {
-		limit = { check_variable = { political_power > 100 } }
+		limit = { check_variable = { FRE_War_Credits > 120 } }
 		add_to_temp_variable = { mission_success_chance = 5 }
 	}
 	if = {
-		limit = { check_variable = { political_power > 150 } }
+		limit = { check_variable = { FRE_War_Credits > 200 } }
 		add_to_temp_variable = { mission_success_chance = 5 }
 	}
 	
@@ -217,17 +236,17 @@ fre_mission_calculate_battle_prep_success = {
 		add_to_temp_variable = { mission_success_chance = 4 }
 	}
 	
-	# Equipment is critical for preparation (up to +18%) - lowered thresholds
+	# Equipment is critical for preparation (up to +18%) - CEFEO-scale thresholds
 	if = {
-		limit = { has_equipment = { infantry_equipment_1 > 10000 } }
+		limit = { has_equipment = { infantry_equipment_1 > 8000 } }
 		add_to_temp_variable = { mission_success_chance = 6 }
 	}
 	if = {
-		limit = { has_equipment = { infantry_equipment_1 > 25000 } }
+		limit = { has_equipment = { infantry_equipment_1 > 18000 } }
 		add_to_temp_variable = { mission_success_chance = 6 }
 	}
 	if = {
-		limit = { has_equipment = { infantry_equipment_1 > 50000 } }
+		limit = { has_equipment = { infantry_equipment_1 > 30000 } }
 		add_to_temp_variable = { mission_success_chance = 6 }
 	}
 	
@@ -251,6 +270,8 @@ fre_mission_calculate_battle_prep_success = {
 		add_to_temp_variable = { mission_success_chance = 2 }
 	}
 	
+	fre_mission_apply_modifier_bonuses = yes
+
 	# Clamp to 0-100
 	if = {
 		limit = { check_variable = { temp.mission_success_chance > 100 } }

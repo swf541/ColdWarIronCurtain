@@ -48,7 +48,7 @@ country_event = {
 		USA = {
 			country_event = Fat_Fucker.4
 		}
-		
+
 		set_country_flag = Egy_Agrees
 	}
 	option = {
@@ -56,7 +56,7 @@ country_event = {
 		USA = {
 			complete_national_focus = USA_50s_Farouk_Refuses_Pressure
 		}
-		
+
 	}
 }
 country_event = {
@@ -1011,7 +1011,7 @@ country_event = {
 
 	option = {
 		name = USA_ROC.1.a
-		
+
 	}
 }
 country_event = {
@@ -1147,7 +1147,7 @@ country_event = {
 			complete_national_focus = USA_50s_Rig_the_Election
 		}
 	}
-	
+
 	option = {
 		name = USA_VIE50s.10.c2
 		USA = {
@@ -1582,7 +1582,7 @@ country_event = {
 	}
 	option = {
 		name = KW_EARLY.6.b2
-		
+
 	}
 }
 
@@ -1689,7 +1689,7 @@ country_event = {
 				}
 			}
 		}
-		
+
 		USA = {
 			country_event = AmericanOffer.2
 			news_event = AmericanOffer.4
@@ -1770,6 +1770,160 @@ country_event = {
 
 	option = {
 		name = USA_INDO.1.a2
+		USA_indochina_france_accepts_talks = yes
+		hidden_effect = {
+			USA = { country_event = { id = USA_INDO.2 days = 3 } }
+		}
+		ai_chance = {
+			base = 55
+			modifier = {
+				factor = 2
+				has_global_flag = USA_VietMinh_Channel_Open	# Hanoi is already talking to Washington, so refusal looks like obstruction
+			}
+			modifier = {
+				factor = 1.5
+				check_variable = { global.Indochina_War_Active_Phase > 6 }
+			}
+			modifier = {
+				factor = 2
+				geneva_vie_side_losing_trigger = yes
+			}
+			modifier = {
+				factor = 0.4
+				check_variable = { StruggleInvolvedNationsIndochinaProFranceScore > 749 }	# winning armies do not sue for peace
+			}
+			modifier = {
+				factor = 1.25
+				is_historical_focus_on = yes
+			}
+		}
+	}
+	option = {
+		name = USA_INDO.1.b2
+		set_temp_variable = { usa_indo_a_points = 175 }
+		USA_indochina_escalation_push = yes
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_communist_score = yes	# a war Paris will not end is one Hanoi wins slowly
+		add_opinion_modifier = {
+			target = USA
+			modifier = large_decrease
+		}
+		hidden_effect = {
+			USA = {
+				add_opinion_modifier = {
+					target = FRA
+					modifier = large_decrease
+				}
+				country_event = { id = USA_INDO.3 days = 3 }
+			}
+		}
+		ai_chance = {
+			base = 45
+			modifier = {
+				factor = 2
+				check_variable = { StruggleInvolvedNationsIndochinaProFranceScore > 749 }
+			}
+			modifier = {
+				factor = 0.5
+				geneva_vie_side_losing_trigger = yes
+			}
+		}
+	}
+}
+country_event = {
+	id = USA_INDO.2
+	immediate = { }
+	title = USA_INDO.2.t
+	desc = USA_INDO.2.d
+	picture = GFX_USA_INDO_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_INDO.2.a
+	}
+}
+country_event = {
+	id = USA_INDO.3
+	immediate = { }
+	title = USA_INDO.3.t
+	desc = USA_INDO.3.d
+	picture = GFX_USA_INDO_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_INDO.3.a
+	}
+}
+# Fired by indochina_geneva_panic_force_conference. The conference is already
+# convening by the time this lands: the choice here is what the American
+# delegation is instructed to save, not whether Washington shows up.
+country_event = {
+	id = USA_INDO.4
+	title = USA_INDO.4.t
+	desc = USA_INDO.4.d
+	picture = GFX_USA_INDO_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {	# hold the line, kill the ballot
+		name = USA_INDO.4.a
+		set_global_flag = geneva_usa_panic_no_ballot
+		set_temp_variable = { usa_indo_score = 100 }
+		USA_indochina_add_profrance_score = yes	# Washington inherits the position Paris can no longer hold
+		set_temp_variable = { usa_indo_b_points = 175 }
+		USA_indochina_diplomatic_push = yes
+		ai_chance = {
+			base = 80
+			modifier = {
+				factor = 1.5
+				has_completed_focus = USA_50s_Withhold_American_Assent
+			}
+			modifier = {
+				factor = 0.4
+				has_completed_focus = USA_50s_Endorse_Free_Vietnamese_Vote
+			}
+		}
+	}
+	option = {	# attend, but sign nothing
+		name = USA_INDO.4.b
+		set_global_flag = geneva_usa_panic_disowns_settlement
+		add_stability = -0.05
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_profrance_score = yes
+		ai_chance = {
+			base = 20
+			modifier = {
+				factor = 2
+				has_completed_focus = USA_50s_Endorse_Free_Vietnamese_Vote
+			}
+		}
+	}
+}
+# The same day, in Paris. FRA scope.
+country_event = {
+	id = USA_INDO.5
+	immediate = { }
+	title = USA_INDO.5.t
+	desc = USA_INDO.5.d
+	picture = GFX_USA_INDO_1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = USA_INDO.5.a
+		add_stability = -0.05
+		add_war_support = -0.10
+		if = {
+			limit = { country_exists = FRE }
+			FRE = {
+				set_temp_variable = { fre_patience_delta = -20 }
+				fre_metropole_patience_change = yes
+			}
+		}
 	}
 }
 add_namespace = nato_expansion
@@ -1781,7 +1935,7 @@ country_event = {
 	picture = GFX_Nato_Debate_Generic
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = nato_expansion.3.a2
 		add_ideas = nato_member
@@ -1823,7 +1977,7 @@ country_event = {
 	picture = GFX_Nato_Debate_Generic
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = nato_expansion.6.a2
 		add_ideas = nato_member
@@ -1857,17 +2011,17 @@ country_event = {
 	picture = GFX_Nato_Debate_Generic
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = nato_expansion.9.a2
 		add_ideas = nato_member
 		news_event = nato_expansion.10
 		USA = { add_to_faction = WGR }
-		
+
 	}
 	option = {
 		name = nato_expansion.9.b2
-		
+
 	}
 }
 country_event = {
@@ -1878,7 +2032,7 @@ country_event = {
 	picture = GFX_Nato_Debate_Generic
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = nato_expansion.12.a2
 		add_ideas = nato_member
@@ -2056,7 +2210,7 @@ country_event = {
 	picture = GFX_Hungarian_Rev_UN_1
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = Hungarian_Rev_UN.1.a2
 		news_event = Hungarian_Rev_UN.10
@@ -2133,7 +2287,7 @@ country_event = {
 	picture = GFX_Hungarian_Rev_UN_3
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = Hungarian_Rev_UN.3.a2
 		news_event = Hungarian_Rev_UN.4
@@ -2198,22 +2352,34 @@ country_event = {
 	picture = GFX_USA_FRAIND_1
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = USA_FRAIND.1.a2
 		custom_effect_tooltip = USA_FRAIND.1.a.tt
 		USA = {
 			country_event = USA_FRAIND.2
 			add_to_variable = {
-				global.Indochina_War_Next_Phase_B_Points = 500
+				global.Indochina_War_Next_Phase_B_Points = 175
 				tooltip = Add_to_De_Escalation_Phase_TT
 			}
 		}
+		set_temp_variable = { usa_indo_score = 100 }
+		USA_indochina_add_proindependence_score = yes	# Paris concedes the principle the nationalists were fighting for
+		set_temp_variable = { usa_indo_score = -50 }
+		USA_indochina_add_profrance_score = yes
 		ai_chance = {
-			factor = 85
+			base = 85
 			modifier = {
-				is_historical_focus_on = yes
 				factor = 1.15
+				is_historical_focus_on = yes
+			}
+			modifier = {
+				factor = 1.5
+				geneva_vie_side_losing_trigger = yes
+			}
+			modifier = {
+				factor = 0.4
+				check_variable = { StruggleInvolvedNationsIndochinaProFranceScore > 749 }
 			}
 		}
 	}
@@ -2223,12 +2389,22 @@ country_event = {
 		USA = {
 			country_event = USA_FRAIND.3
 			add_to_variable = {
-				global.Indochina_War_Next_Phase_A_Points = 500
+				global.Indochina_War_Next_Phase_A_Points = 175
 				tooltip = Add_to_Escalation_Phase_TT
 			}
 		}
+		set_temp_variable = { usa_indo_score = 100 }
+		USA_indochina_add_profrance_score = yes	# the generals get their reprieve
 		ai_chance = {
-			factor = 15
+			base = 15
+			modifier = {
+				factor = 3
+				check_variable = { StruggleInvolvedNationsIndochinaProFranceScore > 749 }
+			}
+			modifier = {
+				factor = 0.5
+				geneva_vie_side_losing_trigger = yes
+			}
 		}
 	}
 }
@@ -2240,12 +2416,12 @@ country_event = {
 	picture = GFX_USA_FRAIND_2
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = USA_FRAIND.2.a2
 		effect_tooltip = {
 			add_to_variable = {
-				global.Indochina_War_Next_Phase_B_Points = 500
+				global.Indochina_War_Next_Phase_B_Points = 175
 				tooltip = Add_to_De_Escalation_Phase_TT
 			}
 		}
@@ -2259,13 +2435,13 @@ country_event = {
 	picture = GFX_USA_FRAIND_3
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = USA_FRAIND.3.a2
 
 		effect_tooltip = {
 			add_to_variable = {
-				global.Indochina_War_Next_Phase_A_Points = 500
+				global.Indochina_War_Next_Phase_A_Points = 175
 				tooltip = Add_to_Escalation_Phase_TT
 			}
 		}
@@ -2297,7 +2473,7 @@ news_event = {
 	picture = GFX_Establish_SEATO_2
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = Establish_SEATO.2.a2
 		add_ideas = SEATO_Member
@@ -2334,7 +2510,7 @@ country_event = {
 	picture = GFX_Establish_SEATO_3
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = Establish_SEATO.3.a2
 	}
@@ -2347,7 +2523,7 @@ country_event = {
 	picture = GFX_Establish_SEATO_4
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = Establish_SEATO.4.a2
 	}
@@ -2375,7 +2551,7 @@ country_event = {
 	picture = GFX_CENTO_GENERIC1
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CENTO_PROPOSAL.2.a2
 		add_ideas = CENTO_member
@@ -2399,7 +2575,7 @@ country_event = {
 	picture = GFX_CENTO_GENERIC_PROTEST
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CENTO_PROPOSAL.3.a2
 	}
@@ -2426,7 +2602,7 @@ country_event = {
 	picture = GFX_CENTO_GENERIC_JOIN
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CENTO_PROPOSAL.5.a2
 	}
@@ -2439,7 +2615,7 @@ country_event = {
 	picture = GFX_CENTO_GENERIC1
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CENTO_PROPOSAL.6.a2
 		add_ideas = CENTO_member
@@ -2462,7 +2638,7 @@ country_event = {
 	picture = GFX_CENTO_GENERIC_PROTEST
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CENTO_PROPOSAL.7.a2
 	}
@@ -2489,10 +2665,10 @@ country_event = {
 	picture = GFX_CENTO_GENERIC_JOIN
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CENTO_PROPOSAL.9.a2
-		
+
 
 	}
 }
@@ -2550,7 +2726,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_1
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.1.a2
 	}
@@ -2563,7 +2739,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_5
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.2.a2
 		hidden_effect = {
@@ -2635,7 +2811,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_5
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.5.a2
 		USA = {
@@ -2660,7 +2836,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_6
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.6.a2
 	}
@@ -2674,7 +2850,7 @@ country_event = {
 	picture = GFX_CIA_7
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.7.a2
 	}
@@ -2703,7 +2879,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_100
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.100.a2
 		ai_chance = {
@@ -2718,7 +2894,7 @@ country_event = {
 		name = CIA_SYRIA.100.b2
 	}
 }
- 
+
 news_event = {
 	id = CIA_SYRIA.101
 	immediate = { }
@@ -2767,7 +2943,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_100
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.50.a2
 		USA = {
@@ -2822,7 +2998,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_51
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.51.a2
 	}
@@ -2835,7 +3011,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_52
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.52.a2
 	}
@@ -2890,7 +3066,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_100
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.53.a2
 		USA = {
@@ -2945,7 +3121,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_54
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.54.a2
 	}
@@ -2958,7 +3134,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_55
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.55.a2
 	}
@@ -3020,7 +3196,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_10
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.10.a2
 	}
@@ -3033,7 +3209,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_11
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.11.a2
 		add_to_variable = { currentMoney = -3 }
@@ -3119,7 +3295,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_12
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.12.a2
 	}
@@ -3132,7 +3308,7 @@ country_event = {
 	picture = GFX_CIA_SYRIA_13
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = CIA_SYRIA.13.a2
 	}
@@ -3248,7 +3424,7 @@ country_event = {
 	picture = GFX_USA_INDONESIA_7
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = USA_INDONESIA.7.a2
 	}
@@ -3529,7 +3705,7 @@ country_event = {
 	desc = USA_50s_Dip_Desks.1.d
 	picture = GFX_USA_50s_Dip_Desks_1
 
-	
+
 	is_triggered_only = yes
 
 	option = {
@@ -3544,7 +3720,7 @@ country_event = {
 	desc = USA_50s_Dip_Desks.2.d
 	picture = GFX_USA_50s_Dip_Desks_2
 
-	
+
 	is_triggered_only = yes
 
 	option = {
@@ -3559,7 +3735,7 @@ country_event = {
 	desc = USA_50s_Dip_Desks.3.d
 	picture = GFX_USA_50s_Dip_Desks_3
 
-	
+
 	is_triggered_only = yes
 
 	option = {
@@ -3574,7 +3750,7 @@ country_event = {
 	desc = USA_50s_Dip_Desks.4.d
 	picture = GFX_USA_50s_Dip_Desks_4
 
-	
+
 	is_triggered_only = yes
 
 	option = {
@@ -3589,7 +3765,7 @@ country_event = {
 	desc = USA_50s_Dip_Desks.5.d
 	picture = GFX_USA_50s_Dip_Desks_5
 
-	
+
 	is_triggered_only = yes
 
 	option = {
@@ -3604,7 +3780,7 @@ country_event = {
 	desc = USA_50s_Dip_Desks.6.d
 	picture = GFX_USA_50s_Dip_Desks_6
 
-	
+
 	is_triggered_only = yes
 
 	option = {
@@ -3619,7 +3795,7 @@ country_event = {
 	desc = USA_50s_Dip_Desks.7.d
 	picture = GFX_USA_50s_Dip_Desks_7
 
-	
+
 	is_triggered_only = yes
 
 	option = {
@@ -3634,7 +3810,7 @@ country_event = {
 	desc = USA_50s_Dip_Desks.8.d
 	picture = GFX_USA_50s_Dip_Desks_8
 
-	
+
 	is_triggered_only = yes
 
 	option = {
@@ -3649,7 +3825,7 @@ country_event = {
 	desc = USA_50s_Dip_Desks.9.d
 	picture = GFX_USA_50s_Dip_Desks_9
 
-	
+
 	is_triggered_only = yes
 
 	option = {
@@ -3664,7 +3840,7 @@ country_event = {
 	desc = USA_50s_Dip_Desks.10.d
 	picture = GFX_USA_50s_Dip_Desks_10
 
-	
+
 	is_triggered_only = yes
 
 	option = {
@@ -3679,10 +3855,290 @@ country_event = {
 	desc = USA_50s_Dip_Desks.11.d
 	picture = GFX_USA_50s_Dip_Desks_11
 
-	
+
 	is_triggered_only = yes
 
 	option = {
 		name = USA_50s_Dip_Desks.11.a
+	}
+}
+add_namespace = USA_DiemRecog
+
+country_event = {
+	id = USA_DiemRecog.1
+	immediate = { }
+	title = USA_DiemRecog.1.t
+	desc = {
+		trigger = { has_global_flag = VIE_Republic_Proclaimed }
+		text = USA_DiemRecog.1.d_referendum
+	}
+	desc = {
+		trigger = { NOT = { has_global_flag = VIE_Republic_Proclaimed } }
+		text = USA_DiemRecog.1.d_premier
+	}
+	picture = GFX_BaoDai.9
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = USA_DiemRecog.1.a
+		add_opinion_modifier = {
+			target = VIE
+			modifier = medium_increase
+		}
+		set_temp_variable = { usa_indo_rapp = -50 }
+		USA_indochina_seed_rapprochement = yes	# recognising one Vietnam is a statement that there are two
+		hidden_effect = {
+			if = {
+				limit = { country_exists = VIE }
+				VIE = { country_event = { id = USA_DiemRecog.2 hours = 12 } }
+			}
+			news_event = { id = USA_DiemRecog.100 hours = 6 }
+		}
+	}
+}
+
+country_event = {
+	id = USA_DiemRecog.2
+	immediate = { }
+	title = USA_DiemRecog.2.t
+	desc = USA_DiemRecog.2.d
+	picture = GFX_BaoDai.9
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = USA_DiemRecog.2.a
+		add_stability = 0.05
+		add_political_power = 50
+		add_opinion_modifier = {
+			target = USA
+			modifier = medium_increase
+		}
+	}
+}
+
+news_event = {
+	id = USA_DiemRecog.100
+	immediate = { }
+	title = USA_DiemRecog.100.t
+	desc = USA_DiemRecog.100.d
+	picture = GFX_DiemRecog.100
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = USA_DiemRecog.100.a
+	}
+}
+
+add_namespace = USA_DiemCoup
+
+country_event = {
+	id = USA_DiemCoup.1
+	immediate = { }
+	title = USA_DiemCoup.1.t
+	desc = USA_DiemCoup.1.d
+	picture = GFX_French_Coup.1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = USA_DiemCoup.1.a
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_profrance_score = yes
+		hidden_effect = {
+			if = {
+				limit = { country_exists = VIE }
+				VIE = { country_event = { id = USA_DiemCoup.2 days = 3 } }
+			}
+			else = {
+				USA = { country_event = { id = USA_DiemCoup.3 days = 2 } }	# there is no longer a Saigon to move against
+			}
+		}
+		ai_chance = {
+			base = 60
+			modifier = {
+				factor = 2
+				AND = {
+					country_exists = VIE
+					VIE = { check_variable = { FRA_Influence < 25 } }	# Saigon is already slipping; the officers will not get a better moment
+				}
+			}
+			modifier = {
+				factor = 0
+				has_completed_focus = FRA_Retreat_From_Indochina	# Paris has written Indochina off and will not be dragged back
+			}
+			modifier = {
+				factor = 0
+				has_completed_focus = FRA_Accept_Diems_Regime
+			}
+		}
+	}
+	option = {
+		name = USA_DiemCoup.1.b
+		set_temp_variable = { usa_indo_b_points = 50 }
+		USA_indochina_diplomatic_push = yes
+		hidden_effect = {
+			USA = { country_event = { id = USA_DiemCoup.3 days = 2 } }
+		}
+		ai_chance = {
+			base = 40
+			modifier = {
+				factor = 3
+				has_completed_focus = FRA_Retreat_From_Indochina
+			}
+			modifier = {
+				factor = 3
+				has_completed_focus = FRA_Accept_Diems_Regime
+			}
+		}
+	}
+}
+
+country_event = {
+	id = USA_DiemCoup.2
+	immediate = { }
+	title = USA_DiemCoup.2.t
+	desc = USA_DiemCoup.2.d
+	picture = GFX_French_Coup.2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = USA_DiemCoup.2.a
+		set_country_flag = VIE_FRA_Coup
+		country_event = { id = French_Coup.2 hours = 3 }
+		hidden_effect = {
+			USA = { country_event = { id = USA_DiemCoup.4 days = 2 } }
+		}
+		ai_chance = {
+			base = 40
+			modifier = {
+				factor = 2
+				check_variable = { FRA_Influence > 24 }	# the palace guard still answers to Paris
+			}
+			modifier = {
+				factor = 0.5
+				has_stability > 0.5
+			}
+		}
+	}
+	option = {
+		name = USA_DiemCoup.2.b
+		add_political_power = -150
+		add_stability = -0.15
+		set_country_flag = VIE_FRA_Coup	# Paris does not get a second attempt, and the standing ProFrench_Coup mission retires with it
+		set_country_flag = VIE_FRA_Coup_Failed
+		add_opinion_modifier = {
+			target = USA
+			modifier = large_decrease
+		}
+		add_opinion_modifier = {
+			target = FRA
+			modifier = large_decrease
+		}
+		hidden_effect = {
+			USA = { country_event = { id = USA_DiemCoup.5 days = 2 } }
+		}
+		ai_chance = {
+			base = 60
+			modifier = {
+				factor = 2
+				has_stability > 0.5
+			}
+			modifier = {
+				factor = 1.5
+				has_war_support > 0.5
+			}
+			modifier = {
+				factor = 0.5
+				check_variable = { FRA_Influence > 24 }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = USA_DiemCoup.3
+	immediate = { }
+	title = USA_DiemCoup.3.t
+	desc = USA_DiemCoup.3.d
+	picture = GFX_USA_INDO_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_DiemCoup.3.a
+		set_temp_variable = { usa_indo_score = 15 }
+		USA_indochina_add_profrance_score = yes
+	}
+}
+
+country_event = {
+	id = USA_DiemCoup.4
+	immediate = { }
+	title = USA_DiemCoup.4.t
+	desc = USA_DiemCoup.4.d
+	picture = GFX_French_Coup.2
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_DiemCoup.4.a
+		set_temp_variable = { usa_indo_score = 100 }
+		USA_indochina_add_profrance_score = yes
+		set_temp_variable = { usa_indo_score = -100 }
+		USA_indochina_add_proindependence_score = yes	# the nationalist government Washington built is gone, and Washington signed for it
+		set_temp_variable = { usa_indo_a_points = 50 }
+		USA_indochina_escalation_push = yes
+		set_temp_variable = { usa_indo_rapp = -75 }
+		USA_indochina_seed_rapprochement = yes
+		set_temp_variable = { geneva_lev_amount = 50 }
+		geneva_add_profrance_leverage = yes
+		hidden_effect = {
+			news_event = { id = USA_DiemCoup.100 hours = 6 }
+		}
+	}
+}
+
+country_event = {
+	id = USA_DiemCoup.5
+	immediate = { }
+	title = USA_DiemCoup.5.t
+	desc = USA_DiemCoup.5.d
+	picture = GFX_USA_INDO_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = USA_DiemCoup.5.a
+		add_political_power = -50
+		set_temp_variable = { usa_indo_score = -100 }
+		USA_indochina_add_proindependence_score = yes
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_communist_score = yes	# the cadres get to say the Americans tried to sell Saigon back to Paris
+		set_temp_variable = { usa_indo_rapp = -50 }
+		USA_indochina_seed_rapprochement = yes
+	}
+}
+
+news_event = {
+	id = USA_DiemCoup.100
+	immediate = { }
+	title = USA_DiemCoup.100.t
+	desc = USA_DiemCoup.100.d
+	picture = GFX_French_Coup.2
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = USA_DiemCoup.100.a
 	}
 }

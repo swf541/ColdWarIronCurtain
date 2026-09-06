@@ -1,0 +1,360 @@
+fre_castor_focus_complete = {
+	set_country_flag = FRE_Operation_Castor_Launched
+	set_country_flag = FRE_Mission_Operation_Castor_Activated
+	fre_castor_load_callback_prices = yes
+	if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+			NOT = { has_global_flag = geneva_conference_concluded }
+			check_variable = { global.Indochina_War_Active_Phase < 9 }
+			country_exists = VIN
+			country_exists = TAI
+			VIN = { NOT = { has_country_flag = VIN_Campaign_Dien_Bien_Active } }
+			fre_dbp_french_aligned_controls_camp_trigger = yes
+			NOT = { has_country_flag = FRE_Dien_Bien_Phu_Established }
+		}
+		country_event = { id = FRE_Events.23 days = 1 }
+	}
+	else_if = {
+		limit = { has_country_flag = FRE_Dien_Bien_Phu_Established }
+		set_country_flag = FRE_Operation_Castor_Result_Success
+		set_country_flag = FRE_Operation_Castor_Success
+		set_country_flag = FRE_Mission_Operation_Castor_Completed
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_global_flag = Indochina_War_Over
+				has_global_flag = geneva_conference_concluded
+				check_variable = { global.Indochina_War_Active_Phase > 8 }
+				NOT = { country_exists = VIN }
+				NOT = { country_exists = TAI }
+				VIN = { has_country_flag = VIN_Campaign_Dien_Bien_Active }
+			}
+		}
+		set_country_flag = FRE_Operation_Castor_Result_Superseded
+	}
+	else = { fre_castor_abort_landing_ground_lost = yes }
+}
+
+fre_castor_prepare_new_operation = {
+	fre_castor_cleanup = yes
+	clr_country_flag = FRE_Operation_Castor_Result_Success
+	clr_country_flag = FRE_Operation_Castor_Result_Failure
+	clr_country_flag = FRE_Operation_Castor_Result_Superseded
+	clr_country_flag = FRE_Operation_Castor_Result_Failure_Full
+	clr_country_flag = FRE_Operation_Castor_Result_Failure_Limited
+	clr_country_flag = FRE_Operation_Castor_Result_Unfunded
+	clr_country_flag = FRE_Operation_Castor_Result_Landing_Ground_Lost
+	clr_country_flag = FRE_Operation_Castor_Success
+	clr_country_flag = FRE_Operation_Castor_Failure
+	clr_country_flag = FRE_Mission_Operation_Castor_Completed
+	clr_country_flag = FRE_Mission_Operation_Castor_Failed
+	set_variable = { FRE_Castor_Hold_Days = 0 }
+	set_variable = { FRE_Castor_Days_Elapsed = 0 }
+	set_variable = { FRE_Castor_Hold_Required = 14 }
+}
+
+fre_castor_begin_common = {
+	set_country_flag = FRE_Castor_Airhead_Active
+	set_country_flag = FRE_Mission_Operation_Castor_Activated
+	671 = {
+		if = {
+			limit = { NOT = { has_dynamic_modifier = { modifier = FRE_Castor_Airhead_Forming } } }
+			add_dynamic_modifier = { modifier = FRE_Castor_Airhead_Forming }
+		}
+	}
+	fre_dbp_fortify_camp = yes
+	vin_cefeo_intel_launch_castor = yes
+	activate_mission = FRE_Mission_Operation_Castor
+}
+
+fre_castor_load_callback_prices = {
+	set_variable = { FRE_Castor_Full_Price = 100 }
+	set_variable = { FRE_Castor_Limited_Price = 60 }
+	if = { limit = { has_country_flag = FRE_Operation_Brochet_Result_Clean } add_to_variable = { FRE_Castor_Full_Price = -15 } add_to_variable = { FRE_Castor_Limited_Price = -15 } }
+	else_if = { limit = { has_country_flag = FRE_Operation_Brochet_Result_Costly } add_to_variable = { FRE_Castor_Full_Price = -5 } add_to_variable = { FRE_Castor_Limited_Price = -5 } }
+	if = { limit = { has_country_flag = FRE_Na_San_Result_Clean } add_to_variable = { FRE_Castor_Full_Price = -15 } add_to_variable = { FRE_Castor_Limited_Price = -15 } }
+	else_if = { limit = { has_country_flag = FRE_Na_San_Result_Costly } add_to_variable = { FRE_Castor_Full_Price = -5 } add_to_variable = { FRE_Castor_Limited_Price = -5 } }
+	else_if = { limit = { has_country_flag = FRE_Na_San_Result_Failure } add_to_variable = { FRE_Castor_Full_Price = 15 } add_to_variable = { FRE_Castor_Limited_Price = 15 } }
+	clamp_variable = { var = FRE_Castor_Full_Price min = 50 max = 140 }
+	clamp_variable = { var = FRE_Castor_Limited_Price min = 25 max = 100 }
+}
+
+fre_castor_begin_full_drop = {
+	if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+			NOT = { has_global_flag = geneva_conference_concluded }
+			check_variable = { global.Indochina_War_Active_Phase < 9 }
+			country_exists = VIN
+			country_exists = TAI
+			VIN = { NOT = { has_country_flag = VIN_Campaign_Dien_Bien_Active } }
+			fre_dbp_french_aligned_controls_camp_trigger = yes
+		}
+		fre_castor_prepare_new_operation = yes
+		set_country_flag = FRE_Castor_Full_Drop
+		fre_castor_load_callback_prices = yes
+		set_temp_variable = { fre_credit_amount = FRE_Castor_Full_Price }
+		multiply_temp_variable = { fre_credit_amount = -1 }
+		fre_change_war_credits = yes
+		add_manpower = -4000
+		add_equipment_to_stockpile = { type = transport_plane_equipment amount = -6 }
+		set_temp_variable = { fre_patience_delta = -6 }
+		fre_metropole_patience_change = yes
+		add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1500 producer = FRA }
+		add_equipment_to_stockpile = { type = support_equipment amount = 200 producer = FRA }
+		fre_castor_begin_common = yes
+	}
+	else = { fre_castor_abort_before_drop = yes }
+}
+
+fre_castor_begin_limited_drop = {
+	if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+			NOT = { has_global_flag = geneva_conference_concluded }
+			check_variable = { global.Indochina_War_Active_Phase < 9 }
+			country_exists = VIN
+			country_exists = TAI
+			VIN = { NOT = { has_country_flag = VIN_Campaign_Dien_Bien_Active } }
+			fre_dbp_french_aligned_controls_camp_trigger = yes
+		}
+		fre_castor_prepare_new_operation = yes
+		set_country_flag = FRE_Castor_Limited_Drop
+		fre_castor_load_callback_prices = yes
+		set_temp_variable = { fre_credit_amount = FRE_Castor_Limited_Price }
+		multiply_temp_variable = { fre_credit_amount = -1 }
+		fre_change_war_credits = yes
+		add_manpower = -2500
+		add_equipment_to_stockpile = { type = transport_plane_equipment amount = -4 }
+		set_temp_variable = { fre_patience_delta = -3 }
+		fre_metropole_patience_change = yes
+		add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 750 producer = FRA }
+		fre_castor_begin_common = yes
+	}
+	else = { fre_castor_abort_before_drop = yes }
+}
+
+fre_castor_abort_before_drop = {
+	if = {
+		limit = {
+			OR = {
+				has_global_flag = Indochina_War_Over
+				has_global_flag = geneva_conference_concluded
+				check_variable = { global.Indochina_War_Active_Phase > 8 }
+				NOT = { country_exists = VIN }
+				NOT = { country_exists = TAI }
+				VIN = { has_country_flag = VIN_Campaign_Dien_Bien_Active }
+			}
+		}
+		fre_castor_prepare_new_operation = yes
+		set_country_flag = FRE_Operation_Castor_Result_Superseded
+		country_event = { id = FRE_Events.33 hours = 6 }
+	}
+	else = { fre_castor_abort_landing_ground_lost = yes }
+}
+
+fre_castor_abort_landing_ground_lost = {
+	fre_castor_prepare_new_operation = yes
+	set_country_flag = FRE_Operation_Castor_Result_Failure
+	set_country_flag = FRE_Operation_Castor_Result_Landing_Ground_Lost
+	set_country_flag = FRE_Operation_Castor_Failure
+	set_country_flag = FRE_Mission_Operation_Castor_Failed
+	set_country_flag = FRE_Operation_Cooldown_Castor
+	add_stability = -0.01
+	country_event = { id = FRE_Events.33 hours = 6 }
+}
+
+fre_castor_abort_unfunded = {
+	fre_castor_prepare_new_operation = yes
+	set_country_flag = FRE_Operation_Castor_Result_Failure
+	set_country_flag = FRE_Operation_Castor_Result_Unfunded
+	set_country_flag = FRE_Operation_Castor_Failure
+	set_country_flag = FRE_Mission_Operation_Castor_Failed
+	set_country_flag = FRE_Operation_Cooldown_Castor
+	add_stability = -0.01
+	add_war_support = -0.01
+	country_event = { id = FRE_Events.33 hours = 6 }
+}
+
+fre_castor_daily_tick = {
+	if = {
+		limit = { has_country_flag = FRE_Castor_Airhead_Active }
+		add_to_variable = { FRE_Castor_Days_Elapsed = 1 }
+		if = {
+			limit = { fre_dbp_french_aligned_controls_camp_trigger = yes }
+			add_to_variable = { FRE_Castor_Hold_Days = 1 }
+		}
+		else = { set_variable = { FRE_Castor_Hold_Days = 0 } }
+
+		if = {
+			limit = { NOT = { check_variable = { FRE_Castor_Hold_Days < FRE_Castor_Hold_Required } } }
+			fre_castor_resolve_success = yes
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_global_flag = Indochina_War_Over
+					has_global_flag = geneva_conference_concluded
+					check_variable = { global.Indochina_War_Active_Phase > 8 }
+				}
+			}
+			fre_castor_resolve_superseded = yes
+		}
+		else_if = {
+			limit = { check_variable = { FRE_Castor_Days_Elapsed > 29 } }
+			fre_castor_resolve_failure = yes
+		}
+	}
+}
+
+fre_castor_deadline_resolve = {
+	if = {
+		limit = { has_country_flag = FRE_Castor_Airhead_Active }
+		if = {
+			limit = {
+				fre_dbp_french_aligned_controls_camp_trigger = yes
+				NOT = { check_variable = { FRE_Castor_Hold_Days < 13 } }
+			}
+			fre_castor_resolve_success = yes
+		}
+		else = { fre_castor_resolve_failure = yes }
+	}
+}
+
+fre_castor_resolve_success = {
+	if = {
+		limit = { has_country_flag = FRE_Castor_Airhead_Active }
+		set_country_flag = FRE_Operation_Castor_Result_Success
+		set_country_flag = FRE_Dien_Bien_Phu_Established
+		set_country_flag = FRE_Operation_Castor_Success
+		set_country_flag = FRE_Mission_Operation_Castor_Completed
+		set_country_flag = FRE_Operation_Cooldown_Castor
+		set_temp_variable = { fre_credit_amount = 40 }
+		fre_change_war_credits = yes
+		set_temp_variable = { fre_patience_delta = 2 }
+		fre_metropole_patience_change = yes
+		air_experience = 25
+		if = {
+			limit = { NOT = { has_global_flag = Indochina_War_Over } }
+			FRA = {
+				add_to_variable = {
+					StruggleInvolvedNationsIndochinaProFranceScore = 10
+					tooltip = Add_to_French_Victory_Points_TT
+				}
+				add_to_variable = {
+					global.Indochina_War_Next_Phase_A_Points = 25
+					tooltip = Add_to_Escalation_Phase_TT
+				}
+				indochina_struggle_recalculate_total_anti_communist_score = yes
+			}
+		}
+		fre_castor_cleanup = yes
+		country_event = { id = FRE_Events.32 hours = 6 }
+	}
+}
+
+fre_castor_resolve_failure = {
+	if = {
+		limit = { has_country_flag = FRE_Castor_Airhead_Active }
+		set_country_flag = FRE_Operation_Castor_Result_Failure
+		set_country_flag = FRE_Operation_Castor_Failure
+		set_country_flag = FRE_Mission_Operation_Castor_Failed
+		set_country_flag = FRE_Operation_Cooldown_Castor
+		if = {
+			limit = { has_country_flag = FRE_Castor_Full_Drop }
+			set_country_flag = FRE_Operation_Castor_Result_Failure_Full
+			add_manpower = -2000
+			set_temp_variable = { fre_patience_delta = -2 }
+			fre_metropole_patience_change = yes
+		}
+		else = {
+			set_country_flag = FRE_Operation_Castor_Result_Failure_Limited
+			add_manpower = -1000
+		}
+		add_stability = -0.03
+		add_war_support = -0.03
+		if = {
+			limit = { NOT = { has_global_flag = Indochina_War_Over } }
+			FRA = {
+				add_to_variable = {
+					StruggleInvolvedNationsIndochinaProFranceScore = -10
+					tooltip = Add_to_French_Victory_Points_TT
+				}
+				add_to_variable = {
+					StruggleInvolvedNationsIndochinaCommunistScore = 10
+					tooltip = Add_to_Communist_Victory_Points_TT
+				}
+				add_to_variable = {
+					global.Indochina_War_Next_Phase_A_Points = 25
+					tooltip = Add_to_Escalation_Phase_TT
+				}
+				indochina_struggle_recalculate_total_anti_communist_score = yes
+			}
+		}
+		fre_dbp_disband_gono = yes
+		fre_castor_cleanup = yes
+		country_event = { id = FRE_Events.33 hours = 6 }
+	}
+}
+
+fre_castor_resolve_superseded = {
+	if = {
+		limit = { has_country_flag = FRE_Castor_Airhead_Active }
+		set_country_flag = FRE_Operation_Castor_Result_Superseded
+		fre_dbp_disband_gono = yes
+		fre_castor_cleanup = yes
+		country_event = { id = FRE_Events.33 hours = 6 }
+	}
+}
+
+fre_castor_orphan_check = {
+	if = {
+		limit = {
+			has_country_flag = FRE_Castor_Airhead_Active
+			OR = {
+				NOT = { country_exists = VIN }
+				NOT = { country_exists = TAI }
+			}
+		}
+		fre_castor_resolve_superseded = yes
+	}
+}
+
+fre_castor_handoff_to_campaign = {
+	if = {
+		limit = { has_country_flag = FRE_Castor_Airhead_Active }
+		set_country_flag = FRE_Operation_Castor_Result_Superseded
+		fre_castor_cleanup = yes
+	}
+}
+
+fre_castor_force_superseded_cleanup = {
+	if = {
+		limit = { has_country_flag = FRE_Castor_Airhead_Active }
+		set_country_flag = FRE_Operation_Castor_Result_Superseded
+		fre_dbp_disband_gono = yes
+	}
+	fre_castor_cleanup = yes
+}
+
+fre_castor_cleanup = {
+	vin_cefeo_intel_finish_castor = yes
+	set_temp_variable = { response_validation_package = 4 }
+	response_package_validation_log = yes
+	671 = {
+		if = {
+			limit = { has_dynamic_modifier = { modifier = FRE_Castor_Airhead_Forming } }
+			remove_dynamic_modifier = { modifier = FRE_Castor_Airhead_Forming }
+		}
+	}
+	clr_country_flag = FRE_Castor_Airhead_Active
+	clr_country_flag = FRE_Mission_Operation_Castor_Activated
+	clr_country_flag = FRE_Castor_Full_Drop
+	clr_country_flag = FRE_Castor_Limited_Drop
+	set_variable = { FRE_Castor_Hold_Days = 0 }
+	set_variable = { FRE_Castor_Days_Elapsed = 0 }
+	set_variable = { FRE_Castor_Hold_Required = 0 }
+	remove_mission = FRE_Mission_Operation_Castor
+}

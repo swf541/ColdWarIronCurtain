@@ -1,0 +1,223 @@
+# ============================================================================
+# Indochina failsafe QA harness
+# ----------------------------------------------------------------------------
+# Console only. Run from any country scope with "e <name>". The break_* effects
+# each reproduce one of the edge cases the layer exists to catch; the router is
+# then either left to the on_actions or invoked directly with
+# test_ic_failsafe_route_now. Read the results out of the game log.
+#
+# The reported bug is test_ic_failsafe_break_vin_to_fre.
+# ============================================================================
+
+test_ic_failsafe_status = {
+	log = "IC FAILSAFE: phase=[?global.Indochina_War_Active_Phase|0] ending_available=[?global.indochina_ending_available_check|0]"
+	log = "IC FAILSAFE SCORES: comm=[?global.ic_score_comm|0] profr=[?global.ic_score_profr|0] proind=[?global.ic_score_proind|0] proeth=[?global.ic_score_proeth|0] kmt=[?global.ic_score_kmt|0] anticomm=[?global.ic_score_anticomm|0]"
+	log = "IC FAILSAFE STALLS: carrier=[?global.ic_stall_carrier_days|0] decided=[?global.ic_stall_decided_days|0] geneva=[?global.ic_stall_geneva_days|0] latch=[?global.ic_stall_latch_days|0] unclicked=[?global.ic_stall_unclicked_days|0] nowar=[?global.ic_stall_nowar_days|0]"
+	if = { limit = { has_global_flag = ic_failsafe_theatre_present } log = "IC FAILSAFE: armed" }
+	else = { log = "IC FAILSAFE: NOT armed - ic_failsafe_theatre_present is unset" }
+	if = { limit = { has_global_flag = Indochina_War_Over } log = "IC FAILSAFE: Indochina_War_Over is SET" }
+	else = { log = "IC FAILSAFE: Indochina_War_Over is unset" }
+	if = { limit = { has_global_flag = ic_failsafe_fired } log = "IC FAILSAFE: the router has run at least once" }
+	if = { limit = { ic_failsafe_militarily_decided_trigger = yes } log = "IC FAILSAFE: militarily decided = TRUE" }
+	if = { limit = { ic_failsafe_geneva_latched_dead_trigger = yes } log = "IC FAILSAFE: Geneva latch is DEAD" }
+	if = { limit = { ic_failsafe_geneva_live_trigger = yes } log = "IC FAILSAFE: a conference is genuinely running" }
+	if = { limit = { ic_failsafe_no_theatre_war_trigger = yes } log = "IC FAILSAFE: nobody in the theatre is at war" }
+	if = { limit = { ic_failsafe_ending_owner_is_human_trigger = yes } log = "IC FAILSAFE: a human can take the ending (90 day grace)" }
+	else = { log = "IC FAILSAFE: no human can take the ending (60 day grace)" }
+}
+
+test_ic_failsafe_route_now = {
+	log = "IC FAILSAFE TEST: forcing a route"
+	indochina_failsafe_route_decisive_result = yes
+	test_ic_failsafe_status = yes
+}
+
+test_ic_failsafe_preflight = {
+	indochina_failsafe_preflight = yes
+	log = "IC FAILSAFE TEST: preflight complete"
+}
+
+test_ic_failsafe_postflight = {
+	indochina_failsafe_postflight = yes
+	log = "IC FAILSAFE TEST: postflight complete"
+}
+
+test_ic_failsafe_arm = {
+	set_global_flag = ic_failsafe_theatre_present
+	set_global_flag = indochina_struggle_initialized
+	log = "IC FAILSAFE TEST: layer armed by hand"
+}
+
+# The reported bug. The corps takes Tonkin outright and the Viet Minh is wiped
+# off the map without VIE ever having been the belligerent, which is exactly the
+# case the old VIE_on_actions hook could not see.
+test_ic_failsafe_break_vin_to_fre = {
+	test_ic_failsafe_arm = yes
+	if = {
+		limit = { country_exists = FRE }
+		FRE = {
+			transfer_state = 1760
+			transfer_state = 786
+			transfer_state = 838
+			transfer_state = 881
+			if = {
+				limit = { country_exists = VIN }
+				annex_country = { target = VIN transfer_troops = no }
+			}
+		}
+	}
+	log = "IC FAILSAFE TEST: FRE has taken Tonkin and annexed VIN"
+	test_ic_failsafe_status = yes
+}
+
+# The communist mirror the hooks never had: the State of Vietnam goes under and
+# nothing in the old system notices.
+test_ic_failsafe_break_vie_to_vin = {
+	test_ic_failsafe_arm = yes
+	if = {
+		limit = { country_exists = VIN }
+		VIN = {
+			transfer_state = 286
+			transfer_state = 757
+			if = {
+				limit = { country_exists = VIE }
+				annex_country = { target = VIE transfer_troops = no }
+			}
+		}
+	}
+	log = "IC FAILSAFE TEST: VIN has taken Saigon and annexed VIE"
+	test_ic_failsafe_status = yes
+}
+
+# France dies in Europe: on_daily_FRA stops and every FRA-scope score read goes
+# with it. The carrier chain should pick the tick up on VIN.
+test_ic_failsafe_kill_fra = {
+	test_ic_failsafe_arm = yes
+	if = {
+		limit = { country_exists = FRA }
+		if = {
+			limit = { country_exists = SOV }
+			SOV = { annex_country = { target = FRA transfer_troops = no } }
+		}
+		else_if = {
+			limit = { country_exists = ENG }
+			ENG = { annex_country = { target = FRA transfer_troops = no } }
+		}
+	}
+	log = "IC FAILSAFE TEST: France annexed - the watchdog should route in 14 days"
+	test_ic_failsafe_status = yes
+}
+
+test_ic_failsafe_kill_all_principals = {
+	test_ic_failsafe_arm = yes
+	if = {
+		limit = { country_exists = PRC }
+		PRC = {
+			if = { limit = { country_exists = VIN } annex_country = { target = VIN transfer_troops = no } }
+			if = { limit = { country_exists = VIE } annex_country = { target = VIE transfer_troops = no } }
+		}
+	}
+	log = "IC FAILSAFE TEST: both Vietnams annexed by a power outside the theatre"
+	test_ic_failsafe_status = yes
+}
+
+# The half of the reported bug that left two French-aligned Vietnams.
+test_ic_failsafe_puppet_vin_to_fra = {
+	test_ic_failsafe_arm = yes
+	if = {
+		limit = {
+			country_exists = FRA
+			country_exists = VIN
+		}
+		FRA = {
+			puppet = { target = VIN }
+			set_autonomy = {
+				target = VIN
+				autonomy_state = autonomy_indon_union
+				end_wars = no
+				end_civil_wars = no
+			}
+		}
+	}
+	log = "IC FAILSAFE TEST: VIN is now a French puppet - break_bad_subjects should free it"
+	test_ic_failsafe_status = yes
+}
+
+# The other half: a peace conference hands the Tai Federation ground it has no
+# claim to. enforce_minority_homelands should strip it back to 671 and 1761.
+test_ic_failsafe_bloat_tai = {
+	test_ic_failsafe_arm = yes
+	if = {
+		limit = { country_exists = TAI }
+		TAI = {
+			transfer_state = 786
+			transfer_state = 881
+			transfer_state = 1280
+			transfer_state = 1762
+			transfer_state = 1763
+		}
+	}
+	log = "IC FAILSAFE TEST: TAI inflated with five states it must not own"
+	test_ic_failsafe_status = yes
+}
+
+# The one-way latch with nothing behind it: every non-Geneva ending is now shut
+# and the conference will never convene.
+test_ic_failsafe_geneva_latch = {
+	test_ic_failsafe_arm = yes
+	set_global_flag = Geneva_Conference
+	clr_global_flag = geneva_conference_announced
+	clr_global_flag = geneva_conference_in_session
+	clr_global_flag = geneva_conference_concluded
+	clr_global_flag = Geneva_Conference_Negotiations_Complete
+	set_variable = { global.ic_stall_latch_days = 0 }
+	log = "IC FAILSAFE TEST: dead Geneva latch set - abort at 60 days, route at 90"
+	test_ic_failsafe_status = yes
+}
+
+test_ic_failsafe_geneva_stall = {
+	test_ic_failsafe_arm = yes
+	set_global_flag = Geneva_Conference
+	set_global_flag = geneva_conference_in_session
+	set_variable = { global.ic_stall_geneva_days = 118 }
+	log = "IC FAILSAFE TEST: conference stalled - compile at 120, cut short at 150"
+}
+
+# Puts every counter two days short of its first threshold so the watchdog can
+# be watched firing without waiting out the grace periods.
+test_ic_failsafe_stall_arm = {
+	test_ic_failsafe_arm = yes
+	set_variable = { global.ic_stall_carrier_days = 12 }
+	set_variable = { global.ic_stall_decided_days = 28 }
+	set_variable = { global.ic_stall_geneva_days = 118 }
+	set_variable = { global.ic_stall_latch_days = 58 }
+	set_variable = { global.ic_stall_unclicked_days = 58 }
+	set_variable = { global.ic_stall_nowar_days = 88 }
+	log = "IC FAILSAFE TEST: every stall counter armed two days short"
+}
+
+test_ic_failsafe_save_repair = {
+	clr_global_flag = ic_failsafe_save_repair_done
+	indochina_failsafe_save_repair = yes
+	log = "IC FAILSAFE TEST: save repair re-run"
+	test_ic_failsafe_status = yes
+}
+
+test_ic_failsafe_reset = {
+	clr_global_flag = ic_failsafe_routing
+	clr_global_flag = ic_failsafe_fired
+	clr_global_flag = ic_failsafe_geneva_aborted
+	clr_global_flag = ic_failsafe_warning_sent
+	clr_global_flag = ic_failsafe_save_repair_done
+	set_variable = { global.ic_stall_carrier_days = 0 }
+	set_variable = { global.ic_stall_decided_days = 0 }
+	set_variable = { global.ic_stall_geneva_days = 0 }
+	set_variable = { global.ic_stall_latch_days = 0 }
+	set_variable = { global.ic_stall_unclicked_days = 0 }
+	set_variable = { global.ic_stall_nowar_days = 0 }
+	every_country = {
+		limit = { has_country_flag = ic_failsafe_pc_handled }
+		clr_country_flag = ic_failsafe_pc_handled
+	}
+	log = "IC FAILSAFE TEST: failsafe state reset"
+}

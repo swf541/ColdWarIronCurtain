@@ -1,0 +1,177 @@
+scripted_gui = {
+	# Geneva Conference negotiation view. Shows the agenda, round counter and
+	# every delegation's weight/patience/status, plus the table-action panel
+	# (phase 3): Champion, Pressure, Concede, Back-Channel, Threaten Walkout,
+	# Force the Vote, and the USA-only Lean on Saigon.
+	# Opened automatically for seated delegations when the conference
+	# convenes, via the "Geneva Conference" pseudo-foci button on the
+	# political tab (politics-list id 29, added at seating so SOV/PRC get it
+	# too), or via the legacy Geneva button on the Indochina struggle window.
+	CWIC_Geneva_Conference_GUI = {
+		context_type = player_context
+		window_name = "CWIC_Geneva_Conference_Window"
+		visible = {
+			check_variable = { View_Geneva_Conference = 1 }
+		}
+		ai_enabled = {
+			always = no
+		}
+		dynamic_lists = {
+			geneva_conf_delegation_listing_grid = {
+				array = global.geneva_delegations
+				change_scope = yes
+				entry_container = geneva_conf_delegation_entry
+			}
+		}
+		triggers = {
+			# Action buttons only appear for seated delegations in session.
+			Geneva_Champion_Button_visible = {
+				has_global_flag = geneva_conference_in_session
+				is_in_array = { global.geneva_delegations = THIS.id }
+			}
+			Geneva_Pressure_Button_visible = {
+				has_global_flag = geneva_conference_in_session
+				is_in_array = { global.geneva_delegations = THIS.id }
+			}
+			Geneva_Concede_Button_visible = {
+				has_global_flag = geneva_conference_in_session
+				is_in_array = { global.geneva_delegations = THIS.id }
+			}
+			Geneva_Backchannel_Button_visible = {
+				has_global_flag = geneva_conference_in_session
+				OR = {
+					tag = VIE
+					tag = VIN
+				}
+				is_in_array = { global.geneva_delegations = THIS.id }
+			}
+			Geneva_Threaten_Button_visible = {
+				has_global_flag = geneva_conference_in_session
+				is_in_array = { global.geneva_delegations = THIS.id }
+			}
+			Geneva_Force_Vote_Button_visible = {
+				has_global_flag = geneva_conference_in_session
+				has_country_flag = geneva_core_delegation
+			}
+			Geneva_Lean_Saigon_Button_visible = {
+				has_global_flag = geneva_conference_in_session
+				tag = USA
+				is_in_array = { global.geneva_delegations = THIS.id }
+			}
+
+			Geneva_Champion_Button_click_enabled = {
+				geneva_action_possible_trigger = yes
+				has_political_power > 24
+				check_variable = { geneva_neg_mine^geneva_sel_clause = 0 }
+				OR = {
+					AND = {
+						check_variable = { global.geneva_severity^geneva_sel_clause = 1 }
+						check_variable = { geneva_weight > 10 }
+					}
+					AND = {
+						check_variable = { global.geneva_severity^geneva_sel_clause = 2 }
+						check_variable = { geneva_weight > 20 }
+					}
+					AND = {
+						check_variable = { global.geneva_severity^geneva_sel_clause = 3 }
+						check_variable = { geneva_weight > 30 }
+					}
+					AND = {
+						NOT = { check_variable = { global.geneva_severity^geneva_sel_clause > 0 } }
+						check_variable = { geneva_weight > 20 }
+					}
+				}
+			}
+			Geneva_Pressure_Button_click_enabled = {
+				geneva_action_possible_trigger = yes
+				has_political_power > 24
+				check_variable = { geneva_weight > 25 }
+				NOT = { check_variable = { geneva_sel_target = THIS.id } }
+				any_country = {
+					check_variable = { THIS.id = PREV.geneva_sel_target }
+					is_in_array = { global.geneva_delegations = THIS.id }
+					NOT = { has_country_flag = geneva_walked_out }
+					check_variable = { geneva_pressured_until < global.geneva_round }
+				}
+			}
+			Geneva_Concede_Button_click_enabled = {
+				geneva_action_possible_trigger = yes
+			}
+			Geneva_Backchannel_Button_click_enabled = {
+				geneva_action_possible_trigger = yes
+				has_political_power > 49
+				NOT = { check_variable = { geneva_backchannel_next > global.geneva_round } }
+				OR = {
+					AND = {
+						tag = VIE
+						country_exists = VIN
+						check_variable = { geneva_sel_target = VIN.id }
+					}
+					AND = {
+						tag = VIN
+						country_exists = VIE
+						check_variable = { geneva_sel_target = VIE.id }
+					}
+				}
+			}
+			Geneva_Threaten_Button_click_enabled = {
+				geneva_action_possible_trigger = yes
+				check_variable = { geneva_patience > 25 }
+				NOT = { check_variable = { geneva_threat_next > global.geneva_round } }
+				check_variable = { geneva_neg_mine^geneva_sel_clause = 0 }
+			}
+			Geneva_Force_Vote_Button_click_enabled = {
+				has_global_flag = geneva_conference_in_session
+				has_country_flag = geneva_core_delegation
+				NOT = { has_country_flag = geneva_walked_out }
+				has_political_power > 49
+				check_variable = { global.geneva_round > 4 }
+			}
+			Geneva_Lean_Saigon_Button_click_enabled = {
+				geneva_action_possible_trigger = yes
+				NOT = { has_country_flag = USA_geneva_leaned_on_saigon }
+				has_political_power > 49
+				country_exists = VIE
+				VIE = {
+					is_in_array = { global.geneva_delegations = THIS.id }
+					NOT = { has_country_flag = geneva_walked_out }
+				}
+			}
+		}
+		effects = {
+			close_button_click = {
+				set_variable = { View_Geneva_Conference = 0 }
+			}
+			geneva_conf_deleg_pick_click = {
+				set_variable = { ROOT.geneva_sel_target = THIS.id }
+			}
+			Geneva_Next_Clause_Button_click = {
+				geneva_ui_cycle_clause = yes
+			}
+			Geneva_Next_Option_Button_click = {
+				geneva_ui_cycle_option = yes
+			}
+			Geneva_Champion_Button_click = {
+				geneva_action_champion = yes
+			}
+			Geneva_Pressure_Button_click = {
+				geneva_action_pressure = yes
+			}
+			Geneva_Concede_Button_click = {
+				geneva_action_concede = yes
+			}
+			Geneva_Backchannel_Button_click = {
+				geneva_action_backchannel = yes
+			}
+			Geneva_Threaten_Button_click = {
+				geneva_action_threaten = yes
+			}
+			Geneva_Force_Vote_Button_click = {
+				geneva_action_force_vote = yes
+			}
+			Geneva_Lean_Saigon_Button_click = {
+				geneva_action_lean_on_saigon = yes
+			}
+		}
+	}
+}

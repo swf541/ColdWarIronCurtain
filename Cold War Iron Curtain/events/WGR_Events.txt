@@ -254,10 +254,22 @@ immediate = { }
 	option = {
 		name = WGRElection.1.c2
 		trigger = {
-			has_country_flag = SOV_Intervention
+			OR = {
+				has_country_flag = SOV_Intervention
+				has_country_flag = SOV_Intervention_Exposed
+			}
 		}
 		hidden_effect = {
             set_country_flag = kpd_wins
+			set_global_flag = WGR_1949_communist_victory
+			# Tell Moscow. This is what reveals the Soviet side branch
+			# SOV_wge_a_red_bonn on the Stalin tree.
+			SOV = {
+				set_country_flag = SOV_WGR49_kpd_victory
+				mark_focus_tree_layout_dirty = yes
+				country_event = { id = sov_german_question.2 days = 2 }
+			}
+			news_event = { id = sov_german_question.3 days = 2 }
             create_country_leader = {
                 name = "Max Reimann"
                 picture = "Max_Reimann.dds"
@@ -328,7 +340,10 @@ immediate = { }
 			
         }
 		load_focus_tree = WGR_Reimann_49
-		
+
+		# Weighted against CDU 45 / SPD 45. A clean MGB operation makes a
+		# communist Bonn roughly a coin flip; an exposed one roughly 15%.
+		# With no Soviet interference at all the option is not even shown.
 		ai_chance = {
 			factor = 10
 			modifier = {
@@ -339,6 +354,19 @@ immediate = { }
 						rule = WGR_1949_elections
 						option = DEFAULT
 					}
+					NOT = { has_country_flag = SOV_Intervention }
+					NOT = { has_country_flag = SOV_Intervention_Exposed }
+				}
+			}
+			modifier = {
+				factor = 9
+				has_country_flag = SOV_Intervention
+			}
+			modifier = {
+				factor = 1.6
+				AND = {
+					has_country_flag = SOV_Intervention_Exposed
+					NOT = { has_country_flag = SOV_Intervention }
 				}
 			}
 		}
@@ -8140,7 +8168,7 @@ country_event = {
 news_event = {
     id = Reimann.172
  immediate = { }
-    title = Reimann.172.a
+    title = Reimann.172.t
     picture = GFX_WGR_Reunification_of_Germany
     desc = Reimann.172.d
 

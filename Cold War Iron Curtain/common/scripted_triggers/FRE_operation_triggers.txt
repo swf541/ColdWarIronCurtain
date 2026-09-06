@@ -1,0 +1,148 @@
+FRE_no_operation_running_trigger = {
+	NOT = {
+		OR = {
+			has_country_flag = FRE_Limited_Operation_Pending
+			has_country_flag = FRE_Limited_Operation_Active
+			has_country_flag = FRE_Mission_Operation_Lorraine_Activated
+			has_country_flag = FRE_Mission_Operation_Hirondelle_Activated
+			has_country_flag = FRE_Mission_Operation_Mouette_Activated
+			has_country_flag = FRE_Mission_Operation_Brochet_Activated
+			has_country_flag = FRE_Mission_Operation_Castor_Activated
+			has_country_flag = FRE_Mission_Operation_Pollux_Activated
+			has_country_flag = FRE_Mission_Operation_Atlante_Activated
+		}
+	}
+}
+
+FRE_hirondelle_terminal_trigger = { OR = { has_country_flag = FRE_Operation_Hirondelle_Result_Clean has_country_flag = FRE_Operation_Hirondelle_Result_Costly has_country_flag = FRE_Operation_Hirondelle_Result_Aborted has_country_flag = FRE_Operation_Hirondelle_Result_Failure has_country_flag = FRE_Operation_Hirondelle_Result_Superseded } }
+FRE_mouette_terminal_trigger = { OR = { has_country_flag = FRE_Operation_Mouette_Result_Clean has_country_flag = FRE_Operation_Mouette_Result_Costly has_country_flag = FRE_Operation_Mouette_Result_Aborted has_country_flag = FRE_Operation_Mouette_Result_Failure has_country_flag = FRE_Operation_Mouette_Result_Superseded } }
+FRE_brochet_terminal_trigger = { OR = { has_country_flag = FRE_Operation_Brochet_Result_Clean has_country_flag = FRE_Operation_Brochet_Result_Costly has_country_flag = FRE_Operation_Brochet_Result_Aborted has_country_flag = FRE_Operation_Brochet_Result_Failure has_country_flag = FRE_Operation_Brochet_Result_Superseded } }
+
+FRE_limited_operation_window_trigger = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	NOT = { has_global_flag = geneva_conference_concluded }
+	NOT = { has_global_flag = Laos_Raid_Active }
+	check_variable = { global.Indochina_War_Active_Phase < 9 }
+	country_exists = VIN
+	NOT = { has_war_with = VIN }	# each renovated operation must own a fresh, isolated war
+	VIN = { VIN_no_campaign_running_trigger = yes }
+}
+
+fre_operation_raw_objective_met = {
+	OR = {
+		AND = {
+			check_variable = { FRE_op_current = 3 }
+			OR = { controls_province = 11909 FRA = { controls_province = 11909 } AND = { country_exists = TAI TAI = { controls_province = 11909 } } AND = { country_exists = VIE VIE = { controls_province = 11909 } } }
+			OR = {
+				controls_province = 1185
+				controls_province = 13753
+				FRA = { OR = { controls_province = 1185 controls_province = 13753 } }
+				AND = { country_exists = TAI TAI = { OR = { controls_province = 1185 controls_province = 13753 } } }
+				AND = { country_exists = VIE VIE = { OR = { controls_province = 1185 controls_province = 13753 } } }
+			}
+		}
+		AND = { check_variable = { FRE_op_current = 4 } OR = { controls_province = 13755 FRA = { controls_province = 13755 } AND = { country_exists = TAI TAI = { controls_province = 13755 } } AND = { country_exists = VIE VIE = { controls_province = 13755 } } } }
+	}
+}
+
+fre_operation_objective_met = {
+	OR = {
+		AND = { check_variable = { FRE_op_current = 2 } check_variable = { FRE_op_objective_hold_days > FRE_op_objective_required } }
+		AND = { check_variable = { FRE_op_current = 3 } check_variable = { FRE_op_objective_hold_days > 4 } }
+		AND = { check_variable = { FRE_op_current = 4 } check_variable = { FRE_op_days_elapsed > 34 } fre_operation_raw_objective_met = yes }
+	}
+}
+
+fre_operation_fre_overextended_trigger = {
+	has_country_flag = FRE_Limited_Operation_Active
+	OR = {
+		AND = {
+			check_variable = { FRE_op_current = 3 }
+			OR = {
+				AND = { 1762 = { is_owned_by = VIN } controls_province = 11936 }
+				AND = { 1768 = { is_owned_by = VIN } OR = { controls_province = 9948 controls_province = 13761 controls_province = 13766 } }
+				AND = { 1280 = { is_owned_by = VIN } OR = { controls_province = 7518 controls_province = 12065 controls_province = 13767 } }
+				AND = { 881 = { is_owned_by = VIN } OR = { controls_province = 1073 controls_province = 1157 controls_province = 7015 controls_province = 12048 controls_province = 13763 controls_province = 13769 } }
+				AND = { 1763 = { is_owned_by = VIN } OR = { controls_province = 4397 controls_province = 9988 controls_province = 10016 controls_province = 13752 controls_province = 16448 controls_province = 16449 } }
+				AND = { 838 = { is_owned_by = VIN } OR = { controls_province = 7280 controls_province = 12297 controls_province = 16447 controls_province = 16525 } }
+			}
+		}
+		AND = {
+			check_variable = { FRE_op_current = 4 }
+			OR = {
+				AND = { 1768 = { is_owned_by = VIN } OR = { controls_province = 9948 controls_province = 13761 controls_province = 13766 } }
+				AND = { 1280 = { is_owned_by = VIN } OR = { controls_province = 7518 controls_province = 12065 controls_province = 13767 } }
+				indochina_french_aligned_controls_vin_rear_trigger = yes
+			}
+		}
+	}
+}
+
+fre_operation_theatre_closed = {
+	OR = {
+		has_global_flag = Indochina_War_Over
+		has_global_flag = geneva_conference_concluded
+		check_variable = { global.Indochina_War_Active_Phase > 8 }
+		NOT = { country_exists = VIN }
+	}
+}
+
+FRE_operation_cooldown_ready_trigger = {
+	NOT = {
+		OR = {
+			AND = {
+				has_country_flag = FRE_Operation_Cooldown_Lorraine
+				NOT = { has_country_flag = { flag = FRE_Operation_Cooldown_Lorraine days > 59 } }
+			}
+			AND = {
+				has_country_flag = FRE_Operation_Cooldown_Hirondelle
+				NOT = { has_country_flag = { flag = FRE_Operation_Cooldown_Hirondelle days > 59 } }
+			}
+			AND = {
+				has_country_flag = FRE_Operation_Cooldown_Mouette
+				NOT = { has_country_flag = { flag = FRE_Operation_Cooldown_Mouette days > 59 } }
+			}
+			AND = {
+				has_country_flag = FRE_Operation_Cooldown_Brochet
+				NOT = { has_country_flag = { flag = FRE_Operation_Cooldown_Brochet days > 59 } }
+			}
+			AND = {
+				has_country_flag = FRE_Operation_Cooldown_Castor
+				NOT = { has_country_flag = { flag = FRE_Operation_Cooldown_Castor days > 59 } }
+			}
+			AND = {
+				has_country_flag = FRE_Operation_Cooldown_Atlante
+				NOT = { has_country_flag = { flag = FRE_Operation_Cooldown_Atlante days > 59 } }
+			}
+		}
+	}
+}
+
+FRE_mission_pp_reserved_trigger = {
+	is_ai = yes
+	check_variable = { political_power < 160 }
+	OR = {
+		AND = {
+			has_country_flag = FRE_Mission_Assess_RC4_Activated
+			NOT = { has_country_flag = FRE_Mission_Assess_RC4_Completed }
+		}
+		AND = {
+			has_country_flag = FRE_Mission_Address_Revers_Report_Activated
+			NOT = { has_country_flag = FRE_Mission_Address_Revers_Report_Completed }
+		}
+		AND = {
+			has_country_flag = FRE_Mission_De_Lattre_Arrival_Activated
+			NOT = { has_country_flag = FRE_Mission_De_Lattre_Arrival_Completed }
+		}
+	}
+}
+
+FRE_operation_credits_short_trigger = {
+	is_ai = yes
+	check_variable = { FRE_War_Credits < 120 }
+	OR = {
+		AND = { has_country_flag = FRE_Operation_Hirondelle_Launched NOT = { FRE_hirondelle_terminal_trigger = yes } }
+		AND = { has_country_flag = FRE_Operation_Mouette_Launched NOT = { FRE_mouette_terminal_trigger = yes } }
+		AND = { has_country_flag = FRE_Operation_Brochet_Launched NOT = { FRE_brochet_terminal_trigger = yes } }
+	}
+}

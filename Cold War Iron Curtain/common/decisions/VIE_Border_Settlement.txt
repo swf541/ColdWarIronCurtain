@@ -1,0 +1,380 @@
+VIE_Border_Settlement = {
+
+	VIE_Border_Table_Demand = {
+		icon = generic_political_discourse
+
+		state_target = yes
+		target_array = global.VIE_border_dispute_states
+		target_root_trigger = {
+			VIE_can_press_border_claims_trigger = yes
+		}
+		target_trigger = {
+			FROM = {
+				VIE_border_target_pressable_trigger = yes
+				check_variable = { VIE_border_stage < 1 }
+				OR = {
+					state = 1799	# Svay Rieng - we have held the claim since the Elysee Accords
+					AND = {
+						OR = {
+							state = 1794
+							state = 1295
+						}
+						ROOT = {
+							custom_trigger_tooltip = {
+								tooltip = VIE_border_tranninh_claimed_TT
+								has_country_flag = VIE_Claimed_TranNinh_Chosen
+							}
+						}
+					}
+					AND = {
+						state = 841	# Phongsaly is only arguable once Tran Ninh is ours
+						OR = {
+							1794 = { check_variable = { VIE_border_stage = 5 } }
+							ROOT = { owns_state = 1794 }	# or it came to us some other way - never lock 841 behind a renounced claim
+						}
+						ROOT = {
+							OR = {
+								owns_state = 671
+								owns_state = 1761
+							}
+						}
+					}
+				}
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = VIE_border_clash_running_tt
+				NOT = { has_country_flag = VIE_Border_Clash_Active }
+			}
+			custom_trigger_tooltip = {
+				tooltip = VIE_border_demand_pending_tt
+				NOT = { has_country_flag = VIE_Border_Demand_Pending }
+			}
+			has_political_power > 49
+		}
+		cost = 50
+		days_re_enable = 30
+		on_map_mode = map_and_decisions_view
+
+		complete_effect = {
+			custom_effect_tooltip = VIE_border_demand_sent_tt
+			hidden_effect = {	# the raw event calls read as a prediction of the answer, which they are not
+				set_country_flag = VIE_Border_Demand_Pending
+				set_variable = { VIE_border_demand_state = FROM.id }
+				FROM = {
+					set_variable = { VIE_border_stage = 1 }
+					save_global_event_target_as = VIE_border_demand_target
+					owner = {
+						save_global_event_target_as = VIE_border_demand_owner
+						country_event = { id = VIE_Border_Settlement.1 days = 2 }
+					}
+				}
+				country_event = { id = VIE_Border_Settlement.4 days = 32 }	# failsafe if the owner never answers
+			}
+		}
+
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+
+	VIE_Border_Provoke_Incidents = {
+		icon = generic_prepare_civil_war
+
+		state_target = yes
+		target_array = global.VIE_border_dispute_states
+		target_root_trigger = {
+			VIE_can_press_border_claims_trigger = yes
+		}
+		target_trigger = {
+			FROM = {
+				VIE_border_target_pressable_trigger = yes
+				check_variable = { VIE_border_stage = 2 }
+				check_variable = { VIE_border_pressure < 100 }
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = VIE_border_clash_running_tt
+				NOT = { has_country_flag = VIE_Border_Clash_Active }
+			}
+			has_political_power > 24
+		}
+		cost = 25
+		days_remove = 14	# the pressure only lands when the campaign resolves, so the ladder never advances ahead of the narrative
+		days_re_enable = 30
+		on_map_mode = map_and_decisions_view
+
+		complete_effect = {
+			custom_effect_tooltip = VIE_border_incidents_begun_tt
+		}
+
+		remove_effect = {
+			FROM = {
+				add_to_variable = { VIE_border_pressure = 25 }
+				clamp_variable = {
+					var = VIE_border_pressure
+					min = 0
+					max = 100
+				}
+				save_global_event_target_as = VIE_border_incident_target
+				owner = { save_global_event_target_as = VIE_border_incident_owner }
+			}
+			random_list = {	# fired the same tick as the pressure gain, so the report always arrives with it
+				50 = { country_event = VIE_Border_Settlement.13 }
+				25 = { country_event = VIE_Border_Settlement.10 }
+				15 = { country_event = VIE_Border_Settlement.11 }
+				10 = { country_event = VIE_Border_Settlement.12 }
+			}
+		}
+
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+
+	VIE_Border_Renewed_Demand = {
+		icon = generic_political_discourse
+
+		state_target = yes
+		target_array = global.VIE_border_dispute_states
+		target_root_trigger = {
+			VIE_can_press_border_claims_trigger = yes
+		}
+		target_trigger = {
+			FROM = {
+				VIE_border_target_pressable_trigger = yes
+				check_variable = { VIE_border_stage = 2 }
+				check_variable = { VIE_border_pressure > 49 }
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = VIE_border_clash_running_tt
+				NOT = { has_country_flag = VIE_Border_Clash_Active }
+			}
+			custom_trigger_tooltip = {
+				tooltip = VIE_border_demand_pending_tt
+				NOT = { has_country_flag = VIE_Border_Demand_Pending }
+			}
+			has_political_power > 74
+		}
+		cost = 75
+		days_re_enable = 60
+		on_map_mode = map_and_decisions_view
+
+		complete_effect = {
+			custom_effect_tooltip = VIE_border_demand_sent_tt
+			hidden_effect = {
+				set_country_flag = VIE_Border_Demand_Pending
+				set_variable = { VIE_border_demand_state = FROM.id }
+				FROM = {
+					set_variable = { VIE_border_stage = 1 }
+					save_global_event_target_as = VIE_border_demand_target
+					owner = {
+						save_global_event_target_as = VIE_border_demand_owner
+						country_event = { id = VIE_Border_Settlement.1 days = 2 }
+					}
+				}
+				country_event = { id = VIE_Border_Settlement.4 days = 32 }	# failsafe if the owner never answers
+			}
+		}
+
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+
+	VIE_Border_Punitive_Clash = {
+		icon = generic_civil_support
+
+		state_target = yes
+		target_array = global.VIE_border_dispute_states
+		target_root_trigger = {
+			VIE_can_press_border_claims_trigger = yes
+		}
+		target_trigger = {
+			FROM = {
+				VIE_border_target_pressable_trigger = yes
+				check_variable = { VIE_border_stage = 2 }
+				check_variable = { VIE_border_pressure > 74 }
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = VIE_border_clash_running_tt
+				NOT = { has_country_flag = VIE_Border_Clash_Active }
+			}
+			has_political_power > 99
+			custom_trigger_tooltip = {	# must mirror the state selection in VIE_border_start_clash exactly
+				tooltip = VIE_border_clash_force_TT
+				FROM = {
+					OR = {
+						is_controlled_by = ROOT	# already under our garrison - nothing to cross
+						any_neighbor_state = {
+							impassable = no
+							is_owned_by = ROOT
+							is_controlled_by = ROOT
+							has_border_war = no
+							has_ROOT_at_least_1_div_in_current_state_scope = yes
+						}
+					}
+				}
+			}
+		}
+		cost = 100
+		days_re_enable = 120
+		on_map_mode = map_and_decisions_view
+
+		complete_effect = {
+			custom_effect_tooltip = VIE_border_clash_launch_tt
+			hidden_effect = {
+				set_variable = { VIE_border_clash_state = FROM.id }
+				FROM = {
+					save_global_event_target_as = VIE_border_clash_target
+					owner = { save_global_event_target_as = VIE_border_clash_owner }
+				}
+				VIE_border_start_clash = yes
+			}
+		}
+
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+
+	VIE_Border_Fabricate_Frontier_Casus_Belli = {
+		icon = generic_prepare_civil_war
+
+		state_target = yes
+		target_array = global.VIE_border_dispute_states
+		target_root_trigger = {
+			VIE_can_press_border_claims_trigger = yes
+		}
+		target_trigger = {
+			FROM = {
+				VIE_border_target_pressable_trigger = yes
+				check_variable = { VIE_border_clash_failed = 1 }
+				NOT = { check_variable = { VIE_border_cb_taken = 1 } }	# once per state - fire_only_once would spend it for all four
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = VIE_border_clash_running_tt
+				NOT = { has_country_flag = VIE_Border_Clash_Active }
+			}
+			has_political_power > 199
+		}
+		cost = 200
+		on_map_mode = map_and_decisions_view
+
+		complete_effect = {
+			custom_effect_tooltip = VIE_border_cb_fabricated_tt
+			hidden_effect = {
+				FROM = {
+					set_variable = { VIE_border_cb_taken = 1 }
+					owner = { save_event_target_as = VIE_border_cb_target }
+				}
+				create_wargoal = {
+					type = take_state_focus
+					target = event_target:VIE_border_cb_target
+					generator = { 1799 1794 1295 841 }
+				}
+				if = {
+					limit = { country_exists = USA }
+					USA = { country_event = { id = VIE_Border_Settlement.20 days = 3 } }
+				}
+				if = {
+					limit = { country_exists = FRA }
+					FRA = { country_event = { id = VIE_Border_Settlement.21 days = 3 } }
+				}
+			}
+			VIE_border_mark_aggressor = yes
+			add_named_threat = {
+				threat = 10
+				name = VIE_border_casus_belli_threat
+			}
+		}
+
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+
+	VIE_Border_Renounce_Claims = {
+		icon = generic_political_discourse
+
+		state_target = yes
+		target_array = global.VIE_border_dispute_states
+		target_root_trigger = {
+			VIE_can_press_border_claims_trigger = yes
+		}
+		target_trigger = {
+			FROM = {
+				check_variable = { VIE_border_stage > 0 }
+				check_variable = { VIE_border_stage < 5 }
+				NOT = { is_owned_by = ROOT }
+			}
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = VIE_border_clash_running_tt
+				NOT = { has_country_flag = VIE_Border_Clash_Active }
+			}
+			has_political_power > 24
+		}
+		cost = 25
+		on_map_mode = map_and_decisions_view
+
+		complete_effect = {
+			clr_country_flag = VIE_Border_Demand_Pending	# always an escape hatch, even mid-demand
+			FROM = {
+				set_variable = { VIE_border_stage = 6 }
+				set_variable = { VIE_border_pressure = 0 }
+				set_variable = { VIE_border_clash_failed = 0 }
+				remove_claim_by = ROOT
+				owner = {
+					add_opinion_modifier = {
+						target = VIE
+						modifier = VIE_Renounced_Border_Claims
+					}
+					reverse_add_opinion_modifier = {
+						target = VIE
+						modifier = VIE_Renounced_Border_Claims
+					}
+				}
+			}
+			add_stability = 0.03
+			VIE_border_mark_chastened = yes
+		}
+
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 10
+				is_historical_focus_on = yes
+			}
+		}
+	}
+}

@@ -1,0 +1,236 @@
+####################################################
+# VIE border settlement QA effects - run as `e <name>` from
+# the console, after `tag VIE`. Companions: IC_Struggle_Test_Effects.txt,
+# IC_Geneva_Test_Effects.txt.
+#
+#   -- setup / teardown --
+#   e test_vie_border_reset             tear down all ladder state (rerunnable)
+#   e test_vie_border_setup_won         southern-victory shape; frees CAM/LOS
+#   e test_vie_border_setup_geneva_20   favourable-Geneva shape instead
+#   e test_vie_border_setup_pathet_lao  clause 5 = 2: 841 + 1295 to a VIN-puppet LAO
+#   e test_vie_border_open              open the category without the focus
+#   e test_vie_border_claim_tranninh    grant the Tran-Ninh claim + choice flag
+#   -- driving the ladder --
+#   e test_vie_border_demand_svay       fire the demand for 1799
+#   e test_vie_border_demand_tranninh   ... 1794
+#   e test_vie_border_demand_houaphanh  ... 1295
+#   e test_vie_border_demand_phongsaly  ... 841
+#   e test_vie_border_lapse             force the unanswered-demand failsafe (.4)
+#   e test_vie_border_strand            park 1295 at stage 1 with no demand pending
+#                                       (the daily cleanup must free it next tick)
+#   e test_vie_border_max_pressure      stage 2 + pressure 100 on all four
+#   e test_vie_border_clash_svay        run the clash against 1799
+#   e test_vie_border_win               force the clash-won event
+#   e test_vie_border_lose              force the clash-lost event
+#   -- inspection / regression --
+#   e test_vie_border_debug             stage + pressure + owner for all four
+#   e test_brevet_refuse                fire Brevert_Lines.3 (scope-bug regression)
+####################################################
+
+test_vie_border_reset = {
+	clr_country_flag = VIE_Border_Settlement_Open
+	clr_country_flag = VIE_Border_Demand_Pending
+	clr_country_flag = VIE_Border_Clash_Active
+	clr_country_flag = VIE_Claimed_TranNinh_Chosen
+	clr_global_flag = VIE_50s_Border_Settlement_Resolved
+	set_variable = { VIE_border_demand_state = 0 }
+	set_variable = { VIE_border_clash_state = 0 }
+	set_variable = { VIE_border_attacker_state = 0 }
+	set_variable = { VIE_brevet_attacker_state = 0 }
+	set_variable = { VIE_brevet_defender_state = 0 }
+	if = { limit = { has_idea = VIE_Regional_Aggressor } remove_ideas = VIE_Regional_Aggressor }
+	if = { limit = { has_idea = VIE_Regional_Hegemon } remove_ideas = VIE_Regional_Hegemon }
+	if = { limit = { has_idea = VIE_Chastened_Frontier } remove_ideas = VIE_Chastened_Frontier }
+	every_state = {	# state-scoped progress survives owner changes, so it must be zeroed explicitly
+		limit = {
+			OR = {
+				state = 1799
+				state = 1794
+				state = 1295
+				state = 841
+			}
+		}
+		set_variable = { VIE_border_stage = 0 }
+		set_variable = { VIE_border_pressure = 0 }
+		set_variable = { VIE_border_clash_failed = 0 }
+		set_variable = { VIE_border_cb_taken = 0 }
+	}
+	clear_array = global.VIE_border_dispute_states
+}
+
+test_vie_border_setup_won = {
+	set_global_flag = Indochina_War_Over
+	set_variable = { global.Indochina_War_Active_Phase = 100 }
+	if = {
+		limit = { country_exists = VIN }
+		annex_country = { target = VIN transfer_troops = no }
+	}
+	if = {
+		limit = { is_subject = yes }
+		overlord = { end_puppet = ROOT }
+	}
+	every_country = {
+		limit = {
+			OR = {
+				original_tag = CAM
+				original_tag = LOS
+			}
+			is_subject_of = FRA
+		}
+		FRA = { end_puppet = PREV }
+	}
+}
+
+test_vie_border_setup_geneva_20 = {
+	set_global_flag = Indochina_War_Over
+	set_global_flag = geneva_conference_concluded
+	set_variable = { global.geneva_partition_line = 3 }
+	if = {
+		limit = { is_subject = yes }
+		overlord = { end_puppet = ROOT }
+	}
+	every_country = {
+		limit = {
+			OR = {
+				original_tag = CAM
+				original_tag = LOS
+			}
+			is_subject_of = FRA
+		}
+		FRA = { end_puppet = PREV }
+	}
+}
+
+test_vie_border_setup_pathet_lao = {
+	set_variable = { global.geneva_laos_cambodia_term = 2 }
+	if = {
+		limit = { NOT = { country_exists = LAO } }
+		LOS = { release = LAO }
+	}
+	LAO = {
+		transfer_state = 841
+		transfer_state = 1295
+		keep_current_politics = yes
+	}
+	if = {
+		limit = { country_exists = VIN }
+		VIN = {
+			set_autonomy = {
+				target = LAO
+				autonomy_state = autonomy_easternbloc
+				end_wars = no
+				end_civil_wars = no
+			}
+		}
+	}
+}
+
+test_vie_border_open = {
+	clear_array = global.VIE_border_dispute_states
+	1799 = { add_to_array = { array = global.VIE_border_dispute_states value = THIS } }	# must mirror VIE_Indochina_Border_Settlement - state scopes, not bare numbers
+	1794 = { add_to_array = { array = global.VIE_border_dispute_states value = THIS } }
+	1295 = { add_to_array = { array = global.VIE_border_dispute_states value = THIS } }
+	841 = { add_to_array = { array = global.VIE_border_dispute_states value = THIS } }
+	set_country_flag = VIE_Border_Settlement_Open	# 1799 is claimed from game start, nothing to add
+}
+
+test_vie_border_claim_tranninh = {
+	set_country_flag = VIE_Claimed_TranNinh_Chosen
+	1295 = { add_claim_by = VIE }
+	1794 = { add_claim_by = VIE }
+}
+
+test_vie_border_demand_svay = {
+	1799 = { test_vie_border_demand_state = yes }
+}
+
+test_vie_border_demand_tranninh = {
+	1794 = { test_vie_border_demand_state = yes }
+}
+
+test_vie_border_demand_houaphanh = {
+	1295 = { test_vie_border_demand_state = yes }
+}
+
+test_vie_border_demand_phongsaly = {
+	841 = { test_vie_border_demand_state = yes }
+}
+
+test_vie_border_demand_state = {	# state scope - mirrors VIE_Border_Table_Demand, where FROM is the state and ROOT the country
+	ROOT = {
+		clr_country_flag = VIE_Border_Demand_Pending
+		set_country_flag = VIE_Border_Demand_Pending
+	}
+	set_variable = { ROOT.VIE_border_demand_state = THIS.id }
+	set_variable = { VIE_border_stage = 1 }
+	save_global_event_target_as = VIE_border_demand_target
+	owner = {
+		save_global_event_target_as = VIE_border_demand_owner
+		country_event = VIE_Border_Settlement.1
+	}
+}
+
+test_vie_border_lapse = {	# run straight after a demand: skips the 32-day wait
+	country_event = VIE_Border_Settlement.4
+}
+
+test_vie_border_strand = {	# the shape the old shared-variable bug left behind
+	clr_country_flag = VIE_Border_Demand_Pending
+	1295 = { set_variable = { VIE_border_stage = 1 } }
+}
+
+test_vie_border_max_pressure = {
+	every_state = {
+		limit = {
+			OR = {
+				state = 1799
+				state = 1794
+				state = 1295
+				state = 841
+			}
+		}
+		set_variable = { VIE_border_stage = 2 }
+		set_variable = { VIE_border_pressure = 100 }
+	}
+	clr_country_flag = VIE_Border_Demand_Pending
+}
+
+test_vie_border_clash_svay = {
+	1799 = {	# VIE_border_start_clash raises the flag itself once a staging state is found
+		save_global_event_target_as = VIE_border_clash_target
+		owner = { save_global_event_target_as = VIE_border_clash_owner }
+		set_variable = { ROOT.VIE_border_clash_state = THIS.id }
+	}
+	VIE_border_start_clash = yes
+}
+
+test_vie_border_win = {
+	country_event = VIE_Border_Settlement.30
+}
+
+test_vie_border_lose = {
+	country_event = VIE_Border_Settlement.31
+}
+
+test_vie_border_debug = {
+	every_state = {
+		limit = {
+			OR = {
+				state = 1799
+				state = 1794
+				state = 1295
+				state = 841
+			}
+		}
+		log = "[GetDateText]: border state [This.GetName] stage [?THIS.VIE_border_stage] pressure [?THIS.VIE_border_pressure] clash_failed [?THIS.VIE_border_clash_failed] cb_taken [?THIS.VIE_border_cb_taken]"
+		if = {	# a province we already occupy resolves through .35, not a border war - the engine rejects a pair under one controller
+			limit = { is_controlled_by = VIE }
+			log = "[GetDateText]: border state [This.GetName] is already VIE-controlled - clash resolves as fait accompli"
+		}
+	}
+	log = "[GetDateText]: VIE demand_state [?ROOT.VIE_border_demand_state] clash_state [?ROOT.VIE_border_clash_state] attacker_state [?ROOT.VIE_border_attacker_state]"	# these read as state_id minus 2^30, not as state numbers
+}
+
+test_brevet_refuse = {
+	country_event = Brevert_Lines.3
+}

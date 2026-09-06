@@ -1,0 +1,461 @@
+# ============================================================================
+# Indochina Struggle failsafe triggers
+# ----------------------------------------------------------------------------
+# Membership tests, stall detectors and latch-free copies of the ending gates,
+# for the contingency layer in IC_Failsafe_Effects.txt.
+#
+# Two things here are deliberately different from IC_struggle_triggers.txt:
+#
+#   - the ending mirrors read global.ic_score_* rather than FRA.Struggle*, so
+#     they still decide correctly after France has been annexed and the
+#     FRA-scope scores are unreadable
+#   - the mirrors drop the NOT = { has_global_flag = Geneva_Conference } clause
+#     that seven of the ten originals carry. That flag is a one-way latch with
+#     no production clearer, so a conference that never concludes closes every
+#     other exit permanently. The router substitutes ic_failsafe_geneva_live_
+#     trigger, which distinguishes a running conference from a dead latch.
+#
+# The originals are left alone: the struggle GUI rows and their availability
+# tooltips depend on the current semantics.
+#
+# The state lists exclude the Paracels (997, 1855) and Ubon Ratchathani (1876).
+# Those carry Vietnamese cores but are contested with China, Humanity and Siam,
+# and a legitimate holding there must never be swept back into the theatre.
+# ============================================================================
+
+ic_failsafe_theatre_tag_trigger = {
+	OR = {
+		tag = FRA
+		tag = FRE
+		tag = VIN
+		tag = VIE
+		tag = CCC
+		tag = FUL
+		tag = NLF
+		tag = PQC
+		tag = TAI
+		tag = TAM
+		tag = NUN
+		tag = THO
+		tag = MEO
+		tag = LOS
+		tag = LAO
+		tag = CAM
+	}
+}
+
+# Who may legitimately hold an Indochina tag as a subject. Anything else is a
+# peace-conference artefact and gets freed - this is the test that unmakes the
+# French-aligned puppet VIN the playtester ended up with.
+ic_failsafe_legitimate_overlord_trigger = {
+	OR = {
+		tag = FRA
+		tag = FRE
+		tag = VIE
+		tag = VIN
+	}
+}
+
+# State scope.
+ic_failsafe_vietnam_state_trigger = {
+	OR = {
+		state = 286
+		state = 671
+		state = 757
+		state = 786
+		state = 838
+		state = 881
+		state = 982
+		state = 983
+		state = 1280
+		state = 1281
+		state = 1285
+		state = 1286
+		state = 1287
+		state = 1288
+		state = 1289
+		state = 1752
+		state = 1753
+		state = 1754
+		state = 1755
+		state = 1756
+		state = 1757
+		state = 1758
+		state = 1759
+		state = 1760
+		state = 1761
+		state = 1762
+		state = 1763
+		state = 1766
+		state = 1767
+		state = 1768
+		state = 1804
+		state = 1875
+	}
+}
+
+ic_failsafe_laos_state_trigger = {
+	OR = {
+		state = 670
+		state = 841
+		state = 1187
+		state = 1191
+		state = 1196
+		state = 1198
+		state = 1295
+		state = 1750
+		state = 1794
+		state = 1795
+		state = 1796
+		state = 1993
+		state = 1997
+	}
+}
+
+ic_failsafe_cambodia_state_trigger = {
+	OR = {
+		state = 741
+		state = 840
+		state = 984
+		state = 985
+		state = 1751
+		state = 1797
+		state = 1798
+		state = 1799
+		state = 1800
+		state = 1801
+		state = 1802
+		state = 1803
+		state = 1899
+		state = 1900
+		state = 1901
+		state = 1902
+		state = 1903
+	}
+}
+
+ic_failsafe_theatre_state_trigger = {
+	OR = {
+		ic_failsafe_vietnam_state_trigger = yes
+		ic_failsafe_laos_state_trigger = yes
+		ic_failsafe_cambodia_state_trigger = yes
+	}
+}
+
+# The struggle is live and the router is not already running. Every entry point
+# tests this; the routing latch is what makes the router safe to call from an
+# on_action that its own payload will re-fire.
+ic_failsafe_active_trigger = {
+	has_global_flag = indochina_struggle_initialized
+	has_global_flag = ic_failsafe_theatre_present
+	NOT = { has_global_flag = Indochina_War_Over }
+	NOT = { has_global_flag = ic_failsafe_routing }
+	check_variable = { global.Indochina_War_Active_Phase < 100 }
+}
+
+# A conference that is genuinely running. Outranks the decisive rungs, the way
+# the wrap-up timer always behaved.
+ic_failsafe_geneva_live_trigger = {
+	has_global_flag = Geneva_Conference
+	OR = {
+		has_global_flag = geneva_conference_announced
+		has_global_flag = geneva_conference_in_session
+	}
+}
+
+# The latch is set but nothing is running behind it and nothing ever concluded:
+# the pipeline broke somewhere between unlock and announce. This is the state
+# that makes the theatre unresolvable, and the only one the router clears.
+ic_failsafe_geneva_latched_dead_trigger = {
+	has_global_flag = Geneva_Conference
+	NOT = { has_global_flag = geneva_conference_announced }
+	NOT = { has_global_flag = geneva_conference_in_session }
+	NOT = { has_global_flag = geneva_conference_concluded }
+	NOT = { has_global_flag = Geneva_Conference_Negotiations_Complete }
+}
+
+# A principal has been knocked out, or a single non-French power holds both
+# capitals. Holding Hanoi and Saigon is deliberately NOT decisive on its own for
+# France: the CEFEO owning both while the Viet Minh is still in the field is an
+# ordinary state of the war, not a result.
+ic_failsafe_militarily_decided_trigger = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	OR = {
+		NOT = { country_exists = VIN }
+		VIN = { has_capitulated = yes }
+		NOT = { country_exists = VIE }
+		VIE = { has_capitulated = yes }
+		AND = {
+			1760 = { owner = { owns_state = 286 } }
+			1760 = {
+				NOT = { is_owned_by = FRE }
+				NOT = { is_owned_by = FRA }
+			}
+		}
+	}
+}
+
+ic_failsafe_carrier_lost_trigger = {
+	NOT = { country_exists = FRA }
+}
+
+ic_failsafe_ending_unclicked_trigger = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	check_variable = { global.indochina_ending_available_check > 0 }
+}
+
+# Over-approximates on purpose: any human anywhere near the ending buys the long
+# grace period rather than the short one.
+ic_failsafe_ending_owner_is_human_trigger = {
+	OR = {
+		AND = { country_exists = VIN  VIN = { is_ai = no } }
+		AND = { country_exists = VIE  VIE = { is_ai = no } }
+		AND = { country_exists = FRA  FRA = { is_ai = no } }
+		AND = { country_exists = FRE  FRE = { is_ai = no } }
+		AND = { country_exists = PQC  PQC = { is_ai = no } }
+		AND = { country_exists = USA  USA = { is_ai = no } }
+		AND = { country_exists = CCC  CCC = { is_ai = no } }
+		AND = { country_exists = FUL  FUL = { is_ai = no } }
+	}
+}
+
+# Nobody in the theatre is shooting at anybody, but the struggle still says the
+# war is on.
+ic_failsafe_no_theatre_war_trigger = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	NOT = { AND = { country_exists = VIN  VIN = { has_war = yes } } }
+	NOT = { AND = { country_exists = NLF  NLF = { has_war = yes } } }
+	NOT = { AND = { country_exists = LAO  LAO = { has_war = yes } } }
+	NOT = { AND = { country_exists = MEO  MEO = { has_war = yes } } }
+	NOT = { AND = { country_exists = PQC  PQC = { has_war = yes } } }
+	NOT = { AND = { country_exists = FRE  FRE = { has_war = yes } } }
+}
+
+ic_failsafe_vin_arc_unfinished_trigger = {
+	country_exists = VIN
+	NOT = { VIN = { has_capitulated = yes } }
+	OR = {
+		NOT = { VIN = { has_country_flag = VIN_Campaign_Cooldown_Cao_Bac } }
+		NOT = { VIN = { has_country_flag = VIN_Campaign_Cooldown_Tay_Bac } }
+		NOT = { VIN = { has_country_flag = VIN_Campaign_Cooldown_Hoa_Binh } }
+		NOT = { VIN = { has_country_flag = VIN_Campaign_Cooldown_Dien_Bien } }
+	}
+}
+
+ic_failsafe_theatre_unfinished_trigger = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	OR = {
+		date < 1954.7.21
+		ic_failsafe_geneva_live_trigger = yes
+		AND = {
+			date < 1955.1.1
+			OR = {
+				ic_failsafe_vin_arc_unfinished_trigger = yes
+				has_global_flag = Laos_Raid_Active
+			}
+		}
+	}
+}
+
+# The router's preflight and postflight both move states and subjects. During a
+# normal campaign lull they must not run merely because an unrelated on_action
+# called the router while no theatre war happened to be live. Exceptional map
+# breaks, earned endings and a dead carrier/conference may still route before
+# the scripted arc's date guard expires.
+ic_failsafe_route_may_mutate_trigger = {
+	OR = {
+		NOT = { ic_failsafe_theatre_unfinished_trigger = yes }
+		ic_failsafe_militarily_decided_trigger = yes
+		ic_failsafe_carrier_lost_trigger = yes
+		ic_failsafe_ending_unclicked_trigger = yes
+		ic_failsafe_geneva_latched_dead_trigger = yes
+		has_global_flag = USA_VIN_Reunification_Complete
+	}
+}
+
+# ----------------------------------------------------------------------------
+# Latch-free ending mirrors. Each is its indochina_struggle_ending_*_trigger
+# counterpart with the Geneva latch clause dropped and the score reads pointed
+# at the global mirrors. Tag scoping is preserved exactly.
+# ----------------------------------------------------------------------------
+
+ic_ending_communist_ok = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	NOT = { has_global_flag = diem_ho_chi_minh_reunified }
+	tag = VIN
+	OR = {
+		AND = {
+			set_temp_variable = { ic_anticomm_x2 = global.ic_score_anticomm }
+			multiply_temp_variable = { ic_anticomm_x2 = 2 }
+			check_variable = { global.ic_score_comm > ic_anticomm_x2 }
+			check_variable = { global.ic_score_comm > 1000 }
+		}
+		AND = {
+			has_war_with = VIE
+			OR = {
+				owns_state = 286
+				VIE = {
+					OR = {
+						has_capitulated = yes
+						exists = no
+					}
+				}
+			}
+		}
+	}
+}
+
+ic_ending_southern_ok = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	tag = VIE
+	NOT = { has_government = communism }
+	OR = {
+		AND = {
+			OR = {
+				has_war_with = VIN
+				AND = {
+					has_opinion = { target = VIN  value < -50 }
+					VIN = { has_opinion = { target = VIE  value < -50 } }
+				}
+			}
+			check_variable = { global.Indochina_War_Active_Phase > 2 }
+			check_variable = { global.Indochina_War_Active_Phase < 9 }
+			set_temp_variable = { ic_comm_x2 = global.ic_score_comm }
+			multiply_temp_variable = { ic_comm_x2 = 2 }
+			check_variable = { global.ic_score_anticomm > ic_comm_x2 }
+			check_variable = { global.ic_score_proind > global.ic_score_profr }
+			check_variable = { global.ic_score_proind > global.ic_score_proeth }
+			check_variable = { global.ic_score_proind > 1000 }
+		}
+		AND = {
+			has_war_with = VIN
+			OR = {
+				owns_state = 1760
+				VIN = { has_capitulated = yes }
+			}
+		}
+		AND = {
+			NOT = { country_exists = VIN }
+			owns_state = 1760
+			owns_state = 286
+		}
+	}
+}
+
+ic_ending_federal_ok = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	date > 1953.1.1
+	tag = FRA
+	set_temp_variable = { ic_comm_x2 = global.ic_score_comm }
+	multiply_temp_variable = { ic_comm_x2 = 2 }
+	check_variable = { global.ic_score_anticomm > ic_comm_x2 }
+	check_variable = { global.ic_score_profr > global.ic_score_proind }
+	check_variable = { global.ic_score_proeth > 250 }
+	check_variable = { global.ic_score_profr > 1000 }
+	check_variable = { global.ic_score_profr > global.ic_score_proeth }
+}
+
+ic_ending_balkanized_ok = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	date > 1953.1.1
+	OR = {
+		tag = FUL
+		tag = FRA
+		tag = CCC
+	}
+	set_temp_variable = { ic_dismantle = global.ic_score_proeth }
+	add_to_temp_variable = { ic_dismantle = global.ic_score_profr }
+	check_variable = { ic_dismantle > 1000 }
+	set_temp_variable = { ic_comm_x2 = global.ic_score_comm }
+	multiply_temp_variable = { ic_comm_x2 = 2 }
+	set_temp_variable = { ic_proind_x2 = global.ic_score_proind }
+	multiply_temp_variable = { ic_proind_x2 = 2 }
+	check_variable = { ic_dismantle > ic_proind_x2 }
+	check_variable = { ic_dismantle > ic_comm_x2 }
+	set_temp_variable = { ic_proeth_x2 = global.ic_score_proeth }
+	multiply_temp_variable = { ic_proeth_x2 = 2 }
+	NOT = { check_variable = { global.ic_score_profr > ic_proeth_x2 } }
+}
+
+ic_ending_dan_quoc_ok = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	OR = {
+		has_global_flag = diem_ho_chi_minh_reunified
+		AND = {
+			has_global_flag = dan_quoc_peace
+			OR = {
+				tag = VIN
+				tag = VIE
+			}
+			VIE = {
+				has_country_leader = {
+					character = VIE_Ngo_Dinh_Diem
+					ruling_only = yes
+				}
+			}
+			VIN = {
+				has_country_leader = {
+					character = VIN_Ho_Chi_Minh
+					ruling_only = yes
+				}
+			}
+			check_variable = { global.ic_score_proind > global.ic_score_profr }
+			check_variable = { global.ic_score_proind > 499 }
+		}
+	}
+}
+
+ic_ending_kmt_ok = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	tag = PQC
+	country_exists = PQC
+	OR = {
+		AND = {
+			country_exists = VIE
+			VIE = { has_country_flag = VIE_PQC_War }
+		}
+		AND = {
+			country_exists = VIE
+			VIE = { has_war_with = PQC }
+		}
+	}
+	PQC = {
+		OR = {
+			AND = {
+				owns_state = 286
+				owns_state = 1760
+			}
+			AND = {
+				OR = {
+					owns_state = 286
+					owns_state = 1760
+				}
+				check_variable = { global.ic_score_kmt > 500 }
+				check_variable = { global.ic_score_kmt > global.ic_score_comm }
+				check_variable = { global.ic_score_kmt > global.ic_score_proeth }
+				check_variable = { global.ic_score_kmt > global.ic_score_profr }
+				check_variable = { global.ic_score_kmt > global.ic_score_proind }
+			}
+		}
+	}
+}
+
+ic_ending_amnv_ok = {
+	NOT = { has_global_flag = Indochina_War_Over }
+	country_exists = USA
+	country_exists = VIN
+	VIN = {
+		has_country_leader = {
+			character = VIN_Ho_Chi_Minh
+			ruling_only = yes
+		}
+		NOT = { has_war_with = USA }
+		USA = { has_opinion = { target = VIN  value > -1 } }
+		has_opinion = { target = USA  value > -1 }
+	}
+	USA = { has_completed_focus = USA_50s_Reestablish_Deer_Team }
+	set_temp_variable = { ic_anticomm_x2 = global.ic_score_anticomm }
+	multiply_temp_variable = { ic_anticomm_x2 = 2 }
+	check_variable = { global.ic_score_comm > ic_anticomm_x2 }
+	check_variable = { global.ic_score_comm > 499 }
+}

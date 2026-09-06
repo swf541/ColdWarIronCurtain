@@ -1,0 +1,819 @@
+# ============================================================================
+#  THE GREEK QUESTION - Greek Civil War side branch for the SOV (Stalin) tree.
+#
+#  Entry: sov_percentage_agreement.1, fired by SOV_Stalin_The_Percentage_Agreement.
+#    option a -> SOV_Followed_Percentage_Agreements  -> historical arm  (SOV_gpa_*)
+#    option b -> SOV_Rejected_Percentage_Agreements  -> intervention arm (SOV_gci_*)
+#  The two arms are mutually exclusive and deliberately share coordinates, so
+#  only one is ever drawn.
+#
+#  Replaces six focuses removed from SOV_Stalin.txt:
+#    SOV_Stalin_Follow_the_Percentage_Agreements
+#    SOV_Stalin_Deport_Black_Sea_Greeks
+#    SOV_Stalin_Soviet_Intervention_in_the_Greek_Civil_War
+#    SOV_Stalin_Assist_in_Greek_Reconstruction
+#    SOV_Stalin_Establish_Military_Bases_in_Greece
+#    SOV_Stalin_Push_For_Bosphorus_Border_Changes
+#  All six reward payloads are carried forward verbatim.
+#
+#  OUTCOME DETECTION - no new resolution event is needed. The war is already
+#  resolved in common/on_actions/wars_on_actions.txt:
+#    "Greek Red Army"      -> PDG annexes GRE and becomes a Soviet subject.
+#    "SOV Intervention Greek Victory" -> white peace, then
+#       Albanian_Counter_Revolution = yes, which releases KOA and has ALB
+#       declare war on it.
+#  So the success arm simply reads "PDG alive, GRE gone, war over", the failure
+#  arm reads "PDG gone, war over", and the Albanian sub-focus reads
+#  "KOA at war with ALB".
+#
+#  Placed LEFT of the main tree (which spans x 11-37).
+# ============================================================================
+
+
+# ############################################################################
+#  ARM A - HISTORICAL. The Percentage Agreement is honoured, the KKE is left to
+#  its fate, and Moscow spends the 1950s repairing relations with Athens.
+# ############################################################################
+
+shared_focus = {
+	id = SOV_gpa_honour_the_agreement
+	icon = GFX_focus_world_peace
+	text_icon = Soviet_focus_style
+	cost = 1
+	x = 37
+	y = 6
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	allow_branch = { has_country_flag = SOV_Followed_Percentage_Agreements }
+	available = { has_country_flag = SOV_Followed_Percentage_Agreements }
+
+	ai_will_do = {
+		factor = 1
+		modifier = {
+			factor = 1000
+			is_historical_focus_on = yes
+			has_game_rule = { rule = SOV_greek_civil_war option = DEFAULT }
+		}
+		modifier = {
+			factor = 1000
+			has_game_rule = { rule = SOV_greek_civil_war option = SOV_GRE_PERCENTAGE }
+		}
+		modifier = {
+			factor = 0
+			has_game_rule = { rule = SOV_greek_civil_war option = SOV_GRE_INTERVENTION }
+		}
+	}
+
+	# Carries the old SOV_Stalin_Follow_the_Percentage_Agreements payload.
+	completion_reward = {
+		add_stability = 0.035
+		add_threat = -5
+		custom_effect_tooltip = SOV_gpa_honour_the_agreement_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_gpa_abandon_the_kke
+	icon = GFX_Guns_for_PDG
+	text_icon = Soviet_focus_style
+	cost = 4
+	relative_position_id = SOV_gpa_honour_the_agreement
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_gpa_honour_the_agreement }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 50
+		add_named_threat = { threat = -10 name = SOV_gpa_abandon_kke_threat }
+		add_to_variable = {
+			bonus_fpp_modifier = -0.25
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = PDG }
+			PDG = { add_opinion_modifier = { target = SOV modifier = large_decrease } }
+		}
+		if = {
+			limit = { country_exists = YUG }
+			YUG = { add_opinion_modifier = { target = SOV modifier = small_decrease } }
+		}
+		news_event = sov_greek_question.1
+		custom_effect_tooltip = SOV_gpa_abandon_the_kke_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_gpa_the_tashkent_exile
+	icon = GFX_Deport_to_DDR
+	text_icon = Soviet_focus_style
+	cost = 4
+	relative_position_id = SOV_gpa_abandon_the_kke
+	x = -2
+	y = 1
+	prerequisite = { focus = SOV_gpa_abandon_the_kke }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 25
+		add_manpower = 15000
+		add_stability = -0.01
+		custom_effect_tooltip = SOV_gpa_the_tashkent_exile_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_gpa_deport_the_black_sea_greeks
+	icon = GFX_Deport_Black_sea_Greeks
+	text_icon = Soviet_focus_style
+	cost = 4
+	relative_position_id = SOV_gpa_abandon_the_kke
+	x = 2
+	y = 1
+	prerequisite = { focus = SOV_gpa_abandon_the_kke }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	# Carries the old SOV_Stalin_Deport_Black_Sea_Greeks payload verbatim.
+	completion_reward = {
+		231 = {
+			add_manpower = -5000
+			remove_from_array  = { culture = 271  }
+			add_dynamic_modifier = {
+				modifier = deported_population
+				days = 731
+			}
+		}
+		218 = {
+			add_manpower = -2000
+			remove_from_array  = { culture = 271  }
+			add_dynamic_modifier = {
+				modifier = deported_population
+				days = 731
+			}
+		}
+		137 = {
+			add_manpower = -2000
+			remove_from_array  = { culture = 271  }
+			add_dynamic_modifier = {
+				modifier = deported_population
+				days = 731
+			}
+		}
+		644 = {
+			add_manpower = 4500
+			add_to_array = { culture = 271 }
+			add_to_variable = {
+				ReligionChristianityOrthodox = 450
+			}
+			add_dynamic_modifier = {
+				modifier = moved_population
+				days = 731
+			}
+		}
+		516 = {
+			add_manpower = 4500
+			add_to_array = { culture = 271 }
+			add_to_variable = {
+				ReligionChristianityOrthodox = 450
+			}
+			add_dynamic_modifier = {
+				modifier = moved_population
+				days = 731
+			}
+		}
+		religious_drift = yes
+	}
+}
+
+shared_focus = {
+	id = SOV_gpa_restore_diplomatic_relations
+	icon = GFX_Restructure_West_German_Debt
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_gpa_abandon_the_kke
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_gpa_the_tashkent_exile }
+	prerequisite = { focus = SOV_gpa_deport_the_black_sea_greeks }
+	available = {
+		date > 1953.1.1
+		country_exists = GRE
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 50
+		add_named_threat = { threat = -5 name = SOV_gpa_normalization_threat }
+		if = {
+			limit = { country_exists = GRE }
+			GRE = {
+				add_opinion_modifier = { target = SOV modifier = medium_increase }
+				set_temp_variable = { percent_change = -5 }
+				set_temp_variable = { tag_index = USA.id }
+				set_temp_variable = { influence_target = THIS.id }
+				change_influence_percentage = yes
+				set_temp_variable = { percent_change = 5 }
+				set_temp_variable = { tag_index = SOV.id }
+				set_temp_variable = { influence_target = THIS.id }
+				change_influence_percentage = yes
+			}
+			add_opinion_modifier = { target = GRE modifier = medium_increase }
+		}
+		news_event = sov_greek_question.2
+		custom_effect_tooltip = SOV_gpa_restore_diplomatic_relations_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_gpa_the_trade_agreement
+	icon = GFX_generic_seize_money
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_gpa_restore_diplomatic_relations
+	x = -2
+	y = 1
+	prerequisite = { focus = SOV_gpa_restore_diplomatic_relations }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		set_temp_variable = { money_to_gain = 40 }
+		add_money_with_tooltip_effect = yes
+		if = {
+			limit = { country_exists = GRE }
+			give_market_access = GRE
+			GRE = {
+				give_market_access = SOV
+				add_opinion_modifier = { target = SOV modifier = medium_increase_trade }
+			}
+			add_opinion_modifier = { target = GRE modifier = medium_increase_trade }
+		}
+		custom_effect_tooltip = SOV_gpa_the_trade_agreement_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_gpa_the_cyprus_question
+	icon = GFX_Debate_Allied_Forces_in_West_Germany
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_gpa_restore_diplomatic_relations
+	x = 2
+	y = 1
+	prerequisite = { focus = SOV_gpa_restore_diplomatic_relations }
+	available = { date > 1954.1.1 }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 40
+		add_to_variable = {
+			bonus_fpp_modifier = 0.5
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = GRE }
+			GRE = {
+				add_opinion_modifier = { target = SOV modifier = medium_increase }
+				add_opinion_modifier = { target = ENG modifier = large_decrease }
+				add_popularity = { ideology = communism popularity = 0.05 }
+			}
+		}
+		if = {
+			limit = { country_exists = TUR }
+			TUR = {
+				if = {
+					limit = { country_exists = GRE }
+					add_opinion_modifier = { target = GRE modifier = large_decrease }
+				}
+			}
+		}
+		if = {
+			limit = { country_exists = ENG }
+			ENG = {
+				if = {
+					limit = { country_exists = GRE }
+					add_opinion_modifier = { target = GRE modifier = large_decrease }
+				}
+			}
+		}
+		news_event = sov_greek_question.3
+		custom_effect_tooltip = SOV_gpa_the_cyprus_question_tt
+	}
+}
+
+
+# ############################################################################
+#  ARM B - INTERVENTION. The Percentage Agreement is torn up and the Soviet
+#  Union backs the Democratic Army openly.
+# ############################################################################
+
+shared_focus = {
+	id = SOV_gci_intervene_in_greece
+	icon = GFX_Guns_for_PDG
+	text_icon = Soviet_focus_style
+	cost = 1
+	x = 38
+	y = 6
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	allow_branch = { has_country_flag = SOV_Rejected_Percentage_Agreements }
+	available = {
+		country_exists = PDG
+		NOT = {
+			PDG = { is_subject_of = YUG }
+		}
+	}
+
+	ai_will_do = {
+		factor = 1
+		modifier = {
+			factor = 0
+			is_historical_focus_on = yes
+			has_game_rule = { rule = SOV_greek_civil_war option = DEFAULT }
+		}
+		modifier = {
+			factor = 1000
+			has_game_rule = { rule = SOV_greek_civil_war option = SOV_GRE_INTERVENTION }
+		}
+		modifier = {
+			factor = 0
+			has_game_rule = { rule = SOV_greek_civil_war option = SOV_GRE_PERCENTAGE }
+		}
+	}
+
+	# Carries the old SOV_Stalin_Soviet_Intervention_in_the_Greek_Civil_War payload.
+	completion_reward = {
+		if = {
+			limit = {
+				country_exists = PDG
+			}
+			every_country = {
+				limit = {
+					is_in_faction_with = SOV
+				}
+				add_to_war = {
+					targeted_alliance = PDG
+					enemy = GRE
+					hostility_reason = asked_to_join
+				}
+			}
+		}
+		else = {
+			declare_war_on = {
+				target = GRE
+				type = annex_everything
+			}
+			GRE = { 1672 = { transfer_state_to = PDG } }
+		}
+		add_to_faction = PDG
+		PDG = {
+			add_ideas = soviet_advisors
+			add_manpower = 25000
+			remove_ideas = cold_war_civil_war_ideological_idea
+		}
+		add_to_array = { sphere_tag_list = PDG.id }
+		PDG = {
+			set_country_flag = Is_In_Sphere
+			set_variable = {
+				Sphere_Leader = SOV.id
+			}
+		}
+		set_global_flag = PDG_INTERVENTION
+	}
+}
+
+shared_focus = {
+	id = SOV_gci_arm_the_democratic_army
+	icon = GFX_usa_50_light_tanks
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_gci_intervene_in_greece
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_gci_intervene_in_greece }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	completion_reward = {
+		add_to_variable = {
+			bonus_fpp_modifier = -0.25
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = PDG }
+			PDG = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_1
+					amount = 8000
+					producer = CUM
+				}
+				add_equipment_to_stockpile = {
+					type = support_equipment
+					amount = 1500
+					producer = CUM
+				}
+				add_manpower = 15000
+				army_experience = 25
+			}
+		}
+		custom_effect_tooltip = SOV_gci_arm_the_democratic_army_tt
+	}
+}
+
+# ---- (i) SUCCESS: PDG survives, Greece is gone ------------------------------
+#  wars_on_actions.txt "Greek Red Army" has PDG annex GRE and become a Soviet
+#  autonomy, so this reads: PDG alive, GRE gone, and the war is over.
+shared_focus = {
+	id = SOV_gci_a_peoples_republic_in_greece
+	icon = GFX_PDG_Integration
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_gci_arm_the_democratic_army
+	x = -3
+	y = 1
+	prerequisite = { focus = SOV_gci_arm_the_democratic_army }
+	available = {
+		country_exists = PDG
+		NOT = { country_exists = GRE }
+		NOT = { has_war_with = GRE }
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 75
+		add_to_variable = {
+			bonus_fpp_modifier = 1
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = PDG }
+			PDG = {
+				add_ideas = comecon_member
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+			add_opinion_modifier = { target = PDG modifier = large_increase }
+		}
+		news_event = sov_greek_question.4
+		custom_effect_tooltip = SOV_gci_a_peoples_republic_in_greece_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_gci_assist_greek_reconstruction
+	icon = GFX_PDG_Integration
+	text_icon = Soviet_focus_style
+	cost = 4
+	relative_position_id = SOV_gci_a_peoples_republic_in_greece
+	x = -1
+	y = 1
+	prerequisite = { focus = SOV_gci_a_peoples_republic_in_greece }
+	available = {
+		NOT = {
+			country_exists = GRE
+		}
+		country_exists = PDG
+	}
+	search_filters = { FOCUS_FILTER_INDUSTRY }
+
+	# Carries the old SOV_Stalin_Assist_in_Greek_Reconstruction payload.
+	completion_reward = {
+		add_to_variable = {
+			custom_expenses = 2
+		}
+		custom_effect_tooltip = soviet_greek_help_tooltip
+		PDG = {
+			add_to_variable = {
+				custom_expenses = -2
+			}
+			add_timed_idea = {
+				idea = soviet_economic_help
+				days = 731
+			}
+			hidden_effect = {
+				country_event = soviet_help.1
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = SOV_gci_military_bases_in_greece
+	icon = GFX_Military_Bases_in_Greece
+	text_icon = Soviet_focus_style
+	cost = 4
+	relative_position_id = SOV_gci_a_peoples_republic_in_greece
+	x = 1
+	y = 1
+	prerequisite = { focus = SOV_gci_a_peoples_republic_in_greece }
+	available = {
+		country_exists = PDG
+	}
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	# Carries the old SOV_Stalin_Establish_Military_Bases_in_Greece payload.
+	completion_reward = {
+		PDG = {
+			give_military_access = SOV
+			add_to_variable = {
+				bonus_fpp_modifier = 0.25
+				tooltip = bonus_fpp_modifier_tt
+			}
+			give_resource_rights = { receiver = SOV state = 185 }
+			182 = {
+				add_building_construction = {
+					type = radar_station
+					level = 1
+					instant_build = yes
+				}
+			}
+			185 = {
+				add_building_construction = {
+					type = coastal_bunker
+					province = 9805
+					level = 2
+					instant_build = yes
+				}
+			}
+			187 = {
+				add_building_construction = {
+					type = radar_station
+					level = 1
+					instant_build = yes
+				}
+			}
+			1248 = {
+				add_building_construction = {
+					type = air_base
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+	}
+}
+
+shared_focus = {
+	id = SOV_gci_bosphorus_border_changes
+	icon = GFX_focus_generic_provoke_border_clashes
+	text_icon = Soviet_focus_style
+	cost = 4
+	relative_position_id = SOV_gci_a_peoples_republic_in_greece
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_gci_military_bases_in_greece }
+	prerequisite = { focus = SOV_gci_assist_greek_reconstruction }
+	available = {
+		OR = {
+			NOT = {
+				country_exists = TUR
+			}
+			TUR = {
+				has_government = communism
+			}
+			TUR = {
+				is_subject_of = SOV
+			}
+		}
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	ai_will_do = {
+		factor = 1
+		modifier = {
+			factor = 0
+			is_historical_focus_on = yes
+			has_game_rule = { rule = SOV_turkey_question option = DEFAULT }
+		}
+		modifier = {
+			factor = 1000
+			has_game_rule = { rule = SOV_turkey_question option = SOV_TUR_ULTIMATUM }
+		}
+		modifier = {
+			factor = 0
+			has_game_rule = { rule = SOV_turkey_question option = SOV_TUR_RELENT }
+		}
+	}
+
+	# Carries the old SOV_Stalin_Push_For_Bosphorus_Border_Changes payload.
+	completion_reward = {
+		YUG = {
+			set_country_flag = Is_In_Sphere
+			set_variable = {
+				Sphere_Leader = SOV.id
+			}
+		}
+		add_to_array = { sphere_tag_list = YUG.id }
+		KRD = {
+				set_country_flag = Is_In_Sphere
+				set_variable = {
+					Sphere_Leader = SOV.id
+				}
+			}
+		if = {
+			limit = {
+				SRT = {
+					has_idea = Full_Soviet_Occupation
+				}
+			}
+			PDG = {
+				transfer_state = 341
+				transfer_state = 339
+				341 = {
+					add_core_of = PDG
+					add_core_of = GRE
+				}
+				339 = {
+					add_core_of = PDG
+					add_core_of = GRE
+				}
+				complete_national_focus = PDG_The_Partition_of_Turkey
+			}
+		}
+		PDG = {
+			transfer_state = 937
+			937 = {
+				add_core_of = PDG
+				add_core_of = GRE
+			}
+		}
+		transfer_state = 793
+		transfer_state = 1671
+		341 = {
+			add_core_of = SRT
+		}
+		339 = {
+			add_core_of = SRT
+		}
+		793 = {
+			add_core_of = SOV
+		}
+		1671	 = {
+			add_core_of = SOV
+		}
+		KRD = {
+			transfer_state = 352
+			transfer_state = 353
+			transfer_state = 1765
+			add_state_core = 1765
+			add_state_core = 352
+			add_state_core = 353
+			transfer_state = 1765
+			transfer_state = 1816
+			add_state_core = 1816
+
+			country_event = resource.1250
+			on_independence_run = yes
+			350 = {
+				add_core_of = KRD
+				add_manpower = 100000
+			}
+		}
+
+
+		SOV = {
+			set_autonomy = {
+				target = KRD
+				autonomy_state = autonomy_easternbloc
+			}
+		}
+		KRD = {
+			add_ideas = comecon_member
+			set_politics = {
+				ruling_party = communism
+				elections_allowed = no
+			}
+		}
+	}
+}
+
+# ---- (ii) FAILURE: the Democratic Army is destroyed -------------------------
+#  wars_on_actions.txt "SOV Intervention Greek Victory" white-peaces us out and
+#  runs Albanian_Counter_Revolution = yes, releasing KOA at war with ALB.
+shared_focus = {
+	id = SOV_gci_the_greek_defeat
+	icon = GFX_Debate_Allied_Forces_in_West_Germany
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_gci_arm_the_democratic_army
+	x = 3
+	y = 1
+	prerequisite = { focus = SOV_gci_arm_the_democratic_army }
+	available = {
+		NOT = { country_exists = PDG }
+		NOT = { has_war_with = GRE }
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 25
+		add_stability = -0.05
+		add_war_support = -0.05
+		add_to_variable = {
+			bonus_fpp_modifier = -0.5
+			tooltip = bonus_fpp_modifier_tt
+		}
+		news_event = sov_greek_question.5
+		custom_effect_tooltip = SOV_gci_the_greek_defeat_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_gci_hold_the_albanian_line
+	icon = GFX_Deport_Traitorous_Elements_in_Germany
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_gci_the_greek_defeat
+	x = -1
+	y = 1
+	prerequisite = { focus = SOV_gci_the_greek_defeat }
+	available = {
+		country_exists = ALB
+		country_exists = KOA
+		KOA = { has_war_with = ALB }
+	}
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	completion_reward = {
+		add_war_support = 0.05
+		if = {
+			limit = { country_exists = ALB }
+			ALB = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_1
+					amount = 6000
+					producer = CUM
+				}
+				add_equipment_to_stockpile = {
+					type = support_equipment
+					amount = 1200
+					producer = CUM
+				}
+				add_manpower = 12000
+				add_stability = 0.05
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+			add_opinion_modifier = { target = ALB modifier = large_increase }
+		}
+		set_variable = {
+			Volunteer_Allowance^ALB = 5
+		}
+		news_event = sov_greek_question.6
+		custom_effect_tooltip = SOV_gci_hold_the_albanian_line_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_gci_the_kke_in_exile
+	icon = GFX_Deport_to_DDR
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_gci_the_greek_defeat
+	x = 1
+	y = 1
+	prerequisite = { focus = SOV_gci_the_greek_defeat }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 25
+		add_manpower = 20000
+		if = {
+			limit = { country_exists = GRE }
+			GRE = {
+				add_popularity = { ideology = communism popularity = 0.05 }
+				add_opinion_modifier = { target = SOV modifier = large_decrease }
+			}
+		}
+		custom_effect_tooltip = SOV_gci_the_kke_in_exile_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_gci_rebuild_the_southern_flank
+	icon = GFX_Diplomacy_with_Poland
+	text_icon = Soviet_focus_style
+	cost = 10
+	relative_position_id = SOV_gci_the_greek_defeat
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_gci_hold_the_albanian_line }
+	prerequisite = { focus = SOV_gci_the_kke_in_exile }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	completion_reward = {
+		add_political_power = 50
+		add_stability = 0.05
+		increase_military_policy = yes
+		add_to_variable = {
+			bonus_fpp_modifier = 0.5
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = BUL }
+			BUL = { add_opinion_modifier = { target = SOV modifier = large_increase } }
+			add_opinion_modifier = { target = BUL modifier = large_increase }
+		}
+		if = {
+			limit = { country_exists = ALB }
+			ALB = { add_opinion_modifier = { target = SOV modifier = large_increase } }
+		}
+		custom_effect_tooltip = SOV_gci_rebuild_the_southern_flank_tt
+	}
+}

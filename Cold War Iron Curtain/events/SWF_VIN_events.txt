@@ -404,11 +404,13 @@ country_event = {
 		name = SWF_VIN.16.a
 		ai_chance = { base = 55 }
 
-		NLF = {
-			clr_country_flag = Tran_quoc_Buu_Leader
-			clr_country_flag = Kieu_Cong_Cung_Leader
-			set_country_flag = Le_Duc_Tho_Leader
-			add_political_power = 25
+		if = {
+			limit = { country_exists = NLF }
+			NLF = {
+				add_political_power = 25
+				set_temp_variable = { nlf_command_choice = 2 }
+				nlf_set_southern_command = yes
+			}
 		}
 	}
 
@@ -416,11 +418,13 @@ country_event = {
 		name = SWF_VIN.16.b
 		ai_chance = { base = 25 }
 
-		NLF = {
-			clr_country_flag = Le_Duc_Tho_Leader
-			clr_country_flag = Kieu_Cong_Cung_Leader
-			set_country_flag = Tran_quoc_Buu_Leader
-			add_political_power = 25
+		if = {
+			limit = { country_exists = NLF }
+			NLF = {
+				add_political_power = 25
+				set_temp_variable = { nlf_command_choice = 4 }
+				nlf_set_southern_command = yes
+			}
 		}
 	}
 
@@ -428,11 +432,13 @@ country_event = {
 		name = SWF_VIN.16.c
 		ai_chance = { base = 20 }
 
-		NLF = {
-			clr_country_flag = Le_Duc_Tho_Leader
-			clr_country_flag = Tran_quoc_Buu_Leader
-			set_country_flag = Kieu_Cong_Cung_Leader
-			add_political_power = 25
+		if = {
+			limit = { country_exists = NLF }
+			NLF = {
+				add_political_power = 25
+				set_temp_variable = { nlf_command_choice = 5 }
+				nlf_set_southern_command = yes
+			}
 		}
 	}
 }
@@ -449,10 +455,10 @@ country_event = {
 
 	option = {
 		name = SWF_VIN.150.a
-		set_party_name = { 
+		set_party_name = {
 			ideology = communism
-			long_name = "Nhom than Stalin Tran Ngoc Danh-Le Hy" 
-			name = "Nhom than Stalin Tran Ngoc Danh-Le Hy" 
+			long_name = VIN_party_stalin_tran_ngoc_danh
+			name = VIN_party_stalin_tran_ngoc_danh
 		}
 	}
 }
@@ -498,10 +504,29 @@ country_event = {
 		trigger = {
 			tag = VIN
 		}
+		ai_chance = {
+			base = 20
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
 
 		set_country_flag = VIN_southern_unity_prioritized
-		NLF = {
-			set_country_flag = NLF_southern_unity_prioritized
+		add_political_power = -50
+		if = {
+			limit = { country_exists = NLF }
+			NLF = {
+				set_country_flag = NLF_southern_unity_prioritized
+				add_war_support = 0.05
+				if = {
+					limit = { has_idea = NLF_fractured_command_structure }
+					swap_ideas = {
+						remove_idea = NLF_fractured_command_structure
+						add_idea = NLF_guerilla_network
+					}
+				}
+			}
 		}
 	}
 
@@ -510,11 +535,45 @@ country_event = {
 		trigger = {
 			tag = VIN
 		}
+		ai_chance = {
+			base = 30
+			modifier = {
+				factor = 4
+				is_historical_focus_on = yes
+			}
+		}
 
 		set_country_flag = VIN_southern_orthodoxy_prioritized
-		NLF = {
-			set_country_flag = NLF_southern_orthodoxy_prioritized
+		add_political_power = 25
+		if = {
+			limit = { country_exists = NLF }
+			NLF = {
+				set_country_flag = NLF_southern_orthodoxy_prioritized
+				add_stability = -0.05
+				if = {
+					limit = { has_idea = NLF_vietminh_disarray }
+					swap_ideas = {
+						remove_idea = NLF_vietminh_disarray
+						add_idea = NLF_rev_cohesion
+					}
+				}
+				if = {
+					limit = { NOT = { NLF_orthodox_southern_command_trigger = yes } }
+					set_temp_variable = { nlf_command_choice = 2 }
+					if = {
+						limit = { date > 1953.3.01 }
+						set_temp_variable = { nlf_command_choice = 3 }
+					}
+					nlf_set_southern_command = yes
+				}
+			}
 		}
+	}
+
+	option = {
+		name = SWF_VIN.17.c
+		trigger = { tag = NLF }
+		ai_chance = { factor = 1 }
 	}
 
 }

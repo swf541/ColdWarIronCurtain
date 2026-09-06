@@ -1,0 +1,265 @@
+# ============================================================================
+#  THE KOREAN QUESTION - Korean War side branch for the SOV (Stalin) tree.
+#
+#  Entry: sov_jvs.4 (Kim Il-sung's request, fires on day 21 from on_startup)
+#  sets SOV_korea_question_active, which reveals this branch.
+#
+#  Replaces the four focuses that used to hang off the Mingrelian Affair /
+#  Jewish Anti-Fascist Committee fork in SOV_Stalin.txt:
+#    SOV_Stalin_Prepare_For_the_Korean_War
+#    SOV_Stalin_Deal_with_the_Chinese
+#    SOV_Stalin_Send_Infantry_Equipment
+#    SOV_Stalin_Establish_the_64th_Fighter_Aviation_Corps
+#  Their reward payloads are carried forward here unchanged so nothing is lost.
+#
+#  This branch deliberately does NOT gate the KPA. Pyongyang still launches the
+#  war on its own through KPA_50s_the_fatherland_liberation_war; what Moscow
+#  controls here is how much materiel, air cover and diplomatic weight the
+#  Korean People's Army has when it does.
+#
+#  Placed to the LEFT of the main tree (which spans x 11-37) so it does not
+#  compete for space with the German branches on the right.
+#
+#  Shared focuses; only the root is listed in the SOV_Stalin focus_tree header.
+# ============================================================================
+
+# ---- ROOT -------------------------------------------------------------------
+shared_focus = {
+	id = SOV_kw_the_korean_question
+	icon = GFX_focus_korean_war
+	text_icon = Soviet_focus_style
+	cost = 3
+	x = 35
+	y = 0
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	# Retired the moment the war ends. Every outcome in wars_on_actions.txt sets
+	# KOREA_CEASEFIRE_UN, at which point this whole branch is replaced in place by
+	# SOV_Korean_Settlement_Branch.txt, which occupies the same coordinates.
+	allow_branch = {
+		has_country_flag = SOV_korea_question_active
+		NOT = { has_global_flag = KOREA_CEASEFIRE_UN }
+	}
+	available = { has_country_flag = SOV_korea_question_active }
+
+	completion_reward = {
+		add_political_power = 40
+		custom_effect_tooltip = SOV_kw_the_korean_question_tt
+	}
+}
+
+# ---- PREPARATIONS (1949 - June 1950) ----------------------------------------
+shared_focus = {
+	id = SOV_kw_rearm_the_korean_peoples_army
+	icon = GFX_usa_50_light_tanks
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_kw_the_korean_question
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_kw_the_korean_question }
+	available = { country_exists = KPA }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	# Carries the old SOV_Stalin_Prepare_For_the_Korean_War and
+	# SOV_Stalin_Send_Infantry_Equipment payloads.
+	completion_reward = {
+		add_to_variable = {
+			bonus_fpp_modifier = -0.25
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				set_temp_variable = { money_to_gain = 100 }
+				add_money_with_tooltip_effect = yes
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_1
+					amount = 15000
+					producer = CUM
+				}
+				add_equipment_to_stockpile = {
+					type = mbt_equipment_1
+					amount = 400
+					producer = CUM
+				}
+				random_owned_controlled_state = {
+					add_building_construction = {
+						type = arms_factory
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state = {
+					add_building_construction = {
+						type = arms_factory
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+		}
+		custom_effect_tooltip = SOV_kw_rearm_the_korean_peoples_army_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kw_advisors_in_pyongyang
+	icon = GFX_Share_intel_with_the_DDR
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_kw_rearm_the_korean_peoples_army
+	x = -2
+	y = 1
+	prerequisite = { focus = SOV_kw_rearm_the_korean_peoples_army }
+	available = { country_exists = KPA }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	completion_reward = {
+		add_political_power = 25
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				give_military_access = SOV
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+				army_experience = 25
+				add_war_support = 0.05
+			}
+			add_opinion_modifier = { target = KPA modifier = large_increase }
+		}
+		custom_effect_tooltip = SOV_kw_advisors_in_pyongyang_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kw_the_sino_soviet_understanding
+	icon = GFX_Sino_Soviet_Friendship
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_kw_rearm_the_korean_peoples_army
+	x = 2
+	y = 1
+	prerequisite = { focus = SOV_kw_rearm_the_korean_peoples_army }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	# Carries the old SOV_Stalin_Deal_with_the_Chinese payload.
+	completion_reward = {
+		add_to_variable = {
+			bonus_fpp_modifier = 0.5
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = PRC }
+			PRC = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_1
+					amount = 1000
+					producer = CUM
+				}
+				add_equipment_to_stockpile = {
+					type = mbt_equipment_1
+					amount = 100
+					producer = CUM
+				}
+				add_opinion_modifier = { target = SOV modifier = medium_increase }
+			}
+			add_opinion_modifier = { target = PRC modifier = medium_increase }
+		}
+		custom_effect_tooltip = SOV_kw_the_sino_soviet_understanding_tt
+	}
+}
+
+# ---- WARTIME (from June 1950) -----------------------------------------------
+shared_focus = {
+	id = SOV_kw_the_64th_fighter_aviation_corps
+	icon = GFX_KPA_Sov_Air_Volunteers
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_kw_rearm_the_korean_peoples_army
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_kw_advisors_in_pyongyang }
+	prerequisite = { focus = SOV_kw_the_sino_soviet_understanding }
+	available = { has_global_flag = korean_war_begun }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	# Carries the old SOV_Stalin_Establish_the_64th_Fighter_Aviation_Corps payload.
+	completion_reward = {
+		add_timed_idea = {
+			days = 900
+			idea = The_64th_Fighter_Aviation_Corps
+		}
+		set_variable = {
+			Volunteer_Allowance^KPA = 5
+		}
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				527 = {
+					add_building_construction = {
+						type = air_base
+						level = 4
+						instant_build = yes
+					}
+				}
+			}
+		}
+		custom_effect_tooltip = SOV_kw_the_64th_fighter_aviation_corps_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kw_mig_alley
+	icon = GFX_KPA_Sov_Air_Volunteers
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_kw_the_64th_fighter_aviation_corps
+	x = -2
+	y = 1
+	prerequisite = { focus = SOV_kw_the_64th_fighter_aviation_corps }
+	available = { has_global_flag = korean_war_begun }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	completion_reward = {
+		air_experience = 50
+		add_to_variable = {
+			bonus_fpp_modifier = 0.25
+			tooltip = bonus_fpp_modifier_tt
+		}
+		news_event = sov_korea_branch.1
+		custom_effect_tooltip = SOV_kw_mig_alley_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kw_deniable_volunteers
+	icon = GFX_Deport_Traitorous_Elements_in_Germany
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_kw_the_64th_fighter_aviation_corps
+	x = 2
+	y = 1
+	prerequisite = { focus = SOV_kw_the_64th_fighter_aviation_corps }
+	available = { has_global_flag = korean_war_begun }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_named_threat = { threat = -5 name = SOV_kw_deniable_volunteers_threat }
+		set_variable = {
+			Volunteer_Allowance^KPA = 10
+		}
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_1
+					amount = 8000
+					producer = CUM
+				}
+				add_manpower = 20000
+			}
+		}
+		custom_effect_tooltip = SOV_kw_deniable_volunteers_tt
+	}
+}
+

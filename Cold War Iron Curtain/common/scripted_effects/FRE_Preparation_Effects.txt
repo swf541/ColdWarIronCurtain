@@ -1,0 +1,113 @@
+fre_preparation_apply_idea = {
+	fre_preparation_response_cleanup = yes
+	if = {
+		limit = { check_variable = { fre_preparation_tier = 2 } }
+		add_ideas = FRE_Preparation_Maximum
+		if = { limit = { country_exists = TAI } TAI = { add_ideas = FRE_Preparation_Maximum } }
+	}
+	else_if = {
+		limit = { check_variable = { fre_preparation_tier = 1 } }
+		add_ideas = FRE_Preparation_Supported
+		if = { limit = { country_exists = TAI } TAI = { add_ideas = FRE_Preparation_Supported } }
+	}
+	else = {
+		add_ideas = FRE_Preparation_Ready
+		if = { limit = { country_exists = TAI } TAI = { add_ideas = FRE_Preparation_Ready } }
+	}
+}
+
+fre_preparation_response_begin = {
+	set_variable = { fre_preparation_tier = 0 }
+	if = {
+		limit = { VIN = { check_variable = { VIN_camp_current = 5 } } }
+		if = { limit = { has_country_flag = FRE_Vinh_Yen_Prepared } set_variable = { fre_preparation_tier = 1 } }
+		country_event = { id = FRE_Preparation.1 hours = 8 }
+	}
+	else_if = {
+		limit = { VIN = { check_variable = { VIN_camp_current = 6 } } }
+		if = { limit = { has_country_flag = FRE_Mao_Khe_Prepared } set_variable = { fre_preparation_tier = 1 } }
+		if = { limit = { has_country_flag = FRE_Vinh_Yen_Defensive_Success } add_to_variable = { fre_preparation_tier = 1 } }
+		clamp_variable = { var = fre_preparation_tier min = 0 max = 2 }
+		country_event = { id = FRE_Preparation.2 hours = 8 }
+	}
+	else_if = {
+		limit = { VIN = { check_variable = { VIN_camp_current = 7 } } }
+		if = { limit = { has_country_flag = FRE_Mao_Khe_Defensive_Success } set_variable = { fre_preparation_tier = 1 } }
+		country_event = { id = FRE_Preparation.3 hours = 8 }
+	}
+	else_if = {
+		limit = { VIN = { check_variable = { VIN_camp_current = 8 } } }
+		if = { limit = { has_country_flag = FRE_Na_San_Prepared } set_variable = { fre_preparation_tier = 1 } }
+		if = { limit = { has_country_flag = FRE_Hoa_Binh_Mobile_Groups_Preserved } add_to_variable = { fre_preparation_tier = 1 } clr_country_flag = FRE_Hoa_Binh_Mobile_Groups_Preserved }
+		if = { limit = { has_country_flag = FRE_Lorraine_Result_Withheld } add_to_variable = { fre_preparation_tier = 1 } }
+		clamp_variable = { var = fre_preparation_tier min = 0 max = 2 }
+		country_event = { id = FRE_Preparation.4 hours = 8 }
+	}
+	fre_preparation_apply_idea = yes
+}
+
+fre_preparation_resolve_from_campaign = {
+	set_temp_variable = { fre_defensive_outcome = 4 }
+	if = { limit = { VIN = { check_variable = { VIN_camp_last_outcome = 4 } } } set_temp_variable = { fre_defensive_outcome = 1 } }
+	else_if = { limit = { VIN = { check_variable = { VIN_camp_last_outcome = 3 } } } set_temp_variable = { fre_defensive_outcome = 2 } }
+	else_if = { limit = { VIN = { check_variable = { VIN_camp_last_outcome = 5 } } } set_temp_variable = { fre_defensive_outcome = 5 } }
+	if = {
+		limit = { VIN = { check_variable = { VIN_camp_current = 5 } } }
+		clr_country_flag = FRE_Vinh_Yen_Result_Clean
+		clr_country_flag = FRE_Vinh_Yen_Result_Costly
+		clr_country_flag = FRE_Vinh_Yen_Result_Failure
+		clr_country_flag = FRE_Vinh_Yen_Result_Superseded
+		clr_country_flag = FRE_Vinh_Yen_Defensive_Success
+		if = { limit = { check_variable = { fre_defensive_outcome = 1 } } set_country_flag = FRE_Vinh_Yen_Result_Clean set_country_flag = FRE_Vinh_Yen_Defensive_Success }
+		else_if = { limit = { check_variable = { fre_defensive_outcome = 2 } } set_country_flag = FRE_Vinh_Yen_Result_Costly set_country_flag = FRE_Vinh_Yen_Defensive_Success }
+		else_if = { limit = { check_variable = { fre_defensive_outcome = 5 } } set_country_flag = FRE_Vinh_Yen_Result_Superseded }
+		else = { set_country_flag = FRE_Vinh_Yen_Result_Failure clr_country_flag = FRE_Vinh_Yen_Defensive_Success }
+	}
+	else_if = {
+		limit = { VIN = { check_variable = { VIN_camp_current = 6 } } }
+		clr_country_flag = FRE_Mao_Khe_Result_Clean
+		clr_country_flag = FRE_Mao_Khe_Result_Costly
+		clr_country_flag = FRE_Mao_Khe_Result_Failure
+		clr_country_flag = FRE_Mao_Khe_Result_Superseded
+		clr_country_flag = FRE_Mao_Khe_Defensive_Success
+		if = { limit = { check_variable = { fre_defensive_outcome = 1 } } set_country_flag = FRE_Mao_Khe_Result_Clean set_country_flag = FRE_Mao_Khe_Defensive_Success }
+		else_if = { limit = { check_variable = { fre_defensive_outcome = 2 } } set_country_flag = FRE_Mao_Khe_Result_Costly set_country_flag = FRE_Mao_Khe_Defensive_Success }
+		else_if = { limit = { check_variable = { fre_defensive_outcome = 5 } } set_country_flag = FRE_Mao_Khe_Result_Superseded }
+		else = { set_country_flag = FRE_Mao_Khe_Result_Failure clr_country_flag = FRE_Mao_Khe_Defensive_Success }
+	}
+	else_if = {
+		limit = { VIN = { check_variable = { VIN_camp_current = 7 } } }
+		clr_country_flag = FRE_Day_River_Result_Clean
+		clr_country_flag = FRE_Day_River_Result_Costly
+		clr_country_flag = FRE_Day_River_Result_Failure
+		clr_country_flag = FRE_Day_River_Result_Superseded
+		if = { limit = { check_variable = { fre_defensive_outcome = 1 } } set_country_flag = FRE_Day_River_Result_Clean }
+		else_if = { limit = { check_variable = { fre_defensive_outcome = 2 } } set_country_flag = FRE_Day_River_Result_Costly }
+		else_if = { limit = { check_variable = { fre_defensive_outcome = 5 } } set_country_flag = FRE_Day_River_Result_Superseded }
+		else = { set_country_flag = FRE_Day_River_Result_Failure }
+	}
+	else_if = {
+		limit = { VIN = { check_variable = { VIN_camp_current = 8 } } }
+		clr_country_flag = FRE_Na_San_Result_Clean
+		clr_country_flag = FRE_Na_San_Result_Costly
+		clr_country_flag = FRE_Na_San_Result_Failure
+		clr_country_flag = FRE_Na_San_Result_Superseded
+		clr_country_flag = FRE_Na_San_Success
+		clr_country_flag = FRE_Na_San_Failure
+		if = { limit = { check_variable = { fre_defensive_outcome = 1 } } set_country_flag = FRE_Na_San_Result_Clean set_country_flag = FRE_Na_San_Success }
+		else_if = { limit = { check_variable = { fre_defensive_outcome = 2 } } set_country_flag = FRE_Na_San_Result_Costly set_country_flag = FRE_Na_San_Success }
+		else_if = { limit = { check_variable = { fre_defensive_outcome = 5 } } set_country_flag = FRE_Na_San_Result_Superseded }
+		else = { set_country_flag = FRE_Na_San_Result_Failure set_country_flag = FRE_Na_San_Failure }
+	}
+}
+
+fre_preparation_response_cleanup = {
+	if = { limit = { has_idea = FRE_Preparation_Ready } remove_ideas = FRE_Preparation_Ready }
+	if = { limit = { has_idea = FRE_Preparation_Supported } remove_ideas = FRE_Preparation_Supported }
+	if = { limit = { has_idea = FRE_Preparation_Maximum } remove_ideas = FRE_Preparation_Maximum }
+	if = { limit = { country_exists = TAI } TAI = {
+		if = { limit = { has_idea = FRE_Preparation_Ready } remove_ideas = FRE_Preparation_Ready }
+		if = { limit = { has_idea = FRE_Preparation_Supported } remove_ideas = FRE_Preparation_Supported }
+		if = { limit = { has_idea = FRE_Preparation_Maximum } remove_ideas = FRE_Preparation_Maximum }
+	} }
+}

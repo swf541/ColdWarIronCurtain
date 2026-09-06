@@ -1,0 +1,117 @@
+# ============================================================================
+# Viet Bac Autonomous Region QA / testing effects
+# ----------------------------------------------------------------------------
+# Run from the console with:   e <effect_name>
+# Every effect here expects VIN scope - `tag VIN` first.
+#
+# Companion files: IC_Geneva_Test_Effects.txt (conference lifecycle and GUI),
+# IC_Struggle_Test_Effects.txt (struggle phases and endings).
+#
+# Quick reference:
+#   e test_viet_bac_setup       hand VIN the four states and mark the war over
+#   e test_viet_bac_ask         fire THO.1 now, skipping the 240-day queue
+#   e test_viet_bac_establish   run the founding payload directly, no event
+#   e test_viet_bac_check       assert the region came out correctly
+#   e test_viet_bac_reset       tear it all down (rerunnable)
+#
+# A full pass is:
+#   e test_viet_bac_setup / e test_viet_bac_ask / pick an option
+#   e test_viet_bac_check
+#   e test_viet_bac_reset
+# ============================================================================
+
+# `e test_viet_bac_setup` - the preconditions the on_daily_VIN gate looks for.
+test_viet_bac_setup = {
+	set_global_flag = Indochina_War_Over
+	if = {
+		limit = { country_exists = THO }
+		annex_country = { target = THO transfer_troops = no }
+	}
+	clr_country_flag = VIN_viet_bac_question_asked
+	clr_country_flag = VIN_viet_bac_zone_granted
+	clr_country_flag = VIN_viet_bac_zone_refused
+	clr_country_flag = VIN_viet_bac_zone_established
+	transfer_state = 1280
+	transfer_state = 1768
+	transfer_state = 881
+	transfer_state = 1767
+	log = "VIET BAC: setup done - VIN holds 1280, 1768, 881, 1767"
+}
+
+# `e test_viet_bac_ask` - skip the queue and put the decision on screen now.
+test_viet_bac_ask = {
+	set_country_flag = VIN_viet_bac_question_asked
+	country_event = THO.1
+}
+
+# `e test_viet_bac_establish` - the founding payload with no event in the way,
+# for checking the state and politics handover on its own.
+test_viet_bac_establish = {
+	vin_establish_viet_bac_zone = yes
+	log = "VIET BAC: establishment effect run"
+}
+
+# `e test_viet_bac_check` - assertions. Silence is a pass.
+test_viet_bac_check = {
+	if = {
+		limit = { NOT = { country_exists = THO } }
+		log = "VIET BAC: FAIL - THO does not exist"
+	}
+	if = {
+		limit = { country_exists = THO NOT = { THO = { is_subject_of = VIN } } }
+		log = "VIET BAC: FAIL - THO is not a subject of VIN"
+	}
+	if = {
+		limit = { NOT = { 1280 = { is_owned_by = THO } } }
+		log = "VIET BAC: FAIL - Cao Bang is not THO's"
+	}
+	if = {
+		limit = { NOT = { 1768 = { is_owned_by = THO } } }
+		log = "VIET BAC: FAIL - Lang Son is not THO's"
+	}
+	if = {
+		limit = { NOT = { 881 = { is_owned_by = THO } } }
+		log = "VIET BAC: FAIL - Dong Bac Bo is not THO's"
+	}
+	if = {	# only a failure when Hanoi actually held Ha Giang to give
+		limit = {
+			NOT = { 1767 = { is_owned_by = THO } }
+			NOT = { 1767 = { is_owned_by = MEO } }
+		}
+		log = "VIET BAC: FAIL - Ha Giang went to neither THO nor MEO"
+	}
+	if = {
+		limit = { NOT = { THO = { has_country_flag = THO_viet_bac_zone } } }
+		log = "VIET BAC: FAIL - zone flag missing"
+	}
+	if = {
+		limit = {
+			NOT = {
+				THO = {
+					has_country_leader = {
+						character = VIN_Chu_Van_Tan
+						ruling_only = yes
+					}
+				}
+			}
+		}
+		log = "VIET BAC: FAIL - Chu Van Tan is not chairing the zone"
+	}
+	log = "VIET BAC: check complete"
+}
+
+# `e test_viet_bac_reset` - put the north back the way it was so the whole
+# chain can be run again from a single save.
+test_viet_bac_reset = {
+	if = {
+		limit = { country_exists = THO }
+		VIN_Chu_Van_Tan = { set_nationality = VIN }
+		THO = { drop_cosmetic_tag = yes }
+		annex_country = { target = THO transfer_troops = no }
+	}
+	clr_country_flag = VIN_viet_bac_question_asked
+	clr_country_flag = VIN_viet_bac_zone_granted
+	clr_country_flag = VIN_viet_bac_zone_refused
+	clr_country_flag = VIN_viet_bac_zone_established
+	log = "VIET BAC: reset done"
+}

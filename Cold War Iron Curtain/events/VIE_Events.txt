@@ -1,5 +1,3 @@
-##### South Vietnam #####
-
 	#Misc
 	add_namespace = VIE_Mechanics
 
@@ -23,6 +21,10 @@
 	add_namespace = VIE_Vinh
 	add_namespace = VIE_Toan
 	add_namespace = VIE_Quang
+	add_namespace = Diem
+	add_namespace = Can_Lao
+	add_namespace = DaiViet
+	add_namespace = Sect_Crisis
 	add_namespace = VIE_Historical
 
 	add_namespace = Initial_CuongDe
@@ -37,6 +39,7 @@
 	add_namespace = CD_Hung
 	add_namespace = NH_DIEMa
 	add_namespace = DiemLR
+	add_namespace = DiemMarx
 	add_namespace = CCC_Pol
 	add_namespace = VIE_Saigon_Captured
 	add_namespace = Cocunut_Monk
@@ -51,6 +54,7 @@
 	add_namespace = Brevert_Lines
 	add_namespace = French_Drawn_Borders
 	add_namespace = Crown_Domains
+	add_namespace = VIE_Pulo_Condore
 
 	#Military
 	add_namespace = VNA
@@ -665,7 +669,10 @@ country_event = {
 				end_wars = no
 				end_civil_wars = no
 			}
-			remove_from_faction = CCC
+			CCC = {
+				leave_faction = yes
+				remove_ideas = State_of_Vietnam_Faction
+			}
 		}
 		if = {
 			limit = {
@@ -704,11 +711,14 @@ country_event = {
 			VIE = {
 				set_autonomy = {
 					target = CCC
-					autonomy_state = autonomy_free
+					autonomous_state = autonomy_free
 					end_wars = no
 					end_civil_wars = no
 				}
-				remove_from_faction = CCC
+				CCC = {
+					leave_faction = yes
+					remove_ideas = State_of_Vietnam_Faction
+				}
 				declare_war_on = { target = CCC }
 			}
 		}
@@ -738,7 +748,6 @@ country_event = {
 	}
 }
 
-### CCC Political Events ###
 
 country_event = {
 	id = CCC_Pol.1
@@ -780,7 +789,7 @@ country_event = {
 
 		set_autonomy = {
 			target = FUL
-			autonomy_state = autonomy_integrated_puppet
+			autonomous_state = autonomy_integrated_puppet
 			end_wars = no
 			end_civil_wars = no
 		}
@@ -789,8 +798,8 @@ country_event = {
 			set_politics = {
 				ruling_party = monarchism
 				elections_allowed = no
-				long_name = "Hoang-Trieu Nguyen"
-				name = "Hoang-Trieu Nguyen"
+				long_name = VIE_PARTY_HOANG_TRIEU_NGUYEN_long
+				name = VIE_PARTY_HOANG_TRIEU_NGUYEN
 			}
 			effect_tooltip = {
 				create_country_leader = {
@@ -830,7 +839,7 @@ country_event = {
 		FRA = {
 			set_autonomy = {
 				target = FUL
-				autonomy_state = autonomy_indon_union
+				autonomous_state = autonomy_indon_union
 				end_wars = yes
 				end_civil_wars = no
 			}
@@ -838,13 +847,14 @@ country_event = {
 		FUL = {
 			set_country_flag = FUL_FRA_flag
 			leave_faction = yes
+			remove_ideas = State_of_Vietnam_Faction
 			drop_cosmetic_tag = yes
 			set_cosmetic_tag = FUL_FRA
 			set_politics = {
 				ruling_party = neutrality
 				elections_allowed = no
-				long_name = "Montagnard Self-Rule Committee"
-				name = "Montagnard Self-Rule Committee"
+				long_name = VIE_PARTY_MONTAGNARD_SELF_RULE_long
+				name = VIE_PARTY_MONTAGNARD_SELF_RULE
 			}
 			effect_tooltip = {
 				create_country_leader = {
@@ -975,7 +985,7 @@ country_event = {
 		add_stability = 0.05
 		set_autonomy = {
 			target = FUL
-			autonomy_state = autonomy_integrated_puppet
+			autonomous_state = autonomy_integrated_puppet
 			end_wars = no
 			end_civil_wars = no
 		}
@@ -985,8 +995,8 @@ country_event = {
 			set_politics = {
 				ruling_party = democratic
 				elections_allowed = no
-				long_name = "Hoi-Dong Nguoi-Thuong Trung-Phan"
-				name = "Hoi-Dong Nguoi-Thuong Trung-Phan"
+				long_name = VIE_PARTY_HOI_DONG_NGUOI_THUONG_TRUNG_PHAN_long
+				name = VIE_PARTY_HOI_DONG_NGUOI_THUONG_TRUNG_PHAN
 			}
 			effect_tooltip = {
 				create_country_leader = {
@@ -1056,6 +1066,13 @@ country_event = {
 			country_event = { id = NUN_Unification.2 hours = 12 }
 			event_option_tooltip = NUN_Unification.2.a
 		}
+		ai_chance = {
+			base = 5
+			modifier = {
+				factor = 20
+				is_historical_focus_on = yes
+			}
+		}
 	}
 
 	option = {
@@ -1067,6 +1084,13 @@ country_event = {
 		VIE = {
 			country_event = { id = NUN_Unification.3 hours = 12 }
 			event_option_tooltip = NUN_Unification.3.a
+		}
+		ai_chance = {
+			base = 5
+			modifier = {
+				factor = 1
+				is_historical_focus_on = yes
+			}
 		}
 	}
 }
@@ -1085,12 +1109,6 @@ country_event = {
 		name = NUN_Unification.2.a
 
 		add_political_power = 150
-		set_autonomy = {
-			target = NUN
-			autonomy_state = autonomy_integrated_puppet
-			end_wars = no
-			end_civil_wars = no
-		}
 		NUN = {
 			hidden_effect = {
 				set_politics = {
@@ -1145,7 +1163,7 @@ country_event = {
 	option = {
 		name = NUN_Unification.3.a
 
-		add_political_power = -150
+		add_political_power = -25
 	}
 }
 
@@ -1192,6 +1210,7 @@ country_event = {
 
 		activate_sect_menu = yes
 		set_cosmetic_tag = VIE_FRA_ETAT
+		VIE_sync_faction_name = yes
 		set_country_flag = VIE_unity_required
 		set_country_flag = VIE_Northern_Question_Flag
 		load_focus_tree = VIE_Bao_Dai_50
@@ -1212,6 +1231,7 @@ country_event = {
 		name = Etat_du_Vietnam.2.a
 
 		set_cosmetic_tag = VIE_FRA_ETAT
+		VIE_sync_faction_name = yes
 		load_focus_tree = VIE_Bao_Dai_50
 	}
 }
@@ -1318,8 +1338,8 @@ country_event = {
 		}
 		set_party_name = {
 			ideology = neutrality
-			long_name = "Chanh-Quyen Nguyen-Van-Xuan"
-			name = "Chanh-Quyen Nguyen-Van-Xuan"
+			long_name = VIE_PARTY_XUAN_long
+			name = VIE_PARTY_XUAN
 		}
 		set_country_flag = VIE_PM_Nguyen_Van_Xuan
 		set_country_flag = {
@@ -1477,7 +1497,7 @@ country_event = {
 		add_ideas = VIE_Looming_Diem
 
 		set_country_flag = VIE_Ambitious_Diem
-		activate_mission = Dealing_With_Diem_Countdown #activate deal with diem mission
+		activate_mission = Dealing_With_Diem_Countdown
 		custom_effect_tooltip = VIE_Diem_Warning_tt
 
 		trigger = {
@@ -1608,16 +1628,15 @@ country_event = {
 			elections_allowed = no
 			last_election = "1955.09.18"
 		}
-		effect_tooltip = {
-			add_country_leader_role = {
-				character = VIE_Ngo_Dinh_Diem
-				promote_leader = yes
-				country_leader = {
-					ideology = oriental_personalism
-				}
-			}
+		promote_character = {
+			character = VIE_Ngo_Dinh_Diem
+			ideology = oriental_personalism
 		}
+		clr_country_flag = VIE_NRC_Interim
 		drop_cosmetic_tag = yes
+		set_global_flag = VIE_Republic_Proclaimed
+		VIE_close_favoritism_minigame = yes
+		VIE_sync_faction_name = yes
 		add_opinion_modifier = {
 			target = FRA
 			modifier = VIE_Diem_Succeeds
@@ -1651,7 +1670,7 @@ country_event = {
 	option = {
 		name = BaoDai.10.a
 
-		add_stability = 0.05
+		add_stability = -0.05
 		every_owned_state = {
 			limit = {
 				is_core_of = VIN
@@ -1663,12 +1682,13 @@ country_event = {
 	option = {
 		name = BaoDai.10.b
 
-		add_stability = -0.15
+		add_political_power = 25
+		add_stability = 0.05
 		every_owned_state = {
 			limit = {
 				is_core_of = VIN
 			}
-			add_resistance = 10
+			add_compliance = 10
 		}
 	}
 }
@@ -1677,7 +1697,21 @@ country_event = {
 	id = BaoDai.11
 	immediate = { }
 	title = BaoDai.11.t
-	desc = BaoDai.11.d
+	desc = {
+		trigger = { has_global_flag = VIE_Republic_Proclaimed }
+		text = BaoDai.11.d_republic
+	}
+	desc = {
+		trigger = {
+			NOT = { has_global_flag = VIE_Republic_Proclaimed }
+			NOT = { has_country_flag = VIE_Hinh_Coup }
+		}
+		text = BaoDai.11.d_throne
+	}
+	desc = {
+		trigger = { has_country_flag = VIE_Hinh_Coup }
+		text = BaoDai.11.d_junta
+	}
 	picture = GFX_BaoDai.11
 
 	is_triggered_only = yes
@@ -1688,7 +1722,18 @@ country_event = {
 
 		FRA = { country_event = { id = BaoDai.12 hours = 13 random_hours = 8 } }
 		hidden_effect = {
-			load_focus_tree = empty_focus # No content past 1955 at the moment
+			if = {
+				limit = { has_global_flag = VIE_Republic_Proclaimed }
+				country_event = { id = Diem.60 hours = 6 }
+			}
+			else_if = {
+				limit = { has_country_flag = VIE_Hinh_Coup }
+				country_event = { id = Diem.62 hours = 6 }
+			}
+			else = {
+				country_event = { id = Diem.61 hours = 6 }
+			}
+			load_focus_tree = empty_focus
 		}
 	}
 }
@@ -1766,7 +1811,17 @@ country_event = {
 
 country_event = {
 	id = BaoDai.16 #Cuongde death
-	immediate = { }
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = {
+					tag = VIE
+					has_character = VIE_Cuong_De
+				}
+				retire_character = VIE_Cuong_De
+			}
+		}
+	}
 	title = {
 		text = BaoDai.16.t.a
 		trigger = {
@@ -1795,7 +1850,6 @@ country_event = {
 
 	trigger = {
 		date < 1960.1.1
-		has_country_flag = VIE_CuongDe_Lost1
 	}
 	is_triggered_only = yes
 
@@ -1885,8 +1939,8 @@ country_event = {
 		set_politics = {
 			ruling_party = neutrality
 			elections_allowed = no
-			long_name = "Hoi-Dong Chuyen-Tiep Quan-Quan"
-			name = "Hoi-Dong Chuyen-Tiep Quan-Quan"
+			long_name = VIE_PARTY_HOI_DONG_CHUYEN_TIEP_QUAN_QUAN_long
+			name = VIE_PARTY_HOI_DONG_CHUYEN_TIEP_QUAN_QUAN
 		}
 		CCC_Jean_Leroy = {
 			add_country_leader_role = {
@@ -1924,20 +1978,12 @@ country_event = {
 			set_temp_variable = { influence_target = THIS.id }
 			change_influence_percentage = yes
 		}
-		FRA = {
-			set_autonomy = {
-				target = ROOT
-				autonomy_state = autonomy_indon_union
-				end_wars = no
-				end_civil_wars = no
-			}
-		}
 		add_stability = -0.20
 		set_politics = {
 			ruling_party = neutrality
 			elections_allowed = no
-			long_name = "Hoi-Dong Chuyen-Tiep Quan-Quan"
-			name = "Hoi-Dong Chuyen-Tiep Quan-Quan"
+			long_name = VIE_PARTY_HOI_DONG_CHUYEN_TIEP_QUAN_QUAN_long
+			name = VIE_PARTY_HOI_DONG_CHUYEN_TIEP_QUAN_QUAN
 		}
 		VIE_Nguyen_Van_Hinh = {
 			add_country_leader_role = {
@@ -1998,18 +2044,13 @@ country_event = {
 			set_temp_variable = { influence_target = THIS.id }
 			change_influence_percentage = yes
 		}
-		FRA = {
-			set_autonomy = {
-				target = ROOT
-				autonomy_state = autonomy_associated_state
-				end_wars = no
-				end_civil_wars = no
-			}
-		}
 		add_ideas = VIE_Independent_Facade
 		add_stability = 0.05
 		set_country_flag = VIE_French_Self_Governance_End
 		news_event = { id = French_Hinh.0 hours = 12 }
+		hidden_effect = {
+			country_event = { id = Diem.62 days = 1 }	# the junta tree ends here too
+		}
 	}
 }
 
@@ -2037,18 +2078,13 @@ country_event = {
 			set_temp_variable = { influence_target = THIS.id }
 			change_influence_percentage = yes
 		}
-		FRA = {
-			set_autonomy = {
-				target = ROOT
-				autonomy_state = autonomy_colony
-				end_wars = no
-				end_civil_wars = no
-			}
-		}
 		add_ideas = VIE_French_Province
 		add_stability = -0.10
 		set_country_flag = VIE_French_Province_End
 		news_event = { id = French_Hinh.100 hours = 12 }
+		hidden_effect = {
+			country_event = { id = Diem.62 days = 1 }	# the junta tree ends here too
+		}
 	}
 }
 
@@ -2150,7 +2186,10 @@ country_event = {
 	fire_only_once = yes
 	trigger = {
 		NOT = {
-			has_country_flag = VIE_Nhu_Jailed
+		    AND = {
+    			has_country_flag = VIE_Nhu_Jailed
+    			has_country_flag = VIE_CuongDe_Succeeds
+            }
 		}
 		date > 1952.1.1
 		date < 1960.1.1
@@ -2190,27 +2229,11 @@ country_event = {
 		name = VIE_PMs.1.a
 
 		VIE_Bao_Dai = {
-			promote_character = yes
 			set_portraits = { civilian = { large = GFX_Bao_Dai_1950 } }
 		}
-		set_party_name = {
-			ideology = neutrality
-			long_name = "Chanh-Quyen Bao-Dai"
-			name = "Chanh-Quyen Bao-Dai"
-		}
+		VIE_vacate_premiership = yes
 		clr_country_flag = VIE_PM_Nguyen_Van_Xuan
-		set_country_flag = VIE_No_Initial_PM
 		set_country_flag = VIE_PM_Nguyen_Van_Xuan_Retired
-		if = {
-			limit = {
-				has_country_flag = VIE_PM_Open
-			}
-			set_country_flag = {
-				flag = VIE_PM_Open
-				value = 2
-			}
-		}
-		reset_favoritism_minigame = yes
 	}
 }
 
@@ -2227,23 +2250,9 @@ country_event = {
 	option = {
 		name = VIE_PMs.2.a
 
-		VIE_Bao_Dai = {
-			promote_character = yes
-		}
-		set_party_name = {
-			ideology = neutrality
-			long_name = "Chanh-Quyen Bao-Dai"
-			name = "Chanh-Quyen Bao-Dai"
-		}
+		VIE_vacate_premiership = yes
 		clr_country_flag = VIE_PM_Nguyen_Phan_Long
-		set_country_flag = VIE_No_Initial_PM
 		set_country_flag = VIE_PM_Nguyen_Phan_Long_Retired
-		set_country_flag = {
-			flag = VIE_PM_Open
-			value = 2
-		}
-		mark_focus_tree_layout_dirty = yes
-		reset_favoritism_minigame = yes
 	}
 }
 
@@ -2260,28 +2269,9 @@ country_event = {
 	option = {
 		name = VIE_PMs.3.a
 
-		VIE_Bao_Dai = {
-			promote_character = yes
-		}
-		set_party_name = {
-			ideology = neutrality
-			long_name = "Chanh-Quyen Bao-Dai"
-			name = "Chanh-Quyen Bao-Dai"
-		}
+		VIE_vacate_premiership = yes
 		clr_country_flag = VIE_PM_Tran_Van_Huu
-		set_country_flag = VIE_No_Initial_PM
 		set_country_flag = VIE_PM_Tran_Van_Huu_Retired
-		if = {
-			limit = {
-				has_country_flag = VIE_PM_Open
-			}
-			set_country_flag = {
-				flag = VIE_PM_Open
-				value = 2
-			}
-		}
-		mark_focus_tree_layout_dirty = yes
-		reset_favoritism_minigame = yes
 	}
 }
 
@@ -2298,28 +2288,9 @@ country_event = {
 	option = {
 		name = VIE_PMs.4.a
 
-		VIE_Bao_Dai = {
-			promote_character = yes
-		}
-		set_party_name = {
-			ideology = neutrality
-			long_name = "Chanh-Quyen Bao-Dai"
-			name = "Chanh-Quyen Bao-Dai"
-		}
+		VIE_vacate_premiership = yes
 		clr_country_flag = VIE_PM_Nguyen_Van_Tam_Flag
-		set_country_flag = VIE_No_Initial_PM
 		set_country_flag = VIE_PM_Nguyen_Van_Tam_Retired
-		if = {
-			limit = {
-				has_country_flag = VIE_PM_Open
-			}
-			set_country_flag = {
-				flag = VIE_PM_Open
-				value = 2
-			}
-		}
-		mark_focus_tree_layout_dirty = yes
-		reset_favoritism_minigame = yes
 	}
 }
 
@@ -2336,33 +2307,14 @@ country_event = {
 	option = {
 		name = VIE_PMs.5.a
 
-		VIE_Bao_Dai = {
-			promote_character = yes
-		}
-		set_party_name = {
-			ideology = neutrality
-			long_name = "Chanh-Quyen Bao-Dai"
-			name = "Chanh-Quyen Bao-Dai"
-		}
+		VIE_vacate_premiership = yes
 		set_politics = {
 			ruling_party = neutrality
 			elections_allowed = no
 			last_election = "1954.06.01"
 		}
 		clr_country_flag = VIE_PM_NguyenPhuc_BuuLoc
-		set_country_flag = VIE_No_Initial_PM
 		set_country_flag = VIE_PM_NguyenPhuc_BuuLoc_Retired
-		if = {
-			limit = {
-				has_country_flag = VIE_PM_Open
-			}
-			set_country_flag = {
-				flag = VIE_PM_Open
-				value = 2
-			}
-		}
-		mark_focus_tree_layout_dirty = yes
-		reset_favoritism_minigame = yes
 	}
 }
 
@@ -2380,32 +2332,18 @@ country_event = {
 		name = VIE_PMs.6.a
 
 		complete_national_focus = VIE_Vinh_Resign
-		VIE_Bao_Dai = {
-			promote_character = yes
-		}
-		set_party_name = {
-			ideology = neutrality
-			long_name = "Chanh-Quyen Bao-Dai"
-			name = "Chanh-Quyen Bao-Dai"
-		}
+		VIE_vacate_premiership = yes
 		set_party_name = {
 			ideology = democratic
-			long_name = "Phuc-Quoc Hoi"
-			name = "Phuc-Quoc Hoi"
+			long_name = VIE_PARTY_PHUC_QUOC_HOI_long
+			name = VIE_PARTY_PHUC_QUOC_HOI
 		}
 		set_politics = {
 			ruling_party = neutrality
 			elections_allowed = no
 		}
 		clr_country_flag = VIE_PM_Tran_Quang_Vinh
-		set_country_flag = VIE_No_Initial_PM
 		set_country_flag = VIE_PM_Tran_Quang_Vinh_Retired
-		set_country_flag = {
-			flag = VIE_PM_Open
-			value = 2
-		}
-		mark_focus_tree_layout_dirty = yes
-		reset_favoritism_minigame = yes
 	}
 }
 
@@ -2422,28 +2360,9 @@ country_event = {
 	option = {
 		name = VIE_PMs.7.a
 
-		VIE_Bao_Dai = {
-			promote_character = yes
-		}
-		set_party_name = {
-			ideology = neutrality
-			long_name = "Chanh-Quyen Bao-Dai"
-			name = "Chanh-Quyen Bao-Dai"
-		}
+		VIE_vacate_premiership = yes
 		clr_country_flag = VIE_PM_Nguyen_Bao_Toan
-		set_country_flag = VIE_No_Initial_PM
 		set_country_flag = VIE_PM_Nguyen_Bao_Toan_Retired
-		if = {
-			limit = {
-				has_country_flag = VIE_PM_Open
-			}
-			set_country_flag = {
-				flag = VIE_PM_Open
-				value = 2
-			}
-		}
-		mark_focus_tree_layout_dirty = yes
-		reset_favoritism_minigame = yes
 	}
 }
 
@@ -2460,28 +2379,936 @@ country_event = {
 	option = {
 		name = VIE_PMs.8.a
 
-		VIE_Bao_Dai = {
-			promote_character = yes
-		}
-		set_party_name = {
-			ideology = neutrality
-			long_name = "Chanh-Quyen Bao-Dai"
-			name = "Chanh-Quyen Bao-Dai"
-		}
+		VIE_vacate_premiership = yes
 		clr_country_flag = VIE_PM_Dinh_Xuan_Quang
-		set_country_flag = VIE_No_Initial_PM
 		set_country_flag = VIE_PM_Dinh_Xuan_Quang_Retired
-		if = {
-			limit = {
-				has_country_flag = VIE_PM_Open
-			}
-			set_country_flag = {
-				flag = VIE_PM_Open
-				value = 2
+	}
+}
+
+country_event = {
+	id = VIE_PMs.9
+	immediate = { }
+	title = VIE_PMs.9.t
+	desc = VIE_PMs.9.d
+	picture = GFX_VIE_PMs.9
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = VIE_PMs.9.a
+
+		VIE_vacate_premiership = yes
+		set_politics = {
+			ruling_party = neutrality
+			elections_allowed = no
+			last_election = "1955.10.23"
+		}
+		clr_country_flag = VIE_PM_Ngo_Dinh_Diem
+		set_country_flag = VIE_PM_Ngo_Dinh_Diem_Retired
+	}
+}
+
+country_event = {
+	id = Diem.1
+	immediate = { }
+	title = Diem.1.t
+	desc = Diem.1.d
+	picture = GFX_Diem.1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.1.a
+		trigger = {
+			custom_trigger_tooltip = {
+				tooltip = VIE_Hinh_Break_Requirement_tt
+				OR = {
+					check_variable = { VIE_Hinh_Standoff > 49 }
+					AND = {
+						is_ai = yes
+						is_historical_focus_on = yes
+					}
+				}
 			}
 		}
-		mark_focus_tree_layout_dirty = yes
-		reset_favoritism_minigame = yes
+
+		add_political_power = -50
+		add_stability = -0.03
+		set_country_flag = VIE_Diem_Controls_Army
+		set_country_flag = VIE_Hinh_Exiled
+		clr_country_flag = VIE_Hinh_Crisis
+		set_temp_variable = { favoritism_change = 15 }
+		VIE_Change_Alt_Favoritism = yes
+		set_temp_variable = { favoritism_change = -10 }
+		VIE_Change_Main_Favoritism = yes
+		set_temp_variable = { influence_change = 10 }
+		VIE_Change_Domestic_Influence = yes
+		set_temp_variable = { daiviet_threat_change = 10 }	# the party had backed him, and his officers go where he goes
+		VIE_daiviet_threat_change = yes
+		add_opinion_modifier = {
+			target = FRA
+			modifier = medium_decrease
+		}
+		reverse_add_opinion_modifier = {
+			target = FRA
+			modifier = medium_decrease
+		}
+		ai_chance = {
+			base = 100
+		}
+	}
+
+	option = {
+		name = Diem.1.b
+
+		add_political_power = -25
+		add_stability = 0.05
+		set_country_flag = VIE_Hinh_Bought_Off	# ends the coup risk, but the premier never gets the army
+		clr_country_flag = VIE_Hinh_Crisis
+		set_temp_variable = { favoritism_change = 10 }
+		VIE_Change_Main_Favoritism = yes
+		set_temp_variable = { influence_change = -10 }
+		VIE_Change_Domestic_Influence = yes
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+}
+
+country_event = {
+	id = Diem.2
+	immediate = { }
+	title = Diem.2.t
+	desc = Diem.2.d
+	picture = GFX_BaoDai.13	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.2.a
+
+		add_political_power = -50
+		add_stability = -0.05
+		add_war_support = 0.10
+		VIE_spawn_binh_xuyen_revolt = yes
+		set_temp_variable = { favoritism_change = 20 }
+		VIE_Change_Alt_Favoritism = yes
+		set_temp_variable = { favoritism_change = -20 }
+		VIE_Change_Main_Favoritism = yes
+		set_temp_variable = { influence_change = 15 }
+		VIE_Change_Domestic_Influence = yes
+	}
+
+	option = {
+		name = Diem.2.b
+
+		add_political_power = -25
+		add_stability = 0.05
+		set_temp_variable = { binh_xuyen_loyalty_change = -20 }
+		binh_xuyen_loyalty_change_tt = yes
+		set_temp_variable = { favoritism_change = -10 }
+		VIE_Change_Alt_Favoritism = yes
+	}
+}
+
+country_event = {
+	id = Diem.42
+	immediate = { }
+	title = Diem.42.t
+	desc = Diem.42.d
+	picture = GFX_BaoDai.13	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.42.a
+
+		VIE_binh_xuyen_retreat_to_rung_sac = yes
+		set_temp_variable = { influence_change = 10 }
+		VIE_Change_Domestic_Influence = yes
+	}
+}
+
+country_event = {
+	id = Diem.3
+	immediate = { }
+	title = Diem.3.t
+	desc = Diem.3.d
+	picture = GFX_BaoDai.9	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.3.a
+
+		set_country_flag = VIE_Diem_NRC_Formed
+		add_political_power = 50
+		add_stability = -0.05
+		set_temp_variable = { favoritism_change = 20 }
+		VIE_Change_Alt_Favoritism = yes
+		set_temp_variable = { favoritism_change = -25 }
+		VIE_Change_Main_Favoritism = yes
+		set_temp_variable = { influence_change = 15 }
+		VIE_Change_Domestic_Influence = yes
+		add_popularity = {
+			ideology = monarchism
+			popularity = -0.10
+		}
+	}
+
+	option = {
+		name = Diem.3.b
+
+		add_political_power = 25
+		add_stability = 0.05
+		set_temp_variable = { favoritism_change = 5 }
+		VIE_Change_Alt_Favoritism = yes
+	}
+}
+
+
+country_event = {
+	id = Diem.4
+	immediate = { }
+	title = Diem.4.t
+	desc = Diem.4.d
+	picture = GFX_BaoDai.9
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.4.a
+
+		add_stability = 0.10
+		add_political_power = 100
+		add_war_support = 0.05
+		set_country_flag = VIE_Diem_Referendum_Won
+		VIE_seat_national_revolution_committee = yes
+		news_event = { id = Diem.10 hours = 6 random_hours = 6 }
+		country_event = { id = BaoDai.9 days = 30 }	# fallback: VIE_Diem_Proclaim_the_Republic normally gets there first
+	}
+}
+
+country_event = {
+	id = Diem.5
+	immediate = { }
+	title = Diem.5.t
+	desc = Diem.5.d
+	picture = GFX_BaoDai.9
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.5.a
+
+		add_stability = -0.08
+		add_political_power = 25
+		add_popularity = {
+			ideology = monarchism
+			popularity = 0.05
+		}
+		every_owned_state = {
+			limit = {
+				is_core_of = VIE
+			}
+			add_compliance = -10
+		}
+		set_country_flag = VIE_Diem_Referendum_Won
+		VIE_seat_national_revolution_committee = yes
+		news_event = { id = Diem.10 hours = 6 random_hours = 6 }
+		country_event = { id = BaoDai.9 days = 45 }	# fallback: VIE_Diem_Proclaim_the_Republic normally gets there first
+	}
+}
+
+country_event = {
+	id = Diem.6
+	immediate = { }
+	title = Diem.6.t
+	desc = Diem.6.d
+	picture = GFX_Diem.6
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.6.a
+
+		add_stability = -0.03
+		add_political_power = -25
+		add_popularity = {
+			ideology = monarchism
+			popularity = 0.10
+		}
+		set_temp_variable = { favoritism_change = 20 }
+		VIE_Change_Main_Favoritism = yes
+		country_event = { id = VIE_PMs.9 hours = 6 }
+	}
+}
+
+
+country_event = {
+	id = Diem.20
+	immediate = { }
+	title = Diem.20.t
+	desc = Diem.20.d
+	picture = GFX_French_Coup.1	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.20.a
+
+		add_stability = -0.05
+		add_war_support = -0.05
+	}
+}
+
+country_event = {
+	id = Diem.21
+	immediate = { }
+	title = Diem.21.t
+	desc = Diem.21.d
+	picture = GFX_BaoDai.13	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		has_country_flag = VIE_Hinh_Crisis
+	}
+
+	option = {
+		name = Diem.21.a
+
+		add_political_power = -25
+		add_timed_idea = {
+			idea = VIE_Caretaker_Cabinet
+			days = 60
+		}
+		set_temp_variable = { hinh_standoff_change = -15 }
+		VIE_hinh_standoff_change = yes
+	}
+}
+
+country_event = {
+	id = Diem.22
+	immediate = { }
+	title = Diem.22.t
+	desc = Diem.22.d
+	picture = GFX_French_Coup.1	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.22.a
+
+		add_political_power = -25
+		add_stability = -0.05
+		set_country_flag = VIE_Diem_Controls_Army
+		set_country_flag = VIE_Hinh_Exiled
+		set_temp_variable = { favoritism_change = 15 }
+		VIE_Change_Alt_Favoritism = yes
+		set_temp_variable = { favoritism_change = -10 }
+		VIE_Change_Main_Favoritism = yes
+		set_temp_variable = { influence_change = 10 }
+		VIE_Change_Domestic_Influence = yes
+		set_temp_variable = { daiviet_threat_change = 10 }
+		VIE_daiviet_threat_change = yes
+	}
+}
+
+country_event = {
+	id = Diem.23
+	immediate = { }
+	title = Diem.23.t
+	desc = Diem.23.d
+	picture = GFX_French_Coup.2	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.23.a
+
+		country_event = { id = French_Coup.2 hours = 3 }
+	}
+}
+
+country_event = {
+	id = Diem.24
+	immediate = { }
+	title = Diem.24.t
+	desc = Diem.24.d
+	picture = GFX_French_Coup.1	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.24.a
+
+		add_stability = 0.05
+		set_temp_variable = { hinh_standoff_change = 25 }
+		VIE_hinh_standoff_change = yes
+		add_opinion_modifier = {
+			target = USA
+			modifier = medium_increase
+		}
+		reverse_add_opinion_modifier = {
+			target = USA
+			modifier = medium_increase
+		}
+	}
+}
+
+# branch. No >= in check_variable - compare against one less.
+country_event = {
+	id = Diem.30
+	immediate = { }
+	title = Diem.30.t
+	desc = Diem.30.d
+	picture = GFX_BaoDai.11	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.30.a
+
+		add_stability = -0.05
+		add_political_power = -25
+		set_temp_variable = { favoritism_change = -15 }
+		VIE_Change_Main_Favoritism = yes
+		hidden_effect = {
+			VIE_calculate_referendum_score = yes
+			if = {
+				limit = { check_variable = { VIE_Referendum_Score > 119 } }
+				country_event = { id = Diem.4 hours = 6 }	# landslide
+			}
+			else_if = {
+				limit = { check_variable = { VIE_Referendum_Score > 69 } }
+				country_event = { id = Diem.5 hours = 6 }	# contested win
+			}
+			else = {
+				country_event = { id = Diem.6 hours = 6 }	# Bao Dai survives
+			}
+		}
+		ai_chance = {
+			base = 100
+		}
+	}
+
+	option = {
+		name = Diem.30.b
+
+		add_stability = 0.05
+		set_temp_variable = { favoritism_change = 25 }
+		VIE_Change_Main_Favoritism = yes
+		country_event = { id = VIE_PMs.9 hours = 6 }
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+}
+
+country_event = {
+	id = Diem.31
+	immediate = { }
+	title = Diem.31.t
+	desc = Diem.31.d
+	picture = GFX_BaoDai.11	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.31.a
+
+		set_country_flag = VIE_Throne_Confirmed
+		add_stability = 0.05
+		add_popularity = { ideology = monarchism popularity = 0.10 }
+		set_temp_variable = { favoritism_change = 25 }
+		VIE_Change_Main_Favoritism = yes
+	}
+}
+
+country_event = {
+	id = Diem.40
+	immediate = { }
+	title = Diem.40.t
+	desc = Diem.40.d
+	picture = GFX_BaoDai.13	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.40.a
+
+		add_political_power = -25
+		add_war_support = 0.05
+		add_manpower = -2000
+		VIE_finish_the_binh_xuyen = yes
+		if = {
+			limit = { has_character = VIE_Duong_Van_Minh }
+			VIE_Duong_Van_Minh = {
+				add_corps_commander_role = {
+					traits = { french_trainee infantry_leader politically_connected Pro_QuocGia }
+					skill = 3
+					attack_skill = 3
+					defense_skill = 3
+					planning_skill = 3
+					logistics_skill = 2
+				}
+			}
+		}
+		set_temp_variable = { favoritism_change = 10 }
+		VIE_Change_Alt_Favoritism = yes
+		ai_chance = {
+			base = 100
+		}
+	}
+
+	option = {
+		name = Diem.40.b
+
+		add_political_power = 25
+		set_temp_variable = { binh_xuyen_annihilation_change = -15 }
+		binh_xuyen_annihilation_change_tt = yes
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+}
+
+country_event = {
+	id = Diem.41
+	immediate = { }
+	title = Diem.41.t
+	desc = Diem.41.d
+	picture = GFX_BaoDai.13	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.41.a
+
+		add_political_power = -25
+		add_stability = 0.05
+		set_temp_variable = { favoritism_change = 10 }
+		VIE_Change_Alt_Favoritism = yes
+		country_event = { id = Diem.50 days = 12 }
+		ai_chance = {
+			base = 100
+		}
+	}
+
+	option = {
+		name = Diem.41.b
+
+		add_political_power = -25
+		add_stability = -0.05
+		add_war_support = 0.05
+		set_temp_variable = { favoritism_change = 15 }
+		VIE_Change_Alt_Favoritism = yes
+		set_temp_variable = { favoritism_change = -10 }
+		VIE_Change_Main_Favoritism = yes
+		country_event = { id = Diem.50 days = 12 }
+		ai_chance = {
+			base = 20
+		}
+	}
+}
+
+country_event = {
+	id = Diem.50
+	immediate = { }
+	title = Diem.50.t
+	desc = Diem.50.d
+	picture = GFX_BaoDai.9	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.50.a
+
+		set_country_flag = VIE_Royal_Guard_Abolished
+		add_manpower = 3000
+		add_war_support = 0.05
+		add_popularity = {
+			ideology = monarchism
+			popularity = -0.05
+		}
+		set_temp_variable = { favoritism_change = -25 }	# the throne loses its own regiment
+		VIE_Change_Main_Favoritism = yes
+		set_temp_variable = { favoritism_change = 15 }
+		VIE_Change_Alt_Favoritism = yes
+		set_temp_variable = { daiviet_threat_change = 10 }
+		VIE_daiviet_threat_change = yes
+	}
+}
+
+# VIE_50s_content_end_tt.
+country_event = {
+	id = Diem.60
+	immediate = { }
+	title = Diem.60.t
+	desc = Diem.60.d
+	picture = GFX_BaoDai.100	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.60.a
+
+		VIE_diem_run_summary = yes
+	}
+}
+
+country_event = {
+	id = Diem.61
+	immediate = { }
+	title = Diem.61.t
+	desc = Diem.61.d
+	picture = GFX_Diem.61
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.61.a
+
+		VIE_diem_run_summary = yes
+	}
+}
+
+country_event = {
+	id = Diem.62
+	immediate = { }
+	title = Diem.62.t
+	desc = Diem.62.d
+	picture = GFX_French_Hinh.0	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Diem.62.a
+
+		VIE_diem_run_summary = yes
+	}
+}
+
+news_event = {
+	id = Diem.10	# the referendum deposes the Chief of State
+	immediate = { }
+	title = Diem.10.t
+	desc = Diem.10.d
+	picture = GFX_BaoDai.100
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Diem.10.a
+	}
+}
+
+news_event = {
+	id = Diem.11
+	immediate = { }
+	title = Diem.11.t
+	desc = Diem.11.d
+	picture = GFX_BaoDai.100	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	major = no
+	fire_only_once = yes
+
+	option = {
+		name = Diem.11.a
+	}
+}
+
+news_event = {
+	id = Diem.12	# 16 July 1955, Saigon refuses the all-Vietnam vote
+	immediate = { }
+	title = Diem.12.t
+	desc = Diem.12.d
+	picture = GFX_BaoDai.100
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Diem.12.a
+	}
+}
+
+news_event = {
+	id = Can_Lao.1	# 2 September 1954, Sac-lenh 116/BNV/CT
+	immediate = { }
+	title = Can_Lao.1.t
+	desc = Can_Lao.1.d
+	picture = GFX_Can_Lao.1
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Can_Lao.1.a
+	}
+}
+
+country_event = {
+	id = DaiViet.1
+	immediate = { }
+	title = DaiViet.1.t
+	desc = DaiViet.1.d
+	picture = GFX_French_Coup.1	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+
+	option = {
+		name = DaiViet.1.a
+
+		add_political_power = -25
+		add_stability = -0.05
+		set_temp_variable = { daiviet_threat_change = -20 }
+		VIE_daiviet_threat_change = yes
+	}
+}
+
+country_event = {
+	id = DaiViet.2
+	immediate = { }
+	title = DaiViet.2.t
+	desc = DaiViet.2.d
+	picture = GFX_French_Coup.2	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+
+	option = {
+		name = DaiViet.2.a
+		trigger = {
+			has_country_flag = VIE_Diem_Controls_Army
+		}
+
+		add_war_support = -0.05
+		add_manpower = -5000
+		add_political_power = -25
+		set_temp_variable = { daiviet_threat_change = -40 }
+		VIE_daiviet_threat_change = yes
+		set_temp_variable = { favoritism_change = 5 }
+		VIE_Change_Alt_Favoritism = yes
+	}
+
+	option = {
+		name = DaiViet.2.b
+		trigger = {
+			NOT = { has_country_flag = VIE_Diem_Controls_Army }
+		}
+
+		add_stability = -0.05
+		add_political_power = -35
+		set_country_flag = VIE_DaiViet_Army_Compromised
+		set_temp_variable = { daiviet_threat_change = -25 }
+		VIE_daiviet_threat_change = yes
+		set_temp_variable = { favoritism_change = 15 }
+		VIE_Change_Main_Favoritism = yes
+		set_temp_variable = { favoritism_change = -10 }
+		VIE_Change_Alt_Favoritism = yes
+	}
+}
+
+country_event = {
+	id = DaiViet.3
+	immediate = { }
+	title = DaiViet.3.t
+	desc = DaiViet.3.d
+	picture = GFX_French_Coup.2	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+
+	option = {
+		name = DaiViet.3.a
+		trigger = {
+			OR = {
+				has_global_flag = USA_Backs_French_Coup
+				NOT = { has_country_flag = VIE_Diem_Controls_Army }
+			}
+		}
+
+		add_stability = -0.08
+		add_political_power = -50
+		set_temp_variable = { favoritism_change = 25 }
+		VIE_Change_Main_Favoritism = yes
+		country_event = { id = VIE_PMs.9 hours = 6 }
+	}
+
+	option = {
+		name = DaiViet.3.b
+		trigger = {
+			NOT = { has_global_flag = USA_Backs_French_Coup }
+			has_country_flag = VIE_Diem_Controls_Army
+		}
+
+		add_stability = -0.05
+		add_political_power = -35
+		set_temp_variable = { daiviet_threat_change = -50 }
+		VIE_daiviet_threat_change = yes
+		set_temp_variable = { favoritism_change = 10 }
+		VIE_Change_Alt_Favoritism = yes
+	}
+}
+
+country_event = {
+	id = DaiViet.4
+	immediate = { }
+	title = DaiViet.4.t
+	desc = DaiViet.4.d
+	picture = GFX_BaoDai.13	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = DaiViet.4.a
+
+		add_political_power = -25
+		add_war_support = 0.05
+		add_stability = -0.05
+		add_manpower = -3000
+		set_country_flag = VIE_Ba_Long_Cleared
+		set_temp_variable = { daiviet_threat_change = -40 }
+		VIE_daiviet_threat_change = yes
+		ai_chance = {
+			base = 100
+		}
+	}
+
+	option = {
+		name = DaiViet.4.b
+
+		add_political_power = -35
+		add_stability = 0.05
+		set_temp_variable = { daiviet_threat_change = -20 }
+		VIE_daiviet_threat_change = yes
+		ai_chance = {
+			base = 20
+		}
+	}
+}
+
+country_event = {
+	id = Sect_Crisis.1
+	immediate = { }
+	title = Sect_Crisis.1.t
+	desc = Sect_Crisis.1.d
+	picture = GFX_French_Coup.1	# placeholder art, see LogDocs/VIE_DIEM_ART_REQUESTS.md
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Sect_Crisis.1.b
+
+		add_political_power = -25
+		if = {
+			limit = { country_exists = VIE }
+			VIE = {
+				set_country_flag = VIE_France_Backs_the_Front
+				set_temp_variable = { cao_dai_loyalty_change = 10 }
+				cao_dai_loyalty_change_tt = yes
+				set_temp_variable = { hoa_hao_loyalty_change = 10 }
+				hoa_hao_loyalty_change_tt = yes
+				set_temp_variable = { binh_xuyen_loyalty_change = 10 }
+				binh_xuyen_loyalty_change_tt = yes
+				set_temp_variable = { favoritism_change = -10 }
+				VIE_Change_Alt_Favoritism = yes
+			}
+		}
+		ai_chance = {
+			base = 60
+			modifier = {
+				factor = 0
+				has_completed_focus = FRA_Accept_Diems_Regime
+			}
+			modifier = {
+				factor = 0
+				has_completed_focus = FRA_Retreat_From_Indochina
+			}
+		}
+	}
+
+	option = {
+		name = Sect_Crisis.1.a
+
+		add_political_power = 25
+		if = {
+			limit = { country_exists = VIE }
+			VIE = {
+				set_country_flag = VIE_France_Abandons_the_Front
+				set_temp_variable = { cao_dai_loyalty_change = -15 }
+				cao_dai_loyalty_change_tt = yes
+				set_temp_variable = { favoritism_change = 10 }
+				VIE_Change_Alt_Favoritism = yes
+			}
+			reverse_add_opinion_modifier = {
+				target = VIE
+				modifier = medium_increase
+			}
+		}
+		ai_chance = {
+			base = 40
+			modifier = {
+				factor = 3
+				has_completed_focus = FRA_Accept_Diems_Regime
+			}
+			modifier = {
+				factor = 3
+				has_completed_focus = FRA_Retreat_From_Indochina
+			}
+		}
+	}
+}
+
+news_event = {
+	id = Sect_Crisis.2
+	immediate = { }
+	title = Sect_Crisis.2.t
+	desc = Sect_Crisis.2.d
+	picture = GFX_BaoDai.100
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = Sect_Crisis.2.a
 	}
 }
 
@@ -2653,11 +3480,11 @@ country_event = {
 			}
 		}
 		add_opinion_modifier = {
-			target = VIE
+			target = FRA
 			modifier = medium_increase
 		}
 		reverse_add_opinion_modifier = {
-			target = VIE
+			target = FRA
 			modifier = medium_increase
 		}
 	}
@@ -3280,8 +4107,8 @@ country_event = {
 		set_politics = {
 			ruling_party = democratic
 			elections_allowed = no
-			long_name = "Chanh-Quyen Tran-Quang-Vinh/Phuc-Quoc Hoi"
-			name = "Chanh-Quyen Tran-Quang-Vinh/Phuc-Quoc Hoi"
+			long_name = VIE_PARTY_TRAN_QUANG_VINH_PQH_long
+			name = VIE_PARTY_TRAN_QUANG_VINH_PQH
 		}
 		VIE_Nguyen_Thanh_Danh = {
 			add_corps_commander_role = {
@@ -3350,8 +4177,8 @@ country_event = {
 		set_politics = {
 			ruling_party = Social_Democratic
 			elections_allowed = no
-			long_name = "Nam-Viet Dan-Xa Dang (Hoa-Hao)"
-			name = "Nam-Viet Dan-Xa Dang (Hoa-Hao)"
+			long_name = VIE_PARTY_NAM_VIET_DAN_XA_DANG_long
+			name = VIE_PARTY_NAM_VIET_DAN_XA_DANG
 		}
 		add_popularity = {
 			ideology = Social_Democratic
@@ -3510,7 +4337,6 @@ country_event = {
 	}
 }
 
-##VIE Historical Events - These events fire automatically no matter what
 
 country_event = {
 	id = VIE_Historical.1
@@ -3806,12 +4632,11 @@ country_event = {
 			}
 		}
 	}
-
-
 	picture = GFX_VIE_Historical.10
 
 	is_triggered_only = yes
 	fire_only_once = no
+
 	option = {
 	    name = VIE_Historical.10.a
 
@@ -3832,6 +4657,7 @@ country_event = {
 			}
 		}
     }
+
 	option = {
 		name = VIE_Historical.10.b
 		add_popularity = {
@@ -3860,6 +4686,7 @@ country_event = {
 			}
 		}
 	}
+
 	option = {
 		name = VIE_Historical.10.ac
 		add_stability = -0.05
@@ -3872,6 +4699,7 @@ country_event = {
 			}
 		}
 	}
+
 	option = {
 		name = VIE_Historical.10.bc
 		add_stability = 0.05
@@ -3885,29 +4713,6 @@ country_event = {
 				}
 			}
 		}
-	}
-}
-#This will stay since it has meaningful effects ig
-country_event = { #Buu-Nhu Sydicalist Alliance
-	id = VIE_Historical.11
-	immediate = { }
-	title = VIE_Historical.11.t
-	desc = VIE_Historical.11.d
-	picture = GFX_VIE_Historical.11
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = VIE_Historical.11.a
-
-		add_stability = 0.05
-		add_war_support = 0.08
-	}
-	option = {
-		name = VIE_Historical.11.b
-
-		add_political_power = 50
-		set_temp_variable = { influence_change = 5 }
-		VIE_Change_Domestic_Influence = yes
 	}
 }
 
@@ -4029,6 +4834,8 @@ country_event = {
 		}
 		ai_chance = {
 			base = 5
+			modifier = { factor = 0 has_game_rule = { rule = VIE_ai_cuong_de_takeover option = VIE_AI_CD_CHALLENGER } }
+			modifier = { factor = 100 has_game_rule = { rule = VIE_ai_cuong_de_takeover option = VIE_AI_CD_HISTORICAL } }
 		}
 	}
 
@@ -4056,7 +4863,9 @@ country_event = {
 		}
 		ai_chance = {
 			base = 5
-			modifier = { is_historical_focus_on = yes factor = 0 }
+			modifier = { factor = 0 has_game_rule = { rule = VIE_ai_cuong_de_takeover option = DEFAULT } is_historical_focus_on = yes }
+			modifier = { factor = 0 has_game_rule = { rule = VIE_ai_cuong_de_takeover option = VIE_AI_CD_HISTORICAL } }
+			modifier = { factor = 1000 has_game_rule = { rule = VIE_ai_cuong_de_takeover option = VIE_AI_CD_CHALLENGER } }
 		}
 	}
 }
@@ -4226,6 +5035,7 @@ country_event = {
 
 		activate_sect_menu = yes
 		set_cosmetic_tag = VIE_FRA_ETAT
+		VIE_sync_faction_name = yes
 		set_country_flag = VIE_unity_required
 
 		news_event = { id = Etat_du_Vietnam.0 hours = 3 random_hours = 6 }
@@ -4314,7 +5124,7 @@ country_event = {
 	immediate = { }
 	title = Initial_CuongDe.10.t
 	desc = Initial_CuongDe.10.d
-	#picture = GFX_Initial_CuongDe.10
+	picture = GFX_Initial_CuongDe.10
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -4445,6 +5255,7 @@ country_event = {
 		set_temp_variable = { favoritism_change = 5 }
 		VIE_Change_Main_Favoritism = yes
 		set_cosmetic_tag = VIE_FRA_ETAT
+		VIE_sync_faction_name = yes
 		set_country_flag = VIE_unity_required
 		set_country_flag = VIE_Northern_Question_Flag
 		load_focus_tree = VIE_Bao_Dai_50
@@ -4640,68 +5451,68 @@ country_event = {
 		hidden_effect = {
 			set_party_name = {
 				ideology = maoism
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = Social_Democratic
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = Social_Liberalism
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = liberal
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = Liberal_Conservatism
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = Christian_Democratic
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = conservative
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = neutrality
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = monarchism
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = fascism
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = islamism
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = radical_shiaism
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 			set_party_name = {
 				ideology = Salafism
-				long_name = "OUTLAWED"
-				name = "OUTLAWED"
+				long_name = VIE_PARTY_OUTLAWED_long
+				name = VIE_PARTY_OUTLAWED
 			}
 		}
 	}
@@ -4782,8 +5593,16 @@ country_event = {
 	picture = GFX_CuongDe.17
 
 	trigger = {
-		date < 1960.1.1 ##date check for it to not trigger for 80s
+		tag = VIE
+		date > 1952.1.1
+		date < 1960.1.1
 		has_country_flag = VIE_CuongDe_Succeeds
+		NOT = {
+			has_country_flag = Nhiep_Successor
+			has_country_flag = Diem_Successor
+			has_country_flag = Hung_Successor
+			has_country_flag = Vinh_Successor
+		}
 	}
 
 	is_triggered_only = yes
@@ -4932,30 +5751,30 @@ country_event = {
 		}
 	}
 }
-country_event = {
-	id = CuongDe_NgoDinh.6
-	immediate = { }
-	title = CuongDe_NgoDinh.6.t
-	desc = CuongDe_NgoDinh.6.d
-	picture = GFX_CuongDe_NgoDinh.6
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = CuongDe_NgoDinh.6.a
-	}
-}
-country_event = {
-	id = CuongDe_NgoDinh.7
-	immediate = { }
-	title = CuongDe_NgoDinh.7.t
-	desc = CuongDe_NgoDinh.7.d
-	picture = GFX_CuongDe_NgoDinh.7
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = CuongDe_NgoDinh.7.a
-	}
-}
+#country_event = {
+#	id = CuongDe_NgoDinh.6
+#	immediate = { }
+#	title = CuongDe_NgoDinh.6.t
+#	desc = CuongDe_NgoDinh.6.d
+#	picture = GFX_CuongDe_NgoDinh.6
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#	option = {
+#		name = CuongDe_NgoDinh.6.a
+#	}
+#}
+#country_event = {
+#	id = CuongDe_NgoDinh.7
+#	immediate = { }
+#	title = CuongDe_NgoDinh.7.t
+#	desc = CuongDe_NgoDinh.7.d
+#	picture = GFX_CuongDe_NgoDinh.7
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#	option = {
+#		name = CuongDe_NgoDinh.7.a
+#	}
+#}
 country_event = {
 	id = CuongDe_NgoDinh.8
 	immediate = { }
@@ -4968,30 +5787,30 @@ country_event = {
 		name = CuongDe_NgoDinh.8.a
 	}
 }
-country_event = {
-	id = CuongDe_NgoDinh.9
-	immediate = { }
-	title = CuongDe_NgoDinh.9.t
-	desc = CuongDe_NgoDinh.9.d
-	picture = GFX_CuongDe_NgoDinh.9
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = CuongDe_NgoDinh.9.a
-	}
-}
-country_event = {
-	id = CuongDe_NgoDinh.10
-	immediate = { }
-	title = CuongDe_NgoDinh.10.t
-	desc = CuongDe_NgoDinh.10.d
-	picture = GFX_CuongDe_NgoDinh.10
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = CuongDe_NgoDinh.10.a
-	}
-}
+#country_event = {
+#	id = CuongDe_NgoDinh.9
+#	immediate = { }
+#	title = CuongDe_NgoDinh.9.t
+#	desc = CuongDe_NgoDinh.9.d
+#	picture = GFX_CuongDe_NgoDinh.9
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#	option = {
+#		name = CuongDe_NgoDinh.9.a
+#	}
+#}
+#country_event = {
+#	id = CuongDe_NgoDinh.10
+#	immediate = { }
+#	title = CuongDe_NgoDinh.10.t
+#	desc = CuongDe_NgoDinh.10.d
+#	picture = GFX_CuongDe_NgoDinh.10
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#	option = {
+#		name = CuongDe_NgoDinh.10.a
+#	}
+#}
 country_event = {
 	id = CuongDe_NgoDinh.11
 	immediate = { }
@@ -5002,6 +5821,11 @@ country_event = {
 	fire_only_once = yes
 	option = {
 		name = CuongDe_NgoDinh.11.a
+
+		custom_effect_tooltip = CuongDe_NgoDinh_27_hint_tt
+		hidden_effect = {
+			country_event = { id = CuongDe_NgoDinh.27 days = 120 }
+		}
 	}
 }
 country_event = {
@@ -5016,54 +5840,54 @@ country_event = {
 		name = CuongDe_NgoDinh.12.a
 	}
 }
-country_event = {
-	id = CuongDe_NgoDinh.13
-	immediate = { }
-	title = CuongDe_NgoDinh.13.t
-	desc = CuongDe_NgoDinh.13.d
-	picture = GFX_CuongDe_NgoDinh.13
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = CuongDe_NgoDinh.13.a
-	}
-}
-country_event = {
-	id = CuongDe_NgoDinh.14
-	immediate = { }
-	title = CuongDe_NgoDinh.14.t
-	desc = CuongDe_NgoDinh.14.d
-	picture = GFX_CuongDe_NgoDinh.14
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = CuongDe_NgoDinh.14.a
-	}
-}
-country_event = {
-	id = CuongDe_NgoDinh.15
-	immediate = { }
-	title = CuongDe_NgoDinh.15.t
-	desc = CuongDe_NgoDinh.15.d
-	picture = GFX_CuongDe_NgoDinh.15
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = CuongDe_NgoDinh.15.a
-	}
-}
-country_event = {
-	id = CuongDe_NgoDinh.16
-	immediate = { }
-	title = CuongDe_NgoDinh.16.t
-	desc = CuongDe_NgoDinh.16.d
-	picture = GFX_CuongDe_NgoDinh.16
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = CuongDe_NgoDinh.16.a
-	}
-}
+#country_event = {
+#	id = CuongDe_NgoDinh.13
+#	immediate = { }
+#	title = CuongDe_NgoDinh.13.t
+#	desc = CuongDe_NgoDinh.13.d
+#	picture = GFX_CuongDe_NgoDinh.13
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#	option = {
+#		name = CuongDe_NgoDinh.13.a
+#	}
+#}
+#country_event = {
+#	id = CuongDe_NgoDinh.14
+#	immediate = { }
+#	title = CuongDe_NgoDinh.14.t
+#	desc = CuongDe_NgoDinh.14.d
+#	picture = GFX_CuongDe_NgoDinh.14
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#	option = {
+#		name = CuongDe_NgoDinh.14.a
+#	}
+#}
+#country_event = {
+#	id = CuongDe_NgoDinh.15
+#	immediate = { }
+#	title = CuongDe_NgoDinh.15.t
+#	desc = CuongDe_NgoDinh.15.d
+#	picture = GFX_CuongDe_NgoDinh.15
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#	option = {
+#		name = CuongDe_NgoDinh.15.a
+#	}
+#}
+#country_event = {
+#	id = CuongDe_NgoDinh.16
+#	immediate = { }
+#	title = CuongDe_NgoDinh.16.t
+#	desc = CuongDe_NgoDinh.16.d
+#	picture = GFX_CuongDe_NgoDinh.16
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#	option = {
+#		name = CuongDe_NgoDinh.16.a
+#	}
+#}
 country_event = {
 	id = CuongDe_NgoDinh.17
 	immediate = { }
@@ -5076,18 +5900,18 @@ country_event = {
 		name = CuongDe_NgoDinh.17.a
 	}
 }
-country_event = {
-	id = CuongDe_NgoDinh.18
-	immediate = { }
-	title = CuongDe_NgoDinh.18.t
-	desc = CuongDe_NgoDinh.18.d
-	picture = GFX_CuongDe_NgoDinh.18
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = CuongDe_NgoDinh.18.a
-	}
-}
+#country_event = {
+#	id = CuongDe_NgoDinh.18
+#	immediate = { }
+#	title = CuongDe_NgoDinh.18.t
+#	desc = CuongDe_NgoDinh.18.d
+#	picture = GFX_CuongDe_NgoDinh.18
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#	option = {
+#		name = CuongDe_NgoDinh.18.a
+#	}
+#}
 country_event = {
 	id = CuongDe_NgoDinh.19
 	immediate = { }
@@ -5110,6 +5934,12 @@ country_event = {
 	fire_only_once = yes
 	option = {
 		name = CuongDe_NgoDinh.20.a
+
+		add_political_power = -50
+		add_stability = -0.05
+		add_war_support = 0.10
+		set_temp_variable = { influence_change = 15 }
+		VIE_Change_Domestic_Influence = yes
 	}
 }
 country_event = {
@@ -5148,18 +5978,18 @@ country_event = {
 		name = CuongDe_NgoDinh.23.a
 	}
 }
-country_event = {
-	id = CuongDe_NgoDinh.24
-	immediate = { }
-	title = CuongDe_NgoDinh.24.t
-	desc = CuongDe_NgoDinh.24.d
-	picture = GFX_CuongDe_NgoDinh.24
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = CuongDe_NgoDinh.24.a
-	}
-}
+#country_event = {
+#	id = CuongDe_NgoDinh.24
+#	immediate = { }
+#	title = CuongDe_NgoDinh.24.t
+#	desc = CuongDe_NgoDinh.24.d
+#	picture = GFX_CuongDe_NgoDinh.24
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#	option = {
+#		name = CuongDe_NgoDinh.24.a
+#	}
+#}
 country_event = {
 	id = CuongDe_NgoDinh.25
 	immediate = { }
@@ -5208,18 +6038,18 @@ country_event = {
 		name = CuongDe_NgoDinh.28.a
 	}
 }
-country_event = {
-	id = CuongDe_NgoDinh.29
-	immediate = { }
-	title = CuongDe_NgoDinh.29.t
-	desc = CuongDe_NgoDinh.29.d
-	picture = GFX_CuongDe_NgoDinh.29
-	is_triggered_only = yes
-	fire_only_once = yes
-	option = {
-		name = CuongDe_NgoDinh.29.a
-	}
-}
+#country_event = {
+#	id = CuongDe_NgoDinh.29
+#	immediate = { }
+#	title = CuongDe_NgoDinh.29.t
+#	desc = CuongDe_NgoDinh.29.d
+#	picture = GFX_CuongDe_NgoDinh.29
+#	is_triggered_only = yes
+#	fire_only_once = yes
+#	option = {
+#		name = CuongDe_NgoDinh.29.a
+#	}
+#}
 country_event = {
 	id = CuongDe_NgoDinh.30
 	immediate = { }
@@ -5408,8 +6238,8 @@ country_event = {
 		set_politics = {
 			ruling_party = democratic
 			elections_allowed = no
-			long_name = "Phuc-Quoc Hoi"
-			name = "Phuc-Quoc Hoi"
+			long_name = VIE_PARTY_PHUC_QUOC_HOI_long
+			name = VIE_PARTY_PHUC_QUOC_HOI
 		}
 		VIE_Cuong_De = {
 			set_character_name = "Nam-Hung"
@@ -5470,6 +6300,7 @@ country_event = {
 		set_country_flag = VIE_unity_required
 		mark_focus_tree_layout_dirty = yes
 		set_cosmetic_tag = VIE_CuongDe
+		VIE_sync_faction_name = yes
 		news_event = { id = CuongDe_Coup.0 hours = 3 random_hours = 6 }
 		hidden_effect = {
 			add_popularity = {
@@ -5479,6 +6310,7 @@ country_event = {
 			complete_national_focus = VIE_CD_NamHung_Vietnam_Emperor
 			complete_national_focus = VIE_NH_NamHung_Vietnam_Emperor
 			country_event = { id = FUL_Unification.2 days = 4 }
+			country_event = { id = CuongDe.16 days = 7 }
 		}
 	}
 }
@@ -5497,6 +6329,15 @@ country_event = {
 		name = CuongDe_Successor.1.a
 
 		set_country_flag = Nhiep_Successor
+		ai_chance = {
+			base = 10
+			modifier = { factor = 1000 has_game_rule = { rule = VIE_ai_cuong_de_successor option = VIE_AI_CDS_NHIEP } }
+			modifier = {
+				factor = 0
+				NOT = { has_game_rule = { rule = VIE_ai_cuong_de_successor option = DEFAULT } }
+				NOT = { has_game_rule = { rule = VIE_ai_cuong_de_successor option = VIE_AI_CDS_NHIEP } }
+			}
+		}
 		retire_character = VIE_Cuong_De
 		add_country_leader_role = {
 			character = VIE_Nguyen_Rinh_Nhiep
@@ -5515,18 +6356,27 @@ country_event = {
 		name = CuongDe_Successor.1.b
 
 		set_country_flag = Diem_Successor
+		ai_chance = {
+			base = 10
+			modifier = { factor = 1000 has_game_rule = { rule = VIE_ai_cuong_de_successor option = VIE_AI_CDS_DIEM } }
+			modifier = {
+				factor = 0
+				NOT = { has_game_rule = { rule = VIE_ai_cuong_de_successor option = DEFAULT } }
+				NOT = { has_game_rule = { rule = VIE_ai_cuong_de_successor option = VIE_AI_CDS_DIEM } }
+			}
+		}
 		retire_character = VIE_Cuong_De
 		set_party_name = {
 			ideology = democratic
-			long_name = "Cong-Nong Dang/Phu-Quoc Hoi Coalition"
-			name = "Cong-Nong Dang/Phu-Quoc Hoi Coalition"
+			long_name = VIE_PARTY_CONGNONG_PQH_COALITION_long
+			name = VIE_PARTY_CONGNONG_PQH_COALITION
 		}
 		set_politics = {
 			ruling_party = socialist
 			elections_allowed = no
 			last_election = "1952.01.01"
-			long_name = "Cong-Nong Dang/Phu-Quoc Hoi Coalition"
-			name = "Cong-Nong Dang/Phu-Quoc Hoi Coalition"
+			long_name = VIE_PARTY_CONGNONG_PQH_COALITION_long
+			name = VIE_PARTY_CONGNONG_PQH_COALITION
 		}
 		effect_tooltip = {
 			add_country_leader_role = {
@@ -5553,13 +6403,22 @@ country_event = {
 		name = CuongDe_Successor.1.c
 
 		set_country_flag = Hung_Successor
+		ai_chance = {
+			base = 10
+			modifier = { factor = 1000 has_game_rule = { rule = VIE_ai_cuong_de_successor option = VIE_AI_CDS_HUNG } }
+			modifier = {
+				factor = 0
+				NOT = { has_game_rule = { rule = VIE_ai_cuong_de_successor option = DEFAULT } }
+				NOT = { has_game_rule = { rule = VIE_ai_cuong_de_successor option = VIE_AI_CDS_HUNG } }
+			}
+		}
 		retire_character = VIE_Cuong_De
 		set_politics = {
 			ruling_party = nationalist
 			elections_allowed = no
 			last_election = "1952.01.01"
-			long_name = "Mat-Tran Thong-Nhut Chong-Cong"
-			name = "Mat-Tran Thong-Nhut Chong-Cong"
+			long_name = VIE_PARTY_MTTNCC_long
+			name = VIE_PARTY_MTTNCC
 		}
 		add_country_leader_role = {
 			character = VIE_Hoang_Nam_Hung
@@ -5584,11 +6443,20 @@ country_event = {
 		name = CuongDe_Successor.1.e
 
 		set_country_flag = Vinh_Successor
+		ai_chance = {
+			base = 10
+			modifier = { factor = 1000 has_game_rule = { rule = VIE_ai_cuong_de_successor option = VIE_AI_CDS_VINH } }
+			modifier = {
+				factor = 0
+				NOT = { has_game_rule = { rule = VIE_ai_cuong_de_successor option = DEFAULT } }
+				NOT = { has_game_rule = { rule = VIE_ai_cuong_de_successor option = VIE_AI_CDS_VINH } }
+			}
+		}
 		retire_character = VIE_Cuong_De
 		set_party_name = {
 			ideology = democratic
-			long_name = "Phu-Quoc Hoi/Cao-Dai Coalition"
-			name = "Phu-Quoc Hoi/Cao-Dai Coalition"
+			long_name = VIE_PARTY_PQH_CAODAI_COALITION_long
+			name = VIE_PARTY_PQH_CAODAI_COALITION
 		}
 		add_country_leader_role = {
 			character = CCC_Tran_Quang_Vinh
@@ -5615,10 +6483,8 @@ country_event = {
 
 	option = {
 		name = NV_CuongDe.1.a
-		FRA = {
-			add_to_variable = { StruggleInvolvedNationsIndochinaProIndependenceScore = 100 }
-			add_to_variable = { StruggleInvolvedNationsIndochinaCommunistScore = 100 }
-		}
+		set_temp_variable = { cuongde_rapprochement_gain = 50 }
+		VIE_cuongde_thaw_effect = yes
 	}
 }
 
@@ -5633,9 +6499,48 @@ country_event = {
 
 	option = {
 		name = NV_CuongDe.2.a
-		FRA = {
-			add_to_variable = { StruggleInvolvedNationsIndochinaProIndependenceScore = 200 }
-			add_to_variable = { StruggleInvolvedNationsIndochinaCommunistScore = 200 }
+		set_temp_variable = { cuongde_rapprochement_gain = 75 }
+		VIE_cuongde_thaw_effect = yes
+		hidden_effect = {
+			set_global_flag = CuongDe_DiemHo_Talks
+		}
+	}
+}
+
+country_event = {
+	id = NV_CuongDe.3
+	immediate = { }
+	title = NV_CuongDe.3.t
+	desc = NV_CuongDe.3.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = NV_CuongDe.3.a
+		ai_chance = {
+			base = 70
+			modifier = {
+				factor = 0
+				has_country_flag = VIN_liberation_of_the_south_prepared
+			}
+		}
+		set_temp_variable = { cuongde_rapprochement_gain = 25 }
+		VIE_cuongde_thaw_effect = yes
+	}
+
+	option = {
+		name = NV_CuongDe.3.b
+		ai_chance = {
+			base = 30
+		}
+		add_opinion_modifier = {
+			target = VIE
+			modifier = small_decrease
+		}
+		reverse_add_opinion_modifier = {
+			target = VIE
+			modifier = small_decrease
 		}
 	}
 }
@@ -5653,13 +6558,46 @@ country_event = {
 		name = NV_CuongDe_Unification.1.a
 		VIE = { country_event = { id = NV_CuongDe_Unification.2 hours = 6 } }
 		ai_chance = {
-			base = 50
+			base = 0
 			modifier = {
+				add = 40
+				check_variable = { global.geneva_rapprochement_vie_vin > 99 }
+			}
+			modifier = {
+				add = 40
+				check_variable = { global.geneva_rapprochement_vie_vin > 199 }
+			}
+			modifier = {
+				add = 20
+				has_global_flag = CuongDe_DiemHo_Talks
+			}
+			modifier = {
+				add = 30
+				has_country_flag = VIN_Accepted_Reunification
+			}
+			modifier = {
+				add = 20
 				has_opinion = {
 					target = VIE
 					value > 20
 				}
-				factor = 100
+			}
+			modifier = {
+				factor = 0.25
+				has_country_flag = VIN_Rejected_Reunification
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					VIE = { has_country_flag = VIE_Hung_Formed_Anticommunist_Front }
+					NOT = {
+						has_country_leader = {
+							character = VIN_Ho_Chi_Minh
+							ruling_only = yes
+						}
+					}
+					has_country_flag = VIN_liberation_of_the_south_prepared
+				}
 			}
 		}
 	}
@@ -5670,11 +6608,16 @@ country_event = {
 		ai_chance = {
 			base = 50
 			modifier = {
-				has_opinion = {
-					target = VIE
-					value < 21
-				}
-				factor = 0
+				factor = 0.5
+				check_variable = { global.geneva_rapprochement_vie_vin > 99 }
+			}
+			modifier = {
+				factor = 0.5
+				check_variable = { global.geneva_rapprochement_vie_vin > 199 }
+			}
+			modifier = {
+				factor = 0.5
+				has_country_flag = VIN_Accepted_Reunification
 			}
 		}
 	}
@@ -5707,6 +6650,12 @@ country_event = {
 
 	option = {
 		name = NV_CuongDe_Unification.3.a
+		custom_effect_tooltip = VIE_cuongde_dan_quoc_armed_tt
+		hidden_effect = {
+			set_global_flag = dan_quoc_peace
+		}
+		indochina_struggle_add_pro_independence_diplomatic_points = yes
+		indochina_struggle_add_pro_independence_diplomatic_points = yes
 		VIE = { country_event = { id = NV_CuongDe_Unification.4 hours = 6 } }
 	}
 }
@@ -5723,55 +6672,7 @@ country_event = {
 
 	option = {
 		name = NV_CuongDe_Unification.4.a
-		FRA = {
-			set_variable = { global.Indochina_War_Active_Phase = 11 }
-		}
-		if = {
-			limit = { country_exists = VIN }
-			VIN = {
-				if = { limit = { country_exists = VIE } white_peace = VIE }
-				if = { limit = { country_exists = NLF } white_peace = NLF }
-				if = { limit = { country_exists = LAO } white_peace = LAO }
-				if = { limit = { country_exists = FRE } annex_country = { target = FRE } }
-				if = { limit = { country_exists = TAM } annex_country = { target = TAM } }
-				if = { limit = { country_exists = TAI } annex_country = { target = TAI } }
-				if = { limit = { country_exists = NUN } annex_country = { target = NUN } }
-			}
-		}
-		if = {
-			limit = { country_exists = VIE }
-			VIE = {
-				if = { limit = { country_exists = VIN } white_peace = VIN }
-				if = { limit = { country_exists = NLF } white_peace = NLF }
-				if = { limit = { country_exists = LAO } white_peace = LAO }
-				if = { limit = { country_exists = NLF } annex_country = { target = NLF } }
-				if = { limit = { country_exists = CCC } annex_country = { target = CCC } }
-				if = { limit = { country_exists = FUL } annex_country = { target = FUL } }
-				leave_faction = yes
-			}
-		}
-		if = {
-			limit = { country_exists = CAM }
-			CAM = {
-				if = { limit = { country_exists = VIN } white_peace = VIN }
-				if = { limit = { country_exists = LAO } white_peace = LAO }
-				if = { limit = { country_exists = NLF } white_peace = NLF }
-				leave_faction = yes
-			}
-		}
-		if = {
-			limit = { country_exists = LOS }
-			LOS = {
-				if = { limit = { country_exists = VIN } white_peace = VIN }
-				if = { limit = { country_exists = LAO } white_peace = LAO }
-				if = { limit = { country_exists = NLF } white_peace = NLF }
-				leave_faction = yes
-			}
-		}
-		news_event = { id = NV_CuongDe_Unification.5 days = 1 }
-		hidden_effect = {
-			country_event = { id = NV_CuongDe_Unification.8 days = 365 }
-		}
+		VIE_cuongde_unification_outcome = yes
 	}
 }
 
@@ -5786,6 +6687,11 @@ country_event = {
 
 	option = {
 		name = NV_CuongDe_Unification.6.a
+		custom_effect_tooltip = VIE_cuongde_failure_branch_tt
+		hidden_effect = {
+			set_country_flag = VIE_CuongDe_Reconciliation_Failed
+			mark_focus_tree_layout_dirty = yes
+		}
 		VIN = { country_event = { id = NV_CuongDe_Unification.7 hours = 12 } }
 	}
 }
@@ -5819,9 +6725,8 @@ country_event = {
 				}
 			}
 		}
-		FRA = {
-			add_to_variable = { StruggleInvolvedNationsIndochinaProIndependenceScore = -50 }
-		}
+		set_temp_variable = { cuongde_rapprochement_loss = -25 }
+		VIE_cuongde_chill_effect = yes
 	}
 }
 
@@ -5833,47 +6738,31 @@ country_event = {
 	picture = GFX_NV_CuongDe_Unification.8
 
 	is_triggered_only = yes
-	fire_only_once = yes
 
 	option = {
 		name = NV_CuongDe_Unification.8.a
-		if = {
-			limit = {
-				country_exists = VIN
-				country_exists = VIE
-			}
-			VIE = {
-				transfer_state = 838
-				transfer_state = 786
-				transfer_state = 671
-				transfer_state = 881
-				transfer_state = 1280
-				transfer_state = 1281
-				transfer_state = 1760
-				transfer_state = 1761
-				transfer_state = 1766
-				annex_country = { target = VIN transfer_troops = yes }
-				if = {
-					limit = {
-						NOT = {
-							has_country_leader = {
-								character = VIE_Ngo_Dinh_Diem
-								ruling_only = yes
-							}
-						}
-					}
-					add_country_leader_role = {
-						character = VIE_Ngo_Dinh_Diem
-						promote_leader = yes
-						country_leader = {
-							ideology = oriental_personalism
-						}
-					}
-				}
-				remove_ideas = State_of_Vietnam_Faction
-			}
+		VIE_cuongde_finalize_unification = yes
+	}
+}
+
+country_event = {
+	id = NV_CuongDe_Unification.9
+	immediate = { }
+	title = NV_CuongDe_Unification.9.t
+	desc = NV_CuongDe_Unification.9.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = NV_CuongDe_Unification.9.a
+		custom_effect_tooltip = VIE_cuongde_failure_branch_tt
+		hidden_effect = {
+			set_country_flag = VIE_CuongDe_Reconciliation_Failed
+			mark_focus_tree_layout_dirty = yes
 		}
-		set_global_flag = diem_ho_chi_minh_reunified
+		set_temp_variable = { cuongde_rapprochement_loss = -50 }
+		VIE_cuongde_chill_effect = yes
 	}
 }
 
@@ -6328,14 +7217,47 @@ country_event = {
 country_event = {
 	id = VIE_Malaysia.1
 	immediate = { }
-	title = VIE_Malaysia.1.t
-	desc = VIE_Malaysia.1.d
+	title = {
+		text = VIE_Malaysia.1.t.a
+		trigger = { original_tag = VIE }
+	}
+	title = {
+		text = VIE_Malaysia.1.t.b
+		trigger = { original_tag = MAL }
+	}
+	title = {
+		text = VIE_Malaysia.1.t.c
+		trigger = { original_tag = MLA }
+	}
+	desc = {
+		text = VIE_Malaysia.1.d.a
+		trigger = { original_tag = VIE }
+	}
+	desc = {
+		text = VIE_Malaysia.1.d.b
+		trigger = { original_tag = MAL }
+	}
+	desc = {
+		text = VIE_Malaysia.1.d.c
+		trigger = { original_tag = MLA }
+	}
 
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
 		name = VIE_Malaysia.1.a
+		trigger = { original_tag = VIE }
+	}
+
+	option = {
+		name = VIE_Malaysia.1.b
+		trigger = { original_tag = MAL }
+	}
+
+	option = {
+		name = VIE_Malaysia.1.c
+		trigger = { original_tag = MLA }
 	}
 }
 
@@ -6786,12 +7708,34 @@ country_event = {
 	option = {
 		name = Brevert_Lines.1.a
 
+		ai_chance = {
+			base = 20
+			modifier = {
+				factor = 3
+				has_opinion = { target = VIE value > 0 }
+			}
+			modifier = {	# OTL Cambodia never renounced the claim
+				factor = 0.25
+				is_historical_focus_on = yes
+			}
+			modifier = {
+				factor = 2
+				has_war = yes
+			}
+		}
 		VIE = { country_event = { id = Brevert_Lines.2 days = 1 } }
 	}
 
 	option = {
 		name = Brevert_Lines.1.b
 
+		ai_chance = {
+			base = 80
+			modifier = {
+				factor = 0.3
+				has_opinion = { target = VIE value > -20 }
+			}
+		}
 		VIE = { country_event = { id = Brevert_Lines.3 days = 1 } }
 	}
 }
@@ -6844,30 +7788,59 @@ country_event = {
 			target = CAM
 			modifier = VIE_Denouced_Brevert_Lines
 		}
+		set_variable = { VIE_brevet_attacker_state = 0 }
+		set_variable = { VIE_brevet_defender_state = 0 }
 		if = {
-			limit = {
-				country_exists = CAM
-				owns_state = 1753
-			}
+			limit = { country_exists = CAM }
 			CAM = {
-				start_border_war = {
-					change_state_after_war = yes
-					attacker = {
-						state = 1753
-						num_provinces = 1
-						on_win = Brevert_Lines.5
-						on_lose = Brevert_Lines.4
-						on_cancel = Brevert_Lines.6
+				random_owned_controlled_state = {
+					limit = {
+						has_border_war = no
+						any_neighbor_state = {
+							is_owned_by = ROOT
+							is_controlled_by = ROOT
+						}
 					}
-					defender = {
-						state = 1753
-						num_provinces = 1
-						on_win = Brevert_Lines.4
-						on_lose = Brevert_Lines.5
-						on_cancel = Brevert_Lines.6
-					}
+					set_variable = { ROOT.VIE_brevet_defender_state = THIS.id }
 				}
 			}
+		}
+		if = {
+			limit = { NOT = { check_variable = { VIE_brevet_defender_state = 0 } } }
+			random_owned_controlled_state = {
+				limit = {
+					has_border_war = no
+					has_ROOT_at_least_1_div_in_current_state_scope = yes
+					any_neighbor_state = { state = var:ROOT.VIE_brevet_defender_state }
+				}
+				set_variable = { ROOT.VIE_brevet_attacker_state = THIS.id }
+			}
+		}
+		if = {
+			limit = {
+				NOT = { check_variable = { VIE_brevet_attacker_state = 0 } }
+				NOT = { check_variable = { VIE_brevet_defender_state = 0 } }
+			}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = var:ROOT.VIE_brevet_attacker_state
+					num_provinces = 1
+					on_win = Brevert_Lines.4
+					on_lose = Brevert_Lines.5
+					on_cancel = Brevert_Lines.6
+				}
+				defender = {
+					state = var:ROOT.VIE_brevet_defender_state
+					num_provinces = 1
+					on_win = Brevert_Lines.7
+					on_lose = Brevert_Lines.8
+					on_cancel = Brevert_Lines.6
+				}
+			}
+		}
+		else = {
+			custom_effect_tooltip = Brevert_Lines_no_clash_tt
 		}
 	}
 }
@@ -6885,10 +7858,12 @@ country_event = {
 	option = {
 		name = Brevert_Lines.4.a
 
+		add_political_power = 50
 		1753 = {
+			remove_claim_by = CAM
 			if = {
-				limit = { NOT = { is_core_of = ROOT } }
-				add_core_of = ROOT
+				limit = { NOT = { is_core_of = VIE } }
+				add_core_of = VIE
 			}
 		}
 	}
@@ -6942,11 +7917,11 @@ country_event = {
 		}
 		if = {
 			limit = {
-				is_in_array = { StruggleInvolvedNationsIndochinaProIndependence = THIS.id }
+				is_in_array = { FRA.StruggleInvolvedNationsIndochinaProIndependence = THIS.id }
 			}
 			FRA = {
 				add_to_variable = {
-					StruggleInvolvedNationsIndochinaProIndependenceScore = -200
+					StruggleInvolvedNationsIndochinaProIndependenceScore = -50
 				}
 			}
 		}
@@ -6956,8 +7931,22 @@ country_event = {
 country_event = {
 	id = Brevert_Lines.6
 	immediate = { }
-	title = Brevert_Lines.6.t
-	desc = Brevert_Lines.6.d
+	title = {
+		text = Brevert_Lines.6.t.a
+		trigger = { original_tag = VIE }
+	}
+	title = {
+		text = Brevert_Lines.6.t.b
+		trigger = { NOT = { original_tag = VIE } }
+	}
+	desc = {
+		text = Brevert_Lines.6.d.a
+		trigger = { original_tag = VIE }
+	}
+	desc = {
+		text = Brevert_Lines.6.d.b
+		trigger = { NOT = { original_tag = VIE } }
+	}
 	picture = GFX_Brevert_Lines.3
 
 	is_triggered_only = yes
@@ -6965,6 +7954,49 @@ country_event = {
 
 	option = {
 		name = Brevert_Lines.6.a
+		trigger = { original_tag = VIE }
+	}
+
+	option = {
+		name = Brevert_Lines.6.b
+		trigger = { NOT = { original_tag = VIE } }
+	}
+}
+
+country_event = {
+	id = Brevert_Lines.7
+	immediate = { }
+	title = Brevert_Lines.7.t
+	desc = Brevert_Lines.7.d
+	picture = GFX_Brevert_Lines.3
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Brevert_Lines.7.a
+
+		add_political_power = 50
+		add_stability = 0.05
+		add_war_support = 0.05
+	}
+}
+
+country_event = {
+	id = Brevert_Lines.8
+	immediate = { }
+	title = Brevert_Lines.8.t
+	desc = Brevert_Lines.8.d
+	picture = GFX_Brevert_Lines.3
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = Brevert_Lines.8.a
+
+		add_political_power = -50
+		add_stability = -0.05
 	}
 }
 
@@ -6983,6 +8015,7 @@ country_event = {
 
 		1295 = { add_claim_by = VIE }
 		1794 = { add_claim_by = VIE }
+		set_country_flag = VIE_Claimed_TranNinh_Chosen
 		every_country = {
 			limit = {
 				OR = {
@@ -7202,6 +8235,128 @@ country_event = {
 }
 
 country_event = {
+	id = VIE_Pulo_Condore.1
+	title = VIE_Pulo_Condore.1.t
+	desc = VIE_Pulo_Condore.1.d
+	picture = GFX_VIE_Pulo_Condore.1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		OR = {
+			is_subject_of = FRA
+			is_in_faction_with = FRE
+		}
+		FRA = { owns_state = 1804 }
+	}
+
+	option = {
+		name = VIE_Pulo_Condore.1.a
+
+		FRA = { country_event = { id = VIE_Pulo_Condore.2 days = 1 } }
+	}
+}
+
+country_event = {
+	id = VIE_Pulo_Condore.2
+	title = VIE_Pulo_Condore.2.t
+	desc = VIE_Pulo_Condore.2.d
+	picture = GFX_VIE_Pulo_Condore.2
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		owns_state = 1804
+		country_exists = VIE
+		VIE = {
+			OR = {
+				is_subject_of = FRA
+				is_in_faction_with = FRE
+			}
+		}
+	}
+
+	option = {
+		name = VIE_Pulo_Condore.2.a
+
+		ai_chance = {
+			base = 75
+			modifier = {
+				factor = 100
+				is_historical_focus_on = yes
+			}
+		}
+
+		VIE = { transfer_state = 1804 }
+		1804 = {
+			add_core_of = VIE
+			remove_claim_by = VIE
+		}
+		add_opinion_modifier = {
+			target = VIE
+			modifier = medium_increase
+		}
+		reverse_add_opinion_modifier = {
+			target = VIE
+			modifier = medium_increase
+		}
+		VIE = { country_event = { id = VIE_Pulo_Condore.3 days = 1 } }
+	}
+
+	option = {
+		name = VIE_Pulo_Condore.2.b
+
+		ai_chance = {
+			base = 25
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+
+		add_opinion_modifier = {
+			target = VIE
+			modifier = medium_decrease
+		}
+		reverse_add_opinion_modifier = {
+			target = VIE
+			modifier = medium_decrease
+		}
+		VIE = { country_event = { id = VIE_Pulo_Condore.4 days = 1 } }
+	}
+}
+
+country_event = {
+	id = VIE_Pulo_Condore.3
+	title = VIE_Pulo_Condore.3.t
+	desc = VIE_Pulo_Condore.3.d
+	picture = GFX_VIE_Pulo_Condore.3
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = VIE_Pulo_Condore.3.a
+	}
+}
+
+country_event = {
+	id = VIE_Pulo_Condore.4
+	title = VIE_Pulo_Condore.4.t
+	desc = VIE_Pulo_Condore.4.d
+	picture = GFX_VIE_Pulo_Condore.4
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = VIE_Pulo_Condore.4.a
+	}
+}
+
+country_event = {
 	id = VIE_Sect_Militias.1
 	immediate = { }
 	title = VIE_Sect_Militias.1.t
@@ -7270,7 +8425,6 @@ country_event = {
 		}
 		set_temp_variable = { umdc_loyalty_change = -35 }
 		umdc_loyalty_change_tt = yes
-		#Effect leading to more leroy stuff
 	}
 
 	option = {
@@ -7280,7 +8434,6 @@ country_event = {
 		umdc_loyalty_change_tt = yes
 		set_temp_variable = { umdc_annihilation_change = -15 }
 		umdc_annihilation_change_tt = yes
-		#Shut down leroy
 	}
 }
 
@@ -7442,6 +8595,13 @@ country_event = {
 		complete_national_focus = VIE_Wait_It_Out
 		set_temp_variable = { influence_change = -15 }
 		VIE_Change_Domestic_Influence = yes
+		ai_chance = {
+			base = 80
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 100
+			}
+		}
 	}
 
 	option = {
@@ -7454,6 +8614,20 @@ country_event = {
 		}
 		set_temp_variable = { influence_change = 15 }
 		VIE_Change_Domestic_Influence = yes
+		ai_chance = {
+			base = 20
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
+			modifier = {
+			    strength_ratio = {
+					tag = VIN
+					ratio > 1.5
+				}
+				factor = 5
+			}
+		}
 	}
 }
 
@@ -7946,7 +9120,6 @@ country_event = {
 	}
 }
 
-#Cuong-de military events
 country_event = {
 	id = VNA.6
 	immediate = { }
@@ -8027,8 +9200,6 @@ news_event = {
 }
 
 
-##### Montagnard Country #####
-
 	#Political
 	add_namespace = QuyChe_16
 	add_namespace = BaoDai_Personality_Cult
@@ -8083,7 +9254,7 @@ country_event = {
 	immediate = { }
 	title = BaoDai_Personality_Cult.1.t
 	desc = BaoDai_Personality_Cult.1.d
-	#picture = GFX_BaoDai_Personality_Cult.1
+	picture = GFX_BaoDai_Personality_Cult.1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8109,7 +9280,7 @@ country_event = {
 	immediate = { }
 	title = FireWater_Kings.1.t
 	desc = FireWater_Kings.1.d
-	#picture = GFX_FireWater_Kings.1
+	picture = GFX_FireWater_Kings.1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8168,7 +9339,7 @@ country_event = {
 	immediate = { }
 	title = Montagnard_Administrative.1.t
 	desc = Montagnard_Administrative.1.d
-	#picture = Montagnard_Administrative.1
+	picture = GFX_Montagnard_Administrative.1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8183,7 +9354,7 @@ country_event = {
 	immediate = { }
 	title = Du_So_21.1.t
 	desc = Du_So_21.1.d
-	#picture = Du_So_21.1
+	picture = GFX_Du_So_21.1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8200,7 +9371,7 @@ country_event = {
 	immediate = { }
 	title = Du_So_21.2.t
 	desc = Du_So_21.2.d
-	#picture = Du_So_21.2
+	picture = GFX_Du_So_21.1 # Reusing due to similarity
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8221,7 +9392,7 @@ country_event = {
 	immediate = { }
 	title = Autonomous_FUL_Republic.1.t
 	desc = Autonomous_FUL_Republic.1.d
-	#picture = GFX_Autonomous_FUL_Republic.1
+	picture = GFX_Autonomous_FUL_Republic.1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8239,7 +9410,7 @@ country_event = {
 	immediate = { }
 	title = Autonomous_FUL_Republic.2.t
 	desc = Autonomous_FUL_Republic.2.d
-	#picture = GFX_Autonomous_FUL_Republic.2
+	picture = GFX_Autonomous_FUL_Republic.1 # Reuses Autonomous_FUL_Republic.1 due to similarity
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8351,7 +9522,7 @@ country_event = {
 	desc = {
 		text = FUL_DanVuong_Model.1.d
 	}
-	#picture = FUL_DanVuong_Model.1
+	picture = GFX_FUL_DanVuong_Model.1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8388,7 +9559,7 @@ country_event = {
 		text = FUL_DanVuong_Model.2.db
 	}
 
-	#picture = FUL_DanVuong_Model.2
+	picture = GFX_FUL_DanVuong_Model.2
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8431,7 +9602,7 @@ country_event = {
 	immediate = { }
 	title = CuongDe_Annexation.1.t
 	desc = CuongDe_Annexation.1.d
-	#picture = CuongDe_Annexation.1
+	picture = GFX_Du_So_21.1 # Reusing due to similarity
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8448,7 +9619,7 @@ country_event = {
 	immediate = { }
 	title = CuongDe_Annexation.2.t
 	desc = CuongDe_Annexation.2.d
-	#picture = CuongDe_Annexation.2
+	picture = GFX_Du_So_21.1 # Reusing due to similarity
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8469,7 +9640,7 @@ country_event = {
 	immediate = { }
 	title = FUL_Econ_Committee.1.t
 	desc = FUL_Econ_Committee.1.d
-	#picture = FUL_Econ_Committee.1
+	picture = GFX_FUL_Econ_Committee.1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8487,7 +9658,7 @@ country_event = {
 	immediate = { }
 	title = Colonel_Massau.1.t
 	desc = Colonel_Massau.1.d
-	#picture = Colonel_Massau.1
+	picture = GFX_Colonel_Massau.1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -8612,7 +9783,7 @@ country_event = {
 		name = Central_Highland_Railway.1.a
 
 		custom_effect_tooltip = Central_Highland_Railway_Construction_tt
-		set_temp_variable = { money_to_gain = -15 }
+		set_temp_variable = { money_to_gain = -0.5 }
 		add_money_with_tooltip_effect = yes
 		country_event = { id = Central_Highland_Railway.4 days = 1800 }
 		FUL = { country_event = { id = Central_Highland_Railway.2 hours = 12 } }
@@ -8928,7 +10099,11 @@ country_event = {
 		FRA = { country_event = { id = DaLat_Question.5 hours = 12 } }
 
 		ai_chance = {
-			base = 100
+			base = 66
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 100
+			}
 		}
 	}
 
@@ -8960,7 +10135,11 @@ country_event = {
 		FUL = { country_event = { id = DaLat_Question.7 hours = 12 } }
 
 		ai_chance = {
-			base = 0
+			base = 33
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
 		}
 	}
 }
@@ -9062,6 +10241,7 @@ country_event = {
 
 	option = {
 		name = VIE_CD_Recruit.1.a
+		custom_effect_tooltip = VIE_CD_Recruit_Strong_Appeal_tt
 		hidden_effect = {
 			random_list = {
 				70 = {
@@ -9078,7 +10258,7 @@ country_event = {
 	}
 	option = {
 		name = VIE_CD_Recruit.1.b
-
+		custom_effect_tooltip = VIE_CD_Recruit_Weak_Appeal_tt
 		hidden_effect = {
 			random_list = {
 				80 = {
@@ -9154,6 +10334,7 @@ country_event = {
 
 	option = {
 		name = VIE_CD_Recruit.4.a
+		custom_effect_tooltip = VIE_CD_Recruit_Strong_Appeal_tt
 		hidden_effect = {
 			random_list = {
 				90 = {
@@ -9169,7 +10350,7 @@ country_event = {
 	}
 	option = {
 		name = VIE_CD_Recruit.4.b
-
+		custom_effect_tooltip = VIE_CD_Recruit_Modest_Appeal_tt
 		hidden_effect = {
 			random_list = {
 				5 = {
@@ -9242,6 +10423,7 @@ country_event = {
 
 	option = {
 		name = VIE_CD_Recruit.7.a
+		custom_effect_tooltip = VIE_CD_Recruit_Strong_Appeal_tt
 		hidden_effect = {
 			random_list = {
 				70 = {
@@ -9258,6 +10440,7 @@ country_event = {
 	}
 	option = {
 		name = VIE_CD_Recruit.7.b
+		custom_effect_tooltip = VIE_CD_Recruit_Weak_Appeal_tt
 		hidden_effect = {
 			random_list = {
 				80 = {
@@ -9303,7 +10486,7 @@ country_event = {
 	}
 }
 
-country_event = { ## Formation of Vietnam China Anti-Communist Association
+country_event = {
 	id = CD_Hung.1
 	immediate = { }
 	title = CD_Hung.1.t
@@ -9317,7 +10500,7 @@ country_event = { ## Formation of Vietnam China Anti-Communist Association
 		name = CD_Hung.1.a
 	}
 }
-country_event = { ## Formation of Anti-Communist Front
+country_event = {
 	id = CD_Hung.2
 	immediate = { }
 	title = CD_Hung.2.t
@@ -9331,7 +10514,7 @@ country_event = { ## Formation of Anti-Communist Front
 		name = CD_Hung.2.a
 	}
 }
-country_event = { ## Modernize war tactics
+country_event = {
 	id = CD_Hung.3
 	immediate = { }
 	title = CD_Hung.3.t
@@ -9345,7 +10528,7 @@ country_event = { ## Modernize war tactics
 		name = CD_Hung.3.a
 	}
 }
-country_event = { ## Purge Leftist
+country_event = {
 	id = CD_Hung.4
 	immediate = { }
 	title = CD_Hung.4.t
@@ -9442,6 +10625,11 @@ country_event = {
 
 	option = {
 		name = NH_DIEMa.7.a
+
+		custom_effect_tooltip = CuongDe_NgoDinh_4_hint_tt
+		hidden_effect = {
+			country_event = { id = CuongDe_NgoDinh.4 days = 90 }
+		}
 	}
 }
 country_event = {
@@ -9542,6 +10730,39 @@ country_event = {
 
 	option = {
 		name = DiemLR.2.a
+	}
+}
+country_event = {
+	id = DiemLR.3
+	immediate = { }
+	title = DiemLR.3.t
+	desc = DiemLR.3.d
+	picture = GFX_DiemLR.3
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = DiemLR.3.a
+	}
+}
+country_event = {
+	id = DiemMarx.1
+	immediate = { }
+	title = DiemMarx.1.t
+	desc = DiemMarx.1.d
+	picture = GFX_DiemMarx.1
+
+	is_triggered_only = yes
+
+	option = {
+		name = DiemMarx.1.a
+
+		add_stability = -0.01
+		add_popularity = {
+			ideology = communism
+			popularity = 0.01
+		}
 	}
 }
 country_event = {
@@ -9824,27 +11045,25 @@ country_event = {
 				modifier = large_decrease
 			}
 		}
-		if = {
-			reset_favoritism_minigame = yes
-			load_focus_tree = VIE_CuongDe_50
-			mark_focus_tree_layout_dirty = yes
-			set_country_flag = VIE_CuongDe_Succeeds
-			set_country_flag = VIE_Dealing_with_CuongDe
-			set_country_flag = VIE_CD_Econ_Available
-			VIE_Cuong_De = {
-				add_country_leader_role = {
-					promote_leader = yes
-					country_leader = {
-						ideology = DanVuong_Model
-					}
+		reset_favoritism_minigame = yes
+		load_focus_tree = VIE_CuongDe_50
+		mark_focus_tree_layout_dirty = yes
+		set_country_flag = VIE_CuongDe_Succeeds
+		set_country_flag = VIE_Dealing_with_CuongDe
+		set_country_flag = VIE_CD_Econ_Available
+		VIE_Cuong_De = {
+			add_country_leader_role = {
+				promote_leader = yes
+				country_leader = {
+					ideology = DanVuong_Model
 				}
 			}
-			set_politics = {
-				ruling_party = democratic
-				elections_allowed = no
-			}
-			add_stability = -0.10
 		}
+		set_politics = {
+			ruling_party = democratic
+			elections_allowed = no
+		}
+		add_stability = -0.10
 	}
 }
 
@@ -9864,7 +11083,7 @@ country_event = {
 		USA = {
 			add_opinion_modifier = {
 				target = VIE
-				modifier = VIE_CuongDe_USA
+				modifier = medium_increase
 			}
 			send_equipment = {
 				equipment = infantry_equipment_0
@@ -9879,7 +11098,7 @@ country_event = {
 		}
 		add_opinion_modifier = {
 			target = USA
-			modifier = VIE_CuongDe_USA
+			modifier = medium_increase
 		}
 		add_to_variable = {
 			currentMoney = 15
@@ -9908,7 +11127,6 @@ country_event = {
 	}
 }
 
-# USA Supports North Vietnam - Reunification Event Chain
 country_event = {
 	id = USA_VIN_Reunification.1
 	immediate = { }

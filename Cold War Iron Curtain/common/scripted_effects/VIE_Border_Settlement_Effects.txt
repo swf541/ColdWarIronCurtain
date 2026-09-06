@@ -1,0 +1,134 @@
+VIE_border_start_clash = {
+	set_variable = { VIE_border_attacker_state = 0 }
+	if = {
+		limit = { event_target:VIE_border_clash_target = { is_controlled_by = ROOT } }
+		set_variable = { VIE_border_attacker_state = event_target:VIE_border_clash_target }
+	}
+	else_if = {
+		random_owned_controlled_state = {
+			limit = {
+				impassable = no
+				has_border_war = no
+				has_ROOT_at_least_1_div_in_current_state_scope = yes
+				any_neighbor_state = { state = event_target:VIE_border_clash_target }
+			}
+			set_variable = { ROOT.VIE_border_attacker_state = THIS.id }
+		}
+	}
+	if = {
+		limit = { NOT = { check_variable = { VIE.VIE_border_attacker_state = 0 } } }
+		set_country_flag = VIE_Border_Clash_Active
+		event_target:VIE_border_clash_target = { set_variable = { VIE_border_stage = 3 } }
+		VIE_border_mark_aggressor = yes
+		add_named_threat = {
+			threat = 2
+			name = VIE_border_clash_threat
+		}
+		if = {
+			limit = {
+				country_exists = VIN
+				event_target:VIE_border_clash_target = { owner = { is_subject_of = VIN } }
+			}
+			VIN = { country_event = { id = VIE_Border_Settlement.40 days = 2 } }
+		}
+		if = {
+			limit = { check_variable = { VIE_border_attacker_state = event_target:VIE_border_clash_target } }
+			country_event = { id = VIE_Border_Settlement.35 days = 3 }
+		}
+		else_if = {
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = var:ROOT.VIE_border_attacker_state
+					num_provinces = 1
+					on_win = VIE_Border_Settlement.30
+					on_lose = VIE_Border_Settlement.31
+					on_cancel = VIE_Border_Settlement.34
+				}
+				defender = {
+					state = event_target:VIE_border_clash_target
+					num_provinces = 1
+					on_win = VIE_Border_Settlement.32
+					on_lose = VIE_Border_Settlement.33
+					on_cancel = VIE_Border_Settlement.34
+				}
+			}
+		}
+	}
+	else = {
+		custom_effect_tooltip = VIE_border_no_clash_tt
+	}
+}
+
+VIE_border_settle_target_state = {
+	var:vie_border_settle_state = {
+		set_variable = { VIE_border_stage = 5 }
+		set_variable = { VIE_border_pressure = 0 }
+		set_variable = { VIE_border_clash_failed = 0 }
+		remove_claim_by = VIE
+		transfer_state_to = VIE
+	}
+}
+
+VIE_border_ladder_cleanup = {	# daily failsafe - a demand whose reply never arrived would strand its state at stage 1
+	if = {
+		limit = {
+			has_country_flag = VIE_Border_Settlement_Open
+			NOT = { has_country_flag = VIE_Border_Demand_Pending }
+		}
+		for_each_loop = {
+			array = global.VIE_border_dispute_states
+			value = vie_border_cleanup_state
+			var:vie_border_cleanup_state = {
+				if = {
+					limit = { check_variable = { VIE_border_stage = 1 } }
+					set_variable = { VIE_border_stage = 2 }
+				}
+			}
+		}
+	}
+}
+
+VIE_border_mark_aggressor = {
+	if = {
+		limit = { has_idea = VIE_Chastened_Frontier }
+		swap_ideas = {
+			remove_idea = VIE_Chastened_Frontier
+			add_idea = VIE_Regional_Aggressor
+		}
+	}
+	else_if = {
+		limit = {
+			NOT = { has_idea = VIE_Regional_Aggressor }
+			NOT = { has_idea = VIE_Regional_Hegemon }
+		}
+		add_ideas = VIE_Regional_Aggressor
+	}
+}
+
+VIE_border_mark_hegemon = {
+	if = {
+		limit = { has_idea = VIE_Regional_Aggressor }
+		swap_ideas = {
+			remove_idea = VIE_Regional_Aggressor
+			add_idea = VIE_Regional_Hegemon
+		}
+	}
+}
+
+VIE_border_mark_chastened = {
+	if = {
+		limit = { has_idea = VIE_Regional_Aggressor }
+		swap_ideas = {
+			remove_idea = VIE_Regional_Aggressor
+			add_idea = VIE_Chastened_Frontier
+		}
+	}
+	else_if = {
+		limit = {
+			NOT = { has_idea = VIE_Regional_Hegemon }
+			NOT = { has_idea = VIE_Chastened_Frontier }
+		}
+		add_ideas = VIE_Chastened_Frontier
+	}
+}

@@ -1,0 +1,197 @@
+# =============================================================================
+# Viet Bac Autonomous Region (THO)
+# =============================================================================
+# THO begins as a French-aligned territorial council. It must have been annexed
+# during Cao-Bac before Hanoi can constitute the communist zone. The chain is:
+#   vin_viet_bac_question_check  - on_daily_VIN gate, queues THO.1 once
+#   THO.1                        - Hanoi decides; refusing ends the chain
+#   THO.2                        - the founding event, calls the effect below
+#   vin_establish_viet_bac_zone  - releases THO and hands it the Viet Bac
+# Every effect here runs in VIN scope. A surviving colonial THO blocks the gate;
+# an annexed THO tag can be released again under Hanoi.
+# This mirrors MEO_creation_of_the_autonomous_zone_of_thaimeo; the two highland
+# settlements are meant to read as one system.
+# =============================================================================
+
+vin_viet_bac_question_check = {
+	if = {
+		limit = {
+			NOT = { has_country_flag = VIN_viet_bac_question_asked }
+			VIN_viet_bac_settlement_trigger = yes
+			owns_state = 1280	# Cao Bang - no zone to offer without its seat
+			owns_state = 1768	# Lang Son
+			NOT = { country_exists = THO }
+		}
+		set_country_flag = VIN_viet_bac_question_asked
+		country_event = { id = THO.1 days = 240 random_days = 60 }	# the OTL region was constituted in 1956, not at the ceasefire
+	}
+}
+
+vin_establish_viet_bac_zone = {
+	hidden_effect = { keep_current_politics = yes }	# releasing a subject must not disturb Hanoi's own government
+	release_autonomy = {
+		target = THO
+		autonomy_state = autonomy_integrated_puppet
+		freedom_level = 0.1
+	}
+	if = {	# Dong Bac Bo is not a THO core, so the release does not carry it
+		limit = { 881 = { is_owned_by = VIN } }
+		THO = { transfer_state = 881 }
+		881 = { add_core_of = THO }
+	}
+	if = {	# Ha Giang only joins if Hanoi holds it; if the Tai-Meo zone never formed it stays Meo
+		limit = { 1767 = { is_owned_by = VIN } }
+		THO = { transfer_state = 1767 }
+		1767 = { add_core_of = THO }
+	}
+	THO = {
+		set_capital = { state = 1280 }
+		set_cosmetic_tag = THO_VIN_Autonomy_Zone
+		set_country_flag = THO_viet_bac_zone
+		if = { limit = { has_idea = French_Indochina_Faction } remove_ideas = French_Indochina_Faction }
+		add_ideas = { Viet_Minh_Faction VIN_highland_autonomy_resources }
+	}
+	remove_from_array = { FRA.StruggleInvolvedNationsIndochinaProEthnic = THO.id }	# the zone answers to Hanoi now, not to the French-sponsored ethnic bloc
+	if = {
+		limit = { NOT = { is_in_array = { FRA.StruggleInvolvedNationsIndochinaCommunist = THO.id } } }
+		add_to_array = { FRA.StruggleInvolvedNationsIndochinaCommunist = THO.id }
+	}
+	VIN_Chu_Van_Tan = { set_nationality = THO }	# Hanoi gives up a corps commander to chair the zone
+	if = {	# the zone runs the same party Hanoi does, which is Lien Viet before the Party comes out from under it
+		limit = { has_government = trotskyism }
+		THO = {
+			tho_viet_bac_politics_trotskyism = yes
+			VIN_Chu_Van_Tan = { promote_character = ho_chi_minh_thought_revsoc }
+		}
+	}
+	else_if = {
+		limit = { has_government = Social_Democratic }
+		THO = {
+			tho_viet_bac_politics_socdem = yes
+			VIN_Chu_Van_Tan = { promote_character = ho_chi_minh_thought_socdem }
+		}
+	}
+	else = {
+		THO = {
+			tho_viet_bac_politics_communism = yes
+			VIN_Chu_Van_Tan = { promote_character = ho_chi_minh_thought }
+		}
+	}
+	vin_grant_viet_bac_autonomy_bonus = yes
+	set_country_flag = VIN_viet_bac_zone_established
+}
+
+# The three politics blocks below run in THO scope. Each leaves the two rival
+# ho_chi_minh_thought groups at 0.01 rather than 0 - Chu Van Tan holds a leader
+# role in all three, and emptying a party that still has a leader crashes the
+# game (the same trap that took down the Japanese party merge).
+tho_viet_bac_politics_communism = {
+	set_popularities = {
+		maoism = 0
+		communism = 95
+		trotskyism = 1
+		socialist = 0
+		Social_Democratic = 1
+
+		democratic = 0
+		Social_Liberalism = 0
+		liberal = 0
+		centrist = 0
+
+		Liberal_Conservatism = 0
+		Christian_Democratic = 0
+		conservative = 0
+
+		neutrality = 0
+		nationalist = 3
+		monarchism = 0
+		fascism = 0
+
+		islamism = 0
+		radical_shiaism = 0
+		Salafism = 0
+	}
+	set_politics = {
+		ruling_party = communism
+		elections_allowed = no
+	}
+	set_party_name = {
+		ideology = communism
+		long_name = VIE_PARTY_THO_COMM_long
+		name = VIE_PARTY_THO_COMM
+	}
+}
+
+tho_viet_bac_politics_trotskyism = {
+	set_popularities = {
+		maoism = 0
+		communism = 1
+		trotskyism = 96
+		socialist = 0
+		Social_Democratic = 1
+
+		democratic = 0
+		Social_Liberalism = 0
+		liberal = 0
+		centrist = 0
+
+		Liberal_Conservatism = 0
+		Christian_Democratic = 0
+		conservative = 0
+
+		neutrality = 0
+		nationalist = 2
+		monarchism = 0
+		fascism = 0
+
+		islamism = 0
+		radical_shiaism = 0
+		Salafism = 0
+	}
+	set_politics = {
+		ruling_party = trotskyism
+		elections_allowed = no
+	}
+	set_party_name = {
+		ideology = trotskyism
+		long_name = VIE_PARTY_THO_TROT_long
+		name = VIE_PARTY_THO_TROT
+	}
+}
+
+tho_viet_bac_politics_socdem = {
+	set_popularities = {
+		maoism = 0
+		communism = 1
+		trotskyism = 1
+		socialist = 0
+		Social_Democratic = 95
+
+		democratic = 0
+		Social_Liberalism = 0
+		liberal = 0
+		centrist = 0
+
+		Liberal_Conservatism = 0
+		Christian_Democratic = 0
+		conservative = 0
+
+		neutrality = 0
+		nationalist = 3
+		monarchism = 0
+		fascism = 0
+
+		islamism = 0
+		radical_shiaism = 0
+		Salafism = 0
+	}
+	set_politics = {
+		ruling_party = Social_Democratic
+		elections_allowed = no
+	}
+	set_party_name = {
+		ideology = Social_Democratic
+		long_name = VIE_PARTY_THO_SOCDEM_long
+		name = VIE_PARTY_THO_COMM
+	}
+}

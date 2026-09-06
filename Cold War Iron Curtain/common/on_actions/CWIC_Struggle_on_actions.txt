@@ -4,10 +4,15 @@ on_actions = {
 			indochina_struggle_clamp_scores = yes
 			indochina_struggle_check_vp_captures = yes
 			if = {
+				limit = { country_exists = FRE }
+				FRE = { fre_limited_operation_daily_tick = yes }
+			}
+			if = {
                 limit = {
                     NOT = { has_global_flag = Indochina_War_Over }
                     check_variable = { global.Indochina_War_Active_Phase < 8 }
                     check_variable = { global.Indochina_War_Next_Phase_A_Points > 499 }
+                    NOT = { check_variable = { global.Indochina_War_Active_Phase = global.Indochina_War_Next_Phase_A } }	# a phase never escalates to itself; at the top of the ladder that looped forever and wiped the de-escalation track with it
                 }
                 set_variable = { global.Indochina_War_Active_Phase = global.Indochina_War_Next_Phase_A }
                 set_variable = { global.Indochina_War_Next_Phase_A_Points = 0 }
@@ -16,11 +21,11 @@ on_actions = {
                 every_country = {
                     limit = {
                         OR = {
-                            is_in_array = { StruggleInvolvedNationsIndochinaCommunist = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaProFrance = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaProIndependence = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaKuomintang = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaProEthnic = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaCommunist = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaProFrance = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaProIndependence = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaKuomintang = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaProEthnic = THIS.id }
                         }
                     }
                     indochina_struggle_starting_idea_phase_change = yes
@@ -32,6 +37,7 @@ on_actions = {
                     NOT = { has_global_flag = Indochina_War_Over }
                     check_variable = { global.Indochina_War_Active_Phase < 8 }
                     check_variable = { global.Indochina_War_Next_Phase_B_Points > 499 }
+                    NOT = { check_variable = { global.Indochina_War_Active_Phase = global.Indochina_War_Next_Phase_B } }
                 }
                 set_variable = { global.Indochina_War_Active_Phase = global.Indochina_War_Next_Phase_B }
                 set_variable = { global.Indochina_War_Next_Phase_A_Points = 0 }
@@ -40,16 +46,21 @@ on_actions = {
                 every_country = {
                     limit = {
                         OR = {
-                            is_in_array = { StruggleInvolvedNationsIndochinaCommunist = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaProFrance = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaProIndependence = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaKuomintang = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaProEthnic = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaCommunist = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaProFrance = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaProIndependence = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaKuomintang = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaProEthnic = THIS.id }
                         }
                     }
                     indochina_struggle_starting_idea_phase_change = yes
                     set_variable = { global.indochina_phase_check = 1 }
                 }
+            }
+
+            if = {
+                limit = { geneva_panic_collapse_trigger = yes }
+                indochina_geneva_panic_force_conference = yes
             }
 
             if = {
@@ -68,7 +79,6 @@ on_actions = {
                 set_global_flag = Failed_State_Available
             }
 
-            # Check for ending availability and show popup
             if = {
                 limit = {
                     NOT = { has_global_flag = Indochina_War_Over }
@@ -151,13 +161,11 @@ on_actions = {
             }
 
             indochina_struggle_recalculate_total_anti_communist_score = yes
+            indochina_failsafe_mirror_scores = yes
             indochina_struggle_update_phase_transitions = yes
 
-            # Automatic trigger for Communist Victory preparation
-            # Checks if VIN meets victory conditions and awards scores to unlock ending in GUI
             indochina_struggle_auto_trigger_communist_victory_preparation = yes
 
-            # Automatic trigger for USA-North Vietnam reunification event chain
             if = {
                 limit = {
                     NOT = { has_global_flag = Indochina_War_Over }
@@ -170,37 +178,93 @@ on_actions = {
                     country_event = { id = USA_VIN_Reunification.1 days = 1 }
                 }
             }
+
+            geneva_conf_world_leverage_pulse = yes
+            if = {
+                limit = { has_global_flag = geneva_conference_in_session }
+                geneva_neg_daily_tick = yes
+                add_to_variable = { global.geneva_tick_days = 1 }
+                if = {
+                    limit = { check_variable = { global.geneva_tick_days > 6 } }
+                    set_variable = { global.geneva_tick_days = 0 }
+                    geneva_conf_round_tick = yes
+                }
+            }
+
+            set_temp_variable = { ic_tick_days = 1 }	# France is the primary watchdog carrier; IC_Failsafe_on_actions.txt carries it on VIN/VIE/FRE/USA if France dies
+            indochina_failsafe_watchdog_tick = yes
 		}
 	}
 	on_monthly_FRA = {
 		effect = {
-			# Time-based bonuses to encourage Geneva Conference in 1954.
+			indochina_geneva_pursuit_tick = yes
+
 			if = {
 				limit = {
 					NOT = { has_global_flag = Indochina_War_Over }
+					check_variable = { global.Indochina_War_Active_Phase > 3 }
+					check_variable = { global.Indochina_War_Active_Phase < 9 }
+					date > 1950.1.1
+					date < 1953.1.1
+				}
+				add_to_variable = { global.Indochina_War_Next_Phase_A_Points = 25 }
+			}
+			if = {
+				limit = {
+					NOT = { has_global_flag = Indochina_War_Over }
+					NOT = { has_global_flag = Indochina_War_Escalated }
 					check_variable = { global.Indochina_War_Active_Phase < 9 }
 					date > 1953.1.1
 					date < 1954.1.1
 				}
-				add_to_variable = { global.Indochina_War_Next_Phase_B_Points = 9 }
+				add_to_variable = { global.Indochina_War_Next_Phase_B_Points = 20 }
 			}
 			if = {
 				limit = {
 					NOT = { has_global_flag = Indochina_War_Over }
+					NOT = { has_global_flag = Indochina_War_Escalated }
 					check_variable = { global.Indochina_War_Active_Phase < 9 }
 					date > 1954.1.1
 					date < 1955.1.1
 				}
-				add_to_variable = { global.Indochina_War_Next_Phase_B_Points = 15 }
+				add_to_variable = { global.Indochina_War_Next_Phase_B_Points = 30 }
 			}
 			if = {
 				limit = {
 					NOT = { has_global_flag = Indochina_War_Over }
+					NOT = { has_global_flag = Indochina_War_Escalated }
 					check_variable = { global.Indochina_War_Active_Phase < 9 }
 					date > 1955.1.1
 					date < 1956.1.1
 				}
-				add_to_variable = { global.Indochina_War_Next_Phase_B_Points = 12 }
+				add_to_variable = { global.Indochina_War_Next_Phase_B_Points = 25 }
+			}
+		}
+	}
+	on_daily_VIN = {
+		effect = {
+			vin_campaign_objective_tick = yes
+			vin_dbp_siege_tick = yes
+			vin_post_dbp_southern_war_check = yes
+			vin_post_dbp_focus_geneva_queue_tick = yes
+			if = {
+				limit = { country_exists = FRE }
+				FRE = {
+					fre_castor_daily_tick = yes
+					fre_pollux_daily_tick = yes
+					fre_atlante_daily_tick = yes
+				}
+			}
+			ic_laos_raid_daily_check = yes
+			vin_viet_bac_question_check = yes
+			if = {
+				limit = { has_country_flag = VIN_Guerilla_Networks_Expanded }
+				add_to_variable = { VIN_Guerilla_Sync_Counter = 1 }
+                if = {
+					limit = { check_variable = { VIN_Guerilla_Sync_Counter > 6.9 } }
+					set_variable = { VIN_Guerilla_Sync_Counter = 0 }
+					vin_sync_guerilla_networks = yes
+				}
 			}
 		}
 	}
@@ -211,14 +275,17 @@ on_actions = {
 	}
 	on_startup = {
 		effect = {
-            # on_startup also fires when loading a save: without this guard every
-            # reload reset the phase/scores and duplicated the GUI arrays.
             if = {
                 limit = { NOT = { has_global_flag = indochina_struggle_initialized } }
                 set_global_flag = indochina_struggle_initialized
-                set_variable = { global.Indochina_War_Active_Phase = 5 }
+                set_variable = { global.Indochina_War_Active_Phase = 4 }	# Medium Intensity: the war opens fightable, with one rung of escalation left
                 set_variable = { global.Indochina_War_Next_Phase_A_Points = 0 }
                 set_variable = { global.Indochina_War_Next_Phase_B_Points = 0 }
+                set_variable = { global.Indochina_Wrapup_Extensions = 0 }	# how many times the wrap-up timer has deferred to a battle still in the field
+				if = {
+                    limit = { country_exists = FRE }
+                    set_global_flag = ic_failsafe_theatre_present
+                }
                 every_country = {
                     limit = {
                         OR = {
@@ -263,6 +330,9 @@ on_actions = {
                 VIN = {
                     indochina_struggle_starting_idea_setup = yes
                 }
+                NLF = {
+                    indochina_struggle_starting_idea_setup = yes
+                }
                 CAM = {
                     indochina_struggle_starting_idea_setup = yes
                 }
@@ -285,6 +355,9 @@ on_actions = {
                     indochina_struggle_starting_idea_setup = yes
                 }
                 MOR = {
+                    indochina_struggle_starting_idea_setup = yes
+                }
+                HUM = {
                     indochina_struggle_starting_idea_setup = yes
                 }
                 FRE = {
@@ -315,6 +388,9 @@ on_actions = {
                     indochina_struggle_starting_idea_setup = yes
                 }
                 THO = {
+                    indochina_struggle_starting_idea_setup = yes
+                }
+                USA = {
                     indochina_struggle_starting_idea_setup = yes
                 }
                 FRA = {
@@ -438,6 +514,18 @@ on_actions = {
                     add_to_array = { StruggleInvolvedNationsIndochinaInterloper = KOR }
                     add_to_array = { StruggleInvolvedNationsIndochinaInterloper = KPA }
                     add_to_array = { StruggleInvolvedNationsIndochinaInterloper = HUM }
+                }
+            }
+
+            if = {
+                limit = {
+                    has_global_flag = geneva_conference_concluded
+                    NOT = { has_global_flag = geneva_politics_entry_repaired }
+                }
+                set_global_flag = geneva_politics_entry_repaired
+                every_country = {
+                    limit = { is_in_array = { array = country_politics_list value = 29 } }
+                    remove_from_array = { array = country_politics_list value = 29 }
                 }
             }
         }

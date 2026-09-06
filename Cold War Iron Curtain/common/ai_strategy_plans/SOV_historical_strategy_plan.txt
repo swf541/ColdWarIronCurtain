@@ -352,35 +352,38 @@ soviet_historical_peaceful = {
 	
 	# Defines which national focuses the AI picks first during this plan.
 	ai_national_focuses = {
-		SOV_Stalin_Save_Northwestern_China
-		SOV_Stalin_Military_Bases_in_East_Turkestan
-		SOV_Stalin_Provide_Guns_To_the_Military_Cliques
+		# The six China focuses moved to the SOV_ccw_* side branch
+		# (common/national_focus/SOV_Chinese_Civil_War_Branch.txt), driven by the
+		# soviet_chinese_civil_war / soviet_china_prc / soviet_china_manchuria
+		# plans below.
 		# SOV_Stalin_Expand_the_North_Chinese_Industrial_Base  # Focus exists only in outdated "Trees for 0.35" folder
 		# SOV_Stalin_Send_The_Armed_Forces  # Focus exists only in outdated "Trees for 0.35" folder
 		# SOV_Stalin_Send_Surplus_Tanks_To_the_North_Koreans  # Focus exists only in outdated "Trees for 0.35" folder
 		# SOV_Stalin_Smuggle_Guns_To_the_Vietnamese  # Focus exists only in outdated "Trees for 0.35" folder
-		SOV_Integrate_Asia_into_the_Eastern_Bloc
 		SOV_Stalin_The_Zhdanov_Doctrine
 		SOV_Stalin_The_Percentage_Agreement
-		# SOV_Stalin_Follow_the_Percentage_Agreements  # fork - driven by SOV_greek_civil_war rule via ai_will_do
-		SOV_Stalin_The_German_Question
-		# SOV_Stalin_Reinforce_Communist_Ideals_In_East_Germany  # fork - driven by SOV_1949_german_election rule via ai_will_do
+		# The Greek focuses moved to the SOV_gpa_* / SOV_gci_* side branch
+		# (common/national_focus/SOV_Greek_Civil_War_Branch.txt), driven by the
+		# soviet_greek_percentage / soviet_greek_intervention plans below.
+		# SOV_Stalin_The_German_Question  # branch removed - the 1949 West German
+		# election is now handled entirely by events (sov_german_question.1 ->
+		# SOV_WGR.1 -> SOV_WGR.2 -> WGRElection.1), weighted by the
+		# SOV_1949_german_election rule through ai_chance rather than ai_will_do.
+		# SOV_Stalin_Reinforce_Communist_Ideals_In_East_Germany  # branch removed
 		# SOV_Stalin_Enact_a_Complete_Embargo_on_Yugoslavia  # Focus exists only in outdated "Trees for 0.35" folder
-		SOV_Stalin_Deport_Black_Sea_Greeks
-		SOV_Stalin_Prepare_For_the_Korean_War
+		# SOV_Stalin_Deport_Black_Sea_Greeks  # now SOV_gpa_deport_the_black_sea_greeks
+		# The four Korea focuses moved to the SOV_kw_* side branch
+		# (common/national_focus/SOV_Korean_War_Branch.txt), driven by the
+		# soviet_korean_war plan below.
 		# SOV_Stalin_Allow_Kim_to_Invade_the_South  # Focus exists only in outdated "Trees for 0.35" folder
-		SOV_Stalin_Deal_with_the_Chinese
-		SOV_Stalin_Recognize_the_Peoples_Republic_of_China
-		SOV_Stalin_Soviet_Loan_to_China
 		# SOV_Stalin_Soviet_Specialists  # Focus exists only in outdated "Trees for 0.35" folder
-		SOV_Stalin_Send_Infantry_Equipment
-		SOV_Stalin_Establish_the_64th_Fighter_Aviation_Corps
 		# SOV_Stalin_Increase_Funding_for_Western_Communist_Parties  # Focus exists only in outdated "Trees for 0.35" folder
 		# SOV_Stalin_Suspend_Claims_on_Turkish_Lands  # Focus exists only in outdated "Trees for 0.35" folder
 		SOV_Stalin_The_Sino_Soviet_Treaty_of_Friendship_Alliance_and_Mutual_Assistance
 		# SOV_Stalin_Recognize_Vietnams_Independence  # Focus exists only in outdated "Trees for 0.35" folder
-		SOV_Stalin_Provide_Material_Assistance_to_the_Volkspolizei
+		# SOV_Stalin_Provide_Material_Assistance_to_the_Volkspolizei  # branch removed
 		# SOV_Stalin_Propose_a_neutral_unified_Austria  # fork - driven by SOV_austria_question rule via ai_will_do
+		#   (now hangs directly off SOV_Stalin_The_Percentage_Agreement)
 	}
 	
 	# Defines which technology categories the AI has weighting towards/against during this plan.
@@ -410,6 +413,366 @@ soviet_historical_peaceful = {
 	
 	# Keep small, as it is used as a factor for some things (such as research needs)
 	# Recommended around 1.0. Useful for relation between plans
+	weight = {
+		factor = 1.0
+		modifier = {
+			factor = 1.0
+		}
+	}
+}
+soviet_interfere_in_west_germany = {
+	name = "Soviet Interference in West Germany"	   # Name of the plan
+	desc = "Gamerule set behavior for Soviet interference in west german elecitons"	   # Description of the plan
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		is_historical_focus_on = yes
+		has_game_rule = { rule = SOV_1949_german_election option = SOV_GER49_INTERFERE }
+	}
+	
+	# When this plan is aborted. The interference decision is no longer a focus -
+	# it is SOV_WGR.1, reached through SOV_Stalin_The_Zhdanov_Doctrine ->
+	# sov_german_question.1. Once Moscow has answered either way, the plan ends.
+	abort = {
+		OR = {
+			has_country_flag = SOV_WGR49_interfered
+			has_country_flag = SOV_WGR49_hands_off
+		}
+	}
+
+	# Defines which national focuses the AI picks first during this plan.
+	# The Zhdanov Doctrine is what fires the entry event, so the AI must reach
+	# it before West Germany completes its own election focus.
+	ai_national_focuses = {
+		SOV_Stalin_The_Zhdanov_Doctrine
+		SOV_Stalin_The_Percentage_Agreement
+	}
+	
+	# Defines which technology categories the AI has weighting towards/against during this plan.
+	# research = {
+		# <category> = <weight>
+	# }
+	
+	# Defines which ideas the AI has weighting towards/against during this plan.
+	# ideas = {
+		# <idea> = <weight>
+	# }
+	
+	# Defines which traits the AI has weighting towards/against during this plan.
+	# traits = {
+		# <trait> = <weight>
+	# }
+	
+	# Defines AI strategies to apply during this plan. 
+	# ai_strategy = {
+		# <strategy attributes>
+	# }
+	
+	# Defines pick weights for specific focuses during this plan.
+	# focus_factors = {
+		# <focus> = <weight>
+	# }
+	
+	# Keep small, as it is used as a factor for some things (such as research needs)
+	# Recommended around 1.0. Useful for relation between plans
+	weight = {
+		factor = 1.0
+		modifier = {
+			factor = 1.0
+		}
+	}
+}
+# A Red Bonn - only ever enabled if the KPD actually won the 1949 election.
+# Drives the AI through the SOV_wge_* side branch
+# (common/national_focus/SOV_WGR_Communist_Branch.txt).
+soviet_red_bonn = {
+	name = "A Red Bonn"
+	desc = "Soviet handling of a communist Federal Republic after the 1949 election"
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_country_flag = SOV_WGR49_kpd_victory
+	}
+
+	abort = {
+		has_completed_focus = SOV_wge_the_atlantic_recoils
+	}
+
+	ai_national_focuses = {
+		SOV_wge_a_red_bonn
+		SOV_wge_recognize_the_reimann_government
+		SOV_wge_bonn_into_the_sphere
+		SOV_wge_comecon_for_the_ruhr
+		SOV_wge_arm_the_west_german_workers
+		SOV_wge_the_ruhr_arsenal
+		SOV_wge_two_states_one_road
+		SOV_wge_the_atlantic_recoils
+	}
+
+	weight = {
+		factor = 1.0
+		modifier = {
+			factor = 1.0
+		}
+	}
+}
+
+# The Korean War side branch (SOV_Korean_War_Branch.txt), revealed by sov_jvs.4
+# on day 21. Moscow does not gate Pyongyang's launch focus - this plan simply
+# makes the AI actually equip the KPA before June 1950 instead of ignoring it.
+soviet_korean_war = {
+	name = "Soviet Support for the Korean People's Army"
+	desc = "Equipping and covering the KPA before and during the Fatherland Liberation War"
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_country_flag = SOV_korea_question_active
+	}
+
+	# The armistice moved to the post-war branch, so this plan now ends when the
+	# ceasefire does - at which point the wartime branch is hidden anyway.
+	abort = {
+		has_global_flag = KOREA_CEASEFIRE_UN
+	}
+
+	ai_national_focuses = {
+		SOV_kw_the_korean_question
+		SOV_kw_rearm_the_korean_peoples_army
+		SOV_kw_advisors_in_pyongyang
+		SOV_kw_the_sino_soviet_understanding
+		SOV_kw_the_64th_fighter_aviation_corps
+		SOV_kw_mig_alley
+		SOV_kw_deniable_volunteers
+	}
+
+	weight = {
+		factor = 1.0
+		modifier = {
+			factor = 1.0
+		}
+	}
+}
+
+# Greek Civil War - historical arm. The Percentage Agreement is honoured and
+# the KKE is abandoned (SOV_Greek_Civil_War_Branch.txt, SOV_gpa_* focuses).
+soviet_greek_percentage = {
+	name = "Soviet Greek Question - Honour the Percentage Agreement"
+	desc = "Historical handling of Greece: the KKE is left to its fate and relations with Athens are repaired"
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_country_flag = SOV_Followed_Percentage_Agreements
+	}
+
+	abort = {
+		date > 1957.01.01
+	}
+
+	ai_national_focuses = {
+		SOV_gpa_honour_the_agreement
+		SOV_gpa_abandon_the_kke
+		SOV_gpa_the_tashkent_exile
+		SOV_gpa_deport_the_black_sea_greeks
+		SOV_gpa_restore_diplomatic_relations
+		SOV_gpa_the_trade_agreement
+		SOV_gpa_the_cyprus_question
+	}
+
+	weight = {
+		factor = 1.0
+		modifier = {
+			factor = 1.0
+		}
+	}
+}
+
+# Greek Civil War - intervention arm. Both outcome sub-branches are listed;
+# the AI can only pick whichever one its available block permits, so listing
+# both is safe and covers either result of the PDG-GRE war.
+soviet_greek_intervention = {
+	name = "Soviet Greek Question - Intervene"
+	desc = "The Percentage Agreement is rejected and the Democratic Army is backed openly"
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_country_flag = SOV_Rejected_Percentage_Agreements
+	}
+
+	abort = {
+		OR = {
+			has_completed_focus = SOV_gci_bosphorus_border_changes
+			has_completed_focus = SOV_gci_rebuild_the_southern_flank
+		}
+	}
+
+	ai_national_focuses = {
+		SOV_gci_intervene_in_greece
+		SOV_gci_arm_the_democratic_army
+		SOV_gci_a_peoples_republic_in_greece
+		SOV_gci_assist_greek_reconstruction
+		SOV_gci_military_bases_in_greece
+		SOV_gci_bosphorus_border_changes
+		SOV_gci_the_greek_defeat
+		SOV_gci_hold_the_albanian_line
+		SOV_gci_the_kke_in_exile
+		SOV_gci_rebuild_the_southern_flank
+	}
+
+	weight = {
+		factor = 1.0
+		modifier = {
+			factor = 1.0
+		}
+	}
+}
+
+# Chinese Civil War side branch (SOV_Chinese_Civil_War_Branch.txt). Visible from
+# game start, so this plan runs from turn one and covers the wartime focuses.
+soviet_chinese_civil_war = {
+	name = "Soviet Support in the Chinese Civil War"
+	desc = "Backing the CCP while the civil war is still being fought"
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_global_flag = CCW_Started
+	}
+
+	abort = {
+		has_global_flag = CCW_Over
+	}
+
+	ai_national_focuses = {
+		SOV_ccw_the_chinese_civil_war
+		SOV_ccw_arm_the_peoples_liberation_army
+	}
+
+	weight = {
+		factor = 1.0
+		modifier = {
+			factor = 1.0
+		}
+	}
+}
+
+# The PRC won - historical. Runs to the 1956 Twentieth Congress.
+soviet_china_prc = {
+	name = "Soviet China Policy - The People's Republic"
+	desc = "The alliance with Peking, from recognition to the Twentieth Congress"
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_global_flag = CCW_Over
+		NOT = { has_country_flag = SOV_PRC_Losing_CCW }
+	}
+
+	abort = {
+		has_completed_focus = SOV_ccw_the_twentieth_congress_in_peking
+	}
+
+	ai_national_focuses = {
+		SOV_ccw_recognize_the_peoples_republic
+		SOV_Stalin_The_Sino_Soviet_Treaty_of_Friendship_Alliance_and_Mutual_Assistance
+		SOV_ccw_soviet_loan_to_china
+		SOV_ccw_the_156_projects
+		SOV_ccw_soviet_advisors_in_china
+		SOV_krushchev_visit_china
+		SOV_ccw_return_port_arthur
+		SOV_ccw_technical_assistance
+		SOV_ccw_the_twentieth_congress_in_peking
+	}
+
+	weight = {
+		factor = 1.0
+		modifier = {
+			factor = 1.0
+		}
+	}
+}
+
+# The nationalists won - the CCP survives only in Manchuria as a Soviet client.
+soviet_china_manchuria = {
+	name = "Soviet China Policy - The Manchurian Rump"
+	desc = "Salvaging the Chinese revolution after the nationalists win"
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_country_flag = SOV_PRC_Losing_CCW
+	}
+
+	abort = {
+		has_completed_focus = SOV_ccw_integrate_asia_into_the_eastern_bloc
+	}
+
+	ai_national_focuses = {
+		SOV_ccw_save_northwestern_china
+		SOV_ccw_military_bases_in_east_turkestan
+		SOV_ccw_provide_guns_to_the_military_cliques
+		SOV_ccw_the_manchurian_redoubt
+		SOV_ccw_rebuild_the_northeast
+		SOV_ccw_shelter_the_chinese_party
+		SOV_ccw_the_manchurian_peoples_army
+		SOV_ccw_the_southern_insurgency
+		SOV_ccw_isolate_the_kuomintang
+		SOV_ccw_integrate_asia_into_the_eastern_bloc
+	}
+
+	weight = {
+		factor = 1.0
+		modifier = {
+			factor = 1.0
+		}
+	}
+}
+
+# Post-war Korea (SOV_Korean_Settlement_Branch.txt). Enabled when the war ends;
+# all three outcome arms are listed, and each arm's allow_branch means the AI can
+# only ever reach the one that actually happened.
+soviet_korean_settlement = {
+	name = "Soviet Korea Policy - After the War"
+	desc = "Handling the peninsula after the armistice, a northern victory or a northern defeat"
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_global_flag = korean_war_begun
+		has_global_flag = KOREA_CEASEFIRE_UN
+	}
+
+	abort = {
+		OR = {
+			has_completed_focus = SOV_kwp_two_koreas_one_peninsula
+			has_completed_focus = SOV_kwp_korea_in_the_socialist_camp
+			has_completed_focus = SOV_kwp_lessons_of_the_korean_war
+		}
+	}
+
+	ai_national_focuses = {
+		SOV_kwp_the_korean_settlement
+		# Historical division
+		SOV_kw_the_armistice_at_panmunjom
+		SOV_kwp_rebuild_the_north
+		SOV_kwp_the_frozen_frontier
+		SOV_kwp_two_koreas_one_peninsula
+		# North wins
+		SOV_kwp_a_unified_korea
+		SOV_kwp_rebuild_the_peninsula
+		SOV_kwp_the_government_in_exile
+		SOV_kwp_korea_in_the_socialist_camp
+		# South wins
+		SOV_kwp_the_korean_disaster
+		SOV_kwp_shelter_the_korean_comrades
+		SOV_kwp_fortify_the_maritime_provinces
+		SOV_kwp_lessons_of_the_korean_war
+	}
+
 	weight = {
 		factor = 1.0
 		modifier = {

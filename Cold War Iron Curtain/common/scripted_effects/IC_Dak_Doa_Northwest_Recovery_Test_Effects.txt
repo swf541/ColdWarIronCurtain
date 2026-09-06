@@ -1,0 +1,201 @@
+# Console diagnostics. Run in the country named by each prefix unless the effect
+# scopes explicitly. Resets only close wars whose package-owned flag is present.
+ic_dak_doa_test_start = {
+	if = {
+		limit = { country_exists = NLF country_exists = FUL country_exists = FRE }
+		NLF = { nlf_dak_doa_begin = yes }
+		log = "IC_TEST|DAK_DOA|START|credits_before=[?FRE.FRE_War_Credits|0]|patience_before=[?FRE.FRE_Metropole_Patience|0]"
+	}
+}
+
+ic_dak_doa_test_choose_hold = { if = { limit = { country_exists = FRE } FRE = { fre_dak_doa_commit_hold = yes } } }
+ic_dak_doa_test_choose_gm100 = { if = { limit = { country_exists = FRE } FRE = { fre_dak_doa_commit_gm100 = yes } } }
+ic_dak_doa_test_choose_evacuation = { if = { limit = { country_exists = FRE } FRE = { fre_dak_doa_commit_evacuation = yes } } }
+
+ic_dak_doa_test_advance_to_hold_boundary = {
+	if = {
+		limit = { country_exists = NLF NLF = { has_country_flag = VIN_Campaign_Dak_Doa_Active } }
+		NLF = {
+			set_province_controller = 1328
+			set_variable = { NLF_Dak_Doa_Hold_Days = 6 }
+			log = "IC_TEST|DAK_DOA|BOUNDARY|hold=6|required=7|elapsed=[?NLF_Dak_Doa_Days_Elapsed|0]"
+		}
+	}
+}
+
+ic_dak_doa_test_reset_streak = {
+	if = {
+		limit = { country_exists = NLF country_exists = FUL }
+		FUL = { set_province_controller = 1328 }
+		NLF = { nlf_dak_doa_update_hold = yes }
+	}
+}
+
+ic_dak_doa_test_force_clean = { if = { limit = { country_exists = NLF } NLF = { set_temp_variable = { nlf_dak_doa_outcome = 1 } nlf_dak_doa_resolve = yes } } }
+ic_dak_doa_test_force_costly = { if = { limit = { country_exists = NLF } NLF = { set_temp_variable = { nlf_dak_doa_outcome = 2 } nlf_dak_doa_resolve = yes } } }
+ic_dak_doa_test_force_failure = { if = { limit = { country_exists = NLF } NLF = { set_temp_variable = { nlf_dak_doa_outcome = 4 } nlf_dak_doa_resolve = yes } } }
+ic_dak_doa_test_force_superseded = { if = { limit = { country_exists = NLF } NLF = { set_temp_variable = { nlf_dak_doa_outcome = 5 } nlf_dak_doa_resolve = yes } } }
+
+ic_dak_doa_test_inspect = {
+	if = {
+		limit = { country_exists = NLF }
+		NLF = {
+			set_temp_variable = { ic_dak_war_ful = 0 }
+			if = { limit = { country_exists = FUL has_war_with = FUL } set_temp_variable = { ic_dak_war_ful = 1 } }
+			log = "IC_TEST|DAK_DOA|INSPECT|active=[?NLF_Dak_Doa_Days_Elapsed|0]|hold=[?NLF_Dak_Doa_Hold_Days|0]|outcome=[?NLF_Dak_Doa_Last_Outcome|0]|war_ful=[?ic_dak_war_ful|0]"
+		}
+	}
+	if = {
+		limit = { country_exists = FRE }
+		FRE = { set_temp_variable = { response_validation_package = 7 } response_package_validation_log = yes }
+	}
+	if = { limit = { country_exists = VIE country_exists = NLF VIE = { has_war_with = NLF } } log = "IC_TEST|DAK_DOA|WIDER_WAR|VIE_NLF=preserved" }
+	if = { limit = { country_exists = FRE country_exists = NLF FRE = { has_war_with = NLF } } log = "IC_TEST|DAK_DOA|WIDER_WAR|FRE_NLF=preserved" }
+	if = { limit = { country_exists = FRA country_exists = NLF FRA = { has_war_with = NLF } } log = "IC_TEST|DAK_DOA|WIDER_WAR|FRA_NLF=preserved" }
+}
+
+ic_dak_doa_test_reset = {
+	if = {
+		limit = { country_exists = NLF }
+		NLF = {
+			nlf_dak_doa_finish = yes
+			clr_country_flag = VIN_Campaign_Dak_Doa_Result_Clean
+			clr_country_flag = VIN_Campaign_Dak_Doa_Result_Costly
+			clr_country_flag = VIN_Campaign_Dak_Doa_Result_Aborted
+			clr_country_flag = VIN_Campaign_Dak_Doa_Result_Failure
+			clr_country_flag = VIN_Campaign_Dak_Doa_Result_Superseded
+			set_variable = { NLF_Dak_Doa_Days_Elapsed = 0 }
+			set_variable = { NLF_Dak_Doa_Last_Outcome = 0 }
+		}
+	}
+	if = {
+		limit = { country_exists = FRE }
+		FRE = {
+			fre_dak_doa_response_cleanup = yes
+			fre_dak_doa_response_clear_results = yes
+			clr_country_flag = FRE_Dak_Doa_GM100_Survived
+			clr_country_flag = FRE_Dak_Doa_GM100_Mauled
+			clr_country_flag = FRE_Dak_Doa_Isolated_Garrison_Lost
+		}
+	}
+}
+
+ic_northwest_recovery_test_record_original_failure = {
+	VIN = {
+		set_country_flag = VIN_Campaign_Tay_Bac_Result_Failure
+		set_country_flag = VIN_Campaign_Cooldown_Tay_Bac
+	}
+}
+
+ic_northwest_recovery_test_start = {
+	VIN = {
+		if = {
+			limit = { VIN_northwest_recovery_target_available_trigger = yes NOT = { has_country_flag = VIN_Campaign_Northwest_Recovery_Attempted } }
+			log = "IC_TEST|NW_RECOVERY|START|supply_before=[?VIN_Campaign_Supply|0]|pp_before=[?political_power|0]"
+			set_country_flag = VIN_Campaign_Northwest_Recovery_Attempted
+			set_country_flag = VIN_Campaign_Northwest_Recovery_Active
+			add_political_power = -50
+			set_temp_variable = { vin_supply_amount = -75 }
+			vin_change_campaign_supply = yes
+			set_temp_variable = { vin_camp_id = 9 }
+			vin_campaign_begin = yes
+			vin_campaign_declare_war = yes
+		}
+	}
+}
+
+ic_northwest_recovery_test_advance_to_hold_boundary = {
+	VIN = {
+		set_province_controller = 10075
+		set_province_controller = 12075
+		set_province_controller = 13775
+		set_province_controller = 16526
+		set_province_controller = 16527
+		set_variable = { VIN_camp_objective_hold_days = 4 }
+		log = "IC_TEST|NW_RECOVERY|BOUNDARY|hold=4|required=5|elapsed=[?VIN_camp_days_elapsed|0]"
+	}
+}
+
+ic_northwest_recovery_test_force_failure = { VIN = { set_temp_variable = { vin_camp_outcome = 4 } vin_campaign_resolve = yes } }
+ic_northwest_recovery_test_force_costly_success = { VIN = { set_temp_variable = { vin_camp_outcome = 2 } vin_campaign_resolve = yes } }
+ic_northwest_recovery_test_force_superseded = { VIN = { set_temp_variable = { vin_camp_outcome = 5 } vin_campaign_resolve = yes } }
+
+ic_northwest_recovery_test_inspect = {
+	VIN = {
+		set_temp_variable = { ic_nw_owns_gate = 0 }
+		set_temp_variable = { ic_nw_fre_war = 0 }
+		set_temp_variable = { ic_nw_tai_war = 0 }
+		set_temp_variable = { ic_nw_cleanup_complete = 0 }
+		if = { limit = { owns_state = 1761 } set_temp_variable = { ic_nw_owns_gate = 1 } }
+		if = { limit = { country_exists = FRE has_war_with = FRE } set_temp_variable = { ic_nw_fre_war = 1 } }
+		if = { limit = { country_exists = TAI has_war_with = TAI } set_temp_variable = { ic_nw_tai_war = 1 } }
+		if = { limit = { has_country_flag = VIN_Campaign_Northwest_Recovery_Cleanup_Complete } set_temp_variable = { ic_nw_cleanup_complete = 1 } }
+		log = "IC_TEST|NW_RECOVERY|INSPECT|campaign=[?VIN_camp_current|0]|days=[?VIN_camp_days_elapsed|0]|hold=[?VIN_camp_objective_hold_days|0]|outcome=[?VIN_camp_last_outcome|0]|owns_1761=[?ic_nw_owns_gate|0]|war_FRE=[?ic_nw_fre_war|0]|war_TAI=[?ic_nw_tai_war|0]|cleanup_complete=[?ic_nw_cleanup_complete|0]|supply=[?VIN_Campaign_Supply|0]|pp=[?political_power|0]"
+	}
+}
+
+ic_northwest_recovery_test_reset = {
+	VIN = {
+		if = {
+			limit = { OR = { has_country_flag = VIN_Campaign_Northwest_Recovery_Owns_War has_country_flag = VIN_Campaign_Northwest_Recovery_Armistice_Pending } }
+			set_country_flag = VIN_Campaign_Northwest_Recovery_Armistice_Pending
+			vin_northwest_recovery_close_owned_war = yes
+		}
+		clr_country_flag = VIN_Campaign_Northwest_Recovery_Armistice_Pending
+		clr_country_flag = VIN_Campaign_Northwest_Recovery_Cleanup_Complete
+		clr_country_flag = VIN_Campaign_Northwest_Recovery_Owns_War
+		vin_northwest_recovery_clear_war_snapshot = yes
+		clr_country_flag = VIN_Campaign_Northwest_Recovery_Active
+		clr_country_flag = VIN_Campaign_Northwest_Recovery_Attempted
+		clr_country_flag = VIN_Campaign_Cooldown_Northwest_Recovery
+		clr_country_flag = VIN_Campaign_Northwest_Recovery_Result_Costly
+		clr_country_flag = VIN_Campaign_Northwest_Recovery_Result_Aborted
+		clr_country_flag = VIN_Campaign_Northwest_Recovery_Result_Failure
+		clr_country_flag = VIN_Campaign_Northwest_Recovery_Result_Superseded
+		remove_mission = VIN_Northwest_Recovery_Objective
+		set_variable = { VIN_camp_objective_hold_days = 0 }
+		if = { limit = { check_variable = { VIN_camp_current = 9 } } set_variable = { VIN_camp_current = 0 } }
+	}
+}
+
+# Shared response selectors used by checkpoint branches for accepted packages.
+# Their lifecycle remains owned by the original package effects.
+ic_response_test_resource_snapshot = {
+	if = { limit = { country_exists = FRE } FRE = { log = "IC_TEST|RESOURCE|credits=[?FRE_War_Credits|0]|manpower_k=[?manpower_k|0]|patience=[?FRE_Metropole_Patience|0]" } }
+	if = { limit = { country_exists = VIN } VIN = { log = "IC_TEST|RESOURCE|campaign_supply=[?VIN_Campaign_Supply|0]|pp=[?political_power|0]" } }
+}
+
+ic_response_test_lorraine_deep = { FRE = { fre_lorraine_commit_deep_thrust = yes } }
+ic_response_test_lorraine_limited = { FRE = { fre_lorraine_commit_limited_raid = yes } }
+ic_response_test_lorraine_withhold = { FRE = { fre_lorraine_withhold_for_na_san = yes } }
+ic_response_test_lorraine_superseded = { FRE = { set_temp_variable = { fre_lorraine_result = 5 } fre_lorraine_response_finish = yes } }
+
+ic_response_test_hoa_binh_amarante = { FRE = { fre_hoa_binh_plan_amarante = yes } }
+ic_response_test_hoa_binh_hold = { FRE = { fre_hoa_binh_commit_hold = yes } }
+ic_response_test_hoa_binh_inconclusive = { FRE = { set_temp_variable = { fre_hoa_binh_result = 4 } fre_hoa_binh_response_finish = yes } }
+ic_response_test_hoa_binh_superseded = { FRE = { set_temp_variable = { fre_hoa_binh_result = 5 } fre_hoa_binh_response_finish = yes } }
+
+ic_response_test_dbp_standard = { FRE = { fre_dbp_commit_standard_hold = yes } }
+ic_response_test_dbp_maximum = { FRE = { fre_dbp_commit_maximum_reinforcement = yes } }
+ic_response_test_dbp_condor = { FRE = { fre_dbp_commit_condor = yes } }
+ic_response_test_dbp_vulture_request = { FRE = { fre_dbp_request_vulture = yes } }
+ic_response_test_dbp_vulture_approved = { FRE = { fre_dbp_vulture_approved = yes } }
+ic_response_test_dbp_vulture_refused = { FRE = { fre_dbp_vulture_refused = yes } }
+
+ic_response_test_castor_full = { FRE = { fre_castor_begin_full_drop = yes } }
+ic_response_test_castor_limited = { FRE = { fre_castor_begin_limited_drop = yes } }
+ic_response_test_castor_failure = { FRE = { fre_castor_resolve_failure = yes } }
+ic_response_test_castor_superseded = { FRE = { fre_castor_resolve_superseded = yes } }
+
+ic_response_test_pollux_historical = { FRE = { fre_pollux_begin_historical = yes } }
+ic_response_test_pollux_escort = { FRE = { fre_pollux_begin_escort = yes } }
+ic_response_test_pollux_airlift = { FRE = { fre_pollux_begin_airlift = yes } }
+ic_response_test_pollux_superseded = { FRE = { fre_pollux_resolve_superseded = yes } }
+
+ic_response_test_atlante_full = { FRE = { fre_atlante_begin_full = yes } }
+ic_response_test_atlante_vietnamese = { FRE = { fre_atlante_begin_vietnamese = yes } }
+ic_response_test_atlante_northern = { FRE = { fre_atlante_choose_northern_priority = yes } }
+ic_response_test_atlante_superseded = { FRE = { fre_atlante_resolve_superseded = yes } }
+
+ic_response_test_post_dbp_fund = { VIN = { vin_post_dbp_fund_southern_war = yes } }
+ic_response_test_post_dbp_negotiate = { VIN = { vin_post_dbp_press_for_geneva = yes } }

@@ -1,0 +1,58 @@
+tax_avoidance_function = {
+	set_variable = { 
+        laffer_tax_rate = laffer_weighted_average_tax_rate
+    }
+	set_variable = { 
+		tax_efficiency_factor = {
+			value = 1 
+			add = effective_tax_rate_factor
+			max = 0
+		}
+	}
+	set_variable = { 
+		tax_avoidance_slope = {
+			value = 0.5 
+			add = modifier@tax_avoidance_elasticity
+			min = 1
+			max = 0
+		}
+	}
+	set_variable = {
+		effective_tax_rate = {
+			value = tax_avoidance_slope
+			multiply = -1
+			multiply = laffer_tax_rate
+			add = tax_efficiency_factor
+			max = 0.01
+			min = 1
+		}
+	}
+}
+tax_avoidance_gui_function = {
+	set_variable = {
+        laffer_tax_rate = current_laffer_variable
+    }
+	set_variable = {
+		effective_tax_rate_gui = {
+			value = tax_avoidance_slope
+			multiply = -1
+			multiply = laffer_tax_rate
+			add = tax_efficiency_factor
+			max = 0.01
+			min = 1
+		}
+	}
+	add_to_array = {
+        effective_tax_rate_gui_info = effective_tax_rate_gui
+    }
+	set_variable = {
+		effective_tax_rate_gui = {
+			value = effective_tax_rate_gui
+			multiply = 100
+			round = yes
+		}
+	}
+	add_to_array = {
+        laffer_gui_segments = effective_tax_rate_gui
+    }
+}

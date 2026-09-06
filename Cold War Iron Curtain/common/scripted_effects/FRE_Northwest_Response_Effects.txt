@@ -1,0 +1,304 @@
+fre_lorraine_focus_complete = {
+	if = {
+		limit = {
+			country_exists = VIN
+			VIN = { has_country_flag = VIN_Campaign_Tay_Bac_Active }
+		}
+		fre_lorraine_response_offer = yes
+	}
+	else = {
+		country_event = { id = FRE_Northwest.1 hours = 1 }
+	}
+}
+
+fre_lorraine_response_offer = {
+	if = {
+		limit = {
+			has_country_flag = FRE_Lorraine_Response_Unlocked
+			NOT = { has_country_flag = FRE_Lorraine_Response_Offered }
+			NOT = { has_country_flag = FRE_Lorraine_Response_Active }
+			NOT = {
+				OR = {
+					has_country_flag = FRE_Lorraine_Result_Success
+					has_country_flag = FRE_Lorraine_Result_Limited
+					has_country_flag = FRE_Lorraine_Result_Failure
+					has_country_flag = FRE_Lorraine_Result_Withheld
+					has_country_flag = FRE_Lorraine_Result_Superseded
+				}
+			}
+			country_exists = VIN
+			VIN = { has_country_flag = VIN_Campaign_Tay_Bac_Active }
+		}
+		set_country_flag = FRE_Lorraine_Response_Offered
+		country_event = { id = FRE_Northwest.1 hours = 1 }
+	}
+}
+
+fre_lorraine_response_begin_common = {
+	set_country_flag = FRE_Lorraine_Response_Active
+	set_country_flag = FRE_Mission_Operation_Lorraine_Activated
+	set_variable = { FRE_Lorraine_Objective_Hold_Days = 0 }
+	clr_country_flag = FRE_Lorraine_Objective_Achieved
+}
+
+fre_lorraine_commit_deep_thrust = {
+	fre_lorraine_response_begin_common = yes
+	set_country_flag = FRE_Lorraine_Response_Deep
+	vin_cefeo_intel_launch_lorraine = yes
+	set_temp_variable = { fre_credit_amount = -100 }
+	fre_change_war_credits = yes
+	set_temp_variable = { fre_patience_delta = -8 }
+	fre_metropole_patience_change = yes
+	add_ideas = FRE_Lorraine_Deep_Columns
+	if = {
+		limit = { country_exists = VIN }
+		VIN = {
+			add_ideas = VIN_Lorraine_Depots_Disrupted
+			set_temp_variable = { vin_supply_amount = -40 }
+			vin_change_campaign_supply = yes
+			add_to_variable = { VIN_camp_days_elapsed = 14 }
+		}
+	}
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = {
+				global.Indochina_War_Next_Phase_A_Points = 25
+				tooltip = Add_to_Escalation_Phase_TT
+			}
+		}
+	}
+}
+
+fre_lorraine_commit_limited_raid = {
+	fre_lorraine_response_begin_common = yes
+	set_country_flag = FRE_Lorraine_Response_Limited
+	vin_cefeo_intel_launch_lorraine = yes
+	set_temp_variable = { fre_credit_amount = -60 }
+	fre_change_war_credits = yes
+	if = {
+		limit = { country_exists = VIN }
+		VIN = {
+			set_temp_variable = { vin_supply_amount = -20 }
+			vin_change_campaign_supply = yes
+			add_to_variable = { VIN_camp_days_elapsed = 7 }
+		}
+	}
+}
+
+fre_lorraine_withhold_for_na_san = {
+	fre_lorraine_response_begin_common = yes
+	set_country_flag = FRE_Lorraine_Response_Withheld
+	vin_cefeo_intel_launch_lorraine = yes
+	set_temp_variable = { fre_credit_amount = -30 }
+	fre_change_war_credits = yes
+	add_ideas = FRE_Northwest_Concentrated_Defence
+	if = {
+		limit = { country_exists = TAI }
+		TAI = {
+			add_ideas = FRE_Northwest_Concentrated_Defence
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1000 producer = FRA }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 100 producer = FRA }
+		}
+	}
+	if = {
+		limit = {
+			has_country_flag = FRE_Na_San_Prepared
+			country_exists = TAI
+		}
+		TAI = {
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 500 producer = FRA }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 100 producer = FRA }
+		}
+	}
+}
+
+fre_lorraine_decline_response = {
+	fre_lorraine_response_begin_common = yes
+	set_country_flag = FRE_Lorraine_Response_Withheld
+	vin_cefeo_intel_launch_lorraine = yes
+}
+
+fre_lorraine_response_daily_tick = {
+	if = {
+		limit = {
+			has_country_flag = FRE_Lorraine_Response_Active
+			has_country_flag = FRE_Lorraine_Response_Deep
+			NOT = { has_country_flag = FRE_Lorraine_Objective_Achieved }
+			country_exists = VIN
+			VIN = { has_country_flag = VIN_Campaign_Tay_Bac_Active }
+		}
+		if = {
+			limit = { fre_lorraine_rear_objective_controlled_trigger = yes }
+			add_to_variable = { FRE_Lorraine_Objective_Hold_Days = 1 }
+			if = {
+				limit = { check_variable = { FRE_Lorraine_Objective_Hold_Days > 6.9 } }
+				set_country_flag = FRE_Lorraine_Objective_Achieved
+			}
+		}
+		else = { set_variable = { FRE_Lorraine_Objective_Hold_Days = 0 } }
+	}
+}
+
+fre_lorraine_response_orphan_check = {
+	if = {
+		limit = {
+			has_country_flag = FRE_Lorraine_Response_Active
+			OR = {
+				NOT = { country_exists = VIN }
+				VIN = { NOT = { has_country_flag = VIN_Campaign_Tay_Bac_Active } }
+			}
+		}
+		set_temp_variable = { fre_lorraine_result = 5 }
+		fre_lorraine_response_finish = yes
+	}
+}
+
+fre_lorraine_resolve_from_northwest = {
+	if = {
+		limit = { has_country_flag = FRE_Lorraine_Response_Active }
+		if = {
+			limit = { VIN = { check_variable = { VIN_camp_last_outcome = 5 } } }
+			set_temp_variable = { fre_lorraine_result = 5 }
+		}
+		else_if = {
+			limit = { has_country_flag = FRE_Lorraine_Response_Withheld }
+			set_temp_variable = { fre_lorraine_result = 4 }
+		}
+		else_if = {
+			limit = { has_country_flag = FRE_Lorraine_Response_Limited }
+			set_temp_variable = { fre_lorraine_result = 2 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = FRE_Lorraine_Response_Deep
+				VIN = {
+					OR = {
+						check_variable = { VIN_camp_last_outcome = 4 }
+						AND = {
+							check_variable = { VIN_camp_last_outcome = 3 }
+							FRE = { has_country_flag = FRE_Lorraine_Objective_Achieved }
+						}
+					}
+				}
+			}
+			set_temp_variable = { fre_lorraine_result = 1 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = FRE_Lorraine_Response_Deep
+				has_country_flag = FRE_Lorraine_Objective_Achieved
+			}
+			set_temp_variable = { fre_lorraine_result = 2 }
+		}
+		else = { set_temp_variable = { fre_lorraine_result = 3 } }
+		fre_lorraine_response_finish = yes
+	}
+}
+
+fre_lorraine_response_finish = {
+	set_country_flag = FRE_Lorraine_Response_Resolved
+	clr_country_flag = FRE_Operation_Lorraine_Success
+	clr_country_flag = FRE_Operation_Lorraine_Failure
+	clr_country_flag = FRE_Mission_Operation_Lorraine_Completed
+	clr_country_flag = FRE_Mission_Operation_Lorraine_Failed
+	clr_country_flag = FRE_Lorraine_Result_Success
+	clr_country_flag = FRE_Lorraine_Result_Limited
+	clr_country_flag = FRE_Lorraine_Result_Failure
+	clr_country_flag = FRE_Lorraine_Result_Withheld
+	clr_country_flag = FRE_Lorraine_Result_Superseded
+	if = {
+		limit = { check_variable = { fre_lorraine_result = 1 } }
+		set_country_flag = FRE_Lorraine_Result_Success
+		set_country_flag = FRE_Operation_Lorraine_Success
+		set_country_flag = FRE_Mission_Operation_Lorraine_Completed
+		if = {
+			limit = { NOT = { has_global_flag = Indochina_War_Over } }
+			FRA = {
+				add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = 15 }
+				add_to_variable = { StruggleInvolvedNationsIndochinaCommunistScore = -10 }
+				indochina_struggle_recalculate_total_anti_communist_score = yes
+			}
+		}
+		set_temp_variable = { fre_patience_delta = 4 }
+		fre_metropole_patience_change = yes
+	}
+	else_if = {
+		limit = { check_variable = { fre_lorraine_result = 2 } }
+		set_country_flag = FRE_Lorraine_Result_Limited
+		set_country_flag = FRE_Mission_Operation_Lorraine_Completed
+		if = {
+			limit = { NOT = { has_global_flag = Indochina_War_Over } }
+			FRA = {
+				add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = 10 }
+				indochina_struggle_recalculate_total_anti_communist_score = yes
+			}
+		}
+	}
+	else_if = {
+		limit = { check_variable = { fre_lorraine_result = 3 } }
+		set_country_flag = FRE_Lorraine_Result_Failure
+		set_country_flag = FRE_Operation_Lorraine_Failure
+		set_country_flag = FRE_Mission_Operation_Lorraine_Failed
+		if = {
+			limit = { NOT = { has_global_flag = Indochina_War_Over } }
+			FRA = {
+				add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = -10 }
+				add_to_variable = { StruggleInvolvedNationsIndochinaCommunistScore = 10 }
+				indochina_struggle_recalculate_total_anti_communist_score = yes
+			}
+		}
+		set_temp_variable = { fre_patience_delta = -6 }
+		fre_metropole_patience_change = yes
+	}
+	else_if = {
+		limit = { check_variable = { fre_lorraine_result = 4 } }
+		set_country_flag = FRE_Lorraine_Result_Withheld
+		set_country_flag = FRE_Mission_Operation_Lorraine_Completed
+	}
+	else = { set_country_flag = FRE_Lorraine_Result_Superseded }
+	if = {
+		limit = { NOT = { check_variable = { fre_lorraine_result = 5 } } }
+		set_country_flag = FRE_Operation_Cooldown_Lorraine
+	}
+	remove_ideas = FRE_Lorraine_Deep_Columns
+	remove_ideas = FRE_Northwest_Concentrated_Defence
+	if = {
+		limit = { country_exists = VIN }
+		VIN = { remove_ideas = VIN_Lorraine_Depots_Disrupted }
+	}
+	if = {
+		limit = { country_exists = TAI }
+		TAI = { remove_ideas = FRE_Northwest_Concentrated_Defence }
+	}
+	clr_country_flag = FRE_Lorraine_Response_Active
+	clr_country_flag = FRE_Lorraine_Response_Deep
+	clr_country_flag = FRE_Lorraine_Response_Limited
+	clr_country_flag = FRE_Lorraine_Response_Withheld
+	clr_country_flag = FRE_Lorraine_Objective_Achieved
+	clr_country_flag = FRE_Mission_Operation_Lorraine_Activated
+	set_variable = { FRE_Lorraine_Objective_Hold_Days = 0 }
+	vin_cefeo_intel_finish_lorraine = yes
+	country_event = { id = FRE_Northwest.2 hours = 6 }
+	if = {
+		limit = { country_exists = VIN }
+		VIN = { country_event = { id = VIN_Northwest.1 hours = 8 } }
+	}
+}
+
+fre_lorraine_response_cleanup = {
+	set_temp_variable = { response_validation_package = 1 }
+	response_package_validation_log = yes
+	remove_ideas = FRE_Lorraine_Deep_Columns
+	remove_ideas = FRE_Northwest_Concentrated_Defence
+	if = { limit = { country_exists = VIN } VIN = { remove_ideas = VIN_Lorraine_Depots_Disrupted } }
+	if = { limit = { country_exists = TAI } TAI = { remove_ideas = FRE_Northwest_Concentrated_Defence } }
+	clr_country_flag = FRE_Lorraine_Response_Active
+	clr_country_flag = FRE_Lorraine_Response_Deep
+	clr_country_flag = FRE_Lorraine_Response_Limited
+	clr_country_flag = FRE_Lorraine_Response_Withheld
+	clr_country_flag = FRE_Lorraine_Objective_Achieved
+	clr_country_flag = FRE_Mission_Operation_Lorraine_Activated
+	set_variable = { FRE_Lorraine_Objective_Hold_Days = 0 }
+	vin_cefeo_intel_finish_lorraine = yes
+}

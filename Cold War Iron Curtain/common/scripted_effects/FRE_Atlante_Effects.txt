@@ -1,0 +1,330 @@
+fre_atlante_focus_complete = {
+	set_country_flag = FRE_Operation_Atlante_Launched
+	if = {
+		limit = { fre_atlante_live_window_trigger = yes }
+		set_country_flag = FRE_Atlante_Choice_Pending
+		country_event = { id = FRE_Atlante.1 hours = 1 }
+	}
+	else = { fre_atlante_resolve_superseded = yes }
+}
+
+fre_atlante_prepare_new_operation = {
+	fre_atlante_cleanup = yes
+	clr_country_flag = FRE_Atlante_Strategy_Central_Commitment
+	clr_country_flag = FRE_Atlante_Strategy_Vietnamese_Lead
+	clr_country_flag = FRE_Atlante_Strategy_Northern_Priority
+	clr_country_flag = FRE_Atlante_Northern_Reserve_Available
+	clr_country_flag = FRE_Atlante_Northern_Reserve_Committed
+	clr_country_flag = FRE_Operation_Atlante_Result_Central_Success
+	clr_country_flag = FRE_Operation_Atlante_Result_Vietnamese_Foothold
+	clr_country_flag = FRE_Operation_Atlante_Result_Stalled
+	clr_country_flag = FRE_Operation_Atlante_Result_Northern_Priority
+	clr_country_flag = FRE_Operation_Atlante_Result_Superseded
+	clr_country_flag = FRE_Atlante_Result_Stalled_Full
+	clr_country_flag = FRE_Atlante_Result_Stalled_Vietnamese
+	clr_country_flag = FRE_Mission_Operation_Atlante_Completed
+	clr_country_flag = FRE_Mission_Operation_Atlante_Failed
+	set_variable = { FRE_Atlante_Days_Elapsed = 0 }
+	set_variable = { FRE_Atlante_Hold_Days = 0 }
+}
+
+fre_atlante_begin_common = {
+	clr_country_flag = FRE_Atlante_Choice_Pending
+	set_country_flag = FRE_Atlante_Offensive_Active
+	set_country_flag = FRE_Mission_Operation_Atlante_Activated
+	vin_cefeo_intel_launch_atlante = yes
+	activate_mission = FRE_Mission_Operation_Atlante
+}
+
+fre_atlante_begin_full = {
+	if = {
+		limit = { fre_atlante_live_window_trigger = yes }
+		fre_atlante_prepare_new_operation = yes
+		set_country_flag = FRE_Atlante_Posture_Full
+		set_country_flag = FRE_Atlante_Strategy_Central_Commitment
+		set_temp_variable = { fre_credit_amount = -100 }
+		fre_change_war_credits = yes
+		add_manpower = -4500
+		set_temp_variable = { fre_patience_delta = -7 }
+		fre_metropole_patience_change = yes
+		if = {
+			limit = { country_exists = VIE }
+			VIE = {
+				add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1800 producer = FRA }
+				add_equipment_to_stockpile = { type = support_equipment amount = 180 producer = FRA }
+				add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 90 producer = FRA }
+			}
+		}
+		fre_atlante_begin_common = yes
+	}
+	else = { fre_atlante_resolve_superseded = yes }
+}
+
+fre_atlante_begin_vietnamese = {
+	if = {
+		limit = { fre_atlante_live_window_trigger = yes }
+		fre_atlante_prepare_new_operation = yes
+		set_country_flag = FRE_Atlante_Posture_Vietnamese
+		set_country_flag = FRE_Atlante_Strategy_Vietnamese_Lead
+		set_temp_variable = { fre_credit_amount = -40 }
+		fre_change_war_credits = yes
+		set_temp_variable = { fre_patience_delta = -2 }
+		fre_metropole_patience_change = yes
+		if = {
+			limit = { country_exists = VIE }
+			VIE = {
+				add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1200 producer = FRA }
+				add_equipment_to_stockpile = { type = support_equipment amount = 120 producer = FRA }
+			}
+		}
+		fre_atlante_begin_common = yes
+	}
+	else = { fre_atlante_resolve_superseded = yes }
+}
+
+fre_atlante_choose_northern_priority = {
+	fre_atlante_prepare_new_operation = yes
+	clr_country_flag = FRE_Atlante_Choice_Pending
+	set_country_flag = FRE_Atlante_Strategy_Northern_Priority
+	set_country_flag = FRE_Atlante_Northern_Reserve_Available
+	set_country_flag = FRE_Operation_Atlante_Result_Northern_Priority
+	set_country_flag = FRE_Mission_Operation_Atlante_Completed
+	set_country_flag = FRE_Operation_Cooldown_Atlante
+	set_temp_variable = { fre_credit_amount = -40 }
+	fre_change_war_credits = yes
+	add_manpower = -2500
+	set_temp_variable = { fre_patience_delta = -3 }
+	fre_metropole_patience_change = yes
+	country_event = { id = FRE_Atlante.4 hours = 6 }
+}
+
+fre_atlante_abandon_unfunded = {
+	fre_atlante_prepare_new_operation = yes
+	clr_country_flag = FRE_Atlante_Choice_Pending
+	set_country_flag = FRE_Operation_Atlante_Result_Stalled
+	set_country_flag = FRE_Mission_Operation_Atlante_Failed
+	set_country_flag = FRE_Operation_Cooldown_Atlante
+	add_war_support = -0.01
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = { StruggleInvolvedNationsIndochinaCommunistScore = 10  tooltip = Add_to_Communist_Victory_Points_TT }
+			indochina_struggle_recalculate_total_anti_communist_score = yes
+		}
+	}
+	country_event = { id = FRE_Atlante.3 hours = 6 }
+}
+
+fre_atlante_daily_tick = {
+	if = {
+		limit = { has_country_flag = FRE_Atlante_Offensive_Active }
+		add_to_variable = { FRE_Atlante_Days_Elapsed = 1 }
+		if = {
+			limit = {
+				OR = {
+					AND = { has_country_flag = FRE_Atlante_Posture_Full  fre_atlante_full_objective_trigger = yes }
+					AND = { has_country_flag = FRE_Atlante_Posture_Vietnamese  fre_atlante_vietnamese_objective_trigger = yes }
+				}
+			}
+			add_to_variable = { FRE_Atlante_Hold_Days = 1 }
+		}
+		else = { set_variable = { FRE_Atlante_Hold_Days = 0 } }
+
+		if = {
+			limit = { NOT = { check_variable = { FRE_Atlante_Hold_Days < 14 } } }
+			if = {
+				limit = { has_country_flag = FRE_Atlante_Posture_Full }
+				fre_atlante_resolve_central_success = yes
+			}
+			else = { fre_atlante_resolve_vietnamese_foothold = yes }
+		}
+		else_if = {
+			limit = { NOT = { fre_atlante_live_window_trigger = yes } }
+			fre_atlante_resolve_superseded = yes
+		}
+	}
+}
+
+fre_atlante_deadline_resolve = {
+	if = {
+		limit = { has_country_flag = FRE_Atlante_Offensive_Active }
+		if = {
+			limit = {
+				OR = {
+					AND = { has_country_flag = FRE_Atlante_Posture_Full  fre_atlante_full_objective_trigger = yes  NOT = { check_variable = { FRE_Atlante_Hold_Days < 13 } } }
+					AND = { has_country_flag = FRE_Atlante_Posture_Vietnamese  fre_atlante_vietnamese_objective_trigger = yes  NOT = { check_variable = { FRE_Atlante_Hold_Days < 13 } } }
+				}
+			}
+			if = { limit = { has_country_flag = FRE_Atlante_Posture_Full }  fre_atlante_resolve_central_success = yes }
+			else = { fre_atlante_resolve_vietnamese_foothold = yes }
+		}
+		else_if = {
+			limit = { NOT = { fre_atlante_live_window_trigger = yes } }
+			fre_atlante_resolve_superseded = yes
+		}
+		else = { fre_atlante_resolve_stalled = yes }
+	}
+}
+
+fre_atlante_resolve_central_success = {
+	if = {
+		limit = { has_country_flag = FRE_Atlante_Offensive_Active }
+		set_country_flag = FRE_Operation_Atlante_Result_Central_Success
+		set_country_flag = FRE_Mission_Operation_Atlante_Completed
+		set_country_flag = FRE_Operation_Cooldown_Atlante
+		army_experience = 20
+		if = {
+			limit = { country_exists = VIE }
+			VIE = { add_stability = 0.01  add_war_support = 0.02 }
+		}
+		if = {
+			limit = { NOT = { has_global_flag = Indochina_War_Over } }
+			FRA = {
+				add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = 10  tooltip = Add_to_French_Victory_Points_TT }
+				indochina_struggle_recalculate_total_anti_communist_score = yes
+			}
+		}
+		fre_atlante_cleanup = yes
+		country_event = { id = FRE_Atlante.2 hours = 6 }
+	}
+}
+
+fre_atlante_resolve_vietnamese_foothold = {
+	if = {
+		limit = { has_country_flag = FRE_Atlante_Offensive_Active }
+		set_country_flag = FRE_Operation_Atlante_Result_Vietnamese_Foothold
+		set_country_flag = FRE_Mission_Operation_Atlante_Completed
+		set_country_flag = FRE_Operation_Cooldown_Atlante
+		army_experience = 10
+		if = {
+			limit = { country_exists = VIE }
+			VIE = { add_stability = 0.02  add_war_support = 0.01 }
+		}
+		if = {
+			limit = { NOT = { has_global_flag = Indochina_War_Over } }
+			FRA = {
+				add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = 10  tooltip = Add_to_French_Victory_Points_TT }
+				indochina_struggle_recalculate_total_anti_communist_score = yes
+			}
+		}
+		fre_atlante_cleanup = yes
+		country_event = { id = FRE_Atlante.2 hours = 6 }
+	}
+}
+
+fre_atlante_resolve_stalled = {
+	if = {
+		limit = { has_country_flag = FRE_Atlante_Offensive_Active }
+		if = {
+			limit = { has_country_flag = FRE_Atlante_Posture_Full }
+			set_country_flag = FRE_Atlante_Result_Stalled_Full
+			add_manpower = -3000
+			set_temp_variable = { fre_patience_delta = -5 }
+			fre_metropole_patience_change = yes
+		}
+		else = {
+			set_country_flag = FRE_Atlante_Result_Stalled_Vietnamese
+			if = { limit = { country_exists = VIE }  VIE = { add_manpower = -1500  add_war_support = -0.02 } }
+		}
+		set_country_flag = FRE_Operation_Atlante_Result_Stalled
+		set_country_flag = FRE_Mission_Operation_Atlante_Failed
+		set_country_flag = FRE_Operation_Cooldown_Atlante
+		add_war_support = -0.02
+		if = {
+			limit = { NOT = { has_global_flag = Indochina_War_Over } }
+			FRA = {
+				add_to_variable = { StruggleInvolvedNationsIndochinaCommunistScore = 10  tooltip = Add_to_Communist_Victory_Points_TT }
+				add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = -10  tooltip = Add_to_French_Victory_Points_TT }
+				indochina_struggle_recalculate_total_anti_communist_score = yes
+			}
+		}
+		fre_atlante_cleanup = yes
+		country_event = { id = FRE_Atlante.3 hours = 6 }
+	}
+}
+
+fre_atlante_resolve_superseded = {
+	if = {
+		limit = {
+			NOT = {
+				OR = {
+					has_country_flag = FRE_Operation_Atlante_Result_Central_Success
+					has_country_flag = FRE_Operation_Atlante_Result_Vietnamese_Foothold
+					has_country_flag = FRE_Operation_Atlante_Result_Stalled
+					has_country_flag = FRE_Operation_Atlante_Result_Northern_Priority
+					has_country_flag = FRE_Operation_Atlante_Result_Superseded
+				}
+			}
+		}
+		set_country_flag = FRE_Operation_Atlante_Result_Superseded
+		fre_atlante_cleanup = yes
+		country_event = { id = FRE_Atlante.5 hours = 6 }
+	}
+}
+
+fre_atlante_handoff_to_dbp = {
+	if = {
+		limit = {
+			has_country_flag = FRE_Atlante_Northern_Reserve_Available
+			NOT = { has_country_flag = FRE_Atlante_Northern_Reserve_Committed }
+		}
+		clr_country_flag = FRE_Atlante_Northern_Reserve_Available
+		set_country_flag = FRE_Atlante_Northern_Reserve_Committed
+		subtract_from_variable = { global.VIN_dbp_siege_days = 10 }
+		if = {
+			limit = { has_global_flag = VIN_DBP_Garrison_Is_FRE }
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1000 producer = FRA }
+			add_equipment_to_stockpile = { type = support_equipment amount = 100 producer = FRA }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 50 producer = FRA }
+		}
+		else_if = {
+			limit = { country_exists = TAI }
+			TAI = {
+				add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1000 producer = FRA }
+				add_equipment_to_stockpile = { type = support_equipment amount = 100 producer = FRA }
+				add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 50 producer = FRA }
+			}
+		}
+	}
+}
+
+fre_atlante_orphan_check = {
+	if = {
+		limit = {
+			OR = {
+				has_country_flag = FRE_Atlante_Offensive_Active
+				has_country_flag = FRE_Atlante_Choice_Pending
+			}
+			OR = { NOT = { country_exists = VIE }  NOT = { country_exists = NLF } }
+		}
+		fre_atlante_resolve_superseded = yes
+	}
+}
+
+fre_atlante_force_superseded_cleanup = {
+	if = {
+		limit = {
+			OR = {
+				has_country_flag = FRE_Atlante_Offensive_Active
+				has_country_flag = FRE_Atlante_Choice_Pending
+			}
+		}
+		set_country_flag = FRE_Operation_Atlante_Result_Superseded
+	}
+	clr_country_flag = FRE_Atlante_Northern_Reserve_Available
+	fre_atlante_cleanup = yes
+}
+
+fre_atlante_cleanup = {
+	vin_cefeo_intel_finish_atlante = yes
+	set_temp_variable = { response_validation_package = 6 }
+	response_package_validation_log = yes
+	clr_country_flag = FRE_Atlante_Choice_Pending
+	clr_country_flag = FRE_Atlante_Offensive_Active
+	clr_country_flag = FRE_Mission_Operation_Atlante_Activated
+	clr_country_flag = FRE_Atlante_Posture_Full
+	clr_country_flag = FRE_Atlante_Posture_Vietnamese
+	set_variable = { FRE_Atlante_Days_Elapsed = 0 }
+	set_variable = { FRE_Atlante_Hold_Days = 0 }
+	remove_mission = FRE_Mission_Operation_Atlante
+}

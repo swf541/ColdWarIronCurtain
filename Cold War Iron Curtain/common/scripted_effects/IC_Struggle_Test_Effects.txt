@@ -1,5 +1,3 @@
-# Console command: ic_reset
-# Resets all Indochina Struggle variables and flags to default state
 d_ic_reset = {
     FROM = {
         set_global_flag = Indochina_Struggle_Test_Mode
@@ -22,7 +20,50 @@ d_ic_reset = {
         set_variable = { global.indochina_border_war_check = 0 }
         set_variable = { show_indochina_end_gui = 0 }
         set_variable = { show_indochina_phase_gui = 0 }
+        set_variable = { show_indochina_outcome_gui = 0 }
+        test_indochina_outcomes_reset = yes
     }
+}
+
+test_indochina_outcomes_reset = {
+    clr_global_flag = Laos_Raid_Stalemate
+    clr_global_flag = Laos_Raid_Total_Failure
+    clr_global_flag = Southern_VietMinh_Defeated
+    clr_global_flag = geneva_nlf_outcome_applied
+    clr_global_flag = geneva_dbp_outcome_applied
+    clr_global_flag = geneva_sects_outcome_applied
+    clr_global_flag = geneva_highland_tai_applied
+    clr_global_flag = geneva_highland_meo_applied
+    clr_global_flag = geneva_highland_nun_applied
+    clr_global_flag = geneva_laos_raid_outcome_applied
+    set_variable = { global.geneva_outcome_nlf = 0 }
+    set_variable = { global.geneva_outcome_pathet_lao = 0 }
+    set_variable = { global.geneva_outcome_dbp = 0 }
+    set_variable = { global.geneva_outcome_sects = 0 }
+    set_variable = { global.geneva_outcome_highland = 0 }
+    set_variable = { global.geneva_outcome_highland_done = 0 }
+    set_variable = { global.geneva_outcome_laos_raid = 0 }
+}
+
+test_usa_settlement_window_open = {
+    set_global_flag = geneva_dbp_outcome_applied
+    set_variable = { global.geneva_outcome_dbp = 2 }
+    log = "[USA TEST] settlement window opened: dbp=[?global.geneva_outcome_dbp] phase=[?global.Indochina_War_Active_Phase] comm=[?global.geneva_cache_comm_score] highland=[?global.geneva_outcome_highland]"
+}
+
+test_usa_settlement_window_close = {
+    test_indochina_outcomes_reset = yes
+    clr_global_flag = Laos_Raid_Attacker_Won
+    clr_global_flag = Laos_Raid_Resolved
+    set_variable = { global.Indochina_War_Active_Phase = 5 }
+    set_variable = { global.geneva_cache_comm_score = 0 }
+    set_variable = { global.geneva_cache_comm_x2 = 0 }
+    set_variable = { global.geneva_cache_anticomm_score = 0 }
+    if = {
+        limit = { country_exists = FRE }
+        FRE = { set_variable = { FRE_Metropole_Patience = 75 } }
+    }
+    log = "[USA TEST] settlement window closed: dbp=[?global.geneva_outcome_dbp] phase=[?global.Indochina_War_Active_Phase] comm=[?global.geneva_cache_comm_score] highland=[?global.geneva_outcome_highland]"
 }
 
 test_indochina_reset = {
@@ -43,6 +84,8 @@ test_indochina_reset = {
     set_variable = { global.indochina_border_war_check = 0 }
     set_variable = { show_indochina_end_gui = 0 }
     set_variable = { show_indochina_phase_gui = 0 }
+    set_variable = { show_indochina_outcome_gui = 0 }
+    test_indochina_outcomes_reset = yes
 }
 
 test_indochina_setup_initial = {
@@ -279,17 +322,20 @@ test_indochina_add_communist_points = {
 
 test_indochina_add_profrance_points = {
     add_to_variable = { FRA.StruggleInvolvedNationsIndochinaProFranceScore = 100 }
-    add_to_variable = { FRA.StruggleInvolvedNationsIndochinaTotalAntiCommunistScore = 100 }
 }
 
 test_indochina_add_proindependence_points = {
     add_to_variable = { FRA.StruggleInvolvedNationsIndochinaProIndependenceScore = 100 }
-    add_to_variable = { FRA.StruggleInvolvedNationsIndochinaTotalAntiCommunistScore = 100 }
 }
 
 test_indochina_add_proethnic_points = {
     add_to_variable = { FRA.StruggleInvolvedNationsIndochinaProEthnicScore = 100 }
-    add_to_variable = { FRA.StruggleInvolvedNationsIndochinaTotalAntiCommunistScore = 100 }
+}
+
+test_ic_score_report = {
+	log = "IC phase [?global.Indochina_War_Active_Phase|0]  A [?global.Indochina_War_Next_Phase_A_Points|0]/500  B [?global.Indochina_War_Next_Phase_B_Points|0]/500"
+	log = "IC scores - COM [?FRA.StruggleInvolvedNationsIndochinaCommunistScore|0]  PFR [?FRA.StruggleInvolvedNationsIndochinaProFranceScore|0]  PIN [?FRA.StruggleInvolvedNationsIndochinaProIndependenceScore|0]  PET [?FRA.StruggleInvolvedNationsIndochinaProEthnicScore|0]  KMT [?FRA.StruggleInvolvedNationsIndochinaKuomintangScore|0]"
+	log = "IC anti-communist total [?FRA.StruggleInvolvedNationsIndochinaTotalAntiCommunistScore|0]"
 }
 
 test_indochina_recalculate_anti_communist = {
@@ -797,18 +843,15 @@ test_indochina_scenario_american_north_vietnam = {
     set_variable = { FRA.StruggleInvolvedNationsIndochinaTotalAntiCommunistScore = 1000 }
 }
 
-# Comprehensive test for USA-North Vietnam ending with full event chain
 test_indochina_full_american_north_vietnam_setup = {
     test_indochina_reset = yes
     test_indochina_set_phase_medium_intensity = yes
     
-    # Complete USA focus
     USA = {
         complete_national_focus = USA_50s_Sponser_CuongDe_Coup
         complete_national_focus = USA_50s_Reestablish_Deer_Team
     }
     
-    # Set up scores - Communist must be > 2x Total Anti-Communist and > 500
     set_variable = { FRA.StruggleInvolvedNationsIndochinaCommunistScore = 2500 }
     set_variable = { FRA.StruggleInvolvedNationsIndochinaProFranceScore = 400 }
     set_variable = { FRA.StruggleInvolvedNationsIndochinaProIndependenceScore = 300 }
@@ -816,7 +859,6 @@ test_indochina_full_american_north_vietnam_setup = {
     set_variable = { FRA.StruggleInvolvedNationsIndochinaTotalAntiCommunistScore = 1000 }
     test_indochina_recalculate_anti_communist = yes
     
-    # Ensure Ho Chi Minh is in power in VIN
     if = {
         limit = {
             country_exists = VIN
@@ -841,7 +883,6 @@ test_indochina_full_american_north_vietnam_setup = {
         }
     }
     
-    # Ensure USA and VIN are not at war
     if = {
         limit = {
             country_exists = USA
@@ -851,7 +892,6 @@ test_indochina_full_american_north_vietnam_setup = {
         VIN = { white_peace = USA }
     }
     
-    # Set positive opinions between USA and VIN
     USA = {
         add_opinion_modifier = {
             target = VIN
@@ -865,7 +905,6 @@ test_indochina_full_american_north_vietnam_setup = {
         }
     }
     
-    # Ensure VIN favors USA over SOV (if SOV exists)
     if = {
         limit = {
             country_exists = SOV
@@ -887,7 +926,6 @@ test_indochina_full_american_north_vietnam_setup = {
     
 }
 
-# Test to manually trigger the first reunification event
 test_indochina_trigger_reunification_chain = {
     if = {
         limit = {
@@ -913,7 +951,6 @@ test_indochina_trigger_reunification_chain = {
     }
 }
 
-# Test to advance through the event chain manually
 test_indochina_advance_reunification_chain = {
     if = {
         limit = {
@@ -932,7 +969,6 @@ test_indochina_advance_reunification_chain = {
     }
 }
 
-# Test to verify ending is available after reunification
 test_indochina_verify_ending_available = {
     if = {
         limit = {
@@ -956,11 +992,9 @@ test_indochina_verify_ending_available = {
     }
 }
 
-# Complete end-to-end test
 test_indochina_full_american_north_vietnam_ending = {
     test_indochina_full_american_north_vietnam_setup = yes
     
-    # Wait a moment then check if chain started
     if = {
         limit = {
             country_exists = USA
@@ -1454,15 +1488,9 @@ test_indochina_test_southern_victory_chain = {
 }
 
 # ============================================
-# CONSOLE COMMANDS (d_ prefix)
 # ============================================
-# Usage: In console, type command without "d_" prefix
-# Example: "ic_reset" calls d_ic_reset
 # FROM = country running command, ROOT = selected country/state/character
 
-# Console command: ic_trigger_ending [ending_name]
-# Directly triggers an ending by name
-# Valid endings: communist, southern, federal, balkanized, dan_quoc, american_north, kuomintang, geneva, never_ending, failed_state
 d_ic_trigger_ending = {
     FROM = {
         if = {
@@ -1545,8 +1573,6 @@ d_ic_setup_ending = {
     }
 }
 
-# Console command: ic_set_phase [phase_number]
-# Sets the Indochina Struggle phase (3-11)
 d_ic_set_phase = {
     FROM = {
         if = {
@@ -1586,40 +1612,30 @@ d_ic_set_phase = {
     }
 }
 
-# Console command: ic_debug
-# Shows current struggle state and all variable values
 d_ic_debug = {
     FROM = {
         test_indochina_debug_state = yes
     }
 }
 
-# Console command: ic_debug_triggers
-# Shows status of all ending triggers
 d_ic_debug_triggers = {
     FROM = {
         test_indochina_debug_all_triggers = yes
     }
 }
 
-# Console command: ic_show_gui
-# Shows the Indochina Struggle GUI
 d_ic_show_gui = {
     FROM = {
         test_indochina_show_gui = yes
     }
 }
 
-# Console command: ic_trigger_reunification
-# Triggers the USA-VIN reunification event chain
 d_ic_trigger_reunification = {
     FROM = {
         test_indochina_trigger_reunification_chain = yes
     }
 }
 
-# Console command: ic_verify_ending [ending_name]
-# Verifies if an ending is available and shows why/why not
 d_ic_verify_ending = {
     FROM = {
         if = {

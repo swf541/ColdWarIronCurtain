@@ -1,0 +1,417 @@
+# Operation Pollux evacuates Lai Chau into an already established Dien Bien Phu
+# camp. It owns no territory, peace, primary-campaign result, or Geneva record.
+# Results: force preserved, column lost, or theatre-superseded.
+
+fre_pollux_focus_complete = {
+	set_country_flag = FRE_Operation_Pollux_Launched
+	if = {
+		limit = {
+			fre_pollux_live_window_trigger = yes
+			fre_pollux_french_aligned_controls_lai_chau_trigger = yes
+		}
+		country_event = { id = FRE_Pollux.1 days = 1 }
+	}
+	else_if = {
+		limit = {
+			fre_pollux_live_window_trigger = yes
+			NOT = { fre_pollux_french_aligned_controls_lai_chau_trigger = yes }
+		}
+		fre_pollux_resolve_origin_lost = yes
+	}
+	else = { fre_pollux_resolve_superseded = yes }
+}
+
+fre_pollux_prepare_new_operation = {
+	fre_pollux_cleanup = yes
+	clr_country_flag = FRE_Operation_Pollux_Result_Preserved
+	clr_country_flag = FRE_Operation_Pollux_Result_Column_Loss
+	clr_country_flag = FRE_Operation_Pollux_Result_Superseded
+	clr_country_flag = FRE_Pollux_Result_Preserved_Escort
+	clr_country_flag = FRE_Pollux_Result_Preserved_Airlift
+	clr_country_flag = FRE_Pollux_Result_Column_Loss_Historical
+	clr_country_flag = FRE_Pollux_Result_Column_Loss_Escort
+	clr_country_flag = FRE_Pollux_Result_Column_Loss_Airlift
+	clr_country_flag = FRE_Pollux_Result_Column_Loss_Origin
+	clr_country_flag = FRE_Pollux_Result_Column_Loss_Unfunded
+	clr_country_flag = FRE_Mission_Operation_Pollux_Completed
+	clr_country_flag = FRE_Mission_Operation_Pollux_Failed
+	set_variable = { FRE_Pollux_Days_Elapsed = 0 }
+	set_variable = { FRE_Pollux_Hold_Days = 0 }
+}
+
+fre_pollux_begin_common = {
+	set_country_flag = FRE_Pollux_Evacuation_Active
+	set_country_flag = FRE_Mission_Operation_Pollux_Activated
+	vin_cefeo_intel_launch_pollux = yes
+	activate_mission = FRE_Mission_Operation_Pollux
+}
+
+fre_pollux_begin_historical = {
+	if = {
+		limit = {
+			fre_pollux_live_window_trigger = yes
+			fre_pollux_french_aligned_controls_lai_chau_trigger = yes
+		}
+		fre_pollux_prepare_new_operation = yes
+		set_country_flag = FRE_Pollux_Posture_Historical
+		set_temp_variable = { fre_credit_amount = -30 }
+		fre_change_war_credits = yes
+		add_equipment_to_stockpile = { type = transport_plane_equipment amount = -3 }
+		set_temp_variable = { fre_patience_delta = -2 }
+		fre_metropole_patience_change = yes
+		fre_pollux_begin_common = yes
+	}
+	else = { fre_pollux_resolve_superseded = yes }
+}
+
+fre_pollux_begin_escort = {
+	if = {
+		limit = {
+			fre_pollux_live_window_trigger = yes
+			fre_pollux_french_aligned_controls_lai_chau_trigger = yes
+		}
+		fre_pollux_prepare_new_operation = yes
+		set_country_flag = FRE_Pollux_Posture_Escort
+		set_temp_variable = { fre_credit_amount = -80 }
+		fre_change_war_credits = yes
+		add_manpower = -2000
+		set_temp_variable = { fre_patience_delta = -5 }
+		fre_metropole_patience_change = yes
+		fre_pollux_begin_common = yes
+	}
+	else = { fre_pollux_resolve_superseded = yes }
+}
+
+fre_pollux_begin_airlift = {
+	if = {
+		limit = {
+			fre_pollux_live_window_trigger = yes
+			fre_pollux_french_aligned_controls_lai_chau_trigger = yes
+		}
+		fre_pollux_prepare_new_operation = yes
+		set_country_flag = FRE_Pollux_Posture_Airlift
+		set_temp_variable = { fre_credit_amount = -120 }
+		fre_change_war_credits = yes
+		add_equipment_to_stockpile = { type = transport_plane_equipment amount = -8 }
+		set_temp_variable = { fre_patience_delta = -7 }
+		fre_metropole_patience_change = yes
+		fre_pollux_begin_common = yes
+	}
+	else = { fre_pollux_resolve_superseded = yes }
+}
+
+fre_pollux_abandon_unfunded = {
+	fre_pollux_prepare_new_operation = yes
+	set_country_flag = FRE_Pollux_Result_Column_Loss_Unfunded
+	fre_pollux_resolve_column_loss = yes
+}
+
+# Historical Pollux preserves the regular detachments flown out under Operation
+# Leda, but the exposed partisan column is lost. The safer alternatives must
+# earn seven consecutive checks before the campaign begins.
+fre_pollux_daily_tick = {
+	if = {
+		limit = { has_country_flag = FRE_Pollux_Evacuation_Active }
+		add_to_variable = { FRE_Pollux_Days_Elapsed = 1 }
+		if = {
+			limit = { has_country_flag = FRE_Pollux_Posture_Escort }
+			if = {
+				limit = { fre_pollux_corridor_open_trigger = yes }
+				add_to_variable = { FRE_Pollux_Hold_Days = 1 }
+			}
+			else = { set_variable = { FRE_Pollux_Hold_Days = 0 } }
+		}
+		else_if = {
+			limit = { has_country_flag = FRE_Pollux_Posture_Airlift }
+			if = {
+				limit = { fre_dbp_french_aligned_controls_camp_trigger = yes }
+				add_to_variable = { FRE_Pollux_Hold_Days = 1 }
+			}
+			else = { set_variable = { FRE_Pollux_Hold_Days = 0 } }
+		}
+
+		# A valid seventh day outranks a same-day campaign launch or settlement.
+		if = {
+			limit = {
+				OR = {
+					AND = { has_country_flag = FRE_Pollux_Posture_Escort  NOT = { check_variable = { FRE_Pollux_Hold_Days < 7 } } }
+					AND = { has_country_flag = FRE_Pollux_Posture_Airlift  NOT = { check_variable = { FRE_Pollux_Hold_Days < 7 } } }
+				}
+			}
+			fre_pollux_resolve_preserved = yes
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_global_flag = Indochina_War_Over
+					has_global_flag = geneva_conference_concluded
+					check_variable = { global.Indochina_War_Active_Phase > 8 }
+					NOT = { country_exists = VIN }
+					NOT = { country_exists = TAI }
+					VIN = { has_country_flag = VIN_Campaign_Dien_Bien_Active }
+				}
+			}
+			fre_pollux_resolve_superseded = yes
+		}
+		else_if = {
+			limit = { has_country_flag = FRE_Pollux_Posture_Historical  check_variable = { FRE_Pollux_Days_Elapsed > 9 } }
+			set_country_flag = FRE_Pollux_Result_Column_Loss_Historical
+			fre_pollux_resolve_column_loss = yes
+		}
+		else_if = {
+			limit = { check_variable = { FRE_Pollux_Days_Elapsed > 20 } }
+			fre_pollux_resolve_column_loss = yes
+		}
+	}
+}
+
+fre_pollux_deadline_resolve = {
+	if = {
+		limit = { has_country_flag = FRE_Pollux_Evacuation_Active }
+		if = {
+			limit = {
+				OR = {
+					AND = { has_country_flag = FRE_Pollux_Posture_Escort  fre_pollux_corridor_open_trigger = yes  NOT = { check_variable = { FRE_Pollux_Hold_Days < 6 } } }
+					AND = { has_country_flag = FRE_Pollux_Posture_Airlift  fre_dbp_french_aligned_controls_camp_trigger = yes  NOT = { check_variable = { FRE_Pollux_Hold_Days < 6 } } }
+				}
+			}
+			fre_pollux_resolve_preserved = yes
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_global_flag = Indochina_War_Over
+					has_global_flag = geneva_conference_concluded
+					check_variable = { global.Indochina_War_Active_Phase > 8 }
+					NOT = { country_exists = VIN }
+					NOT = { country_exists = TAI }
+					VIN = { has_country_flag = VIN_Campaign_Dien_Bien_Active }
+				}
+			}
+			fre_pollux_resolve_superseded = yes
+		}
+		else = { fre_pollux_resolve_column_loss = yes }
+	}
+}
+
+fre_pollux_supply_garrison_full = {
+	if = {
+		limit = { has_global_flag = VIN_DBP_Garrison_Is_FRE }
+		add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1250 producer = FRA }
+		add_equipment_to_stockpile = { type = support_equipment amount = 150 producer = FRA }
+		add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 75 producer = FRA }
+	}
+	else_if = {
+		limit = { country_exists = TAI }
+		TAI = {
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1250 producer = FRA }
+			add_equipment_to_stockpile = { type = support_equipment amount = 150 producer = FRA }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 75 producer = FRA }
+		}
+	}
+}
+
+fre_pollux_supply_garrison_leda = {
+	if = {
+		limit = { has_global_flag = VIN_DBP_Garrison_Is_FRE }
+		add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 500 producer = FRA }
+		add_equipment_to_stockpile = { type = support_equipment amount = 75 producer = FRA }
+	}
+	else_if = {
+		limit = { country_exists = TAI }
+		TAI = {
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 500 producer = FRA }
+			add_equipment_to_stockpile = { type = support_equipment amount = 75 producer = FRA }
+		}
+	}
+}
+
+fre_pollux_deploy_survivor_group = {
+	if = {
+		limit = {
+			has_global_flag = VIN_DBP_Garrison_Deployed
+			NOT = { has_country_flag = FRE_Pollux_Survivor_Group_Deployed }
+		}
+		set_country_flag = FRE_Pollux_Survivor_Group_Deployed
+		if = {
+			limit = { has_global_flag = VIN_DBP_Garrison_Is_FRE }
+			671 = {
+				create_unit = {
+					division = "name = \"GMPT 1 - Pollux Survivors\" division_template = \"Groupement Operationnel du Nord-Ouest\" start_experience_factor = 0.45 start_equipment_factor = 0.85"
+					owner = FRE
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 4529
+				}
+			}
+		}
+		else_if = {
+			limit = { country_exists = TAI }
+			671 = {
+				create_unit = {
+					division = "name = \"GMPT 1 - Pollux Survivors\" division_template = \"Groupement Operationnel du Nord-Ouest\" start_experience_factor = 0.45 start_equipment_factor = 0.85"
+					owner = TAI
+					allow_spawning_on_enemy_provs = yes
+					prioritize_location = 4529
+				}
+			}
+		}
+	}
+}
+
+fre_pollux_resolve_preserved = {
+	if = {
+		limit = { has_country_flag = FRE_Pollux_Evacuation_Active }
+		set_country_flag = FRE_Operation_Pollux_Result_Preserved
+		if = {
+			limit = { has_country_flag = FRE_Pollux_Posture_Escort }
+			set_country_flag = FRE_Pollux_Result_Preserved_Escort
+			add_manpower = 2000
+		}
+		else = { set_country_flag = FRE_Pollux_Result_Preserved_Airlift }
+		set_country_flag = FRE_Mission_Operation_Pollux_Completed
+		set_country_flag = FRE_Operation_Cooldown_Pollux
+		set_country_flag = FRE_Pollux_Garrison_Reinforced
+		fre_pollux_supply_garrison_full = yes
+		fre_pollux_deploy_survivor_group = yes
+		army_experience = 15
+		if = {
+			limit = { NOT = { has_global_flag = Indochina_War_Over } }
+			FRA = {
+				add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = 10  tooltip = Add_to_French_Victory_Points_TT }
+				indochina_struggle_recalculate_total_anti_communist_score = yes
+			}
+		}
+		fre_pollux_cleanup = yes
+		country_event = { id = FRE_Pollux.2 hours = 6 }
+	}
+}
+
+fre_pollux_resolve_column_loss = {
+	if = {
+		limit = {
+			OR = {
+				has_country_flag = FRE_Pollux_Evacuation_Active
+				has_country_flag = FRE_Pollux_Result_Column_Loss_Historical
+				has_country_flag = FRE_Pollux_Result_Column_Loss_Origin
+				has_country_flag = FRE_Pollux_Result_Column_Loss_Unfunded
+			}
+			NOT = { has_country_flag = FRE_Operation_Pollux_Result_Column_Loss }
+		}
+		if = {
+			limit = { has_country_flag = FRE_Pollux_Posture_Escort }
+			set_country_flag = FRE_Pollux_Result_Column_Loss_Escort
+			add_manpower = -3000
+			set_temp_variable = { fre_patience_delta = -4 }
+			fre_metropole_patience_change = yes
+		}
+		else_if = {
+			limit = { has_country_flag = FRE_Pollux_Posture_Airlift }
+			set_country_flag = FRE_Pollux_Result_Column_Loss_Airlift
+			add_manpower = -1500
+		}
+		else_if = {
+			limit = { has_country_flag = FRE_Pollux_Result_Column_Loss_Unfunded }
+			add_manpower = -2000
+		}
+		else = {
+			if = {
+				limit = { NOT = { has_country_flag = FRE_Pollux_Result_Column_Loss_Origin } }
+				set_country_flag = FRE_Pollux_Result_Column_Loss_Historical
+			}
+			add_manpower = -2000
+			if = {
+				limit = { has_country_flag = FRE_Pollux_Result_Column_Loss_Historical }
+				fre_pollux_supply_garrison_leda = yes
+			}
+		}
+		set_country_flag = FRE_Operation_Pollux_Result_Column_Loss
+		set_country_flag = FRE_Mission_Operation_Pollux_Failed
+		set_country_flag = FRE_Operation_Cooldown_Pollux
+		add_stability = -0.01
+		add_war_support = -0.02
+		if = {
+			limit = { NOT = { has_global_flag = Indochina_War_Over } }
+			FRA = {
+				add_to_variable = { StruggleInvolvedNationsIndochinaCommunistScore = 15  tooltip = Add_to_Communist_Victory_Points_TT }
+				add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = -15  tooltip = Add_to_French_Victory_Points_TT }
+				indochina_struggle_recalculate_total_anti_communist_score = yes
+			}
+		}
+		fre_pollux_cleanup = yes
+		country_event = { id = FRE_Pollux.3 hours = 6 }
+	}
+}
+
+fre_pollux_resolve_origin_lost = {
+	fre_pollux_prepare_new_operation = yes
+	set_country_flag = FRE_Pollux_Result_Column_Loss_Origin
+	fre_pollux_resolve_column_loss = yes
+}
+
+fre_pollux_resolve_superseded = {
+	if = {
+		limit = {
+			NOT = {
+				OR = {
+					has_country_flag = FRE_Operation_Pollux_Result_Preserved
+					has_country_flag = FRE_Operation_Pollux_Result_Column_Loss
+					has_country_flag = FRE_Operation_Pollux_Result_Superseded
+				}
+			}
+		}
+		set_country_flag = FRE_Operation_Pollux_Result_Superseded
+		fre_pollux_cleanup = yes
+		country_event = { id = FRE_Pollux.4 hours = 6 }
+	}
+}
+
+# Called immediately from the parent campaign's begin effect. The daily tick's
+# objective-first priority is reproduced here so a completed seventh day is not
+# discarded merely because Hanoi launches on the same date.
+fre_pollux_handoff_to_campaign = {
+	if = {
+		limit = { has_country_flag = FRE_Pollux_Evacuation_Active }
+		if = {
+			limit = {
+				OR = {
+					AND = { has_country_flag = FRE_Pollux_Posture_Escort  fre_pollux_corridor_open_trigger = yes  NOT = { check_variable = { FRE_Pollux_Hold_Days < 6 } } }
+					AND = { has_country_flag = FRE_Pollux_Posture_Airlift  fre_dbp_french_aligned_controls_camp_trigger = yes  NOT = { check_variable = { FRE_Pollux_Hold_Days < 6 } } }
+				}
+			}
+			fre_pollux_resolve_preserved = yes
+		}
+		else = { fre_pollux_resolve_superseded = yes }
+	}
+}
+
+fre_pollux_orphan_check = {
+	if = {
+		limit = {
+			has_country_flag = FRE_Pollux_Evacuation_Active
+			OR = { NOT = { country_exists = VIN }  NOT = { country_exists = TAI } }
+		}
+		fre_pollux_resolve_superseded = yes
+	}
+}
+
+fre_pollux_force_superseded_cleanup = {
+	if = {
+		limit = { has_country_flag = FRE_Pollux_Evacuation_Active }
+		set_country_flag = FRE_Operation_Pollux_Result_Superseded
+	}
+	fre_pollux_cleanup = yes
+}
+
+fre_pollux_cleanup = {
+	vin_cefeo_intel_finish_pollux = yes
+	set_temp_variable = { response_validation_package = 5 }
+	response_package_validation_log = yes
+	clr_country_flag = FRE_Pollux_Evacuation_Active
+	clr_country_flag = FRE_Mission_Operation_Pollux_Activated
+	clr_country_flag = FRE_Pollux_Posture_Historical
+	clr_country_flag = FRE_Pollux_Posture_Escort
+	clr_country_flag = FRE_Pollux_Posture_Airlift
+	set_variable = { FRE_Pollux_Days_Elapsed = 0 }
+	set_variable = { FRE_Pollux_Hold_Days = 0 }
+	remove_mission = FRE_Mission_Operation_Pollux
+}

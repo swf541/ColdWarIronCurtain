@@ -1,0 +1,213 @@
+# ============================================================================
+# Cuong De / Ho Chi Minh reconciliation (VIE_50s_CuongDe tree)
+# ----------------------------------------------------------------------------
+# Glue between the NV_CuongDe_Unification event chain and the Indochina
+# Struggle / Geneva Conference systems. The chain no longer hand-rolls its
+# own war ending: depending on when the accord lands it either de-escalates
+# the struggle toward the existing Dan Quoc Peace ending
+# (indochina_struggle_dan_quoc_peace), converts into negotiating capital at
+# a sitting Geneva Conference, or becomes a post-partition reunification
+# bid. The final merge always runs through the Dan Quoc machinery so the
+# war can only end once.
+# ============================================================================
+
+# Called from NV_CuongDe_Unification.4 (VIE scope) when Hanoi has accepted
+# the reunification proposal. Dispatches on the state of the wider conflict.
+VIE_cuongde_unification_outcome = {
+	if = {
+		limit = { has_global_flag = geneva_conference_in_session }
+		# The accord lands while the powers sit in Geneva: it becomes
+		# negotiating capital rather than a separate peace.
+		custom_effect_tooltip = VIE_cuongde_outcome_geneva_tt
+		set_temp_variable = { geneva_lev_amount = 100 }
+		geneva_add_vie_vin_rapprochement = yes
+		set_temp_variable = { geneva_lev_amount = 50 }
+		geneva_add_proindependence_leverage = yes
+		hidden_effect = {
+			if = { limit = { country_exists = VIE } VIE = { geneva_conf_refresh_prefs = yes } }
+			if = { limit = { country_exists = VIN } VIN = { geneva_conf_refresh_prefs = yes } }
+			country_event = { id = NV_CuongDe_Unification.8 days = 180 }
+		}
+	}
+	else_if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+			country_exists = VIN
+		}
+		# The war is still live: the accord is an armistice, not yet a
+		# merger. Guns fall silent, the diplomatic track takes over, and a
+		# conference convened later starts already softened.
+		custom_effect_tooltip = VIE_cuongde_outcome_armistice_tt
+		if = {
+			limit = {
+				country_exists = VIN
+				has_war_with = VIN
+			}
+			white_peace = VIN
+		}
+		if = {
+			limit = {
+				country_exists = NLF
+				has_war_with = NLF
+			}
+			white_peace = NLF
+		}
+		indochina_struggle_add_pro_independence_diplomatic_points = yes
+		indochina_struggle_add_pro_independence_diplomatic_points = yes
+		set_temp_variable = { geneva_lev_amount = 100 }
+		geneva_add_vie_vin_rapprochement = yes
+		hidden_effect = {
+			news_event = { id = NV_CuongDe_Unification.5 days = 1 }
+			country_event = { id = NV_CuongDe_Unification.8 days = 180 }
+		}
+	}
+	else_if = {
+		limit = { country_exists = VIN }
+		# The struggle already closed with two Vietnams standing (Geneva
+		# partition, a negotiated peace, or a frozen conflict): the accord
+		# is a reunification bid between two states at peace.
+		custom_effect_tooltip = VIE_cuongde_outcome_postwar_tt
+		add_opinion_modifier = {
+			target = VIN
+			modifier = large_increase
+		}
+		VIN = {
+			add_opinion_modifier = {
+				target = VIE
+				modifier = large_increase
+			}
+		}
+		hidden_effect = {
+			news_event = { id = NV_CuongDe_Unification.5 days = 1 }
+			country_event = { id = NV_CuongDe_Unification.8 days = 180 }
+		}
+	}
+	else = {
+		# The North no longer exists; there is nobody left to reconcile with.
+		custom_effect_tooltip = VIE_cuongde_outcome_moot_tt
+	}
+}
+
+# Called from NV_CuongDe_Unification.8 (VIE scope) when the transition
+# period ends. Performs the actual merger through the Dan Quoc Peace
+# machinery - or aborts if the men who signed the accord are gone.
+VIE_cuongde_finalize_unification = {
+	if = {
+		limit = { has_global_flag = geneva_conference_in_session }
+		# Never conclude while the powers are still at the table; try again
+		# once the conference has risen.
+		custom_effect_tooltip = VIE_cuongde_finalize_deferred_tt
+		hidden_effect = {
+			country_event = { id = NV_CuongDe_Unification.8 days = 30 }
+		}
+	}
+	else_if = {
+		limit = { has_global_flag = diem_ho_chi_minh_reunified }
+		# Some other road already led to the same reunified Vietnam.
+		custom_effect_tooltip = VIE_cuongde_finalize_moot_tt
+	}
+	else_if = {
+		limit = {
+			country_exists = VIN
+			indochina_dan_quoc_peace_cond_diem = yes
+			indochina_dan_quoc_peace_cond_ho_chi_minh = yes
+			NOT = { has_war_with = VIN }
+		}
+		custom_effect_tooltip = VIE_cuongde_finalize_merge_tt
+		if = {
+			limit = {
+				NOT = { has_global_flag = Indochina_War_Over }
+			}
+			# The struggle is still formally open: let the Dan Quoc Peace
+			# ending close it. With diem_ho_chi_minh_reunified set first,
+			# the effect performs the merge, the white peaces, the cleanup
+			# and the Indochina_Struggle_Ending.5 news itself.
+			hidden_effect = {
+				set_global_flag = diem_ho_chi_minh_reunified
+			}
+			indochina_struggle_dan_quoc_peace = yes
+		}
+		else = {
+			# The war was already closed (Geneva partition or an earlier
+			# peace); only the merger itself remains. Mirrors the merge
+			# branch of indochina_struggle_dan_quoc_peace.
+			VIE = {
+				transfer_state = 838
+				transfer_state = 786
+				transfer_state = 671
+				transfer_state = 881
+				transfer_state = 1280
+				transfer_state = 1281
+				transfer_state = 1760
+				transfer_state = 1761
+				transfer_state = 1766
+				annex_country = {
+					target = VIN
+					transfer_troops = yes
+				}
+				if = {
+					limit = {
+						NOT = {
+							has_country_leader = {
+								character = VIE_Ngo_Dinh_Diem
+								ruling_only = yes
+							}
+						}
+					}
+					add_country_leader_role = {
+						character = VIE_Ngo_Dinh_Diem
+						promote_leader = yes
+						country_leader = {
+							ideology = oriental_personalism
+						}
+					}
+				}
+				remove_ideas = State_of_Vietnam_Faction
+			}
+			set_global_flag = diem_ho_chi_minh_reunified
+		}
+	}
+	else = {
+		# Diem or Ho is gone, or the guns speak again: the moment has passed.
+		hidden_effect = {
+			country_event = { id = NV_CuongDe_Unification.9 hours = 6 }
+		}
+		custom_effect_tooltip = VIE_cuongde_finalize_failed_tt
+	}
+}
+
+# Shared reward for the reconciliation press events: warmth between the two
+# Vietnams plus diplomatic de-escalation of the struggle. Amount of
+# rapprochement is passed in temp variable cuongde_rapprochement_gain.
+VIE_cuongde_thaw_effect = {
+	indochina_struggle_add_pro_independence_diplomatic_points = yes
+	indochina_struggle_add_communist_diplomatic_points = yes
+	set_temp_variable = { geneva_lev_amount = cuongde_rapprochement_gain }
+	geneva_add_vie_vin_rapprochement = yes
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			add_opinion_modifier = {
+				target = VIN
+				modifier = small_increase
+			}
+		}
+	}
+	if = {
+		limit = { country_exists = VIN }
+		VIN = {
+			add_opinion_modifier = {
+				target = VIE
+				modifier = small_increase
+			}
+		}
+	}
+}
+
+# Souring effect: the reconciliation curdles. The leverage API clamps
+# non-positive amounts back to +50, so negative rapprochement is written
+# directly.
+VIE_cuongde_chill_effect = {
+	add_to_variable = { global.geneva_rapprochement_vie_vin = cuongde_rapprochement_loss }
+	custom_effect_tooltip = geneva_sub_vie_vin_rapprochement_TT
+}

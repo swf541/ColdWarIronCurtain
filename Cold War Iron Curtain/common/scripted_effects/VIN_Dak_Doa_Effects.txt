@@ -1,0 +1,265 @@
+nlf_dak_doa_begin = {
+	clr_country_flag = VIN_Campaign_Dak_Doa_Result_Clean
+	clr_country_flag = VIN_Campaign_Dak_Doa_Result_Costly
+	clr_country_flag = VIN_Campaign_Dak_Doa_Result_Aborted
+	clr_country_flag = VIN_Campaign_Dak_Doa_Result_Failure
+	clr_country_flag = VIN_Campaign_Dak_Doa_Result_Superseded
+	set_country_flag = VIN_Campaign_Dak_Doa_Active
+	set_variable = { NLF_Dak_Doa_Days_Elapsed = 0 }
+	set_variable = { NLF_Dak_Doa_Hold_Days = 0 }
+	set_variable = { NLF_Dak_Doa_Last_Outcome = 0 }
+	if = {
+		limit = { NOT = { has_country_flag = VIN_Dak_Doa_Temporary_Objective_VP } }
+		1286 = { add_victory_points = { province = 1328 value = 1 } }
+		set_country_flag = VIN_Dak_Doa_Temporary_Objective_VP
+	}
+	if = {
+		limit = { country_exists = FUL NOT = { has_war_with = FUL } }
+		set_country_flag = VIN_Campaign_Dak_Doa_Owns_FUL_War
+		hidden_effect = { declare_war_on = { target = FUL type = annex_everything } }
+	}
+	activate_mission = VIN_Dak_Doa_Objective
+	if = {
+		limit = { country_exists = FRE }
+		FRE = { fre_dak_doa_response_begin = yes }
+	}
+}
+
+fre_dak_doa_response_clear_postures = {
+	clr_country_flag = FRE_Dak_Doa_Posture_Hold
+	clr_country_flag = FRE_Dak_Doa_Posture_GM100
+	clr_country_flag = FRE_Dak_Doa_Posture_Evacuate
+}
+
+fre_dak_doa_response_clear_results = {
+	clr_country_flag = FRE_Dak_Doa_Result_Held
+	clr_country_flag = FRE_Dak_Doa_Result_Relief_Successful
+	clr_country_flag = FRE_Dak_Doa_Result_Post_Overrun
+	clr_country_flag = FRE_Dak_Doa_Result_Relief_Force_Mauled
+	clr_country_flag = FRE_Dak_Doa_Result_Evacuated
+	clr_country_flag = FRE_Dak_Doa_Result_Superseded
+}
+
+fre_dak_doa_response_remove_modifier = {
+	1286 = {
+		if = { limit = { has_dynamic_modifier = { modifier = FRE_Dak_Doa_Isolated_Post } } remove_dynamic_modifier = { modifier = FRE_Dak_Doa_Isolated_Post } }
+		if = { limit = { has_dynamic_modifier = { modifier = FRE_Dak_Doa_GM100_Defense } } remove_dynamic_modifier = { modifier = FRE_Dak_Doa_GM100_Defense } }
+	}
+}
+
+fre_dak_doa_response_begin = {
+	fre_dak_doa_response_remove_modifier = yes
+	fre_dak_doa_response_clear_postures = yes
+	fre_dak_doa_response_clear_results = yes
+	set_country_flag = FRE_Dak_Doa_Response_Active
+	set_country_flag = FRE_Dak_Doa_Response_Choice_Pending
+	log = "IC_RESPONSE|package=7|stage=before_selection|credits=[?FRE_War_Credits|0]|manpower_k=[?manpower_k|0]|patience=[?FRE_Metropole_Patience|0]"
+	country_event = { id = FRE_Dak_Doa.1 hours = 1 }
+}
+
+fre_dak_doa_commit_hold = {
+	fre_dak_doa_response_clear_postures = yes
+	clr_country_flag = FRE_Dak_Doa_Response_Choice_Pending
+	set_country_flag = FRE_Dak_Doa_Posture_Hold
+	set_temp_variable = { fre_credit_amount = -20 }
+	fre_change_war_credits = yes
+	add_manpower = -750
+	set_temp_variable = { fre_patience_delta = -2 }
+	fre_metropole_patience_change = yes
+	1286 = { add_dynamic_modifier = { modifier = FRE_Dak_Doa_Isolated_Post days = -1 } }
+}
+
+fre_dak_doa_commit_gm100 = {
+	fre_dak_doa_response_clear_postures = yes
+	clr_country_flag = FRE_Dak_Doa_Response_Choice_Pending
+	set_country_flag = FRE_Dak_Doa_Posture_GM100
+	set_temp_variable = { fre_credit_amount = -70 }
+	fre_change_war_credits = yes
+	add_manpower = -2500
+	set_temp_variable = { fre_patience_delta = -5 }
+	fre_metropole_patience_change = yes
+	1286 = { add_dynamic_modifier = { modifier = FRE_Dak_Doa_GM100_Defense days = -1 } }
+}
+
+fre_dak_doa_commit_evacuation = {
+	fre_dak_doa_response_clear_postures = yes
+	clr_country_flag = FRE_Dak_Doa_Response_Choice_Pending
+	set_country_flag = FRE_Dak_Doa_Posture_Evacuate
+	set_temp_variable = { fre_credit_amount = -15 }
+	fre_change_war_credits = yes
+	add_manpower = -500
+	set_temp_variable = { fre_patience_delta = -1 }
+	fre_metropole_patience_change = yes
+	fre_dak_doa_response_remove_modifier = yes
+}
+
+fre_dak_doa_response_record_result = {
+	fre_dak_doa_response_clear_results = yes
+	if = {
+		limit = { NLF = { OR = { check_variable = { NLF_Dak_Doa_Last_Outcome = 3 } check_variable = { NLF_Dak_Doa_Last_Outcome = 5 } } } }
+		set_country_flag = FRE_Dak_Doa_Result_Superseded
+	}
+	else_if = {
+		limit = { has_country_flag = FRE_Dak_Doa_Posture_Evacuate }
+		set_country_flag = FRE_Dak_Doa_Result_Evacuated
+		set_country_flag = FRE_Dak_Doa_GM100_Survived
+	}
+	else_if = {
+		limit = { NLF = { check_variable = { NLF_Dak_Doa_Last_Outcome = 4 } } has_country_flag = FRE_Dak_Doa_Posture_GM100 }
+		set_country_flag = FRE_Dak_Doa_Result_Relief_Successful
+		set_country_flag = FRE_Dak_Doa_GM100_Survived
+	}
+	else_if = {
+		limit = { NLF = { check_variable = { NLF_Dak_Doa_Last_Outcome = 4 } } }
+		set_country_flag = FRE_Dak_Doa_Result_Held
+	}
+	else_if = {
+		limit = { has_country_flag = FRE_Dak_Doa_Posture_GM100 }
+		set_country_flag = FRE_Dak_Doa_Result_Relief_Force_Mauled
+		set_country_flag = FRE_Dak_Doa_GM100_Mauled
+		add_manpower = -5000
+		set_temp_variable = { fre_credit_amount = -60 }
+		fre_change_war_credits = yes
+		set_temp_variable = { fre_patience_delta = -8 }
+		fre_metropole_patience_change = yes
+	}
+	else = {
+		set_country_flag = FRE_Dak_Doa_Result_Post_Overrun
+		set_country_flag = FRE_Dak_Doa_Isolated_Garrison_Lost
+		add_manpower = -1000
+		set_temp_variable = { fre_credit_amount = -10 }
+		fre_change_war_credits = yes
+		set_temp_variable = { fre_patience_delta = -3 }
+		fre_metropole_patience_change = yes
+	}
+}
+
+fre_dak_doa_response_cleanup = {
+	fre_dak_doa_response_remove_modifier = yes
+	clr_country_flag = FRE_Dak_Doa_Response_Active
+	clr_country_flag = FRE_Dak_Doa_Response_Choice_Pending
+	fre_dak_doa_response_clear_postures = yes
+}
+
+fre_dak_doa_resolve_from_parent = {
+	fre_dak_doa_response_record_result = yes
+	set_temp_variable = { response_validation_package = 7 }
+	response_package_validation_log = yes
+	log = "IC_RESPONSE|package=7|stage=after_resolution|credits=[?FRE_War_Credits|0]|manpower_k=[?manpower_k|0]|patience=[?FRE_Metropole_Patience|0]"
+	fre_dak_doa_response_cleanup = yes
+	country_event = { id = FRE_Dak_Doa.2 hours = 4 }
+}
+
+nlf_dak_doa_record_result = {
+	clr_country_flag = VIN_Campaign_Dak_Doa_Result_Clean
+	clr_country_flag = VIN_Campaign_Dak_Doa_Result_Costly
+	clr_country_flag = VIN_Campaign_Dak_Doa_Result_Aborted
+	clr_country_flag = VIN_Campaign_Dak_Doa_Result_Failure
+	clr_country_flag = VIN_Campaign_Dak_Doa_Result_Superseded
+	if = { limit = { check_variable = { NLF_Dak_Doa_Last_Outcome = 1 } } set_country_flag = VIN_Campaign_Dak_Doa_Result_Clean }
+	else_if = { limit = { check_variable = { NLF_Dak_Doa_Last_Outcome = 2 } } set_country_flag = VIN_Campaign_Dak_Doa_Result_Costly }
+	else_if = { limit = { check_variable = { NLF_Dak_Doa_Last_Outcome = 3 } } set_country_flag = VIN_Campaign_Dak_Doa_Result_Aborted }
+	else_if = { limit = { check_variable = { NLF_Dak_Doa_Last_Outcome = 4 } } set_country_flag = VIN_Campaign_Dak_Doa_Result_Failure }
+	else = { set_country_flag = VIN_Campaign_Dak_Doa_Result_Superseded }
+}
+
+nlf_dak_doa_apply_resolution_balance = {
+	if = {
+		limit = { check_variable = { NLF_Dak_Doa_Last_Outcome = 1 } }
+		FRA = { add_to_variable = { StruggleInvolvedNationsIndochinaCommunistScore = 10 tooltip = Add_to_Communist_Victory_Points_TT } add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = -5 tooltip = Add_to_French_Victory_Points_TT } }
+	}
+	else_if = {
+		limit = { check_variable = { NLF_Dak_Doa_Last_Outcome = 2 } }
+		FRA = { add_to_variable = { StruggleInvolvedNationsIndochinaCommunistScore = 5 tooltip = Add_to_Communist_Victory_Points_TT } add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = -2 tooltip = Add_to_French_Victory_Points_TT } }
+	}
+	else_if = {
+		limit = { check_variable = { NLF_Dak_Doa_Last_Outcome = 4 } }
+		FRA = { add_to_variable = { StruggleInvolvedNationsIndochinaCommunistScore = -5 tooltip = Add_to_Communist_Victory_Points_TT } add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = 5 tooltip = Add_to_French_Victory_Points_TT } }
+	}
+	FRA = { indochina_struggle_recalculate_total_anti_communist_score = yes }
+}
+
+nlf_dak_doa_finish = {
+	if = {
+		limit = { has_country_flag = VIN_Campaign_Dak_Doa_Owns_FUL_War country_exists = FUL has_war_with = FUL }
+		white_peace = FUL
+	}
+	clr_country_flag = VIN_Campaign_Dak_Doa_Owns_FUL_War
+	clr_country_flag = VIN_Campaign_Dak_Doa_Active
+	remove_mission = VIN_Dak_Doa_Objective
+	if = {
+		limit = { has_country_flag = VIN_Dak_Doa_Temporary_Objective_VP }
+		1286 = { add_victory_points = { province = 1328 value = -1 } }
+		clr_country_flag = VIN_Dak_Doa_Temporary_Objective_VP
+	}
+	set_variable = { NLF_Dak_Doa_Hold_Days = 0 }
+}
+
+nlf_dak_doa_resolve = {
+	set_country_flag = VIN_Campaign_Dak_Doa_Resolving
+	set_variable = { NLF_Dak_Doa_Last_Outcome = nlf_dak_doa_outcome }
+	nlf_dak_doa_record_result = yes
+	if = { limit = { country_exists = FRE } FRE = { fre_dak_doa_resolve_from_parent = yes } }
+	nlf_dak_doa_apply_resolution_balance = yes
+	nlf_dak_doa_finish = yes
+	clr_country_flag = VIN_Campaign_Dak_Doa_Resolving
+	country_event = { id = VIN_Dak_Doa.1 hours = 6 }
+}
+
+nlf_dak_doa_update_hold = {
+	if = {
+		limit = { country_exists = FRE FRE = { has_country_flag = FRE_Dak_Doa_Posture_Evacuate } }
+		add_to_variable = { NLF_Dak_Doa_Hold_Days = 1 }
+	}
+	else_if = {
+		limit = { NLF_dak_doa_objective_held_trigger = yes }
+		add_to_variable = { NLF_Dak_Doa_Hold_Days = 1 }
+	}
+	else = { set_variable = { NLF_Dak_Doa_Hold_Days = 0 } }
+}
+
+nlf_dak_doa_check_resolution = {
+	if = {
+		limit = { NLF_dak_doa_superseded_trigger = yes }
+		set_temp_variable = { nlf_dak_doa_outcome = 5 }
+		nlf_dak_doa_resolve = yes
+	}
+	else_if = {
+		limit = { country_exists = FRE FRE = { has_country_flag = FRE_Dak_Doa_Posture_Evacuate } check_variable = { NLF_Dak_Doa_Hold_Days > 6 } }
+		set_temp_variable = { nlf_dak_doa_outcome = 1 }
+		nlf_dak_doa_resolve = yes
+	}
+	else_if = {
+		limit = { check_variable = { NLF_Dak_Doa_Hold_Days > 6 } NOT = { check_variable = { NLF_Dak_Doa_Days_Elapsed > 45 } } }
+		if = { limit = { NOT = { check_variable = { NLF_Dak_Doa_Days_Elapsed > 21 } } } set_temp_variable = { nlf_dak_doa_outcome = 1 } }
+		else = { set_temp_variable = { nlf_dak_doa_outcome = 2 } }
+		nlf_dak_doa_resolve = yes
+	}
+	else_if = {
+		limit = { check_variable = { NLF_Dak_Doa_Days_Elapsed > 45 } }
+		set_temp_variable = { nlf_dak_doa_outcome = 4 }
+		nlf_dak_doa_resolve = yes
+	}
+	else_if = {
+		limit = { NLF_dak_doa_war_abandoned_trigger = yes }
+		set_temp_variable = { nlf_dak_doa_outcome = 3 }
+		nlf_dak_doa_resolve = yes
+	}
+}
+
+nlf_dak_doa_daily_tick = {
+	if = {
+		limit = { has_country_flag = VIN_Campaign_Dak_Doa_Active NOT = { has_country_flag = VIN_Campaign_Dak_Doa_Resolving } }
+		add_to_variable = { NLF_Dak_Doa_Days_Elapsed = 1 }
+		nlf_dak_doa_update_hold = yes
+		nlf_dak_doa_check_resolution = yes
+	}
+}
+
+nlf_dak_doa_deadline_resolve = {
+	if = {
+		limit = { has_country_flag = VIN_Campaign_Dak_Doa_Active }
+		set_temp_variable = { nlf_dak_doa_outcome = 4 }
+		nlf_dak_doa_resolve = yes
+	}
+}

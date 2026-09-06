@@ -1,0 +1,269 @@
+# ============================================================================
+# Indochina Struggle failsafe hooks
+# ----------------------------------------------------------------------------
+# Tier 1 is everything below on_subject_annexed: a structural break in the
+# theatre routes at once, with no grace period, because these are unambiguous
+# one-shot events and waiting lets a vanilla peace conference commit the damage.
+# on_capitulation_immediate is the important one - it runs in the capitulation
+# frame, so an ending that lands there removes the war participant before the
+# conference can ever be spawned. on_capitulation and the two peace-conference
+# slots are the second and third lines for when it does not.
+#
+# Tier 2 is the watchdog carrier chain. The struggle heartbeat is on_daily_FRA,
+# which stops the day France is annexed, so the tick is handed down a chain of
+# guards that are mutually exclusive by construction: exactly one carrier is
+# live at any instant, and ic_tick_days normalises the day counters across the
+# daily, weekly and monthly slots.
+#
+# HOI4 merges same-named on_action slots across files, so nothing that already
+# hooks these slots elsewhere has to move.
+# ============================================================================
+on_actions = {
+
+	on_capitulation_immediate = {
+		effect = {
+			# ROOT is the capitulated country, FROM is the winner.
+			if = {
+				limit = {
+					ic_failsafe_active_trigger = yes
+					ROOT = {
+						OR = {
+							original_tag = VIN
+							original_tag = VIE
+						}
+					}
+				}
+				indochina_failsafe_route_decisive_result = yes
+			}
+		}
+	}
+
+	on_capitulation = {
+		effect = {
+			if = {
+				limit = {
+					ic_failsafe_active_trigger = yes
+					ROOT = {
+						OR = {
+							original_tag = VIN
+							original_tag = VIE
+						}
+					}
+				}
+				indochina_failsafe_route_decisive_result = yes
+			}
+		}
+	}
+
+	# ROOT is the winner, FROM is the loser. Empty the pot before the conference
+	# distributes it, then resolve the war ourselves. This cannot cancel the
+	# conference - vanilla only ever uses this slot to move states - so the two
+	# capitulation slots above are what actually prevents one.
+	on_before_peace_conference_start = {
+		effect = {
+			if = {
+				limit = {
+					ic_failsafe_active_trigger = yes
+					OR = {
+						ROOT = { ic_failsafe_theatre_tag_trigger = yes }
+						FROM = { ic_failsafe_theatre_tag_trigger = yes }
+					}
+				}
+				indochina_failsafe_set_receiver = yes
+				indochina_failsafe_repatriate_theatre_states = yes
+				indochina_failsafe_enforce_minority_homelands = yes
+				indochina_failsafe_route_decisive_result = yes
+			}
+		}
+	}
+
+	# Fires once per winner/loser pair, so a three-winner conference calls this
+	# six times. Latched on ROOT so the repair only runs once.
+	on_peaceconference_ended = {
+		effect = {
+			if = {
+				limit = {
+					NOT = { ROOT = { has_country_flag = ic_failsafe_pc_handled } }
+					OR = {
+						ROOT = { ic_failsafe_theatre_tag_trigger = yes }
+						FROM = { ic_failsafe_theatre_tag_trigger = yes }
+					}
+				}
+				ROOT = { set_country_flag = ic_failsafe_pc_handled }
+				if = {
+					limit = { ic_failsafe_active_trigger = yes }
+					indochina_failsafe_route_decisive_result = yes
+				}
+				else_if = {
+					limit = {
+						has_global_flag = Indochina_War_Over
+						NOT = { has_global_flag = ic_failsafe_routing }
+					}
+					indochina_failsafe_set_receiver = yes	# the war was already settled and a later conference redrew it anyway
+					indochina_failsafe_break_bad_subjects = yes
+					indochina_failsafe_enforce_state_allow_list = yes
+				}
+			}
+		}
+	}
+
+	on_annex = {
+		effect = {
+			# ROOT is the annexed country, FROM is the annexer.
+			if = {
+				limit = {
+					ic_failsafe_active_trigger = yes
+					ROOT = {
+						OR = {
+							original_tag = VIN
+							original_tag = VIE
+							original_tag = FRE
+						}
+					}
+				}
+				if = {
+					limit = {
+						ROOT = { original_tag = FRE }
+						country_exists = FRE
+					}
+					FRE = { fre_dissolution_cleanup = yes }	# hand the crown domains back rather than let them ride along into the annexer; if the corps is already gone, preflight frees them instead
+				}
+				indochina_failsafe_route_decisive_result = yes
+			}
+		}
+	}
+
+	# ROOT is the nation being puppeted, FROM is the overlord. This is the slot
+	# that catches the French-aligned puppet VIN a peace conference produced.
+	on_puppet = {
+		effect = {
+			if = {
+				limit = {
+					ic_failsafe_active_trigger = yes
+					ROOT = { ic_failsafe_theatre_tag_trigger = yes }
+					NOT = { FROM = { ic_failsafe_legitimate_overlord_trigger = yes } }
+				}
+				indochina_failsafe_break_bad_subjects = yes
+				indochina_failsafe_route_decisive_result = yes
+			}
+		}
+	}
+
+	on_release_as_puppet = {
+		effect = {
+			if = {
+				limit = {
+					ic_failsafe_active_trigger = yes
+					ROOT = { ic_failsafe_theatre_tag_trigger = yes }
+					NOT = { FROM = { ic_failsafe_legitimate_overlord_trigger = yes } }
+				}
+				indochina_failsafe_break_bad_subjects = yes
+				indochina_failsafe_route_decisive_result = yes
+			}
+		}
+	}
+
+	on_subject_annexed = {
+		effect = {
+			if = {
+				limit = {
+					ic_failsafe_active_trigger = yes
+					ROOT = {
+						OR = {
+							original_tag = VIN
+							original_tag = VIE
+							original_tag = FRE
+						}
+					}
+				}
+				indochina_failsafe_route_decisive_result = yes
+			}
+		}
+	}
+
+	# Watchdog carriers. on_daily_FRA is primary and lives in
+	# CWIC_Struggle_on_actions.txt next to the rest of the heartbeat; these are
+	# the fallbacks for when France is no longer on the map.
+	on_daily_VIN = {
+		effect = {
+			if = {
+				limit = { NOT = { country_exists = FRA } }
+				set_temp_variable = { ic_tick_days = 1 }
+				indochina_failsafe_watchdog_tick = yes
+			}
+		}
+	}
+
+	on_daily_VIE = {
+		effect = {
+			if = {
+				limit = {
+					NOT = { country_exists = FRA }
+					NOT = { country_exists = VIN }
+				}
+				set_temp_variable = { ic_tick_days = 1 }
+				indochina_failsafe_watchdog_tick = yes
+			}
+		}
+	}
+
+	on_weekly_FRE = {
+		effect = {
+			if = {
+				limit = {
+					NOT = { country_exists = FRA }
+					NOT = { country_exists = VIN }
+					NOT = { country_exists = VIE }
+				}
+				set_temp_variable = { ic_tick_days = 7 }
+				indochina_failsafe_watchdog_tick = yes
+			}
+		}
+	}
+
+	on_monthly_USA = {
+		effect = {
+			if = {
+				limit = {
+					NOT = { country_exists = FRA }
+					NOT = { country_exists = VIN }
+					NOT = { country_exists = VIE }
+					NOT = { country_exists = FRE }
+				}
+				set_temp_variable = { ic_tick_days = 30 }
+				indochina_failsafe_watchdog_tick = yes
+			}
+		}
+	}
+
+	on_startup = {
+		effect = {
+			if = {
+				limit = { NOT = { has_global_flag = ic_failsafe_save_repair_done } }
+				set_global_flag = ic_failsafe_save_repair_done
+				# on_startup has no ROOT country scope. Scripted effects cannot run
+				# from None, so select the first surviving watchdog carrier.
+				if = {
+					limit = { country_exists = FRA }
+					FRA = { indochina_failsafe_save_repair = yes }
+				}
+				else_if = {
+					limit = { country_exists = VIN }
+					VIN = { indochina_failsafe_save_repair = yes }
+				}
+				else_if = {
+					limit = { country_exists = VIE }
+					VIE = { indochina_failsafe_save_repair = yes }
+				}
+				else_if = {
+					limit = { country_exists = FRE }
+					FRE = { indochina_failsafe_save_repair = yes }
+				}
+				else_if = {
+					limit = { country_exists = USA }
+					USA = { indochina_failsafe_save_repair = yes }
+				}
+			}
+		}
+	}
+}

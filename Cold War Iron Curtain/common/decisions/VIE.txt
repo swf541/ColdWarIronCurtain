@@ -41,6 +41,7 @@ VIE_Flag_Change = {
 				}
 				set_cosmetic_tag = VIE_RCB_ETAT
 			}
+			VIE_sync_faction_name = yes
 		}
 	}
 	VIE_Merge_Two_Flags = {
@@ -92,6 +93,7 @@ VIE_Flag_Change = {
 				}
 				set_cosmetic_tag = VIE_CCC_ETAT
 			}
+			VIE_sync_faction_name = yes
 		}
 	}
 }
@@ -101,6 +103,9 @@ VIE_CrownDomain_Decisions = {
 		visible = {
 			has_country_flag = CrownDomain_Decisions_Unlocked
 			country_exists = FUL
+			NOT = {
+				has_country_flag = VIE_Montagnard_Autonomy_Retained	# Saigon guaranteed the highlands instead of taking them
+			}
 		}
 		available = {
 			OR = {
@@ -119,6 +124,7 @@ VIE_CrownDomain_Decisions = {
 			custom_effect_tooltip = VIE_FUL_Annexation_Trigger_tt
 			FUL = {
 				set_country_flag = VIE_FUL_Annexation_Trigger
+				country_event = { id = Du_So_21.1 days = 3 }
 			}
 		}
 	}
@@ -164,7 +170,24 @@ VIE_CrownDomain_Decisions = {
 }
 
 VIE_Bao_Dai_Power_Minigame = {
-	# Cuong-De Leader Decisions\
+	# Situation Report
+	VIE_Diem_Situation_Report = {
+		icon = generic_political_discourse
+		visible = {
+			has_country_flag = VIE_PM_Ngo_Dinh_Diem
+		}
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = VIE_Diem_Situation_Report_tt
+				always = no
+			}
+		}
+		fire_only_once = no
+		selectable_mission = no
+		ai_will_do = {
+			factor = 0
+		}
+	}
 	CuongDe_NgoDinh_Countdown = {
 		activation = {
 			always = no
@@ -178,7 +201,7 @@ VIE_Bao_Dai_Power_Minigame = {
 				}
 			}
 		}
-		cost = 75
+		cost = 40
 		days_mission_timeout = 14
 		selectable_mission = yes
 		is_good = no
@@ -195,6 +218,10 @@ VIE_Bao_Dai_Power_Minigame = {
 				tooltip = CD_Xuan_Yes_tt
 				has_country_flag = CD_Xuan_Yes
 			}
+			custom_trigger_tooltip = {
+				tooltip = VIE_Xuan_CCC_Peace_tt
+				has_war = no
+			}
 		}
 		visible = {
 			has_country_flag = CD_Xuan_Yes
@@ -206,6 +233,12 @@ VIE_Bao_Dai_Power_Minigame = {
 		fire_only_once = yes
 		selectable_mission = no
 		complete_effect = {
+			add_stability = 0.10
+			add_political_power = 100
+			add_timed_idea = {
+				idea = VIE_Cochinchina_Devolution
+				days = 365
+			}
 			set_country_flag = {
 				flag = Released_CCC_CD_temp
 				days = 365
@@ -270,23 +303,19 @@ VIE_Bao_Dai_Power_Minigame = {
 		}
 		custom_cost_text = VIE_has_250_mil
 		ai_will_do = {
-			base = 10
+			base = 1
 			modifier = {
-				factor = 100
+				factor = 30
 				AND = {
-					check_variable = {
-						currentMoney > 5
-					}
-					has_political_power > 74
+					check_variable = { currentMoney > 5 }
+					has_political_power > 100
 				}
 			}
 			modifier = {
 				factor = 0
-				AND = {
-					check_variable = {
-						currentMoney < 2
-					}
-					has_political_power < 49
+				OR = {
+					check_variable = { currentMoney < 2 }
+					has_political_power < 75
 				}
 			}
 		}
@@ -301,9 +330,11 @@ VIE_Bao_Dai_Power_Minigame = {
 			add_money_with_tooltip_effect = yes
 			add_equipment_to_stockpile = {
 				type = infantry_equipment
-				amount = 500
+				amount = 1500
 				producer = USA
 			}
+			set_temp_variable = { influence_change = 8 }
+			VIE_Change_Domestic_Influence = yes
 		}
 	}
 	Reach_out_to_Phan_van_Giao = {
@@ -472,9 +503,7 @@ VIE_Bao_Dai_Power_Minigame = {
 			}
 		}
 	}
-	# Cuong-De Opposition Decisions
 	Dealing_With_CuongDe_Mission = {
-		#Repeatable - Adds 5 FF to Cuong-De every 4 days
 		activation = {
 			always = no
 		}
@@ -516,7 +545,6 @@ VIE_Bao_Dai_Power_Minigame = {
 		}
 	}
 	CuongDe_Countdown = {
-		# Fires once, leads to second part of Cuong-De struggle
 		activation = {
 			always = no
 		}
@@ -577,22 +605,19 @@ VIE_Bao_Dai_Power_Minigame = {
 			has_country_flag = VIE_Opposition_Cuong_De
 		}
 		ai_will_do = {
-			base = 10
+			base = 201
 			modifier = {
-				factor = 999
-				AND = {
-					is_historical_focus_on = yes
-					check_variable = {
-						Alt_Favoritism > 39
-					}
-				}
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_historical = yes }
 			}
-			# modifier = {
-			# 	factor = 0
-			# 	AND = {
-			# 		AI will not do this at all if Cuong-De path is selected in game rules
-			# 	}
-			# }
+			modifier = {
+				factor = 0
+				has_political_power < 29
+			}
+			modifier = {
+				factor = 6
+				VIE_ai_pm_pursue_historical = yes
+			}
 		}
 		cost = 25
 		days_re_enable = 15
@@ -615,10 +640,18 @@ VIE_Bao_Dai_Power_Minigame = {
 			has_country_flag = VIE_Opposition_Cuong_De
 		}
 		ai_will_do = {
-			base = 5
+			base = 26
 			modifier = {
 				factor = 0
-				is_historical_focus_on = yes
+				NOT = { VIE_ai_pm_pursue_challenger = yes }
+			}
+			modifier = {
+				factor = 0
+				has_political_power < 100
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_challenger = yes
 			}
 		}
 		cost = 25
@@ -642,10 +675,18 @@ VIE_Bao_Dai_Power_Minigame = {
 			has_country_flag = VIE_Opposition_Cuong_De
 		}
 		ai_will_do = {
-			base = 5
+			base = 26
 			modifier = {
 				factor = 0
-				is_historical_focus_on = yes
+				NOT = { VIE_ai_pm_pursue_challenger = yes }
+			}
+			modifier = {
+				factor = 0
+				has_political_power < 100
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_challenger = yes
 			}
 		}
 		cost = 45
@@ -669,17 +710,24 @@ VIE_Bao_Dai_Power_Minigame = {
 			has_country_flag = VIE_Opposition_Cuong_De
 		}
 		ai_will_do = {
-			base = 5
+			base = 26
 			modifier = {
 				factor = 0
-				is_historical_focus_on = yes
+				NOT = { VIE_ai_pm_pursue_challenger = yes }
+			}
+			modifier = {
+				factor = 0
+				has_political_power < 100
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_challenger = yes
 			}
 		}
-		cost = 125
+		cost = 65
 		fire_only_once = yes
 		selectable_mission = no
 	}
-	# Long Opposition Decisions
 	Discredit_the_Nguyen_Phan_Long_Faction = {
 		visible = {
 			has_country_flag = VIE_Opposition_Nguyen_Phan_Long
@@ -688,6 +736,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		days_re_enable = 45
 		fire_only_once = no
 		selectable_mission = no
+		ai_will_do = {
+			base = 26
+			modifier = {
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_historical = yes }
+			}
+			modifier = {
+				factor = 0
+				has_political_power < 100
+			}
+			modifier = {
+				factor = 6
+				VIE_ai_pm_pursue_historical = yes
+			}
+		}
 		complete_effect = {
 			set_temp_variable = { favoritism_change = -5 }
 			VIE_Change_Alt_Favoritism = yes
@@ -701,6 +764,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		days_re_enable = 5
 		fire_only_once = no
 		selectable_mission = no
+		ai_will_do = {
+			base = 26
+			modifier = {
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_challenger = yes }
+			}
+			modifier = {
+				factor = 0
+				has_political_power < 100
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_challenger = yes
+			}
+		}
 		complete_effect = {
 			set_temp_variable = { favoritism_change = 5 }
 			VIE_Change_Alt_Favoritism = yes
@@ -727,24 +805,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		}
 		custom_cost_text = VIE_has_100_mil
 		ai_will_do = {
-			base = 10
+			base = 26
 			modifier = {
-				factor = 100
-				AND = {
-					check_variable = {
-						currentMoney > 3
-					}
-					has_political_power > 49
-				}
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_challenger = yes }
 			}
 			modifier = {
 				factor = 0
-				AND = {
-					check_variable = {
-						currentMoney < 1
-					}
-					has_political_power < 19
+				OR = {
+					check_variable = { currentMoney < 2 }
+					has_political_power < 100
 				}
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_challenger = yes
 			}
 		}
 		days_re_enable = 10
@@ -790,7 +865,7 @@ VIE_Bao_Dai_Power_Minigame = {
 			if = {
 				limit = {
 					check_variable = {
-						Alt_Favoritism > 79
+						Alt_Favoritism > 59
 					}
 				}
 				set_country_flag = Long_Stays_PM
@@ -800,7 +875,6 @@ VIE_Bao_Dai_Power_Minigame = {
 			}
 		}
 	}
-	# Vinh Opposition Decisions
 	Phuong_Mutiny_Timer = {
 		activation = {
 			always = no
@@ -824,7 +898,6 @@ VIE_Bao_Dai_Power_Minigame = {
 			country_event = VIE_Vinh.3
 		}
 	}
-	# Huu Opposition Decisions
 	Discredit_the_Tran_Van_Huu_Faction = {
 		complete_effect = {
 			set_temp_variable = { favoritism_change = -5 }
@@ -837,6 +910,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		days_re_enable = 45
 		fire_only_once = no
 		selectable_mission = no
+		ai_will_do = {
+			base = 26
+			modifier = {
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_historical = yes }
+			}
+			modifier = {
+				factor = 0
+				has_political_power < 100
+			}
+			modifier = {
+				factor = 6
+				VIE_ai_pm_pursue_historical = yes
+			}
+		}
 	}
 	Boost_Huu_French_Favoritism = {
 		visible = {
@@ -846,6 +934,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		days_re_enable = 5
 		fire_only_once = no
 		selectable_mission = no
+		ai_will_do = {
+			base = 26
+			modifier = {
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_challenger = yes }
+			}
+			modifier = {
+				factor = 0
+				has_political_power < 100
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_challenger = yes
+			}
+		}
 		complete_effect = {
 			set_temp_variable = { favoritism_change = 5 }
 			VIE_Change_Alt_Favoritism = yes
@@ -872,28 +975,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		}
 		custom_cost_text = VIE_has_250_mil
 		ai_will_do = {
-			base = 10
+			base = 26
 			modifier = {
-				factor = 100
-				AND = {
-					check_variable = {
-						currentMoney > 5
-					}
-					has_political_power > 74
-				}
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_historical = yes }
 			}
 			modifier = {
 				factor = 0
-				AND = {
-					check_variable = {
-						currentMoney < 2
-					}
-					has_political_power < 49
+				OR = {
+					check_variable = { currentMoney < 2 }
+					has_political_power < 100
 				}
 			}
 			modifier = {
-				factor = 0
-				is_historical_focus_on = yes
+				factor = 8
+				VIE_ai_pm_pursue_historical = yes
 			}
 		}
 		days_re_enable = 12
@@ -984,10 +1080,18 @@ VIE_Bao_Dai_Power_Minigame = {
 			VIE_Change_Alt_Favoritism = yes
 		}
 		ai_will_do = {
-			base = 5
+			base = 26
 			modifier = {
 				factor = 0
-				is_historical_focus_on = yes
+				NOT = { VIE_ai_pm_pursue_historical = yes }
+			}
+			modifier = {
+				factor = 0
+				has_political_power < 100
+			}
+			modifier = {
+				factor = 6
+				VIE_ai_pm_pursue_historical = yes
 			}
 		}
 	}
@@ -1006,15 +1110,18 @@ VIE_Bao_Dai_Power_Minigame = {
 			VIE_Change_Alt_Favoritism = yes
 		}
 		ai_will_do = {
-			base = 10
+			base = 26
 			modifier = {
-				factor = 999
-				AND = {
-					is_historical_focus_on = yes
-					check_variable = {
-						FRA_Influence < VIE_Influence
-					}
-				}
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_challenger = yes }
+			}
+			modifier = {
+				factor = 0
+				has_political_power < 100
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_challenger = yes
 			}
 		}
 	}
@@ -1034,19 +1141,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		}
 		custom_cost_text = VIE_has_200_mil
 		ai_will_do = {
-			base = 10
+			base = 26
 			modifier = {
-				factor = 100
-				AND = {
-					check_variable = {
-						currentMoney > 3
-					}
-					has_political_power > 49
-				}
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_historical = yes }
 			}
 			modifier = {
 				factor = 0
-				is_historical_focus_on = yes
+				OR = {
+					check_variable = { currentMoney < 2 }
+					has_political_power < 100
+				}
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_historical = yes
 			}
 		}
 		days_re_enable = 20
@@ -1098,27 +1207,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		}
 		custom_cost_text = VIE_has_150_mil
 		ai_will_do = {
-			base = 10
+			base = 26
 			modifier = {
-				factor = 100
-				AND = {
-					check_variable = {
-						currentMoney > 3
-					}
-					has_political_power > 49
-					check_variable = {
-						FRA_Influence < VIE_Influence
-					}
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_challenger = yes }
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					check_variable = { currentMoney < 2 }
+					has_political_power < 100
 				}
 			}
 			modifier = {
-				factor = 999
-				AND = {
-					is_historical_focus_on = yes
-					check_variable = {
-						FRA_Influence < VIE_Influence
-					}
-				}
+				factor = 8
+				VIE_ai_pm_pursue_challenger = yes
 			}
 		}
 		days_re_enable = 15
@@ -1161,19 +1264,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		}
 		custom_cost_text = VIE_has_250_mil
 		ai_will_do = {
-			base = 5
+			base = 26
 			modifier = {
-				factor = 100
-				AND = {
-					check_variable = {
-						currentMoney > 4
-					}
-					has_political_power > 59
-				}
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_historical = yes }
 			}
 			modifier = {
 				factor = 0
-				is_historical_focus_on = yes
+				OR = {
+					check_variable = { currentMoney < 2 }
+					has_political_power < 100
+				}
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_historical = yes
 			}
 		}
 		days_re_enable = 25
@@ -1221,27 +1326,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		}
 		custom_cost_text = VIE_has_200_mil
 		ai_will_do = {
-			base = 10
+			base = 26
 			modifier = {
-				factor = 100
-				AND = {
-					check_variable = {
-						currentMoney > 4
-					}
-					has_political_power > 59
-					check_variable = {
-						FRA_Influence < VIE_Influence
-					}
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_challenger = yes }
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					check_variable = { currentMoney < 2 }
+					has_political_power < 100
 				}
 			}
 			modifier = {
-				factor = 999
-				AND = {
-					is_historical_focus_on = yes
-					check_variable = {
-						FRA_Influence < VIE_Influence
-					}
-				}
+				factor = 8
+				VIE_ai_pm_pursue_challenger = yes
 			}
 		}
 		days_re_enable = 20
@@ -1294,24 +1393,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		}
 		custom_cost_text = VIE_has_200_mil
 		ai_will_do = {
-			base = 10
-			modifier = {
-				factor = 100
-				AND = {
-					check_variable = {
-						currentMoney > 4
-					}
-					has_political_power > 59
-					}
-				}
+			base = 26
 			modifier = {
 				factor = 0
-				AND = {
-					check_variable = {
-						currentMoney < 2
-					}
-					has_political_power < 39
+				NOT = { VIE_ai_pm_pursue_challenger = yes }
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					check_variable = { currentMoney < 2 }
+					has_political_power < 100
 				}
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_challenger = yes
 			}
 		}
 		days_re_enable = 12
@@ -1373,24 +1469,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		}
 		custom_cost_text = VIE_has_200_mil
 		ai_will_do = {
-			base = 10
+			base = 26
 			modifier = {
-				factor = 100
-				AND = {
-					check_variable = {
-						currentMoney > 4
-					}
-					has_political_power > 59
-				}
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_historical = yes }
 			}
 			modifier = {
 				factor = 0
-				AND = {
-					check_variable = {
-						currentMoney < 2
-					}
-					has_political_power < 39
+				OR = {
+					check_variable = { currentMoney < 2 }
+					has_political_power < 100
 				}
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_historical = yes
 			}
 		}
 		days_re_enable = 12
@@ -1452,24 +1545,21 @@ VIE_Bao_Dai_Power_Minigame = {
 		}
 		custom_cost_text = VIE_has_150_mil
 		ai_will_do = {
-			base = 10
+			base = 26
 			modifier = {
-				factor = 100
-				AND = {
-					check_variable = {
-						currentMoney > 4
-					}
-					has_political_power > 59
-				}
+				factor = 0
+				NOT = { VIE_ai_pm_pursue_historical = yes }
 			}
 			modifier = {
 				factor = 0
-				AND = {
-					check_variable = {
-						currentMoney < 2
-					}
-					has_political_power < 14
+				OR = {
+					check_variable = { currentMoney < 2 }
+					has_political_power < 100
 				}
+			}
+			modifier = {
+				factor = 8
+				VIE_ai_pm_pursue_historical = yes
 			}
 		}
 		days_re_enable = 12
@@ -1510,7 +1600,6 @@ VIE_Bao_Dai_Power_Minigame = {
 			VIE_Change_Alt_Favoritism = yes
 		}
 	}
-	# Diem Opposition Decisions
 	Discredit_the_Ngo_Dinh_Diem_Faction = {
 		complete_effect = {
 			set_temp_variable = { favoritism_change = -5 }
@@ -1547,12 +1636,9 @@ VIE_Bao_Dai_Power_Minigame = {
 			}
 		}
 	}
-	# General Favoritism Decisions
 	Uncensor_Bao_Dais_Scandals = {
 		visible = {
-			has_country_leader = {
-				character = VIE_Bao_Dai
-			}
+			has_country_flag = VIE_Main_Bao_Dai
 		}
 		complete_effect = {
 			set_temp_variable = { favoritism_change = -15 }
@@ -1577,7 +1663,7 @@ VIE_Bao_Dai_Power_Minigame = {
 			VIE_Change_Domestic_Influence = yes
 		}
 		ai_will_do = {
-			base = 10
+			base = 1
 			modifier = {
 				factor = 150
 				AND = {
@@ -1622,7 +1708,7 @@ VIE_Bao_Dai_Power_Minigame = {
 			}
 		}
 		ai_will_do = {
-			base = 10
+			base = 1
 			modifier = {
 				factor = 180
 				AND = {
@@ -1659,7 +1745,7 @@ VIE_Bao_Dai_Power_Minigame = {
 			VIE_Change_Domestic_Influence = yes
 		}
 		ai_will_do = {
-			base = 10
+			base = 1
 			modifier = {
 				factor = 150
 				AND = {
@@ -1704,7 +1790,7 @@ VIE_Bao_Dai_Power_Minigame = {
 			}
 		}
 		ai_will_do = {
-			base = 10
+			base = 1
 			modifier = {
 				factor = 180
 				AND = {
@@ -1774,7 +1860,7 @@ VIE_Bao_Dai_Power_Minigame = {
 			}
 		}
 		ai_will_do = {
-			base = 10
+			base = 1
 			modifier = {
 				factor = 20
 				has_political_power > 159
@@ -1848,7 +1934,7 @@ VIE_Bao_Dai_Power_Minigame = {
 			}
 		}
 		ai_will_do = {
-			base = 10
+			base = 1
 			modifier = {
 				factor = 20
 				has_political_power > 249
@@ -1868,11 +1954,18 @@ VIE_Bao_Dai_Power_Minigame = {
 				has_country_flag = VIE_FRA_Coup
 			}
 			NOT = {
-				has_completed_focus = VIE_Matignon_Treaty
+				has_country_flag = VIE_Hinh_Crisis
+			}
+			NOT = {
+				has_country_flag = VIE_Matignon_Treaty_Signed
 			}
 			OR = {
 				has_character = CCC_Jean_Leroy
 				has_character = VIE_Nguyen_Van_Hinh
+			}
+			OR = {
+				is_ai = no
+				NOT = { has_game_rule = { rule = VIE_ai_french_coup option = VIE_FRENCH_COUP_AI_EXEMPT } }
 			}
 		}
 		days_mission_timeout = 45
@@ -1891,12 +1984,354 @@ VIE_Bao_Dai_Power_Minigame = {
 						FRA_Influence > 10
 					}
 				}
-				has_completed_focus = VIE_Matignon_Treaty
+				has_country_flag = VIE_Matignon_Treaty_Signed
 			}
 		}
 		timeout_effect = {
 			set_country_flag = VIE_FRA_Coup
 			country_event = French_Coup.2
+		}
+	}
+	VIE_Hinh_Coup_Attempt = {
+		activation = {
+			has_country_flag = VIE_Hinh_Crisis
+			has_character = VIE_Nguyen_Van_Hinh
+			NOT = {
+				has_country_flag = VIE_FRA_Coup
+			}
+			NOT = {
+				has_country_flag = VIE_Diem_Controls_Army
+			}
+			NOT = {
+				has_country_flag = VIE_Hinh_Bought_Off
+			}
+			OR = {
+				is_ai = no
+				NOT = { has_game_rule = { rule = VIE_ai_french_coup option = VIE_FRENCH_COUP_AI_EXEMPT } }
+			}
+		}
+		days_mission_timeout = 135	# 7 July 1954 cabinet to Hinh's resignation on 13 November, with a little slack
+		selectable_mission = no
+		is_good = no
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+		cancel_trigger = {
+			OR = {
+				custom_trigger_tooltip = {
+					tooltip = VIE_Diem_Controls_Army_tt
+					has_country_flag = VIE_Diem_Controls_Army
+				}
+				has_country_flag = VIE_Hinh_Bought_Off
+				NOT = { has_character = VIE_Nguyen_Van_Hinh }
+			}
+		}
+		timeout_effect = {
+			clr_country_flag = VIE_Hinh_Crisis
+			if = {
+				limit = {
+					is_ai = yes
+					is_historical_focus_on = yes
+					check_variable = { VIE_Hinh_Standoff < 50 }
+				}
+				set_variable = { VIE_Hinh_Standoff = 50 }
+			}
+			if = {
+				limit = { check_variable = { VIE_Hinh_Standoff > 49 } }
+				country_event = Diem.22
+			}
+			else = {
+				set_country_flag = VIE_FRA_Coup
+				country_event = Diem.23
+			}
+		}
+	}
+	VIE_Hinh_Request_American_Guards = {
+		visible = {
+			has_country_flag = VIE_Hinh_Crisis
+		}
+		available = {
+			has_political_power > 49
+			USA = {
+				OR = {
+					has_completed_focus = USA_50s_Permit_Diem_Regime
+					has_opinion = {
+						target = VIE
+						value > 24
+					}
+				}
+			}
+		}
+		cost = 50
+		fire_only_once = yes
+		selectable_mission = no
+		complete_effect = {
+			country_event = { id = Diem.24 days = 14 }
+		}
+		ai_will_do = {
+			base = 40
+			modifier = {
+				factor = 0
+				has_political_power < 60
+			}
+		}
+	}
+	VIE_Hinh_Buy_the_Officer_Corps = {
+		visible = {
+			has_country_flag = VIE_Hinh_Crisis
+		}
+		custom_cost_trigger = {
+			has_political_power > 24
+			check_variable = { currentMoney > 0.09 }
+		}
+		custom_cost_text = VIE_Hinh_Buy_the_Officer_Corps_cost
+		days_re_enable = 20
+		fire_only_once = no
+		selectable_mission = no
+		complete_effect = {
+			add_political_power = -25
+			set_temp_variable = { money_to_gain = -0.1 }
+			add_money_with_tooltip_effect = yes
+			set_temp_variable = { hinh_standoff_change = 10 }
+			VIE_hinh_standoff_change = yes
+		}
+		ai_will_do = {
+			base = 30
+			modifier = {
+				factor = 0
+				has_political_power < 60
+			}
+		}
+	}
+	VIE_Hinh_Appeal_to_Bao_Dai = {
+		visible = {
+			has_country_flag = VIE_Hinh_Crisis
+		}
+		available = {
+			has_political_power > 29
+		}
+		cost = 30
+		fire_only_once = yes
+		selectable_mission = no
+		complete_effect = {
+			set_temp_variable = { hinh_standoff_change = 20 }
+			VIE_hinh_standoff_change = yes
+			set_temp_variable = { favoritism_change = 10 }	# the throne does not do favours for nothing
+			VIE_Change_Main_Favoritism = yes
+		}
+		ai_will_do = {
+			base = 25
+			modifier = {
+				factor = 0
+				has_political_power < 60
+			}
+		}
+	}
+	VIE_Hinh_Reform_the_Cabinet = {
+		visible = {
+			has_country_flag = VIE_Hinh_Crisis
+			has_idea = VIE_Caretaker_Cabinet
+		}
+		available = {
+			has_political_power > 39
+		}
+		cost = 40
+		fire_only_once = yes
+		selectable_mission = no
+		complete_effect = {
+			remove_ideas = VIE_Caretaker_Cabinet
+			add_stability = 0.05
+			set_temp_variable = { hinh_standoff_change = 10 }
+			VIE_hinh_standoff_change = yes
+		}
+		ai_will_do = {
+			base = 35
+			modifier = {
+				factor = 0
+				has_political_power < 60
+			}
+		}
+	}
+	VIE_Hinh_Ease_Out_the_Chief = {	# the bought-off path's only route to the army: Le-Van-Ty takes the General Staff on 12 January 1955
+		visible = {
+			has_country_flag = VIE_PM_Ngo_Dinh_Diem
+			has_country_flag = VIE_Hinh_Bought_Off
+			NOT = {
+				has_country_flag = VIE_Diem_Controls_Army
+			}
+		}
+		available = {
+			date > 1955.01.12
+			has_character = VIE_Le_Van_Ty
+			has_political_power > 74
+		}
+		cost = 75
+		days_remove = 30
+		fire_only_once = yes
+		selectable_mission = no
+		remove_effect = {
+			set_country_flag = VIE_Diem_Controls_Army
+			add_stability = -0.03
+			set_temp_variable = { favoritism_change = -10 }
+			VIE_Change_Main_Favoritism = yes
+			set_temp_variable = { influence_change = 5 }
+			VIE_Change_Domestic_Influence = yes
+			set_temp_variable = { daiviet_threat_change = 10 }	# the chief goes, and the officers who backed him take the grievance to the party
+			VIE_daiviet_threat_change = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+	VIE_DaiViet_Plot = {
+		activation = {
+			has_country_flag = VIE_PM_Ngo_Dinh_Diem
+			NOT = {
+				has_global_flag = VIE_Republic_Proclaimed
+			}
+			NOT = {
+				has_country_flag = VIE_DaiViet_Plot_Running
+			}
+			NOT = {
+				has_country_flag = VIE_Hinh_Coup
+			}
+			check_variable = {
+				VIE_DaiViet_Threat > 49
+			}
+		}
+		days_mission_timeout = 45
+		selectable_mission = no
+		is_good = no
+		available = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+		cancel_trigger = {
+			custom_trigger_tooltip = {
+				tooltip = VIE_DaiViet_Threat_Contained_tt
+				check_variable = {
+					VIE_DaiViet_Threat < 50
+				}
+			}
+		}
+		timeout_effect = {
+			set_country_flag = {
+				flag = VIE_DaiViet_Plot_Running
+				days = 120
+			}
+			if = {
+				limit = { check_variable = { VIE_DaiViet_Threat > 99 } }
+				country_event = DaiViet.3
+			}
+			else_if = {
+				limit = { check_variable = { VIE_DaiViet_Threat > 74 } }
+				country_event = DaiViet.2
+			}
+			else = {
+				country_event = DaiViet.1
+			}
+		}
+	}
+	VIE_DaiViet_Offer_Cabinet_Seats = {
+		visible = {
+			has_country_flag = VIE_PM_Ngo_Dinh_Diem
+			NOT = { has_global_flag = VIE_Republic_Proclaimed }
+		}
+		available = {
+			has_political_power > 49
+			check_variable = {
+				VIE_DaiViet_Threat > 4
+			}
+		}
+		cost = 50
+		days_re_enable = 90
+		fire_only_once = no
+		selectable_mission = no
+		complete_effect = {
+			set_temp_variable = { daiviet_threat_change = -25 }
+			VIE_daiviet_threat_change = yes
+			set_temp_variable = { favoritism_change = -5 }	# power shared is standing spent
+			VIE_Change_Alt_Favoritism = yes
+		}
+		ai_will_do = {
+			base = 20
+			modifier = {
+				factor = 0
+				has_political_power < 80
+			}
+			modifier = {
+				factor = 4
+				check_variable = { VIE_DaiViet_Threat > 44 }
+			}
+		}
+	}
+	VIE_DaiViet_Can_Lao_Infiltration = {
+		visible = {
+			has_country_flag = VIE_Can_Lao_Founded
+			NOT = { has_global_flag = VIE_Republic_Proclaimed }
+		}
+		available = {
+			has_political_power > 24
+			check_variable = {
+				VIE_DaiViet_Threat > 4
+			}
+		}
+		cost = 25
+		days_re_enable = 60
+		fire_only_once = no
+		selectable_mission = no
+		complete_effect = {
+			set_temp_variable = { daiviet_threat_change = -20 }
+			VIE_daiviet_threat_change = yes
+		}
+		ai_will_do = {
+			base = 50
+			modifier = {
+				factor = 0
+				has_political_power < 50
+			}
+			modifier = {
+				factor = 4
+				check_variable = { VIE_DaiViet_Threat > 34 }
+			}
+		}
+	}
+	VIE_DaiViet_Arrest_the_Cadres = {
+		visible = {
+			has_country_flag = VIE_PM_Ngo_Dinh_Diem
+			NOT = { has_global_flag = VIE_Republic_Proclaimed }
+		}
+		available = {
+			has_political_power > 34
+			has_stability > 0.19
+			check_variable = {
+				VIE_DaiViet_Threat > 4
+			}
+		}
+		cost = 35
+		days_re_enable = 120
+		fire_only_once = no
+		selectable_mission = no
+		complete_effect = {
+			add_stability = -0.05
+			set_temp_variable = { daiviet_threat_change = -35 }
+			VIE_daiviet_threat_change = yes
+			set_temp_variable = { favoritism_change = -3 }
+			VIE_Change_Alt_Favoritism = yes
+		}
+		ai_will_do = {
+			base = 15
+			modifier = {
+				factor = 0
+				has_political_power < 70
+			}
+			modifier = {
+				factor = 6
+				check_variable = { VIE_DaiViet_Threat > 64 }
+			}
 		}
 	}
 }
@@ -3485,78 +3920,6 @@ VIE_State_Integration_Decisions = {
 			}
 		}
 	}
-	Core_VIN_States = {
-		state_target = yes
-		target_trigger = {
-			ROOT = {
-				has_country_flag = VIE_Can_Integrate_VIN
-			}
-			FROM = {
-				is_core_of = VIN
-				is_owned_by = VIE
-				NOT = {
-					is_core_of = VIE
-				}
-			}
-		}
-		available = {
-			FROM = {
-				resistance < 15
-				compliance > 85
-			}
-		}
-		cancel_trigger = {
-			FROM = {
-				NOT = {
-					is_owned_and_controlled_by = VIE
-				}
-			}
-		}
-		target_array = VIE.owned_controlled_states
-		on_map_mode = decision_view_only
-		custom_cost_trigger = {
-			command_power > 24
-			has_political_power > 49
-			has_equipment = {
-				infantry_equipment > 249
-			}
-		}
-		custom_cost_text = VIE_Can_Integrate_VIN_State
-		ai_will_do = {
-			base = 10
-			modifier = {
-				factor = 100
-				has_political_power > 74
-				has_equipment = {
-					infantry_equipment < 350
-				}
-			}
-			modifier = {
-				factor = 0
-				has_political_power < 49
-				has_equipment = {
-					infantry_equipment > 350
-				}
-			}
-		}
-		selectable_mission = no
-		fire_only_once = yes
-		complete_effect = {
-			hidden_effect = {
-				add_command_power = -25
-				add_political_power = -50
-				add_equipment_to_stockpile = {
-					type = infantry_equipment
-					amount = -250
-				}
-			}
-			FROM = {
-				remove_core_of = VIN
-				add_core_of = VIE
-				cancel_resistance = yes
-			}
-		}
-	}
 	Drafting_Youth = {
 		available = {
 			has_manpower < 5000
@@ -3567,7 +3930,7 @@ VIE_State_Integration_Decisions = {
 				factor = 100
 				AND = {
 					has_political_power > 149
-					has_manpower < -5000
+					has_manpower < 5000
 				}
 			}
 			modifier = {
@@ -7333,6 +7696,21 @@ VIE_Integrate_Sect_Armies = {
 			hidden_effect = {
 				add_command_power = -50
 				add_political_power = -50
+				division_template = {
+					name = "Su Doan Bien"
+					division_names_group = VIE_MIL_01
+					priority = 1
+					template_counter = 208
+					is_locked = yes
+					regiments = {
+						militia = { x = 0 y = 0 }
+						militia = { x = 0 y = 1 }
+						militia = { x = 0 y = 2 }
+					}
+					support = {
+						light_artillery_support = { x = 0 y = 0 }
+					}
+				}
 			}
 			add_to_variable = {
 				FRA_Influence = 5
@@ -7416,10 +7794,16 @@ VIE_Recruit_CEFEO_Foreign_Legion_Units = {
 			factor = 0
 		}
 		visible = {
-			has_completed_focus = VIE_Coordinate_with_CEFEO
+			OR = {
+				has_completed_focus = VIE_Coordinate_with_CEFEO
+				has_completed_focus = VIE_CD_Coordinate_with_CEFEO
+			}
 		}
 		available = {
-			has_completed_focus = VIE_Coordinate_with_CEFEO
+			OR = {
+				has_completed_focus = VIE_Coordinate_with_CEFEO
+				has_completed_focus = VIE_CD_Coordinate_with_CEFEO
+			}
 		}
 		fire_only_once = yes
 		custom_cost_trigger = {
@@ -7431,13 +7815,14 @@ VIE_Recruit_CEFEO_Foreign_Legion_Units = {
 			hidden_effect = {
 				add_command_power = -50
 				add_political_power = -25
+				VIE_create_CEFEO_FFL_templates = yes
 			}
 			add_to_variable = {
 				FRA_Influence = 5
 			}
 			capital_scope = {
 				create_unit = {
-					division = "name = \"Division de Tonkin\" division_template = \"Légion Étrangère Française Blindée\" start_experience_factor = 0.1 start_equipment_factor = 1"
+					division = "name = \"Division de Tonkin\" division_template = \"Legion Etrangere Francaise Blindee\" start_experience_factor = 0.1 start_equipment_factor = 1"
 					owner = VIE
 				}
 			}
@@ -7448,10 +7833,16 @@ VIE_Recruit_CEFEO_Foreign_Legion_Units = {
 			factor = 0
 		}
 		visible = {
-			has_completed_focus = VIE_Coordinate_with_CEFEO
+			OR = {
+				has_completed_focus = VIE_Coordinate_with_CEFEO
+				has_completed_focus = VIE_CD_Coordinate_with_CEFEO
+			}
 		}
 		available = {
-			has_completed_focus = VIE_Coordinate_with_CEFEO
+			OR = {
+				has_completed_focus = VIE_Coordinate_with_CEFEO
+				has_completed_focus = VIE_CD_Coordinate_with_CEFEO
+			}
 		}
 		fire_only_once = yes
 		custom_cost_trigger = {
@@ -7463,13 +7854,14 @@ VIE_Recruit_CEFEO_Foreign_Legion_Units = {
 			hidden_effect = {
 				add_command_power = -50
 				add_political_power = -25
+				VIE_create_CEFEO_FFL_templates = yes
 			}
 			add_to_variable = {
 				FRA_Influence = 5
 			}
 			capital_scope = {
 				create_unit = {
-					division = "name = \"1er Régiment Etranger de Parachutistes\" division_template = \"Régiment Étranger Parachutiste\" start_experience_factor = 0.8 start_equipment_factor = 1"
+					division = "name = \"1er Regiment Etranger de Parachutistes\" division_template = \"Regiment Etranger Parachutiste\" start_experience_factor = 0.8 start_equipment_factor = 1"
 					owner = VIE
 				}
 			}
@@ -7480,10 +7872,16 @@ VIE_Recruit_CEFEO_Foreign_Legion_Units = {
 			factor = 0
 		}
 		visible = {
-			has_completed_focus = VIE_Coordinate_with_CEFEO
+			OR = {
+				has_completed_focus = VIE_Coordinate_with_CEFEO
+				has_completed_focus = VIE_CD_Coordinate_with_CEFEO
+			}
 		}
 		available = {
-			has_completed_focus = VIE_Coordinate_with_CEFEO
+			OR = {
+				has_completed_focus = VIE_Coordinate_with_CEFEO
+				has_completed_focus = VIE_CD_Coordinate_with_CEFEO
+			}
 		}
 		fire_only_once = yes
 		custom_cost_trigger = {
@@ -7495,13 +7893,14 @@ VIE_Recruit_CEFEO_Foreign_Legion_Units = {
 			hidden_effect = {
 				add_command_power = -50
 				add_political_power = -25
+				VIE_create_CEFEO_FFL_templates = yes
 			}
 			add_to_variable = {
 				FRA_Influence = 5
 			}
 			capital_scope = {
 				create_unit = {
-					division = "name = \"3e Régiment Etranger de Parachutistes\" division_template = \"Régiment Étranger Parachutiste\" start_experience_factor = 0.8 start_equipment_factor = 1"
+					division = "name = \"3e Regiment Etranger de Parachutistes\" division_template = \"Regiment Etranger Parachutiste\" start_experience_factor = 0.8 start_equipment_factor = 1"
 					owner = VIE
 				}
 			}
@@ -7512,10 +7911,16 @@ VIE_Recruit_CEFEO_Foreign_Legion_Units = {
 			factor = 0
 		}
 		visible = {
-			has_completed_focus = VIE_Coordinate_with_CEFEO
+			OR = {
+				has_completed_focus = VIE_Coordinate_with_CEFEO
+				has_completed_focus = VIE_CD_Coordinate_with_CEFEO
+			}
 		}
 		available = {
-			has_completed_focus = VIE_Coordinate_with_CEFEO
+			OR = {
+				has_completed_focus = VIE_Coordinate_with_CEFEO
+				has_completed_focus = VIE_CD_Coordinate_with_CEFEO
+			}
 		}
 		fire_only_once = yes
 		custom_cost_trigger = {
@@ -7527,13 +7932,14 @@ VIE_Recruit_CEFEO_Foreign_Legion_Units = {
 			hidden_effect = {
 				add_command_power = -50
 				add_political_power = -25
+				VIE_create_CEFEO_FFL_templates = yes
 			}
 			add_to_variable = {
 				FRA_Influence = 5
 			}
 			capital_scope = {
 				create_unit = {
-					division = "name = \"Brigade d'Annam-Laos\" division_template = \"Légion Étrangère Française\" start_experience_factor = 0.3 start_equipment_factor = 1"
+					division = "name = \"Brigade d'Annam-Laos\" division_template = \"Legion Etrangere Francaise\" start_experience_factor = 0.3 start_equipment_factor = 1"
 					owner = VIE
 				}
 			}
@@ -7544,10 +7950,16 @@ VIE_Recruit_CEFEO_Foreign_Legion_Units = {
 			factor = 0
 		}
 		visible = {
-			has_completed_focus = VIE_Coordinate_with_CEFEO
+			OR = {
+				has_completed_focus = VIE_Coordinate_with_CEFEO
+				has_completed_focus = VIE_CD_Coordinate_with_CEFEO
+			}
 		}
 		available = {
-			has_completed_focus = VIE_Coordinate_with_CEFEO
+			OR = {
+				has_completed_focus = VIE_Coordinate_with_CEFEO
+				has_completed_focus = VIE_CD_Coordinate_with_CEFEO
+			}
 		}
 		fire_only_once = yes
 		custom_cost_trigger = {
@@ -7559,13 +7971,14 @@ VIE_Recruit_CEFEO_Foreign_Legion_Units = {
 			hidden_effect = {
 				add_command_power = -50
 				add_political_power = -25
+				VIE_create_CEFEO_FFL_templates = yes
 			}
 			add_to_variable = {
 				FRA_Influence = 5
 			}
 			capital_scope = {
 				create_unit = {
-					division = "name = \"11e régiment d'infanterie de marine\" division_template = \"Légion Étrangère Française\" start_experience_factor = 0.3 start_equipment_factor = 1"
+					division = "name = \"11e Regiment d'Infanterie de Marine\" division_template = \"Legion Etrangere Francaise\" start_experience_factor = 0.3 start_equipment_factor = 1"
 					owner = VIE
 				}
 			}
@@ -7854,7 +8267,6 @@ VIE_Francophile_Ideals = {
 	}
 }
 
-####################################
 FUL_VietMinh_War = {
 	FUL_VietMinh_War_decision = {
 		available = {
@@ -7869,6 +8281,194 @@ FUL_VietMinh_War = {
 		}
 		ai_will_do = {
 			factor = 100
+		}
+	}
+}
+
+VIE_Marxist_Organization = {
+	VIE_Organize_Party_Cells = {
+		visible = {
+			NOT = {
+				has_idea = VIE_Democratic_Centralism_1
+				has_idea = VIE_Democratic_Centralism_2
+				has_idea = VIE_Democratic_Centralism_3
+			}
+		}
+		cost = 50
+		days_remove = 90
+		fire_only_once = yes
+		ai_will_do = {
+			base = 5
+			modifier = {
+				factor = 0
+				has_political_power < 60
+			}
+		}
+		remove_effect = {
+			add_ideas = VIE_Democratic_Centralism_1
+		}
+	}
+	VIE_Introduce_Democratic_Centralism = {
+		visible = {
+			has_idea = VIE_Democratic_Centralism_1
+		}
+		cost = 50
+		days_remove = 100
+		fire_only_once = yes
+		ai_will_do = {
+			base = 5
+			modifier = {
+				factor = 0
+				has_political_power < 60
+			}
+		}
+		remove_effect = {
+			swap_ideas = {
+				remove_idea = VIE_Democratic_Centralism_1
+				add_idea = VIE_Democratic_Centralism_2
+			}
+		}
+	}
+	VIE_Vanguard_NhanVi_Revolution = {
+		visible = {
+			has_idea = VIE_Democratic_Centralism_2
+		}
+		cost = 50
+		days_remove = 120
+		fire_only_once = yes
+		ai_will_do = {
+			base = 5
+			modifier = {
+				factor = 0
+				has_political_power < 60
+			}
+		}
+		remove_effect = {
+			swap_ideas = {
+				remove_idea = VIE_Democratic_Centralism_2
+				add_idea = VIE_Democratic_Centralism_3
+			}
+		}
+	}
+	VIE_Cadres_To_Barracks = {
+		visible = {
+			check_variable = {
+				VIE_ChieuHoi_Cadres > 0
+			}
+		}
+		available = {
+			NOT = {
+				has_country_flag = VIE_Cadre_Deployment_Cooldown
+			}
+		}
+		cost = 25
+		custom_cost_trigger = {
+			has_political_power > 24
+			check_variable = {
+				currentMoney > 0.09
+			}
+		}
+		custom_cost_text = VIE_has_100_mil_25pp
+		days_remove = 60
+		fire_only_once = no
+		ai_will_do = {
+			base = 3
+			modifier = {
+				factor = 0
+				OR = {
+					has_political_power < 50
+					check_variable = {
+						currentMoney < 0.5
+					}
+				}
+			}
+		}
+		complete_effect = {
+			subtract_from_variable = {
+				VIE_ChieuHoi_Cadres = 1
+			}
+			set_temp_variable = {
+				money_to_gain = -0.1
+			}
+			add_money_with_tooltip_effect = yes
+			army_experience = 10
+			add_command_power = 5
+			set_country_flag = VIE_Cadre_Deployment_Cooldown
+		}
+		remove_effect = {
+			clr_country_flag = VIE_Cadre_Deployment_Cooldown
+			hidden_effect = {
+				random_list = {
+					20 = {
+						country_event = { id = DiemMarx.1 hours = 6 }
+					}
+					80 = {
+					}
+				}
+			}
+		}
+	}
+	VIE_Cadres_To_Villages = {
+		visible = {
+			check_variable = {
+				VIE_ChieuHoi_Cadres > 0
+			}
+		}
+		available = {
+			NOT = {
+				has_country_flag = VIE_Cadre_Deployment_Cooldown
+			}
+			check_variable = {
+				VIE_Land_Reform_Penalty < 0.6
+			}
+		}
+		cost = 25
+		custom_cost_trigger = {
+			has_political_power > 24
+			check_variable = {
+				currentMoney > 0.09
+			}
+		}
+		custom_cost_text = VIE_has_100_mil_25pp
+		days_remove = 60
+		fire_only_once = no
+		ai_will_do = {
+			base = 3
+			modifier = {
+				factor = 0
+				OR = {
+					has_political_power < 50
+					check_variable = {
+						currentMoney < 0.5
+					}
+				}
+			}
+		}
+		complete_effect = {
+			subtract_from_variable = {
+				VIE_ChieuHoi_Cadres = 1
+			}
+			set_temp_variable = {
+				money_to_gain = -0.1
+			}
+			add_money_with_tooltip_effect = yes
+			custom_effect_tooltip = Decrease_Land_Reform_Penalty_5
+			add_to_variable = {
+				VIE_Land_Reform_Penalty = 0.05
+			}
+			set_country_flag = VIE_Cadre_Deployment_Cooldown
+		}
+		remove_effect = {
+			clr_country_flag = VIE_Cadre_Deployment_Cooldown
+			hidden_effect = {
+				random_list = {
+					20 = {
+						country_event = { id = DiemMarx.1 hours = 6 }
+					}
+					80 = {
+					}
+				}
+			}
 		}
 	}
 }

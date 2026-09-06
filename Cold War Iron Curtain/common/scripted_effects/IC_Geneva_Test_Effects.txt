@@ -1,0 +1,1213 @@
+test_geneva_reset = {
+	clr_global_flag = geneva_conference_announced
+	clr_global_flag = geneva_conference_in_session
+	clr_global_flag = geneva_conference_concluded
+	clr_global_flag = geneva_unified_settlement
+	clr_global_flag = geneva_interim_government_period
+	clr_global_flag = geneva_election_resolved
+	clr_global_flag = Geneva_Conference_Preparations
+	clr_global_flag = Geneva_Conference_Negotiations_Complete
+	clr_global_flag = Geneva_Conference
+	clr_global_flag = geneva_conf_attendance_autogranted	# otherwise a re-convened conference silently pays no delegation payload
+	clr_global_flag = Indochina_Geneva_Pursuit
+	set_variable = { global.Indochina_Geneva_Pursuit_Source = 0 }
+	clr_global_flag = Indochina_Geneva_Panic
+	clr_global_flag = geneva_usa_panic_no_ballot
+	clr_global_flag = geneva_election_campaign_open
+	clr_global_flag = Indochina_War_Over
+	set_variable = { global.geneva_round = 0 }
+	set_variable = { global.geneva_tick_days = 0 }
+	set_variable = { global.geneva_outcome = 0 }
+	set_variable = { global.geneva_wrecker = 0 }
+	set_variable = { global.geneva_partition_line = 0 }
+	set_variable = { global.geneva_elections_term = 0 }
+	set_variable = { global.geneva_withdrawal_term = 0 }
+	set_variable = { global.geneva_alignment_term = 0 }
+	set_variable = { global.geneva_laos_cambodia_term = 0 }
+	set_variable = { global.geneva_minorities_term = 0 }
+	set_variable = { global.geneva_final_comm_score = 0 }
+	set_variable = { global.geneva_final_anticomm_score = 0 }
+	clear_array = global.geneva_delegations
+	clear_array = global.geneva_clause_current
+	clear_array = global.geneva_push
+	clear_array = global.geneva_severity
+	clear_array = global.geneva_neg_country
+	clear_array = global.geneva_neg_clause
+	clear_array = global.geneva_neg_option
+	clear_array = global.geneva_neg_amount
+	clear_array = global.geneva_neg_days
+	clear_array = global.geneva_neg_clause_count
+	every_country = {
+		limit = {
+			OR = {
+				tag = FRA
+				tag = VIE
+				tag = VIN
+				tag = USA
+				tag = SOV
+				tag = PRC
+				tag = ENG
+				tag = LOS
+				tag = CAM
+				tag = LAO
+				tag = PQC
+			}
+		}
+		clr_country_flag = geneva_walked_out
+		clr_country_flag = geneva_core_delegation
+		set_variable = { View_Geneva_Conference = 0 }
+		set_variable = { geneva_grievance = 0 }
+		set_variable = { geneva_neg_display_clause = 0 }
+		set_variable = { geneva_neg_display_days = 0 }
+		clear_array = geneva_neg_mine
+	}
+	every_country = {	# reseating re-adds it; a mid-session reset must not leave the button behind
+		limit = { is_in_array = { array = country_politics_list value = 29 } }
+		remove_from_array = { array = country_politics_list value = 29 }
+	}
+	if = {
+		limit = { country_exists = FRA }
+		FRA = {
+			clr_country_flag = FRA_Accepted_Ceasefire
+			clr_country_flag = FRA_Rejected_Ceasefire
+			clr_country_flag = FRA_Accepted_Reunification
+			clr_country_flag = FRA_Rejected_Reunification
+		}
+	}
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			clr_country_flag = VIE_Accepted_Ceasefire
+			clr_country_flag = VIE_Rejected_Ceasefire
+			clr_country_flag = VIE_Accepted_Reunification
+			clr_country_flag = VIE_Rejected_Reunification
+			clr_country_flag = VIE_Rejected_Reunification_USA_Intervention
+		}
+	}
+	if = {
+		limit = { country_exists = VIN }
+		VIN = {
+			clr_country_flag = VIN_Accepted_Ceasefire
+			clr_country_flag = VIN_Rejected_Ceasefire
+			clr_country_flag = VIN_Accepted_Reunification
+			clr_country_flag = VIN_Rejected_Reunification
+		}
+	}
+	if = {
+		limit = { country_exists = USA }
+		USA = {
+			clr_country_flag = USA_Tampered_With_VIE
+			clr_country_flag = USA_geneva_leaned_on_saigon
+		}
+	}
+}
+
+test_geneva_reset_leverage = {
+	set_variable = { global.geneva_lev_communist = 0 }
+	set_variable = { global.geneva_lev_profrance = 0 }
+	set_variable = { global.geneva_lev_proindependence = 0 }
+	set_variable = { global.geneva_lev_usa = 0 }
+	set_variable = { global.geneva_lev_federal = 0 }
+	set_variable = { global.geneva_lev_ethnic = 0 }
+	set_variable = { global.geneva_rapprochement_vie_vin = 0 }
+	clr_global_flag = geneva_pathet_lao_war_seen
+	clr_global_flag = geneva_pathet_lao_outcome_applied
+	clr_global_flag = geneva_usa_backs_vie_applied
+	clr_global_flag = geneva_handoff_applied
+	clr_global_flag = geneva_usa_backs_france_applied
+	clr_global_flag = geneva_usa_danquoc_applied
+	clr_global_flag = geneva_cuongde_talks_applied
+	clr_global_flag = geneva_cuongde_front_applied
+}
+
+test_geneva_announce = {
+	geneva_conf_announce = yes
+}
+
+test_geneva_start = {
+	geneva_conf_initialize = yes
+}
+
+test_geneva_force_session = {
+	if = {
+		limit = { NOT = { has_global_flag = geneva_conference_in_session } }
+		test_geneva_reset = yes
+		geneva_conf_initialize = yes
+	}
+}
+
+test_geneva_tick = {
+	geneva_conf_round_tick = yes
+}
+
+test_geneva_tick_5 = {
+	geneva_conf_round_tick = yes
+	geneva_conf_round_tick = yes
+	geneva_conf_round_tick = yes
+	geneva_conf_round_tick = yes
+	geneva_conf_round_tick = yes
+}
+
+test_geneva_finish = {
+	test_geneva_force_session = yes
+	set_variable = { global.geneva_round = 10 }
+	geneva_conf_compile_settlement = yes
+}
+
+test_geneva_auto_resolve = {
+	geneva_conf_auto_resolve = yes
+}
+
+
+test_geneva_show_gui = {
+	set_variable = { View_Geneva_Conference = 1 }
+}
+
+test_geneva_hide_gui = {
+	set_variable = { View_Geneva_Conference = 0 }
+}
+
+test_geneva_seat_me = {
+	if = {
+		limit = {
+			has_global_flag = geneva_conference_in_session
+			NOT = { is_in_array = { global.geneva_delegations = THIS.id } }
+		}
+		geneva_conf_seat_delegation = yes
+	}
+}
+
+test_geneva_buff_me = {
+	add_political_power = 500
+	add_to_variable = { geneva_weight = 500 }
+	set_variable = { geneva_patience = 100 }
+	set_variable = { geneva_actions_used = 0 }
+	set_variable = { geneva_pressured_until = 0 }
+	set_variable = { geneva_backchannel_next = 0 }
+	set_variable = { geneva_threat_next = 0 }
+	set_variable = { geneva_threats_used = 0 }
+	set_variable = { geneva_grievance = 0 }
+	set_variable = { geneva_provocation = 0 }
+	clr_country_flag = geneva_walked_out
+}
+
+test_geneva_refresh_actions = {
+	set_variable = { geneva_actions_used = 0 }
+	set_variable = { geneva_pressured_until = 0 }
+	set_variable = { geneva_backchannel_next = 0 }
+	set_variable = { geneva_threat_next = 0 }
+	set_variable = { geneva_threats_used = 0 }
+}
+
+test_geneva_max_rapprochement = {
+	set_variable = { global.geneva_rapprochement_vie_vin = 120 }
+	if = {
+		limit = {
+			has_global_flag = geneva_conference_in_session
+			country_exists = VIE
+		}
+		VIE = { geneva_conf_refresh_prefs = yes }
+	}
+	if = {
+		limit = {
+			has_global_flag = geneva_conference_in_session
+			country_exists = VIN
+		}
+		VIN = { geneva_conf_refresh_prefs = yes }
+	}
+}
+
+test_geneva_lev_communist = {
+	set_temp_variable = { geneva_lev_amount = 100 }
+	geneva_add_communist_leverage = yes
+}
+
+test_geneva_lev_profrance = {
+	set_temp_variable = { geneva_lev_amount = 100 }
+	geneva_add_profrance_leverage = yes
+}
+
+test_geneva_lev_proindependence = {
+	set_temp_variable = { geneva_lev_amount = 100 }
+	geneva_add_proindependence_leverage = yes
+}
+
+test_geneva_lev_usa = {
+	set_temp_variable = { geneva_lev_amount = 100 }
+	geneva_add_usa_leverage = yes
+}
+
+test_geneva_lev_federal = {
+	set_temp_variable = { geneva_lev_amount = 100 }
+	geneva_add_federal_leverage = yes
+}
+
+test_geneva_lev_ethnic = {
+	set_temp_variable = { geneva_lev_amount = 100 }
+	geneva_add_ethnic_leverage = yes
+}
+
+test_geneva_lev_all = {
+	test_geneva_lev_communist = yes
+	test_geneva_lev_profrance = yes
+	test_geneva_lev_proindependence = yes
+	test_geneva_lev_usa = yes
+	test_geneva_lev_federal = yes
+	test_geneva_lev_ethnic = yes
+}
+
+test_geneva_settle_otl = {
+	test_geneva_force_session = yes
+	set_variable = { global.geneva_clause_current^0 = 2 }
+	set_variable = { global.geneva_clause_current^1 = 2 }
+	set_variable = { global.geneva_clause_current^2 = 1 }
+	set_variable = { global.geneva_clause_current^3 = 1 }
+	set_variable = { global.geneva_clause_current^4 = 1 }
+	set_variable = { global.geneva_clause_current^5 = 1 }
+	set_variable = { global.geneva_clause_current^6 = 0 }
+	set_variable = { global.geneva_round = 10 }
+	geneva_conf_compile_settlement = yes
+}
+
+test_geneva_settle_unified = {
+	test_geneva_force_session = yes
+	set_variable = { global.geneva_clause_current^0 = 2 }
+	set_variable = { global.geneva_clause_current^1 = 0 }
+	set_variable = { global.geneva_clause_current^2 = 2 }
+	set_variable = { global.geneva_clause_current^3 = 1 }
+	set_variable = { global.geneva_clause_current^4 = 1 }
+	set_variable = { global.geneva_clause_current^5 = 1 }
+	set_variable = { global.geneva_clause_current^6 = 0 }
+	set_variable = { global.geneva_round = 10 }
+	geneva_conf_compile_settlement = yes
+}
+
+test_geneva_settle_13th = {
+	test_geneva_force_session = yes
+	set_variable = { global.geneva_clause_current^0 = 2 }
+	set_variable = { global.geneva_clause_current^1 = 1 }
+	set_variable = { global.geneva_clause_current^2 = 1 }
+	set_variable = { global.geneva_clause_current^3 = 1 }
+	set_variable = { global.geneva_clause_current^4 = 1 }
+	set_variable = { global.geneva_clause_current^5 = 1 }
+	set_variable = { global.geneva_clause_current^6 = 0 }
+	set_variable = { global.geneva_round = 10 }
+	geneva_conf_compile_settlement = yes
+}
+
+test_geneva_settle_20th = {
+	test_geneva_force_session = yes
+	set_variable = { global.geneva_clause_current^0 = 2 }
+	set_variable = { global.geneva_clause_current^1 = 3 }
+	set_variable = { global.geneva_clause_current^2 = 1 }
+	set_variable = { global.geneva_clause_current^3 = 1 }
+	set_variable = { global.geneva_clause_current^4 = 1 }
+	set_variable = { global.geneva_clause_current^5 = 1 }
+	set_variable = { global.geneva_clause_current^6 = 0 }
+	set_variable = { global.geneva_round = 10 }
+	geneva_conf_compile_settlement = yes
+}
+
+test_geneva_collapse_no_ceasefire = {
+	test_geneva_force_session = yes
+	set_variable = { global.geneva_clause_current^0 = 0 }
+	set_variable = { global.geneva_round = 10 }
+	geneva_conf_compile_settlement = yes
+}
+
+test_geneva_collapse_walkouts = {
+	test_geneva_force_session = yes
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_country_flag = geneva_walked_out
+			set_variable = { geneva_patience = 0 }
+		}
+	}
+	if = {
+		limit = { country_exists = VIN }
+		VIN = {
+			set_country_flag = geneva_walked_out
+			set_variable = { geneva_patience = 0 }
+			save_global_event_target_as = Geneva_Wrecker
+			set_variable = { global.geneva_wrecker = THIS.id }
+		}
+	}
+	geneva_conf_compile_settlement = yes
+}
+
+test_geneva_election_now = {
+	if = {
+		limit = {
+			country_exists = VIE
+			country_exists = VIN
+		}
+		set_global_flag = geneva_interim_government_period
+		clr_global_flag = geneva_election_resolved
+		VIN = { country_event = { id = Geneva_Conference_Session.21 days = 1 } }
+	}
+}
+
+test_geneva_election_favor_ho = {
+	set_variable = { global.geneva_final_comm_score = 3000 }
+	set_variable = { global.geneva_final_anticomm_score = 300 }
+}
+
+test_geneva_election_favor_saigon = {
+	set_variable = { global.geneva_final_comm_score = 300 }
+	set_variable = { global.geneva_final_anticomm_score = 3000 }
+}
+
+test_geneva_debug = {
+	if = {
+		limit = { has_global_flag = geneva_conference_announced }
+	}
+	else = {
+	}
+	if = {
+		limit = { has_global_flag = geneva_conference_in_session }
+	}
+	else = {
+	}
+	if = {
+		limit = { has_global_flag = geneva_conference_concluded }
+	}
+	else = {
+	}
+	if = {
+		limit = { has_global_flag = geneva_unified_settlement }
+	}
+	else = {
+	}
+	if = {
+		limit = { has_global_flag = geneva_interim_government_period }
+	}
+	else = {
+	}
+	if = {
+		limit = { has_global_flag = geneva_election_resolved }
+	}
+	else = {
+	}
+	if = {
+		limit = { has_global_flag = Geneva_Conference_Negotiations_Complete }
+	}
+	else = {
+	}
+	if = {
+		limit = { check_variable = { global.geneva_round > 0 } }
+	}
+	else = {
+	}
+	if = {
+		limit = { is_in_array = { global.geneva_delegations = THIS.id } }
+	}
+	else = {
+	}
+}
+
+test_vie_sect_show_gui = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = { set_variable = { show_vie_sect_gui = 1 } }
+	}
+}
+
+test_vie_sect_hide_gui = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = { set_variable = { show_vie_sect_gui = 0 } }
+	}
+}
+
+test_vie_sect_reset = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { Binh_Xuyen_Loyalty = 80 }
+			set_variable = { Binh_Xuyen_Annihilation = 100 }
+			set_variable = { Cao_Dai_Loyalty = 60 }
+			set_variable = { Cao_Dai_Annihilation = 100 }
+			set_variable = { Harmonism_Loyalty = 100 }
+			set_variable = { Harmonism_Annihilation = 100 }
+			set_variable = { Hoa_Hao_Loyalty = 60 }
+			set_variable = { Hoa_Hao_Annihilation = 100 }
+			set_variable = { UMDC_Loyalty = 90 }
+			set_variable = { UMDC_Annihilation = 100 }
+			set_variable = { VIE_Sect_Pity_1 = 0 }
+			set_variable = { VIE_Sect_Pity_2 = 0 }
+			set_variable = { VIE_Sect_Pity_3 = 0 }
+			set_variable = { VIE_Sect_Pity_4 = 0 }
+			set_variable = { VIE_Sect_Pity_5 = 0 }
+			set_variable = { VIE_Sect_Conflict_Prompt = 0 }
+			set_variable = { show_vie_sect_conflict = 0 }
+			vietnam_faction_ui_update_number = yes
+		}
+	}
+}
+
+test_vie_sect_ready_integration = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { Binh_Xuyen_Loyalty = 2 }
+			set_variable = { Cao_Dai_Loyalty = 2 }
+			set_variable = { Harmonism_Loyalty = 2 }
+			set_variable = { Hoa_Hao_Loyalty = 2 }
+			set_variable = { UMDC_Loyalty = 2 }
+			vietnam_faction_ui_update_number = yes
+		}
+	}
+}
+
+test_vie_sect_ready_dismantle = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { Binh_Xuyen_Annihilation = 2 }
+			set_variable = { Cao_Dai_Annihilation = 2 }
+			set_variable = { Harmonism_Annihilation = 2 }
+			set_variable = { Hoa_Hao_Annihilation = 2 }
+			set_variable = { UMDC_Annihilation = 2 }
+			vietnam_faction_ui_update_number = yes
+		}
+	}
+}
+
+test_vie_sect_max_pity = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { VIE_Sect_Pity_1 = 1 }
+			set_variable = { VIE_Sect_Pity_2 = 1 }
+			set_variable = { VIE_Sect_Pity_3 = 1 }
+			set_variable = { VIE_Sect_Pity_4 = 1 }
+			set_variable = { VIE_Sect_Pity_5 = 1 }
+		}
+	}
+}
+
+test_vie_sect_prompt_attack_success = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { VIE_Conflict_ID = 1 }
+			set_variable = { VIE_Sect_Conflict_Prompt = 1 }
+			set_variable = { show_vie_sect_conflict = 1 }
+		}
+	}
+}
+
+test_vie_sect_prompt_attack_failure = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { VIE_Conflict_ID = 1 }
+			set_variable = { VIE_Sect_Conflict_Prompt = 2 }
+			set_variable = { show_vie_sect_conflict = 1 }
+		}
+	}
+}
+
+test_vie_sect_prompt_seize_success = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { VIE_Conflict_ID = 1 }
+			set_variable = { VIE_Sect_Conflict_Prompt = 3 }
+			set_variable = { show_vie_sect_conflict = 1 }
+		}
+	}
+}
+
+test_vie_sect_prompt_seize_failure = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { VIE_Conflict_ID = 1 }
+			set_variable = { VIE_Sect_Conflict_Prompt = 4 }
+			set_variable = { show_vie_sect_conflict = 1 }
+		}
+	}
+}
+
+test_indochina_diplomacy_phase = {
+	test_indochina_set_phase_high_tension = yes
+	add_political_power = 300
+}
+
+test_outcomes_show_gui = {
+	set_variable = { show_indochina_outcome_gui = 1 }
+}
+
+test_outcomes_hide_gui = {
+	set_variable = { show_indochina_outcome_gui = 0 }
+}
+
+test_outcomes_reset = {
+	test_indochina_outcomes_reset = yes
+}
+
+test_outcomes_pulse = {
+	geneva_conf_world_leverage_pulse = yes
+}
+
+test_outcomes_nlf_kill = {
+	if = {
+		limit = { country_exists = NLF country_exists = VIE }
+		VIE = { annex_country = { target = NLF transfer_troops = no } }
+	}
+	else_if = {
+		limit = { country_exists = NLF country_exists = FRA }
+		FRA = { annex_country = { target = NLF transfer_troops = no } }
+	}
+}
+
+test_outcomes_dbp_victory = {
+	if = {
+		limit = { country_exists = FRE }
+		FRE = { set_country_flag = FRE_DBP_Result_Victory }
+	}
+}
+
+test_outcomes_dbp_fall = {
+	if = {
+		limit = { country_exists = FRE }
+		FRE = { set_country_flag = FRE_DBP_Result_Fall }
+	}
+}
+
+test_outcomes_dbp_breakout = {
+	if = {
+		limit = { country_exists = FRE }
+		FRE = { set_country_flag = FRE_DBP_Result_Breakout }
+	}
+}
+
+test_outcomes_sects_all = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_country_flag = integrated_binh_xuyen
+			set_country_flag = integrated_cao_dai
+			set_country_flag = integrated_harmonism
+			set_country_flag = integrated_hoa_hao
+			set_country_flag = integrated_umdc
+		}
+	}
+}
+
+test_outcomes_highlands_all = {
+	if = {
+		limit = { country_exists = VIN }
+		if = {
+			limit = { country_exists = TAI }
+			VIN = { annex_country = { target = TAI transfer_troops = no } }
+		}
+		if = {
+			limit = { country_exists = MEO }
+			VIN = { annex_country = { target = MEO transfer_troops = no } }
+		}
+		if = {
+			limit = { country_exists = NUN }
+			VIN = { annex_country = { target = NUN transfer_troops = no } }
+		}
+	}
+}
+
+test_outcomes_laos_victory = {
+	set_global_flag = Laos_Raid_Resolved
+	set_global_flag = Laos_Raid_Attacker_Won
+}
+
+test_outcomes_laos_stalemate = {
+	set_global_flag = Laos_Raid_Resolved
+	set_global_flag = Laos_Raid_Stalemate
+}
+
+test_outcomes_laos_failure = {
+	set_global_flag = Laos_Raid_Resolved
+	set_global_flag = Laos_Raid_Total_Failure
+}
+
+test_geneva_neg_debug = {
+	log = "GENEVA NEG: entries=[?global.geneva_neg_country^num]"
+	set_temp_variable = { g_dbg_i = 0 }
+	set_temp_variable = { g_dbg_sz = global.geneva_neg_country^num }
+	while_loop_effect = {
+		limit = { check_variable = { g_dbg_i < g_dbg_sz } }
+		log = "GENEVA NEG [?g_dbg_i|0]: country=[?global.geneva_neg_country^g_dbg_i|0] clause=[?global.geneva_neg_clause^g_dbg_i|0] option=[?global.geneva_neg_option^g_dbg_i|0] amount=[?global.geneva_neg_amount^g_dbg_i|0] days=[?global.geneva_neg_days^g_dbg_i|0]"
+		add_to_temp_variable = { g_dbg_i = 1 }
+	}
+}
+
+test_geneva_neg_tick = {
+	geneva_neg_daily_tick = yes
+}
+
+test_geneva_neg_flush = {
+	geneva_neg_flush_all = yes
+}
+
+test_geneva_runoff = {
+	test_geneva_force_session = yes
+	every_country = {
+		limit = { is_in_array = { global.geneva_delegations = THIS.id } }
+		set_variable = { geneva_prio^1 = 0 }
+	}
+	set_variable = { global.geneva_round = 0 }	# keep the tick from tripping the round-10 compile
+	set_variable = { global.geneva_clause_current^1 = 2 }
+	set_variable = { global.geneva_push^5 = 1000 }	# clause 1, option 1 (13th parallel): the plurality
+	set_variable = { global.geneva_push^6 = 600 }	# clause 1, option 2 (17th parallel)
+	set_variable = { global.geneva_push^7 = 500 }	# clause 1, option 3 (20th parallel)
+	geneva_conf_round_tick = yes
+	log = "GENEVA RUNOFF: 13th=1000 vs 17th+20th=1100 -> line=[?global.geneva_clause_current^1|0] (expect 2)"
+}
+
+test_geneva_runoff_20th = {
+	test_geneva_force_session = yes
+	every_country = {
+		limit = { is_in_array = { global.geneva_delegations = THIS.id } }
+		set_variable = { geneva_prio^1 = 0 }
+	}
+	set_variable = { global.geneva_round = 0 }	# keep the tick from tripping the round-10 compile
+	set_variable = { global.geneva_clause_current^1 = 2 }
+	set_variable = { global.geneva_push^5 = 500 }	# clause 1, option 1 (13th parallel)
+	set_variable = { global.geneva_push^6 = 600 }	# clause 1, option 2 (17th parallel)
+	set_variable = { global.geneva_push^7 = 1000 }	# clause 1, option 3 (20th parallel): the plurality
+	geneva_conf_round_tick = yes
+	log = "GENEVA RUNOFF 20TH: 20th=1000 vs 13th+17th=1100 -> line=[?global.geneva_clause_current^1|0] (expect 2)"
+}
+
+test_geneva_fre_pursuit = {
+	test_geneva_reset = yes
+	set_global_flag = Indochina_Geneva_Pursuit
+	set_variable = { global.Indochina_War_Active_Phase = 5 }
+	set_variable = { global.Indochina_War_Next_Phase_B_Points = 0 }
+	indochina_geneva_pursuit_tick = yes
+	if = {
+		limit = { has_global_flag = geneva_conference_announced }
+		log = "GENEVA PURSUIT: FAIL - convened at phase 5"
+	}
+	else = {
+		log = "GENEVA PURSUIT: deferred at phase 5, B=[?global.Indochina_War_Next_Phase_B_Points|0] (expect 200)"
+	}
+	set_variable = { global.Indochina_War_Active_Phase = 8 }
+	set_variable = { global.Indochina_War_Next_Phase_B_Points = 600 }
+	indochina_geneva_pursuit_tick = yes
+	if = {
+		limit = { has_global_flag = geneva_conference_announced }
+		log = "GENEVA PURSUIT: convened at phase 8 as expected, pursuit flag cleared"
+	}
+	else = {
+		log = "GENEVA PURSUIT: FAIL - still deferred at phase 8 with B=600"
+	}
+}
+
+test_geneva_stale_hollow = {
+	test_geneva_reset = yes
+	set_global_flag = geneva_conference_in_session
+	clear_array = global.geneva_delegations
+	set_variable = { global.geneva_round = 11 }
+	geneva_conf_round_tick = yes
+	log = "GENEVA STALE HOLLOW: delegations=[?global.geneva_delegations^num|0] (expect >0) round=[?global.geneva_round|0] (expect 0) concluded flag must be absent"
+	if = {
+		limit = { has_global_flag = geneva_conference_concluded }
+		log = "GENEVA STALE HOLLOW: FAIL - compiled a settlement instead of rebuilding"
+	}
+}
+
+test_geneva_panic = {
+	clr_global_flag = Indochina_Geneva_Panic
+	clr_global_flag = geneva_conference_announced
+	clr_global_flag = geneva_conference_in_session
+	clr_global_flag = geneva_conference_concluded
+	clr_global_flag = Geneva_Conference_Preparations
+	clr_global_flag = Indochina_War_Over
+	set_variable = { global.geneva_outcome_dbp = 2 }	# the camp fell
+	set_variable = { global.geneva_outcome_highland = 2 }
+	1761 = { set_state_owner_to = VIN }
+	1766 = { set_state_owner_to = VIN }
+	log = "GENEVA PANIC: preconditions set, phase=[?global.Indochina_War_Active_Phase|0]"
+	if = {
+		limit = { geneva_panic_collapse_trigger = yes }
+		indochina_geneva_panic_force_conference = yes
+		log = "GENEVA PANIC: convened - phase=[?global.Indochina_War_Active_Phase|0] (expect 11)"
+	}
+	else = {
+		log = "GENEVA PANIC: FAIL - trigger did not fire"
+	}
+}
+
+test_geneva_panic_ballot = {
+	set_global_flag = geneva_usa_panic_no_ballot
+	if = {
+		limit = { country_exists = USA }
+		USA = {
+			geneva_conf_refresh_prefs = yes
+			log = "GENEVA PANIC BALLOT: elections pref=[?geneva_pref^2|0] (expect 0) prio=[?geneva_prio^2|0] (expect 10)"
+		}
+	}
+}
+
+test_geneva_campaign_window = {
+	log = "GENEVA CAMPAIGN WINDOW: term=[?global.geneva_elections_term|0] interim=[?global.geneva_tick_days|0]"
+	if = {
+		limit = { geneva_election_campaign_open_trigger = yes }
+		log = "GENEVA CAMPAIGN WINDOW: already open"
+	}
+	else = {
+		log = "GENEVA CAMPAIGN WINDOW: shut (expected until the run-up) - opening it now"
+	}
+	set_global_flag = geneva_election_campaign_open
+	if = {
+		limit = { geneva_election_campaign_open_trigger = yes }
+		log = "GENEVA CAMPAIGN WINDOW: open - the ballot focuses should now be selectable"
+	}
+	else = {
+		log = "GENEVA CAMPAIGN WINDOW: FAIL - still shut with the flag set, so the pending half is false"
+	}
+}
+
+test_geneva_unified_liquidation = {
+	if = {
+		limit = { country_exists = FRE }
+		log = "GENEVA UNIFIED: FAIL - FRE still exists"
+	}
+	if = {
+		limit = { country_exists = NUN }
+		log = "GENEVA UNIFIED: FAIL - NUN still exists"
+	}
+	if = {
+		limit = { country_exists = TAI }
+		log = "GENEVA UNIFIED: FAIL - TAI still exists"
+	}
+	if = {
+		limit = { country_exists = TAM }
+		log = "GENEVA UNIFIED: FAIL - TAM still exists"
+	}
+	if = {
+		limit = {
+			country_exists = MEO
+			NOT = { check_variable = { global.geneva_minorities_term = 1 } }
+		}
+		log = "GENEVA UNIFIED: FAIL - MEO survived without a minorities clause"
+	}
+	log = "GENEVA UNIFIED: liquidation check complete"
+}
+
+test_vie_diem_pm = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			unlock_national_focus = VIE_PM_Diem
+			set_party_name = {
+				ideology = neutrality
+				long_name = VIE_PARTY_MTTNTLQG_long
+				name = VIE_PARTY_MTTNTLQG
+			}
+			promote_character = {
+				character = VIE_Ngo_Dinh_Diem
+				ideology = oriental_personalism
+			}
+			set_politics = {
+				ruling_party = socialist
+				elections_allowed = no
+				last_election = "1954.06.01"
+			}
+			clr_country_flag = VIE_No_Initial_PM
+			set_country_flag = VIE_PM_Ngo_Dinh_Diem
+			set_variable = { VIE_Hinh_Standoff = 0 }
+			set_variable = { VIE_DaiViet_Threat = 10 }
+			reset_favoritism_minigame = yes
+			set_country_flag = VIE_Opposition_Diem
+			set_country_flag = {
+				flag = VIE_PM_Open
+				value = 1
+			}
+			refresh_favoritism_minigame = yes
+			mark_focus_tree_layout_dirty = yes
+			log = "VIE DIEM: premiership installed"
+		}
+	}
+}
+
+test_vie_referendum_high = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { Alt_Favoritism = 90 }
+			set_variable = { Main_Favoritism = 10 }
+			set_variable = { VIE_Influence = 90 }
+			set_variable = { FRA_Influence = 10 }
+			set_variable = { Cao_Dai_Loyalty = 10 }
+			set_variable = { Hoa_Hao_Loyalty = 10 }
+			set_country_flag = crushed_binh_xuyen
+			set_country_flag = VIE_Diem_Controls_Army
+			set_country_flag = VIE_Diem_Refugees_Settled
+			set_country_flag = VIE_Diem_NRC_Formed
+			VIE_calculate_referendum_score = yes
+			log = "VIE REFERENDUM: high band, score=[?VIE_Referendum_Score|0] (expect >119)"
+		}
+	}
+}
+
+test_vie_referendum_mid = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { Alt_Favoritism = 55 }
+			set_variable = { Main_Favoritism = 45 }
+			set_variable = { VIE_Influence = 50 }
+			set_variable = { FRA_Influence = 50 }
+			set_variable = { Cao_Dai_Loyalty = 50 }
+			set_variable = { Hoa_Hao_Loyalty = 50 }
+			clr_country_flag = crushed_binh_xuyen
+			clr_country_flag = integrated_binh_xuyen
+			set_country_flag = VIE_Diem_Controls_Army
+			clr_country_flag = VIE_Diem_Refugees_Settled
+			set_country_flag = VIE_Diem_NRC_Formed
+			VIE_calculate_referendum_score = yes
+			log = "VIE REFERENDUM: mid band, score=[?VIE_Referendum_Score|0] (expect 70-119)"
+		}
+	}
+}
+
+test_vie_referendum_low = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { Alt_Favoritism = 10 }
+			set_variable = { Main_Favoritism = 80 }
+			set_variable = { VIE_Influence = 20 }
+			set_variable = { FRA_Influence = 80 }
+			set_variable = { Cao_Dai_Loyalty = 90 }
+			set_variable = { Hoa_Hao_Loyalty = 90 }
+			clr_country_flag = crushed_binh_xuyen
+			clr_country_flag = integrated_binh_xuyen
+			clr_country_flag = VIE_Diem_Controls_Army
+			clr_country_flag = VIE_Diem_Refugees_Settled
+			clr_country_flag = VIE_Diem_NRC_Formed
+			VIE_calculate_referendum_score = yes
+			log = "VIE REFERENDUM: low band, score=[?VIE_Referendum_Score|0] (expect <70)"
+		}
+	}
+}
+
+test_vie_referendum_debug = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			VIE_calculate_referendum_score = yes
+			log = "VIE REFERENDUM: score=[?VIE_Referendum_Score|0] alt=[?Alt_Favoritism|0] main=[?Main_Favoritism|0] influence=[?VIE_Influence|0] caodai=[?Cao_Dai_Loyalty|0] hoahao=[?Hoa_Hao_Loyalty|0]"
+		}
+	}
+}
+
+test_vie_hinh_open = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { VIE_Hinh_Standoff = 0 }
+			clr_country_flag = VIE_Diem_Controls_Army
+			clr_country_flag = VIE_Hinh_Bought_Off
+			clr_country_flag = VIE_Hinh_Exiled
+			clr_country_flag = VIE_FRA_Coup
+			set_country_flag = VIE_Hinh_Crisis
+			activate_mission = VIE_Hinh_Coup_Attempt
+			country_event = { id = Diem.20 hours = 1 }
+			log = "VIE HINH: standoff opened, mission armed"
+		}
+	}
+}
+
+test_vie_hinh_standoff_high = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { VIE_Hinh_Standoff = 75 }
+			log = "VIE HINH: standoff=[?VIE_Hinh_Standoff|0] (expect >49, coup collapses)"
+		}
+	}
+}
+
+test_vie_hinh_standoff_low = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { VIE_Hinh_Standoff = 20 }
+			log = "VIE HINH: standoff=[?VIE_Hinh_Standoff|0] (expect <50, junta takes the state)"
+		}
+	}
+}
+
+test_vie_hinh_timeout = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			clr_country_flag = VIE_Hinh_Crisis
+			if = {
+				limit = { check_variable = { VIE_Hinh_Standoff > 49 } }
+				country_event = Diem.22
+				log = "VIE HINH: timeout resolved high, Diem.22"
+			}
+			else = {
+				set_country_flag = VIE_FRA_Coup
+				country_event = Diem.23
+				log = "VIE HINH: timeout resolved low, Diem.23 -> French_Coup.2"
+			}
+		}
+	}
+}
+
+test_vie_daiviet_low = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { VIE_DaiViet_Threat = 60 }
+			clr_country_flag = VIE_DaiViet_Plot_Running
+			log = "VIE DAIVIET: threat=[?VIE_DaiViet_Threat|0] (expect DaiViet.1)"
+		}
+	}
+}
+
+test_vie_daiviet_high = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { VIE_DaiViet_Threat = 85 }
+			clr_country_flag = VIE_DaiViet_Plot_Running
+			log = "VIE DAIVIET: threat=[?VIE_DaiViet_Threat|0] (expect DaiViet.2)"
+		}
+	}
+}
+
+test_vie_daiviet_max = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_variable = { VIE_DaiViet_Threat = 100 }
+			clr_country_flag = VIE_DaiViet_Plot_Running
+			log = "VIE DAIVIET: threat=[?VIE_DaiViet_Threat|0] (expect DaiViet.3)"
+		}
+	}
+}
+
+test_vie_daiviet_plot = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_country_flag = {
+				flag = VIE_DaiViet_Plot_Running
+				days = 120
+			}
+			if = {
+				limit = { check_variable = { VIE_DaiViet_Threat > 99 } }
+				country_event = DaiViet.3
+			}
+			else_if = {
+				limit = { check_variable = { VIE_DaiViet_Threat > 74 } }
+				country_event = DaiViet.2
+			}
+			else = {
+				country_event = DaiViet.1
+			}
+			log = "VIE DAIVIET: plot fired at threat=[?VIE_DaiViet_Threat|0]"
+		}
+	}
+}
+
+test_vie_binh_xuyen_rung_sac = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			clr_country_flag = crushed_binh_xuyen
+			clr_country_flag = integrated_binh_xuyen
+			set_variable = { Binh_Xuyen_Annihilation = 100 }
+			VIE_binh_xuyen_driven_from_saigon = yes
+			vietnam_faction_ui_update_number = yes
+			log = "VIE BINH-XUYEN: annihilation=[?Binh_Xuyen_Annihilation|0] (expect 30, crushed flag unset)"
+		}
+	}
+}
+
+test_vie_end_of_content = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			if = {
+				limit = { has_global_flag = VIE_Republic_Proclaimed }
+				country_event = Diem.60
+			}
+			else_if = {
+				limit = { has_country_flag = VIE_Hinh_Coup }
+				country_event = Diem.62
+			}
+			else = {
+				country_event = Diem.61
+			}
+			log = "VIE END: end of content event fired"
+		}
+	}
+}
+
+test_vie_diem_debug = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			log = "VIE DIEM: hinh=[?VIE_Hinh_Standoff|0] daiviet=[?VIE_DaiViet_Threat|0] binhxuyen_annih=[?Binh_Xuyen_Annihilation|0] referendum=[?VIE_Referendum_Score|0]"
+			if = {
+				limit = { has_country_flag = VIE_Diem_Controls_Army }
+				log = "VIE DIEM: flag VIE_Diem_Controls_Army"
+			}
+			if = {
+				limit = { has_country_flag = VIE_Hinh_Exiled }
+				log = "VIE DIEM: flag VIE_Hinh_Exiled"
+			}
+			if = {
+				limit = { has_country_flag = VIE_Hinh_Bought_Off }
+				log = "VIE DIEM: flag VIE_Hinh_Bought_Off"
+			}
+			if = {
+				limit = { has_country_flag = VIE_Can_Lao_Founded }
+				log = "VIE DIEM: flag VIE_Can_Lao_Founded"
+			}
+			if = {
+				limit = { has_country_flag = VIE_Binh_Xuyen_Rung_Sac }
+				log = "VIE DIEM: flag VIE_Binh_Xuyen_Rung_Sac"
+			}
+			if = {
+				limit = { has_country_flag = VIE_Hoang_Dieu_Complete }
+				log = "VIE DIEM: flag VIE_Hoang_Dieu_Complete"
+			}
+			if = {
+				limit = { has_country_flag = VIE_Ba_Long_Cleared }
+				log = "VIE DIEM: flag VIE_Ba_Long_Cleared"
+			}
+			if = {
+				limit = { has_country_flag = VIE_Royal_Guard_Abolished }
+				log = "VIE DIEM: flag VIE_Royal_Guard_Abolished"
+			}
+			if = {
+				limit = { has_country_flag = VIE_Decree_21 }
+				log = "VIE DIEM: flag VIE_Decree_21"
+			}
+			if = {
+				limit = { has_country_flag = VIE_Reject_Geneva_Elections }
+				log = "VIE DIEM: flag VIE_Reject_Geneva_Elections"
+			}
+			if = {
+				limit = { has_country_flag = VIE_Unified_Front_Formed }
+				log = "VIE DIEM: flag VIE_Unified_Front_Formed"
+			}
+		}
+	}
+}
+
+test_vie_diem_spine = {	# completes the whole historical spine so the lower half of the branch is reachable at once
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			complete_national_focus = VIE_Diem_Second_in_Command
+			complete_national_focus = VIE_Diem_Refugee_Commissariat
+			complete_national_focus = VIE_Diem_Cabinet_of_Eighteen
+			complete_national_focus = VIE_Diem_First_Cabinet
+			complete_national_focus = VIE_Diem_Form_the_NRM
+			complete_national_focus = VIE_Diem_National_Bank
+			complete_national_focus = VIE_Diem_National_Revolutionary_Committee
+			set_country_flag = VIE_Diem_Controls_Army
+			log = "[GetDateText]: [Root.GetName]: TEST diem spine completed"
+		}
+	}
+}
+
+test_vie_diem_crownlands = {	# arms the Decree 21 / retain-autonomy fork
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			complete_national_focus = VIE_Diem_Fate_of_the_Crownlands
+			log = "[GetDateText]: [Root.GetName]: TEST crownlands fork armed, FUL exists = [?FUL.NumOwnedStates|0]"
+		}
+	}
+}
+
+test_vie_diem_united_front = {	# sets up the dismantle node without playing the sect crisis
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_country_flag = VIE_Unified_Front_Formed
+			complete_national_focus = VIE_Diem_Nhan_Vi_the_Press
+			log = "[GetDateText]: [Root.GetName]: TEST united front standing, press node granted"
+		}
+	}
+}
+
+test_vie_diem_cadres = {	# jumps straight to the civil action wing terminus
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			complete_national_focus = VIE_Diem_Ally_Tran_Quoc_Buu
+			complete_national_focus = VIE_Diem_Promote_the_Defectors
+			complete_national_focus = VIE_Diem_Civil_Action_Commissariat
+			log = "[GetDateText]: [Root.GetName]: TEST civil action wing granted, ChieuHoi cadres = [?VIE_ChieuHoi_Cadres|0]"
+		}
+	}
+}
+
+test_vie_diem_arvn = {	# grants the military wing up to the ARVN founding
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_country_flag = VIE_Diem_Controls_Army
+			complete_national_focus = VIE_Diem_Confront_Binh_Xuyen
+			complete_national_focus = VIE_Diem_Modernize_Ong_Lem
+			complete_national_focus = VIE_Diem_Battle_of_Saigon
+			complete_national_focus = VIE_Diem_Abolish_the_Royal_Guard
+			complete_national_focus = VIE_Diem_Hoang_Dieu_Campaign
+			complete_national_focus = VIE_Diem_Promote_Loyalist_Officers
+			log = "[GetDateText]: [Root.GetName]: TEST military wing granted up to the ARVN node"
+		}
+	}
+}
+
+test_vie_binh_xuyen_spawn = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			VIE_spawn_binh_xuyen_revolt = yes
+			log = "[GetDateText]: [Root.GetName]: TEST Binh-Xuyen revolt spawned, CCC holds Phuoc Tuy and Cholon"
+		}
+	}
+}
+
+test_vie_binh_xuyen_rungsac = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			VIE_binh_xuyen_retreat_to_rung_sac = yes
+			log = "[GetDateText]: [Root.GetName]: TEST Binh-Xuyen driven into the Rung-Sac, annihilation = [?Binh_Xuyen_Annihilation|0]"
+		}
+	}
+}
+
+test_vie_binh_xuyen_resolve = {
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			VIE_finish_the_binh_xuyen = yes
+			log = "[GetDateText]: [Root.GetName]: TEST Binh-Xuyen finished, crushed = [?VIE_Warlord_Status_2|0], annihilation = [?Binh_Xuyen_Annihilation|0]"
+		}
+	}
+}
+
+test_vie_diem_republic = {	# drops the run straight onto the referendum finale
+	if = {
+		limit = { country_exists = VIE }
+		VIE = {
+			set_country_flag = VIE_Diem_Referendum_Won
+			complete_national_focus = VIE_Diem_Second_Cabinet
+			complete_national_focus = VIE_Diem_Seize_the_Royal_Estate
+			log = "[GetDateText]: [Root.GetName]: TEST referendum won, republic node available from 26 October"
+		}
+	}
+}

@@ -38,10 +38,13 @@ shared_focus = {
 	completion_reward = {
 		add_threat = 0.01
 		add_political_power = 50
+		set_country_flag = USA_Indochina_Desk_Open
+		set_temp_variable = { geneva_lev_amount = 25 }
+		USA_indochina_geneva_pressure = yes
 		country_event = { id = USA_50s_Dip_Desks.3 hours = 6 }
 	}
 }
-# 
+#
 shared_focus = {
 	id = USA_50s_FP_Reach_Out_to_the_Meads
 	text_icon = USA_focus_style
@@ -75,6 +78,7 @@ shared_focus = {
 		focus = USA_50s_Support_French_Allies
 	}
 	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
 		country_exists = VIN
 		country_exists = VIE
 		VIN = {
@@ -101,7 +105,7 @@ shared_focus = {
 		}
 	}
 	x = -4
-	y = 1
+	y = 2
 	bypass = {
 		has_global_flag = Indochina_War_Over
 	}
@@ -147,16 +151,15 @@ shared_focus = {
 			modifier = FRA_Unconventional_Approach
 		}
 		}
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_proindependence_score = yes
+		set_temp_variable = { usa_indo_score = -50 }
+		USA_indochina_add_profrance_score = yes
+		set_temp_variable = { usa_indo_b_points = 50 }
+		USA_indochina_diplomatic_push = yes
 		country_event = {
 			id = USA_VIE.1
 		}
-		hidden_effect = {
-			country_event = {
-				id = USA_VIE.2
-				days = 1
-			}
-		}
-
 	}
 }
 
@@ -171,21 +174,17 @@ shared_focus = {
 	}
 	x = -1
 	y = 1
-	bypass = {
-		OR = {
-			has_global_flag = Indochina_War_Over
-			AND = {
-				country_exists = VIE
-				VIE = {
-					has_country_leader = {
-						character = VIE_Cuong_De
-						ruling_only = yes
-					}
-				}
-			}
+	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
+		custom_trigger_tooltip = {
+			tooltip = USA_indochina_back_cuongde_TT
+			USA_indochina_back_cuongde_trigger = yes
 		}
 	}
-	bypass_effect = {
+	bypass = {
+		has_global_flag = Indochina_War_Over	# he no longer bypasses on already ruling: that case is now a reachable, and different, completion
+					}
+	completion_reward = {
 		if = {
 			limit = {
 				country_exists = VIE
@@ -196,18 +195,27 @@ shared_focus = {
 					}
 				}
 			}
+			# He is already in Saigon. There is nothing to overthrow: this is
+			# recognition, money and an American guarantee for a government
+			# that got there on its own.
+			set_country_flag = USA_CuongDe_Backed_Incumbent
 			VIE = {
+				add_opinion_modifier = {
+					target = USA
+					modifier = VIE_CuongDe_USA
+				}
 				country_event = { id = USA_VIE_CuongDe_Installation.2 hours = 12 }
 			}
 		}
-	}
-	completion_reward = {
+		else = {
+			set_country_flag = USA_CuongDe_Installed_By_Us	# read by USA_indochina_cuongde_tier: only an American-made regime scores as sponsorship
 		VIE = {
 			add_opinion_modifier = {
 				target = USA
 				modifier = VIE_CuongDe_USA
 			}
 			country_event = { id = USA_VIE_CuongDe_Installation.1 hours = 12 }
+			}
 		}
 		VIN = {
 			add_opinion_modifier = {
@@ -224,7 +232,7 @@ shared_focus = {
 		USA = {
 			add_opinion_modifier = {
 				target = VIE
-				modifier = VIE_CuongDe_USA
+				modifier = medium_increase	# Saigon is our man now; VIE_CuongDe_USA is the resentment the other way
 			}
 			add_opinion_modifier = {
 				target = VIN
@@ -259,6 +267,18 @@ shared_focus = {
 		set_temp_variable = { tag_index = USA.id }
 		set_temp_variable = { influence_target = VIE.id }
 		change_influence_percentage = yes
+		USA_indochina_cuongde_tier = yes
+	}
+	ai_will_do = {
+		base = 5
+		modifier = {
+			factor = 0
+			is_historical_focus_on = yes
+		}
+		modifier = {
+			factor = 3
+			date < 1952.1.1	# the coup is only worth running while it can still shape the war
+		}
 	}
 }
 
@@ -273,6 +293,9 @@ shared_focus = {
 	}
 	x = 0
 	y = 1
+	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
+	}
 	bypass = {
 		has_global_flag = Indochina_War_Over
 	}
@@ -294,7 +317,7 @@ shared_focus = {
 					instant_build = yes
 				}
 			}
-			
+
 		}
 		USA = {
 			add_to_variable = {
@@ -315,8 +338,32 @@ shared_focus = {
 				target = VIE
 			}
 		}
+		set_temp_variable = { usa_indo_score = 100 }
+		USA_indochina_add_proindependence_score = yes
+		set_temp_variable = { usa_indo_b_points = 50 }
+		USA_indochina_diplomatic_push = yes
+		set_temp_variable = { usa_indo_rapp = 50 }
+		USA_indochina_seed_rapprochement = yes
+		if = {
+			limit = { has_global_flag = USA_CuongDe_Early_Sponsorship }
+			custom_effect_tooltip = USA_50s_Stabilize_DanQuoc_early_bonus_TT
+			set_temp_variable = { usa_indo_score = 100 }
+			USA_indochina_add_proindependence_score = yes
+			set_temp_variable = { usa_indo_rapp = 50 }
+			USA_indochina_seed_rapprochement = yes
+		}
+		set_global_flag = geneva_usa_danquoc_applied	# paid in full here, so the daily pulse must not grant it again
+		set_temp_variable = { geneva_lev_amount = 125 }
+		geneva_add_proindependence_leverage = yes
 		country_event = {
 			id = USA_VIE.4
+		}
+	}
+	ai_will_do = {
+		base = 20
+		modifier = {
+			factor = 2
+			has_global_flag = USA_CuongDe_Early_Sponsorship
 		}
 	}
 }
@@ -332,6 +379,9 @@ shared_focus = {
 	}
 	x = 1
 	y = 1
+	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
+	}
 	bypass = {
 		has_global_flag = Indochina_War_Over
 	}
@@ -343,6 +393,21 @@ shared_focus = {
 		set_temp_variable = { tag_index = USA.id }
 		set_temp_variable = { influence_target = VIN.id }
 		change_influence_percentage = yes
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_communist_score = yes
+		set_temp_variable = { usa_indo_b_points = 50 }
+		USA_indochina_diplomatic_push = yes
+		set_temp_variable = { usa_indo_rapp = 50 }
+		USA_indochina_seed_rapprochement = yes
+		set_temp_variable = { geneva_lev_amount = 25 }
+		geneva_add_communist_leverage = yes
+	}
+	ai_will_do = {
+		base = 5
+		modifier = {
+			factor = 0
+			is_historical_focus_on = yes	# Washington never courted Ho
+		}
 	}
 }
 
@@ -357,6 +422,9 @@ shared_focus = {
 	}
 	x = 0
 	y = 1
+	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
+	}
 	bypass = {
 		has_global_flag = Indochina_War_Over
 	}
@@ -400,11 +468,25 @@ shared_focus = {
 					modifier = VIN_Deer_Team_USA
 				}
 				}
+		set_temp_variable = { usa_indo_score = 100 }
+		USA_indochina_add_communist_score = yes
+		set_temp_variable = { usa_indo_score = -50 }
+		USA_indochina_add_profrance_score = yes	# Washington arming Hanoi's rivals-in-name knocks the legs from under the French case
+		set_temp_variable = { usa_indo_b_points = 100 }
+		USA_indochina_diplomatic_push = yes
+		set_temp_variable = { usa_indo_rapp = 50 }
+		USA_indochina_seed_rapprochement = yes
+		set_temp_variable = { geneva_lev_amount = 50 }
+		geneva_add_communist_leverage = yes
 			}
+	ai_will_do = {
+		base = 5
+		modifier = {
+			factor = 0
+			is_historical_focus_on = yes
+		}
+	}
 }
-	
-
-
 
 shared_focus = {
 	id = USA_50s_Support_French_Allies
@@ -426,7 +508,10 @@ shared_focus = {
 		}
 	}
 	x = 2
-	y = 1
+	y = 2
+	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
+	}
 	bypass = {
 		OR = {
 			has_global_flag = Indochina_War_Over
@@ -469,6 +554,13 @@ shared_focus = {
 			target = VIE
 			modifier = VIE_USA_French
 		}
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_profrance_score = yes
+		set_temp_variable = { usa_indo_score = -15 }
+		USA_indochina_add_proindependence_score = yes	# Washington siding with Paris undercuts Saigon's claim to speak for the nation
+		set_temp_variable = { usa_indo_b_points = 25 }
+		USA_indochina_diplomatic_push = yes
+		set_country_flag = USA_Indochina_Backs_France
 	}
 }
 
@@ -486,6 +578,9 @@ shared_focus = {
 	}
 	x = -2
 	y = 1
+	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
+	}
 	bypass = {
 		has_global_flag = Indochina_War_Over
 	}
@@ -503,6 +598,19 @@ shared_focus = {
 				modifier = small_increase
 			}
 		}
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_profrance_score = yes
+		set_temp_variable = { usa_indo_b_points = 50 }
+		USA_indochina_diplomatic_push = yes
+		set_temp_variable = { geneva_lev_amount = 25 }
+		geneva_add_profrance_leverage = yes
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 5
+			is_historical_focus_on = yes
+		}
 	}
 }
 
@@ -517,10 +625,16 @@ shared_focus = {
 	}
 	x = -1
 	y = 1
+	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
+		custom_trigger_tooltip = {
+			tooltip = USA_indochina_settlement_window_TT
+			USA_indochina_settlement_window_trigger = yes	# Washington turns diplomatic when the war turns, not on a date
+		}
+	}
 	bypass = {
 		has_global_flag = Indochina_War_Over
 	}
-	relative_position_id = USA_50s_Diplomatic_Assurances_to_France
 	completion_reward = {
 		VIN = {
 			add_popularity = {
@@ -538,6 +652,24 @@ shared_focus = {
 				modifier = VIN_USA_Negotiations
 			}
 		}
+		set_global_flag = USA_VietMinh_Channel_Open	# Paris can no longer claim there is nobody to talk to
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_communist_score = yes
+		set_temp_variable = { usa_indo_b_points = 100 }
+		USA_indochina_diplomatic_push = yes
+		set_temp_variable = { usa_indo_rapp = 50 }
+		USA_indochina_seed_rapprochement = yes
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 3
+			is_historical_focus_on = yes
+		}
+		modifier = {
+			factor = 0.25
+			geneva_vie_side_dominant_trigger = yes	# no reason to court Hanoi while our clients are winning
+		}
 	}
 }
 
@@ -552,12 +684,43 @@ shared_focus = {
 	}
 	x = 1
 	y = 1
+	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
+		custom_trigger_tooltip = {
+			tooltip = USA_indochina_settlement_window_TT
+			USA_indochina_settlement_window_trigger = yes	# Washington turns diplomatic when the war turns, not on a date
+		}
+	}
 	bypass = {
 		has_global_flag = Indochina_War_Over
 	}
 	completion_reward = {
-		FRA = {
-			country_event = USA_INDO.1
+		add_political_power = -50
+		USA_indochina_negotiating_table_push = yes
+		if = {
+			limit = { country_exists = FRA }
+			FRA = {
+				country_event = USA_INDO.1
+			}
+		}
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 3
+			is_historical_focus_on = yes
+		}
+		modifier = {
+			factor = 2
+			check_variable = { global.Indochina_War_Active_Phase > 6 }	# worth most near the bottom of the ladder
+		}
+		modifier = {
+			factor = 2
+			has_global_flag = USA_VietMinh_Channel_Open
+		}
+		modifier = {
+			factor = 2
+			check_variable = { global.geneva_outcome_dbp = 2 }	# after the camp falls there is nothing left to argue about
 		}
 	}
 }
@@ -585,16 +748,149 @@ shared_focus = {
 		OR = {
 			geneva_conference_available_trigger = yes
 			has_global_flag = Indochina_War_Over
+			has_global_flag = geneva_conference_concluded
 		}
 	}
 	available = {
-		always = no
+		custom_trigger_tooltip = {
+			tooltip = geneva_conference_convened_trigger_TT
+			OR = {
+				has_global_flag = Geneva_Conference_Preparations
+				has_global_flag = geneva_conference_in_session
+			}
+		}
 	}
 	completion_reward = {
-		custom_effect_tooltip = autocompleted_by_event
-		effect_tooltip = {
-			news_event = Indochina_Struggle_Ending.8
+		if = {
+			limit = { NOT = { has_global_flag = geneva_conf_attendance_autogranted } }	# sending Dulles only pays when Washington walked the branch here; a granted seat is already priced by geneva_conf_seed_weight
+			set_temp_variable = { geneva_lev_amount = 75 }
+			USA_indochina_geneva_pressure = yes
 		}
+	}
+	ai_will_do = {
+		base = 20
+		modifier = {
+			factor = 3
+			geneva_conference_should_be_available_trigger = yes
+		}
+	}
+}
+
+# Washington's stance on the reunification clause at the table. Historically the accords' election clause was accepted by France, the DRV and the State of Vietnam while the United States pointedly declined to associate itself with it - that abstention is this pair, and it is separate from what Washington does about the ballot afterwards (USA_50s_The_All_Vietnam_Ballot).
+shared_focus = {
+	id = USA_50s_Withhold_American_Assent
+	text_icon = USA_focus_style
+	icon = GFX_usa_50_block_unification_elections
+	cost = 2
+	relative_position_id = USA_50s_The_Geneva_Conferece
+	prerequisite = {
+		focus = USA_50s_The_Geneva_Conferece
+	}
+	mutually_exclusive = {
+		focus = USA_50s_Endorse_Free_Vietnamese_Vote
+	}
+	x = -1
+	y = 1
+	available = {
+		custom_trigger_tooltip = {
+			tooltip = geneva_conference_convened_trigger_TT
+			OR = {
+				has_global_flag = Geneva_Conference_Preparations
+				has_global_flag = geneva_conference_in_session
+			}
+		}
+	}
+	bypass = {
+		OR = {
+			has_global_flag = geneva_conference_concluded
+			AND = {
+				has_global_flag = Indochina_War_Over
+				NOT = { has_global_flag = geneva_conference_concluded }
+			}
+		}
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 2
+			is_historical_focus_on = yes
+		}
+		modifier = {
+			factor = 0.2
+			geneva_vie_side_losing_trigger = yes	# no leverage to spend on a veto when our clients are losing
+		}
+	}
+	completion_reward = {
+		set_temp_variable = { geneva_lev_amount = 50 }
+		geneva_add_usa_leverage = yes
+		if = {
+			limit = { has_global_flag = geneva_conference_in_session }
+			set_variable = { geneva_pref^2 = 0 }
+			set_variable = { geneva_prio^2 = 10 }
+			add_to_variable = { global.geneva_push^8 = 150 }	# clause 2 option 0: no reunification vote
+			custom_effect_tooltip = geneva_usa_hardline_elections_TT
+		}
+	}
+}
+
+shared_focus = {
+	id = USA_50s_Endorse_Free_Vietnamese_Vote
+	text_icon = USA_focus_style
+	icon = GFX_usa_50_allow_unification_elections
+	cost = 2
+	relative_position_id = USA_50s_The_Geneva_Conferece
+	prerequisite = {
+		focus = USA_50s_The_Geneva_Conferece
+	}
+	mutually_exclusive = {
+		focus = USA_50s_Withhold_American_Assent
+	}
+	x = 1
+	y = 1
+	available = {
+		custom_trigger_tooltip = {
+			tooltip = geneva_conference_convened_trigger_TT
+			OR = {
+				has_global_flag = Geneva_Conference_Preparations
+				has_global_flag = geneva_conference_in_session
+			}
+		}
+	}
+	bypass = {
+		OR = {
+			has_global_flag = geneva_conference_concluded
+			AND = {
+				has_global_flag = Indochina_War_Over
+				NOT = { has_global_flag = geneva_conference_concluded }
+			}
+		}
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 0
+			is_historical_focus_on = yes
+		}
+		modifier = {
+			factor = 3
+			geneva_vie_side_dominant_trigger = yes	# a vote we expect to win is worth underwriting
+		}
+	}
+	completion_reward = {
+		set_temp_variable = { geneva_lev_amount = 50 }
+		geneva_add_usa_leverage = yes
+		if = {
+			limit = { has_global_flag = geneva_conference_in_session }
+			set_variable = { geneva_pref^2 = 2 }
+			if = {
+				limit = { check_variable = { geneva_prio^2 < 8 } }
+				set_variable = { geneva_prio^2 = 8 }
+			}
+			add_to_variable = { global.geneva_push^10 = 150 }	# clause 2 option 2: a vote within two years
+			custom_effect_tooltip = geneva_usa_endorse_elections_TT
+		}
+		set_temp_variable = { usa_indo_rapp = 50 }
+		USA_indochina_seed_rapprochement = yes
 	}
 }
 
@@ -612,6 +908,9 @@ shared_focus = {
 	}
 	x = 2
 	y = 1
+	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
+	}
 	bypass = {
 		OR = {
 			has_global_flag = Indochina_War_Over
@@ -628,6 +927,23 @@ shared_focus = {
 				level = 5
 			}
 		}
+		set_temp_variable = { usa_indo_score = 100 }
+		USA_indochina_add_profrance_score = yes
+		set_temp_variable = { usa_indo_score = 15 }
+		USA_indochina_add_communist_score = yes	# American guns in French hands are a recruiting argument for Hanoi
+		set_temp_variable = { usa_indo_a_points = 50 }
+		USA_indochina_escalation_push = yes
+	}
+	ai_will_do = {
+		base = 5
+		modifier = {
+			factor = 0
+			is_historical_focus_on = yes	# Washington paid, but through the diplomatic track
+		}
+		modifier = {
+			factor = 2
+			geneva_vie_side_losing_trigger = yes
+		}
 	}
 }
 
@@ -642,6 +958,9 @@ shared_focus = {
 	}
 	x = -1
 	y = 1
+	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
+	}
 	bypass = {
 		has_global_flag = Indochina_War_Over
 	}
@@ -666,6 +985,17 @@ shared_focus = {
 				producer = CAP
 			}
 		}
+		set_temp_variable = { usa_indo_score = 100 }
+		USA_indochina_add_profrance_score = yes
+		set_temp_variable = { usa_indo_a_points = 50 }
+		USA_indochina_escalation_push = yes
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 2
+			geneva_vie_side_losing_trigger = yes
+		}
 	}
 }
 
@@ -680,6 +1010,20 @@ shared_focus = {
 	}
 	x = 1
 	y = 1
+	available = {
+		hidden_trigger = { USA_indochina_bilateral_track_open_trigger = yes }	# Washington's own Indochina policy closes once Geneva convenes
+		custom_trigger_tooltip = {
+			tooltip = USA_indochina_vulture_TT
+			OR = {
+				USA_indochina_direct_action_trigger = yes	# the insurgency is broken and Hanoi is losing: finish it
+				AND = {	# or the historical proposal - air power to save a camp that is going under
+					country_exists = VIN
+					VIN = { has_country_flag = VIN_Campaign_Dien_Bien_Active }
+					NOT = { check_variable = { global.geneva_outcome_dbp > 0 } }	# still undecided
+				}
+			}
+		}
+	}
 	bypass = {
 		has_global_flag = Indochina_War_Over
 	}
@@ -687,6 +1031,17 @@ shared_focus = {
 		custom_effect_tooltip = USA_vietnam_vulture
 		VIN = {
 			set_country_flag = Operation_Vulture
+		}
+		if = {
+			limit = {
+				country_exists = FRE
+				country_exists = VIN
+				VIN = { has_country_flag = VIN_Campaign_Dien_Bien_Active }
+			}
+			FRE = {
+				set_country_flag = FRE_DBP_Vulture_Direct_Intervention
+				fre_dbp_vulture_approved = yes
+			}
 		}
 		FRE = {
 			declare_war_on = {
@@ -702,7 +1057,47 @@ shared_focus = {
 			target = NLF
 			type = annex_everything
 		}
+		add_threat = 3
+		set_global_flag = USA_Direct_Intervention
+		set_temp_variable = { usa_indo_score = 200 }
+		USA_indochina_add_communist_score = yes	# American bombers are the Viet Minh's best recruiting sergeant
+		set_temp_variable = { usa_indo_score = -100 }
+		USA_indochina_add_proindependence_score = yes	# the war is an American war now; Saigon's nationalists own none of it
+		set_temp_variable = { usa_indo_score = -50 }
+		USA_indochina_add_profrance_score = yes	# and Paris is a passenger in its own colony
+		set_temp_variable = { usa_indo_a_points = 175 }
+		USA_indochina_escalation_push = yes
+		set_temp_variable = { usa_indo_rapp = -75 }
+		USA_indochina_seed_rapprochement = yes
+		set_temp_variable = { geneva_lev_amount = 75 }
+		geneva_add_communist_leverage = yes
+		VIN = {
+			add_war_support = 0.15
+		}
 		news_event = Operation_Vulture.1
+	}
+	ai_will_do = {
+		base = 1
+		modifier = {
+			factor = 0
+			is_historical_focus_on = yes	# Eisenhower refused it
+		}
+		modifier = {
+			factor = 0
+			has_global_flag = Geneva_Conference_Preparations
+		}
+		modifier = {
+			factor = 0
+			has_global_flag = Indochina_War_Over
+		}
+		modifier = {
+			factor = 4
+			check_variable = { global.geneva_cache_comm_score > 749 }
+		}
+		modifier = {
+			factor = 0.25
+			check_variable = { global.Indochina_War_Active_Phase > 6 }	# no appetite for escalation once the shooting has died down
+		}
 	}
 }
 
@@ -740,28 +1135,118 @@ shared_focus = {
 	}
 }
 
+# Branch head for what Washington does about the ballot the accords scheduled. Hangs off USA_50s_The_French_Indochina_War rather than the conference focus: that one bypasses on Indochina_War_Over, which a settlement sets at once, so this branch opens within a day of the accords whatever Indochina policy Washington pursued. The conference-table stance lives separately on USA_50s_Withhold_American_Assent / USA_50s_Endorse_Free_Vietnamese_Vote.
 shared_focus = {
-	id = USA_50s_Reunification_Election
+	id = USA_50s_The_All_Vietnam_Ballot
 	text_icon = USA_focus_style
-		icon = GFX_usa_50_france_speeds_up_decolonization
-	cost = 3
-	relative_position_id = USA_50s_The_Geneva_Conferece
+	icon = GFX_usa_50_geneva_conference
+	cost = 1
+	relative_position_id = USA_50s_Withhold_American_Assent
 	prerequisite = {
-		focus = USA_50s_The_Geneva_Conferece
-	}
-	mutually_exclusive = {
-		focus = USA_50s_Block_Unification_Elections
+		focus = USA_50s_Withhold_American_Assent
+		focus = USA_50s_Endorse_Free_Vietnamese_Vote
 	}
 	x = 1
 	y = 1
 	available = {
 		custom_trigger_tooltip = {
-			tooltip = Geneva_Complete_Success_TT
-			geneva_conference_complete_success_trigger = yes
-		}	
+			tooltip = geneva_election_scheduled_avail_TT
+			geneva_election_pending_trigger = yes
+		}
+	}
+	bypass = {
+		OR = {
+			custom_trigger_tooltip = {
+				tooltip = geneva_elections_never_scheduled_TT
+				AND = {
+					has_global_flag = geneva_conference_concluded
+					NOT = { has_global_flag = geneva_unified_settlement }
+					NOT = { check_variable = { global.geneva_elections_term > 1 } }
+				}
+			}
+			has_global_flag = geneva_election_resolved
+			AND = {
+				has_global_flag = Indochina_War_Over
+				NOT = { has_global_flag = geneva_conference_concluded }	# the war ended with no accords, so no ballot was ever scheduled
+			}
+		}
+	}
+	ai_will_do = {
+		base = 20
 	}
 	completion_reward = {
-		custom_effect_tooltip = autocompleted_by_event
+		add_political_power = 25
+		set_temp_variable = { geneva_lev_amount = 25 }
+		USA_indochina_geneva_pressure = yes
+	}
+}
+
+shared_focus = {
+	id = USA_50s_Reunification_Election
+	text_icon = USA_focus_style
+		icon = GFX_usa_50_france_speeds_up_decolonization
+	cost = 2
+	relative_position_id = USA_50s_The_All_Vietnam_Ballot
+	prerequisite = {
+		focus = USA_50s_The_All_Vietnam_Ballot
+	}
+	mutually_exclusive = {
+		focus = USA_50s_Block_Unification_Elections
+	}
+	x = 2
+	y = 1
+	available = {
+		custom_trigger_tooltip = {
+			tooltip = geneva_election_campaign_open_avail_TT
+			geneva_election_campaign_open_trigger = yes	# the run-up, not the signing ceremony
+		}
+	}
+	bypass = {
+		OR = {
+			has_global_flag = geneva_election_resolved
+			AND = {
+				has_global_flag = Indochina_War_Over
+				NOT = { has_global_flag = geneva_conference_concluded }
+			}
+			AND = {	# Saigon settled it unilaterally; there is no ballot left to endorse or block
+				country_exists = VIE
+				VIE = { has_country_flag = VIE_reunification_election_refused }
+			}
+		}
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 0.1
+			geneva_vie_side_dominant_trigger = yes
+		}
+		modifier = {
+			factor = 0.2
+			is_historical_focus_on = yes	# Washington did not underwrite the 1956 ballot
+		}
+	}
+	completion_reward = {
+		# Washington tells Saigon it will not stand in the way of a supervised all-Vietnam vote. Saigon still answers for itself in .7 - it may cancel the ballot over Washington's objection.
+		custom_effect_tooltip = USA_50s_Endorse_Ballot_to_Saigon_tt
+		if = {
+			limit = { country_exists = VIE }
+			VIE = { country_event = { id = VIE_VIN_Reunification_50s.7 days = 3 } }
+		}
+		if = {
+			limit = { country_exists = VIN }
+			VIN = {
+				add_opinion_modifier = {
+					target = USA
+					modifier = medium_increase
+				}
+			}
+			add_opinion_modifier = {
+				target = VIN
+				modifier = medium_increase
+			}
+		}
+		set_temp_variable = { usa_indo_rapp = 50 }
+		USA_indochina_seed_rapprochement = yes
 	}
 }
 
@@ -804,7 +1289,7 @@ shared_focus = {
                 x = 500
                 tooltip = adjust_money_mil_tt
             }
-			add_offsite_building = { 
+			add_offsite_building = {
 				type = office_park
 				level = 2
 			}
@@ -822,20 +1307,40 @@ shared_focus = {
                 x = 500
                 tooltip = adjust_money_mil_tt
 			}
-			add_offsite_building = { 
+			add_offsite_building = {
 				type = office_park
 				level = 2
 			}
 		}
 	}
-}
+		else = {	# both Vietnams still standing: the money goes to our own client
+			VIE = {
+				add_to_variable = {
+					currentMoney = 0.5
+				}
+				set_temp_variable = {
+					x = 500
+					tooltip = adjust_money_mil_tt
+				}
+				add_offsite_building = {
+					type = office_park
+					level = 2
+				}
+			}
+		}
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_proindependence_score = yes
+	}
+	ai_will_do = {
+		base = 15
+	}
 }
 
 shared_focus = {
 	id = USA_50s_Allow_Free_Elections
 	text_icon = USA_focus_style
 		icon = GFX_usa_50_allow_free_elections
-	cost = 3
+	cost = 2
 	relative_position_id = USA_50s_Reunification_Election
 	prerequisite = {
 		focus = USA_50s_Reunification_Election
@@ -843,20 +1348,57 @@ shared_focus = {
 	mutually_exclusive = {
 		focus = USA_50s_Rig_the_Vietnamese_Elections
 	}
-	x = 0
+	x = -1
 	y = 1
 	available = {
-		always = no
-		# Will be unlocked during Reunification Elections
+		custom_trigger_tooltip = {
+			tooltip = geneva_election_campaign_open_avail_TT
+			geneva_election_campaign_open_trigger = yes	# the run-up, not the signing ceremony
+		}
 	}
-	completion_reward = {
-		custom_effect_tooltip = autocompleted_by_event
-		VIN = {
-			annex_country = {
-				target = VIE
-				transfer_troops = yes
+	bypass = {
+		OR = {
+			has_global_flag = geneva_election_resolved
+			AND = {
+				has_global_flag = Indochina_War_Over
+				NOT = { has_global_flag = geneva_conference_concluded }
+			}
+			AND = {
+				country_exists = VIN
+				VIN = {
+					OR = {
+						has_country_flag = VIN_reunification_election_cancelled
+						has_country_flag = VIN_liberation_of_the_south_prepared
+					}
+				}
 			}
 		}
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 0.1
+			is_historical_focus_on = yes
+		}
+	}
+	completion_reward = {
+		# The vote itself is resolved by the hidden Session.21 arbiter; a fair
+		# election simply means Washington keeps its thumb off the scale.
+		custom_effect_tooltip = geneva_usa_free_elections_TT
+		VIN = {
+			add_opinion_modifier = {
+				target = USA
+				modifier = medium_increase
+			}
+		}
+		add_opinion_modifier = {
+			target = VIN
+			modifier = medium_increase
+		}
+		set_temp_variable = { usa_indo_rapp = 75 }
+		USA_indochina_seed_rapprochement = yes
+		set_temp_variable = { usa_indo_score = 15 }
+		USA_indochina_add_communist_score = yes	# a vote Hanoi expects to win is a vote Hanoi campaigns for
 	}
 }
 
@@ -864,7 +1406,7 @@ shared_focus = {
 	id = USA_50s_Rig_the_Vietnamese_Elections
 	text_icon = USA_focus_style
 		icon = GFX_usa_50_rig_vietnamese_elections
-	cost = 3
+	cost = 2
 	relative_position_id = USA_50s_Reunification_Election
 	prerequisite = {
 		focus = USA_50s_Reunification_Election
@@ -872,84 +1414,132 @@ shared_focus = {
 	mutually_exclusive = {
 		focus = USA_50s_Allow_Free_Elections
 	}
-	x = 2
+	x = 1
 	y = 1
 	available = {
-		always = no
-		# Will be unlocked during Reunification Elections
+		custom_trigger_tooltip = {
+			tooltip = geneva_election_campaign_open_avail_TT
+			geneva_election_campaign_open_trigger = yes	# the run-up, not the signing ceremony
+		}
 	}
-	completion_reward = {
-		custom_effect_tooltip = autocompleted_by_event
-		random_list = {
-			70 = {
-				#VIN REJECTS ELECTION RESULTS
+	bypass = {
+		OR = {
+			has_global_flag = geneva_election_resolved
+			AND = {
+				has_global_flag = Indochina_War_Over
+				NOT = { has_global_flag = geneva_conference_concluded }
 			}
-			25 = {
+			AND = {
+				country_exists = VIN
 				VIN = {
-					annex_country = {
-						target = VIE
-						transfer_troops = yes
-					}
-				}
-			}
-			5 = {
-				VIE = {
-					annex_country = {
-						target = VIN
-						transfer_troops = yes
+					OR = {
+						has_country_flag = VIN_reunification_election_cancelled
+						has_country_flag = VIN_liberation_of_the_south_prepared
 					}
 				}
 			}
 		}
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 2
+			is_historical_focus_on = yes
+		}
+	}
+	completion_reward = {
+		# USA_Tampered_With_VIE tilts the Session.21 arbiter toward Saigon
+		# (and away from Ho Chi Minh's list) when the vote is resolved.
+		custom_effect_tooltip = geneva_usa_rig_elections_TT
+		set_country_flag = USA_Tampered_With_VIE
+		if = {
+			limit = { country_exists = VIE }
+			VIE = { country_event = { id = VIE_VIN_Reunification_50s.10 days = 5 } }	# Saigon is told, not asked - rigging is not put to the client
+		}
+		VIN = {
+			add_opinion_modifier = {
+				target = USA
+				modifier = medium_decrease
+			}
+		}
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_proindependence_score = yes
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_communist_score = yes	# a stolen ballot is the best argument the cadres ever had
+		set_temp_variable = { usa_indo_rapp = -75 }
+		USA_indochina_seed_rapprochement = yes
 	}
 }
 
 shared_focus = {
 	id = USA_50s_Block_Unification_Elections
-	completion_reward = { }
 	text_icon = USA_focus_style
 	icon = GFX_usa_50_block_unification_elections
-	cost = 3
-	relative_position_id = USA_50s_The_Geneva_Conferece
+	cost = 2
+	relative_position_id = USA_50s_The_All_Vietnam_Ballot
 	prerequisite = {
-		focus = USA_50s_The_Geneva_Conferece
+		focus = USA_50s_The_All_Vietnam_Ballot
 	}
 	mutually_exclusive = {
 		focus = USA_50s_Reunification_Election
 	}
-	x = -1
+	x = -2
 	y = 1
-	bypass = {
+	available = {
 		custom_trigger_tooltip = {
-			tooltip = "The §YReunification Election§! deal wasn't passed."
-			OR = {
-				geneva_conference_otl_success_trigger = yes
-				NOT = { country_exists = VIE }
+			tooltip = geneva_election_campaign_open_avail_TT
+			geneva_election_campaign_open_trigger = yes	# the run-up, not the signing ceremony
+		}
+	}
+	bypass = {
+		OR = {
+			has_global_flag = geneva_election_resolved
+			AND = {
+				has_global_flag = Indochina_War_Over
+				NOT = { has_global_flag = geneva_conference_concluded }
+			}
+			AND = {	# Saigon settled it unilaterally; there is no ballot left to endorse or block
+				country_exists = VIE
+				VIE = { has_country_flag = VIE_reunification_election_refused }
 			}
 		}
 	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 0.1
+			geneva_vie_side_losing_trigger = yes	# a veto Saigon cannot survive is not worth pressing
+		}
+		modifier = {
+			factor = 3
+			is_historical_focus_on = yes
+		}
+	}
 	completion_reward = {
-		custom_effect_tooltip = autocompleted_by_event
+		# Washington asks Saigon to refuse the ballot. It does not cancel the vote itself: the flags the Session.21 arbiter stands down on are set by Saigon's own answer in .6, because in 1956 it was Diem's decision to go along with the American position.
+		set_country_flag = USA_Tampered_With_VIE
+		custom_effect_tooltip = USA_50s_Block_Ballot_to_Saigon_tt
+		if = {
+			limit = { country_exists = VIE }
+			VIE = { country_event = { id = VIE_VIN_Reunification_50s.6 days = 3 } }
+		}
 		VIN = {
 			add_stability = -0.05
 			add_war_support = -0.05
 		}
-		add_opinion_modifier = {
-			target = VIE
-			modifier = medium_increase
-		}
-		VIE = {
-			add_opinion_modifier = {
-				target = USA
-				modifier = medium_increase
-			}
-		}
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_proindependence_score = yes
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_communist_score = yes	# denying Hanoi the ballot hands it back the argument for the gun
+		set_temp_variable = { usa_indo_a_points = 50 }
+		USA_indochina_escalation_push = yes
+		set_temp_variable = { usa_indo_rapp = -75 }
+		USA_indochina_seed_rapprochement = yes
 	}
 }
 
 shared_focus = {
 	id = USA_50s_Stir_Unrest_Among_Catholic_North_Vietnamese
-	completion_reward = { }
 	text_icon = USA_focus_style
 	icon = GFX_usa_50_stir_unrest_north_vietnamese_catholics
 	cost = 3
@@ -977,39 +1567,16 @@ shared_focus = {
 				modifier = medium_increase
 			}
 		}
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_proindependence_score = yes
+		set_temp_variable = { usa_indo_a_points = 50 }
+		USA_indochina_escalation_push = yes
 	}
-}
-
-shared_focus = {
-	id = USA_50s_Launch_Operation_Passage_to_Freedom
-	completion_reward = { }
-	text_icon = USA_focus_style
-	icon = GFX_usa_50_operation_passage_to_freedom
-	cost = 2
-	relative_position_id = USA_50s_Stir_Unrest_Among_Catholic_North_Vietnamese
-	prerequisite = {
-		focus = USA_50s_Stir_Unrest_Among_Catholic_North_Vietnamese
-	}
-	x = 0
-	y = 1
-	completion_reward = {
-		news_event = Passage_to_Freedom.0
-		#Note to Redo this Later
-		VIN = {
-			capital_scope = {
-				add_manpower = -310000
-				add_to_variable = {
-					ReligionChristianityCatholic = -100
-				}
-			}
-		}
-		VIE = {
-			capital_scope = {
-				add_manpower = 310000
-				add_to_variable = {
-					ReligionChristianityCatholic = 100
-				}
-			}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 2
+			is_historical_focus_on = yes
 		}
 	}
 }
@@ -1025,13 +1592,31 @@ shared_focus = {
 		focus = USA_50s_Military_Aid_to_France
 	}
 	x = 0
-	y = 3
+	y = 4
+	available = {
+		custom_trigger_tooltip = {
+			tooltip = USA_indochina_settlement_window_TT
+			USA_indochina_settlement_window_trigger = yes	# Washington turns diplomatic when the war turns, not on a date
+		}
+	}
 	bypass = {
 		has_global_flag = Indochina_War_Over
 	}
 	completion_reward = {
-		FRA = {
-			country_event = USA_FRAIND.1
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_proindependence_score = yes
+		if = {
+			limit = { country_exists = FRA }
+			FRA = {
+				country_event = USA_FRAIND.1
+			}
+		}
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 3
+			is_historical_focus_on = yes
 		}
 	}
 }
@@ -1053,8 +1638,34 @@ shared_focus = {
 	}
 	x = -1
 	y = 1
+	available = {
+		custom_trigger_tooltip = {
+			tooltip = USA_50s_Fund_French_Coup_avail_TT
+			AND = {
+				USA_indochina_diem_governs_trigger = yes
+				USA_indochina_french_coup_possible_trigger = yes
+				NOT = { has_global_flag = VIE_Republic_Proclaimed }	# the October referendum settles the question; after it there is nothing left to pre-empt
+					}
+				}
+			}
 	completion_reward = {
-		
+		add_political_power = -50
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_profrance_score = yes
+		set_temp_variable = { usa_indo_score = -50 }
+		USA_indochina_add_proindependence_score = yes	# Saigon's own government undone with American money
+		set_global_flag = USA_Backs_French_Coup
+		if = {
+			limit = { country_exists = FRA }
+			FRA = { country_event = { id = USA_DiemCoup.1 days = 2 } }
+		}
+	}
+	ai_will_do = {
+		base = 5
+		modifier = {
+			factor = 0
+			is_historical_focus_on = yes
+		}
 	}
 }
 
@@ -1075,6 +1686,22 @@ shared_focus = {
 	}
 	x = 1
 	y = 1
+	available = {
+		custom_trigger_tooltip = {
+			tooltip = USA_50s_Permit_Diem_avail_TT
+			USA_indochina_diem_governs_trigger = yes
+		}
+	}
+	bypass = {	# only this half of the pair carries the bypass: bypassing one locks its mutually exclusive sibling, so keeping it in one place makes the no-Diem case resolve the same way every time
+		OR = {
+			NOT = { country_exists = VIE }
+			VIE = { has_country_flag = VIE_Hinh_Coup }	# the generals moved without us
+			AND = {
+				date > 1957.1.1
+				NOT = { USA_indochina_diem_governs_trigger = yes }	# Saigon is somebody else's problem now
+			}
+		}
+	}
 	completion_reward = {
 		USA = {
 			add_opinion_modifier = {
@@ -1101,6 +1728,8 @@ shared_focus = {
 				x = 250
 				tooltip = adjust_money_mil_tt
 			}
+			if = {
+				limit = { owns_state = 286 }	# Saigon may have changed hands by the time Washington gets here
 			286 = {
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
@@ -1114,6 +1743,89 @@ shared_focus = {
 					instant_build = yes
 				}
 			}
+		}
+		}
+		set_temp_variable = { usa_indo_score = 100 }
+		USA_indochina_add_proindependence_score = yes
+		set_temp_variable = { usa_indo_score = -50 }
+		USA_indochina_add_profrance_score = yes
+		set_temp_variable = { geneva_lev_amount = 50 }
+		geneva_add_proindependence_leverage = yes
+		country_event = { id = USA_DiemRecog.1 hours = 6 }
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 5
+			is_historical_focus_on = yes
+		}
+	}
+}
+
+shared_focus = {
+	id = USA_50s_Launch_Operation_Passage_to_Freedom
+	text_icon = USA_focus_style
+	icon = GFX_usa_50_operation_passage_to_freedom
+	cost = 2
+	# The sealift ran August 1954 to May 1955, well before the election fight, so it hangs off
+	# backing Diem rather than off blocking the 1956 ballot. Saigon has to be receiving first.
+	relative_position_id = USA_50s_Permit_Diem_Regime
+	prerequisite = {
+		focus = USA_50s_Permit_Diem_Regime
+	}
+	x = 0
+	y = 1
+	available = {
+		custom_trigger_tooltip = {
+			tooltip = USA_50s_Passage_to_Freedom_avail_TT
+			USA_indochina_passage_ready_trigger = yes
+		}
+	}
+	bypass = {
+		OR = {
+			NOT = { country_exists = VIN }
+			NOT = { country_exists = VIE }
+			AND = {	# the 300-day movement window closed and Saigon never opened its end
+				date > 1956.1.1
+				NOT = { USA_indochina_passage_ready_trigger = yes }
+			}
+		}
+	}
+	completion_reward = {
+		news_event = Passage_to_Freedom.0
+		#Note to Redo this Later
+		if = {	# both scopes ran unguarded; a partitioned north or a lost south crashed the effect
+			limit = {
+				country_exists = VIN
+				country_exists = VIE
+			}
+			VIN = {
+				capital_scope = {
+					add_manpower = -310000
+					add_to_variable = {
+						ReligionChristianityCatholic = -100
+					}
+				}
+			}
+			VIE = {
+				capital_scope = {
+					add_manpower = 310000
+					add_to_variable = {
+						ReligionChristianityCatholic = 100
+					}
+				}
+			}
+		}
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_proindependence_score = yes
+		set_temp_variable = { usa_indo_rapp = -50 }
+		USA_indochina_seed_rapprochement = yes
+	}
+	ai_will_do = {
+		base = 10
+		modifier = {
+			factor = 2
+			is_historical_focus_on = yes
 		}
 	}
 }
@@ -1190,19 +1902,19 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes     
+			change_influence_percentage = yes
 		}
 		ETH = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		GHA = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		custom_effect_tooltip = American_Decolonization_Enable_TT
 	}
@@ -1387,7 +2099,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 			capital_scope = {
 				add_extra_state_shared_building_slots = 2
 				add_building_construction = {
@@ -1431,7 +2143,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 			capital_scope = {
 				add_extra_state_shared_building_slots = 5
 				add_building_construction = {
@@ -1480,7 +2192,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 			add_popularity = {
 				ideology = communism
 				popularity = -0.02
@@ -1565,7 +2277,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		ZIM = {
 			add_timed_idea = {
@@ -1581,7 +2293,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		LIB = {
 			add_timed_idea = {
@@ -1597,7 +2309,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		DOC = {
 			add_timed_idea = {
@@ -1613,7 +2325,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 	}
 }
@@ -1649,7 +2361,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		ZIM = {
 			add_timed_idea = {
@@ -1665,7 +2377,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		LIB = {
 			add_timed_idea = {
@@ -1681,7 +2393,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		DOC = {
 			add_timed_idea = {
@@ -1697,7 +2409,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 	}
 }
@@ -1731,7 +2443,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		ZIM = {
 			custom_effect_tooltip = American_Funding_TT
@@ -1745,7 +2457,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		LIB = {
 			custom_effect_tooltip = American_Funding_TT
@@ -1759,7 +2471,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		DOC = {
 			custom_effect_tooltip = American_Funding_TT
@@ -1773,7 +2485,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 	}
 }
@@ -1806,7 +2518,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		POR = {
 			add_opinion_modifier = {
@@ -1816,7 +2528,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		BEL = {
 			add_opinion_modifier = {
@@ -1826,7 +2538,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		POR = {
 			add_opinion_modifier = {
@@ -1836,7 +2548,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 	}
 }
@@ -1866,10 +2578,10 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		POR = {
-			
+
 			add_opinion_modifier = {
 				target = USA
 				modifier = medium_increase
@@ -1877,10 +2589,10 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		BEL = {
-			
+
 			add_opinion_modifier = {
 				target = USA
 				modifier = medium_increase
@@ -1888,10 +2600,10 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		POR = {
-			
+
 			add_opinion_modifier = {
 				target = USA
 				modifier = medium_increase
@@ -1899,7 +2611,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 	}
 }
@@ -1929,7 +2641,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 7 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 			add_stability = 0.02
 		}
 		USA = {
@@ -1946,7 +2658,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 7 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 			add_stability = 0.02
 		}
 		USA = {
@@ -1963,7 +2675,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 			add_stability = 0.02
 		}
 		USA = {
@@ -2004,7 +2716,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 			add_stability = 0.01
 		}
 	}
@@ -2184,7 +2896,7 @@ shared_focus = {
 		}
 		NOT = {
 			has_completed_focus = USA_50s_Issue_Diplomatic_Objections
-		}	
+		}
 	}
 	prerequisite = {
 		focus = USA_50s_The_Hungarian_Revolution
@@ -2292,7 +3004,7 @@ shared_focus = {
 			}
 			add_to_variable = {
 				ReligionChristianityProtestant = 10000
-			}	
+			}
 		}
 		religious_drift = yes
 	}
@@ -2344,7 +3056,7 @@ shared_focus = {
 		}
 		NOT = {
 			has_completed_focus = USA_50s_Bring_the_Issue_to_the_UN
-		}	
+		}
 	}
 	x = 37
 	y = 2
@@ -2400,7 +3112,7 @@ shared_focus = {
 			add_to_variable = {
 				ReligionChristianityProtestant = 10000
 			}
-			
+
 		}
 		religious_drift = yes
 	}
@@ -3265,13 +3977,13 @@ shared_focus = {
 	prerequisite = {
 		focus = USA_50s_Expanding_NATO
 	}
-	
+
 	bypass = {
 		WGR = {
 			has_idea = nato_member
-		}	
+		}
 	}
-	
+
 	available = {
 		country_exists = WGR
 		OR = {
@@ -3281,11 +3993,11 @@ shared_focus = {
 		NOT = {
 			OR = {
 				has_global_flag = Germany_Unified_Neutral
-				WGR = {has_government = communism}	
+				WGR = {has_government = communism}
 				WGR = {has_government = fascism}
 				WGR = {has_completed_focus = WGR_Ollenhauer_53_Continue_a_Neutral_FP_Agenda}
 				WGR = {is_ai = no}
-			}	
+			}
 		}
 	}
 	x = 58
@@ -3349,7 +4061,7 @@ shared_focus = {
 	completion_reward = {
 		add_political_power = 100
 		country_event = { id = USA_50s_Dip_Desks.2 hours = 6 }
-		
+
 	}
 }
 
@@ -3583,7 +4295,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 	}
 }
@@ -3625,7 +4337,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 	}
 }
@@ -3655,7 +4367,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 	}
 }
@@ -3827,7 +4539,7 @@ shared_focus = {
 		}
 		NOT = {
 			has_completed_focus = USA_50s_Abstain_in_the_UNSC
-		}	
+		}
 	}
 	prerequisite = {
 		focus = USA_50s_The_Suez_Crisis
@@ -4080,7 +4792,7 @@ shared_focus = {
 		}
 		NOT = {
 			has_completed_focus = USA_50s_Abstain_in_the_UNSC
-		}	
+		}
 	}
 	prerequisite = {
 		focus = USA_50s_The_Suez_Crisis
@@ -4346,7 +5058,7 @@ shared_focus = {
 		}
 		NOT = {
 			has_completed_focus = USA_50s_Support_the_Tripartite_Alliance
-		}	
+		}
 	}
 	x = 85
 	y = 3
@@ -4416,7 +5128,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 	}
 }
@@ -4456,7 +5168,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 	}
 }
@@ -4559,7 +5271,7 @@ shared_focus = {
 }
 shared_focus = {
 	id = USA_50s_Improve_Malayan_Infrastructure
-	icon = GFX_Generic_National_Focus_Construction_6
+	icon = GFX_generic_focus_construction_mine_entrance
 	text_icon = USA_focus_style
 	cost = 3
 	offset = {
@@ -4647,7 +5359,7 @@ shared_focus = {
 }
 shared_focus = {
 	id = USA_50s_Bankroll_Malayan_Reconstruction
-	icon = GFX_Generic_National_Focus_Construction_12
+	icon = GFX_generic_focus_construction_steel_crane
 	text_icon = USA_focus_style
 	cost = 3
 	offset = {
@@ -4681,7 +5393,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 	}
 }
@@ -4715,7 +5427,7 @@ shared_focus = {
 }
 shared_focus = {
 	id = USA_50s_Redirect_Aid_to_Sarawak_and_North_Borneo
-	icon = GFX_usa_fp_generic_financial_aid 
+	icon = GFX_usa_fp_generic_financial_aid
 	text_icon = USA_focus_style
 	cost = 3
 	offset = {
@@ -4725,7 +5437,7 @@ shared_focus = {
 		}
 	}
 	prerequisite = {
-		focus = USA_50s_The_Fall_of_Malaya 
+		focus = USA_50s_The_Fall_of_Malaya
 	}
 	x = 117
 	y = 6
@@ -4737,7 +5449,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 			add_to_variable = {
 				MutualAssistanceProgramFunding = 15
 			}
@@ -4747,7 +5459,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 			add_to_variable = {
 				MutualAssistanceProgramFunding = 15
 			}
@@ -4767,7 +5479,7 @@ shared_focus = {
 		}
 	}
 	prerequisite = {
-		focus = USA_50s_Redirect_Aid_to_Sarawak_and_North_Borneo 
+		focus = USA_50s_Redirect_Aid_to_Sarawak_and_North_Borneo
 	}
 	x = 117
 	y = 7
@@ -4827,7 +5539,7 @@ shared_focus = {
 	}
 }
 shared_focus = {
-	id = USA_50s_Fund_Tengku_Mahmuds_Revolt 
+	id = USA_50s_Fund_Tengku_Mahmuds_Revolt
 	icon = GFX_usa_80_insert_agents_in_south_mexico
 	text_icon = USA_focus_style
 	cost = 3
@@ -4838,7 +5550,7 @@ shared_focus = {
 		}
 	}
 	prerequisite = {
-		focus = USA_50s_The_Fall_of_Malaya 
+		focus = USA_50s_The_Fall_of_Malaya
 	}
 	x = 120
 	y = 6
@@ -4870,7 +5582,7 @@ shared_focus = {
 			}
 		}
 		SRM = {
-			
+
 			transfer_state = 1892
 			transfer_state = 1891
 			transfer_state = 1893
@@ -4888,7 +5600,7 @@ shared_focus = {
 	}
 }
 shared_focus = {
-	id = USA_50s_Intensify_Aid_Smuggling 
+	id = USA_50s_Intensify_Aid_Smuggling
 	icon = GFX_usa_fp80_share_intelligence_reports_with_iraq
 	text_icon = USA_focus_style
 	cost = 3
@@ -4899,7 +5611,7 @@ shared_focus = {
 		}
 	}
 	prerequisite = {
-		focus = USA_50s_Fund_Tengku_Mahmuds_Revolt 
+		focus = USA_50s_Fund_Tengku_Mahmuds_Revolt
 	}
 	x = 119
 	y = 7
@@ -4932,8 +5644,8 @@ shared_focus = {
 	}
 }
 shared_focus = {
-	id = USA_50s_Permit_Thai_Intervention 
-	icon = GFX_Generic_National_Focus_Diplomacy_18
+	id = USA_50s_Permit_Thai_Intervention
+	icon = GFX_generic_focus_diplomacy_thai_hotline
 	text_icon = USA_focus_style
 	cost = 3
 	offset = {
@@ -4943,7 +5655,7 @@ shared_focus = {
 		}
 	}
 	prerequisite = {
-		focus = USA_50s_Fund_Tengku_Mahmuds_Revolt 
+		focus = USA_50s_Fund_Tengku_Mahmuds_Revolt
 	}
 	x = 121
 	y = 7
@@ -5291,7 +6003,7 @@ shared_focus = {
 	available = {
 		KOR = {
 			has_war_with = KPA
-		}		
+		}
 	}
 	prerequisite = {
 		focus = USA_50s_Attempt_Negotiations
@@ -5330,7 +6042,7 @@ shared_focus = {
 	available = {
 		KOR = {
 			has_war_with = KPA
-		}		
+		}
 	}
 	prerequisite = {
 		focus = USA_50s_No_Surrender
@@ -5635,7 +6347,7 @@ shared_focus = {
 			KOR = {
 				white_peace = PRC
 				white_peace = KPA
-				annex_country = { 
+				annex_country = {
 					target = KPA
 					transfer_troops = no
 				}
@@ -5714,7 +6426,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 			capital_scope = {
 				add_extra_state_shared_building_slots = 4
 				add_building_construction = {
@@ -5763,7 +6475,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = -5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		SPR = {
 			add_opinion_modifier = {
@@ -5773,7 +6485,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = -5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		BEL = {
 			add_opinion_modifier = {
@@ -5783,7 +6495,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = -5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		POR = {
 			add_opinion_modifier = {
@@ -5793,7 +6505,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = -5 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 		}
 		every_country = {
 			limit = {
@@ -5809,8 +6521,8 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
-			
+			change_influence_percentage = yes
+
 			add_opinion_modifier = {
 				target = USA
 				modifier = large_increase
@@ -5887,7 +6599,7 @@ shared_focus = {
 	}
 	shared_focus = {
 		id = USA_50s_Reassure_the_China_Lobby_Republicans
-		icon = GFX_Generic_National_Focus_USA_18
+		icon = GFX_generic_focus_usa_capitol_accord
 		cost = 3.00
 		prerequisite = {
 			focus = USA_50s_Fully_Withdraw_from_China
@@ -5901,7 +6613,7 @@ shared_focus = {
 		completion_reward = {
 			add_political_power = 50
 			add_popularity = {
-				ideology = conservative 
+				ideology = conservative
 				popularity = 0.02
 			}
 		}
@@ -6062,7 +6774,7 @@ shared_focus = {
 			}
 		}
 		completion_reward = {
-			
+
 			hidden_effect = {
 				every_state = {
 					remove_core_of = CHI
@@ -6340,7 +7052,7 @@ shared_focus = {
 					amount = 5000
 					producer = CAP
 				}
-				
+
 			}
 		}
 	}
@@ -6446,7 +7158,7 @@ shared_focus = {
 			add_threat = 5
 			add_political_power = 50
 			add_war_support = 0.05
-			
+
 		}
 	}
 	shared_focus = {
@@ -6467,7 +7179,7 @@ shared_focus = {
 				set_temp_variable = { percent_change = 5 }
 				set_temp_variable = { tag_index = ROOT.id }
 				set_temp_variable = { influence_target = THIS.id }
-				change_influence_percentage = yes  
+				change_influence_percentage = yes
 			}
 		}
 	}
@@ -6524,7 +7236,7 @@ shared_focus = {
 		x = 1
 		y = 7
 		available = {
-			has_global_flag = PRC_victory
+			has_global_flag = PRC_Victory
 		}
 		relative_position_id = USA_50s_The_Chinese_Civil_War
 		completion_reward = {
@@ -6533,7 +7245,7 @@ shared_focus = {
 	}
 	shared_focus = {
 		id = USA_50s_Maintain_Support_for_the_Kuomintang
-		icon = GFX_Reconstruct_KMT 
+		icon = GFX_Reconstruct_KMT
 		cost = 3.00
 		prerequisite = {
 			focus = USA_50s_The_First_Domino
@@ -6588,7 +7300,7 @@ shared_focus = {
 		y = 9
 		relative_position_id = USA_50s_The_Chinese_Civil_War
 		completion_reward = {
-			custom_effect_tooltip = increase_us_influence_on_taiwan_tt 
+			custom_effect_tooltip = increase_us_influence_on_taiwan_tt
 			increase_us_influence = yes
 			add_threat = 1
 			CHI = { country_event = KMT_Taiwan50s.41 }
@@ -6646,7 +7358,7 @@ shared_focus = {
 				set_temp_variable = { percent_change = 10 }
 				set_temp_variable = { tag_index = ROOT.id }
 				set_temp_variable = { influence_target = THIS.id }
-				change_influence_percentage = yes  
+				change_influence_percentage = yes
 			}
 		}
 	}
@@ -6667,7 +7379,7 @@ shared_focus = {
 				give_guarantee = USA
 				add_ideas = trade_treaty_USA
 			}
-			
+
 		}
 
 	}
@@ -6735,7 +7447,7 @@ shared_focus = {
 			add_command_power = 25
 			CHI = {
 				army_experience = 100
-				add_command_power = 25		
+				add_command_power = 25
 				every_army_leader = {
 					add_planning = 1
 					add_defense = 1
@@ -6762,7 +7474,7 @@ shared_focus = {
 				MutualAssistanceProgramFunding = 50
 			}
 			custom_effect_tooltip = major_increase_mutual_assistance_funding
-			
+
 			capital_scope = {
 				add_extra_state_shared_building_slots = 5
 				add_building_construction = {
@@ -6805,7 +7517,7 @@ shared_focus = {
 			set_temp_variable = { percent_change = 10 }
 			set_temp_variable = { tag_index = ROOT.id }
 			set_temp_variable = { influence_target = THIS.id }
-			change_influence_percentage = yes  
+			change_influence_percentage = yes
 			capital_scope = {
 				add_extra_state_shared_building_slots = 5
 				add_building_construction = {
@@ -6850,7 +7562,7 @@ shared_focus = {
 	}
 	shared_focus = {
 		id = USA_50s_East_Turkestan_Desk
-		icon = GFX_Generic_National_Focus_Politics_53
+		icon = GFX_generic_focus_politics_redrawing_the_map
 		cost = 1.00
 		prerequisite = {
 			focus = USA_50s_The_Fate_of_Mainland_China
@@ -6864,7 +7576,7 @@ shared_focus = {
 	}
 	shared_focus = {
 		id = USA_50s_East_Turkestan_is_Nankings_Problem
-		icon = GFX_Generic_National_Focus_Diplomacy_3
+		icon = GFX_generic_focus_diplomacy_kuomintang_salute
 		cost = 0.20
 		prerequisite = {
 			focus = USA_50s_East_Turkestan_Desk
@@ -6882,7 +7594,7 @@ shared_focus = {
 	}
 	shared_focus = {
 		id = USA_50s_Recognize_Masud_Sabris_Government
-		icon = GFX_Generic_National_Focus_Diplomacy_1
+		icon = GFX_generic_focus_diplomacy_treaty_signing
 		cost = 3.00
 		prerequisite = {
 			focus = USA_50s_East_Turkestan_Desk
@@ -6933,7 +7645,7 @@ shared_focus = {
 				set_temp_variable = { percent_change = 5 }
 				set_temp_variable = { tag_index = ROOT.id }
 				set_temp_variable = { influence_target = THIS.id }
-				change_influence_percentage = yes  
+				change_influence_percentage = yes
 			}
 		}
 	}
@@ -6985,7 +7697,7 @@ shared_focus = {
 	}
 	shared_focus = {
 		id = USA_50s_Failure_in_East_Turkestan
-		icon = GFX_Generic_National_Focus_Politics_48
+		icon = GFX_generic_focus_politics_watching_the_left
 		cost = 3.00
 		prerequisite = {
 			focus = USA_50s_Send_American_Advisors

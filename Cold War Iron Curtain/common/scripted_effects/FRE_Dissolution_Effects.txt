@@ -1,0 +1,193 @@
+# =============================================================================
+# CEFEO dissolution
+# =============================================================================
+# =============================================================================
+
+fre_hand_back_crown_domains = {
+	every_subject_country = {
+		limit = {
+			OR = {
+				tag = TAI
+				tag = TAM
+				tag = NUN
+				tag = THO
+			}
+		}
+		save_event_target_as = fre_departing_domain
+		if = {
+			limit = { FRA = { exists = yes } }
+			FRA = {
+				puppet = { target = event_target:fre_departing_domain }
+				set_autonomy = {
+					target = event_target:fre_departing_domain
+					autonomy_state = autonomy_indon_union
+					end_wars = no
+					end_civil_wars = no
+				}
+			}
+		}
+		else = {
+			FRE = {
+				set_autonomy = {
+					target = event_target:fre_departing_domain
+					autonomy_state = autonomy_free
+					end_wars = no
+					end_civil_wars = no
+				}
+			}
+		}
+	}
+}
+
+fre_dissolution_cleanup = {
+	if = {
+		limit = { country_exists = VIN has_war_with = VIN }
+		log = "FRE_OP_TRACE: DISSOLUTION entered_while_at_war_with_VIN operation=[?FRE_op_current|0]"
+	}
+	fre_castor_force_superseded_cleanup = yes
+	fre_pollux_force_superseded_cleanup = yes
+	fre_atlante_force_superseded_cleanup = yes
+	fre_dbp_disband_gono = yes
+	fre_lorraine_response_cleanup = yes
+	fre_hoa_binh_response_cleanup = yes
+	fre_dbp_response_cleanup = yes
+	fre_preparation_response_cleanup = yes
+	if = {
+		limit = { has_country_flag = FRE_Limited_Operation_Active }
+		set_temp_variable = { fre_op_outcome = 5 }
+		fre_operation_resolve_outcome = yes
+	}
+	clr_country_flag = FRE_Hoa_Binh_Mobile_Groups_Preserved
+	if = {
+		limit = { has_dynamic_modifier = { modifier = War_Exhaustion_Modifier } }
+		remove_dynamic_modifier = { modifier = War_Exhaustion_Modifier }
+	}
+	remove_ideas = FRE_Expeditionary_Command
+	remove_ideas = FRE_Under_Metropole_Command
+	remove_ideas = FRE_Indochina_War_Credits
+	fre_indochina_command_dismantle = yes
+	fre_hand_back_crown_domains = yes
+	remove_ideas = FRE_Metropole_Subsidies_Full
+	remove_ideas = FRE_Metropole_Subsidies_Reduced
+	remove_ideas = FRE_Metropole_Subsidies_Cut
+	remove_ideas = FRE_Operation_Overextension
+	remove_ideas = FRE_Limited_Operation_Light
+	remove_ideas = FRE_Limited_Operation_Standard
+	remove_ideas = FRE_Limited_Operation_Maximum
+	remove_ideas = FRE_Preparation_Ready
+	remove_ideas = FRE_Preparation_Supported
+	remove_ideas = FRE_Preparation_Maximum
+	remove_ideas = FRE_Highland_Overextension
+	remove_ideas = FRE_Campaign_Overextension
+	remove_ideas = FRE_Command_Carpentier
+	remove_ideas = FRE_Command_De_Lattre
+	remove_ideas = FRE_Command_Salan
+	remove_ideas = FRE_Command_Navarre
+	set_country_flag = FRE_CEFEO_Dissolved
+	clr_country_flag = FRE_Metropole_Request_Pending
+	clr_country_flag = FRE_VNA_Training_Pending
+	clr_country_flag = FRE_Mission_Operation_Lorraine_Activated
+	clr_country_flag = FRE_Mission_Operation_Hirondelle_Activated
+	clr_country_flag = FRE_Mission_Operation_Mouette_Activated
+	clr_country_flag = FRE_Mission_Operation_Brochet_Activated
+	clr_country_flag = FRE_Mission_Operation_Castor_Activated
+	clr_country_flag = FRE_Mission_Operation_Pollux_Activated
+	if = {
+		limit = {
+			country_exists = VIN
+			has_war_with = VIN
+		}
+		log = "FRE_OP_TRACE: WHITE_PEACE caller=fre_dissolution_cleanup actor=FRE target=VIN operation=[?FRE_op_current|0]"
+		white_peace = VIN
+	}
+	if = {
+		limit = {
+			country_exists = NLF
+			has_war_with = NLF
+		}
+		white_peace = NLF
+	}
+}
+
+fre_dissolve_cefeo_to_vie = {
+	if = {
+		limit = {
+			country_exists = FRE
+			country_exists = VIE
+		}
+		FRE = { fre_dissolution_cleanup = yes }
+		VIE = {
+			annex_country = {
+				target = FRE
+				transfer_troops = no
+			}
+			army_experience = 50
+		}
+		if = {
+			limit = { country_exists = FRA }
+			FRA = {
+				add_manpower = 50000
+				country_event = { id = FRE_Winddown.5 days = 2 }
+			}
+		}
+	}
+}
+
+fre_dissolve_cefeo_to_vin = {
+	if = {
+		limit = {
+			country_exists = FRE
+			country_exists = VIN
+		}
+		FRE = { fre_dissolution_cleanup = yes }
+		VIN = {
+			annex_country = {
+				target = FRE
+				transfer_troops = no
+			}
+		}
+		if = {
+			limit = { country_exists = FRA }
+			FRA = {
+				add_manpower = 30000
+				country_event = { id = FRE_Winddown.5 days = 2 }
+			}
+		}
+	}
+}
+
+fre_dissolve_cefeo_auto = {
+	if = {
+		limit = { country_exists = FRE }
+		if = {
+			limit = {
+				country_exists = VIN
+				OR = {
+					has_global_flag = FRE_Defeat_in_Indochina
+					VIN = { has_government = communism }
+				}
+			}
+			fre_dissolve_cefeo_to_vin = yes
+		}
+		else_if = {
+			limit = { country_exists = VIE }
+			fre_dissolve_cefeo_to_vie = yes
+		}
+		else_if = {
+			limit = {
+				country_exists = VIN
+			}
+			fre_dissolve_cefeo_to_vin = yes
+		}
+		else_if = {
+			limit = { country_exists = FRA }
+			FRE = { fre_dissolution_cleanup = yes }
+			FRA = {
+				annex_country = {
+					target = FRE
+					transfer_troops = no
+				}
+			}
+		}
+	}
+}

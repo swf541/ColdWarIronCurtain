@@ -2677,7 +2677,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			if = {
-				limit = { has_global_flag = PRC_victory }
+				limit = { has_global_flag = PRC_Victory }
 				add_opinion_modifier = {
 					target = PRC
 					modifier = small_increase_trade
@@ -2690,7 +2690,7 @@ focus_tree = {
 				}
 			}
 			else_if = {
-				limit = { has_global_flag = ROC_victory }
+				limit = { has_global_flag = ROC_Victory }
 				add_opinion_modifier = {
 					target = CHI
 					modifier = small_increase_trade
@@ -2775,11 +2775,11 @@ focus_tree = {
 		completion_reward = {
 			country_event = jap_treaty.12
 			if = {
-				limit = { has_global_flag = PRC_victory }
+				limit = { has_global_flag = PRC_Victory }
 				PRC = { country_event = jap_treaty.12 }
 			}
 			else_if = {
-				limit = { has_global_flag = ROC_victory }
+				limit = { has_global_flag = ROC_Victory }
 				CHI = { country_event = jap_treaty.12 }
 			}
 		}
@@ -2803,7 +2803,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			if = {
-				limit = { has_global_flag = PRC_victory }
+				limit = { has_global_flag = PRC_Victory }
 				add_opinion_modifier = {
 					target = PRC
 					modifier = small_increase
@@ -2816,7 +2816,7 @@ focus_tree = {
 				}
 			}
 			else_if = {
-				limit = { has_global_flag = ROC_victory }
+				limit = { has_global_flag = ROC_Victory }
 				add_opinion_modifier = {
 					target = CHI
 					modifier = small_increase

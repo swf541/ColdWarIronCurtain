@@ -1,8 +1,5 @@
 add_namespace = MEO
 
-# MEO 1950s focus-event chain
-# MEO.18 is intentionally the only event in this set that completes a national focus.
-# The country flags are lightweight hooks for external triggers/AI/decisions.
 
 country_event = {
     id = MEO.7
@@ -78,8 +75,6 @@ country_event = {
     }
 }
 
-# 1950: the first Dương / Thổ phỉ uprising.
-# This event deliberately does not choose a post-uprising focus; the player chooses the branch from the tree.
 country_event = {
     id = MEO.12
     title = MEO.12.t
@@ -90,8 +85,22 @@ country_event = {
     option = {
         name = MEO.12.a
         set_country_flag = MEO_1950_hoang_uprising
+        set_global_flag = Duong_Tutsi_and_Tho_Phi_Revolt
         add_war_support = 0.03
         complete_national_focus = MEO_begin_of_the_duong_tutsi_and_tho_phi_revolt
+    }
+}
+
+country_event = {
+    id = MEO.26
+    title = MEO.26.t
+    desc = MEO.26.d
+    is_triggered_only = yes
+    fire_only_once = yes
+
+    option = {
+        name = MEO.26.a
+        add_political_power = 25
     }
 }
 
@@ -108,8 +117,6 @@ country_event = {
     }
 }
 
-# This event is fired for both MEO and VIN by the autonomy focus.
-# Its effects are only hook flags: keep the sovereignty/puppet logic in the focus or its parent event.
 country_event = {
     id = MEO.14
     title = MEO.14.t
@@ -135,7 +142,45 @@ country_event = {
     option = {
         name = MEO.14.b
         trigger = { tag = VIN }
+        ai_chance = {
+			base = 5
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 100
+			}
+		}
         set_country_flag = VIN_thai_meo_autonomy_granted
+        MEO = {
+            set_country_flag = MEO_zone_led_by_lo_van_hac
+            meo_promote_lo_van_hac_for_autonomous_zone = yes
+        }
+    }
+    option = {
+        name = MEO.14.c
+        trigger = { tag = VIN }
+        ai_chance = {
+			base = 2
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
+		}
+        set_country_flag = VIN_thai_meo_autonomy_granted
+        MEO = {
+            set_country_flag = MEO_zone_led_by_vuong_chi_sinh
+            MEO_vuong_chi_sinh = {
+                add_country_leader_role = {
+                    promote_leader = yes
+                    country_leader = {
+                        ideology = monarchist
+                    }
+                }
+            }
+            set_politics = {
+                ruling_party = monarchism
+                elections_allowed = no
+            }
+        }
     }
 }
 
@@ -152,8 +197,6 @@ country_event = {
     }
 }
 
-# Fired in VIN by the MEO independence focus.
-# The actual war/negotiation trigger remains external by design.
 country_event = {
     id = MEO.16
     title = MEO.16.t
@@ -162,17 +205,22 @@ country_event = {
 
     option = {
         name = MEO.16.a
+        ai_chance = { factor = 76 }
         set_country_flag = VIN_meo_rebellion_to_be_crushed
-        add_war_support = 0.03
+        add_war_support = 0.05
+        declare_war_on = {
+            target = MEO
+            type = annex_everything
+        }
     }
     option = {
         name = MEO.16.b
+        ai_chance = { factor = 24 }
         set_country_flag = VIN_meo_negotiations_considered
         add_political_power = 15
     }
 }
 
-# Fired in FRA by the MEO independence focus.
 country_event = {
     id = MEO.17
     title = MEO.17.t
@@ -189,8 +237,6 @@ country_event = {
     }
 }
 
-# 1959: this is the branch-selecting event.
-# Script keys retain the existing focus IDs, but the localisation presents Hoàng A. Tưởng as the claimant.
 country_event = {
     id = MEO.18
     title = MEO.18.t
@@ -200,17 +246,66 @@ country_event = {
 
     option = {
         name = MEO.18.a
+        ai_chance = {
+			base = 5
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 100
+			}
+		}
         set_country_flag = MEO_1959_uprising_suppressed
         complete_national_focus = MEO_combat_the_duong_trung_nhan_revolt
     }
     option = {
         name = MEO.18.b
+        ai_chance = {
+			base = 1
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
+		}
         set_country_flag = MEO_1959_uprising_joined
         complete_national_focus = MEO_proclaim_duong_trung_nhan_as_king_of_the_meo
     }
 }
 
-# Fired in VIN when MEO backs Vương Chí Sình in 1959.
+country_event = {
+    id = MEO.27
+    title = MEO.27.t
+    desc = MEO.27.d
+    is_triggered_only = yes
+
+    option = {
+        name = MEO.27.a
+        ai_chance = {
+			base = 5
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 100
+			}
+		}
+        MEO = {
+            set_country_flag = MEO_hanoi_chose_autonomy
+            complete_national_focus = MEO_creation_of_the_autonomous_zone_of_thaimeo
+        }
+    }
+    option = {
+        name = MEO.27.b
+        ai_chance = {
+			base = 2
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
+		}
+        MEO = {
+            set_country_flag = MEO_hanoi_chose_integration
+            complete_national_focus = MEO_accept_the_unification_with_vietnam
+        }
+    }
+}
+
 country_event = {
     id = MEO.19
     title = MEO.19.t
@@ -266,7 +361,6 @@ country_event = {
     }
 }
 
-# Fired in VIN after MEO declares independence in the 1959 branch.
 country_event = {
     id = MEO.23
     title = MEO.23.t
@@ -275,11 +369,17 @@ country_event = {
 
     option = {
         name = MEO.23.a
+        ai_chance = { factor = 80 }
         set_country_flag = VIN_1959_meo_rebellion_to_be_crushed
-        add_war_support = 0.04
+        add_war_support = 0.1
+        declare_war_on = {
+            target = MEO
+            type = annex_everything
+        }
     }
     option = {
         name = MEO.23.b
+        ai_chance = { factor = 20 }
         set_country_flag = VIN_1959_meo_negotiations_considered
         add_political_power = 15
     }
@@ -295,10 +395,10 @@ country_event = {
         name = MEO.24.a
         set_country_flag = MEO_vuong_chi_sinh_assassinated
         add_war_support = 0.05
+        MEO_vuong_chi_sinh = { retire = yes }
     }
 }
 
-# Fired in VIN after the MEO assassination event.
 country_event = {
     id = MEO.25
     title = MEO.25.t

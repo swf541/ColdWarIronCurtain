@@ -1,0 +1,2235 @@
+#   ----------------------------------------------------------------------------
+#
+#   Clause indices (global.geneva_clause_current^N holds the tabled option):
+#    0 Ceasefire            0 = none          1 = phased          2 = immediate
+#    1 Partition line       0 = unified       1 = 13th parallel   2 = 17th parallel  3 = 20th parallel
+#    2 Reunification vote   0 = none          1 = postponed       2 = within two years  3 = immediate
+#    3 French withdrawal    0 = retained      1 = timetabled      2 = immediate
+#    4 Alignment            0 = free blocs    1 = enforced neutrality
+#    5 Laos & Cambodia      0 = French Union  1 = independent     2 = communist regroupment zones
+#    6 Minority peoples     0 = no provision  1 = autonomy guarantees
+#
+#   ----------------------------------------------------------------------------
+
+geneva_lev_default_amount = {
+	if = {
+		limit = { NOT = { check_variable = { geneva_lev_amount > 0 } } }
+		set_temp_variable = { geneva_lev_amount = 50 }
+	}
+}
+geneva_add_communist_leverage = {
+	geneva_lev_default_amount = yes
+	add_to_variable = { global.geneva_lev_communist = geneva_lev_amount }
+	custom_effect_tooltip = geneva_add_communist_leverage_TT
+}
+geneva_add_profrance_leverage = {
+	geneva_lev_default_amount = yes
+	add_to_variable = { global.geneva_lev_profrance = geneva_lev_amount }
+	custom_effect_tooltip = geneva_add_profrance_leverage_TT
+}
+geneva_add_proindependence_leverage = {
+	geneva_lev_default_amount = yes
+	add_to_variable = { global.geneva_lev_proindependence = geneva_lev_amount }
+	custom_effect_tooltip = geneva_add_proindependence_leverage_TT
+}
+geneva_add_usa_leverage = {
+	geneva_lev_default_amount = yes
+	add_to_variable = { global.geneva_lev_usa = geneva_lev_amount }
+	custom_effect_tooltip = geneva_add_usa_leverage_TT
+}
+geneva_add_federal_leverage = {
+	geneva_lev_default_amount = yes
+	add_to_variable = { global.geneva_lev_federal = geneva_lev_amount }
+	custom_effect_tooltip = geneva_add_federal_leverage_TT
+}
+geneva_add_ethnic_leverage = {
+	geneva_lev_default_amount = yes
+	add_to_variable = { global.geneva_lev_ethnic = geneva_lev_amount }
+	custom_effect_tooltip = geneva_add_ethnic_leverage_TT
+}
+geneva_add_vie_vin_rapprochement = {
+	geneva_lev_default_amount = yes
+	add_to_variable = { global.geneva_rapprochement_vie_vin = geneva_lev_amount }
+	custom_effect_tooltip = geneva_add_vie_vin_rapprochement_TT
+}
+
+
+geneva_outcome_award_proindependence = {
+	geneva_lev_default_amount = yes
+	if = {
+		limit = {
+			has_global_flag = geneva_conference_in_session
+			country_exists = VIE
+			VIE = {
+				is_in_array = { global.geneva_delegations = THIS.id }
+				NOT = { has_country_flag = geneva_walked_out }
+			}
+		}
+		VIE = { add_to_variable = { geneva_weight = geneva_lev_amount } }
+		custom_effect_tooltip = geneva_outcome_award_vie_weight_TT
+	}
+	else = {
+		geneva_add_proindependence_leverage = yes
+	}
+}
+geneva_outcome_award_communist = {
+	geneva_lev_default_amount = yes
+	if = {
+		limit = {
+			has_global_flag = geneva_conference_in_session
+			country_exists = VIN
+			VIN = {
+				is_in_array = { global.geneva_delegations = THIS.id }
+				NOT = { has_country_flag = geneva_walked_out }
+			}
+		}
+		VIN = { add_to_variable = { geneva_weight = geneva_lev_amount } }
+		custom_effect_tooltip = geneva_outcome_award_vin_weight_TT
+	}
+	else = {
+		geneva_add_communist_leverage = yes
+	}
+}
+geneva_outcome_award_profrance = {
+	geneva_lev_default_amount = yes
+	if = {
+		limit = {
+			has_global_flag = geneva_conference_in_session
+			country_exists = FRA
+			FRA = {
+				is_in_array = { global.geneva_delegations = THIS.id }
+				NOT = { has_country_flag = geneva_walked_out }
+			}
+		}
+		FRA = { add_to_variable = { geneva_weight = geneva_lev_amount } }
+		custom_effect_tooltip = geneva_outcome_award_fra_weight_TT
+	}
+	else = {
+		geneva_add_profrance_leverage = yes
+	}
+}
+
+
+geneva_conf_world_leverage_pulse = {
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		if = {
+			limit = { country_exists = FRA }
+			set_variable = { global.geneva_cache_comm_score = FRA.StruggleInvolvedNationsIndochinaCommunistScore }
+			set_variable = { global.geneva_cache_anticomm_score = FRA.StruggleInvolvedNationsIndochinaProFranceScore }
+			add_to_variable = { global.geneva_cache_anticomm_score = FRA.StruggleInvolvedNationsIndochinaProIndependenceScore }
+			set_variable = { global.geneva_cache_comm_x2 = global.geneva_cache_comm_score }
+			multiply_variable = { global.geneva_cache_comm_x2 = 2 }
+		}
+		# --- Laotian Civil War tracking (LAO = Pathet Lao, LOS = Kingdom) ---
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_pathet_lao_war_seen }
+				country_exists = LAO
+				country_exists = LOS
+				LOS = { has_war_with = LAO }
+			}
+			set_global_flag = geneva_pathet_lao_war_seen
+		}
+		if = {
+			limit = {
+				has_global_flag = geneva_pathet_lao_war_seen
+				NOT = { has_global_flag = geneva_pathet_lao_outcome_applied }
+				country_exists = LAO
+				OR = {
+					NOT = { country_exists = LOS }
+					LOS = { has_capitulated = yes }
+				}
+			}
+			set_global_flag = geneva_pathet_lao_outcome_applied
+			set_variable = { global.geneva_outcome_pathet_lao = 1 }
+			set_temp_variable = { geneva_lev_amount = 125 }
+			geneva_add_communist_leverage = yes
+		}
+		else_if = {
+			limit = {
+				has_global_flag = geneva_pathet_lao_war_seen
+				NOT = { has_global_flag = geneva_pathet_lao_outcome_applied }
+				country_exists = LOS
+				LOS = { has_capitulated = no }
+				OR = {
+					NOT = { country_exists = LAO }
+					LAO = { has_capitulated = yes }
+				}
+			}
+			set_global_flag = geneva_pathet_lao_outcome_applied
+			set_variable = { global.geneva_outcome_pathet_lao = 2 }
+			set_temp_variable = { geneva_lev_amount = 125 }
+			geneva_add_profrance_leverage = yes
+		}
+
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_usa_backs_vie_applied }
+				country_exists = USA
+				USA = { has_country_flag = USA_VIE_Direct_Intervention_Locked }
+			}
+			set_global_flag = geneva_usa_backs_vie_applied
+			set_temp_variable = { geneva_lev_amount = 75 }
+			geneva_add_proindependence_leverage = yes
+			set_temp_variable = { geneva_lev_amount = 75 }
+			geneva_add_usa_leverage = yes
+		}
+
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_handoff_applied }
+				country_exists = VIE
+				VIE = { has_completed_focus = VIE_Second_Elysee_Accords }
+			}
+			set_global_flag = geneva_handoff_applied
+			set_temp_variable = { geneva_lev_amount = 75 }
+			geneva_add_federal_leverage = yes
+		}
+
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_usa_backs_france_applied }
+				country_exists = USA
+				USA = {
+					OR = {
+						has_completed_focus = USA_50s_Operation_Vulture
+						has_completed_focus = USA_50s_Military_Aid_to_France
+					}
+				}
+			}
+			set_global_flag = geneva_usa_backs_france_applied
+			set_temp_variable = { geneva_lev_amount = 50 }
+			geneva_add_profrance_leverage = yes
+		}
+
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_usa_danquoc_applied }
+				country_exists = USA
+				USA = { has_completed_focus = USA_50s_Stabilize_DanQuoc_Regime }
+			}
+			set_global_flag = geneva_usa_danquoc_applied
+			set_temp_variable = { geneva_lev_amount = 50 }
+			geneva_add_proindependence_leverage = yes
+		}
+
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_cuongde_talks_applied }
+				has_global_flag = CuongDe_DiemHo_Talks
+			}
+			set_global_flag = geneva_cuongde_talks_applied
+			set_temp_variable = { geneva_lev_amount = 50 }
+			geneva_add_proindependence_leverage = yes
+		}
+
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_cuongde_front_applied }
+				country_exists = VIE
+				VIE = { has_country_flag = VIE_Hung_Formed_Anticommunist_Front }
+			}
+			set_global_flag = geneva_cuongde_front_applied
+			add_to_variable = { global.geneva_rapprochement_vie_vin = -50 }
+		}
+
+
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_nlf_outcome_applied }
+				OR = {
+					NOT = { country_exists = NLF }
+					NLF = { has_capitulated = yes }
+					NLF = { num_of_controlled_states < 1 }
+	}
+			}
+			set_global_flag = geneva_nlf_outcome_applied
+			set_global_flag = Southern_VietMinh_Defeated
+			if = {
+				limit = { date < 1952.1.1 }
+				set_variable = { global.geneva_outcome_nlf = 1 }
+				set_temp_variable = { geneva_lev_amount = 100 }
+			}
+			else_if = {
+				limit = { date < 1953.1.1 }
+				set_variable = { global.geneva_outcome_nlf = 2 }
+				set_temp_variable = { geneva_lev_amount = 75 }
+			}
+			else = {
+				set_variable = { global.geneva_outcome_nlf = 3 }
+				set_temp_variable = { geneva_lev_amount = 50 }
+			}
+			geneva_outcome_award_proindependence = yes
+			if = {
+				limit = {
+					has_global_flag = geneva_conference_in_session
+					country_exists = VIE
+					VIE = { is_in_array = { global.geneva_delegations = THIS.id } }
+				}
+				VIE = { geneva_conf_refresh_prefs = yes }
+			}
+		}
+
+		if = {
+			limit = {
+				has_global_flag = Laos_Raid_Stalemate
+				check_variable = { global.geneva_outcome_pathet_lao = 0 }
+			}
+			set_variable = { global.geneva_outcome_pathet_lao = 3 }	# display only: points paid by the Laos Raid scenario
+		}
+
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_dbp_outcome_applied }
+				country_exists = FRE
+				FRE = {
+					OR = {
+						has_country_flag = FRE_DBP_Result_Victory
+						has_country_flag = FRE_DBP_Result_Fall
+						has_country_flag = FRE_DBP_Result_Breakout
+					}
+				}
+			}
+			set_global_flag = geneva_dbp_outcome_applied
+			if = {
+				limit = { FRE = { has_country_flag = FRE_DBP_Result_Victory } }
+				set_variable = { global.geneva_outcome_dbp = 1 }
+				set_temp_variable = { geneva_lev_amount = 75 }
+				geneva_outcome_award_profrance = yes
+			}
+			else_if = {
+				limit = { FRE = { has_country_flag = FRE_DBP_Result_Fall } }
+				set_variable = { global.geneva_outcome_dbp = 2 }
+				set_temp_variable = { geneva_lev_amount = 100 }
+				geneva_outcome_award_communist = yes
+			}
+			else = {
+				set_variable = { global.geneva_outcome_dbp = 3 }
+				set_temp_variable = { geneva_lev_amount = 25 }
+				geneva_outcome_award_profrance = yes
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_sects_outcome_applied }
+				country_exists = VIE
+				VIE = {
+					OR = { has_country_flag = crushed_binh_xuyen has_country_flag = integrated_binh_xuyen }
+					OR = { has_country_flag = crushed_cao_dai has_country_flag = integrated_cao_dai }
+					OR = { has_country_flag = crushed_harmonism has_country_flag = integrated_harmonism }
+					OR = { has_country_flag = crushed_hoa_hao has_country_flag = integrated_hoa_hao }
+					OR = { has_country_flag = crushed_umdc has_country_flag = integrated_umdc }
+				}
+			}
+			set_global_flag = geneva_sects_outcome_applied
+			set_variable = { global.geneva_outcome_sects = 1 }
+			set_temp_variable = { geneva_lev_amount = 75 }
+			geneva_outcome_award_proindependence = yes
+		}
+
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_highland_tai_applied }
+				NOT = { check_variable = { global.geneva_outcome_highland_done > 1 } }
+				OR = {
+					TAI = { is_subject_of = VIN }
+					AND = {
+						NOT = { country_exists = TAI }
+						OR = {
+							671 = { is_owned_by = VIN }
+							AND = {
+								671 = { is_owned_by = MEO }
+								MEO = { is_subject_of = VIN }
+							}
+						}
+					}
+				}
+			}
+			set_global_flag = geneva_highland_tai_applied
+			add_to_variable = { global.geneva_outcome_highland = 1 }
+			set_temp_variable = { geneva_lev_amount = 25 }
+			geneva_outcome_award_communist = yes
+		}
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_highland_meo_applied }
+				NOT = { check_variable = { global.geneva_outcome_highland_done > 1 } }
+				OR = {
+					MEO = { is_subject_of = VIN }
+					AND = {
+						NOT = { country_exists = MEO }
+						1767 = { is_owned_by = VIN }
+					}
+				}
+			}
+			set_global_flag = geneva_highland_meo_applied
+			add_to_variable = { global.geneva_outcome_highland = 1 }
+			set_temp_variable = { geneva_lev_amount = 25 }
+			geneva_outcome_award_communist = yes
+		}
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_highland_nun_applied }
+				NOT = { check_variable = { global.geneva_outcome_highland_done > 1 } }
+				OR = {
+					NUN = { is_subject_of = VIN }
+					AND = {
+						NOT = { country_exists = NUN }
+						1281 = { is_owned_by = VIN }
+					}
+				}
+			}
+			set_global_flag = geneva_highland_nun_applied
+			add_to_variable = { global.geneva_outcome_highland = 1 }
+			set_temp_variable = { geneva_lev_amount = 25 }
+			geneva_outcome_award_communist = yes
+		}
+		if = {
+			limit = {
+				check_variable = { global.geneva_outcome_highland > 2 }
+				check_variable = { global.geneva_outcome_highland_done = 0 }
+			}
+			set_variable = { global.geneva_outcome_highland_done = 1 }
+		}
+
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_laos_raid_outcome_applied }
+				has_global_flag = Laos_Raid_Resolved
+			}
+			set_global_flag = geneva_laos_raid_outcome_applied
+			if = {
+				limit = { has_global_flag = Laos_Total_War }
+				set_variable = { global.geneva_outcome_laos_raid = 4 }	# escalation: the wider war pays out via the Pathet Lao scenario
+			}
+			else_if = {
+				limit = { has_global_flag = Laos_Raid_Attacker_Won }
+				set_variable = { global.geneva_outcome_laos_raid = 1 }
+				set_temp_variable = { geneva_lev_amount = 100 }
+				geneva_outcome_award_communist = yes
+			}
+			else_if = {
+				limit = { has_global_flag = Laos_Raid_Total_Failure }
+				set_variable = { global.geneva_outcome_laos_raid = 3 }
+				set_temp_variable = { geneva_lev_amount = 75 }
+				geneva_outcome_award_profrance = yes
+			}
+			else_if = {
+				limit = { has_global_flag = Laos_Raid_Stalemate }
+				set_variable = { global.geneva_outcome_laos_raid = 2 }
+				set_temp_variable = { geneva_lev_amount = 50 }
+				geneva_outcome_award_communist = yes
+			}
+		}
+	}
+}
+
+
+geneva_conf_resolve_pending_outcomes = {
+	if = {
+		limit = { NOT = { has_global_flag = geneva_nlf_outcome_applied } }
+		set_global_flag = geneva_nlf_outcome_applied
+		set_variable = { global.geneva_outcome_nlf = 4 }	# the southern insurgency outlasted the war
+		set_temp_variable = { geneva_lev_amount = 75 }
+		geneva_add_communist_leverage = yes
+	}
+	if = {
+		limit = { NOT = { has_global_flag = geneva_sects_outcome_applied } }
+		set_global_flag = geneva_sects_outcome_applied
+		set_variable = { global.geneva_outcome_sects = 2 }	# a fractured South weakens the anti-communist chair
+		set_temp_variable = { geneva_lev_amount = 50 }
+		geneva_add_communist_leverage = yes
+	}
+	if = {
+		limit = {
+			NOT = { has_global_flag = geneva_pathet_lao_outcome_applied }
+			check_variable = { global.geneva_outcome_pathet_lao = 0 }
+		}
+		set_variable = { global.geneva_outcome_pathet_lao = 4 }	# no settlement in Laos before the conference
+	}
+	if = {
+		limit = { check_variable = { global.geneva_outcome_highland_done = 0 } }
+		set_variable = { global.geneva_outcome_highland_done = 2 }
+		set_temp_variable = { g_hl_surv = 3 }
+		subtract_from_temp_variable = { g_hl_surv = global.geneva_outcome_highland }
+		if = {
+			limit = { check_variable = { g_hl_surv > 0 } }
+			set_temp_variable = { geneva_lev_amount = 25 }
+			multiply_temp_variable = { geneva_lev_amount = g_hl_surv }
+			geneva_add_ethnic_leverage = yes
+		}
+	}
+}
+
+
+# g_neg_option, g_neg_amount. With temp g_geneva_headless = 1 (auto-resolve)
+geneva_neg_start = {
+	if = {
+		limit = { check_variable = { g_geneva_headless = 1 } }
+		set_temp_variable = { g_npi = g_neg_clause }
+		multiply_temp_variable = { g_npi = 4 }
+		add_to_temp_variable = { g_npi = g_neg_option }
+		add_to_variable = { global.geneva_push^g_npi = g_neg_amount }
+	}
+	else_if = {
+		limit = { check_variable = { geneva_neg_mine^g_neg_clause = 0 } }
+		add_to_array = { global.geneva_neg_country = THIS.id }
+		add_to_array = { global.geneva_neg_clause = g_neg_clause }
+		add_to_array = { global.geneva_neg_option = g_neg_option }
+		add_to_array = { global.geneva_neg_amount = g_neg_amount }
+		add_to_array = { global.geneva_neg_days = 3 }
+		geneva_neg_rebuild_mirrors = yes
+		custom_effect_tooltip = geneva_neg_start_TT
+	}
+}
+
+geneva_neg_rebuild_mirrors = {
+	every_country = {
+		limit = { is_in_array = { global.geneva_delegations = THIS.id } }
+		set_variable = { geneva_neg_display_clause = 0 }
+		set_variable = { geneva_neg_display_days = 0 }
+		clear_array = geneva_neg_mine
+		resize_array = { array = geneva_neg_mine size = 7 value = 0 }
+	}
+	clear_array = global.geneva_neg_clause_count
+	resize_array = { array = global.geneva_neg_clause_count size = 7 value = 0 }
+	set_temp_variable = { g_ni = 0 }
+	set_temp_variable = { g_nsz = global.geneva_neg_country^num }
+	while_loop_effect = {
+		limit = { check_variable = { g_ni < g_nsz } }
+		set_temp_variable = { g_nown = global.geneva_neg_country^g_ni }
+		set_temp_variable = { g_ncl = global.geneva_neg_clause^g_ni }
+		set_temp_variable = { g_nda = global.geneva_neg_days^g_ni }
+		add_to_variable = { global.geneva_neg_clause_count^g_ncl = 1 }
+		every_country = {
+			limit = { check_variable = { THIS.id = g_nown } }
+			set_variable = { geneva_neg_mine^g_ncl = 1 }
+			if = {
+				limit = { check_variable = { geneva_neg_display_clause = 0 } }
+				set_temp_variable = { g_ncl1 = g_ncl }
+				add_to_temp_variable = { g_ncl1 = 1 }
+				set_variable = { geneva_neg_display_clause = g_ncl1 }
+				set_variable = { geneva_neg_display_days = g_nda }
+			}
+		}
+		add_to_temp_variable = { g_ni = 1 }
+	}
+}
+
+geneva_neg_daily_tick = {
+	set_temp_variable = { g_ni = global.geneva_neg_country^num }
+	subtract_from_temp_variable = { g_ni = 1 }
+	while_loop_effect = {
+		limit = { check_variable = { g_ni > -1 } }
+		set_temp_variable = { g_nown = global.geneva_neg_country^g_ni }
+		set_temp_variable = { g_ndrop = 0 }
+		every_country = {
+			limit = {
+				check_variable = { THIS.id = g_nown }
+				has_country_flag = geneva_walked_out
+			}
+			set_temp_variable = { g_ndrop = 1 }
+		}
+		if = {
+			limit = { check_variable = { g_ndrop = 0 } }
+			subtract_from_variable = { global.geneva_neg_days^g_ni = 1 }
+			if = {
+				limit = { check_variable = { global.geneva_neg_days^g_ni < 1 } }
+				set_temp_variable = { g_npi = global.geneva_neg_clause^g_ni }
+				multiply_temp_variable = { g_npi = 4 }
+				add_to_temp_variable = { g_npi = global.geneva_neg_option^g_ni }
+				add_to_variable = { global.geneva_push^g_npi = global.geneva_neg_amount^g_ni }
+				set_temp_variable = { g_ndrop = 1 }
+			}
+		}
+		if = {
+			limit = { check_variable = { g_ndrop = 1 } }
+			remove_from_array = { array = global.geneva_neg_country index = g_ni }
+			remove_from_array = { array = global.geneva_neg_clause index = g_ni }
+			remove_from_array = { array = global.geneva_neg_option index = g_ni }
+			remove_from_array = { array = global.geneva_neg_amount index = g_ni }
+			remove_from_array = { array = global.geneva_neg_days index = g_ni }
+		}
+		subtract_from_temp_variable = { g_ni = 1 }
+	}
+	geneva_neg_rebuild_mirrors = yes
+}
+
+geneva_neg_flush_all = {
+	set_temp_variable = { g_ni = 0 }
+	set_temp_variable = { g_nsz = global.geneva_neg_country^num }
+	while_loop_effect = {
+		limit = { check_variable = { g_ni < g_nsz } }
+		set_temp_variable = { g_npi = global.geneva_neg_clause^g_ni }
+		multiply_temp_variable = { g_npi = 4 }
+		add_to_temp_variable = { g_npi = global.geneva_neg_option^g_ni }
+		add_to_variable = { global.geneva_push^g_npi = global.geneva_neg_amount^g_ni }
+		add_to_temp_variable = { g_ni = 1 }
+	}
+	geneva_neg_clear = yes
+}
+
+geneva_conf_seed_severity = {
+	clear_array = global.geneva_severity
+	add_to_array = { global.geneva_severity = 2 }	# ceasefire
+	add_to_array = { global.geneva_severity = 3 }	# partition line
+	add_to_array = { global.geneva_severity = 3 }	# reunification vote
+	add_to_array = { global.geneva_severity = 2 }	# french withdrawal
+	add_to_array = { global.geneva_severity = 1 }	# alignment
+	add_to_array = { global.geneva_severity = 2 }	# laos and cambodia
+	add_to_array = { global.geneva_severity = 1 }	# minority peoples
+}
+
+geneva_neg_clear = {
+	clear_array = global.geneva_neg_country
+	clear_array = global.geneva_neg_clause
+	clear_array = global.geneva_neg_option
+	clear_array = global.geneva_neg_amount
+	clear_array = global.geneva_neg_days
+	geneva_neg_rebuild_mirrors = yes
+}
+
+# ----------------------------------------------------------------------------
+# Delegation seating
+# ----------------------------------------------------------------------------
+
+geneva_conf_seat_delegation = {
+	add_to_array = { global.geneva_delegations = THIS.id }
+	set_variable = { geneva_patience = 100 }
+	set_variable = { geneva_weight = 0 }
+	set_variable = { geneva_grievance = 0 }
+	set_variable = { geneva_provocation = 0 }	# how hard this delegation is currently being strong-armed; gates the AI walkout floor
+	set_variable = { geneva_threats_used = 0 }
+	set_variable = { geneva_neg_display_clause = 0 }
+	set_variable = { geneva_neg_display_days = 0 }
+	clear_array = geneva_neg_mine
+	resize_array = { array = geneva_neg_mine size = 7 value = 0 }
+	clr_country_flag = geneva_walked_out
+	clear_array = geneva_pref
+	clear_array = geneva_prio
+	geneva_conf_set_delegation_prefs = yes
+	geneva_conf_seed_weight = yes
+	set_variable = { geneva_actions_used = 0 }
+	set_variable = { geneva_sel_clause = 0 }
+	set_variable = { geneva_sel_option = 0 }
+	set_variable = { geneva_sel_target = 0 }
+	set_variable = { geneva_pressured_until = 0 }
+	set_variable = { geneva_backchannel_next = 0 }
+	set_variable = { geneva_threat_next = 0 }
+	set_variable = { View_Geneva_Conference = 1 }
+	if = {
+		limit = { NOT = { is_in_array = { country_politics_list = 29 } } }
+		add_to_array = { country_politics_list = 29 }
+	}
+}
+
+geneva_conf_refresh_prefs = {
+	clear_array = geneva_pref
+	clear_array = geneva_prio
+	geneva_conf_set_delegation_prefs = yes
+}
+
+geneva_conf_set_delegation_prefs = {
+	set_temp_variable = { g_sc_comm = 0 }
+	set_temp_variable = { g_sc_fra = 0 }
+	set_temp_variable = { g_sc_ind = 0 }
+	set_temp_variable = { g_sc_eth = 0 }
+	if = {
+		limit = { country_exists = FRA }
+		set_temp_variable = { g_sc_comm = FRA.StruggleInvolvedNationsIndochinaCommunistScore }
+		set_temp_variable = { g_sc_fra = FRA.StruggleInvolvedNationsIndochinaProFranceScore }
+		set_temp_variable = { g_sc_ind = FRA.StruggleInvolvedNationsIndochinaProIndependenceScore }
+		set_temp_variable = { g_sc_eth = FRA.StruggleInvolvedNationsIndochinaProEthnicScore }
+	}
+
+	if = {
+		limit = { OR = { tag = VIN tag = LAO } }
+		add_to_array = { geneva_pref = 2 }	# ceasefire: immediate
+		add_to_array = { geneva_pref = 2 }	# partition: 17th, the line Hanoi arrived expecting. The 13th is a claim made from the battlefield, not an opening position
+		add_to_array = { geneva_pref = 2 }	# elections: two years
+		add_to_array = { geneva_pref = 2 }	# withdrawal: immediate
+		add_to_array = { geneva_pref = 0 }	# alignment: free blocs (keeps Soviet/Chinese backing)
+		add_to_array = { geneva_pref = 2 }	# Laos/Cambodia: regroupment zones
+		add_to_array = { geneva_pref = 0 }	# minorities: none
+		add_to_array = { geneva_prio = 4 }
+		add_to_array = { geneva_prio = 10 }	# the partition line is what Hanoi is actually here to fight over
+		add_to_array = { geneva_prio = 8 }
+		add_to_array = { geneva_prio = 3 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 3 }
+		add_to_array = { geneva_prio = 1 }
+		set_temp_variable = { g_comm_x1 = g_sc_fra }
+		add_to_temp_variable = { g_comm_x1 = g_sc_ind }
+		if = {
+			limit = { check_variable = { g_sc_comm > g_comm_x1 } }
+			set_variable = { geneva_pref^1 = 1 }	# winning, but not decisively: press for the 13th rather than the whole country
+		}
+		set_temp_variable = { g_comm_x2 = g_comm_x1 }
+		multiply_temp_variable = { g_comm_x2 = 2 }
+		if = {
+			limit = { check_variable = { g_sc_comm > g_comm_x2 } }
+			set_variable = { geneva_pref^1 = 0 }	# demand a unified Vietnam
+			set_variable = { geneva_prio^1 = 10 }
+			set_variable = { geneva_pref^2 = 3 }	# and the vote that would deliver it
+		}
+		set_temp_variable = { g_anti_x2 = g_sc_comm }
+		multiply_temp_variable = { g_anti_x2 = 2 }
+		set_temp_variable = { g_anti_tot = g_sc_fra }
+		add_to_temp_variable = { g_anti_tot = g_sc_ind }
+		if = {
+			limit = { check_variable = { g_anti_tot > g_anti_x2 } }
+			set_variable = { geneva_pref^1 = 2 }	# accept the 17th
+			set_variable = { geneva_pref^2 = 2 }	# elections in two years
+			set_variable = { geneva_pref^3 = 1 }	# tolerate a timetabled withdrawal
+		}
+		if = {
+			limit = {
+				tag = VIN
+				check_variable = { global.geneva_rapprochement_vie_vin > 99 }
+			}
+			set_variable = { geneva_pref^1 = 2 }	# accept the 17th
+			set_variable = { geneva_pref^2 = 2 }	# elections in two years
+		}
+		if = {
+			limit = {
+				tag = VIN
+				check_variable = { global.geneva_rapprochement_vie_vin > 199 }
+			}
+			set_variable = { geneva_pref^2 = 3 }	# immediate elections
+			set_variable = { geneva_prio^2 = 10 }
+		}
+		if = {
+			limit = { tag = LAO }
+			set_variable = { geneva_prio^5 = 10 }
+			set_variable = { geneva_prio^1 = 2 }	# the Pathet Lao have no stake in the Vietnamese line and must not carry a weight-10 vote on it
+		}
+	}
+	else_if = {
+		limit = { OR = { tag = SOV tag = PRC } }
+		add_to_array = { geneva_pref = 2 }
+		add_to_array = { geneva_pref = 2 }	# partition: 17th (pressure VIN to settle)
+		add_to_array = { geneva_pref = 2 }	# elections: two years
+		add_to_array = { geneva_pref = 2 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 2 }
+		add_to_array = { geneva_pref = 0 }
+		add_to_array = { geneva_prio = 7 }
+		add_to_array = { geneva_prio = 5 }
+		add_to_array = { geneva_prio = 7 }
+		add_to_array = { geneva_prio = 6 }
+		add_to_array = { geneva_prio = 7 }
+		add_to_array = { geneva_prio = 5 }
+		add_to_array = { geneva_prio = 1 }
+	}
+	else_if = {
+		limit = { tag = FRA }
+		add_to_array = { geneva_pref = 2 }	# ceasefire: immediate (wants out)
+		add_to_array = { geneva_pref = 2 }	# partition: 17th
+		add_to_array = { geneva_pref = 1 }	# elections: postponed
+		add_to_array = { geneva_pref = 1 }	# withdrawal: timetabled
+		add_to_array = { geneva_pref = 1 }	# alignment: neutrality
+		add_to_array = { geneva_pref = 0 }	# Laos/Cambodia: French Union
+		add_to_array = { geneva_pref = 0 }
+		add_to_array = { geneva_prio = 7 }
+		add_to_array = { geneva_prio = 10 }	# the line is what Paris can defend at the table; everything else is negotiable
+		add_to_array = { geneva_prio = 4 }
+		add_to_array = { geneva_prio = 4 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 4 }
+		add_to_array = { geneva_prio = 2 }
+		if = {
+			limit = { check_variable = { g_sc_fra > 999 } }
+			set_variable = { geneva_pref^1 = 3 }	# 20th parallel
+		}
+		if = {
+			limit = { check_variable = { global.geneva_lev_federal > 99 } }
+			set_variable = { geneva_pref^3 = 0 }	# retained presence
+			set_variable = { geneva_prio^3 = 9 }
+		}
+		if = {
+			limit = { check_variable = { g_sc_eth > 499 } }
+			set_variable = { geneva_pref^6 = 1 }	# sect/highland autonomy
+			set_variable = { geneva_prio^6 = 5 }
+		}
+		if = {
+			limit = {
+				country_exists = VIE
+				NOT = { has_opinion = { target = VIE value > 0 } }
+			}
+			set_variable = { geneva_pref^6 = 1 }	# minority autonomy as a wedge
+			set_variable = { geneva_prio^6 = 7 }
+		}
+		set_temp_variable = { g_fra_x2 = g_sc_fra }
+		multiply_temp_variable = { g_fra_x2 = 2 }
+		if = {
+			limit = { check_variable = { g_sc_comm > g_fra_x2 } }
+			set_variable = { geneva_pref^3 = 2 }	# immediate withdrawal
+			set_variable = { geneva_prio^3 = 8 }
+			set_variable = { geneva_pref^5 = 1 }	# concede Laos/Cambodia independence
+			set_variable = { geneva_prio^0 = 10 }	# the ceasefire above all
+		}
+	}
+	else_if = {
+		limit = { tag = VIE }
+		add_to_array = { geneva_pref = 2 }	# ceasefire: immediate
+		add_to_array = { geneva_pref = 2 }	# partition: 17th. The 20th is a claim Saigon can only make from strength, applied below
+		add_to_array = { geneva_pref = 0 }	# elections: none (fears losing them)
+		add_to_array = { geneva_pref = 1 }	# withdrawal: timetabled
+		add_to_array = { geneva_pref = 0 }	# alignment: free (wants US umbrella)
+		add_to_array = { geneva_pref = 1 }	# Laos/Cambodia: independent
+		add_to_array = { geneva_pref = 0 }
+		add_to_array = { geneva_prio = 5 }
+		add_to_array = { geneva_prio = 10 }	# where the line falls is existential for Saigon; the rest it can trade
+		add_to_array = { geneva_prio = 8 }
+		add_to_array = { geneva_prio = 3 }
+		add_to_array = { geneva_prio = 3 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 2 }
+		set_temp_variable = { g_vie_comm_x2 = g_sc_comm }
+		multiply_temp_variable = { g_vie_comm_x2 = 2 }
+		set_temp_variable = { g_vie_anti_x3 = g_sc_fra }
+		add_to_temp_variable = { g_vie_anti_x3 = g_sc_ind }
+		multiply_temp_variable = { g_vie_anti_x3 = 3 }
+		if = {
+			limit = {
+				has_global_flag = Southern_VietMinh_Defeated
+				NOT = { check_variable = { g_vie_comm_x2 > g_vie_anti_x3 } }
+			}
+			set_variable = { geneva_pref^1 = 3 }	# press for the 20th
+		}
+		if = {
+			limit = { has_global_flag = geneva_usa_backs_vie_applied }
+			set_variable = { geneva_pref^3 = 2 }
+		}
+		if = {
+			limit = { check_variable = { global.geneva_rapprochement_vie_vin > 99 } }
+			set_variable = { geneva_pref^2 = 2 }
+			set_variable = { geneva_pref^4 = 1 }
+		}
+		if = {
+			limit = { check_variable = { global.geneva_rapprochement_vie_vin > 199 } }
+			set_variable = { geneva_pref^1 = 2 }	# accept the 17th
+			set_variable = { geneva_pref^2 = 3 }	# immediate elections
+			set_variable = { geneva_prio^2 = 9 }
+			set_variable = { geneva_pref^4 = 1 }	# enforced neutrality
+		}
+	}
+	else_if = {
+		limit = { tag = USA }
+		add_to_array = { geneva_pref = 1 }	# ceasefire: phased (distrusts it)
+		add_to_array = { geneva_pref = 2 }	# partition: 17th
+		add_to_array = { geneva_pref = 0 }	# elections: none
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 0 }	# alignment: free (SEATO)
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 0 }
+		add_to_array = { geneva_prio = 4 }
+		add_to_array = { geneva_prio = 6 }
+		add_to_array = { geneva_prio = 8 }
+		add_to_array = { geneva_prio = 3 }
+		add_to_array = { geneva_prio = 8 }
+		add_to_array = { geneva_prio = 4 }
+		add_to_array = { geneva_prio = 1 }
+		if = {
+			limit = { has_global_flag = geneva_usa_backs_vie_applied }
+			set_variable = { geneva_pref^1 = 3 }	# push the line to the 20th
+		}
+		set_temp_variable = { g_usa_anti = g_sc_fra }
+		add_to_temp_variable = { g_usa_anti = g_sc_ind }
+		set_temp_variable = { g_usa_comm_x2 = g_sc_comm }
+		multiply_temp_variable = { g_usa_comm_x2 = 2 }
+		if = {
+			limit = {
+				is_ai = yes
+				NOT = { check_variable = { g_usa_anti > g_usa_comm_x2 } }
+			}
+			set_variable = { geneva_pref^2 = 2 }	# elections in two years
+			set_variable = { geneva_prio^2 = 5 }
+		}
+		if = {
+			limit = { has_global_flag = geneva_usa_panic_no_ballot }
+			set_variable = { geneva_pref^2 = 0 }	# no reunification ballot
+			set_variable = { geneva_prio^2 = 10 }
+			set_variable = { geneva_pref^1 = 2 }	# and hold the 17th rather than chase a line the army on the ground cannot reach
+			set_variable = { geneva_prio^1 = 9 }
+		}
+		if = {
+			limit = { has_completed_focus = USA_50s_Withhold_American_Assent }
+			set_variable = { geneva_pref^2 = 0 }
+			set_variable = { geneva_prio^2 = 10 }
+		}
+		if = {
+			limit = { has_completed_focus = USA_50s_Endorse_Free_Vietnamese_Vote }
+			set_variable = { geneva_pref^2 = 2 }
+		}
+	}
+	else_if = {
+		limit = { tag = ENG }
+		add_to_array = { geneva_pref = 2 }
+		add_to_array = { geneva_pref = 2 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 0 }
+		add_to_array = { geneva_prio = 5 }
+		add_to_array = { geneva_prio = 4 }
+		add_to_array = { geneva_prio = 3 }
+		add_to_array = { geneva_prio = 3 }
+		add_to_array = { geneva_prio = 5 }
+		add_to_array = { geneva_prio = 4 }
+		add_to_array = { geneva_prio = 1 }
+	}
+	else_if = {
+		limit = { OR = { tag = LOS tag = CAM } }
+		add_to_array = { geneva_pref = 2 }
+		add_to_array = { geneva_pref = 2 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 1 }	# their own independence above all
+		add_to_array = { geneva_pref = 0 }
+		add_to_array = { geneva_prio = 5 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 3 }
+		add_to_array = { geneva_prio = 4 }
+		add_to_array = { geneva_prio = 10 }
+		add_to_array = { geneva_prio = 1 }
+	}
+	else_if = {
+		limit = { tag = PQC }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 3 }
+		add_to_array = { geneva_pref = 0 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 0 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 1 }	# minorities: autonomy guarantees
+		add_to_array = { geneva_prio = 4 }
+		add_to_array = { geneva_prio = 9 }
+		add_to_array = { geneva_prio = 8 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 6 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 10 }
+	}
+	else = {
+		add_to_array = { geneva_pref = 2 }
+		add_to_array = { geneva_pref = 2 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 1 }
+		add_to_array = { geneva_pref = 0 }
+		add_to_array = { geneva_prio = 3 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 2 }
+		add_to_array = { geneva_prio = 1 }
+	}
+}
+
+geneva_conf_seed_weight = {
+	set_temp_variable = { g_w = 0 }
+	if = {
+		limit = { OR = { tag = VIN tag = LAO } }
+		set_temp_variable = { g_w = 70 }
+		if = {
+			limit = { country_exists = FRA }
+			set_temp_variable = { g_ws = FRA.StruggleInvolvedNationsIndochinaCommunistScore }
+			divide_temp_variable = { g_ws = 50 }
+			add_to_temp_variable = { g_w = g_ws }
+		}
+		set_temp_variable = { g_ws = global.geneva_lev_communist }
+		divide_temp_variable = { g_ws = 4 }
+		add_to_temp_variable = { g_w = g_ws }
+		if = { limit = { tag = LAO } multiply_temp_variable = { g_w = 0.4 } }
+	}
+	else_if = {
+		limit = { OR = { tag = SOV tag = PRC } }
+		set_temp_variable = { g_w = 50 }
+		set_temp_variable = { g_ws = global.geneva_lev_communist }
+		divide_temp_variable = { g_ws = 5 }
+		add_to_temp_variable = { g_w = g_ws }
+	}
+	else_if = {
+		limit = { tag = FRA }
+		set_temp_variable = { g_w = 80 }
+		set_temp_variable = { g_ws = StruggleInvolvedNationsIndochinaProFranceScore }
+		divide_temp_variable = { g_ws = 20 }
+		add_to_temp_variable = { g_w = g_ws }
+		add_to_temp_variable = { g_w = global.geneva_lev_profrance }
+		set_temp_variable = { g_ws = global.geneva_lev_federal }
+		divide_temp_variable = { g_ws = 2 }
+		add_to_temp_variable = { g_w = g_ws }
+	}
+	else_if = {
+		limit = { tag = VIE }
+		set_temp_variable = { g_w = 70 }
+		if = {
+			limit = { country_exists = FRA }
+			set_temp_variable = { g_ws = FRA.StruggleInvolvedNationsIndochinaProIndependenceScore }
+			divide_temp_variable = { g_ws = 20 }
+			add_to_temp_variable = { g_w = g_ws }
+		}
+		add_to_temp_variable = { g_w = global.geneva_lev_proindependence }
+	}
+	else_if = {
+		limit = { tag = USA }
+		set_temp_variable = { g_w = 60 }
+		add_to_temp_variable = { g_w = global.geneva_lev_usa }
+	}
+	else_if = {
+		limit = { tag = ENG }
+		set_temp_variable = { g_w = 40 }
+	}
+	else_if = {
+		limit = { OR = { tag = LOS tag = CAM tag = PQC } }
+		set_temp_variable = { g_w = 25 }
+		if = {
+			limit = {
+				OR = { tag = LOS tag = CAM }
+				country_exists = FRA
+			}
+			set_temp_variable = { g_ws = FRA.StruggleInvolvedNationsIndochinaProEthnicScore }
+			divide_temp_variable = { g_ws = 40 }
+			add_to_temp_variable = { g_w = g_ws }
+		}
+		set_temp_variable = { g_ws = global.geneva_lev_ethnic }	# pool was accumulated but never read before this
+		divide_temp_variable = { g_ws = 2 }
+		add_to_temp_variable = { g_w = g_ws }
+	}
+	else = {
+		set_temp_variable = { g_w = 20 }
+	}
+	set_variable = { geneva_weight = g_w }
+	round_variable = geneva_weight
+}
+
+
+geneva_conf_announce = {
+	if = {
+		limit = {
+			NOT = { has_global_flag = geneva_conference_announced }
+			NOT = { has_global_flag = geneva_conference_in_session }
+			NOT = { has_global_flag = geneva_conference_concluded }
+			NOT = { has_global_flag = Indochina_War_Over }
+		}
+		set_global_flag = geneva_conference_announced
+		set_global_flag = Geneva_Conference_Preparations
+		every_country = {
+			limit = {
+				OR = {
+					tag = FRA
+					tag = VIE
+					tag = VIN
+					tag = USA
+					tag = SOV
+					tag = PRC
+					tag = ENG
+					tag = LOS
+					tag = CAM
+					tag = LAO
+					tag = PQC
+				}
+			}
+			country_event = { id = Geneva_Conference_Session.10 days = 1 }
+		}
+		if = {
+			limit = { country_exists = FRA }
+			FRA = { country_event = { id = Geneva_Conference_Session.11 days = 6 } }
+		}
+		else = {
+			country_event = { id = Geneva_Conference_Session.11 days = 6 }
+		}
+	}
+}
+
+indochina_geneva_pursuit_tick = {
+	if = {
+		limit = {
+			has_global_flag = Indochina_Geneva_Pursuit
+			NOT = { has_global_flag = Indochina_War_Over }
+			NOT = { has_global_flag = geneva_conference_announced }
+			NOT = { has_global_flag = geneva_conference_in_session }
+			NOT = { has_global_flag = geneva_conference_concluded }
+		}
+		if = {
+			limit = {
+				country_exists = VIN
+				VIN = { vin_post_dbp_strategy_unresolved_trigger = yes }
+			}
+			log = "GENEVA_SOURCE|DEFERRED|date=[GetDateText]|source=[?global.Indochina_Geneva_Pursuit_Source|0]|reason=VIN_post_DBP_choice_unresolved|caller=pursuit_tick"
+		}
+		else_if = {
+			limit = {
+				geneva_conference_should_be_available_trigger = yes
+			}
+			indochina_struggle_invite_countries_to_geneva = yes
+		}
+		else = {
+			add_to_variable = { global.Indochina_War_Next_Phase_B_Points = 50 }
+		}
+	}
+}
+
+geneva_conf_initialize = {
+	if = {
+		limit = {
+			NOT = { has_global_flag = geneva_conference_in_session }
+			NOT = { has_global_flag = geneva_conference_concluded }
+			NOT = { has_global_flag = Indochina_War_Over }
+		}
+		set_global_flag = geneva_conference_in_session
+		set_global_flag = Geneva_Conference_Preparations
+		geneva_conf_resolve_pending_outcomes = yes
+		set_variable = { global.geneva_round = 0 }
+		set_variable = { global.geneva_tick_days = 0 }
+		set_variable = { global.geneva_outcome = 0 }
+		set_variable = { global.geneva_wrecker = 0 }
+		set_variable = { global.geneva_walkout_news = 0 }
+		clear_array = global.geneva_delegations
+
+		clear_array = global.geneva_clause_current
+		add_to_array = { global.geneva_clause_current = 2 }	# immediate ceasefire
+		add_to_array = { global.geneva_clause_current = 2 }	# 17th parallel
+		add_to_array = { global.geneva_clause_current = 1 }	# elections postponed
+		add_to_array = { global.geneva_clause_current = 1 }	# timetabled withdrawal
+		add_to_array = { global.geneva_clause_current = 1 }	# neutrality
+		add_to_array = { global.geneva_clause_current = 1 }	# independent Laos/Cambodia
+		add_to_array = { global.geneva_clause_current = 0 }	# no minority provision
+
+		geneva_conf_seed_severity = yes
+
+		clear_array = global.geneva_push
+		resize_array = { array = global.geneva_push size = 28 value = 0 }
+		geneva_neg_clear = yes
+
+		if = {
+			limit = { country_exists = FRA }
+			FRA = {
+				geneva_conf_seat_delegation = yes
+				set_country_flag = geneva_core_delegation
+			}
+		}
+		if = {
+			limit = { country_exists = VIE }
+			VIE = {
+				geneva_conf_seat_delegation = yes
+				set_country_flag = geneva_core_delegation
+			}
+		}
+		if = {
+			limit = { country_exists = VIN }
+			VIN = {
+				geneva_conf_seat_delegation = yes
+				set_country_flag = geneva_core_delegation
+			}
+		}
+		# Great-power seats.
+		if = { limit = { country_exists = USA } USA = { geneva_conf_seat_delegation = yes } }
+		if = { limit = { country_exists = SOV } SOV = { geneva_conf_seat_delegation = yes } }
+		if = { limit = { country_exists = PRC } PRC = { geneva_conf_seat_delegation = yes } }
+		if = { limit = { country_exists = ENG } ENG = { geneva_conf_seat_delegation = yes } }
+		if = { limit = { country_exists = LOS } LOS = { geneva_conf_seat_delegation = yes } }
+		if = { limit = { country_exists = CAM } CAM = { geneva_conf_seat_delegation = yes } }
+		if = { limit = { country_exists = LAO } LAO = { geneva_conf_seat_delegation = yes } }
+		if = { limit = { country_exists = PQC } PQC = { geneva_conf_seat_delegation = yes } }
+
+		geneva_conf_catch_up_delegation_focuses = yes
+
+		every_country = {
+			limit = { is_ai = no }
+			news_event = Geneva_Conference_Session.1
+		}
+	}
+}
+
+
+geneva_conf_catch_up_delegation_focuses = {
+	set_global_flag = geneva_conf_attendance_autogranted
+	if = {
+		limit = {
+			country_exists = USA
+			USA = {
+				USA_has_1950s_focus_tree_trigger = yes
+				NOT = { has_completed_focus = USA_50s_The_Geneva_Conferece }
+			}
+		}
+		USA = { complete_national_focus = USA_50s_The_Geneva_Conferece }
+	}
+	if = {
+		limit = {
+			country_exists = VIN
+			VIN = {
+				has_focus_tree = VIN_1950s
+				NOT = { has_completed_focus = VIN_The_Geneva_Peace_Conference }
+			}
+		}
+		VIN = { complete_national_focus = VIN_The_Geneva_Peace_Conference }
+	}
+	if = {
+		limit = {
+			country_exists = FRA
+			FRA = {
+				has_focus_tree = FRA_1950s
+				NOT = { has_completed_focus = FRA_Geneva_Peace_Conference }
+			}
+		}
+		FRA = { complete_national_focus = FRA_Geneva_Peace_Conference }
+	}
+	if = {
+		limit = {
+			country_exists = ENG
+			ENG = {
+				has_focus_tree = UK50
+				NOT = { has_completed_focus = UK50_Participate_Geneva_Conference }
+			}
+		}
+		ENG = { complete_national_focus = UK50_Participate_Geneva_Conference }
+	}
+	if = {
+		limit = {
+			country_exists = CAM
+			CAM = {
+				has_focus_tree = 1950s_Cambodia
+				NOT = { has_completed_focus = CAM_The_Geneva_Conference }
+			}
+		}
+		CAM = { complete_national_focus = CAM_The_Geneva_Conference }
+	}
+}
+
+
+geneva_conf_round_tick = {
+	set_temp_variable = { g_tick_repaired = 0 }
+	if = {
+		limit = {
+			has_global_flag = geneva_conference_in_session
+			NOT = { has_global_flag = Indochina_War_Over }
+			NOT = { check_variable = { global.geneva_delegations^num > 0 } }
+		}
+		clr_global_flag = geneva_conference_in_session
+		geneva_conf_initialize = yes
+		set_temp_variable = { g_tick_repaired = 1 }
+	}
+	if = {
+		limit = {
+			has_global_flag = geneva_conference_in_session
+			NOT = { has_global_flag = Indochina_War_Over }
+			check_variable = { g_tick_repaired = 0 }
+		}
+		if = {
+			limit = { check_variable = { global.geneva_round > 9 } }
+			set_variable = { global.geneva_round = 0 }	# a live session never persists past round 10, so anything higher is stale save data that would compile instantly
+		}
+		add_to_variable = { global.geneva_round = 1 }
+
+		every_country = {
+			limit = { is_in_array = { global.geneva_delegations = THIS.id } }
+			set_variable = { geneva_actions_used = 0 }
+		}
+
+		every_country = {
+			limit = {
+				is_in_array = { global.geneva_delegations = THIS.id }
+				NOT = { has_country_flag = geneva_walked_out }
+				is_ai = yes
+			}
+			set_temp_variable = { g_budget = 1 }
+			if = {
+				limit = { check_variable = { geneva_weight > 80 } }
+				set_temp_variable = { g_budget = 2 }
+			}
+			if = {
+				limit = { check_variable = { geneva_weight > 160 } }
+				set_temp_variable = { g_budget = 3 }
+			}
+			set_temp_variable = { g_conceded = 0 }
+			set_temp_variable = { g_a0 = 0 }
+			set_temp_variable = { g_a1 = 0 }
+			set_temp_variable = { g_a2 = 0 }
+			set_temp_variable = { g_a3 = 0 }
+			set_temp_variable = { g_a4 = 0 }
+			set_temp_variable = { g_a5 = 0 }
+			set_temp_variable = { g_a6 = 0 }
+			while_loop_effect = {
+				limit = { check_variable = { g_budget > 0 } }
+			set_temp_variable = { g_bc = -1 }
+				set_temp_variable = { g_bcare = 0 }
+			set_temp_variable = { g_ci = 0 }
+			while_loop_effect = {
+				limit = { check_variable = { g_ci < 7 } }
+					set_temp_variable = { g_acted = 0 }
+					if = { limit = { check_variable = { g_ci = 0 } } set_temp_variable = { g_acted = g_a0 } }
+					else_if = { limit = { check_variable = { g_ci = 1 } } set_temp_variable = { g_acted = g_a1 } }
+					else_if = { limit = { check_variable = { g_ci = 2 } } set_temp_variable = { g_acted = g_a2 } }
+					else_if = { limit = { check_variable = { g_ci = 3 } } set_temp_variable = { g_acted = g_a3 } }
+					else_if = { limit = { check_variable = { g_ci = 4 } } set_temp_variable = { g_acted = g_a4 } }
+					else_if = { limit = { check_variable = { g_ci = 5 } } set_temp_variable = { g_acted = g_a5 } }
+					else = { set_temp_variable = { g_acted = g_a6 } }
+				set_temp_variable = { g_pv = geneva_pref^g_ci }
+				set_temp_variable = { g_tv = global.geneva_clause_current^g_ci }
+					set_temp_variable = { g_care = geneva_prio^g_ci }
+					multiply_temp_variable = { g_care = global.geneva_severity^g_ci }
+				if = {
+					limit = {
+							check_variable = { g_acted = 0 }
+						NOT = { check_variable = { g_pv = g_tv } }
+							check_variable = { g_care > g_bcare }
+					}
+						set_temp_variable = { g_bcare = g_care }
+					set_temp_variable = { g_bc = g_ci }
+				}
+				add_to_temp_variable = { g_ci = 1 }
+			}
+			if = {
+					limit = { check_variable = { g_bc < 0 } }
+					set_temp_variable = { g_budget = 0 }	# nothing left worth fighting for this round
+				}
+				else = {
+					if = { limit = { check_variable = { g_bc = 0 } } set_temp_variable = { g_a0 = 1 } }
+					else_if = { limit = { check_variable = { g_bc = 1 } } set_temp_variable = { g_a1 = 1 } }
+					else_if = { limit = { check_variable = { g_bc = 2 } } set_temp_variable = { g_a2 = 1 } }
+					else_if = { limit = { check_variable = { g_bc = 3 } } set_temp_variable = { g_a3 = 1 } }
+					else_if = { limit = { check_variable = { g_bc = 4 } } set_temp_variable = { g_a4 = 1 } }
+					else_if = { limit = { check_variable = { g_bc = 5 } } set_temp_variable = { g_a5 = 1 } }
+					else = { set_temp_variable = { g_a6 = 1 } }
+					set_temp_variable = { g_bsev = global.geneva_severity^g_bc }
+					set_temp_variable = { g_bprio = geneva_prio^g_bc }
+					if = {
+						limit = {
+							check_variable = { g_bprio < 3 }
+							check_variable = { geneva_weight < 60 }
+							check_variable = { g_conceded = 0 }
+						}
+						set_variable = { geneva_sel_clause = g_bc }
+						geneva_action_concede = yes
+						set_temp_variable = { g_conceded = 1 }
+					}
+					else_if = {
+						limit = {
+							check_variable = { g_bsev > 2 }
+							check_variable = { g_bprio > 8 }
+							check_variable = { geneva_patience > 60 }	# a bluff made from comfort, never from the brink
+							check_variable = { global.geneva_round > 2 }
+							check_variable = { geneva_threats_used < 2 }
+							NOT = { check_variable = { geneva_threat_next > global.geneva_round } }
+						}
+						set_variable = { geneva_sel_clause = g_bc }
+						add_to_variable = { geneva_threats_used = 1 }
+						geneva_action_threaten = yes
+					}
+					else = {
+						set_temp_variable = { g_amt = 25 }
+						set_temp_variable = { g_amt2 = g_bprio }
+						multiply_temp_variable = { g_amt2 = 5 }
+						add_to_temp_variable = { g_amt = g_amt2 }
+						multiply_temp_variable = { g_amt = geneva_weight }
+						divide_temp_variable = { g_amt = 100 }
+						set_temp_variable = { g_neg_clause = g_bc }
+						set_temp_variable = { g_neg_option = geneva_pref^g_bc }
+						set_temp_variable = { g_neg_amount = g_amt }
+						geneva_neg_start = yes
+						set_temp_variable = { g_wcost = g_bsev }
+						multiply_temp_variable = { g_wcost = 3 }
+						subtract_from_variable = { geneva_weight = g_wcost }
+				clamp_variable = {
+					var = geneva_weight
+							min = 15
+					max = 10000
+				}
+			}
+					subtract_from_temp_variable = { g_budget = 1 }
+		}
+			}
+		}
+
+		set_temp_variable = { g_prev_0 = global.geneva_clause_current^0 }
+		set_temp_variable = { g_prev_1 = global.geneva_clause_current^1 }
+		set_temp_variable = { g_prev_2 = global.geneva_clause_current^2 }
+		set_temp_variable = { g_prev_3 = global.geneva_clause_current^3 }
+		set_temp_variable = { g_prev_4 = global.geneva_clause_current^4 }
+		set_temp_variable = { g_prev_5 = global.geneva_clause_current^5 }
+		set_temp_variable = { g_prev_6 = global.geneva_clause_current^6 }
+
+		# --- Weighted vote per clause: strength = weight x priority. Ties keep
+		set_temp_variable = { g_c = 0 }
+		while_loop_effect = {
+			limit = { check_variable = { g_c < 7 } }
+			set_temp_variable = { g_opt_0 = 0 }
+			set_temp_variable = { g_opt_1 = 0 }
+			set_temp_variable = { g_opt_2 = 0 }
+			set_temp_variable = { g_opt_3 = 0 }
+			every_country = {
+				limit = {
+					is_in_array = { global.geneva_delegations = THIS.id }
+					NOT = { has_country_flag = geneva_walked_out }
+				}
+				set_temp_variable = { g_vote = geneva_weight }
+				multiply_temp_variable = { g_vote = geneva_prio^g_c }
+				set_temp_variable = { g_p = geneva_pref^g_c }
+				if = {
+					limit = { check_variable = { g_p = 0 } }
+					add_to_temp_variable = { g_opt_0 = g_vote }
+				}
+				else_if = {
+					limit = { check_variable = { g_p = 1 } }
+					add_to_temp_variable = { g_opt_1 = g_vote }
+				}
+				else_if = {
+					limit = { check_variable = { g_p = 2 } }
+					add_to_temp_variable = { g_opt_2 = g_vote }
+				}
+				else = {
+					add_to_temp_variable = { g_opt_3 = g_vote }
+				}
+			}
+			set_temp_variable = { g_pi0 = g_c }
+			multiply_temp_variable = { g_pi0 = 4 }
+			set_temp_variable = { g_pi1 = g_pi0 }
+			add_to_temp_variable = { g_pi1 = 1 }
+			set_temp_variable = { g_pi2 = g_pi0 }
+			add_to_temp_variable = { g_pi2 = 2 }
+			set_temp_variable = { g_pi3 = g_pi0 }
+			add_to_temp_variable = { g_pi3 = 3 }
+			add_to_temp_variable = { g_opt_0 = global.geneva_push^g_pi0 }
+			add_to_temp_variable = { g_opt_1 = global.geneva_push^g_pi1 }
+			add_to_temp_variable = { g_opt_2 = global.geneva_push^g_pi2 }
+			add_to_temp_variable = { g_opt_3 = global.geneva_push^g_pi3 }
+			set_temp_variable = { g_best = global.geneva_clause_current^g_c }
+			if = {
+				limit = { check_variable = { g_best = 0 } }
+				set_temp_variable = { g_best_v = g_opt_0 }
+			}
+			else_if = {
+				limit = { check_variable = { g_best = 1 } }
+				set_temp_variable = { g_best_v = g_opt_1 }
+			}
+			else_if = {
+				limit = { check_variable = { g_best = 2 } }
+				set_temp_variable = { g_best_v = g_opt_2 }
+			}
+			else = {
+				set_temp_variable = { g_best_v = g_opt_3 }
+			}
+			if = {
+				limit = { check_variable = { g_opt_0 > g_best_v } }
+				set_temp_variable = { g_best = 0 }
+				set_temp_variable = { g_best_v = g_opt_0 }
+			}
+			if = {
+				limit = { check_variable = { g_opt_1 > g_best_v } }
+				set_temp_variable = { g_best = 1 }
+				set_temp_variable = { g_best_v = g_opt_1 }
+			}
+			if = {
+				limit = { check_variable = { g_opt_2 > g_best_v } }
+				set_temp_variable = { g_best = 2 }
+				set_temp_variable = { g_best_v = g_opt_2 }
+			}
+			if = {
+				limit = { check_variable = { g_opt_3 > g_best_v } }
+				set_temp_variable = { g_best = 3 }
+				set_temp_variable = { g_best_v = g_opt_3 }
+			}
+			if = {	# Clause 1 is the only ordinal one: 1/2/3 run north to south along the same axis, so a plurality is not a mandate. If the table's majority sits south of the 13th or north of the 20th, the line settles on the 17th rather than handing the extreme to whichever bloc stayed concentrated while the other split. Option 0 (a unified Vietnam) is off the axis and never merged.
+				limit = { check_variable = { g_c = 1 } }
+				if = {
+					limit = { check_variable = { g_best = 1 } }
+					set_temp_variable = { g_ro_south = g_opt_2 }
+					add_to_temp_variable = { g_ro_south = g_opt_3 }
+					multiply_temp_variable = { g_ro_south = 1.5 }	# a plurality is not a mandate: the 13th holds only against half again the combined weight sitting south of it
+					if = {
+						limit = { NOT = { check_variable = { g_opt_1 > g_ro_south } } }
+						set_temp_variable = { g_best = 2 }
+					}
+				}
+				else_if = {
+					limit = { check_variable = { g_best = 3 } }
+					set_temp_variable = { g_ro_north = g_opt_1 }
+					add_to_temp_variable = { g_ro_north = g_opt_2 }
+					multiply_temp_variable = { g_ro_north = 1.5 }
+					if = {
+						limit = { NOT = { check_variable = { g_opt_3 > g_ro_north } } }
+						set_temp_variable = { g_best = 2 }
+					}
+				}
+			}
+			set_variable = { global.geneva_clause_current^g_c = g_best }
+			add_to_temp_variable = { g_c = 1 }
+		}
+
+		set_temp_variable = { g_pz = 0 }
+		while_loop_effect = {
+			limit = { check_variable = { g_pz < 28 } }
+			set_variable = { global.geneva_push^g_pz = 0 }
+			add_to_temp_variable = { g_pz = 1 }
+		}
+
+		set_temp_variable = { g_rc = 0 }
+		while_loop_effect = {
+			limit = { check_variable = { g_rc < 7 } }
+			set_temp_variable = { g_rprev = -1 }
+			if = { limit = { check_variable = { g_rc = 0 } } set_temp_variable = { g_rprev = g_prev_0 } }
+			else_if = { limit = { check_variable = { g_rc = 1 } } set_temp_variable = { g_rprev = g_prev_1 } }
+			else_if = { limit = { check_variable = { g_rc = 2 } } set_temp_variable = { g_rprev = g_prev_2 } }
+			else_if = { limit = { check_variable = { g_rc = 3 } } set_temp_variable = { g_rprev = g_prev_3 } }
+			else_if = { limit = { check_variable = { g_rc = 4 } } set_temp_variable = { g_rprev = g_prev_4 } }
+			else_if = { limit = { check_variable = { g_rc = 5 } } set_temp_variable = { g_rprev = g_prev_5 } }
+			else = { set_temp_variable = { g_rprev = g_prev_6 } }
+			set_temp_variable = { g_rnew = global.geneva_clause_current^g_rc }
+			set_temp_variable = { g_rsev = global.geneva_severity^g_rc }
+			if = {
+				limit = {
+					NOT = { check_variable = { g_rprev = g_rnew } }
+					check_variable = { g_rsev > 1 }
+				}
+				set_temp_variable = { g_rreb = g_rsev }
+				multiply_temp_variable = { g_rreb = 5 }	# 10/15 weight rebate for the losers
+				every_country = {
+					limit = {
+						is_in_array = { global.geneva_delegations = THIS.id }
+						NOT = { has_country_flag = geneva_walked_out }
+						NOT = { check_variable = { geneva_pref^g_rc = g_rnew } }
+					}
+					add_to_variable = { geneva_weight = g_rreb }
+					add_to_variable = { geneva_grievance = g_rsev }
+					if = {
+						limit = { check_variable = { g_rsev > 2 } }
+						set_temp_variable = { g_rcp = geneva_weight }
+						multiply_temp_variable = { g_rcp = 0.45 }
+						set_temp_variable = { g_rpi = g_rc }
+						multiply_temp_variable = { g_rpi = 4 }
+						add_to_temp_variable = { g_rpi = geneva_pref^g_rc }
+						add_to_variable = { global.geneva_push^g_rpi = g_rcp }
+					}
+				}
+			}
+			add_to_temp_variable = { g_rc = 1 }
+		}
+
+		set_variable = { global.geneva_walkout_news = 0 }	# global, not temp: every_country re-scopes and a temp written in there would not survive back out
+		every_country = {
+			limit = {
+				is_in_array = { global.geneva_delegations = THIS.id }
+				NOT = { has_country_flag = geneva_walked_out }
+			}
+			set_temp_variable = { g_mis = 0 }
+			set_temp_variable = { g_tot = 1 }
+			set_temp_variable = { g_c2 = 0 }
+			while_loop_effect = {
+				limit = { check_variable = { g_c2 < 7 } }
+				add_to_temp_variable = { g_tot = geneva_prio^g_c2 }
+				set_temp_variable = { g_p2 = geneva_pref^g_c2 }
+				set_temp_variable = { g_t2 = global.geneva_clause_current^g_c2 }
+				if = {
+					limit = { NOT = { check_variable = { g_p2 = g_t2 } } }
+					set_temp_variable = { g_dist = g_p2 }
+					subtract_from_temp_variable = { g_dist = g_t2 }
+					if = {
+						limit = { check_variable = { g_dist < 0 } }
+						multiply_temp_variable = { g_dist = -1 }
+					}
+					set_temp_variable = { g_add = geneva_prio^g_c2 }
+					if = {
+						limit = {
+							check_variable = { g_dist = 1 }
+							NOT = { check_variable = { g_c2 = 4 } }
+							NOT = { check_variable = { g_c2 = 6 } }
+						}
+						divide_temp_variable = { g_add = 2 }
+					}
+					add_to_temp_variable = { g_mis = g_add }
+				}
+				add_to_temp_variable = { g_c2 = 1 }
+			}
+			multiply_temp_variable = { g_mis = 100 }
+			divide_temp_variable = { g_mis = g_tot }
+			set_temp_variable = { g_dissat = 0 }
+			if = {
+				limit = { check_variable = { g_mis > 54 } }
+				subtract_from_variable = { geneva_patience = 9 }
+				set_temp_variable = { g_dissat = 1 }
+			}
+			else_if = {
+				limit = { check_variable = { g_mis > 34 } }
+				subtract_from_variable = { geneva_patience = 4 }
+				set_temp_variable = { g_dissat = 1 }
+			}
+			else = {
+				add_to_variable = { geneva_patience = 3 }
+			}
+			set_temp_variable = { g_hi_mis = 0 }
+			if = {
+				limit = {
+					check_variable = { global.geneva_severity^1 > 2 }
+					NOT = { check_variable = { geneva_pref^1 = global.geneva_clause_current^1 } }
+				}
+				set_temp_variable = { g_hi_mis = 1 }
+			}
+			if = {
+				limit = {
+					check_variable = { global.geneva_severity^2 > 2 }
+					NOT = { check_variable = { geneva_pref^2 = global.geneva_clause_current^2 } }
+				}
+				set_temp_variable = { g_hi_mis = 1 }
+			}
+			if = {
+				limit = { check_variable = { g_hi_mis = 1 } }
+				subtract_from_variable = { geneva_patience = 3 }
+			}
+			if = {
+				limit = {
+					check_variable = { g_dissat = 1 }
+					NOT = { check_variable = { geneva_pref^1 = global.geneva_clause_current^1 } }
+					OR = {
+						check_variable = { global.geneva_clause_current^1 = 0 }
+						AND = {
+							check_variable = { global.geneva_clause_current^1 = 1 }
+							check_variable = { geneva_pref^1 > 2 }
+						}
+						AND = {
+							check_variable = { global.geneva_clause_current^1 = 3 }
+							check_variable = { geneva_pref^1 < 2 }
+						}
+					}
+				}
+				add_to_variable = { geneva_provocation = 2 }
+			}
+			if = {
+				limit = { check_variable = { geneva_grievance > 7 } }
+				subtract_from_variable = { geneva_patience = 2 }
+			}
+			if = {
+				limit = { check_variable = { geneva_grievance > 0 } }
+				subtract_from_variable = { geneva_grievance = 1 }	# last week's insult fades: only sustained churn at the table accumulates
+			}
+			if = {
+				limit = { check_variable = { geneva_provocation > 0 } }
+				subtract_from_variable = { geneva_provocation = 1 }	# pressure has to be kept up to keep a delegation at the door
+			}
+			set_temp_variable = { g_floor = 0 }	# human delegations always keep the right to storm out
+			if = {
+				limit = {
+					is_ai = yes
+					NOT = { has_game_rule = { rule = geneva_ai_walkout option = GENEVA_AI_WALKOUT_HISTORICAL } }
+				}
+				set_temp_variable = { g_floor = 15 }	# an AI does not leave over ordinary defeats at the table, however badly the clauses go
+			}
+			if = {
+				limit = {
+					is_ai = yes
+					has_game_rule = { rule = geneva_ai_walkout option = DEFAULT }
+					check_variable = { geneva_provocation > 2 }
+				}
+				set_temp_variable = { g_floor = 0 }	# actively provoked round after round: the door is open again
+			}
+			if = {
+				limit = { check_variable = { geneva_patience < g_floor } }
+				set_variable = { geneva_patience = g_floor }
+			}
+			clamp_variable = {
+				var = geneva_patience
+				min = 0
+				max = 100
+			}
+			if = {
+				limit = { check_variable = { geneva_patience < 1 } }
+				set_country_flag = geneva_walked_out
+				save_global_event_target_as = Geneva_Wrecker
+				set_variable = { global.geneva_wrecker = THIS.id }
+				add_to_variable = { global.geneva_walkout_news = 1 }	# reported once below, and only if the collapse check is not about to report it with .3/.4 instead
+			}
+		}
+
+		set_temp_variable = { g_core_out = 0 }
+		every_country = {
+			limit = {
+				has_country_flag = geneva_core_delegation
+				has_country_flag = geneva_walked_out
+			}
+			add_to_temp_variable = { g_core_out = 1 }
+		}
+		if = {
+			limit = {
+				check_variable = { global.geneva_walkout_news > 0 }
+				NOT = { check_variable = { g_core_out > 1 } }
+			}
+			every_country = {
+				limit = { is_ai = no }
+				news_event = Geneva_Conference_Session.2
+			}
+		}
+		set_variable = { global.geneva_walkout_news = 0 }
+		if = {
+			limit = { check_variable = { g_core_out > 1 } }
+			geneva_conf_compile_settlement = yes
+		}
+		else_if = {
+			limit = { check_variable = { global.geneva_round > 9 } }
+			geneva_conf_compile_settlement = yes
+		}
+	}
+}
+
+
+geneva_conf_compile_settlement = {
+	if = {
+		limit = { has_global_flag = geneva_conference_in_session }
+		clr_global_flag = geneva_conference_in_session
+		set_global_flag = geneva_conference_concluded
+		geneva_neg_clear = yes
+		every_country = {
+			limit = { is_in_array = { global.geneva_delegations = THIS.id } }
+			set_variable = { View_Geneva_Conference = 0 }
+		}
+		every_country = {
+			limit = { is_in_array = { array = country_politics_list value = 29 } }
+			remove_from_array = { array = country_politics_list value = 29 }
+		}
+
+		set_temp_variable = { g_core_out = 0 }
+		every_country = {
+			limit = {
+				has_country_flag = geneva_core_delegation
+				has_country_flag = geneva_walked_out
+			}
+			add_to_temp_variable = { g_core_out = 1 }
+		}
+
+		if = {
+			limit = {
+				OR = {
+					check_variable = { global.geneva_clause_current^0 = 0 }
+					check_variable = { g_core_out > 1 }
+				}
+			}
+			# ------------------------- COLLAPSE -------------------------
+			set_variable = { global.geneva_outcome = 2 }
+			every_country = {
+				limit = {
+					has_country_flag = geneva_core_delegation
+					has_country_flag = geneva_walked_out
+				}
+				if = { limit = { tag = FRA } set_country_flag = FRA_Rejected_Ceasefire }
+				if = { limit = { tag = VIE } set_country_flag = VIE_Rejected_Ceasefire }
+				if = { limit = { tag = VIN } set_country_flag = VIN_Rejected_Ceasefire }
+			}
+			if = {
+				limit = { indochina_struggle_ending_failed_state_trigger = yes }
+				every_country = {
+					limit = { is_ai = no }
+					news_event = Geneva_Conference_Session.4
+				}
+				indochina_struggle_run_failed_state_ending_effect = yes
+			}
+			else = {
+				every_country = {
+					limit = { is_ai = no }
+					news_event = Geneva_Conference_Session.3
+				}
+				indochina_struggle_run_never_ending_conflict_ending_effect = yes
+			}
+		}
+		else = {
+			# ------------------------- SETTLEMENT -------------------------
+			set_variable = { global.geneva_outcome = 1 }
+			set_global_flag = Geneva_Conference_Negotiations_Complete
+			set_variable = { global.geneva_partition_line = global.geneva_clause_current^1 }
+			set_variable = { global.geneva_elections_term = global.geneva_clause_current^2 }
+			set_variable = { global.geneva_withdrawal_term = global.geneva_clause_current^3 }
+			set_variable = { global.geneva_alignment_term = global.geneva_clause_current^4 }
+			set_variable = { global.geneva_laos_cambodia_term = global.geneva_clause_current^5 }
+			set_variable = { global.geneva_minorities_term = global.geneva_clause_current^6 }
+			if = {
+				limit = { check_variable = { global.geneva_clause_current^1 = 0 } }
+				set_global_flag = geneva_unified_settlement
+			}
+			if = {
+				limit = { country_exists = FRA }
+				set_variable = { global.geneva_final_comm_score = FRA.StruggleInvolvedNationsIndochinaCommunistScore }
+				set_variable = { global.geneva_final_anticomm_score = FRA.StruggleInvolvedNationsIndochinaProFranceScore }
+				add_to_variable = { global.geneva_final_anticomm_score = FRA.StruggleInvolvedNationsIndochinaProIndependenceScore }
+				set_variable = { global.geneva_cache_comm_score = global.geneva_final_comm_score }
+				set_variable = { global.geneva_cache_anticomm_score = global.geneva_final_anticomm_score }
+				set_variable = { global.geneva_cache_comm_x2 = global.geneva_cache_comm_score }
+				multiply_variable = { global.geneva_cache_comm_x2 = 2 }
+			}
+
+			every_country = {
+				limit = { is_ai = no }
+				news_event = Geneva_Conference_Session.5
+			}
+
+			if = { limit = { country_exists = FRA } FRA = { set_country_flag = FRA_Accepted_Ceasefire } }
+			if = { limit = { country_exists = VIE } VIE = { set_country_flag = VIE_Accepted_Ceasefire } }
+			if = { limit = { country_exists = VIN } VIN = { set_country_flag = VIN_Accepted_Ceasefire } }
+
+			if = {
+				limit = { check_variable = { global.geneva_clause_current^2 > 1 } }
+				if = { limit = { country_exists = FRA } FRA = { set_country_flag = FRA_Accepted_Reunification } }
+				if = { limit = { country_exists = VIE } VIE = { set_country_flag = VIE_Accepted_Reunification } }
+				if = { limit = { country_exists = VIN } VIN = { set_country_flag = VIN_Accepted_Reunification } }
+			}
+			else = {
+				if = {
+					limit = { country_exists = FRA }
+					FRA = {
+						if = {
+							limit = { check_variable = { geneva_pref^2 > 1 } }
+							set_country_flag = FRA_Accepted_Reunification
+						}
+						else = {
+							set_country_flag = FRA_Rejected_Reunification
+						}
+					}
+				}
+				if = {
+					limit = { country_exists = VIN }
+					VIN = {
+						if = {
+							limit = { check_variable = { geneva_pref^2 > 1 } }
+							set_country_flag = VIN_Accepted_Reunification
+						}
+						else = {
+							set_country_flag = VIN_Rejected_Reunification
+						}
+					}
+				}
+				if = {
+					limit = { country_exists = VIE }
+					VIE = {
+						if = {
+							limit = {
+								check_variable = { geneva_pref^2 > 1 }
+								country_exists = USA
+								USA = { has_completed_focus = USA_50s_Withhold_American_Assent }
+							}
+							set_country_flag = VIE_Rejected_Reunification_USA_Intervention
+							USA = { set_country_flag = USA_Tampered_With_VIE }
+						}
+						else_if = {
+							limit = { check_variable = { geneva_pref^2 > 1 } }
+							set_country_flag = VIE_Accepted_Reunification
+						}
+						else = {
+							set_country_flag = VIE_Rejected_Reunification
+						}
+					}
+				}
+			}
+
+			indochina_struggle_run_geneva_ending_effect = yes
+
+			if = {
+				limit = {
+					has_global_flag = Geneva_Conference	# set by indochina_struggle_unlock_geneva_conference in the settlement branch above and never cleared. The phase it sets alongside is 11, but the ending cleanup inside that same call overwrites it with 100 before control returns here
+					country_exists = VIE
+					country_exists = VIN
+					OR = {
+						has_global_flag = geneva_unified_settlement
+						check_variable = { global.geneva_elections_term > 1 }
+					}
+				}
+				set_global_flag = geneva_interim_government_period
+				every_country = {
+					limit = { is_ai = no }
+					news_event = { id = Geneva_Conference_Session.20 days = 2 }
+				}
+				if = {
+					limit = { check_variable = { global.geneva_elections_term = 3 } }
+					VIE = { country_event = { id = Geneva_Conference_Session.26 days = 95 random_days = 15 } }
+					VIN = { country_event = { id = Geneva_Conference_Session.26 days = 95 random_days = 15 } }
+					VIN = { country_event = { id = Geneva_Conference_Session.21 days = 150 random_days = 30 } }
+					if = {
+						limit = { country_exists = FRA }
+						FRA = { country_event = { id = Geneva_Conference_Session.27 days = 85 } }
+					}
+					else = {
+						VIN = { country_event = { id = Geneva_Conference_Session.27 days = 85 } }
+					}
+				}
+				else_if = {
+					limit = { check_variable = { global.geneva_elections_term = 2 } }
+					VIE = { country_event = { id = Geneva_Conference_Session.26 days = 420 random_days = 30 } }
+					VIN = { country_event = { id = Geneva_Conference_Session.26 days = 420 random_days = 30 } }
+					VIN = { country_event = { id = Geneva_Conference_Session.21 days = 540 random_days = 90 } }
+					if = {
+						limit = { country_exists = FRA }
+						FRA = { country_event = { id = Geneva_Conference_Session.27 days = 400 } }
+					}
+					else = {
+						VIN = { country_event = { id = Geneva_Conference_Session.27 days = 400 } }
+					}
+				}
+				else = {
+					VIE = { country_event = { id = Geneva_Conference_Session.26 days = 220 random_days = 30 } }
+					VIN = { country_event = { id = Geneva_Conference_Session.26 days = 220 random_days = 30 } }
+					VIN = { country_event = { id = Geneva_Conference_Session.21 days = 300 random_days = 90 } }
+					if = {
+						limit = { country_exists = FRA }
+						FRA = { country_event = { id = Geneva_Conference_Session.27 days = 205 } }
+					}
+					else = {
+						VIN = { country_event = { id = Geneva_Conference_Session.27 days = 205 } }
+					}
+				}
+			}
+		}
+	}
+}
+
+
+geneva_conf_auto_resolve = {
+	if = {
+		limit = {
+			country_exists = VIN
+			VIN = { vin_post_dbp_strategy_unresolved_trigger = yes }
+		}
+		set_global_flag = Indochina_Geneva_Pursuit
+		log = "GENEVA_SOURCE|DEFERRED|date=[GetDateText]|source=[?global.Indochina_Geneva_Pursuit_Source|0]|reason=VIN_post_DBP_choice_unresolved|caller=auto_resolve"
+	}
+	else_if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+			NOT = {
+				AND = {
+					has_global_flag = geneva_conference_announced
+					NOT = { has_global_flag = geneva_conference_in_session }
+					NOT = { has_global_flag = geneva_conference_concluded }
+				}
+			}
+		}
+		if = {
+			limit = { check_variable = { global.Indochina_Geneva_Pursuit_Source < 1 } }
+			set_variable = { global.Indochina_Geneva_Pursuit_Source = 4 }
+		}
+		log = "GENEVA_SOURCE|AUTO_RESOLVE|date=[GetDateText]|source=[?global.Indochina_Geneva_Pursuit_Source|0]"
+		set_temp_variable = { g_geneva_headless = 1 }	# AI stakes bank instantly; the 3-day pipeline never stalls the loop
+		geneva_neg_flush_all = yes
+		if = {
+			limit = {
+				NOT = { has_global_flag = geneva_conference_in_session }
+				NOT = { has_global_flag = geneva_conference_concluded }
+			}
+			geneva_conf_initialize = yes
+		}
+		set_temp_variable = { g_ar = 0 }
+		while_loop_effect = {
+			limit = {
+				check_variable = { g_ar < 12 }
+				has_global_flag = geneva_conference_in_session
+			}
+			geneva_conf_round_tick = yes
+			add_to_temp_variable = { g_ar = 1 }
+		}
+		if = {
+			limit = { has_global_flag = geneva_conference_in_session }
+			geneva_conf_compile_settlement = yes
+		}
+		set_variable = { global.Indochina_Geneva_Pursuit_Source = 0 }
+	}
+}
+
+
+geneva_action_champion = {
+	set_temp_variable = { g_ch_cost = global.geneva_severity^geneva_sel_clause }
+	multiply_temp_variable = { g_ch_cost = 5 }	# 5/10/15 weight by clause severity
+	set_temp_variable = { g_ch_cost_x2 = g_ch_cost }
+	multiply_temp_variable = { g_ch_cost_x2 = 2 }
+	if = {
+		limit = {
+			geneva_action_possible_trigger = yes
+			has_political_power > 24
+			check_variable = { geneva_weight > g_ch_cost_x2 }
+			check_variable = { geneva_neg_mine^geneva_sel_clause = 0 }
+		}
+		add_political_power = -25
+		add_to_variable = { geneva_actions_used = 1 }
+		subtract_from_variable = { geneva_weight = g_ch_cost }
+		set_variable = { geneva_pref^geneva_sel_clause = geneva_sel_option }
+		if = {
+			limit = { check_variable = { geneva_prio^geneva_sel_clause < 8 } }
+			set_variable = { geneva_prio^geneva_sel_clause = 8 }
+		}
+		set_temp_variable = { g_neg_clause = geneva_sel_clause }
+		set_temp_variable = { g_neg_option = geneva_sel_option }
+		set_temp_variable = { g_neg_amount = geneva_weight }
+		divide_temp_variable = { g_neg_amount = 2 }
+		add_to_temp_variable = { g_neg_amount = 100 }
+		geneva_neg_start = yes
+	}
+}
+
+geneva_action_pressure = {
+	if = {
+		limit = {
+			geneva_action_possible_trigger = yes
+			has_political_power > 24
+			check_variable = { geneva_weight > 25 }
+			NOT = { check_variable = { geneva_sel_target = THIS.id } }
+		}
+		set_temp_variable = { g_tid = geneva_sel_target }
+		set_temp_variable = { g_c = geneva_sel_clause }
+		set_temp_variable = { g_myp = geneva_pref^geneva_sel_clause }
+		set_temp_variable = { g_cost = -1 }
+		every_country = {
+			limit = {
+				check_variable = { THIS.id = g_tid }
+				is_in_array = { global.geneva_delegations = THIS.id }
+				NOT = { has_country_flag = geneva_walked_out }
+				check_variable = { geneva_pressured_until < global.geneva_round }
+			}
+			set_temp_variable = { g_cost = geneva_weight }
+			divide_temp_variable = { g_cost = 2 }
+			if = {
+				limit = { check_variable = { g_cost < 10 } }
+				set_temp_variable = { g_cost = 10 }
+			}
+			set_variable = { geneva_pref^g_c = g_myp }
+			subtract_from_variable = { geneva_patience = 5 }
+			add_to_variable = { geneva_provocation = 3 }	# being strong-armed is the provocation that reopens the door for an AI delegation
+			set_variable = { geneva_pressured_until = global.geneva_round }
+			add_to_variable = { geneva_pressured_until = 2 }
+		}
+		if = {
+			limit = { check_variable = { g_cost > -1 } }
+			add_political_power = -25
+			add_to_variable = { geneva_actions_used = 1 }
+			subtract_from_variable = { geneva_weight = g_cost }
+			clamp_variable = {
+				var = geneva_weight
+				min = 5
+				max = 10000
+			}
+		}
+	}
+}
+
+geneva_action_concede = {
+	if = {
+		limit = { geneva_action_possible_trigger = yes }
+		add_to_variable = { geneva_actions_used = 1 }
+		set_temp_variable = { g_c = geneva_sel_clause }
+		set_temp_variable = { g_t = global.geneva_clause_current^g_c }
+		set_variable = { geneva_pref^g_c = g_t }
+		set_variable = { geneva_prio^g_c = 1 }
+		add_to_variable = { geneva_weight = 15 }
+		every_country = {
+			limit = {
+				is_in_array = { global.geneva_delegations = THIS.id }
+				NOT = { has_country_flag = geneva_walked_out }
+				check_variable = { geneva_pref^g_c = g_t }
+			}
+			add_to_variable = { geneva_patience = 8 }
+			clamp_variable = {
+				var = geneva_patience
+				min = 0
+				max = 100
+			}
+		}
+	}
+}
+
+geneva_action_backchannel = {
+	if = {
+		limit = {
+			geneva_action_possible_trigger = yes
+			has_political_power > 49
+			NOT = { check_variable = { geneva_backchannel_next > global.geneva_round } }
+			OR = {
+				AND = {
+					tag = VIE
+					country_exists = VIN
+					check_variable = { geneva_sel_target = VIN.id }
+				}
+				AND = {
+					tag = VIN
+					country_exists = VIE
+					check_variable = { geneva_sel_target = VIE.id }
+				}
+			}
+		}
+		add_political_power = -50
+		add_to_variable = { geneva_actions_used = 1 }
+		set_variable = { geneva_backchannel_next = global.geneva_round }
+		add_to_variable = { geneva_backchannel_next = 2 }
+		set_temp_variable = { geneva_lev_amount = 25 }
+		geneva_add_vie_vin_rapprochement = yes
+		if = {
+			limit = {
+				tag = VIE
+				country_exists = VIN
+			}
+			VIN = { country_event = { id = Geneva_Conference_Session.12 days = 1 } }
+		}
+		else_if = {
+			limit = {
+				tag = VIN
+				country_exists = VIE
+			}
+			VIE = { country_event = { id = Geneva_Conference_Session.12 days = 1 } }
+		}
+		if = {
+			limit = { check_variable = { global.geneva_rapprochement_vie_vin > 99 } }
+			if = { limit = { country_exists = VIE } VIE = { geneva_conf_refresh_prefs = yes } }
+			if = { limit = { country_exists = VIN } VIN = { geneva_conf_refresh_prefs = yes } }
+		}
+	}
+}
+
+geneva_action_threaten = {
+	if = {
+		limit = {
+			geneva_action_possible_trigger = yes
+			check_variable = { geneva_patience > 25 }
+			NOT = { check_variable = { geneva_threat_next > global.geneva_round } }
+			check_variable = { geneva_neg_mine^geneva_sel_clause = 0 }
+		}
+		add_to_variable = { geneva_actions_used = 1 }
+		set_variable = { geneva_threat_next = global.geneva_round }
+		add_to_variable = { geneva_threat_next = 3 }
+		set_temp_variable = { g_threat_cost = 5 }
+		set_temp_variable = { g_threat_sev = global.geneva_severity^geneva_sel_clause }
+		multiply_temp_variable = { g_threat_sev = 3 }
+		add_to_temp_variable = { g_threat_cost = g_threat_sev }
+		if = {
+			limit = { check_variable = { g_threat_cost < 8 } }
+			set_temp_variable = { g_threat_cost = 11 }	# severity array missing on stale saves: legacy cost
+		}
+		subtract_from_variable = { geneva_patience = g_threat_cost }
+		set_temp_variable = { g_neg_clause = geneva_sel_clause }
+		set_temp_variable = { g_neg_option = geneva_pref^geneva_sel_clause }
+		set_temp_variable = { g_neg_amount = geneva_weight }
+		add_to_temp_variable = { g_neg_amount = 250 }
+		geneva_neg_start = yes
+	}
+}
+
+geneva_action_force_vote = {
+	if = {
+		limit = {
+			has_global_flag = geneva_conference_in_session
+			has_country_flag = geneva_core_delegation
+			NOT = { has_country_flag = geneva_walked_out }
+			has_political_power > 49
+			check_variable = { global.geneva_round > 4 }
+		}
+		add_political_power = -50
+		geneva_neg_flush_all = yes
+		set_variable = { global.geneva_round = 9 }
+		geneva_conf_round_tick = yes
+	}
+}
+
+# breaks publicly.
+geneva_action_lean_on_saigon = {
+	if = {
+		limit = {
+			geneva_action_possible_trigger = yes
+			tag = USA
+			NOT = { has_country_flag = USA_geneva_leaned_on_saigon }
+			has_political_power > 49
+			country_exists = VIE
+			VIE = {
+				is_in_array = { global.geneva_delegations = THIS.id }
+				NOT = { has_country_flag = geneva_walked_out }
+			}
+		}
+		add_political_power = -50
+		add_to_variable = { geneva_actions_used = 1 }
+		set_country_flag = USA_geneva_leaned_on_saigon
+		set_country_flag = USA_Tampered_With_VIE
+		VIE = {
+			set_variable = { geneva_pref^2 = 0 }
+			set_variable = { geneva_prio^2 = 8 }
+			add_to_variable = { geneva_provocation = 4 }
+		}
+		if = {
+			limit = { check_variable = { global.geneva_rapprochement_vie_vin > 49 } }
+			every_country = {
+				limit = { is_ai = no }
+				news_event = Geneva_Conference_Session.13
+			}
+			subtract_from_variable = { geneva_weight = 25 }
+			clamp_variable = {
+				var = geneva_weight
+				min = 5
+				max = 10000
+			}
+			if = {
+				limit = { country_exists = VIN }
+				VIN = {
+					subtract_from_variable = { geneva_patience = 10 }
+					add_to_variable = { geneva_provocation = 2 }
+				}
+			}
+			if = {
+				limit = { country_exists = SOV }
+				SOV = {
+					subtract_from_variable = { geneva_patience = 10 }
+					add_to_variable = { geneva_provocation = 2 }
+				}
+			}
+		}
+	}
+}
+
+# ----------------------------------------------------------------------------
+# c0=3, c1=4, c2=4, c3=3, c4=2, c5=3, c6=2.
+# ----------------------------------------------------------------------------
+
+geneva_ui_cycle_clause = {
+	add_to_variable = { geneva_sel_clause = 1 }
+	if = {
+		limit = { check_variable = { geneva_sel_clause > 6 } }
+		set_variable = { geneva_sel_clause = 0 }
+	}
+	set_variable = { geneva_sel_option = 0 }
+}
+geneva_ui_cycle_option = {
+	add_to_variable = { geneva_sel_option = 1 }
+	if = {
+		limit = {
+			check_variable = { geneva_sel_clause = 1 }
+		}
+		if = {
+			limit = { check_variable = { geneva_sel_option > 3 } }
+			set_variable = { geneva_sel_option = 0 }
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { geneva_sel_clause = 2 }
+		}
+		if = {
+			limit = { check_variable = { geneva_sel_option > 3 } }
+			set_variable = { geneva_sel_option = 0 }
+		}
+	}
+	else_if = {
+		limit = {
+			OR = {
+				check_variable = { geneva_sel_clause = 0 }
+				check_variable = { geneva_sel_clause = 3 }
+				check_variable = { geneva_sel_clause = 5 }
+			}
+		}
+		if = {
+			limit = { check_variable = { geneva_sel_option > 2 } }
+			set_variable = { geneva_sel_option = 0 }
+		}
+	}
+	else = {
+		if = {
+			limit = { check_variable = { geneva_sel_option > 1 } }
+			set_variable = { geneva_sel_option = 0 }
+		}
+	}
+}

@@ -1,0 +1,436 @@
+#
+# 7 theatre-superseded.
+
+fre_dbp_response_begin = {
+	fre_atlante_handoff_to_dbp = yes
+	fre_dbp_response_cleanup = yes
+	clr_country_flag = FRE_DBP_Response_Resolved
+	clr_country_flag = FRE_DBP_Response_Result_Held
+	clr_country_flag = FRE_DBP_Response_Result_Reinforced
+	clr_country_flag = FRE_DBP_Response_Result_Condor
+	clr_country_flag = FRE_DBP_Response_Result_Vulture
+	clr_country_flag = FRE_DBP_Response_Result_Fall
+	clr_country_flag = FRE_DBP_Response_Result_Inconclusive
+	clr_country_flag = FRE_DBP_Response_Result_Superseded
+	clr_country_flag = FRE_DBP_Response_Loss_Standard
+	clr_country_flag = FRE_DBP_Response_Loss_Maximum
+	clr_country_flag = FRE_DBP_Response_Loss_Condor
+	clr_country_flag = FRE_DBP_Response_Loss_Vulture
+	clr_country_flag = FRE_DBP_Condor_Result_Failed
+	clr_country_flag = FRE_DBP_Vulture_Result_Refused
+	clr_country_flag = FRE_DBP_Garrison_Preserved
+	if = {
+		limit = { NOT = { has_global_flag = geneva_dbp_outcome_applied } }
+		clr_country_flag = FRE_DBP_Result_Victory
+		clr_country_flag = FRE_DBP_Result_Fall
+		clr_country_flag = FRE_DBP_Result_Breakout
+	}
+	set_country_flag = FRE_DBP_Response_Active
+	set_country_flag = FRE_DBP_Response_Choice_Pending
+	set_variable = { FRE_DBP_Condor_Hold_Days = 0 }
+	country_event = { id = FRE_Dien_Bien.1 hours = 1 }
+}
+
+fre_dbp_response_apply_state_modifier = {
+	671 = {
+		if = { limit = { has_dynamic_modifier = { modifier = FRE_DBP_Standard_Holdout } } remove_dynamic_modifier = { modifier = FRE_DBP_Standard_Holdout } }
+		if = { limit = { has_dynamic_modifier = { modifier = FRE_DBP_Maximum_Holdout } } remove_dynamic_modifier = { modifier = FRE_DBP_Maximum_Holdout } }
+		if = { limit = { has_dynamic_modifier = { modifier = FRE_DBP_Condor_Staging } } remove_dynamic_modifier = { modifier = FRE_DBP_Condor_Staging } }
+		if = { limit = { has_dynamic_modifier = { modifier = FRE_DBP_Vulture_Air_Support } } remove_dynamic_modifier = { modifier = FRE_DBP_Vulture_Air_Support } }
+		if = {
+			limit = { FRE = { has_country_flag = FRE_DBP_Posture_Standard } }
+			add_dynamic_modifier = { modifier = FRE_DBP_Standard_Holdout }
+		}
+		else_if = {
+			limit = { FRE = { has_country_flag = FRE_DBP_Posture_Maximum } }
+			add_dynamic_modifier = { modifier = FRE_DBP_Maximum_Holdout }
+		}
+		else_if = {
+			limit = { FRE = { has_country_flag = FRE_DBP_Posture_Condor } }
+			add_dynamic_modifier = { modifier = FRE_DBP_Condor_Staging }
+		}
+		if = {
+			limit = { FRE = { has_country_flag = FRE_DBP_Vulture_Support_Approved } }
+			add_dynamic_modifier = { modifier = FRE_DBP_Vulture_Air_Support }
+		}
+	}
+}
+
+fre_dbp_commit_standard_hold = {
+	clr_country_flag = FRE_DBP_Response_Choice_Pending
+	set_country_flag = FRE_DBP_Posture_Standard
+	add_manpower = -2500
+	set_temp_variable = { fre_patience_delta = -3 }
+	fre_metropole_patience_change = yes
+	if = {
+		limit = { country_exists = TAI }
+		TAI = {
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 750 producer = FRA }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 75 producer = FRA }
+		}
+	}
+	fre_dbp_response_apply_state_modifier = yes
+}
+
+fre_dbp_commit_maximum_reinforcement = {
+	clr_country_flag = FRE_DBP_Response_Choice_Pending
+	set_country_flag = FRE_DBP_Posture_Maximum
+	set_temp_variable = { fre_credit_amount = -100 }
+	fre_change_war_credits = yes
+	add_manpower = -6000
+	set_temp_variable = { fre_patience_delta = -8 }
+	fre_metropole_patience_change = yes
+	subtract_from_variable = { global.VIN_dbp_siege_days = 14 }
+	if = {
+		limit = { country_exists = TAI }
+		TAI = {
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 2500 producer = FRA }
+			add_equipment_to_stockpile = { type = support_equipment amount = 300 producer = FRA }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 200 producer = FRA }
+		}
+	}
+	fre_dbp_response_apply_state_modifier = yes
+}
+
+fre_dbp_commit_condor = {
+	clr_country_flag = FRE_DBP_Response_Choice_Pending
+	set_country_flag = FRE_DBP_Posture_Condor
+	set_temp_variable = { fre_credit_amount = -70 }
+	fre_change_war_credits = yes
+	add_manpower = -3500
+	set_temp_variable = { fre_patience_delta = -5 }
+	fre_metropole_patience_change = yes
+	if = {
+		limit = { country_exists = TAI }
+		TAI = {
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1500 producer = FRA }
+			add_equipment_to_stockpile = { type = support_equipment amount = 150 producer = FRA }
+		}
+	}
+	fre_dbp_response_apply_state_modifier = yes
+}
+
+fre_dbp_request_vulture = {
+	clr_country_flag = FRE_DBP_Response_Choice_Pending
+	set_country_flag = FRE_DBP_Posture_Vulture
+	set_country_flag = FRE_DBP_Vulture_Request_Pending
+	set_temp_variable = { fre_credit_amount = -40 }
+	fre_change_war_credits = yes
+	set_temp_variable = { fre_patience_delta = -4 }
+	fre_metropole_patience_change = yes
+	if = {
+		limit = {
+			country_exists = VIN
+			VIN = { has_country_flag = Operation_Vulture }
+		}
+		fre_dbp_vulture_approved = yes
+	}
+	else_if = {
+		limit = { country_exists = USA }
+		USA = { country_event = { id = FRE_DBP.10 days = 3 } }
+	}
+}
+
+fre_dbp_vulture_approved = {
+	if = {
+		limit = {
+			has_country_flag = FRE_DBP_Response_Active
+			NOT = { has_country_flag = FRE_DBP_Vulture_Support_Approved }
+		}
+		clr_country_flag = FRE_DBP_Vulture_Request_Pending
+		set_country_flag = FRE_DBP_Vulture_Support_Approved
+		subtract_from_variable = { global.VIN_dbp_siege_days = 10 }
+		add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1000 producer = USA }
+		add_equipment_to_stockpile = { type = support_equipment amount = 200 producer = USA }
+		if = {
+			limit = { country_exists = TAI }
+			TAI = { add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 1000 producer = USA } }
+		}
+		fre_dbp_response_apply_state_modifier = yes
+		country_event = { id = FRE_Dien_Bien.2 hours = 6 }
+	}
+}
+
+fre_dbp_vulture_refused = {
+	if = {
+		limit = { has_country_flag = FRE_DBP_Response_Active }
+		clr_country_flag = FRE_DBP_Vulture_Request_Pending
+		set_country_flag = FRE_DBP_Vulture_Support_Refused
+		country_event = { id = FRE_Dien_Bien.3 hours = 6 }
+	}
+}
+
+fre_dbp_response_daily_tick = {
+	if = {
+		limit = {
+			has_country_flag = FRE_DBP_Response_Active
+			NOT = { has_country_flag = FRE_DBP_Vulture_Support_Approved }
+			country_exists = VIN
+			VIN = { has_country_flag = Operation_Vulture }
+		}
+		set_country_flag = FRE_DBP_Vulture_Direct_Intervention
+		fre_dbp_vulture_approved = yes
+	}
+	if = {
+		limit = {
+			has_country_flag = FRE_DBP_Response_Active
+			has_country_flag = FRE_DBP_Posture_Condor
+			NOT = { has_country_flag = FRE_DBP_Condor_Objective_Achieved }
+			country_exists = VIN
+			VIN = {
+				has_country_flag = VIN_Campaign_Dien_Bien_Active
+				vin_dbp_valley_invested_trigger = yes
+			}
+		}
+		set_country_flag = FRE_DBP_Condor_Window_Open
+		if = {
+			limit = { fre_dbp_condor_corridor_open_trigger = yes }
+			add_to_variable = { FRE_DBP_Condor_Hold_Days = 1 }
+			if = {
+				limit = { check_variable = { FRE_DBP_Condor_Hold_Days > 6.9 } }
+				set_country_flag = FRE_DBP_Condor_Objective_Achieved
+				set_country_flag = FRE_DBP_Garrison_Preserved
+				subtract_from_variable = { global.VIN_dbp_siege_days = 14 }
+				country_event = { id = FRE_Dien_Bien.4 hours = 6 }
+			}
+		}
+		else = { set_variable = { FRE_DBP_Condor_Hold_Days = 0 } }
+	}
+}
+
+fre_dbp_response_orphan_check = {
+	if = {
+		limit = {
+			has_country_flag = FRE_DBP_Response_Active
+			OR = {
+				NOT = { country_exists = VIN }
+				VIN = { NOT = { has_country_flag = VIN_Campaign_Dien_Bien_Active } }
+			}
+		}
+		set_temp_variable = { fre_dbp_response_result = 7 }
+		fre_dbp_response_finish = yes
+	}
+}
+
+fre_dbp_resolve_from_campaign = {
+	if = {
+		limit = { has_country_flag = FRE_DBP_Response_Active }
+		if = {
+			limit = { VIN = { check_variable = { VIN_camp_last_outcome = 5 } } }
+			set_temp_variable = { fre_dbp_response_result = 7 }
+		}
+		else_if = {
+			limit = {
+				VIN = { check_variable = { VIN_camp_last_outcome = 4 } }
+				has_country_flag = FRE_DBP_Posture_Maximum
+			}
+			set_temp_variable = { fre_dbp_response_result = 2 }
+		}
+		else_if = {
+			limit = {
+				VIN = { check_variable = { VIN_camp_last_outcome = 4 } }
+				has_country_flag = FRE_DBP_Posture_Condor
+				has_country_flag = FRE_DBP_Condor_Objective_Achieved
+			}
+			set_temp_variable = { fre_dbp_response_result = 3 }
+		}
+		else_if = {
+			limit = {
+				VIN = { check_variable = { VIN_camp_last_outcome = 4 } }
+				has_country_flag = FRE_DBP_Posture_Vulture
+				has_country_flag = FRE_DBP_Vulture_Support_Approved
+			}
+			set_temp_variable = { fre_dbp_response_result = 4 }
+		}
+		else_if = {
+			limit = { VIN = { check_variable = { VIN_camp_last_outcome = 4 } } }
+			if = {
+				limit = {
+					has_country_flag = FRE_DBP_Posture_Condor
+					NOT = { has_country_flag = FRE_DBP_Condor_Objective_Achieved }
+				}
+				set_country_flag = FRE_DBP_Condor_Result_Failed
+			}
+			if = {
+				limit = {
+					has_country_flag = FRE_DBP_Posture_Vulture
+					NOT = { has_country_flag = FRE_DBP_Vulture_Support_Approved }
+				}
+				set_country_flag = FRE_DBP_Vulture_Result_Refused
+			}
+			set_temp_variable = { fre_dbp_response_result = 1 }
+		}
+		else_if = {
+			limit = {
+				VIN = {
+					OR = {
+						check_variable = { VIN_camp_last_outcome = 1 }
+						check_variable = { VIN_camp_last_outcome = 2 }
+					}
+				}
+			}
+			set_temp_variable = { fre_dbp_response_result = 5 }
+		}
+		else = { set_temp_variable = { fre_dbp_response_result = 6 } }
+		fre_dbp_response_finish = yes
+	}
+}
+
+fre_dbp_reward_standard_hold = {
+	set_temp_variable = { fre_credit_amount = 40 }
+	fre_change_war_credits = yes
+	set_temp_variable = { fre_patience_delta = 3 }
+	fre_metropole_patience_change = yes
+	add_war_support = 0.02
+}
+
+fre_dbp_reward_reinforced_hold = {
+	set_temp_variable = { fre_credit_amount = 100 }
+	fre_change_war_credits = yes
+	set_temp_variable = { fre_patience_delta = 8 }
+	fre_metropole_patience_change = yes
+	add_manpower = 2000
+	add_war_support = 0.04
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = 10 }
+			subtract_from_variable = { StruggleInvolvedNationsIndochinaCommunistScore = 10 }
+		}
+	}
+}
+
+fre_dbp_reward_condor = {
+	set_temp_variable = { fre_credit_amount = 80 }
+	fre_change_war_credits = yes
+	set_temp_variable = { fre_patience_delta = 6 }
+	fre_metropole_patience_change = yes
+	add_manpower = 2500
+	add_war_support = 0.03
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = 10 }
+			subtract_from_variable = { StruggleInvolvedNationsIndochinaCommunistScore = 5 }
+		}
+	}
+}
+
+fre_dbp_reward_vulture_hold = {
+	set_temp_variable = { fre_credit_amount = 75 }
+	fre_change_war_credits = yes
+	set_temp_variable = { fre_patience_delta = 5 }
+	fre_metropole_patience_change = yes
+	add_war_support = 0.03
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = { add_to_variable = { StruggleInvolvedNationsIndochinaProFranceScore = 10 } }
+	}
+}
+
+fre_dbp_penalty_camp_lost = {
+	if = {
+		limit = { has_country_flag = FRE_DBP_Posture_Maximum }
+		set_country_flag = FRE_DBP_Response_Loss_Maximum
+		add_manpower = -7000
+		add_equipment_to_stockpile = { type = infantry_equipment_1 amount = -2000 }
+		add_equipment_to_stockpile = { type = support_equipment amount = -250 }
+		add_equipment_to_stockpile = { type = artillery_equipment_1 amount = -125 }
+		set_temp_variable = { fre_patience_delta = -10 }
+		fre_metropole_patience_change = yes
+		add_war_support = -0.05
+	}
+	else_if = {
+		limit = { has_country_flag = FRE_DBP_Posture_Condor }
+		set_country_flag = FRE_DBP_Response_Loss_Condor
+		if = {
+			limit = { has_country_flag = FRE_DBP_Condor_Objective_Achieved }
+			add_manpower = -2000
+			add_war_support = -0.02
+		}
+		else = {
+			add_manpower = -5000
+			set_temp_variable = { fre_patience_delta = -5 }
+			fre_metropole_patience_change = yes
+			add_war_support = -0.04
+		}
+	}
+	else_if = {
+		limit = { has_country_flag = FRE_DBP_Posture_Vulture }
+		set_country_flag = FRE_DBP_Response_Loss_Vulture
+		add_manpower = -4000
+		set_temp_variable = { fre_patience_delta = -6 }
+		fre_metropole_patience_change = yes
+		add_war_support = -0.04
+	}
+	else = {
+		set_country_flag = FRE_DBP_Response_Loss_Standard
+		add_manpower = -3000
+		add_war_support = -0.03
+	}
+}
+
+fre_dbp_response_finish = {
+	set_country_flag = FRE_DBP_Response_Resolved
+	if = {
+		limit = { check_variable = { fre_dbp_response_result = 1 } }
+		set_country_flag = FRE_DBP_Response_Result_Held
+		fre_dbp_reward_standard_hold = yes
+	}
+	else_if = {
+		limit = { check_variable = { fre_dbp_response_result = 2 } }
+		set_country_flag = FRE_DBP_Response_Result_Reinforced
+		fre_dbp_reward_reinforced_hold = yes
+	}
+	else_if = {
+		limit = { check_variable = { fre_dbp_response_result = 3 } }
+		set_country_flag = FRE_DBP_Response_Result_Condor
+		fre_dbp_reward_condor = yes
+	}
+	else_if = {
+		limit = { check_variable = { fre_dbp_response_result = 4 } }
+		set_country_flag = FRE_DBP_Response_Result_Vulture
+		fre_dbp_reward_vulture_hold = yes
+	}
+	else_if = {
+		limit = { check_variable = { fre_dbp_response_result = 5 } }
+		set_country_flag = FRE_DBP_Response_Result_Fall
+		fre_dbp_penalty_camp_lost = yes
+	}
+	else_if = {
+		limit = { check_variable = { fre_dbp_response_result = 6 } }
+		set_country_flag = FRE_DBP_Response_Result_Inconclusive
+	}
+	else = { set_country_flag = FRE_DBP_Response_Result_Superseded }
+	FRA = { indochina_struggle_recalculate_total_anti_communist_score = yes }
+	fre_dbp_response_cleanup = yes
+	country_event = { id = FRE_Dien_Bien.5 hours = 6 }
+	if = {
+		limit = { country_exists = VIN }
+		VIN = { country_event = { id = VIN_Dien_Bien.1 hours = 8 } }
+	}
+}
+
+fre_dbp_response_cleanup = {
+	set_temp_variable = { response_validation_package = 3 }
+	response_package_validation_log = yes
+	671 = {
+		if = { limit = { has_dynamic_modifier = { modifier = FRE_DBP_Standard_Holdout } } remove_dynamic_modifier = { modifier = FRE_DBP_Standard_Holdout } }
+		if = { limit = { has_dynamic_modifier = { modifier = FRE_DBP_Maximum_Holdout } } remove_dynamic_modifier = { modifier = FRE_DBP_Maximum_Holdout } }
+		if = { limit = { has_dynamic_modifier = { modifier = FRE_DBP_Condor_Staging } } remove_dynamic_modifier = { modifier = FRE_DBP_Condor_Staging } }
+		if = { limit = { has_dynamic_modifier = { modifier = FRE_DBP_Vulture_Air_Support } } remove_dynamic_modifier = { modifier = FRE_DBP_Vulture_Air_Support } }
+	}
+	clr_country_flag = FRE_DBP_Response_Active
+	clr_country_flag = FRE_DBP_Response_Choice_Pending
+	clr_country_flag = FRE_DBP_Posture_Standard
+	clr_country_flag = FRE_DBP_Posture_Maximum
+	clr_country_flag = FRE_DBP_Posture_Condor
+	clr_country_flag = FRE_DBP_Posture_Vulture
+	clr_country_flag = FRE_DBP_Condor_Window_Open
+	clr_country_flag = FRE_DBP_Condor_Objective_Achieved
+	clr_country_flag = FRE_DBP_Vulture_Request_Pending
+	clr_country_flag = FRE_DBP_Vulture_Support_Approved
+	clr_country_flag = FRE_DBP_Vulture_Support_Refused
+	clr_country_flag = FRE_DBP_Vulture_Direct_Intervention
+	set_variable = { FRE_DBP_Condor_Hold_Days = 0 }
+}

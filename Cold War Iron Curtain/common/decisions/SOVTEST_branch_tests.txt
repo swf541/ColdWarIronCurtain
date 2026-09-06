@@ -1,0 +1,229 @@
+# ============================================================================
+#  TEMPORARY - test decisions that force each Soviet side branch to appear.
+#  Delete this file, common/decisions/categories/SOVTEST_branch_test_categories.txt
+#  and localisation/english/SOVTEST_branch_tests_l_english.yml when finished.
+#
+#  Every decision sets exactly the state the branch's allow_branch checks for,
+#  then marks the focus tree dirty so it redraws immediately. All are repeatable.
+#
+#  Mutually exclusive pairs (only one of each can be drawn at a time):
+#    Stalin Notes   <-> Red Bonn
+#    Greek historical <-> Greek intervention
+#    China PRC victory <-> China Manchuria
+#    Korea wartime  <-> Korea settlement (and the three settlement arms)
+# ============================================================================
+
+SOVTEST_branch_tests = {
+
+	# ---- GERMANY ----------------------------------------------------------
+	SOVTEST_show_stalin_notes = {
+		icon = generic_political_discourse
+		cost = 0
+		fire_only_once = no
+		ai_will_do = { factor = 0 }
+
+		complete_effect = {
+			clr_country_flag = SOV_WGR49_kpd_victory
+			set_country_flag = SOV_german_question_active
+			set_country_flag = SOV_german_question_fired
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	SOVTEST_show_red_bonn = {
+		icon = generic_political_discourse
+		cost = 0
+		fire_only_once = no
+		ai_will_do = { factor = 0 }
+
+		complete_effect = {
+			clr_country_flag = SOV_german_question_active
+			set_country_flag = SOV_WGR49_kpd_victory
+			set_country_flag = SOV_WGR49_interfered
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	# ---- GREECE -----------------------------------------------------------
+	SOVTEST_show_greek_historical = {
+		icon = generic_political_discourse
+		cost = 0
+		fire_only_once = no
+		ai_will_do = { factor = 0 }
+
+		complete_effect = {
+			clr_country_flag = SOV_Rejected_Percentage_Agreements
+			set_country_flag = SOV_Followed_Percentage_Agreements
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	SOVTEST_show_greek_intervention = {
+		icon = generic_political_discourse
+		cost = 0
+		fire_only_once = no
+		ai_will_do = { factor = 0 }
+
+		complete_effect = {
+			clr_country_flag = SOV_Followed_Percentage_Agreements
+			set_country_flag = SOV_Rejected_Percentage_Agreements
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	# ---- CHINA ------------------------------------------------------------
+	# The root is visible from game start, so these only decide which arm draws.
+	SOVTEST_show_china_prc_victory = {
+		icon = generic_political_discourse
+		cost = 0
+		fire_only_once = no
+		ai_will_do = { factor = 0 }
+
+		complete_effect = {
+			clr_country_flag = SOV_PRC_Losing_CCW
+			clr_global_flag = CCW_Started
+			clr_global_flag = ROC_Victory
+			set_global_flag = CCW_Over
+			set_global_flag = ROC_taiwan
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	SOVTEST_show_china_manchuria = {
+		icon = generic_political_discourse
+		cost = 0
+		fire_only_once = no
+		ai_will_do = { factor = 0 }
+
+		complete_effect = {
+			clr_global_flag = CCW_Started
+			clr_global_flag = ROC_taiwan
+			set_global_flag = CCW_Over
+			set_global_flag = ROC_Victory
+			set_country_flag = SOV_PRC_Losing_CCW
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	# ---- KOREA: WARTIME ---------------------------------------------------
+	SOVTEST_show_korea_wartime = {
+		icon = generic_political_discourse
+		cost = 0
+		fire_only_once = no
+		ai_will_do = { factor = 0 }
+
+		complete_effect = {
+			set_country_flag = SOV_korea_question_active
+			set_global_flag = korean_war_begun
+			clr_global_flag = KOREA_CEASEFIRE_UN
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	# ---- KOREA: POST-WAR --------------------------------------------------
+	# Each of these has to leave the world in the state the arm reads, not just
+	# set a flag - the arms check who still exists.
+	SOVTEST_show_korea_division = {
+		icon = generic_political_discourse
+		cost = 0
+		fire_only_once = no
+		ai_will_do = { factor = 0 }
+
+		visible = {
+			country_exists = KPA
+			country_exists = KOR
+		}
+
+		complete_effect = {
+			set_country_flag = SOV_korea_question_active
+			set_global_flag = korean_war_begun
+			set_global_flag = KOREA_CEASEFIRE_UN
+			clr_global_flag = korean_war
+			KOR = { clr_country_flag = lost_in_korean_war }
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	SOVTEST_show_korea_north_wins = {
+		icon = generic_political_discourse
+		cost = 0
+		fire_only_once = no
+		ai_will_do = { factor = 0 }
+
+		visible = {
+			country_exists = KPA
+			country_exists = KOR
+		}
+
+		complete_effect = {
+			set_country_flag = SOV_korea_question_active
+			set_global_flag = korean_war_begun
+			set_global_flag = KOREA_CEASEFIRE_UN
+			clr_global_flag = korean_war
+			KOR = { set_country_flag = lost_in_korean_war }
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	# Destructive: the south-victory arm requires the KPA to be gone, so this
+	# actually annexes it. Save first.
+	SOVTEST_show_korea_south_wins = {
+		icon = generic_political_discourse
+		cost = 0
+		fire_only_once = no
+		ai_will_do = { factor = 0 }
+
+		visible = {
+			country_exists = KPA
+			country_exists = KOR
+		}
+
+		complete_effect = {
+			set_country_flag = SOV_korea_question_active
+			set_global_flag = korean_war_begun
+			set_global_flag = KOREA_CEASEFIRE_UN
+			clr_global_flag = korean_war
+			KOR = {
+				clr_country_flag = lost_in_korean_war
+				annex_country = {
+					target = KPA
+					transfer_troops = no
+				}
+			}
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	# ---- RESET ------------------------------------------------------------
+	# Clears every flag these decisions set, so the tree returns to its 1949
+	# state. Does not undo the annexation from the south-victory test.
+	SOVTEST_reset_all_branches = {
+		icon = generic_political_discourse
+		cost = 0
+		fire_only_once = no
+		ai_will_do = { factor = 0 }
+
+		complete_effect = {
+			clr_country_flag = SOV_german_question_active
+			clr_country_flag = SOV_german_question_fired
+			clr_country_flag = SOV_WGR49_kpd_victory
+			clr_country_flag = SOV_WGR49_interfered
+			clr_country_flag = SOV_WGR49_hands_off
+			clr_country_flag = SOV_Followed_Percentage_Agreements
+			clr_country_flag = SOV_Rejected_Percentage_Agreements
+			clr_country_flag = SOV_korea_question_active
+			clr_country_flag = SOV_PRC_Losing_CCW
+			clr_global_flag = KOREA_CEASEFIRE_UN
+			clr_global_flag = korean_war_begun
+			clr_global_flag = CCW_Over
+			clr_global_flag = ROC_taiwan
+			clr_global_flag = ROC_Victory
+			set_global_flag = CCW_Started
+			if = {
+				limit = { country_exists = KOR }
+				KOR = { clr_country_flag = lost_in_korean_war }
+			}
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+}

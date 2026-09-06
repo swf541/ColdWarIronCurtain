@@ -74,11 +74,14 @@ on_actions = {
                     }
                 }
             }
-            # Force highest intensity phase (Phase 3) when VIE and VIN declare war on each other
+            # Force highest intensity phase (Phase 3) when VIE and VIN declare war on each other.
+            # Phase numbers rise as things calm down (3 = High Intensity, 8 = Low Tension),
+            # so any tension-era phase must snap back down to full war. 9+ are terminal.
             if = {
                 limit = {
                     NOT = { has_global_flag = Indochina_War_Over }
-                    check_variable = { global.Indochina_War_Active_Phase < 3 }
+                    check_variable = { global.Indochina_War_Active_Phase > 3 }
+                    check_variable = { global.Indochina_War_Active_Phase < 9 }
                     OR = {
                         AND = {
                             FROM = { original_tag = VIE }
@@ -91,20 +94,69 @@ on_actions = {
                     }
                 }
                 set_variable = { global.Indochina_War_Active_Phase = 3 }
-                set_variable = { global.Indochina_War_Next_Phase_A_Points = 450 }
+				set_variable = { global.Indochina_War_Next_Phase_A_Points = 0 }
                 set_variable = { global.Indochina_War_Next_Phase_B_Points = 0 }
                 indochina_struggle_update_phase_transitions = yes
                 every_country = {
                     limit = {
                         OR = {
-                            is_in_array = { StruggleInvolvedNationsIndochinaCommunist = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaProFrance = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaProIndependence = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaKuomintang = THIS.id }
-                            is_in_array = { StruggleInvolvedNationsIndochinaProEthnic = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaCommunist = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaProFrance = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaProIndependence = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaKuomintang = THIS.id }
+                            is_in_array = { FRA.StruggleInvolvedNationsIndochinaProEthnic = THIS.id }
                         }
                     }
                     indochina_struggle_starting_idea_phase_change = yes
+                }
+                set_variable = { global.indochina_phase_check = 1 }
+            }
+            # FRE and TAM side with the State of Vietnam in any open VIE-VIN war.
+            if = {
+                limit = {
+                    NOT = { has_global_flag = Indochina_War_Over }
+                    OR = {
+                        AND = {
+                            FROM = { original_tag = VIE }
+                            ROOT = { original_tag = VIN }
+                        }
+                        AND = {
+                            FROM = { original_tag = VIN }
+                            ROOT = { original_tag = VIE }
+                        }
+                    }
+                }
+                if = {
+                    limit = {
+                        country_exists = FRE
+                        FRE = {
+                            NOT = { has_war_with = VIE }
+                            NOT = { has_war_with = VIN }
+                        }
+                    }
+                    FRE = {
+                        add_to_war = {
+                            targeted_alliance = VIE
+                            enemy = VIN
+                            hostility_reason = asked_to_join
+                        }
+                    }
+                }
+                if = {
+                    limit = {
+                        country_exists = TAM
+                        TAM = {
+                            NOT = { has_war_with = VIE }
+                            NOT = { has_war_with = VIN }
+                        }
+                    }
+                    TAM = {
+                        add_to_war = {
+                            targeted_alliance = VIE
+                            enemy = VIN
+                            hostility_reason = asked_to_join
+                        }
+                    }
                 }
             }
         }

@@ -68,7 +68,7 @@ country_event = {
 			modifier = {
 				factor = 0
 				is_historical_focus_on = yes
-			}	
+			}
 		}
 	}
 	option = {
@@ -79,7 +79,7 @@ country_event = {
 			modifier = {
 				factor = 0
 				is_historical_focus_on = yes
-			}	
+			}
 		}
 	}
 }
@@ -140,7 +140,7 @@ country_event = {
 			modifier = {
 				factor = 0
 				is_historical_focus_on = yes
-			}	
+			}
 		}
 	}
 }
@@ -217,7 +217,7 @@ country_event = {
 	option = {
 		name = MAL_FP.2.a
 	}
-}          
+}
 
 country_event = {
 	id = MAL_Econ.0
@@ -635,12 +635,12 @@ country_event = {
 
 	option = {
 		name = MAL_baling.1.a  # "Prepare the delegation"
-		trigger = { }
-		ai_chance = { factor = 100 }
-		hidden_effect = {
+
+		MLA = {
 			country_event = { id = MLA_baling.1 }
-			news_event = { id = MAL_baling.3010 }
 		}
+		SGP = { country_event = { id = SGP_baling.1 hours = 6 } }	# David Marshall attended the historical talks
+		news_event = { id = MAL_baling.3010 }
 	}
 }
 country_event = {
@@ -653,50 +653,51 @@ country_event = {
 
 	option = {
 		name = MLA_baling.1.a  # "Attend the Talks"
+
 		ai_chance = { factor = 100 }
-		trigger = { }
-		hidden_effect = {
-			country_event = { id = MAL_baling.2 }
-		}
+
+		MAL = { country_event = { id = MAL_baling.2 } }	# unscoped, this fired Malaya's event on the MNLA
 	}
 	option = {
 		name = MLA_baling.1.b  # "Reject the Talks"
+
 		ai_chance = { factor = 0 }
-		trigger = { }
-		hidden_effect = {
-			news_event = { id = MAL_baling.3011 }
-		}
+
+		set_temp_variable = { emergency_momentum_shift = -20 }	# refusing to even attend hands Kuala Lumpur the moral high ground
+		MLA_shift_emergency_momentum = yes
+		MAL = { add_stability = 0.03 }
+		news_event = { id = MAL_baling.3011 }
 	}
 }
-add_namespace = MAL_Temple
+
 country_event = {
-	id = MAL_Temple.0
-	title = MAL_Temple.0.t
-	desc = MAL_Temple.0.d
-	picture = GFX_MAL_Temple_0
-	fire_only_once = yes
+	id = MAL_baling.2
+	title = MAL_baling.2.t
+	desc = MAL_baling.2.d
+	picture = GFX_MAL_baling_2
+
 	is_triggered_only = yes
 
 	option = {
-		name = MAL_Temple.0.a
+		name = MAL_baling.2.a  # "Insist on full surrender"
+		ai_chance = {
+			factor = 60
+			modifier = { factor = 10 is_historical_focus_on = yes }	# the Tunku demanded surrender at the real talks
+		}
+
+		MLA = { country_event = { id = MLA_baling.2 } }
 	}
-}
-
-news_event = {
-	id = MAL_Temple.1
-	title = MAL_Temple.1.t
-	desc = MAL_Temple.1.d
-	picture = GFX_MAL_Temple_1
-
-	is_triggered_only = yes
-	major = yes
-	fire_only_once = yes
-
 	option = {
-		name = MAL_Temple.1.a
+		name = MAL_baling.2.b  # "Offer political compromise"
+
+		ai_chance = {
+			factor = 40
+			modifier = { factor = 0 is_historical_focus_on = yes }
+		}
+
+		MLA = { country_event = { id = MLA_baling.3 } }
 	}
 }
-
 
 news_event = {
 	id = MAL_baling.3010
@@ -711,29 +712,7 @@ news_event = {
 		name = MAL_baling.3010.a
 	}
 }
-country_event = {
-	id = MAL_baling.2
-	title = MAL_baling.2.t
-	desc = MAL_baling.2.d
-	picture = GFX_MAL_baling_2
 
-	is_triggered_only = yes
-
-	option = {
-		name = MAL_baling.2.a  # "Insist on full surrender"
-		ai_chance = { factor = 60 }
-		hidden_effect = {
-			country_event = { id = MLA_baling.2 }
-		}
-	}
-	option = {
-		name = MAL_baling.2.b  # "Offer political compromise"
-		ai_chance = { factor = 40 }
-		hidden_effect = {
-			country_event = { id = MLA_baling.3 }
-		}
-	}
-}
 country_event = {
 	id = MLA_baling.2
 	title = MLA_baling.2.t
@@ -745,6 +724,10 @@ country_event = {
 	option = {
 		name = MLA_baling.2.a  # "We reject their insulting terms"
 		ai_chance = { factor = 100 }
+		set_temp_variable = { emergency_momentum_shift = 10 }	# the historical collapse: a propaganda win for the MCP, but the standing amnesty still bleeds cadres
+		MLA_shift_emergency_momentum = yes
+		add_war_support = -0.03
+		MAL = { add_stability = -0.03 }
 		hidden_effect = {
 			news_event = { id = MAL_baling.3011 }
 		}
@@ -760,7 +743,14 @@ country_event = {
 
 	option = {
 		name = MLA_baling.3.a  # "Accept in good faith"
-		ai_chance = { factor = 25 }
+		trigger = {
+			check_variable = { emergency_momentum < -100 }	# the MCP only takes terms once it is already losing
+			NOT = { has_global_flag = MAL_EMERGENCY_NEGOTIATED_PEACE }
+		}
+		ai_chance = {
+			factor = 25
+			modifier = { factor = 0 is_historical_focus_on = yes }	# Chin Peng walked away in 1955
+		}
 		hidden_effect = {
 			set_country_flag = baling_agreement_accepted
 			news_event = { id = MAL_baling.3012 }
@@ -770,6 +760,12 @@ country_event = {
 	option = {
 		name = MLA_baling.3.b  # "Use the talks to regroup"
 		ai_chance = { factor = 45 }
+		set_temp_variable = { emergency_momentum_shift = 25 }	# the lull is spent rebuilding the jungle columns
+		MLA_shift_emergency_momentum = yes
+		add_timed_idea = {
+			idea = MLA_prepared_operation
+			days = 90
+		}
 		hidden_effect = {
 			set_country_flag = baling_agreement_stalled
 			news_event = { id = MAL_baling.3013 }
@@ -778,6 +774,9 @@ country_event = {
 	option = {
 		name = MLA_baling.3.c  # "Refuse the offer entirely"
 		ai_chance = { factor = 30 }
+		set_temp_variable = { emergency_momentum_shift = -30 }	# refusing a genuine offer is the worst look available to the MCP
+		MLA_shift_emergency_momentum = yes
+		add_war_support = -0.05
 		hidden_effect = {
 			news_event = { id = MAL_baling.3011 }
 		}
@@ -818,25 +817,68 @@ news_event = {
 
 	option = { name = MAL_baling.3013.a }
 }
+
+add_namespace = MAL_Temple
+country_event = {
+	id = MAL_Temple.0
+	title = MAL_Temple.0.t
+	desc = MAL_Temple.0.d
+	picture = GFX_MAL_Temple_0
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = MAL_Temple.0.a
+	}
+}
+
+news_event = {
+	id = MAL_Temple.1
+	title = MAL_Temple.1.t
+	desc = MAL_Temple.1.d
+	picture = GFX_MAL_Temple_1
+
+	is_triggered_only = yes
+	major = yes
+	fire_only_once = yes
+
+	option = {
+		name = MAL_Temple.1.a
+	}
+}
+
 country_event = {
 	id = SGP_baling.1
 	title = SGP_baling.1.t
 	desc = SGP_baling.1.d
 	picture = GFX_SGP_baling_1
 
-	trigger = {
-		has_country_flag = baling_talks_in_progress
-	}
+	is_triggered_only = yes
+	fire_only_once = yes
 
 	option = {
 		name = SGP_baling.1.a  # "Open quiet channels with Malaya"
 		ai_chance = { factor = 65 }
+		add_opinion_modifier = {
+			target = MAL
+			modifier = medium_increase
+		}
+		reverse_add_opinion_modifier = {
+			target = MAL
+			modifier = medium_increase
+		}
 	}
 	option = {
 		name = SGP_baling.1.b  # "Hold firm against Communists"
 		ai_chance = { factor = 35 }
+		add_stability = 0.03
+		add_popularity = {
+			ideology = communism
+			popularity = -0.02
+		}
 	}
 }
+
 add_namespace = MAL
 country_event = {
     id = MAL.1951
@@ -891,58 +933,19 @@ country_event = {
 	}
 	# title = "A Step Towards Sovereignty"
 	# desc = mal.0.d
-	
+
 	is_triggered_only = yes
 	fire_only_once = yes
 	hidden = yes
-	
+
 	#immediate = {
 	#	drop_cosmetic_tag = yes
 	#	set_cosmetic_tag = MAL_FED
 	#}
 }
 
-country_event = {
-	id = mal.1 
- immediate = { }
-	hidden = yes
-
-	is_triggered_only = yes
-	fire_only_once = yes
-
-	immediate = {
-		ENG = { white_peace = MLA }
-		RAJ = { white_peace = MLA }
-		MLA = { annex_country = { target = MAL transfer_troops = no } set_capital = { state = 784 } }
-	}
-}
-
-country_event = {
-	id = mal.2 
- immediate = { }
-	hidden = yes
-
-	is_triggered_only = yes
-	fire_only_once = yes
-
-	immediate = {
-		if = {
-			limit = {
-				MLA = { is_subject_of = ENG }
-			}
-			MAL = { annex_country = { target = MLA } }
-		}
-		if = {
-			limit = {
-				791 = { is_owned_by = ENG }
-				MAL = { is_subject_of = ENG }
-			}
-			MAL = {
-				transfer_state = 791
-			}
-		}
-	}
-}
+# mal.1 and mal.2 are deleted: legacy outcome-blind Emergency resolvers (MLA annexes MAL / MAL annexes MLA
+# plus a silent Pahang transfer). The Emergency victory effects in MLA_scripted_effects.txt replace them.
 
 #Malaysia Events
 news_event = {
@@ -957,15 +960,15 @@ news_event = {
 
 	option = {
 		name = Malaysia.0.a
-		
+
 		trigger = {
 			original_tag = MAL
 		}
 	}
-	
+
 	option = {
 		name = Malaysia.0.b
-		
+
 		trigger = {
 			NOT = { original_tag = MAL }
 		}

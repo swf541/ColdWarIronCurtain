@@ -1,0 +1,252 @@
+fre_hoa_binh_response_begin = {
+	fre_hoa_binh_response_cleanup = yes
+	clr_country_flag = FRE_Hoa_Binh_Result_Hold_Wager_Lost
+	set_country_flag = FRE_Hoa_Binh_Response_Active
+	set_country_flag = FRE_Hoa_Binh_Phase_Salient_Established
+	set_country_flag = FRE_Hoa_Binh_Phase_Counteroffensive
+	set_country_flag = FRE_Hoa_Binh_Response_Choice_Pending
+	set_variable = { FRE_Hoa_Binh_Withdrawal_Day = 105 }
+	1766 = {
+		if = {
+			limit = { NOT = { has_dynamic_modifier = { modifier = FRE_Hoa_Binh_Salient } } }
+			add_dynamic_modifier = { modifier = FRE_Hoa_Binh_Salient }
+		}
+	}
+	country_event = { id = FRE_Battles.5 days = 1 }
+}
+
+fre_hoa_binh_plan_amarante = {
+	clr_country_flag = FRE_Hoa_Binh_Response_Choice_Pending
+	set_country_flag = FRE_Hoa_Binh_Amarante_Planned
+	set_temp_variable = { fre_credit_amount = -30 }
+	fre_change_war_credits = yes
+	add_manpower = -1500
+}
+
+fre_hoa_binh_commit_hold = {
+	clr_country_flag = FRE_Hoa_Binh_Response_Choice_Pending
+	set_country_flag = FRE_Hoa_Binh_Hold_Committed
+	set_temp_variable = { fre_credit_amount = -80 }
+	fre_change_war_credits = yes
+	add_manpower = -4000
+	1766 = {
+		if = {
+			limit = { has_dynamic_modifier = { modifier = FRE_Hoa_Binh_Salient } }
+			remove_dynamic_modifier = { modifier = FRE_Hoa_Binh_Salient }
+		}
+		if = {
+			limit = { NOT = { has_dynamic_modifier = { modifier = FRE_Hoa_Binh_Holdout } } }
+			add_dynamic_modifier = { modifier = FRE_Hoa_Binh_Holdout }
+		}
+	}
+	if = {
+		limit = { country_exists = TAM }
+		TAM = {
+			add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 750 producer = FRA }
+			add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 75 producer = FRA }
+		}
+	}
+}
+
+fre_hoa_binh_reward_orderly_withdrawal = {
+	set_country_flag = FRE_Hoa_Binh_Mobile_Groups_Preserved
+	add_manpower = 1500
+	add_equipment_to_stockpile = { type = infantry_equipment_1 amount = 2000 producer = FRA }
+	add_equipment_to_stockpile = { type = support_equipment amount = 250 producer = FRA }
+	add_equipment_to_stockpile = { type = artillery_equipment_1 amount = 100 producer = FRA }
+	set_temp_variable = { fre_credit_amount = 75 }
+	fre_change_war_credits = yes
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = {
+				global.Indochina_War_Next_Phase_B_Points = 25
+				tooltip = Add_to_De_Escalation_Phase_TT
+			}
+		}
+	}
+}
+
+fre_hoa_binh_reward_salient_held = {
+	set_temp_variable = { fre_credit_amount = 100 }
+	fre_change_war_credits = yes
+	set_temp_variable = { fre_patience_delta = 10 }
+	fre_metropole_patience_change = yes
+	add_war_support = 0.03
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = {
+				StruggleInvolvedNationsIndochinaCommunistScore = -10
+				tooltip = Add_to_Communist_Victory_Points_TT
+			}
+			add_to_variable = {
+				StruggleInvolvedNationsIndochinaProFranceScore = 10
+				tooltip = Add_to_French_Victory_Points_TT
+			}
+		}
+	}
+}
+
+fre_hoa_binh_penalty_committed_hold_lost = {
+	add_manpower = -3000
+	add_equipment_to_stockpile = { type = infantry_equipment_1 amount = -1500 }
+	add_equipment_to_stockpile = { type = support_equipment amount = -150 }
+	add_equipment_to_stockpile = { type = artillery_equipment_1 amount = -75 }
+	set_temp_variable = { fre_credit_amount = -75 }
+	fre_change_war_credits = yes
+	set_temp_variable = { fre_patience_delta = -8 }
+	fre_metropole_patience_change = yes
+	add_war_support = -0.04
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = {
+				StruggleInvolvedNationsIndochinaCommunistScore = 10
+				tooltip = Add_to_Communist_Victory_Points_TT
+			}
+			add_to_variable = {
+				StruggleInvolvedNationsIndochinaProFranceScore = -10
+				tooltip = Add_to_French_Victory_Points_TT
+			}
+			add_to_variable = {
+				global.Indochina_War_Next_Phase_A_Points = 50
+				tooltip = Add_to_Escalation_Phase_TT
+			}
+		}
+	}
+}
+
+fre_hoa_binh_response_daily_tick = {
+	if = {
+		limit = {
+			has_country_flag = FRE_Hoa_Binh_Response_Active
+			has_country_flag = FRE_Hoa_Binh_Amarante_Planned
+			NOT = { has_country_flag = FRE_Hoa_Binh_Amarante_Executed }
+			country_exists = VIN
+			VIN = {
+				has_country_flag = VIN_Campaign_Hoa_Binh_Active
+				check_variable = { VIN_camp_days_elapsed > 104 }
+			}
+			1766 = { indochina_french_held_state_trigger = yes }
+		}
+		set_country_flag = FRE_Hoa_Binh_Amarante_Executed
+		VIN = { set_country_flag = VIN_Hoa_Binh_Amarante_Withdrawal_Ready }
+	}
+}
+
+fre_hoa_binh_response_orphan_check = {
+	if = {
+		limit = {
+			has_country_flag = FRE_Hoa_Binh_Response_Active
+			OR = {
+				NOT = { country_exists = VIN }
+				VIN = { NOT = { has_country_flag = VIN_Campaign_Hoa_Binh_Active } }
+			}
+		}
+		set_temp_variable = { fre_hoa_binh_result = 5 }
+		fre_hoa_binh_response_finish = yes
+	}
+}
+
+fre_hoa_binh_resolve_from_campaign = {
+	if = {
+		limit = { has_country_flag = FRE_Hoa_Binh_Response_Active }
+		if = {
+			limit = { VIN = { check_variable = { VIN_camp_last_outcome = 5 } } }
+			set_temp_variable = { fre_hoa_binh_result = 5 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = FRE_Hoa_Binh_Amarante_Executed
+				VIN = { check_variable = { VIN_camp_last_outcome = 1 } }
+			}
+			set_temp_variable = { fre_hoa_binh_result = 1 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = FRE_Hoa_Binh_Hold_Committed
+				VIN = { check_variable = { VIN_camp_last_outcome = 4 } }
+			}
+			set_temp_variable = { fre_hoa_binh_result = 2 }
+		}
+		else_if = {
+			limit = {
+				VIN = {
+					OR = {
+						check_variable = { VIN_camp_last_outcome = 1 }
+						check_variable = { VIN_camp_last_outcome = 2 }
+					}
+				}
+			}
+			set_temp_variable = { fre_hoa_binh_result = 3 }
+		}
+		else = { set_temp_variable = { fre_hoa_binh_result = 4 } }
+		fre_hoa_binh_response_finish = yes
+	}
+}
+
+fre_hoa_binh_response_finish = {
+	clr_country_flag = FRE_Hoa_Binh_Result_Withdrawal
+	clr_country_flag = FRE_Hoa_Binh_Result_Held
+	clr_country_flag = FRE_Hoa_Binh_Result_Lost
+	clr_country_flag = FRE_Hoa_Binh_Result_Inconclusive
+	clr_country_flag = FRE_Hoa_Binh_Result_Superseded
+	if = {
+		limit = { check_variable = { fre_hoa_binh_result = 1 } }
+		set_country_flag = FRE_Hoa_Binh_Result_Withdrawal
+		fre_hoa_binh_reward_orderly_withdrawal = yes
+	}
+	else_if = {
+		limit = { check_variable = { fre_hoa_binh_result = 2 } }
+		set_country_flag = FRE_Hoa_Binh_Result_Held
+		fre_hoa_binh_reward_salient_held = yes
+	}
+	else_if = {
+		limit = { check_variable = { fre_hoa_binh_result = 3 } }
+		set_country_flag = FRE_Hoa_Binh_Result_Lost
+		if = {
+			limit = { has_country_flag = FRE_Hoa_Binh_Hold_Committed }
+			set_country_flag = FRE_Hoa_Binh_Result_Hold_Wager_Lost
+			fre_hoa_binh_penalty_committed_hold_lost = yes
+		}
+	}
+	else_if = {
+		limit = { check_variable = { fre_hoa_binh_result = 4 } }
+		set_country_flag = FRE_Hoa_Binh_Result_Inconclusive
+	}
+	else = { set_country_flag = FRE_Hoa_Binh_Result_Superseded }
+	fre_hoa_binh_response_cleanup = yes
+	country_event = { id = FRE_Hoa_Binh.1 hours = 6 }
+	if = {
+		limit = { country_exists = VIN }
+		VIN = { country_event = { id = VIN_Hoa_Binh.1 hours = 8 } }
+	}
+}
+
+fre_hoa_binh_response_cleanup = {
+	set_temp_variable = { response_validation_package = 2 }
+	response_package_validation_log = yes
+	1766 = {
+		if = {
+			limit = { has_dynamic_modifier = { modifier = FRE_Hoa_Binh_Salient } }
+			remove_dynamic_modifier = { modifier = FRE_Hoa_Binh_Salient }
+		}
+		if = {
+			limit = { has_dynamic_modifier = { modifier = FRE_Hoa_Binh_Holdout } }
+			remove_dynamic_modifier = { modifier = FRE_Hoa_Binh_Holdout }
+		}
+	}
+	clr_country_flag = FRE_Hoa_Binh_Response_Active
+	clr_country_flag = FRE_Hoa_Binh_Phase_Salient_Established
+	clr_country_flag = FRE_Hoa_Binh_Phase_Counteroffensive
+	clr_country_flag = FRE_Hoa_Binh_Response_Choice_Pending
+	clr_country_flag = FRE_Hoa_Binh_Amarante_Planned
+	clr_country_flag = FRE_Hoa_Binh_Amarante_Executed
+	clr_country_flag = FRE_Hoa_Binh_Hold_Committed
+	set_variable = { FRE_Hoa_Binh_Withdrawal_Day = 0 }
+	if = {
+		limit = { country_exists = VIN }
+		VIN = { clr_country_flag = VIN_Hoa_Binh_Amarante_Withdrawal_Ready }
+	}
+}

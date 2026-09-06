@@ -1,0 +1,205 @@
+# American glue into the Indochina Struggle and Geneva Conference systems.
+# The USA sits in StruggleInvolvedNationsIndochinaInterloper and has no score
+# of its own, so every lever here moves somebody else's numbers.
+
+USA_indochina_diplomatic_push = {	# temp usa_indo_b_points
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		add_to_variable = {
+			global.Indochina_War_Next_Phase_B_Points = usa_indo_b_points
+			tooltip = Add_to_De_Escalation_Phase_TT
+		}
+	}
+}
+
+USA_indochina_escalation_push = {	# temp usa_indo_a_points
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		add_to_variable = {
+			global.Indochina_War_Next_Phase_A_Points = usa_indo_a_points
+			tooltip = Add_to_Escalation_Phase_TT
+		}
+	}
+}
+
+USA_indochina_add_communist_score = {	# temp usa_indo_score, may be negative
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = {
+				StruggleInvolvedNationsIndochinaCommunistScore = usa_indo_score
+				tooltip = Add_to_Communist_Victory_Points_TT
+			}
+		}
+		indochina_struggle_clamp_scores = yes
+	}
+}
+
+USA_indochina_add_proindependence_score = {	# temp usa_indo_score, may be negative
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = {
+				StruggleInvolvedNationsIndochinaProIndependenceScore = usa_indo_score
+				tooltip = Add_to_Independent_Victory_Points_TT
+			}
+		}
+		indochina_struggle_clamp_scores = yes
+		indochina_struggle_recalculate_total_anti_communist_score = yes
+	}
+}
+
+USA_indochina_add_profrance_score = {	# temp usa_indo_score, may be negative
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		FRA = {
+			add_to_variable = {
+				StruggleInvolvedNationsIndochinaProFranceScore = usa_indo_score
+				tooltip = Add_to_French_Victory_Points_TT
+			}
+		}
+		indochina_struggle_clamp_scores = yes
+		indochina_struggle_recalculate_total_anti_communist_score = yes
+	}
+}
+
+USA_indochina_geneva_pressure = {	# temp geneva_lev_amount; weight is only seeded once, at seating
+	if = {
+		limit = { has_global_flag = geneva_conference_in_session }
+		add_to_variable = { geneva_weight = geneva_lev_amount }
+		custom_effect_tooltip = USA_indochina_geneva_weight_TT
+	}
+	else = {
+		geneva_add_usa_leverage = yes
+	}
+}
+
+USA_indochina_seed_rapprochement = {	# temp usa_indo_rapp; written directly because the leverage API clamps negatives
+	add_to_variable = { global.geneva_rapprochement_vie_vin = usa_indo_rapp }
+	if = {
+		limit = { check_variable = { usa_indo_rapp > 0 } }
+		custom_effect_tooltip = USA_indochina_rapprochement_gain_TT
+	}
+	else = {
+		custom_effect_tooltip = USA_indochina_rapprochement_loss_TT
+	}
+	if = {
+		limit = { has_global_flag = geneva_conference_in_session }
+		hidden_effect = {	# the 99/199 tiers are only read at seating and on refresh
+			if = {
+				limit = { country_exists = VIE }
+				VIE = { geneva_conf_refresh_prefs = yes }
+			}
+			if = {
+				limit = { country_exists = VIN }
+				VIN = { geneva_conf_refresh_prefs = yes }
+			}
+		}
+	}
+}
+
+USA_indochina_negotiating_table_push = {	# worth most near the bottom of the ladder, where it converts straight into the Geneva window
+	if = {
+		limit = { check_variable = { global.Indochina_War_Active_Phase = 8 } }
+		set_temp_variable = { usa_indo_b_points = 175 }
+	}
+	else_if = {
+		limit = { check_variable = { global.Indochina_War_Active_Phase = 7 } }
+		set_temp_variable = { usa_indo_b_points = 175 }
+	}
+	else = {
+		set_temp_variable = { usa_indo_b_points = 175 }
+	}
+	USA_indochina_diplomatic_push = yes
+}
+
+USA_indochina_france_accepts_talks = {	# FRA scope; Paris convenes, Washington only ever pushed
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		set_temp_variable = { usa_indo_score = 50 }
+		USA_indochina_add_profrance_score = yes	# Paris arrives as a mediator rather than a loser
+		add_stability = -0.05	# the army and the colonial lobby are not consulted
+		if = {
+			limit = {
+				geneva_conference_should_be_available_trigger = yes
+				NOT = { has_global_flag = Geneva_Conference_Preparations }
+				NOT = { has_global_flag = geneva_conference_in_session }
+			}
+			set_global_flag = Geneva_Conference_Preparations
+			indochina_struggle_invite_countries_to_geneva = yes
+		}
+		else = {
+			set_temp_variable = { usa_indo_b_points = 175 }
+			USA_indochina_diplomatic_push = yes
+		}
+	}
+}
+
+# An American-made regime with years to bed in is worth more than a late palace
+# reshuffle, and both are worth more than endorsing a man who got to Saigon
+# without any help from Washington.
+USA_indochina_cuongde_tier = {
+	if = {
+		limit = { NOT = { has_global_flag = Indochina_War_Over } }
+		if = {
+			limit = {
+				has_country_flag = USA_CuongDe_Backed_Incumbent	# he was already there; we bought a seat at his table, not the table
+			}
+			custom_effect_tooltip = USA_indochina_cuongde_incumbent_TT
+			set_temp_variable = { usa_indo_score = 50 }
+			USA_indochina_add_proindependence_score = yes
+			set_temp_variable = { usa_indo_rapp = 40 }
+			USA_indochina_seed_rapprochement = yes
+			set_temp_variable = { geneva_lev_amount = 40 }
+			geneva_add_proindependence_leverage = yes
+		}
+		else_if = {
+			limit = {
+				has_country_flag = USA_CuongDe_Installed_By_Us
+					date < 1952.1.1
+			}
+			set_global_flag = USA_CuongDe_Early_Sponsorship
+			custom_effect_tooltip = USA_indochina_cuongde_early_TT
+			set_temp_variable = { usa_indo_score = 200 }
+			USA_indochina_add_proindependence_score = yes
+			set_temp_variable = { usa_indo_score = -50 }
+			USA_indochina_add_profrance_score = yes	# Paris loses its claim to speak for Vietnamese nationalism
+			set_temp_variable = { usa_indo_b_points = 50 }
+			USA_indochina_diplomatic_push = yes
+			set_temp_variable = { usa_indo_rapp = 100 }
+			USA_indochina_seed_rapprochement = yes	# crosses the 99 tier the day the coup lands
+			set_temp_variable = { geneva_lev_amount = 75 }
+			geneva_add_proindependence_leverage = yes
+			if = {
+				limit = { country_exists = VIE }
+				VIE = { add_stability = 0.10 }	# offsets part of the coup's own -0.25
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = USA_CuongDe_Installed_By_Us
+				date < 1954.1.1
+			}
+			custom_effect_tooltip = USA_indochina_cuongde_mid_TT
+			set_temp_variable = { usa_indo_score = 100 }
+			USA_indochina_add_proindependence_score = yes
+			set_temp_variable = { usa_indo_score = -50 }
+			USA_indochina_add_profrance_score = yes
+			set_temp_variable = { usa_indo_b_points = 50 }
+			USA_indochina_diplomatic_push = yes
+			set_temp_variable = { usa_indo_rapp = 50 }
+			USA_indochina_seed_rapprochement = yes
+			set_temp_variable = { geneva_lev_amount = 50 }
+			geneva_add_proindependence_leverage = yes
+		}
+		else = {
+			custom_effect_tooltip = USA_indochina_cuongde_late_TT
+			set_temp_variable = { usa_indo_score = 50 }
+			USA_indochina_add_proindependence_score = yes
+			set_temp_variable = { usa_indo_rapp = 25 }
+			USA_indochina_seed_rapprochement = yes
+			set_temp_variable = { geneva_lev_amount = 25 }
+			geneva_add_proindependence_leverage = yes
+		}
+	}
+}

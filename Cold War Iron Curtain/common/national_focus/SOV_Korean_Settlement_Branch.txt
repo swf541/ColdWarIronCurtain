@@ -1,0 +1,528 @@
+# ============================================================================
+#  THE KOREAN SETTLEMENT - post-war Korea side branch for the SOV (Stalin) tree.
+#
+#  Appears when the Korean War ends and replaces SOV_Korean_War_Branch.txt in
+#  place - the wartime branch's allow_branch now excludes KOREA_CEASEFIRE_UN, and
+#  this branch occupies the same coordinates.
+#
+#  OUTCOME DETECTION - no new flags needed. All three endings are already
+#  produced by common/on_actions/wars_on_actions.txt and are distinguishable
+#  from the state they leave behind:
+#
+#    NORTH WINS   - the KPA takes the whole peninsula except state 1004, which
+#                   is marked with the state flag JEJU. What is left of the
+#                   South survives there as a rump and receives the country flag
+#                   lost_in_korean_war from korean_surrender.5.
+#                   Trigger: KOR = { has_country_flag = lost_in_korean_war }
+#
+#    SOUTH WINS   - KOR annexes the KPA outright. This is the only ending in
+#                   which the KPA ceases to exist.
+#                   Trigger: NOT = { country_exists = KPA }
+#
+#    DIVISION     - negotiated ceasefire (decisions/korean_war.txt,
+#                   USA_FP_50s.txt, America_1950s_Expansion.txt). Both Koreas
+#                   survive along the line.
+#                   Trigger: both exist, and the South did not lose.
+#
+#  All three set KOREA_CEASEFIRE_UN and clear korean_war, so the root gates on
+#  that plus korean_war_begun - a ceasefire flag with no war behind it should
+#  not open this branch.
+#
+#  The three arms are mutually exclusive and share coordinates, so only one is
+#  ever drawn.
+#
+#  NOTE ON THE EXILED SOUTH: where the rump government ends up varies by
+#  playthrough, so it is referred to generically throughout - never by island.
+#
+#  SOV_kw_the_armistice_at_panmunjom was moved here from the wartime branch. It
+#  was only ever available after the ceasefire, so leaving it behind would have
+#  orphaned it. Its ID, payload and localisation are unchanged.
+#
+#  Shared focuses; only the root is listed in the SOV_Stalin focus_tree header.
+# ============================================================================
+
+# ---- ROOT -------------------------------------------------------------------
+shared_focus = {
+	id = SOV_kwp_the_korean_settlement
+	icon = GFX_focus_korean_war
+	text_icon = Soviet_focus_style
+	cost = 3
+	x = 35
+	y = 0
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	allow_branch = {
+		has_global_flag = korean_war_begun
+		has_global_flag = KOREA_CEASEFIRE_UN
+	}
+	available = {
+		has_global_flag = KOREA_CEASEFIRE_UN
+	}
+
+	completion_reward = {
+		add_political_power = 40
+		custom_effect_tooltip = SOV_kwp_the_korean_settlement_tt
+	}
+}
+
+
+# ############################################################################
+#  ARM A - HISTORICAL DIVISION. Both Koreas survive along the line.
+# ############################################################################
+
+shared_focus = {
+	id = SOV_kw_the_armistice_at_panmunjom
+	icon = GFX_Hold_Conference_on_Neutrality
+	text_icon = Soviet_focus_style
+	cost = 10
+	relative_position_id = SOV_kwp_the_korean_settlement
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_kwp_the_korean_settlement }
+	# The war-ended gate is repeated here, not just on the root. A focus that
+	# declares its own allow_branch is evaluated on that block alone rather than
+	# inheriting the parent's hidden state, so without these two lines this arm
+	# renders from 1949 - both Koreas exist and the South has not lost yet.
+	allow_branch = {
+		has_global_flag = korean_war_begun
+		has_global_flag = KOREA_CEASEFIRE_UN
+		country_exists = KPA
+		country_exists = KOR
+		NOT = { KOR = { has_country_flag = lost_in_korean_war } }
+	}
+	available = {
+		has_global_flag = KOREA_CEASEFIRE_UN
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 75
+		add_stability = 0.05
+		add_named_threat = { threat = -10 name = SOV_kw_panmunjom_threat }
+		add_to_variable = {
+			bonus_fpp_modifier = 0.5
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				set_temp_variable = { money_to_gain = 60 }
+				add_money_with_tooltip_effect = yes
+				add_stability = 0.05
+			}
+		}
+		news_event = sov_korea_branch.2
+		custom_effect_tooltip = SOV_kw_the_armistice_at_panmunjom_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kwp_rebuild_the_north
+	icon = GFX_Comecon_Aid
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_kw_the_armistice_at_panmunjom
+	x = -2
+	y = 1
+	prerequisite = { focus = SOV_kw_the_armistice_at_panmunjom }
+	search_filters = { FOCUS_FILTER_INDUSTRY }
+
+	completion_reward = {
+		set_temp_variable = { money_to_gain = -50 }
+		add_money_with_tooltip_effect = yes
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				set_temp_variable = { money_to_gain = 110 }
+				add_money_with_tooltip_effect = yes
+				add_stability = 0.10
+				random_owned_controlled_state = {
+					add_extra_state_shared_building_slots = 3
+					add_building_construction = {
+						type = industrial_complex
+						level = 3
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state = {
+					add_extra_state_shared_building_slots = 2
+					add_building_construction = {
+						type = infrastructure
+						level = 2
+						instant_build = yes
+					}
+				}
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+		}
+		custom_effect_tooltip = SOV_kwp_rebuild_the_north_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kwp_the_frozen_frontier
+	icon = GFX_Diplomacy_with_Poland
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_kw_the_armistice_at_panmunjom
+	x = 2
+	y = 1
+	prerequisite = { focus = SOV_kw_the_armistice_at_panmunjom }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	completion_reward = {
+		add_named_threat = { threat = -5 name = SOV_kwp_frozen_frontier_threat }
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_1
+					amount = 8000
+					producer = CUM
+				}
+				army_experience = 25
+				add_war_support = 0.05
+				give_military_access = SOV
+			}
+		}
+		custom_effect_tooltip = SOV_kwp_the_frozen_frontier_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kwp_two_koreas_one_peninsula
+	icon = GFX_Warsaw_Pact
+	text_icon = Soviet_focus_style
+	cost = 10
+	relative_position_id = SOV_kw_the_armistice_at_panmunjom
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_kwp_rebuild_the_north }
+	prerequisite = { focus = SOV_kwp_the_frozen_frontier }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 50
+		add_to_variable = {
+			bonus_fpp_modifier = 0.5
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				add_ideas = comecon_member
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+			add_opinion_modifier = { target = KPA modifier = large_increase }
+		}
+		news_event = sov_korea_settlement.1
+		custom_effect_tooltip = SOV_kwp_two_koreas_one_peninsula_tt
+	}
+}
+
+
+# ############################################################################
+#  ARM B - THE NORTH WINS. The peninsula is unified under Pyongyang and what is
+#  left of the southern government survives in exile.
+# ############################################################################
+
+shared_focus = {
+	id = SOV_kwp_a_unified_korea
+	icon = GFX_The_Unification_of_Germany
+	text_icon = Soviet_focus_style
+	cost = 10
+	relative_position_id = SOV_kwp_the_korean_settlement
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_kwp_the_korean_settlement }
+	# War-ended gate repeated - see the note on the division arm above.
+	allow_branch = {
+		has_global_flag = korean_war_begun
+		has_global_flag = KOREA_CEASEFIRE_UN
+		country_exists = KPA
+		KOR = { has_country_flag = lost_in_korean_war }
+	}
+	available = {
+		has_global_flag = KOREA_CEASEFIRE_UN
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 100
+		add_named_threat = { threat = 10 name = SOV_kwp_unified_korea_threat }
+		add_to_variable = {
+			bonus_fpp_modifier = 1
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				add_stability = 0.10
+				add_war_support = 0.10
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+			add_opinion_modifier = { target = KPA modifier = large_increase }
+		}
+		news_event = sov_korea_settlement.2
+		custom_effect_tooltip = SOV_kwp_a_unified_korea_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kwp_rebuild_the_peninsula
+	icon = GFX_Comecon_Aid
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_kwp_a_unified_korea
+	x = -2
+	y = 1
+	prerequisite = { focus = SOV_kwp_a_unified_korea }
+	search_filters = { FOCUS_FILTER_INDUSTRY }
+
+	completion_reward = {
+		set_temp_variable = { money_to_gain = -70 }
+		add_money_with_tooltip_effect = yes
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				set_temp_variable = { money_to_gain = 150 }
+				add_money_with_tooltip_effect = yes
+				add_stability = 0.05
+				random_owned_controlled_state = {
+					add_extra_state_shared_building_slots = 3
+					add_building_construction = {
+						type = industrial_complex
+						level = 3
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state = {
+					add_extra_state_shared_building_slots = 3
+					add_building_construction = {
+						type = industrial_complex
+						level = 2
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state = {
+					add_building_construction = {
+						type = infrastructure
+						level = 3
+						instant_build = yes
+					}
+				}
+			}
+		}
+		custom_effect_tooltip = SOV_kwp_rebuild_the_peninsula_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kwp_the_government_in_exile
+	icon = GFX_Debate_Allied_Forces_in_West_Germany
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_kwp_a_unified_korea
+	x = 2
+	y = 1
+	prerequisite = { focus = SOV_kwp_a_unified_korea }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 40
+		add_named_threat = { threat = -5 name = SOV_kwp_exile_threat }
+		if = {
+			limit = { country_exists = KOR }
+			KOR = {
+				add_stability = -0.10
+				add_war_support = -0.10
+				add_opinion_modifier = { target = SOV modifier = large_decrease }
+			}
+		}
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				add_war_support = 0.05
+				add_opinion_modifier = { target = SOV modifier = medium_increase }
+			}
+		}
+		news_event = sov_korea_settlement.3
+		custom_effect_tooltip = SOV_kwp_the_government_in_exile_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kwp_korea_in_the_socialist_camp
+	icon = GFX_Warsaw_Pact
+	text_icon = Soviet_focus_style
+	cost = 10
+	relative_position_id = SOV_kwp_a_unified_korea
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_kwp_rebuild_the_peninsula }
+	prerequisite = { focus = SOV_kwp_the_government_in_exile }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 75
+		add_to_variable = {
+			bonus_fpp_modifier = 1
+			tooltip = bonus_fpp_modifier_tt
+		}
+		if = {
+			limit = { country_exists = KPA }
+			KPA = {
+				add_ideas = comecon_member
+				give_military_access = SOV
+				set_temp_variable = { New_sphere_leader = SOV }
+				add_to_sphere = yes
+				add_opinion_modifier = { target = SOV modifier = large_increase }
+			}
+			if = {
+				limit = {
+					is_faction_leader = yes
+					NOT = { is_in_faction_with = KPA }
+				}
+				add_to_faction = KPA
+			}
+		}
+		if = {
+			limit = { country_exists = JAP }
+			JAP = { add_opinion_modifier = { target = SOV modifier = large_decrease } }
+		}
+		custom_effect_tooltip = SOV_kwp_korea_in_the_socialist_camp_tt
+	}
+}
+
+
+# ############################################################################
+#  ARM C - THE SOUTH WINS. The KPA has been annexed and the Soviet Union has
+#  lost a client on its own Pacific frontier.
+# ############################################################################
+
+shared_focus = {
+	id = SOV_kwp_the_korean_disaster
+	icon = GFX_Debate_Allied_Forces_in_West_Germany
+	text_icon = Soviet_focus_style
+	cost = 5
+	relative_position_id = SOV_kwp_the_korean_settlement
+	x = 0
+	y = 1
+	prerequisite = { focus = SOV_kwp_the_korean_settlement }
+	# War-ended gate repeated - see the note on the division arm above. Without it
+	# this arm would render in any game where the KPA never existed at all.
+	allow_branch = {
+		has_global_flag = korean_war_begun
+		has_global_flag = KOREA_CEASEFIRE_UN
+		NOT = { country_exists = KPA }
+	}
+	available = {
+		has_global_flag = KOREA_CEASEFIRE_UN
+	}
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 25
+		add_stability = -0.05
+		add_war_support = -0.05
+		add_to_variable = {
+			bonus_fpp_modifier = -1
+			tooltip = bonus_fpp_modifier_tt
+		}
+		news_event = sov_korea_settlement.4
+		custom_effect_tooltip = SOV_kwp_the_korean_disaster_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kwp_shelter_the_korean_comrades
+	icon = GFX_Deport_to_DDR
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_kwp_the_korean_disaster
+	x = -2
+	y = 1
+	prerequisite = { focus = SOV_kwp_the_korean_disaster }
+	search_filters = { FOCUS_FILTER_POLITICAL }
+
+	completion_reward = {
+		add_political_power = 25
+		add_manpower = 30000
+		add_stability = -0.02
+		if = {
+			limit = { country_exists = KOR }
+			KOR = {
+				add_stability = -0.05
+				add_popularity = { ideology = communism popularity = 0.05 }
+			}
+		}
+		news_event = sov_korea_settlement.5
+		custom_effect_tooltip = SOV_kwp_shelter_the_korean_comrades_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kwp_fortify_the_maritime_provinces
+	icon = GFX_Diplomacy_with_Poland
+	text_icon = Soviet_focus_style
+	cost = 8
+	relative_position_id = SOV_kwp_the_korean_disaster
+	x = 2
+	y = 1
+	prerequisite = { focus = SOV_kwp_the_korean_disaster }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	completion_reward = {
+		add_war_support = 0.05
+		increase_military_policy = yes
+		add_named_threat = { threat = 5 name = SOV_kwp_maritime_threat }
+		random_owned_state = {
+			limit = { is_core_of = SOV }
+			add_building_construction = {
+				type = air_base
+				level = 3
+				instant_build = yes
+			}
+		}
+		random_owned_state = {
+			limit = { is_core_of = SOV }
+			add_building_construction = {
+				type = radar_station
+				level = 2
+				instant_build = yes
+			}
+		}
+		custom_effect_tooltip = SOV_kwp_fortify_the_maritime_provinces_tt
+	}
+}
+
+shared_focus = {
+	id = SOV_kwp_lessons_of_the_korean_war
+	icon = GFX_German_Nuclear_Program
+	text_icon = Soviet_focus_style
+	cost = 10
+	relative_position_id = SOV_kwp_the_korean_disaster
+	x = 0
+	y = 2
+	prerequisite = { focus = SOV_kwp_shelter_the_korean_comrades }
+	prerequisite = { focus = SOV_kwp_fortify_the_maritime_provinces }
+	search_filters = { FOCUS_FILTER_MILITARY }
+
+	completion_reward = {
+		add_political_power = 50
+		add_stability = 0.05
+		army_experience = 50
+		air_experience = 50
+		add_to_variable = {
+			bonus_fpp_modifier = 0.5
+			tooltip = bonus_fpp_modifier_tt
+		}
+		add_tech_bonus = {
+			name = SOV_kwp_lessons_of_the_korean_war
+			bonus = 0.5
+			uses = 2
+			category = land_doctrine
+		}
+		custom_effect_tooltip = SOV_kwp_lessons_of_the_korean_war_tt
+	}
+}

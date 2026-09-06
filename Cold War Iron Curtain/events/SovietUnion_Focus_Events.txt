@@ -161,7 +161,7 @@ country_event = { #Percentage go or not
 		name = sov_percentage_agreement.1.a
 		set_country_flag = SOV_Followed_Percentage_Agreements
 		mark_focus_tree_layout_dirty = yes
-		complete_national_focus = SOV_Stalin_Follow_the_Percentage_Agreements
+		complete_national_focus = SOV_gpa_honour_the_agreement
 		ai_chance = {
 			factor = 99
 			modifier = {
@@ -174,19 +174,203 @@ country_event = { #Percentage go or not
 		name = sov_percentage_agreement.1.b
 		set_country_flag = SOV_Rejected_Percentage_Agreements
 		mark_focus_tree_layout_dirty = yes
-		complete_national_focus = SOV_Stalin_Soviet_Intervention_in_the_Greek_Civil_War
+		complete_national_focus = SOV_gci_intervene_in_greece
 	}
 }
-country_event = { #Percentage go or not
+
+# ==========================================================================
+#  Greek Civil War side branch flavour (news only, no choices). Fired from
+#  the matching focus in common/national_focus/SOV_Greek_Civil_War_Branch.txt.
+# ==========================================================================
+add_namespace = sov_greek_question
+
+news_event = {
+	id = sov_greek_question.1			# SOV_gpa_abandon_the_kke
+	title = sov_greek_question.1.t
+	desc = sov_greek_question.1.d
+	picture = GFX_Guns_for_PDG
+
+	major = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_greek_question.1.a
+	}
+}
+
+news_event = {
+	id = sov_greek_question.2			# SOV_gpa_restore_diplomatic_relations
+	title = sov_greek_question.2.t
+	desc = sov_greek_question.2.d
+	picture = GFX_news_event_BCR_sov_am_pull_back_troops
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_greek_question.2.a
+	}
+}
+
+news_event = {
+	id = sov_greek_question.3			# SOV_gpa_the_cyprus_question
+	title = sov_greek_question.3.t
+	desc = sov_greek_question.3.d
+	picture = GFX_news_event_BCR_sov_am_pull_back_troops
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_greek_question.3.a
+	}
+}
+
+news_event = {
+	id = sov_greek_question.4			# SOV_gci_a_peoples_republic_in_greece
+	title = sov_greek_question.4.t
+	desc = sov_greek_question.4.d
+	picture = GFX_PDG_Integration
+
+	major = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_greek_question.4.a
+	}
+}
+
+news_event = {
+	id = sov_greek_question.5			# SOV_gci_the_greek_defeat
+	title = sov_greek_question.5.t
+	desc = sov_greek_question.5.d
+	picture = GFX_Guns_for_PDG
+
+	major = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_greek_question.5.a
+	}
+}
+
+news_event = {
+	id = sov_greek_question.6			# SOV_gci_hold_the_albanian_line
+	title = sov_greek_question.6.t
+	desc = sov_greek_question.6.d
+	picture = GFX_Albania_Eight
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_greek_question.6.a
+	}
+}
+# The German Question - entry point for the 1949 West German election arc.
+# Fired by SOV_Stalin_The_Zhdanov_Doctrine. Hands off to SOV_WGR.1, which
+# carries the actual interfere / stay-out choice. If the KPD subsequently wins
+# (WGRElection.1 option c) the Soviet side branch SOV_wge_a_red_bonn is
+# revealed; otherwise nothing further happens.
+country_event = {
 	id = sov_german_question.1
 	immediate = { }
 	title = sov_german_question.1.t
 	desc = sov_german_question.1.desc
 	picture = GFX_WGR_Bundeshaus_Bonn
 	is_triggered_only = yes
+	fire_only_once = yes
 	option = {
 		name = sov_german_question.1.a
-		complete_national_focus = SOV_Stalin_The_German_Question
+		add_political_power = 25
+		hidden_effect = {
+			country_event = { id = SOV_WGR.1 days = 3 }
+		}
+	}
+}
+
+# ==========================================================================
+#  A RED BONN - fired from WGRElection.1 option c when the KPD wins. This is
+#  what reveals the SOV_wge_a_red_bonn side branch (see
+#  common/national_focus/SOV_WGR_Communist_Branch.txt).
+# ==========================================================================
+country_event = {
+	id = sov_german_question.2
+	title = sov_german_question.2.t
+	desc = sov_german_question.2.d
+	picture = GFX_WGR_Bundeshaus_Bonn
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		set_country_flag = SOV_WGR49_kpd_victory
+		mark_focus_tree_layout_dirty = yes
+	}
+
+	option = {
+		name = sov_german_question.2.a
+		add_political_power = 50
+		complete_national_focus = SOV_wge_a_red_bonn
+	}
+}
+
+news_event = {
+	id = sov_german_question.3
+	title = sov_german_question.3.t
+	desc = sov_german_question.3.d
+	picture = GFX_WGR_Reunification_of_Germany
+
+	major = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_german_question.3.a
+	}
+}
+
+# --- Branch flavour (news only, no choices) -------------------------------
+news_event = {
+	id = sov_german_question.4			# SOV_wge_recognize_the_reimann_government
+	title = sov_german_question.4.t
+	desc = sov_german_question.4.d
+	picture = GFX_news_event_BCR_sov_am_pull_back_troops
+
+	is_triggered_only = yes
+
+	option = {
+		name = sov_german_question.4.a
+	}
+}
+
+news_event = {
+	id = sov_german_question.5			# SOV_wge_two_states_one_road
+	title = sov_german_question.5.t
+	desc = sov_german_question.5.d
+	picture = GFX_WGR_Saar_NEWS_EVENT_goes_to_West_Germany
+
+	major = yes
+	is_triggered_only = yes
+
+	option = {
+		name = sov_german_question.5.a
+	}
+}
+
+news_event = {
+	id = sov_german_question.6			# SOV_wge_the_atlantic_recoils
+	title = sov_german_question.6.t
+	desc = sov_german_question.6.d
+	picture = GFX_news_event_DDR_Invade_WGR
+
+	is_triggered_only = yes
+
+	option = {
+		name = sov_german_question.6.a
 	}
 }
 country_event = { #Percentage go or not
@@ -2086,4 +2270,154 @@ country_event = {
 			set_compliance = 0
 		}
 	}
+}
+# ==========================================================================
+#  Chinese Civil War side branch flavour (news only, no choices). Fired from
+#  the matching focus in common/national_focus/SOV_Chinese_Civil_War_Branch.txt.
+# ==========================================================================
+add_namespace = sov_china_branch
+
+news_event = {
+	id = sov_china_branch.1			# SOV_ccw_the_156_projects
+	title = sov_china_branch.1.t
+	desc = sov_china_branch.1.d
+	picture = GFX_Comecon_Aid
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_china_branch.1.a
+	}
+}
+
+news_event = {
+	id = sov_china_branch.2			# SOV_ccw_return_port_arthur
+	title = sov_china_branch.2.t
+	desc = sov_china_branch.2.d
+	picture = GFX_Sino_Soviet_Friendship
+
+	major = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_china_branch.2.a
+	}
+}
+
+news_event = {
+	id = sov_china_branch.3			# SOV_ccw_the_twentieth_congress_in_peking
+	title = sov_china_branch.3.t
+	desc = sov_china_branch.3.d
+	picture = GFX_twentieth_congress_of_the_cpsu
+
+	major = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_china_branch.3.a
+	}
+}
+
+news_event = {
+	id = sov_china_branch.4			# SOV_ccw_the_manchurian_redoubt
+	title = sov_china_branch.4.t
+	desc = sov_china_branch.4.d
+	picture = GFX_Sino_Soviet_Friendship
+
+	major = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_china_branch.4.a
+	}
+}
+
+news_event = {
+	id = sov_china_branch.5			# SOV_ccw_shelter_the_chinese_party
+	title = sov_china_branch.5.t
+	desc = sov_china_branch.5.d
+	picture = GFX_Sino_Soviet_Friendship
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_china_branch.5.a
+	}
+}
+
+news_event = {
+	id = sov_china_branch.6			# SOV_ccw_the_southern_insurgency
+	title = sov_china_branch.6.t
+	desc = sov_china_branch.6.d
+	picture = GFX_Guns_for_PDG
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = sov_china_branch.6.a
+	}
+}
+
+# ==========================================================================
+#  Post-war Korea side branch flavour (news only, no choices). Fired from the
+#  matching focus in common/national_focus/SOV_Korean_Settlement_Branch.txt.
+# ==========================================================================
+add_namespace = sov_korea_settlement
+
+news_event = {
+	id = sov_korea_settlement.1		# SOV_kwp_two_koreas_one_peninsula
+	title = sov_korea_settlement.1.t
+	desc = sov_korea_settlement.1.d
+	picture = GFX_Korean_War_Taiwan_Yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	option = { name = sov_korea_settlement.1.a }
+}
+
+news_event = {
+	id = sov_korea_settlement.2		# SOV_kwp_a_unified_korea
+	title = sov_korea_settlement.2.t
+	desc = sov_korea_settlement.2.d
+	picture = GFX_Korean_War_Taiwan_Yes
+	major = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	option = { name = sov_korea_settlement.2.a }
+}
+
+news_event = {
+	id = sov_korea_settlement.3		# SOV_kwp_the_government_in_exile
+	title = sov_korea_settlement.3.t
+	desc = sov_korea_settlement.3.d
+	picture = GFX_Korean_War_Taiwan_Yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	option = { name = sov_korea_settlement.3.a }
+}
+
+news_event = {
+	id = sov_korea_settlement.4		# SOV_kwp_the_korean_disaster
+	title = sov_korea_settlement.4.t
+	desc = sov_korea_settlement.4.d
+	picture = GFX_Korean_War_Taiwan_Yes
+	major = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	option = { name = sov_korea_settlement.4.a }
+}
+
+news_event = {
+	id = sov_korea_settlement.5		# SOV_kwp_shelter_the_korean_comrades
+	title = sov_korea_settlement.5.t
+	desc = sov_korea_settlement.5.d
+	picture = GFX_KPA_Sov_Air_Volunteers
+	is_triggered_only = yes
+	fire_only_once = yes
+	option = { name = sov_korea_settlement.5.a }
 }

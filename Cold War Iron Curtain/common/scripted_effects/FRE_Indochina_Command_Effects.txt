@@ -1,0 +1,114 @@
+# French Indochina command model: CEFEO leads the northern domains while the
+# State of Vietnam retains its southern subjects. No-call policy keeps the
+# French Indochina and Viet Minh factions from widening scripted wars.
+
+# FRE scope. This is intentionally one-shot: later political events may release
+# a southern domain, and reloading a save must not undo that choice.
+fre_indochina_command_initialize = {
+	if = {
+		limit = {
+			NOT = { has_country_flag = FRE_French_Indochina_Command_Established }
+			NOT = { has_country_flag = FRE_CEFEO_Dissolved }
+			NOT = { has_global_flag = Indochina_War_Over }
+			country_exists = VIE
+			VIE = { NOT = { has_country_flag = VIE_generic_faction_created } }
+		}
+
+		# Migration for saves made before this model: retire Saigon's old faction.
+		if = {
+			limit = { VIE = { is_faction_leader = yes } }
+			VIE = { dismantle_faction = yes }
+		}
+		if = {
+			limit = { is_faction_leader = yes }
+			dismantle_faction = yes
+		}
+		if = {
+			limit = {
+				is_in_faction = yes
+				NOT = { is_faction_leader = yes }
+			}
+			leave_faction = yes
+		}
+		if = {
+			limit = { NOT = { is_in_faction = yes } }
+			create_faction_from_template = faction_template_french_indochina
+		}
+
+		set_country_flag = FRE_French_Indochina_Command_Established
+		add_ideas = French_Indochina_Faction
+
+		if = {
+			limit = { VIE = { NOT = { is_in_faction_with = FRE } } }
+			add_to_faction = VIE
+		}
+		if = {
+			limit = { country_exists = CCC CCC = { NOT = { is_in_faction_with = FRE } } }
+			add_to_faction = CCC
+		}
+		if = {
+			limit = { country_exists = FUL FUL = { NOT = { is_in_faction_with = FRE } } }
+			add_to_faction = FUL
+		}
+		if = {
+			limit = { country_exists = TAI TAI = { NOT = { is_in_faction_with = FRE } } }
+			add_to_faction = TAI
+		}
+		if = {
+			limit = { country_exists = NUN NUN = { NOT = { is_in_faction_with = FRE } } }
+			add_to_faction = NUN
+		}
+		if = {
+			limit = { country_exists = TAM TAM = { NOT = { is_in_faction_with = FRE } } }
+			add_to_faction = TAM
+		}
+		if = {
+			limit = { country_exists = THO THO = { NOT = { is_in_faction_with = FRE } } }
+			add_to_faction = THO
+		}
+
+		# These are UI identities, not extra combat modifiers.
+		VIE = { if = { limit = { NOT = { has_idea = State_of_Vietnam_Faction } } add_ideas = State_of_Vietnam_Faction } }
+		if = { limit = { country_exists = CCC } CCC = { if = { limit = { NOT = { has_idea = State_of_Vietnam_Faction } } add_ideas = State_of_Vietnam_Faction } } }
+		if = { limit = { country_exists = FUL } FUL = { if = { limit = { NOT = { has_idea = State_of_Vietnam_Faction } } add_ideas = State_of_Vietnam_Faction } } }
+		if = { limit = { country_exists = TAI } TAI = { if = { limit = { NOT = { has_idea = French_Indochina_Faction } } add_ideas = French_Indochina_Faction } } }
+		if = { limit = { country_exists = NUN } NUN = { if = { limit = { NOT = { has_idea = French_Indochina_Faction } } add_ideas = French_Indochina_Faction } } }
+		if = { limit = { country_exists = TAM } TAM = { if = { limit = { NOT = { has_idea = French_Indochina_Faction } } add_ideas = French_Indochina_Faction } } }
+		if = { limit = { country_exists = THO } THO = { if = { limit = { NOT = { has_idea = French_Indochina_Faction } } add_ideas = French_Indochina_Faction } } }
+	}
+
+	# Outside the one-shot block so saves from the temporary separation model heal.
+	if = {
+		limit = {
+			NOT = { has_global_flag = Indochina_War_Over }
+			country_exists = VIN
+			country_exists = NLF
+			VIN = {
+				is_faction_leader = yes
+				has_country_flag = VIN_NLF_Coordination_Channel
+			}
+			NLF = {
+				has_country_flag = NLF_Hanoi_Coordination
+				NOT = { is_in_faction = yes }
+			}
+		}
+		VIN = { add_to_faction = NLF }
+	}
+}
+
+# FRE scope. Called before crown-domain handback and before FRE is annexed.
+fre_indochina_command_dismantle = {
+	if = {
+		limit = {
+			has_country_flag = FRE_French_Indochina_Command_Established
+			is_faction_leader = yes
+		}
+		dismantle_faction = yes
+	}
+	remove_ideas = French_Indochina_Faction
+	if = { limit = { country_exists = TAI } TAI = { remove_ideas = French_Indochina_Faction } }
+	if = { limit = { country_exists = NUN } NUN = { remove_ideas = French_Indochina_Faction } }
+	if = { limit = { country_exists = TAM } TAM = { remove_ideas = French_Indochina_Faction } }
+	if = { limit = { country_exists = THO } THO = { remove_ideas = French_Indochina_Faction } }
+	clr_country_flag = FRE_French_Indochina_Command_Established
+}
