@@ -772,6 +772,20 @@ def run_doctrine_negative_fixtures() -> None:
 
 
 def validate_doctrine_rework() -> None:
+    parked = [path for path in doctrine_files if not path.is_file()]
+    if len(parked) == len(doctrine_files):
+        print(
+            "Doctrine rework is parked under "
+            "'common/technologies/doctrine rework/' and is not loaded by the game; "
+            "skipping doctrine contracts."
+        )
+        return
+    if parked:
+        fail(
+            "doctrine rework is half parked; these files are missing from the active "
+            f"technologies directory: {sorted(path.name for path in parked)}"
+        )
+        return
     by_file: dict[str, dict[str, str]] = {}
     for path in doctrine_files:
         filename = path.name
@@ -2564,15 +2578,26 @@ key_files = doctrine_files + [
     *FOCUS_FILES,
 ]
 for candidate in key_files:
+    if candidate in doctrine_files and not candidate.is_file():
+        continue
     brace_balance(candidate)
 
-# Doctrine loader contract.
-for candidate in doctrine_files:
-    if not candidate.is_file() or candidate.stat().st_size == 0:
-        fail(f"doctrine technology file is absent or empty: {candidate.name}")
-parked = TECH_DIR / "doctrine rework"
-if parked.exists() and any(parked.iterdir()):
-    fail("common/technologies/doctrine rework must be empty or absent")
+# Doctrine loader contract. The rework is either active in
+# common/technologies/ or parked in common/technologies/doctrine rework/,
+# which HOI4 does not load. Both are valid; a mix of the two is not.
+parked_dir = TECH_DIR / "doctrine rework"
+active_doctrine = [path for path in doctrine_files if path.is_file() and path.stat().st_size]
+parked_doctrine = sorted(parked_dir.glob("*.txt")) if parked_dir.is_dir() else []
+if active_doctrine and parked_doctrine:
+    fail(
+        "doctrine technologies exist both in common/technologies and in "
+        "common/technologies/doctrine rework; the game would load only the active copy"
+    )
+elif active_doctrine and len(active_doctrine) != len(doctrine_files):
+    missing = sorted(path.name for path in doctrine_files if path not in active_doctrine)
+    fail(f"doctrine rework is active but incomplete; missing: {missing}")
+elif not active_doctrine and not parked_doctrine:
+    fail("doctrine technologies are neither active nor parked")
 
 doctrine_root = MOD / "common/doctrines"
 intentional_empty = {
@@ -2683,7 +2708,9 @@ for name, block, path in doctrine_blocks:
         re.search(pattern, code_only(block)) for pattern in land_effect_patterns
     ):
         fail(f"land doctrine has no gameplay effect: {name}")
-if re.search(r"\bdefence\s*=", code_only(text(TECH_DIR / "land_doctrine.txt"))):
+if active_doctrine and re.search(
+    r"\bdefence\s*=", code_only(text(TECH_DIR / "land_doctrine.txt"))
+):
     fail("land doctrine uses rejected equipment stat spelling 'defence'; use 'defense'")
 
 tag_text = code_only(text(MOD / "common/technology_tags/00_technology.txt"))
