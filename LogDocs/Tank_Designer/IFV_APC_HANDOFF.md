@@ -1,13 +1,23 @@
 # IFV / APC implementation handoff
 
-Date: 2026-09-06 (updated). This is the entry point for a new, blank-context session.
+Date: 2026-09-07 (updated). This is the entry point for a new, blank-context session.
 Branch: `tank-designer-and-doctrine-rework-test`.
 Gameplay HEAD at the previous handoff: `80304e2030`.
 
-## Status: APC family complete and validated in game. Next agent builds the IFV.
+## Status: APC and IFV families implemented and both validated in game
 
 Date: 2026-09-07. Branch `tank-designer-and-doctrine-rework-test`. Gameplay HEAD at the
-start of this work: `80304e2030`. **Everything is staged, nothing is committed.**
+start of this work: `80304e2030`. The APC batch is committed as `660f8984ae`; the IFV
+batch is staged. Nothing is pushed - the branch is one commit ahead of
+`origin/tank-designer-and-doctrine-rework-test`.
+
+**IFV owner QA passed, 2026-09-07.** Confirmed in a live NSB campaign: the Tank Designer
+opens correctly for the IFV hulls, designs track across both production filters as one
+design, heavy-mechanized battalions draw from the family correctly, and `error.log` shows
+no errors attributable to this work. The owner rated it a cleaner first outcome than the
+APC batch, which needed three rounds to resolve the equipment-domain routing. The
+shared-archetype and `type = { armor mechanized }` decisions are therefore validated twice,
+independently.
 
 The APC designer family is done and confirmed working in a live NSB campaign: eight
 designer hulls on the `mechanized_equipment` archetype covering the eight frozen Light
@@ -27,8 +37,8 @@ Owner QA confirmed, in game:
 - `error.log` is clean for this work. No errors reference the new technologies, hulls,
   modules, sprites, designer GUI or localisation.
 
-**The next agent's job is the IFV family.** Read "IFV batch: exact instructions for the
-next agent" below; it is a step-by-step mirror of what is already proven here.
+The IFV implementation followed the exact mirror described below. The remaining IFV
+work is fresh client QA and user evaluation, not another implementation pass.
 
 ## Designer routing: three rounds of QA, resolved
 
@@ -236,21 +246,20 @@ the only stat pinned equal to the frozen row and enforced by the validator.
 `hardness = 0.5` and `reliability = 1` on every hull; half-track suspension takes
 hardness to 0.3 and reliability to 0.9, tracked suspensions keep 0.5 / 1.0.
 
-### Full 18-envelope mapping (only the first block is implemented)
+### Full 18-envelope mapping (APC and IFV designer blocks implemented)
 
 | Frozen rows | Legacy equipment | Archetype it must supply | Designer family | State |
 | --- | --- | --- | --- | --- |
 | Light Mech I-VIII / APC | `mechanized_equipment_3..10` | `mechanized_equipment` | `apc_chassis_0..7`, light-hull generation | **done** |
-| Heavy Mech I-VIII / IFV | `mechanized_heavy_equipment_1..8` | `mechanized_heavy_equipment` | `ifv_chassis_0..7`, light-hull generation, armed | not started |
+| Heavy Mech I-VIII / IFV | `mechanized_heavy_equipment_1..8` | `mechanized_heavy_equipment` | `ifv_chassis_0..7`, light-hull generation, armed | **implemented; static contract passes** |
 | WWII Mech 1-2 | `mechanized_equipment_1..2` | `mechanized_equipment` | intentionally legacy-only; pre-designer era | not planned |
 | Marine mech | `mechanized_marine_equipment` | `mechanized_marine_equipment` | amphibious mobility module on eligible designs | not started |
 | Heavy APC / heavy IFV (medium hull) | no legacy row | tbd | medium-hull generation of the two families above | not started |
 
 The IFV batch is the direct mirror of this one: `mechanized_heavy_equipment` gains the
-same 15-position layout, a `tank_apc_armament`-plus-autocannon/ATGM armament set, and
-`ifv_chassis_0..7` pinned to the `mechanized_heavy_equipment_1..8` rows. It is the
-armed line, so its AI recipes **do** need the ammunition contract that APC recipes are
-explicitly exempted from.
+same 15-position layout, IFV-only fighting-compartment/autocannon/ATGM armament
+modules, and `ifv_chassis_0..7` pinned to the `mechanized_heavy_equipment_1..8` rows.
+It is the armed line, so its AI recipes include kinetic/AP and HE ammunition.
 
 ### Validation actually performed
 
@@ -261,13 +270,22 @@ python3 "CWIC Backup/tools/loc_audit_1.py" --check
 git diff --check
 ```
 
-All pass. The validator now reports 1295 technologies, 253 tank modules, 125 historical
+The implementation pass reports 1303 technologies, 269 tank modules, 125 historical
 tank designs, 30 generic bookmark variants, 14 national presets, 460 named OOB requests
-across 68 NSB OOBs, 76 country-history bootstrap sites, **8 APC designer hulls** and 15
-designer slots. Workbook SHA-256 re-verified unchanged
+across 68 NSB OOBs, 76 country-history bootstrap sites, **8 APC designer hulls**,
+**8 IFV designer hulls** and 15 designer slots. Workbook SHA-256 re-verified unchanged
 (`dc2c9800b69b0f2f00568cdfe0f4bcac55c8bdd61476409b4a88b6d8e566b532`).
 
-New validator contract (`validate_apc_designer_family`), all of it enforced on every run:
+The post-update self-test, fixture restoration hashes, final diff check, encoding
+audit, and localisation audit are recorded in `/tmp/ifv_fixture_rerun.log`,
+`/tmp/ifv_fixture_hash_{before,after}.txt`, `/tmp/ifv_designer_cached_diff_check.log`,
+`/tmp/ifv_encoding_check.log`, and `/tmp/ifv_designer_loc.log`. The balance/module/
+envelope report is in `/tmp/ifv_designer_reports.log`; it predates the final source
+mtimes by minutes and is therefore supporting rather than freshest evidence. No
+live-game IFV QA is claimed.
+
+APC validator contract (`validate_apc_designer_family`), with the IFV mirror
+(`validate_ifv_designer_family`), is enforced on every run:
 
 - Archetype exposes ten specialized slots with the shared category layout, both
   mandatory weapon positions restricted to APC-only categories and still `required`.
@@ -286,14 +304,21 @@ New validator contract (`validate_apc_designer_family`), all of it enforced on e
 - `validate_designer_window_coverage`: every `module_slots = inherit` equipment and
   every `duplicate_archetypes` role resolves an `equipment_designer_*` window.
 
-Six negative fixtures run under `--tank-self-test` (they write a mutation to
-`mechanized.txt`, assert rejection, and restore the file byte-identically): legacy row
-inherits slots; a tank gun category is allowed on an APC; a hull leaves the mechanized
-archetype; a hull loses its DLC gate; the archetype leaves the armor domain; and the APC designer window is removed.
+The IFV mirror additionally pins Heavy Mech row stat/resource inheritance, the
+`x = -9` technology column and `@year` rows, IFV-only module categories, positive
+attack multipliers, AP/HE ammunition prerequisites in all eight AI recipes, 1980
+bookmark coverage, IFV sprites/localisation, and the IFV GUI window. Its negative
+fixtures cover legacy slot leakage, tank-gun category leakage, archetype/DLC/domain
+drift, zero attack multipliers, wrong recipe gates, bad bookmark coverage, wrong
+technology art, localisation BOMs, GUI BOMs, and missing-window coverage.
 
-The module balance report now excludes the seven APC modules from frozen-workbook
-coverage and names them as an explicit exemption. The 2023 workbook predates this family
-and cannot carry those rows; the alternative was silently widening its coverage.
+Six APC and eleven IFV negative fixtures run under `--tank-self-test` (they write a
+mutation to the source, assert rejection, and restore the file byte-identically).
+
+The module balance report now excludes the seven APC and sixteen IFV modules from
+frozen-workbook coverage and names them as explicit exemptions. The 2023 workbook
+predates these families and cannot carry those rows; the alternative was silently
+widening its coverage.
 
 ### Limitations - do not overstate this batch
 
@@ -334,7 +359,28 @@ and cannot carry those rows; the alternative was silently widening its coverage.
 - `visual_level` 2-9 is shared with the legacy mechanized rows; no new entity aliases
   were added and `zz_CWIC_armor_entity_aliases.asset` is untouched.
 
-## IFV batch: exact instructions for the next agent
+## IFV batch: implementation contract and completion record
+
+The following instructions were the implementation contract for this batch and are
+now retained as the design rationale. They are no longer an unstarted-work queue.
+
+### Completion record (2026-09-07)
+
+- Eight IFV hulls share `mechanized_heavy_equipment`, restate
+  `type = { armor mechanized }`, inherit the 15 slots, and preserve the legacy
+  Heavy Mech rows without `module_slots`.
+- IFV-only superstructure and armament modules, NSB technology gates, 1980
+  bookmark grants, `land_ifv` AI recipes, icons, English localisation, script
+  enums, and `tank_chassis_ifv.gui` are present.
+- IFV weapon modules multiply attack stats; all AI recipes mount kinetic/AP and
+  HE ammunition and are gated on the hull, ammunition, and HE-ammunition techs.
+- The accepted Heavy Mech III / IFV tier remains 1955, with matching hull year,
+  technology start year, and `@1955` tree row.
+- Owner QA 2026-09-07 confirmed designer routing, single-design identity across
+  both production filters, heavy-mechanized battalion supply, and a clean
+  `error.log`. Still untested, same as the APC batch: save/reload of a saved
+  design, long-run AI production behavior with mechanized also in the `armor`
+  domain, the 1980 bookmark path, non-NSB regression, and balance calibration.
 
 The IFV family is a direct mirror of the APC family. Every architectural question it
 raises has already been answered and validated in game by the APC batch. Follow the
@@ -347,7 +393,7 @@ APC implementation as the reference; the diff for it is staged and readable.
 | Frozen rows | Heavy Mech I-VIII = `mechanized_heavy_equipment_1..8` |
 | Archetype that must supply units | `mechanized_heavy_equipment` |
 | File | `common/units/equipment/mechanized_heavy.txt` |
-| Current archetype state | `type = mechanized`, `interface_category_land`, no module slots |
+| Archetype state at batch start | `type = mechanized`, `interface_category_land`, no module slots |
 | Consumers | `common/units/CWIC-Infantry.txt` (`mechanized_heavy_equipment = 50`), `common/units/CWIC-Special-Units.txt` |
 | Legacy technologies | `mechanized_heavy_infantry`..`8` in `common/technologies/armor.txt`, NSB folder column `x = 3` |
 | Equipment years | 1947, 1950, **1955**, 1965, 1975, 1985, 1995, 2005 |
@@ -505,6 +551,107 @@ or at minimum countries with corresponding non-NSB vehicles already implemented.
 This is an explicit remaining requirement, not optional cosmetic polish and not
 something the current 14 national presets have completed.
 
+## The drawio is a primary source and it ratifies the standalone families
+
+Added 2026-09-07 after decoding `Tank_Designer_Slimemix (1).drawio`. Earlier documents
+quoted only the xlsx `Roles` tab and concluded APC/IFV had to be roles on the light and
+medium tank hulls. That reading is wrong, and the standalone-family implementation is the
+one the sources actually support. **Read this before proposing any re-plumbing.**
+
+The drawio is 12 deflate+base64 pages. Decode each `<diagram>` body with
+`urllib.parse.unquote(zlib.decompress(base64.b64decode(body), -15).decode())`; node text is
+`value=` on `<mxCell>` and position is the child `<mxGeometry x= y=>`. Max fontSize in the
+file is 20, so do not try to find headings by font size - cluster by `x`. On the Whole Tech
+Tree page the year axis is at `x = 6400`: `y=80`->1940, 200->1943, 320->1945, then every
+120px is five years (440->1950 ... 2120->2020).
+
+Three carrier designs exist across the sources and they disagree:
+
+| # | Source | Design |
+| --- | --- | --- |
+| 1 | xlsx `Roles` tab | APC/IFV as roles hosted on the light and medium tank hulls |
+| 2 | drawio `[DONE] AFV Hulls` | Three carrier leaf nodes only: `IFV` (1960, off Post-WW2 Light Tank), `Heavy APC` (1985, off Second Gen MBT), `Heavy IFV` (2005, off Second+ Gen MBT). Pre-1960 carriers appear only as example vehicles under the light-tank hulls. |
+| 3 | drawio `[REFERENCE] Whole Tech Tree`, `x = -840..-920` | A dedicated mechanized ladder in its own column, separate from every tank hull column |
+
+Design 3 is the implemented one and the owner ratified it on 2026-09-07:
+
+```
+Early WW2 Mechanized (1940) -> Mid-WW2 Mechanized (1943) -> Late WW2 Mechanized (1945)
+        |
+        +-- Light Mech./Wheeled Mech. -> APC              -> Light Mechanised II..VII
+        +-- Heavy Mech./Tracked Mech. -> Heavy APC/IFV    -> Heavy Mechanised II..VII
+```
+
+So Light Mech is the APC line (`mechanized_equipment` / `apc_chassis_*`) and Heavy Mech is
+the IFV line (`mechanized_heavy_equipment` / `ifv_chassis_*`), exactly as built. The
+wheeled/tracked flavour split is explicit in the node labels and is the design reason APC
+AI recipes allow `tank_non_tracked_suspension_type` while the IFV line leans tracked.
+
+Two things the diagram does **not** authorise, so keep taking them from the frozen manifest:
+
+- **Tier count and years.** The diagram gives seven tiers per branch at 1950/1960/1970/
+  1980/1990/2000/2010. The implementation's 8+8 at 1947/1950/1960/1965/1975/1985/1995/2005
+  comes from the 18 frozen mechanized envelope rows in `Balance_Target_Manifest.md`, which
+  outranks the diagram's decade cadence. Do not "correct" the years to the diagram.
+- **Heavy APC / Heavy IFV.** Both diagrams place these on the medium hull lineage
+  (design 2 explicitly hangs them off Second Gen and Second+ Gen MBT, at 1985 and 2005).
+  That matches the still-unstarted "Heavy APC / heavy IFV (medium hull)" row in the
+  18-envelope table below. They are a medium-hull generation, not more tiers on the
+  existing light-hull families.
+
+### Special Capabilities - the source for the specials modules
+
+`[REFERENCE] Whole Tech Tree` at `x = 4680..5400`, mirrored on
+`[TODO] Base & Other Tech Modules`. Years read off the `x = 6400` axis:
+
+| Year | Nodes |
+| --- | --- |
+| 1940 | Amphibious Drive |
+| 1945 | OPVT, Underwater Driving Capability, Dozer Plow |
+| 1950 | Log (`+2% reliability`) |
+| 1955 | Anti-Mine Plow |
+| 1960 | Paradrop Capability (annotated "Light tanks only - Weight - Fuel consumption - Armour %") |
+| 1965 | Anti-Mine Roller (KMT-5) |
+| 1970 | Integrated Trench-Digging Plow, Anti-Mine Plow (second tier) |
+| 1980 | Anti-Mine Roller With Electro-Magnetic Coils (KMT-7 EMT) |
+
+`Amphibious Drive` at 1940 is the node that retires the legacy
+`amphibious1..5` / `mechanized_marine_equipment_1..5` compatibility line. The
+`[TODO] Trucks & Amphibious` page is a bare undifferentiated `Truck I` / `Amphibious I`
+grid with no design content - do not mine it, it will waste a session.
+
+`[TODO] Base & Other Tech Modules` additionally carries RWS I/II/III (1965/1985/2005),
+Blow-Out Panels ("Incompatible with carousel autoloaders"), Unmanned Fighting Compartment
+("Minimal requirements are either carousel loader or belt loader"), Unmanned/semi-unmanned
+Turret/Superstructure, external fuel containers, and 50s/60s/80s/90s MBT hull notes.
+
+### Roles: why the APC and IFV dropdowns read "Unknown"
+
+Mechanism confirmed 2026-09-07 by reading the module set and vanilla GUI, not by guessing:
+
+- The role dropdown is **global, not per-archetype**. It lists the base role plus one entry
+  per distinct `allow_equipment_type` value in the loaded module set. CWIC has exactly four
+  (`anti_tank` x35, `artillery` x4, `anti_air` x3, `flame` x1), so every chassis designer in
+  the mod shows exactly five entries. No APC or IFV module carries `allow_equipment_type`,
+  so four of the five are forbidden (`GFX_role_forbidden`, the red X).
+- An entry's **name** comes from the `duplicate_archetypes` entry it would switch to, in
+  `x_tank_chassis.txt`. `mechanized_equipment` and `mechanized_heavy_equipment` have none,
+  so the engine has nothing to name and falls back to the generic `unknown` loc key
+  (`terrain_l_english.yml:2` -> "Unknown"). That is why even Artillery and Anti-Air, which
+  render fine in a light-tank designer, read "Unknown" here.
+
+Consequence: the `tank_designer_mechanized_equipment`, `tank_designer_mechanized` and
+`tank_designer_mechanized_heavy_equipment` loc keys **cannot** fix the label - the lookup
+never reaches localisation. The earlier note in this handoff saying to "check the label in
+the next run and delete the unused pair" is superseded: neither can resolve until duplicate
+archetypes exist. Both key shapes are structurally plausible (vanilla uses
+`tank_designer_<archetype>` for chassis-swap roles and `tank_designer_<extra type>` for role
+types like `anti_air`), so leave both in place until one is observed resolving in game.
+
+To give these families working roles you need **both** halves: a `duplicate_archetypes`
+entry targeting the archetype, and at least one module with `allow_equipment_type`. One
+without the other yields either an unnamed entry or a permanently forbidden one.
+
 ## Read order and authority
 
 1. This handoff: current status and next implementation course.
@@ -621,11 +768,18 @@ exception. Resolve archetype inheritance when checking legacy values. Light
 Mech has zero soft/hard attack and piercing; Heavy Mech is the armed IFV line.
 Do not equate the legacy name "Heavy Mech" automatically with heavy tank hulls.
 
-Source role matrix: light hull supports APC and IFV; medium hull supports heavy
-APC and heavy IFV. Source role penalties give APC -0.4 armor/hardness and IFV
--0.2; exact implementation and stacking must be checked against game semantics.
-Use the Roles tab, Total Balance Sheet Object 842, diagram page 10 progression,
-and page 9 per-nation light-chassis vehicles/availability as design references.
+Source role penalties give APC -0.4 armor/hardness and IFV -0.2; exact
+implementation and stacking must be checked against game semantics. Use Total
+Balance Sheet Object 842 and the `[TODO] Light Chassis Based Vehicles` page's
+per-nation vehicles/availability as design references.
+
+**Superseded 2026-09-07:** the xlsx `Roles` tab's "light hull supports APC and IFV,
+medium hull supports heavy APC and heavy IFV" matrix is one of three conflicting
+carrier designs in the sources, and it is not the one CWIC implements. The
+`[REFERENCE] Whole Tech Tree` mechanized column - a dedicated ladder separate from
+every tank hull - is the ratified design. See "The drawio is a primary source" above
+before treating the Roles tab as authority. The one part of the Roles tab that still
+holds is that Heavy APC and Heavy IFV belong to the **medium** hull generation.
 
 Relevant paths under `Cold War Iron Curtain/`:
 
