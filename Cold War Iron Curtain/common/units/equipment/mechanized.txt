@@ -10,13 +10,216 @@ equipments = {
 		is_archetype = yes
 		picture = archetype_motorized_equipment		
 		is_buildable = no
-		type = mechanized
+		# QA 2026-09-06: the equipment designer is selected from the equipment domain,
+		# not from the presence of module slots or a designer GUI window. With
+		# `type = mechanized` alone the production view opened the legacy land upgrade
+		# popup (`land_equipment_designer_view`) for the APC hulls. `armor` is what
+		# routes an equipment to `tank_designer_view`; `mechanized` is retained so the
+		# archetype keeps its land/transport classification for the AI and for every
+		# `transport = mechanized_equipment` consumer.
+		type = { armor mechanized }
 		
 		group_by = archetype
 		
 		interface_category = interface_category_land
 		
 		upgrades = {
+		}
+
+		# Armored personnel carrier designer layout (No Step Back only).
+		# Five mandatory positions plus the ten shared specialized slots.
+		# The mandatory turret and armament positions take APC-only categories so a
+		# personnel carrier can never mount a tank gun or a tank fighting turret.
+		# Legacy mechanized_equipment_1..10 deliberately omit `module_slots = inherit`
+		# and therefore stay plain non-designer equipment for non-NSB games.
+		module_slots = {
+
+			turret_type_slot = {
+				required = yes
+				allowed_module_categories = {
+					tank_apc_superstructure
+				}
+			}
+
+			main_armament_slot = {
+				required = yes
+				allowed_module_categories = {
+					tank_apc_armament
+				}
+			}
+
+			suspension_type_slot = {
+				required = yes
+				allowed_module_categories = {
+					tank_suspension_bogie
+					tank_suspension_independent_internal
+					tank_suspension_independent_external
+					tank_suspension_torsion
+					tank_suspension_hydropneumatic
+					tank_non_tracked_suspension_type
+				}
+			}
+
+			armor_type_slot = {
+				required = yes
+				allowed_module_categories = {
+					tank_armor_welded
+					tank_armor_cast
+					tank_armor_spaced
+					tank_armor_composite
+					tank_armor_du_composite
+					tank_armor_aluminium
+				}
+			}
+
+			engine_type_slot = {
+				required = yes
+				allowed_module_categories = {
+					tank_engine_gasoline
+					tank_engine_diesel
+					tank_engine_gas_turbine
+				}
+			}
+
+			tank_special_slot_1 = {
+				required = no
+				allowed_module_categories = {
+					tank_ammo_kinetic
+					tank_ammo_chemical
+					tank_ammo_missile
+					tank_ammo_he
+				}
+			}
+
+			tank_special_slot_2 = {
+				required = no
+				allowed_module_categories = {
+					tank_ammo_kinetic
+					tank_ammo_chemical
+					tank_ammo_missile
+					tank_ammo_he
+				}
+			}
+
+			tank_special_slot_3 = {
+				required = no
+				allowed_module_categories = {
+					tank_fcs_aiming
+				}
+			}
+
+			tank_special_slot_4 = {
+				required = no
+				allowed_module_categories = {
+					tank_fcs_optics
+				}
+			}
+
+			tank_special_slot_5 = {
+				required = no
+				allowed_module_categories = {
+					tank_fcs_computer
+					tank_fcs_radar
+				}
+			}
+
+			tank_special_slot_6 = {
+				required = no
+				allowed_module_categories = {
+					tank_loader_manual_assist
+					tank_loader_autoloader
+					tank_loader_artillery
+				}
+			}
+
+			tank_special_slot_7 = {
+				required = no
+				allowed_module_categories = {
+					tank_protection_passive
+					tank_protection_reactive
+				}
+			}
+
+			tank_special_slot_8 = {
+				required = no
+				allowed_module_categories = {
+					tank_protection_passive
+					tank_protection_reactive
+					tank_protection_active
+				}
+			}
+
+			tank_special_slot_9 = {
+				required = no
+				allowed_module_categories = {
+					tank_survivability
+					tank_mobility_auxiliary
+					tank_smoke
+				}
+			}
+
+			tank_special_slot_10 = {
+				required = no
+				allowed_module_categories = {
+					tank_secondary_turret
+					tank_survivability
+					tank_mobility_auxiliary
+					tank_smoke
+				}
+			}
+
+		}
+		module_count_limit = {
+			category = tank_secondary_turret
+			count < 2
+		}
+		module_count_limit = {
+			category = tank_protection_passive
+			count < 2
+		}
+		module_count_limit = {
+			category = tank_protection_reactive
+			count < 2
+		}
+		module_count_limit = {
+			category = tank_protection_active
+			count < 2
+		}
+		module_count_limit = {
+			category = tank_survivability
+			count < 2
+		}
+		module_count_limit = {
+			category = tank_fcs_aiming
+			count < 2
+		}
+		module_count_limit = {
+			category = tank_fcs_optics
+			count < 2
+		}
+		module_count_limit = {
+			category = tank_fcs_computer
+			count < 2
+		}
+		module_count_limit = {
+			category = tank_fcs_radar
+			count < 2
+		}
+		module_count_limit = {
+			category = tank_mobility_auxiliary
+			count < 2
+		}
+		module_count_limit = {
+			category = tank_smoke
+			count < 2
+		}
+
+		default_modules = {
+			main_armament_slot = apc_firing_ports
+			turret_type_slot = apc_open_troop_bay
+			suspension_type_slot = Half_track
+			armor_type_slot = Armor_0_W
+			engine_type_slot = tank_gasoline_engine
 		}
 		
 		#Misc Abilities
@@ -292,5 +495,387 @@ equipments = {
 			aluminium = 1
 		}
 	}	
+
+### APC designer hulls (No Step Back)
+
+# One designer hull per frozen Light Mech row. The hulls share the
+# mechanized_equipment archetype so every existing mechanized, marine-support and
+# support-company consumer resolves designer APCs with no sub-unit change.
+# Hull values are authored approximations: hull plus the baseline recipe
+# (apc_open_troop_bay, apc_firing_ports, Half_track, Armor_0_W, tank_gasoline_engine)
+# is intended to land near the legacy row it replaces. They are not calibrated
+# against a full-design estimator and are not certified balance matches.
+
+#1947 APC hull - designer replacement for mechanized_equipment_3
+
+	apc_chassis_0 = {
+		abbreviation = "apc0"
+		derived_variant_name = apc_equipment_0
+		year = 1947
+
+		archetype = mechanized_equipment
+		type = { armor mechanized }
+		priority = 40
+		visual_level = 2
+		module_slots = inherit
+		upgrades = {
+			tank_engine_upgrade
+			tank_armor_upgrade
+		}
+
+		can_be_produced = {
+			has_dlc = "No Step Back"
+		}
+
+		#Misc Abilities
+		maximum_speed = 11
+		reliability = 1
+
+		#Defensive Abilities
+		defense = 11
+		breakthrough = 3
+		hardness = 0.5
+		armor_value = 15
+
+		#Offensive Abilities
+		soft_attack = 0
+		hard_attack = 0
+		air_attack = 0
+
+		lend_lease_cost = 5
+
+		fuel_consumption = 0
+		build_cost_ic = 5.6
+		resources = {
+			coal = 2
+		}
+	}
+
+#1950 APC hull - designer replacement for mechanized_equipment_4
+
+	apc_chassis_1 = {
+		abbreviation = "apc1"
+		derived_variant_name = apc_equipment_1
+		year = 1950
+
+		archetype = mechanized_equipment
+		type = { armor mechanized }
+		parent = apc_chassis_0
+		priority = 40
+		visual_level = 3
+		module_slots = inherit
+		upgrades = {
+			tank_engine_upgrade
+			tank_armor_upgrade
+		}
+
+		can_be_produced = {
+			has_dlc = "No Step Back"
+		}
+
+		#Misc Abilities
+		maximum_speed = 11.5
+		reliability = 1
+
+		#Defensive Abilities
+		defense = 14
+		breakthrough = 4
+		hardness = 0.5
+		armor_value = 18
+
+		#Offensive Abilities
+		soft_attack = 0
+		hard_attack = 0
+		air_attack = 0
+
+		lend_lease_cost = 5
+
+		fuel_consumption = 0
+		build_cost_ic = 6.6
+		resources = {
+			coal = 2
+		}
+	}
+
+#1960 APC hull - designer replacement for mechanized_equipment_5
+
+	apc_chassis_2 = {
+		abbreviation = "apc2"
+		derived_variant_name = apc_equipment_2
+		year = 1960
+
+		archetype = mechanized_equipment
+		type = { armor mechanized }
+		parent = apc_chassis_1
+		priority = 40
+		visual_level = 4
+		module_slots = inherit
+		upgrades = {
+			tank_engine_upgrade
+			tank_armor_upgrade
+		}
+
+		can_be_produced = {
+			has_dlc = "No Step Back"
+		}
+
+		#Misc Abilities
+		maximum_speed = 12.5
+		reliability = 1
+
+		#Defensive Abilities
+		defense = 14
+		breakthrough = 4
+		hardness = 0.5
+		armor_value = 22
+
+		#Offensive Abilities
+		soft_attack = 0
+		hard_attack = 0
+		air_attack = 0
+
+		lend_lease_cost = 5
+
+		fuel_consumption = 0
+		build_cost_ic = 7.6
+		resources = {
+			coal = 2
+		}
+	}
+
+#1965 APC hull - designer replacement for mechanized_equipment_6
+
+	apc_chassis_3 = {
+		abbreviation = "apc3"
+		derived_variant_name = apc_equipment_3
+		year = 1965
+
+		archetype = mechanized_equipment
+		type = { armor mechanized }
+		parent = apc_chassis_2
+		priority = 40
+		visual_level = 5
+		module_slots = inherit
+		upgrades = {
+			tank_engine_upgrade
+			tank_armor_upgrade
+		}
+
+		can_be_produced = {
+			has_dlc = "No Step Back"
+		}
+
+		#Misc Abilities
+		maximum_speed = 13.5
+		reliability = 1
+
+		#Defensive Abilities
+		defense = 16
+		breakthrough = 5
+		hardness = 0.5
+		armor_value = 24
+
+		#Offensive Abilities
+		soft_attack = 0
+		hard_attack = 0
+		air_attack = 0
+
+		lend_lease_cost = 5
+
+		fuel_consumption = 0
+		build_cost_ic = 8.6
+		resources = {
+			coal = 2
+			aluminium = 1
+		}
+	}
+
+#1975 APC hull - designer replacement for mechanized_equipment_7
+
+	apc_chassis_4 = {
+		abbreviation = "apc4"
+		derived_variant_name = apc_equipment_4
+		year = 1975
+
+		archetype = mechanized_equipment
+		type = { armor mechanized }
+		parent = apc_chassis_3
+		priority = 40
+		visual_level = 6
+		module_slots = inherit
+		upgrades = {
+			tank_engine_upgrade
+			tank_armor_upgrade
+		}
+
+		can_be_produced = {
+			has_dlc = "No Step Back"
+		}
+
+		#Misc Abilities
+		maximum_speed = 15
+		reliability = 1
+
+		#Defensive Abilities
+		defense = 16
+		breakthrough = 5
+		hardness = 0.5
+		armor_value = 28
+
+		#Offensive Abilities
+		soft_attack = 0
+		hard_attack = 0
+		air_attack = 0
+
+		lend_lease_cost = 5
+
+		fuel_consumption = 0
+		build_cost_ic = 10.6
+		resources = {
+			coal = 2
+			aluminium = 1
+		}
+	}
+
+#1985 APC hull - designer replacement for mechanized_equipment_8
+
+	apc_chassis_5 = {
+		abbreviation = "apc5"
+		derived_variant_name = apc_equipment_5
+		year = 1985
+
+		archetype = mechanized_equipment
+		type = { armor mechanized }
+		parent = apc_chassis_4
+		priority = 40
+		visual_level = 7
+		module_slots = inherit
+		upgrades = {
+			tank_engine_upgrade
+			tank_armor_upgrade
+		}
+
+		can_be_produced = {
+			has_dlc = "No Step Back"
+		}
+
+		#Misc Abilities
+		maximum_speed = 16
+		reliability = 1
+
+		#Defensive Abilities
+		defense = 16
+		breakthrough = 5
+		hardness = 0.5
+		armor_value = 32
+
+		#Offensive Abilities
+		soft_attack = 0
+		hard_attack = 0
+		air_attack = 0
+
+		lend_lease_cost = 5
+
+		fuel_consumption = 0
+		build_cost_ic = 11.6
+		resources = {
+			coal = 2
+			aluminium = 1
+		}
+	}
+
+#1995 APC hull - designer replacement for mechanized_equipment_9
+
+	apc_chassis_6 = {
+		abbreviation = "apc6"
+		derived_variant_name = apc_equipment_6
+		year = 1995
+
+		archetype = mechanized_equipment
+		type = { armor mechanized }
+		parent = apc_chassis_5
+		priority = 40
+		visual_level = 8
+		module_slots = inherit
+		upgrades = {
+			tank_engine_upgrade
+			tank_armor_upgrade
+		}
+
+		can_be_produced = {
+			has_dlc = "No Step Back"
+		}
+
+		#Misc Abilities
+		maximum_speed = 17
+		reliability = 1
+
+		#Defensive Abilities
+		defense = 19
+		breakthrough = 6
+		hardness = 0.5
+		armor_value = 36
+
+		#Offensive Abilities
+		soft_attack = 0
+		hard_attack = 0
+		air_attack = 0
+
+		lend_lease_cost = 5
+
+		fuel_consumption = 0
+		build_cost_ic = 12.6
+		resources = {
+			coal = 2
+			aluminium = 1
+		}
+	}
+
+#2005 APC hull - designer replacement for mechanized_equipment_10
+
+	apc_chassis_7 = {
+		abbreviation = "apc7"
+		derived_variant_name = apc_equipment_7
+		year = 2005
+
+		archetype = mechanized_equipment
+		type = { armor mechanized }
+		parent = apc_chassis_6
+		priority = 40
+		visual_level = 9
+		module_slots = inherit
+		upgrades = {
+			tank_engine_upgrade
+			tank_armor_upgrade
+		}
+
+		can_be_produced = {
+			has_dlc = "No Step Back"
+		}
+
+		#Misc Abilities
+		maximum_speed = 18.5
+		reliability = 1
+
+		#Defensive Abilities
+		defense = 19
+		breakthrough = 6
+		hardness = 0.5
+		armor_value = 40
+
+		#Offensive Abilities
+		soft_attack = 0
+		hard_attack = 0
+		air_attack = 0
+
+		lend_lease_cost = 5
+
+		fuel_consumption = 0
+		build_cost_ic = 14.6
+		resources = {
+			coal = 2
+			aluminium = 1
+		}
+	}
+
 }
-	

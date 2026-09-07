@@ -38,6 +38,35 @@ MOD = ROOT / "Cold War Iron Curtain"
 TECH_DIR = MOD / "common/technologies"
 MODULE_FILE = MOD / "common/units/equipment/modules/00_tank_modules.txt"
 CHASSIS_FILE = MOD / "common/units/equipment/tank_chassis.txt"
+MECHANIZED_FILE = MOD / "common/units/equipment/mechanized.txt"
+# The APC designer family reuses the mechanized_equipment archetype so every
+# existing mechanized consumer resolves designer personnel carriers unchanged.
+# tier -> (legacy Light Mech row it replaces, hull technology, introduction year)
+APC_HULL_ROWS = {
+    0: ("mechanized_equipment_3", "nsb_apc_hulls0", 1947),
+    1: ("mechanized_equipment_4", "nsb_apc_hulls1", 1950),
+    2: ("mechanized_equipment_5", "nsb_apc_hulls2", 1960),
+    3: ("mechanized_equipment_6", "nsb_apc_hulls3", 1965),
+    4: ("mechanized_equipment_7", "nsb_apc_hulls4", 1975),
+    5: ("mechanized_equipment_8", "nsb_apc_hulls5", 1985),
+    6: ("mechanized_equipment_9", "nsb_apc_hulls6", 1995),
+    7: ("mechanized_equipment_10", "nsb_apc_hulls7", 2005),
+}
+# The 2023 balance workbook is frozen and predates the APC designer family, so
+# its module sheets can never carry these rows. They are authored values kept in
+# script only, and the module balance report reports them as an explicit
+# exemption instead of silently widening workbook coverage.
+APC_SUPERSTRUCTURE_MODULES = (
+    "apc_open_troop_bay",
+    "apc_troop_compartment",
+    "apc_frontal_engine_layout",
+)
+APC_ARMAMENT_MODULES = (
+    "apc_firing_ports",
+    "apc_pintle_mg",
+    "apc_cupola_hmg",
+    "apc_remote_weapon_station",
+)
 TANK_SPECIAL_SLOT_CATEGORIES = {
     1: {"tank_ammo_kinetic", "tank_ammo_chemical", "tank_ammo_missile", "tank_ammo_he"},
     2: {"tank_ammo_kinetic", "tank_ammo_chemical", "tank_ammo_missile", "tank_ammo_he"},
@@ -1850,11 +1879,15 @@ def tank_module_balance_report() -> str:
     master = _normalize_master_module_rows(
         read_module_workbook(BALANCE_WORKBOOK_FILE, "Total Balance Sheet", "Z")
     )
-    if len(csv_rows) != len(module_ids):
-        fail(f"tank balance CSV has {len(csv_rows)} module rows; expected {len(module_ids)}")
+    exempt = set(APC_SUPERSTRUCTURE_MODULES) | set(APC_ARMAMENT_MODULES)
+    sourced_modules = module_ids - exempt
+    if exempt - module_ids:
+        fail(f"workbook-exempt modules that no longer exist: {sorted(exempt - module_ids)}")
+    if len(csv_rows) != len(sourced_modules):
+        fail(f"tank balance CSV has {len(csv_rows)} module rows; expected {len(sourced_modules)}")
     for source, rows in (("CSV", csv_rows), ("Minimal", minimal), ("Master", master)):
-        missing = module_ids - set(rows)
-        extra = set(rows) - module_ids
+        missing = sourced_modules - set(rows)
+        extra = set(rows) - sourced_modules
         if missing:
             fail(f"{source} tank balance is missing module IDs: {sorted(missing)}")
         if extra:
@@ -1862,7 +1895,7 @@ def tank_module_balance_report() -> str:
     unlocks = module_unlock_provenance()
     checked = 0
     populated = 0
-    for module in sorted(module_ids):
+    for module in sorted(sourced_modules):
         record = module_balance_record(module)
         for source, rows in (("CSV", csv_rows), ("Minimal", minimal), ("Master", master)):
             if module not in rows:
@@ -1913,12 +1946,14 @@ def tank_module_balance_report() -> str:
     if metadata_count != len(SCRIPT_OWNED_MODULES):
         fail(f"operation/provenance metadata covers {metadata_count}/{len(SCRIPT_OWNED_MODULES)} script-owned modules")
     return (
-        f"Tank module balance report: {len(module_ids)} IDs reconciled across CSV, "
+        f"Tank module balance report: {len(sourced_modules)} IDs reconciled across CSV, "
         f"Total Balance Sheet Minimal, and Total Balance Sheet; {checked} populated "
         f"stat/resource cells checked; operation/provenance metadata {metadata_count}/{len(SCRIPT_OWNED_MODULES)}; "
         f"22 script-owned IDs reconciled; 1 reviewed turret source-to-live override; "
         f"explicit exclusions cover eligibility, display, conversion, and XP fields "
-        f"(the manual's 23 count has no additional module ID)."
+        f"(the manual's 23 count has no additional module ID); "
+        f"{len(exempt)} APC designer modules are authored in script only and are "
+        f"exempt from the frozen workbook: {sorted(exempt)}."
     )
 
 
@@ -3238,14 +3273,18 @@ ai_types = set(re.findall(r"^\s*type\s*=\s*([A-Za-z0-9_]+)", ai_text, re.MULTILI
 missing_ai = expected_types - ai_types
 if missing_ai:
     fail(f"tank types without a generic historical AI design: {sorted(missing_ai)}")
-if len(re.findall(r"^\s*history\s*=\s*yes\b", ai_text, re.MULTILINE)) != len(expected_types):
-    fail("generic tank AI file must contain one historical recipe per supported tank type")
+if len(re.findall(r"^\s*history\s*=\s*yes\b", ai_text, re.MULTILINE)) != len(expected_types) + len(APC_HULL_ROWS):
+    fail("generic tank AI file must contain one historical recipe per supported tank and APC type")
 for recipe in keyed_blocks(ai_text, "target_variant"):
     type_match = re.search(r"\btype\s*=\s*(\w+)", recipe)
     if not type_match:
         continue
     equipment_type = type_match.group(1)
     if re.search(r"_(?:aa|flame)_chassis_", equipment_type):
+        continue
+    # APC hulls mount troop-compartment armament, never a gun that multiplies
+    # ammunition stats, so shell modules do not apply to them.
+    if equipment_type.startswith("apc_chassis_"):
         continue
     for category in ammo_categories:
         if not re.search(rf"\btank_special_slot_\d+\s*=\s*{category}\b", recipe):
@@ -3276,6 +3315,12 @@ stale_generated_enums = (
     r"medium_tank_rocket_chassisbt_equipment_[0-9]+",
     r"heavy_tank_rocket_chassist_equipment_[0-9]+",
 )
+for tier in range(len(APC_HULL_ROWS)):
+    # equipment_database.cpp:656 logs every equipment id missing from this
+    # documentation enum. QA 2026-09-07 saw eight such lines for the APC hulls.
+    if not re.search(rf"(?m)^\s*apc_chassis_{tier}\s*$", enum_text):
+        fail(f"apc_chassis_{tier} is missing from script_enum_equipment_bonus_type")
+
 for pattern in stale_generated_enums:
     if re.search(rf"^\s*{pattern}\s*$", enum_text, re.MULTILINE):
         fail(f"stale generated tank enum remains: {pattern}")
@@ -3317,6 +3362,274 @@ if "--doctrine-self-test" in sys.argv:
 validate_tank_rework()
 if "--tank-self-test" in sys.argv:
     run_tank_negative_fixtures()
+
+
+def designer_window_names() -> set[str]:
+    names: set[str] = set()
+    for path in sorted((MOD / "interface/equipmentdesigner/tanks").glob("*.gui")):
+        names.update(re.findall(r'name\s*=\s*"(equipment_designer_[A-Za-z0-9_]+)"', code_only(text(path))))
+    return names
+
+
+def validate_designer_window_coverage(window_override: set[str] | None = None) -> None:
+    """Every designable hull must resolve an equipment designer window.
+
+    QA 2026-09-06: apc_chassis_* shipped with module slots but no designer window,
+    and the production view silently fell back to the legacy Create Variant upgrade
+    popup instead of the module designer. Per
+    interface/equipmentdesigner/_documentation.info the window is resolved as
+    equipment_designer_<EQUIPMENT>[_TAG] then equipment_designer_<ARCHETYPE>[_TAG],
+    so a missing window is a silent, non-erroring downgrade. This check makes that
+    class of failure loud for every future designer family.
+    """
+    windows = designer_window_names() if window_override is None else window_override
+    designable: dict[str, str] = {}
+    for source in (CHASSIS_FILE, MECHANIZED_FILE):
+        for name, block in top_level_blocks(text(source), "equipments"):
+            if direct_values(block, "module_slots") != ["inherit"]:
+                continue
+            parents = direct_values(block, "archetype")
+            designable[name] = parents[0] if parents else name
+    duplicates = {
+        name: direct_values(block, "archetype")[0]
+        for name, block in top_level_blocks(
+            text(MOD / "common/units/equipment/x_tank_chassis.txt"), "duplicate_archetypes"
+        )
+        if direct_values(block, "archetype")
+    }
+    if not designable:
+        fail("no designable hulls were found for designer window coverage")
+    for equipment, archetype in sorted(designable.items()):
+        wanted = {f"equipment_designer_{equipment}", f"equipment_designer_{archetype}"}
+        wanted.update(
+            f"equipment_designer_{duplicate}"
+            for duplicate, parent in duplicates.items()
+            if parent == archetype
+        )
+        if not (wanted & windows):
+            fail(
+                f"{equipment} has designer module slots but no designer window; "
+                f"the production view would fall back to the legacy upgrade popup"
+            )
+    for duplicate, archetype in sorted(duplicates.items()):
+        if f"equipment_designer_{duplicate}" not in windows:
+            fail(f"duplicate role archetype {duplicate} has no designer window")
+
+
+def validate_apc_designer_family() -> None:
+    """Contract for the APC designer family carried on mechanized_equipment.
+
+    The hulls deliberately share the legacy archetype so that mechanized,
+    marine-support and support-company sub-units resolve designer personnel
+    carriers with no `need` change. That only stays safe while the legacy rows
+    keep no module slots of their own, so non-NSB games are unaffected.
+    """
+    brace_balance(MECHANIZED_FILE)
+    blocks = dict(top_level_blocks(text(MECHANIZED_FILE), "equipments"))
+
+    archetype = blocks.get("mechanized_equipment", "")
+    if not archetype:
+        fail("mechanized_equipment archetype is missing")
+        return
+    special = [
+        slot
+        for index in range(1, 11)
+        for slot in keyed_blocks(archetype, f"tank_special_slot_{index}")
+    ]
+    if len(special) != 10:
+        fail("APC archetype must expose the ten shared specialized special slots")
+    for message in tank_slot_layout_errors(archetype):
+        fail(f"mechanized_equipment: {message}")
+    for slot, expected in (
+        ("turret_type_slot", {"tank_apc_superstructure"}),
+        ("main_armament_slot", {"tank_apc_armament"}),
+    ):
+        found = keyed_blocks(archetype, slot)
+        categories = set(
+            re.findall(r"\btank_[a-z_]+\b", " ".join(keyed_blocks(found[0], "allowed_module_categories")))
+        ) if len(found) == 1 else set()
+        if categories != expected:
+            fail(f"APC {slot} must be restricted to {sorted(expected)}, found {sorted(categories)}")
+        if len(found) == 1 and "required = yes" not in found[0]:
+            fail(f"APC {slot} must stay mandatory")
+    defaults = keyed_blocks(archetype, "default_modules")
+    default_map = dict(re.findall(r"(?m)^\s*(\w+)\s*=\s*(\w+)\s*$", defaults[0])) if len(defaults) == 1 else {}
+    if set(default_map) != {
+        "main_armament_slot", "turret_type_slot", "suspension_type_slot",
+        "armor_type_slot", "engine_type_slot",
+    }:
+        fail("APC archetype must give every mandatory slot a default module")
+    if default_map.get("turret_type_slot") not in APC_SUPERSTRUCTURE_MODULES:
+        fail("APC default turret module is not an APC superstructure")
+    if default_map.get("main_armament_slot") not in APC_ARMAMENT_MODULES:
+        fail("APC default armament is not APC armament")
+    limits = re.findall(r"module_count_limit\s*=\s*\{([^{}]*)\}", archetype, re.DOTALL)
+    if sum("category = tank_secondary_turret" in limit for limit in limits) != 1:
+        fail("APC archetype must retain one secondary turret count limit")
+    # QA 2026-09-06: the designer is chosen from the equipment domain. Without
+    # `armor` the production view opens the legacy land upgrade popup instead of
+    # tank_designer_view; without `mechanized` the archetype loses its land and
+    # transport classification for the AI and for `transport = mechanized_equipment`.
+    archetype_domain = set(re.findall(r"\w+", " ".join(direct_values(archetype, "type")) or ""))
+    if not archetype_domain:
+        archetype_domain = set(re.findall(r"(?m)^\s*type\s*=\s*\{([^}]*)\}", archetype))
+        archetype_domain = set(re.findall(r"\w+", " ".join(archetype_domain)))
+    if archetype_domain != {"armor", "mechanized"}:
+        fail(f"APC archetype domain must be armor plus mechanized, found {sorted(archetype_domain)}")
+
+    # Legacy rows must stay plain equipment so non-NSB games are untouched.
+    for tier in range(1, 11):
+        legacy = blocks.get(f"mechanized_equipment_{tier}", "")
+        if not legacy:
+            fail(f"legacy mechanized_equipment_{tier} is missing")
+        elif "module_slots" in code_only(legacy):
+            fail(f"legacy mechanized_equipment_{tier} must not inherit designer slots")
+
+    tech_text = code_only(text(TECH_DIR / "NSB_armor.txt"))
+    legacy_folder_text = code_only(text(TECH_DIR / "armor.txt"))
+    for tier, (legacy_row, technology, year) in APC_HULL_ROWS.items():
+        hull = blocks.get(f"apc_chassis_{tier}", "")
+        if not hull:
+            fail(f"apc_chassis_{tier} is missing")
+            continue
+        if direct_values(hull, "archetype") != ["mechanized_equipment"]:
+            fail(f"apc_chassis_{tier} must share the mechanized_equipment archetype")
+        hull_domain = set(re.findall(r"\w+", " ".join(re.findall(r"(?m)^\s*type\s*=\s*\{([^}]*)\}", hull))))
+        if hull_domain != {"armor", "mechanized"}:
+            fail(f"apc_chassis_{tier} must restate the armor/mechanized domain, found {sorted(hull_domain)}")
+        if direct_values(hull, "module_slots") != ["inherit"]:
+            fail(f"apc_chassis_{tier} must inherit the APC designer slots")
+        if direct_values(hull, "derived_variant_name") != [f"apc_equipment_{tier}"]:
+            fail(f"apc_chassis_{tier} has the wrong derived variant name")
+        if direct_values(hull, "year") != [str(year)]:
+            fail(f"apc_chassis_{tier} year differs from the {legacy_row} row it replaces")
+        produced = keyed_blocks(hull, "can_be_produced")
+        if len(produced) != 1 or 'has_dlc = "No Step Back"' not in produced[0]:
+            fail(f"apc_chassis_{tier} must be gated behind No Step Back")
+        expected_parent = [] if tier == 0 else [f"apc_chassis_{tier - 1}"]
+        if direct_values(hull, "parent") != expected_parent:
+            fail(f"apc_chassis_{tier} has a broken hull upgrade chain")
+        legacy = blocks.get(legacy_row, "")
+        for stat in ("armor_value",):
+            hull_value = direct_values(hull, stat)
+            legacy_value = direct_values(legacy, stat)
+            if hull_value != legacy_value:
+                fail(
+                    f"apc_chassis_{tier} {stat} {hull_value} drifts from frozen "
+                    f"{legacy_row} {legacy_value}"
+                )
+        if not re.search(rf"\benable_equipments\s*=\s*\{{[^}}]*\bapc_chassis_{tier}\b", tech_text, re.DOTALL):
+            fail(f"apc_chassis_{tier} is not unlocked by an NSB technology")
+        if technology not in technology_set:
+            fail(f"APC hull technology {technology} is undefined")
+        if re.search(rf"\b{technology}\b", legacy_folder_text):
+            fail(f"{technology} leaks into the legacy armour folder")
+        # QA 2026-09-07: the APC column first shipped on raw folder rows copied from
+        # the mechanized line, which sit on a different scale than the @year macros
+        # used by every other NSB armour column. The tree then drew "1947 APC" on the
+        # 1955 row. Pin each hull technology to the year row its start_year claims.
+        tech_block = dict(top_level_blocks(text(TECH_DIR / "NSB_armor.txt"), "technologies")).get(technology, "")
+        if direct_values(tech_block, "start_year") != [str(year)]:
+            fail(f"{technology} start_year differs from the {legacy_row} row it replaces")
+        row = re.search(r"nsb_armor_folder\s*}?\s*position\s*=\s*\{[^}]*y\s*=\s*(@?[0-9]+)", tech_block)
+        if not row:
+            row = re.search(r"position\s*=\s*\{[^}]*y\s*=\s*(@?[0-9]+)", tech_block)
+        if not row or row.group(1) != f"@{year}":
+            fail(
+                f"{technology} sits on tree row {row.group(1) if row else 'none'}, "
+                f"expected the @{year} year row"
+            )
+
+    for module, category in (
+        [(name, "tank_apc_superstructure") for name in APC_SUPERSTRUCTURE_MODULES]
+        + [(name, "tank_apc_armament") for name in APC_ARMAMENT_MODULES]
+    ):
+        if module not in module_ids:
+            fail(f"APC module {module} is missing")
+            continue
+        if module_category(module) != category:
+            fail(f"APC module {module} has category {module_category(module)}, expected {category}")
+        if needs_ammunition(module):
+            fail(f"APC module {module} multiplies gun stats and would need ammunition")
+
+    apc_recipes = [
+        recipe for recipe in keyed_blocks(ai_text, "target_variant")
+        if re.search(r"\btype\s*=\s*apc_chassis_\d+", recipe)
+    ]
+    if len(apc_recipes) != len(APC_HULL_ROWS):
+        fail("every APC hull needs one generic historical AI recipe")
+    for recipe in apc_recipes:
+        tier = int(re.search(r"\btype\s*=\s*apc_chassis_(\d+)", recipe).group(1))
+        if "turret_type_slot = tank_apc_superstructure" not in recipe:
+            fail(f"APC AI recipe {tier} does not use the APC superstructure category")
+        if "main_armament_slot = tank_apc_armament" not in recipe:
+            fail(f"APC AI recipe {tier} does not use the APC armament category")
+    for tier, (_, technology, _) in APC_HULL_ROWS.items():
+        if not re.search(rf"enable = \{{ has_tech = {technology} \}}", ai_text):
+            fail(f"APC AI recipe for tier {tier} is not gated on {technology}")
+
+    hull_loc = text(MOD / "localisation/english/tank_modules_l_english.yml")
+    tech_loc = text(MOD / "localisation/english/nsb_armor_l_english.yml")
+    for tier, (_, technology, _) in APC_HULL_ROWS.items():
+        for key, source in (
+            (f"apc_chassis_{tier}", hull_loc),
+            (f"apc_chassis_{tier}_short", hull_loc),
+            (f"apc_chassis_{tier}_desc", hull_loc),
+            (f"apc_equipment_{tier}", hull_loc),
+            (technology, tech_loc),
+        ):
+            if not re.search(rf"(?m)^\s*{key}:\d*\s+\"", source):
+                fail(f"APC localisation key is missing: {key}")
+    for module in APC_SUPERSTRUCTURE_MODULES + APC_ARMAMENT_MODULES:
+        for key in (module, f"{module}_desc"):
+            if not re.search(rf"(?m)^\s*{key}:\d*\s+\"", hull_loc):
+                fail(f"APC localisation key is missing: {key}")
+
+
+def run_apc_negative_fixtures() -> None:
+    """The APC contract must reject the shapes that would break legacy support."""
+    source = text(MECHANIZED_FILE)
+    for label, mutation in (
+        ("legacy row inherits slots", lambda v: v.replace(
+            "\tmechanized_equipment_3 = {\n\t\tyear = 1947",
+            "\tmechanized_equipment_3 = {\n\t\tmodule_slots = inherit\n\t\tyear = 1947", 1)),
+        ("tank gun allowed on an APC", lambda v: v.replace(
+            "\t\t\t\t\ttank_apc_armament\n", "\t\t\t\t\ttank_small_main_armament\n", 1)),
+        ("hull leaves the mechanized archetype", lambda v: v.replace(
+            "\tapc_chassis_0 = {\n\t\tabbreviation", "\tapc_chassis_0 = {\n\t\tarchetype = light_tank_chassis\n\t\tabbreviation", 1)),
+        ("hull loses its DLC gate", lambda v: v.replace('has_dlc = "No Step Back"', "always = yes", 1)),
+        ("archetype leaves the armor domain", lambda v: v.replace(
+            "\t\ttype = { armor mechanized }\n", "\t\ttype = mechanized\n", 1)),
+    ):
+        mutated = mutation(source)
+        if mutated == source:
+            raise AssertionError(f"APC fixture did not mutate the source: {label}")
+        MECHANIZED_FILE.write_text(mutated, encoding="utf-8", newline="")
+        previous = len(errors)
+        try:
+            validate_apc_designer_family()
+            rejected = len(errors) > previous
+        finally:
+            del errors[previous:]
+            MECHANIZED_FILE.write_text(source, encoding="utf-8", newline="")
+        if not rejected:
+            raise AssertionError(f"APC contract accepted a broken mutation: {label}")
+    windows = designer_window_names()
+    if "equipment_designer_mechanized_equipment" not in windows:
+        raise AssertionError("the APC designer window is missing from the fixture baseline")
+    previous = len(errors)
+    validate_designer_window_coverage(windows - {"equipment_designer_mechanized_equipment"})
+    rejected = len(errors) > previous
+    del errors[previous:]
+    if not rejected:
+        raise AssertionError("designer window coverage accepted a missing APC window")
+
+
+validate_apc_designer_family()
+validate_designer_window_coverage()
+if "--tank-self-test" in sys.argv:
+    run_apc_negative_fixtures()
+
 balance_report = tank_balance_report() if "--tank-balance-report" in sys.argv else ""
 module_balance_report = (
     tank_module_balance_report() if "--tank-module-balance-report" in sys.argv else ""
@@ -3336,7 +3649,7 @@ print(
     f"{len(NATIONAL_PRESETS)} national presets "
     f"and {versioned_oob_requests} named OOB requests across "
     f"{len(oob_files_with_tanks)} NSB OOBs, {history_bootstrap_sites} country-history "
-    "bootstrap sites, and 15 designer slots checked."
+    f"bootstrap sites, {len(APC_HULL_ROWS)} APC designer hulls, and 15 designer slots checked."
 )
 if balance_report:
     print(balance_report)
