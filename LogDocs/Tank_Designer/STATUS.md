@@ -49,7 +49,7 @@ Two failures the first gate run reported, both resolved:
 
 ## Open findings
 
-### Finding 1: legacy armour focus awards were never migrated to NSB designer equipment
+### Finding 1: legacy armour focus awards were never migrated to NSB designer equipment - resolved 2026-09-08
 
 Reported case: `BUL_Soviet_T55s` shows no completion award though it should grant 200
 `mbt_equipment_3` from CUM.
@@ -79,31 +79,66 @@ The carrier presets are the model - same producer-resolution rule, same named na
 designs. This wants a validator contract pinning every focus armour grant to a design
 some bootstrap creates, exactly like the OOB `force_equipment_variants` check.
 
-### Finding 2: `tank_gasoline_engine` outperforms the entire CWIC petrol ladder
+Resolution: every active, in-scope legacy armour grant now keeps its original
+non-NSB branch and gains an NSB branch that creates an obsolete producer-owned
+export design before granting the matching chassis variant. The mapping uses the
+largest designer chassis whose ratified introduction year is no later than the
+legacy equipment year. This pass added 314 migrations; 9 existing export branches
+were retained. The validator now checks all 323 in-scope grants, their chassis and
+variant pairs, producer helper calls, and the 8 intentional equipment-type exceptions
+(16 grants).
 
-| Module | Localised name | Speed multiplier |
-| --- | --- | --- |
-| `tank_gasoline_engine` | Gasoline Engine | **0.15** |
-| `Petrol_0` | WW2 Gasoline Engine | 0.05 |
-| `Petrol_1` | Post-WW2 Gasoline Engine | 0.07 |
-| `Petrol_2` | Early Cold War Gasoline Engine | 0.09 |
-| `Petrol_3` | Mid-Cold War Gasoline Engine | 0.11 |
+The 11 explicitly reference-only focus paths remain outside this contract:
+`FOR HOTFIX/`, `Need Finished/`, `OUTDATED_PRC_60s.txt`, `Old/`, `Toberemoved/`,
+and `Trees for 0.35/`. Static validation passed; no live QA or balance acceptance
+is claimed for this migration.
 
-`tank_gasoline_engine` is the vanilla module, inherited unchanged, and CWIC's only
-module on `category = tank_engine_gasoline` outside the `Petrol_*` ladder. It is
-enabled by the base NSB armour tech (`NSB_armor.txt:63`) while `Petrol_0` is gated
-much later (`NSB_armor.txt:1074`). The earliest, cheapest gasoline engine is strictly
-the best one, beating even Mid-Cold War petrol.
+Deferred follow-up: the migrated NSB focus effects currently use generic
+`CWIC Export ...` `variant_name` values rather than historical preset variants.
+This is immersion-breaking and does not track the legacy equipment identity.
+Another session must research and map each focus effect/equipment grant to its
+historical variant counterpart. This is intentionally deferred because the
+research cost is high; no mapping is implemented in this pass.
 
-**Blast radius:** all 40 generic and 576 of 586 national presets use
-`engine_type_slot = tank_gasoline_engine`. Rebalancing the ladder or retiring
-`tank_gasoline_engine` in favour of `Petrol_0` means re-pointing every carrier preset
-recipe and re-checking the frozen envelopes. Do this **before** authoring further
-preset tiers, not after.
+### Finding 2: base gasoline engine outranked the CWIC petrol ladder - resolved
 
-Note that `tank_gasoline_engine` is not a stub and must not simply be deleted:
-`Petrol_0` declares it as `parent`, and it is the `engine_type_slot` default at
-`tank_chassis.txt:391, 795, 1200`.
+The script-owned `tank_gasoline_engine` was the `Petrol_0` parent and the default
+engine slot, but its `maximum_speed` multiplier was 0.15, above every CWIC petrol
+tier (`Petrol_0` 0.05, `Petrol_1` 0.07, `Petrol_2` 0.09, `Petrol_3` 0.11). It is
+enabled by the base NSB armour tech (`NSB_armor.txt:63`); `Petrol_0` remains gated
+at `NSB_armor.txt:1074`.
+
+The ladder is corrected in place: `tank_gasoline_engine.maximum_speed` is 0.03,
+below `Petrol_0` at 0.05. The module remains the pre-WW2 parent/base definition;
+`Petrol_0` is the starting template. The English localisation now calls the former
+"Gasoline Engine" **"Pre-WW2 Gasoline Engine"**.
+
+Every tank-bootstrap country-history site grants `nsb_engines`, so `Petrol_0` is
+available through the same starting-tech contract. The two scripted effects now route
+all 576 national and 40 generic starting variants to `Petrol_0`; the four USA
+manifest entries are synchronized. The three archetype default slots elsewhere remain
+`tank_gasoline_engine` under the existing parent/default decision and were not changed
+by this scoped preset migration.
+
+The full static report passes with the inventory line unchanged. Relative to the
+previous engine-only report, the 11 sampled tank envelope estimates changed as
+follows (`speed`, `fuel_usage`):
+
+| Recipe | Speed | Fuel |
+| --- | ---: | ---: |
+| Heavy Tank I | -3.13 -> -2.59 | -2.45 -> -2.02 |
+| Heavy Tank II | -2.69 -> -2.14 | -2.45 -> -2.02 |
+| Heavy Tank IV | -3.25 -> -2.69 | -2.45 -> -2.02 |
+| Heavy Tank V | -3.81 -> -3.24 | -2.45 -> -2.02 |
+| WWII Tank 1 | -4.07 -> -3.51 | -1.45 -> -1.02 |
+| WWII Tank 2 | -4.63 -> -4.06 | -1.45 -> -1.02 |
+| MBT II | -5.19 -> -4.61 | -1.45 -> -1.02 |
+| MBT III | -5.75 -> -5.16 | -1.45 -> -1.02 |
+| Light Tank I | -5.02 -> -4.43 | 0.35 -> 0.78 |
+| Light Tank II | -5.58 -> -4.98 | 0.35 -> 0.78 |
+| Light Tank IV | -7.70 -> -7.08 | 0.35 -> 0.78 |
+
+These are diagnostic estimates only; no live balance acceptance is claimed.
 
 ### Finding 3: presets show the generic carrier icon, not per-design art
 
@@ -119,6 +154,19 @@ closely, so the module baselines are landing where they were aimed.
 Unresolved: whether carrier designs get per-chassis pictures (cheap, one icon per hull
 tier, still not per-vehicle), or whether the tank icon-generation path can be reused
 for the mechanized archetype at all.
+
+### Finding 4: major-country Petrol_1 bootstrap is deferred
+
+`nsb_engines0` enables `Petrol_1`, starts in 1950, costs 2 research, and is not
+granted by any country history. USA, SOV, FRA, ENG and WGR grant `nsb_engines` in
+their NSB starting-tech blocks but do not grant `nsb_engines0`. Current historical
+medium-tank national presets exist only for USA and SOV; FRA/ENG/WGR/JAP appear in
+carrier paths, not this medium-tank ladder.
+
+Recommendation: keep `Petrol_0` as the universal starting preset engine. Do not add
+major-country `nsb_engines0` grants or `Petrol_1` routing until a country/tier
+historical mapping and balance contract exists. This is an open design item, not
+implemented in this pass.
 
 ## Owner QA notes, 2026-09-06 playtest
 
@@ -166,26 +214,27 @@ non-NSB players, and a designer UI pass at 1920x1080 and 2560x1440 at 1.0x and 2
 
 ## Next scope
 
-1. **Finding 2 first.** It has the widest blast radius and gates further preset
-   authoring. Decide the engine ladder, then re-point presets and re-check envelopes.
-2. **Finding 1.** The 301 focus grants, with a validator contract. Plan the mapping
-   rule and its exception list before editing; the applications themselves are
-   mechanical once the rule exists.
-3. **QA items 2 and 4** - research date gating and ahead-of-time penalties. Bounded.
-4. **QA items 3, 6, 7** - turret stat check, radar tooltip verification, focus-effect
+Finding 2 is resolved by the static engine-ladder correction and preset migration
+above; further preset authoring is no longer gated on the old baseline-module issue.
+Remaining work:
+
+1. **QA items 2 and 4** - research date gating and ahead-of-time penalties. Bounded.
+2. **QA items 3, 6, 7** - turret stat check, radar tooltip verification, focus-effect
    verbosity. Bounded cleanups.
-5. **Finding 3** - carrier art decision.
-6. **Historical coverage sweep.** Explicitly required, not optional polish: named
-   designs for **all** armour vehicle families (light, medium, heavy, APC, IFV and other
-   armoured roles) across all countries, or at minimum every country with a
-   corresponding non-NSB vehicle already implemented. The 14 national medium presets do
-   not complete this. Drive it from the existing `TAG_<equipment>` localisation
+3. **Finding 3** - carrier art decision.
+4. **Finding 4** - decide whether any country/tier receives `nsb_engines0` and
+   `Petrol_1`; requires a historical mapping and balance contract before implementation.
+5. **Historical coverage sweep.** Explicitly required, not optional polish: named
+   designs for **all** armour vehicle families (light, medium, heavy, APC, IFV and
+   other armoured roles) across all countries, or at minimum every country with a
+   corresponding non-NSB vehicle already implemented. The 14 national medium presets
+   do not complete this. Drive it from the existing `TAG_<equipment>` localisation
    inventory rather than inventing mappings. The manifest's `future_inventory` already
    holds 354 selected APC/IFV tier 5-7 pairs with provenance.
-7. **Deferred content batches**, in this order and each with an explicit slot-budget
+6. **Deferred content batches**, in this order and each with an explicit slot-budget
    statement: amphibious (only together with marine sub-unit supply), artillery/AA
    against the frozen manifest, night/thermal vision, page-2 specials.
-8. **Envelope calibration** slots in before any batch that needs static estimates as
+7. **Envelope calibration** slots in before any batch that needs static estimates as
    acceptance evidence.
 
 Estimator status: module parents no longer stack predecessor stats. Radar II fuel 1.2

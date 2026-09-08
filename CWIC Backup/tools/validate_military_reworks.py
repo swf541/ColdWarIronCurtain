@@ -110,6 +110,22 @@ FOCUS_FILES = (
     MOD / "common/national_focus/GRE_military_shared_1950s.txt",
     MOD / "common/national_focus/50s_FIN.txt",
 )
+NATIONAL_FOCUS_DIR = MOD / "common/national_focus"
+LEGACY_ARMOUR_GRANT_PATH_EXCEPTIONS = frozenset(
+    {
+        "Cold War Iron Curtain/common/national_focus/FOR HOTFIX/70s_Pak_Notes_for_Reference_Only_Do_Not_Delete.txt",
+        "Cold War Iron Curtain/common/national_focus/Need Finished/50s_TUR_new.txt",
+        "Cold War Iron Curtain/common/national_focus/Need Finished/EGY_1950s_RCC.txt",
+        "Cold War Iron Curtain/common/national_focus/OUTDATED_PRC_60s.txt",
+        "Cold War Iron Curtain/common/national_focus/Old/ISR_50s_old.txt",
+        "Cold War Iron Curtain/common/national_focus/Old/YUG_1950s.txt",
+        "Cold War Iron Curtain/common/national_focus/Toberemoved/50s_SYR.txt",
+        "Cold War Iron Curtain/common/national_focus/Toberemoved/60s_SYR.txt",
+        "Cold War Iron Curtain/common/national_focus/Toberemoved/IRQ_Mid_1960s.txt",
+        "Cold War Iron Curtain/common/national_focus/Trees for 0.35/stalintreereworknew.txt",
+        "Cold War Iron Curtain/common/national_focus/Trees for 0.35/Japan/JAP_1950s.txt",
+    }
+)
 TANK_ROLE_FILE = MOD / "common/units/need_for_tank_roles.txt"
 TANK_ICON_FILE = MOD / "interface/cwic_tank_rework_icons.gfx"
 TANK_LOC_FILE = MOD / "localisation/english/tank_modules_l_english.yml"
@@ -266,12 +282,31 @@ FLAME_TECH_GRANTS = {
     },
 }
 EXPORT_VARIANTS = {
-    "CWIC Export Main Battle Tank 1950": "medium_tank_chassis_3",
+    "CWIC Export Main Battle Tank 1942": "medium_tank_chassis_1",
     "CWIC Export Main Battle Tank 1944": "medium_tank_chassis_2",
+    "CWIC Export Main Battle Tank 1950": "medium_tank_chassis_3",
+    "CWIC Export Main Battle Tank 1960": "medium_tank_chassis_4",
+    "CWIC Export Main Battle Tank 1970": "medium_tank_chassis_5",
+    "CWIC Export Main Battle Tank 1980": "medium_tank_chassis_6",
     "CWIC Export Light Tank 1942": "light_tank_chassis_1",
     "CWIC Export Light Tank 1944": "light_tank_chassis_2",
+    "CWIC Export Heavy Tank 1942": "heavy_tank_chassis_1",
     "CWIC Export Heavy Tank 1944": "heavy_tank_chassis_2",
+    "CWIC Export Armored Personnel Carrier 1947": "apc_chassis_0",
+    "CWIC Export Armored Personnel Carrier 1950": "apc_chassis_1",
+    "CWIC Export Armored Personnel Carrier 1960": "apc_chassis_2",
+    "CWIC Export Armored Personnel Carrier 1965": "apc_chassis_3",
+    "CWIC Export Infantry Fighting Vehicle 1950": "ifv_chassis_1",
+    "CWIC Export Infantry Fighting Vehicle 1965": "ifv_chassis_3",
 }
+LEGACY_ARMOUR_GRANT = re.compile(
+    r"^(?:lt_equipment|mbt_equipment|ht_equipment|mechanized_equipment"
+    r"|mechanized_heavy_equipment|mechanized_marine_equipment)(?:_\d+)?$"
+)
+UNMIGRATED_LEGACY_ARMOUR = frozenset(
+    {"mechanized_equipment", "mechanized_equipment_1", "mechanized_equipment_2"}
+    | {f"mechanized_marine_equipment_{tier}" for tier in range(1, 6)}
+)
 BOOKMARK_VARIANT_NAMES = {
     "heavy_tank_artillery_chassis_1": "Standard Heavy SPG 1942",
     "heavy_tank_artillery_chassis_3": "Standard Heavy SPG 1950",
@@ -1930,15 +1965,18 @@ def tank_module_balance_report() -> str:
             if module not in rows:
                 continue
             source_record = record
-            # The workbook is immutable. The reviewed QA turret change lives in
+            # The workbook is immutable. Reviewed source-to-live overrides live in
             # the CSV and script; still verify the old source cells explicitly.
-            # See Deferred_Design_Decisions.md, conventional turret balance.
+            # See DECISIONS.md for the conventional turret balance and base
+            # gasoline engine speed ordering.
             if module == "conventional_turret" and source != "CSV":
                 source_record = record | {
                     "add": {"build_cost_ic": 1.0, "reliability": 0.15},
                     "multiply": {},
                     "dismantle": 0.5,
                 }
+            if module == "tank_gasoline_engine" and source != "CSV":
+                source_record = record | {"multiply": {"maximum_speed": 0.15}}
             row_checked, row_populated = _compare_module_row(module, rows[module], source_record, source)
             checked += row_checked
             populated += row_populated
@@ -1949,6 +1987,8 @@ def tank_module_balance_report() -> str:
                     for metric, (column, csv_index, multiply_column, multiply_index) in MODULE_BALANCE_COLUMNS.items():
                         if module == "conventional_turret" and metric in {"build_cost_ic", "breakthrough"}:
                             continue  # Explicit source-to-live deviation, checked above and by turret_contract.
+                        if module == "tank_gasoline_engine" and metric == "maximum_speed":
+                            continue  # Frozen workbook retains the pre-rebalance source value.
                         for workbook_column, csv_column in ((column, csv_index), (multiply_column, multiply_index)):
                             if workbook_column is None:
                                 continue
@@ -1978,7 +2018,7 @@ def tank_module_balance_report() -> str:
         f"Tank module balance report: {len(sourced_modules)} IDs reconciled across CSV, "
         f"Total Balance Sheet Minimal, and Total Balance Sheet; {checked} populated "
         f"stat/resource cells checked; operation/provenance metadata {metadata_count}/{len(SCRIPT_OWNED_MODULES)}; "
-        f"22 script-owned IDs reconciled; 1 reviewed turret source-to-live override; "
+        f"22 script-owned IDs reconciled; 2 reviewed source-to-live overrides; "
         f"explicit exclusions cover eligibility, display, conversion, and XP fields "
         f"(the manual's 23 count has no additional module ID); "
         f"{len(APC_SUPERSTRUCTURE_MODULES) + len(APC_ARMAMENT_MODULES)} APC and "
@@ -2244,6 +2284,106 @@ def tank_balance_report() -> str:
         f"(39 targets, 1 Abrams reference), {sum(years.values())} year entries; "
         f"scope manifest: {BALANCE_MANIFEST_FILE.relative_to(ROOT)}"
     )
+
+
+def named_block_spans(value: str, label: str) -> list[tuple[str, int, int, str]]:
+    code = strip_script_comments(value)
+    spans: list[tuple[str, int, int, str]] = []
+    for match in re.finditer(r"\b([A-Za-z0-9_]+)\s*=\s*\{", code):
+        opening = code.find("{", match.start(), match.end())
+        ending = balanced_end(code, opening, f"{label}.{match[1]}")
+        spans.append((match[1], match.start(), ending, code[match.start() : ending + 1]))
+    return spans
+
+
+def nearest_containing_span(
+    spans: list[tuple[str, int, int, str]],
+    start: int,
+    end: int,
+    name: str | None = None,
+) -> tuple[str, int, int, str] | None:
+    containing = [
+        span for span in spans
+        if (name is None or span[0] == name)
+        and span[1] <= start
+        and end <= span[2]
+        and not (span[1] == start and span[2] == end)
+    ]
+    return min(containing, key=lambda span: span[2] - span[1], default=None)
+
+
+def validate_focus_armour_grants(
+    overrides: dict[str, str] | None = None,
+) -> int:
+    checked = 0
+    overrides = overrides or {}
+    for path in sorted(NATIONAL_FOCUS_DIR.rglob("*.txt")):
+        relative = str(path.relative_to(ROOT))
+        if relative in LEGACY_ARMOUR_GRANT_PATH_EXCEPTIONS:
+            continue
+        value = strip_script_comments(overrides.get(relative, text(path)))
+        if not re.search(r"\badd_equipment_to_stockpile\s*=\s*\{", value):
+            continue
+        spans = named_block_spans(value, relative)
+        for grant in (span for span in spans if span[0] == "add_equipment_to_stockpile"):
+            type_values = top_level_values(grant[3], "type")
+            if len(type_values) != 1 or not LEGACY_ARMOUR_GRANT.fullmatch(type_values[0]):
+                continue
+            equipment_type = type_values[0]
+            if equipment_type in UNMIGRATED_LEGACY_ARMOUR:
+                continue
+            legacy_else = (
+                nearest_containing_span(spans, grant[1], grant[2], "else")
+                or nearest_containing_span(spans, grant[1], grant[2], "else_if")
+            )
+            if legacy_else is None:
+                fail(f"{relative}:{value[:grant[1]].count(chr(10)) + 1} legacy {equipment_type} grant lacks an NSB fallback branch")
+                continue
+            parent = nearest_containing_span(spans, legacy_else[1], legacy_else[2])
+            if parent is None:
+                fail(f"{relative} legacy {equipment_type} grant has no conditional parent")
+                continue
+            parent_text = value[parent[1] : parent[2] + 1]
+            children = top_level_ranges(parent_text, f"{relative} conditional parent")
+            else_children = [
+                (start, end, child) for name, start, end, child in children
+                if name in {"else", "else_if"}
+                and parent[1] + start <= grant[1] <= parent[1] + end
+            ]
+            preceding_if = [
+                child for name, start, end, child in children
+                if name == "if"
+                and else_children
+                and parent[1] + end < parent[1] + else_children[0][0]
+                and 'has_dlc = "No Step Back"' in child
+            ]
+            if not else_children or not preceding_if:
+                fail(f"{relative}:{value[:grant[1]].count(chr(10)) + 1} legacy {equipment_type} grant lacks a sibling NSB designer branch")
+
+        for grant in (span for span in spans if span[0] == "add_equipment_to_stockpile"):
+            variant_values = top_level_values(grant[3], "variant_name")
+            type_values = top_level_values(grant[3], "type")
+            if len(variant_values) != 1 or not variant_values[0].startswith("CWIC Export "):
+                continue
+            variant, equipment_type = variant_values[0], type_values[0] if len(type_values) == 1 else ""
+            expected_type = EXPORT_VARIANTS.get(variant)
+            if expected_type != equipment_type:
+                fail(f"{relative}:{value[:grant[1]].count(chr(10)) + 1} export grant has wrong type for {variant}")
+                continue
+            designer_if = nearest_containing_span(spans, grant[1], grant[2], "if")
+            if designer_if is None or 'has_dlc = "No Step Back"' not in designer_if[3]:
+                fail(f"{relative}:{value[:grant[1]].count(chr(10)) + 1} export grant lacks its NSB branch")
+                continue
+            producer_values = top_level_values(grant[3], "producer")
+            helper = "cwic_create_" + re.sub(r"[^A-Za-z0-9]+", "_", variant).lower().strip("_")[len("cwic_"):]
+            producer_blocks = (
+                top_level_named_blocks(designer_if[3], producer_values[0], relative)
+                if len(producer_values) == 1
+                else []
+            )
+            if not any(top_level_values(block, helper) == ["yes"] for block in producer_blocks):
+                fail(f"{relative}:{value[:grant[1]].count(chr(10)) + 1} export grant lacks producer helper {helper}")
+    return checked
 
 
 def validate_tank_rework() -> None:
@@ -2523,6 +2663,7 @@ def validate_tank_rework() -> None:
         flag = re.sub(r"[^A-Za-z0-9]+", "_", helper).lower().strip("_") + "_created"
         if "set_country_flag = " + flag not in variant_text:
             fail(f"export variant {helper} lacks its producer flag guard")
+    validate_focus_armour_grants()
     focus_contracts = {
         "BRA_american_tanks": ("nsb_main_battle_tanks2", "medium_tank_chassis_3", "CWIC Export Main Battle Tank 1950"),
         "BRA_soviet_tanks": ("nsb_main_battle_tanks2", "medium_tank_chassis_3", "CWIC Export Main Battle Tank 1950"),
@@ -2978,6 +3119,20 @@ def run_tank_negative_fixtures() -> None:
     def rejected(condition: bool, label: str) -> None:
         if not condition:
             raise AssertionError(f"tank negative fixture was accepted: {label}")
+    focus_path = NATIONAL_FOCUS_DIR / "1950s_Afghanistan.txt"
+    focus_source = text(focus_path)
+    helper_position = focus_source.find("cwic_create_export_main_battle_tank_1950")
+    limit_position = focus_source.rfind('has_dlc = "No Step Back"', 0, helper_position)
+    malformed_focus = (
+        focus_source[:limit_position]
+        + focus_source[limit_position:].replace('has_dlc = "No Step Back"', 'has_dlc = "Other DLC"', 1)
+    )
+    previous_errors = len(errors)
+    validate_focus_armour_grants({str(focus_path.relative_to(ROOT)): malformed_focus})
+    rejected_malformed_focus = len(errors) > previous_errors
+    del errors[previous_errors:]
+    if not rejected_malformed_focus:
+        raise AssertionError("focus armour grant contract accepted a missing NSB gate")
 
     armor_techs = dict(top_level_blocks(text(TECH_DIR / "NSB_armor.txt"), "technologies"))
     module_techs = dict(top_level_blocks(text(TECH_DIR / "NSB_armor_modules.txt"), "technologies"))

@@ -102,6 +102,40 @@ country scope
   -> set_oob = <bookmark NSB OOB>
 ```
 
+## Legacy focus armour grants
+
+**Ratified 2026-09-08.** On an NSB profile, a legacy armour focus grant maps to
+the largest designer chassis whose introduction year is no later than the legacy
+equipment year. The producer creates one obsolete, no-tech export variant for
+that chassis, and the focus grants that producer-owned variant. The non-NSB
+branch remains the original legacy equipment grant unchanged. Producer
+resolution follows the established producer, creator, owner, OOB-tag order.
+
+The export inventory required by the current grants is:
+
+- Main Battle Tank: 1942, 1944, 1950, 1960, 1970 and 1980.
+- Light Tank: 1942 and 1944.
+- Heavy Tank: 1942 and 1944.
+- APC: 1947, 1950, 1960 and 1965.
+- IFV: 1950 and 1965.
+
+All export variants use the established obsolete baseline loadouts. The eight
+equipment-type exceptions remain legacy grants: `mechanized_equipment`,
+`mechanized_equipment_1`, `mechanized_equipment_2`, and
+`mechanized_marine_equipment_1..5`. The first three are pre-designer WWII rows
+without replacements; the marine rows remain legacy until a designer vehicle
+supplies the marine sub-unit. The 11 explicitly reference-only focus paths are
+excluded from this migration and from its validator contract: `FOR HOTFIX/`,
+`Need Finished/`, `OUTDATED_PRC_60s.txt`, `Old/`, `Toberemoved/`, and
+`Trees for 0.35/`.
+
+**Deferred follow-up.** The current focus effects use generic `CWIC Export ...`
+`variant_name` values instead of historical preset variants. This is
+immersion-breaking and does not track the legacy equipment identity. A future
+session must research and map each focus effect/equipment grant to its
+historical variant counterpart. The research cost is intentionally deferred;
+no historical mapping is part of this migration.
+
 ## Naming and localisation
 
 - Country-specific localisation is the naming authority over the consolidated file
@@ -174,6 +208,8 @@ the slot specialization may use now-ineligible placements - use fresh campaigns.
 | 5.3.4 | Turret cost ordering | **LP premium kept, 1.5 tie broken.** `oscillating_turret` 1.5 to 1.75, dismantling 0.75 to 0.875, preserving the file-wide 0.5 ratio. |
 | 5.3.5 | 12 of 15 sub-units `active = yes` | **Normalised to `active = yes`, not `no`.** The manual's recommendation was wrong: legacy `armor.txt` enables only `light_armor`, `medium_armor`, `heavy_armor`, `super_heavy_armor`. The 9 role brigades and 3 flame tanks are enabled only by `nsb_iw_armored_vehicles`, so in a non-NSB profile `active = yes` is the sole thing making them buildable. Setting them to `no` would have deleted them from non-NSB play. The validator contract was inverted to match. |
 | 5.3.6 | `tank_gasoline_engine` home, missing `xp_cost` | **Base engine, not a duplicate.** It is `Petrol_0`'s declared parent and the `engine_type_slot` default at `tank_chassis.txt:391, 795, 1200`. Gains `xp_cost = 1` and `dismantle_cost_ic = 0.5`. |
+| 5.3.7 | Base gasoline engine speed ordering and preset baseline | **Rebalanced and rerouted.** `tank_gasoline_engine` remains the script-owned pre-WW2 base module and `Petrol_0` remains its child/starting template. Its `maximum_speed` multiplier is 0.03, below `Petrol_0` at 0.05. The living CSV and frozen-workbook validator override are updated. The 576 national and 40 generic preset references in the two scripted effects now use `Petrol_0`; the four USA manifest entries are synchronized. `tank_gasoline_engine` localisation is "Pre-WW2 Gasoline Engine". |
+| 5.3.8 | Major-country `Petrol_1` bootstrap | **Deferred.** Every tank-bootstrap country-history site grants `nsb_engines`; no country history grants `nsb_engines0`. `nsb_engines0` starts in 1950 and costs 2 research. Keep `Petrol_0` as the universal preset baseline until a country/tier-specific historical and balance contract is authored. |
 | 6 | Research cost curve | **Ratified and applied.** R1-R7; 91 of 169 technologies repriced; 337 to 345.5 (+2.52%); USA/SOV 1970 -1.67%, 2020 +8.33%. |
 | 6 | XP economy | **Flat at 1, deliberate.** No repricing. Closed. |
 
