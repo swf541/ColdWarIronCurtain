@@ -88,9 +88,9 @@ Passed and committed. Both bookmarks load, presets load, stockpiles and factory
 lines exist, `error.log` is acceptable. AI production is deferred to a single
 final pass once the remaining designer content is in, at the owner's direction.
 
-Three findings came out of the run - focus `completion_reward` duplication,
-`tank_gasoline_engine` outperforming the `Petrol_*` ladder, and carrier designs
-inheriting the generic archetype picture. All three are next-session scope and
+Three findings came out of the run - legacy armour focus awards never migrated to
+NSB designer equipment, `tank_gasoline_engine` outperforming the `Petrol_*`
+ladder, and carrier designs inheriting the generic archetype picture. All three are next-session scope and
 written up in `IFV_APC_HANDOFF.md`. Finding 2 is the one that touches this batch:
 every carrier preset uses `tank_gasoline_engine`, so an engine rebalance means
 re-pointing all of them.

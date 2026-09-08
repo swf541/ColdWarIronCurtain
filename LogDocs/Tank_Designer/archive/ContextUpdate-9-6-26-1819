@@ -1,0 +1,54 @@
+Changes since b4a1232 — branch tank-designer-and-doctrine-rework-test
+
+Three commits, all pushed. Local is level with origin, no tracked modifications. Validator passes at HEAD:
+1287 technologies, 246 tank modules, 125 historical tank designs, 30 bookmark variants, 460 named OOB requests, 15 designer slots.
+
+1. a997a48 — Move tools into proper directory
+
+Pure renames, no content change.
+- tools/artillery_aa_targets.py → CWIC Backup/tools/
+- tools/hyprland_uimouse.py → CWIC Backup/tools/
+- tools/loc_audit.py → CWIC Backup/tools/loc_audit_1.py
+
+Regression risk: the tools/ directory no longer exists in git. Any doc or habit pointing at tools/loc_audit.py or tools/validate_military_reworks.py is now dead — the real paths are under CWIC Backup/tools/. Also note CWIC Backup/tools/loc_audit.py already existed and is byte-identical to the newly landed loc_audit_1.py; one of the two should be deleted rather than both being maintained. Stale path references remain in HANDOFF_ICONS.md, LOC_STYLE_GUIDE.md, and several LogDocs.
+
+2. 368fa48 — Tank module slots out of the shared designer loc namespace
+
+The root cause: tank chassis and plane airframes both used special_type_slot_N, and EQ_MOD_SLOT_<slot>_TITLE is keyed on slot name alone. Vanilla's plane_designer_l_english.yml aliases slots 5 and 6 to slot 4's title and won the lookup, so Computer/Radar and Loading System both rendered as "Optics".
+
+All ten tank special slots renamed special_type_slot_N → tank_special_slot_N across 110 files:
+- common/units/equipment/tank_chassis.txt
+- 105 designer GUI files under interface/…/tanks/
+- common/ai_equipment/generic_tank.txt
+- CWIC_tank_designer_effects.txt, CWIC_tank_focus_effects.txt
+- localisation/english/tank_modules_l_english.yml
+- CWIC Backup/tools/validate_military_reworks.py (five regexes/format strings)
+
+Regression risk — the one to watch: tank_special_slot_N is now the only valid slot name. Any new AI recipe, variant recipe, chassis edit, or GUI file written against special_type_slot_N will fail the validator (or silently not bind). The French and Japanese tank_modules_l_*.yml still carry 10 special_type_slot_* keys each — deliberately untouched per the English-loc-only rule, so those two languages will still show the vanilla plane titles until the translation owners update them.
+
+3. b2cd569 — Actually patch tank designer GUI error spam
+
+Replaced gfx/entities/zz_CWIC_armor_level0_entities.asset (313 lines, 62 aliases) with gfx/entities/zz_CWIC_armor_entity_aliases.asset (~15.2k lines, 3,019 aliases). The old file is deleted — do not resurrect it.
+
+The previous file only covered _0 on the three base armor sub-units, so *_brigade roles and every visual level above 0 kept spamming equipment_model_util on designer hover. The new file spans base armor, tank destroyer, SP artillery, SP AA and flame sub-units across levels 0–9 (light/medium) and 0–4 (heavy), for the 75 tag/class combinations that define a base armor entity. Flame aliases clone the shared <class>_flame_tank_entity so flame art survives.
+
+Deliberately excluded: GER light, GER heavy, ITA heavy, JAP light. The mod's units_tanks.asset replaces vanilla's and those four have no base entity to clone — they were the four Couldn't find parent clone entity errors the old file produced. The zz_ prefix is load-order critical: all existing clones in the mod resolve backward, none forward, so this must load last.
+
+LogDocs/Tank_Designer/HANDOFF_Tier3.md was updated to describe this.
+
+Untracked / device-local — will diverge silently
+
+Not in git, so Astra won't see them; if the same filenames exist on the other device they'll conflict:
+- LogDocs/Doctrine_Rework/ — Plan, Cell_Manifest, Land_Doctrine_Tree_Structure, Icon_Art_Requests (only Doctrine_Rework_Investigation.md is tracked)
+- LogDocs/Tank_Designer/HANDOFF_Deferred_Scope.md, TankQANotes.txt, Screenshots_9-6-26/
+- LogDocs/Indochina/VIN_FRE_Session_Handoff.md
+- CWIC Backup/documentation/Indochina_AFK_Playtest.md, Tank_Designer_Development_Branch_Comparison_2026-09-05.md
+- CWIC Backup/tools/indochina_event_pictures/
+- error-1949NSB.log, error-1949NoNSB.log, error-1980NSB.log, error-1980NoNSB.log
+- a stale LibreOffice lock: LogDocs/Tank_Designer/.~lock.2023 - CWIC Tank Rework Balance.xlsx#
+
+These should be committed or deleted deliberately before the next multi-device session.
+
+Open QA items from the 9-6 playtest (not yet fixed, so don't assume they're done)
+
+Both NSB and non-NSB loaded clean at 1949 and 1980. Outstanding: FIN's "Acquire Soviet T-55's" grants nothing without a SOV tech check on non-NSB; tank research isn't date-gated (1980 start still has 1955+ tech locked, and 1985 techs research with no penalty); light turret module duplicates conventional turret stats; NSB has no preset T-54/55; ATGM piercing looks unbounded (600 pierce / 95 hard on Gun-Launched III); vehicle radar stats look off; CWIC_tank_focus_effects.txt floods USA/SOV production tabs with presets on NSB.

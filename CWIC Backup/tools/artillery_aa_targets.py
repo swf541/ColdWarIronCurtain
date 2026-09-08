@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
-DIRECTORY = ROOT / "LogDocs/Tank_Designer"
+DIRECTORY = ROOT / "LogDocs/Tank_Designer/data"
 WORKBOOK = DIRECTORY / "2023 - CWIC Tank Rework Balance.xlsx"
 MANIFEST = DIRECTORY / "Artillery_AA_Target_Manifest.md"
 SHA = "dc2c9800b69b0f2f00568cdfe0f4bcac55c8bdd61476409b4a88b6d8e566b532"

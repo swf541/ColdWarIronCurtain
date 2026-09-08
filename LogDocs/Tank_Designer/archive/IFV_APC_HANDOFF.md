@@ -51,27 +51,41 @@ of the designer content is in. Step 2 is committed on that basis.
 Three findings from the QA run. None of them block the commit; all three are
 next-session scope and none originate in the preset/OOB migration itself.
 
-### Finding 1: armour-import focus rewards - a mod-wide duplicate `completion_reward`
+### Finding 1: legacy armour focus awards were never migrated to NSB designer equipment
 
 Reported case: `BUL_Soviet_T55s` shows no completion award even though it should
-grant 200 `mbt_equipment_3` from CUM. Cause found: the focus declares
-`completion_reward` **twice** - an empty block at `1950s_BUL.txt:1559` and the real
-`add_equipment_to_stockpile` block at `1950s_BUL.txt:1571`. This is the duplicate
-`completion_reward` trap already recorded for the Diem work, where one of the two
-blocks is silently dropped.
+grant 200 `mbt_equipment_3` from CUM.
 
-This is not a handful of focuses. A sweep of `common/national_focus/` finds
-**12,852 focuses with more than one `completion_reward`**, of which 12,769 have an
-empty block first. 484 of them grant equipment. The empty-first shape is uniform
-enough to look like a generator or template artifact rather than hand-authored
-mistakes, and the top files are broad (`50s_PER.txt` 233, `60s_NGA.txt` 189,
-`SAF_1960s.txt` 188, `60s_ITA.txt` 187, `CAM_50s.txt` 185).
+Owner's diagnosis, confirmed: this is our own NSB designer change, not a focus
+scripting bug. Every legacy armour equipment entry is reparented onto a designer
+archetype - `tank_medium.txt` puts all 10 `mbt_equipment_*` on
+`archetype = medium_tank_chassis`, and `tank_heavy.txt` (5), `tank_light.txt` (6)
+and `mechanized.txt` (18) do the same onto their designer archetypes. So
+`add_equipment_to_stockpile = { type = mbt_equipment_3 producer = CUM }` names an
+equipment that now belongs to a designer family and has no design behind it for
+that producer. Nothing is granted and the reward renders empty.
 
-Next session should establish which of the two blocks the engine actually keeps
-before touching anything - if the *last* block wins, the rewards fire and only the
-focus tooltip is wrong, which is a much smaller problem than 12,769 dead rewards.
-Deleting the empty leading block is almost certainly the fix either way, but it is
-a mod-wide mechanical edit and deserves its own batch and its own validator check.
+To be explicit, since an earlier draft of this document got it wrong: **two
+`completion_reward` blocks in one focus is not disallowed and is not the cause
+here.** The duplicate-block pattern is real and widespread but is a separate,
+independent issue - see [[cwic-diem-debloat-2026-08]] - and it is not what
+`BUL_Soviet_T55s` is demonstrating.
+
+Scope of the actual migration owed: **301 `add_equipment_to_stockpile` grants
+across the focus trees name a legacy armour type, and all 301 specify a producer.**
+They span 22 distinct types, led by `mbt_equipment_3` (57), `mbt_equipment_2` (44),
+`lt_equipment_2` (31), `mbt_equipment_0` (30), `ht_equipment_3` (25) and
+`mbt_equipment_1` (24), plus 28 mechanized/heavy-mechanized grants. Heaviest files
+are `60s_Generic.txt` (41), `60s_ITA.txt` (26), `60s_SOM.txt` (26) and
+`60s_VIE.txt` (26).
+
+Each grant needs a decision, not a mechanical rename: which designer chassis and
+which named design the awarding producer should hand over, on both the NSB and
+non-NSB profiles. The carrier presets from this batch are the model - the same
+producer-resolution rule (producer, then creator, then owner) and the same named
+national designs apply. This is a sizeable batch of its own and wants a validator
+contract that pins every focus armour grant to a design some bootstrap creates,
+exactly like the OOB `force_equipment_variants` check already does.
 
 ### Finding 2: `tank_gasoline_engine` outperforms the entire CWIC petrol ladder
 

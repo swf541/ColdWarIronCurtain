@@ -29,7 +29,7 @@ if "--help" in sys.argv:
         "--doctrine-self-test and --tank-self-test add in-memory negative fixtures.\n"
         "--tank-balance-report additionally reads the untracked workbook at the repository "
         "root and prints the reviewed scope; the tracked manifest is "
-        "LogDocs/Tank_Designer/Balance_Target_Manifest.md."
+        "LogDocs/Tank_Designer/data/Balance_Target_Manifest.md."
     )
     sys.exit(0)
 
@@ -100,9 +100,9 @@ ENUM_FILE = MOD / "common/script_enums.txt"
 VARIANT_EFFECT_FILE = MOD / "common/scripted_effects/CWIC_tank_designer_effects.txt"
 FOCUS_EFFECT_FILE = MOD / "common/scripted_effects/CWIC_tank_focus_effects.txt"
 NATIONAL_EFFECT_FILE = MOD / "common/scripted_effects/CWIC_national_tank_presets.txt"
-NATIONAL_MANIFEST_FILE = ROOT / "LogDocs/Tank_Designer/National_Tank_Preset_Manifest.json"
+NATIONAL_MANIFEST_FILE = ROOT / "LogDocs/Tank_Designer/data/National_Tank_Preset_Manifest.json"
 NATIONAL_PRESETS = json.loads(NATIONAL_MANIFEST_FILE.read_text(encoding="utf-8"))["presets"]
-CARRIER_MANIFEST_FILE = ROOT / "LogDocs/Tank_Designer/APC_IFV_Preset_Manifest.json"
+CARRIER_MANIFEST_FILE = ROOT / "LogDocs/Tank_Designer/data/APC_IFV_Preset_Manifest.json"
 CARRIER_MANIFEST = json.loads(CARRIER_MANIFEST_FILE.read_text(encoding="utf-8"))
 CARRIER_PRESETS = CARRIER_MANIFEST["presets"]
 FOCUS_FILES = (
@@ -113,9 +113,9 @@ FOCUS_FILES = (
 TANK_ROLE_FILE = MOD / "common/units/need_for_tank_roles.txt"
 TANK_ICON_FILE = MOD / "interface/cwic_tank_rework_icons.gfx"
 TANK_LOC_FILE = MOD / "localisation/english/tank_modules_l_english.yml"
-BALANCE_MANIFEST_FILE = ROOT / "LogDocs/Tank_Designer/Balance_Target_Manifest.md"
-BALANCE_WORKBOOK_FILE = ROOT / "LogDocs/Tank_Designer/2023 - CWIC Tank Rework Balance.xlsx"
-BALANCE_CSV_FILE = ROOT / "LogDocs/Tank_Designer/2023 - CWIC Tank Rework Balance(Total Balance Sheet Minimal).csv"
+BALANCE_MANIFEST_FILE = ROOT / "LogDocs/Tank_Designer/data/Balance_Target_Manifest.md"
+BALANCE_WORKBOOK_FILE = ROOT / "LogDocs/Tank_Designer/data/2023 - CWIC Tank Rework Balance.xlsx"
+BALANCE_CSV_FILE = ROOT / "LogDocs/Tank_Designer/data/2023 - CWIC Tank Rework Balance(Total Balance Sheet Minimal).csv"
 BALANCE_METRICS = (
     ("reliability", "C", True),
     ("hardness", "D", True),
