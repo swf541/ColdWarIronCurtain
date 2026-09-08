@@ -11,6 +11,7 @@ import re
 import sys
 import csv
 import json
+import unicodedata
 from collections import Counter
 from hashlib import sha256
 from pathlib import Path
@@ -101,6 +102,9 @@ FOCUS_EFFECT_FILE = MOD / "common/scripted_effects/CWIC_tank_focus_effects.txt"
 NATIONAL_EFFECT_FILE = MOD / "common/scripted_effects/CWIC_national_tank_presets.txt"
 NATIONAL_MANIFEST_FILE = ROOT / "LogDocs/Tank_Designer/National_Tank_Preset_Manifest.json"
 NATIONAL_PRESETS = json.loads(NATIONAL_MANIFEST_FILE.read_text(encoding="utf-8"))["presets"]
+CARRIER_MANIFEST_FILE = ROOT / "LogDocs/Tank_Designer/APC_IFV_Preset_Manifest.json"
+CARRIER_MANIFEST = json.loads(CARRIER_MANIFEST_FILE.read_text(encoding="utf-8"))
+CARRIER_PRESETS = CARRIER_MANIFEST["presets"]
 FOCUS_FILES = (
     MOD / "common/national_focus/60s_Generic.txt",
     MOD / "common/national_focus/GRE_military_shared_1950s.txt",
@@ -214,8 +218,8 @@ HISTORY_DIR = MOD / "history/countries"
 SUPPORTED_ROLES = ("aa", "artillery", "destroyer", "flame")
 FAMILY_TIERS = {"light": 10, "medium": 10, "heavy": 5}
 OOB_TANK_PATTERN = re.compile(
-    r"\b(?:light|medium|heavy)_tank"
-    r"(?:_(?:aa|artillery|destroyer|flame))?_chassis_[0-9]+\b"
+    r"\b(?:(?:light|medium|heavy)_tank"
+    r"(?:_(?:aa|artillery|destroyer|flame))?|apc|ifv)_chassis_[0-9]+\b"
 )
 STARTING_VARIANT_EFFECT = "cwic_create_starting_tank_variants = yes"
 # Manufacturer bloc tags sell tanks but never load an OOB of their own.
@@ -345,16 +349,23 @@ UNSUPPORTED_IDS = {
 }
 
 
+BOOKMARK_VARIANT_NAMES.update({r["type"]: r["generic_name"] for r in CARRIER_MANIFEST["recipes"]})
+BOOKMARK_VARIANT_TECHS.update({r["type"]: r["technology"] for r in CARRIER_MANIFEST["recipes"]})
+
+
 def bookmark_variant_name(equipment_type: str, producer: str) -> str:
-    for preset in NATIONAL_PRESETS:
+    for preset in NATIONAL_PRESETS + CARRIER_PRESETS:
         if (preset["type"], preset["producer"]) == (equipment_type, producer):
             return preset["name"]
     return BOOKMARK_VARIANT_NAMES[equipment_type]
 
 
 def oob_variant_producer(block: str, default_tag: str) -> str:
-    match = re.search(r'\b(?:owner|producer|creator)\s*=\s*"?([A-Z]{3})"?', code_only(block))
-    return match[1] if match else default_tag
+    for field in ("producer", "creator", "owner"):
+        match = re.search(rf'\b{field}\s*=\s*"?([A-Z]{{3}})"?', code_only(block))
+        if match:
+            return match[1]
+    return default_tag
 
 errors: list[str] = []
 
@@ -2005,8 +2016,15 @@ ENVELOPE_RECIPE_MAP = {
 }
 
 
-def _variant_recipes() -> dict[str, dict[str, object]]:
-    recipes: dict[str, dict[str, object]] = {}
+def _variant_recipes() -> dict[tuple[str, str], dict[str, object]]:
+    """Recipes keyed by (name, chassis).
+
+    A design name is only unique per country: the carrier presets give many tags
+    the same exported vehicle, and an incomplete national ladder can place that
+    vehicle on a different hull tier. Identical repeats are expected; only a
+    same-name-same-chassis pair with a different loadout is a real conflict.
+    """
+    recipes: dict[tuple[str, str], dict[str, object]] = {}
     for path in (VARIANT_EFFECT_FILE, FOCUS_EFFECT_FILE, NATIONAL_EFFECT_FILE):
         for block in keyed_blocks(text(path), "create_equipment_variant"):
             name_match = re.search(r'(?m)^\s*name\s*=\s*"([^"]+)"', block)
@@ -2029,10 +2047,23 @@ def _variant_recipes() -> dict[str, dict[str, object]]:
                 if match.group(2) != "empty":
                     slots.append((match.group(1), match.group(2)))
             name = name_match.group(1)
-            if name in recipes:
-                fail(f"duplicate tank recipe name: {name}")
-            recipes[name] = {"name": name, "type": type_match.group(1), "slots": slots, "source": path.name}
+            key = (name, type_match.group(1))
+            record = {"name": name, "type": type_match.group(1), "slots": slots, "source": path.name}
+            if key in recipes and recipes[key]["slots"] != slots:
+                fail(f"tank recipe {name} on {key[1]} has conflicting loadouts")
+            recipes[key] = record
     return recipes
+
+
+def _variant_recipes_by_name() -> dict[str, dict[str, object]]:
+    """Name-only view for the envelope map, which samples unique tank designs."""
+    by_name: dict[str, dict[str, object]] = {}
+    for (name, _chassis), record in _variant_recipes().items():
+        if name in by_name and by_name[name]["slots"] != record["slots"]:
+            by_name[name] = {"name": name, "ambiguous": True}
+            continue
+        by_name.setdefault(name, record)
+    return by_name
 
 
 def _effective_module_operations(module: str, trail: tuple[str, ...] = ()) -> tuple[dict[str, float], dict[str, float], set[str]]:
@@ -2105,7 +2136,7 @@ def _format_estimate(value: float, metric: str) -> str:
 
 
 def tank_envelope_report() -> str:
-    recipes = _variant_recipes()
+    recipes = _variant_recipes_by_name()
     if not recipes:
         fail("tank envelope report found no selected tank recipes")
         return ""
@@ -2118,6 +2149,8 @@ def tank_envelope_report() -> str:
             fail(f"tank envelope map names unknown target: {target}")
         if recipe_name not in recipes:
             fail(f"tank envelope map recipe is missing: {recipe_name}")
+        elif recipes[recipe_name].get("ambiguous"):
+            fail(f"tank envelope map recipe is not unique: {recipe_name}")
         else:
             selected[target] = recipes[recipe_name]
     if not selected:
@@ -2598,7 +2631,7 @@ def validate_tank_qa_contracts(tank_techs: dict[str, str]) -> None:
     for helper in top_level_blocks("effects = {\n" + text(FOCUS_EFFECT_FILE) + "\n}", "effects"):
         if not top_level_named_blocks(helper[1], "hidden_effect", helper[0]):
             fail(f"export setup helper {helper[0]} must hide internal variant creation")
-    for name, recipe in _variant_recipes().items():
+    for (name, _chassis), recipe in _variant_recipes().items():
         for slot, module in recipe["slots"]:
             match = re.fullmatch(r"tank_special_slot_(\d+)", slot)
             if match and module_category(module) not in TANK_SPECIAL_SLOT_CATEGORIES.get(int(match[1]), set()):
@@ -2622,7 +2655,7 @@ def validate_national_tank_presets(national_override: str | None = None, generic
     pairs = {(p["producer"], p["type"]) for p in NATIONAL_PRESETS}
     if len(NATIONAL_PRESETS) != 14 or pairs != expected_pairs:
         fail("national presets must cover exactly USA/SOV medium tiers 0-6")
-    guards = keyed_blocks(national, "if")
+    guards = keyed_blocks(keyed_blocks(national, "cwic_create_national_tank_variants")[0], "if")
     if len(guards) != len(NATIONAL_PRESETS):
         fail("national preset guard count differs from manifest")
     legacy_loc = text(MOD / "localisation/english/equipment_country_l_english.yml")
@@ -2661,6 +2694,232 @@ def validate_national_tank_presets(national_override: str | None = None, generic
             fail(f"generic preset {kind} must exclude national preset producers")
     if generic.find("cwic_create_national_tank_variants = yes") < 0 or generic.find("cwic_create_national_tank_variants = yes") > generic.find("create_equipment_variant ="):
         fail("national presets must bootstrap before generic presets")
+
+
+def carrier_source_inventory() -> dict[tuple[str, str], list[tuple[str, str, int, str]]]:
+    """Inventory live legacy localisation independently of the authored manifest."""
+    inventory: dict[tuple[str, str], list[tuple[str, str, int, str]]] = {}
+    pattern = re.compile(r'^\s*(([A-Z]{3})_(mechanized(?:_heavy)?_equipment)_(\d+)):\d*\s*"([^"]*)"')
+    for path in sorted((MOD / "localisation/english").glob("*.yml")):
+        for line_number, line in enumerate(text(path).splitlines(), 1):
+            match = pattern.match(line)
+            if not match:
+                continue
+            key, tag, legacy, level, name = match.groups()
+            family, offset = ("ifv", 1) if "heavy" in legacy else ("apc", 3)
+            tier = int(level) - offset
+            if not 0 <= tier <= 7:
+                continue
+            tag = {"MBZ": "MZB"}.get(tag, tag)
+            inventory.setdefault((tag, f"{family}_chassis_{tier}"), []).append(
+                (key, str(path.relative_to(ROOT)), line_number, name)
+            )
+    return inventory
+
+
+def validate_carrier_bookmarks(national_override: str | None = None,
+                              generic_override: str | None = None,
+                              manifest_override: dict | None = None,
+                              oob_overrides: dict[str, str] | None = None,
+                              history_overrides: dict[str, str] | None = None) -> None:
+    """Pin source coverage, executable initialization order and migrated requests."""
+    manifest = CARRIER_MANIFEST if manifest_override is None else manifest_override
+    national = code_only(text(NATIONAL_EFFECT_FILE) if national_override is None else national_override)
+    generic = code_only(text(VARIANT_EFFECT_FILE) if generic_override is None else generic_override)
+    recipes = manifest["recipes"]
+    wanted = {f"{family}_chassis_{tier}" for family in ("apc", "ifv") for tier in range(5)}
+    recipe_map = {r["type"]: r for r in recipes}
+    if len(recipes) != 10 or set(recipe_map) != wanted:
+        fail("carrier recipes must cover exactly APC/IFV bookmark tiers 0-4")
+        return
+    presets = manifest["presets"]
+    pairs = {(p["producer"], p["type"]) for p in presets}
+    inventory = carrier_source_inventory()
+    expected_pairs = {pair for pair in inventory if pair[1] in wanted}
+    if len(presets) != 572 or len(pairs) != len(presets) or pairs != expected_pairs:
+        fail("carrier national preset coverage must equal the 572 source-derived bookmark pairs without duplicates")
+    if manifest.get("source_tag_aliases") != {"MBZ": "MZB"}:
+        fail("carrier source tag alias must remain MBZ -> MZB")
+    country_tags = set()
+    for path in (MOD / "common/country_tags").glob("*.txt"):
+        country_tags.update(re.findall(r'^\s*([A-Z]{3})\s*=', code_only(text(path)), re.MULTILINE))
+    if {tag for tag, _ in pairs} - country_tags:
+        fail("carrier national presets include an undefined producer tag")
+    mandatory = {"main_armament_slot", "turret_type_slot", "suspension_type_slot", "armor_type_slot", "engine_type_slot"}
+    all_slots = mandatory | {f"tank_special_slot_{i}" for i in range(1, 11)}
+    for kind, recipe in recipe_map.items():
+        family, _, tier = kind.split("_")
+        if recipe["technology"] != f"nsb_{family}_hulls{tier}":
+            fail(f"carrier recipe {kind} has the wrong hull technology")
+        slots = recipe["modules"]
+        if set(slots) != all_slots:
+            fail(f"carrier recipe {kind} must specify exactly all 15 slots")
+        for slot, module in slots.items():
+            if module == "empty" and slot not in mandatory:
+                continue
+            category = module_category(module)
+            allowed = ({f"tank_{family}_armament"} if slot == "main_armament_slot" else
+                       {f"tank_{family}_superstructure"} if slot == "turret_type_slot" else
+                       {"tank_suspension_type", "tank_non_tracked_suspension_type"} if slot == "suspension_type_slot" else
+                       {"tank_armor_type"} if slot == "armor_type_slot" else
+                       {"tank_engine_type"} if slot == "engine_type_slot" else
+                       SPECIAL_SLOT_CATEGORIES.get(int(slot.rsplit("_", 1)[1]), set()))
+            if module not in module_ids or category not in allowed:
+                fail(f"carrier recipe {kind} has illegal module {module} in {slot}")
+        categories = {module_category(module) for module in slots.values()}
+        if family == "ifv" and missing_ammunition_categories(categories):
+            fail(f"carrier recipe {kind} lacks attack-producing AP/HE ammunition")
+        if family == "apc" and slots.get("main_armament_slot") != "apc_firing_ports":
+            fail(f"carrier recipe {kind} must retain the unarmed APC baseline")
+
+    def check_guard(guard: str, recipe: dict, name: str, producer: str | None) -> None:
+        kind = recipe["type"]
+        flag = f"cwic_starting_{kind}_created"
+        limits = top_level_named_blocks(guard, "limit")
+        variants = top_level_named_blocks(guard, "create_equipment_variant")
+        if len(limits) != 1 or len(variants) != 1:
+            fail(f"carrier {producer}/{kind} needs one direct limit and variant")
+            return
+        limit, variant = limits[0], variants[0]
+        for required in ('has_dlc = "No Step Back"', f"has_tech = {recipe['technology']}",
+                         f"NOT = {{ has_country_flag = {flag} }}"):
+            if required not in limit:
+                fail(f"carrier {producer}/{kind} missing limit: {required}")
+        if top_level_values(limit, "has_tech") != [recipe["technology"]]:
+            fail(f"carrier {producer}/{kind} must use only its hull technology guard")
+        if top_level_values(limit, "tag") != ([producer] if producer else []):
+            fail(f"carrier {producer}/{kind} has wrong producer guard")
+        if top_level_values(guard, "set_country_flag") != [flag]:
+            fail(f"carrier {producer}/{kind} missing creation flag")
+        for field, expected in (("name", name), ("type", kind), ("allow_without_tech", "yes"),
+                                ("parent_version", "0"), ("mark_older_equipment_obsolete", "yes")):
+            if top_level_values(variant, field) != [expected]:
+                fail(f"carrier {producer}/{kind} wrong {field}")
+        upgrades = top_level_named_blocks(variant, "upgrades")
+        if len(upgrades) != 1 or dict(re.findall(r'(\w+)\s*=\s*(\w+)', upgrades[0])) != {"tank_engine_upgrade": "0", "tank_armor_upgrade": "0"}:
+            fail(f"carrier {producer}/{kind} upgrades must be zero")
+        modules = top_level_named_blocks(variant, "modules")
+        values = re.findall(r'(\w+)\s*=\s*(\w+)', modules[0]) if len(modules) == 1 else []
+        if len(values) != 15 or dict(values) != recipe["modules"]:
+            fail(f"carrier {producer}/{kind} modules differ from its 15-slot recipe")
+        if guard.find("set_country_flag") < guard.find("create_equipment_variant"):
+            fail(f"carrier {producer}/{kind} sets its flag before creation")
+
+    for kind in sorted(wanted):
+        helper = f"cwic_create_national_{kind}_variants"
+        bodies = top_level_named_blocks(national, helper)
+        if len(bodies) != 1:
+            fail(f"carrier helper {helper} must occur exactly once")
+            continue
+        guards = top_level_named_blocks(bodies[0], "if")
+        expected = [p for p in presets if p["type"] == kind]
+        if len(guards) != len(expected):
+            fail(f"carrier helper {helper} guard count differs from manifest")
+        by_tag: dict[str, list[str]] = {}
+        for guard in guards:
+            limits = top_level_named_blocks(guard, "limit")
+            tags = top_level_values(limits[0], "tag") if len(limits) == 1 else []
+            by_tag.setdefault(tags[0] if len(tags) == 1 else "", []).append(guard)
+        for preset in expected:
+            pair = preset["producer"], kind
+            sources = inventory.get(pair, [])
+            # Detailed country files precede the consolidated fallback; duplicate
+            # ALB/MBZ keys retain their first occurrence. No legacy loc is rewritten.
+            selected = sorted(sources, key=lambda row: (Path(row[1]).name == "equipment_country_l_english.yml", row[1], row[2]))
+            if not selected:
+                fail(f"carrier {pair} lacks live source provenance")
+                continue
+            source = selected[0]
+            normalized = unicodedata.normalize("NFKD", source[3]).encode("ascii", "ignore").decode().strip()
+            if (preset["legacy_name_key"], preset["source_path"], preset["source_line"], preset["source_name"]) != source or preset["name"] != normalized:
+                fail(f"carrier {pair} name/provenance differs from selected live localisation")
+            provenance = {(p["source_key"], p["source_path"], p["line"], p["raw_source_name"]) for p in preset["provenance"]}
+            if provenance != set(sources):
+                fail(f"carrier {pair} provenance omits or invents source entries")
+            if preset["modules"] != recipe_map[kind]["modules"] or preset["technology"] != recipe_map[kind]["technology"]:
+                fail(f"carrier {pair} preset differs from baseline recipe")
+            matches = by_tag.get(pair[0], [])
+            if len(matches) != 1:
+                fail(f"carrier {pair} must have exactly one national guard")
+            else:
+                check_guard(matches[0], recipe_map[kind], preset["name"], pair[0])
+
+    dispatchers = top_level_named_blocks(generic, "cwic_create_starting_tank_variants")
+    if len(dispatchers) != 1:
+        fail("carrier bookmark dispatcher must occur exactly once")
+        return
+    events = []
+    for key, _, _, body in top_level_ranges(dispatchers[0], "bookmark dispatcher"):
+        match = re.fullmatch(r'cwic_create_national_((?:apc|ifv)_chassis_[0-7])_variants', key)
+        if match:
+            events.append(("national", match[1]))
+            if body.strip() != "yes":
+                fail(f"carrier dispatcher must call {key} with yes")
+        elif key == "if":
+            variants = top_level_named_blocks(body, "create_equipment_variant")
+            types = top_level_values(variants[0], "type") if len(variants) == 1 else []
+            if types and types[0] in wanted:
+                kind = types[0]
+                events.append(("generic", kind))
+                check_guard(body, recipe_map[kind], recipe_map[kind]["generic_name"], None)
+    expected_events = [(mode, f"{family}_chassis_{tier}") for family in ("apc", "ifv") for tier in range(5) for mode in ("national", "generic")]
+    if events != expected_events:
+        fail("carrier dispatcher must interleave national then fallback per ascending tier, with each family contiguous")
+    # Execute the validated event model for actual and synthetic partial national
+    # coverage. Flags persist across calls; obsolescence affects only that family.
+    for coverage in [{kind for tag, kind in pairs if tag == producer} for producer in {tag for tag, _ in pairs}] + [set(), wanted, {"apc_chassis_4", "ifv_chassis_3"}]:
+        flags: set[str] = set()
+        created: list[str] = []
+        active: dict[str, str] = {}
+        def simulate(unlocked: set[str]) -> None:
+            for mode, kind in events:
+                if kind not in unlocked or kind in flags or (mode == "national" and kind not in coverage):
+                    continue
+                flags.add(kind)
+                created.append(kind)
+                active[kind.split("_")[0]] = kind
+        first = {kind for kind in wanted if int(kind[-1]) < 4}
+        simulate(first)
+        before = list(created)
+        simulate(first)
+        if before != created or set(created) != first:
+            fail("carrier initialization must be complete and idempotent under partial national coverage")
+        simulate(wanted)
+        if len(created) != 10 or active != {family: f"{family}_chassis_4" for family in ("apc", "ifv")}:
+            fail("carrier initialization must preserve newest-only visibility after new hull unlocks")
+
+    actual_requests = Counter()
+    for path in sorted(OOB_DIR.glob("*_nsb.txt")):
+        relative = str(path.relative_to(ROOT))
+        value = code_only((oob_overrides or {}).get(relative, text(path)))
+        if re.search(r'\b(?:mechanized_equipment_(?:[3-9]|10)|mechanized_heavy_equipment_\d+|heavy_mechanized_equipment_\d+)\b', value):
+            fail(f"{path.name} retains postwar legacy or misspelled carrier equipment")
+        for key in ("add_equipment_to_stockpile", "add_equipment_production"):
+            for block in keyed_blocks(value, key):
+                kinds = top_level_values(block, "type")
+                if kinds and re.fullmatch(r'(?:apc|ifv)_chassis_\d+', kinds[0]):
+                    name = top_level_values(block, "variant_name" if key.endswith("stockpile") else "version_name")
+                    actual_requests[(relative, kinds[0], oob_variant_producer(block, path.stem[:3]), name[0] if len(name) == 1 else "")] += 1
+        for block in keyed_blocks(value, "force_equipment_variants"):
+            for kind, _, _, request in top_level_ranges(block, "carrier forced requests"):
+                if re.fullmatch(r'(?:apc|ifv)_chassis_\d+', kind):
+                    names = top_level_values(request, "version_name")
+                    actual_requests[(relative, kind, oob_variant_producer(request, path.stem[:3]), names[0] if len(names) == 1 else "")] += 1
+    expected_requests = Counter((r["file"], r["chassis"], r["resolved_producer"], r["resolved_variant_name"]) for r in manifest["oob_migration"])
+    if sum(expected_requests.values()) != 100 or actual_requests != expected_requests:
+        fail("carrier OOB migration must preserve the manifest's 100 producer/chassis/name requests")
+    for row in manifest["oob_migration"]:
+        if row["resolved_variant_name"] != bookmark_variant_name(row["chassis"], row["resolved_producer"]):
+            fail("carrier OOB manifest requests a name the resolved producer does not create")
+    for path in sorted(HISTORY_DIR.glob("*.txt")):
+        tag = path.name[:3]
+        if tag not in MANUFACTURER_BLOC_TAGS:
+            continue
+        value = code_only((history_overrides or {}).get(str(path.relative_to(ROOT)), text(path)))
+        required = set().union(*(techs for (producer, _), techs in foreign_producer_techs.items() if producer == tag))
+        candidates = [body for body in keyed_blocks(value, "if") if STARTING_VARIANT_EFFECT in body and 'has_dlc = "No Step Back"' in body]
+        if not any(required <= set(re.findall(r'\b(nsb_\w+)\s*=\s*1\b', body[:body.find(STARTING_VARIANT_EFFECT)])) for body in candidates):
+            fail(f"{tag} manufacturer must grant every requested foreign chassis technology before NSB variant creation")
 
 
 def tank_slot_layout_errors(block: str) -> list[str]:
@@ -3102,12 +3361,12 @@ for path in sorted(OOB_DIR.glob("*_nsb.txt")):
     era = path.stem.split("_")[1]
 
     def record_creator(block: str, refs: list[str]) -> None:
-        creator = FOREIGN_CREATOR_PATTERN.search(code_only(block))
-        if not creator:
+        creator = oob_variant_producer(block, path.stem[:3])
+        if creator == path.stem[:3]:
             return
         for ref in refs:
             if ref in BOOKMARK_VARIANT_TECHS:
-                foreign_producer_techs.setdefault((creator.group(1), era), set()).add(
+                foreign_producer_techs.setdefault((creator, era), set()).add(
                     BOOKMARK_VARIANT_TECHS[ref]
                 )
 
@@ -3163,7 +3422,7 @@ for path in sorted(OOB_DIR.glob("*_nsb.txt")):
                         f"variant {name_match.group(1)!r}, which no bootstrap creates"
                     )
                 versioned_oob_requests += 1
-invalid_oob = oob_refs - expected_types
+invalid_oob = oob_refs - expected_types - {f"{family}_chassis_{tier}" for family in ("apc", "ifv") for tier in range(8)}
 if invalid_oob:
     fail(f"NSB OOBs reference invalid tank types: {sorted(invalid_oob)}")
 
@@ -3270,7 +3529,9 @@ for block in variant_blocks:
             f"starting variant {variant_type} has wrong required slots: "
             f"{sorted(slot_names)}"
         )
-    for _, module in slots:
+    for slot, module in slots:
+        if module == "empty" and slot.startswith("tank_special_slot_"):
+            continue
         if module not in module_ids:
             fail(f"starting variant {variant_type} uses undefined module {module}")
     if needs_ammunition(dict(slots).get("main_armament_slot", "")):
@@ -3994,7 +4255,7 @@ print(
     "Military rework validation passed: "
     f"{len(technology_set)} technologies, {len(module_ids)} tank modules, "
     f"{len(expected_types)} historical tank designs, {len(oob_refs)} generic bookmark variants, "
-    f"{len(NATIONAL_PRESETS)} national presets "
+    f"{len(NATIONAL_PRESETS) + len(CARRIER_PRESETS)} national presets "
     f"and {versioned_oob_requests} named OOB requests across "
     f"{len(oob_files_with_tanks)} NSB OOBs, {history_bootstrap_sites} country-history "
     f"bootstrap sites, {len(APC_HULL_ROWS)} APC designer hulls, "

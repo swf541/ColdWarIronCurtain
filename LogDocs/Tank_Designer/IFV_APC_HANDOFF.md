@@ -2,9 +2,189 @@
 
 Date: 2026-09-07 (updated). This is the entry point for a new, blank-context session.
 Branch: `tank-designer-and-doctrine-rework-test`.
-Gameplay HEAD at the previous handoff: `80304e2030`.
+Step 2 implementation baseline: `faddc3dd5e` (`Add IFV designer family`).
 
-## Status: APC and IFV families implemented and both validated in game
+## Current status: Step 2 bookmark presets and OOB migration
+
+Date: 2026-09-07. The owner authorized reconciliation of the mapping conflicts
+found in the read-only pass, then continuation of this batch. Presets and OOB
+migration belong to the same commit; no intermediate gameplay state is supported.
+
+Implemented in this batch:
+
+- Ten generic carrier bookmark designs and 572 nationally named designs across
+  86 tags, covering `apc_chassis_0..4` and `ifv_chassis_0..4`. These are exactly
+  the carrier chassis referenced by the 1949/1980 NSB OOB union. The other 354
+  national tier-5..7 mappings are retained as future inventory, not presets.
+- All 100 postwar carrier requests across 43 NSB OOB files now select an explicit
+  design name and chassis. Quantities, factory settings, experience, owners and
+  creators are preserved. WWII `mechanized_equipment_1..2`, the marine line and
+  non-NSB OOBs are unchanged.
+- Corresponding NSB country-history chassis grants before OOB loading, including
+  imported designs' producer grants and the CAP/CUM manufacturer bootstraps.
+- National/generic creation interleaved per ascending hull tier, with shared
+  per-chassis flags and obsolescence. This handles incomplete national ladders:
+  creating all national designs first could otherwise leave a lower generic
+  fallback created after a higher national design. Existing medium presets stay
+  in their original helper; ten carrier helpers reside in the same national file.
+
+The exact mapping, source provenance, recipes and deferred inventory are in
+`APC_IFV_Preset_Manifest.json`; the human-readable phase-1 mapping and decisions
+are in `APC_IFV_Bookmark_Mapping.md`. The final gate output and file-by-file review
+are recorded in `APC_IFV_Step2_Review.md`.
+
+**Verification gate closed, 2026-09-07.** `validate_military_reworks.py` passes.
+Closing it needed two fixes, both written up in `APC_IFV_Step2_Review.md`: the
+validator's global design-name uniqueness check was the wrong invariant for
+carriers and is now keyed by `(name, chassis)`, and three pre-existing medium-tank
+OOB requests (KPA x1, BUL x2) that named a generic design while crediting SOV as
+creator were renamed to SOV's national designs on the owner's decision. The batch
+is still uncommitted and still has no owner-run game QA.
+
+## Owner QA passed, 2026-09-08 - Step 2 accepted, committed
+
+Both bookmarks load, the presets load, and stockpiles and factory lines exist.
+`error.log` is acceptable. This closes the Step 2 acceptance boundary except for
+AI production, which the owner is deferring to a single final pass once the rest
+of the designer content is in. Step 2 is committed on that basis.
+
+Three findings from the QA run. None of them block the commit; all three are
+next-session scope and none originate in the preset/OOB migration itself.
+
+### Finding 1: armour-import focus rewards - a mod-wide duplicate `completion_reward`
+
+Reported case: `BUL_Soviet_T55s` shows no completion award even though it should
+grant 200 `mbt_equipment_3` from CUM. Cause found: the focus declares
+`completion_reward` **twice** - an empty block at `1950s_BUL.txt:1559` and the real
+`add_equipment_to_stockpile` block at `1950s_BUL.txt:1571`. This is the duplicate
+`completion_reward` trap already recorded for the Diem work, where one of the two
+blocks is silently dropped.
+
+This is not a handful of focuses. A sweep of `common/national_focus/` finds
+**12,852 focuses with more than one `completion_reward`**, of which 12,769 have an
+empty block first. 484 of them grant equipment. The empty-first shape is uniform
+enough to look like a generator or template artifact rather than hand-authored
+mistakes, and the top files are broad (`50s_PER.txt` 233, `60s_NGA.txt` 189,
+`SAF_1960s.txt` 188, `60s_ITA.txt` 187, `CAM_50s.txt` 185).
+
+Next session should establish which of the two blocks the engine actually keeps
+before touching anything - if the *last* block wins, the rewards fire and only the
+focus tooltip is wrong, which is a much smaller problem than 12,769 dead rewards.
+Deleting the empty leading block is almost certainly the fix either way, but it is
+a mod-wide mechanical edit and deserves its own batch and its own validator check.
+
+### Finding 2: `tank_gasoline_engine` outperforms the entire CWIC petrol ladder
+
+There are two overlapping gasoline families:
+
+| module | localised name | speed multiplier |
+| --- | --- | --- |
+| `tank_gasoline_engine` | Gasoline Engine | **0.15** |
+| `Petrol_0` | WW2 Gasoline Engine | 0.05 |
+| `Petrol_1` | Post-WW2 Gasoline Engine | 0.07 |
+| `Petrol_2` | Early Cold War Gasoline Engine | 0.09 |
+| `Petrol_3` | Mid-Cold War Gasoline Engine | 0.11 |
+
+`tank_gasoline_engine` is the vanilla module, inherited unchanged; it is CWIC's
+only module on `category = tank_engine_gasoline` outside the `Petrol_*` ladder.
+It is enabled by the base NSB armour tech (`NSB_armor.txt:63`), while `Petrol_0`
+is gated much later (`NSB_armor.txt:1074`) - which is why it reads as "doesn't
+appear in the tech tree" next to the ladder. The owner's "may be reversed" reading
+is correct in effect: the earliest, cheapest gasoline engine is strictly the best
+one, beating even Mid-Cold War petrol.
+
+**This directly affects this batch.** All 40 generic and 576 of 586 national
+presets use `engine_type_slot = tank_gasoline_engine`, per the batch's own
+baseline-module decision. If the ladder is rebalanced or `tank_gasoline_engine` is
+retired in favour of `Petrol_0`, every carrier preset recipe must be re-pointed and
+the frozen envelopes re-checked. Do this before authoring further preset tiers, not
+after.
+
+### Finding 3: presets show the generic carrier icon, not per-design art
+
+`BTR-40` renders with the generic APC picture. Cause: `apc_chassis_*` and
+`ifv_chassis_*` declare no `picture` of their own in
+`common/units/equipment/mechanized.txt`, so every carrier design inherits
+`archetype_motorized_equipment` from the `mechanized_equipment` archetype
+(`mechanized.txt:11`). Legacy per-country carrier equipment had its own art; a
+designer design has one name but no art hook per name.
+
+Stats are the good news: the owner confirms legacy and new NSB APC/IFV stats match
+closely, so the module baselines are landing where they were aimed.
+
+Art scope is unresolved and was already outside this batch. Next session needs to
+decide whether carrier designs get per-chassis pictures (cheap, one icon per hull
+tier, still not per-vehicle), or whether the tank icon-generation path can be
+reused for the mechanized archetype at all.
+
+### Contradictions resolved and authored decisions
+
+1. The old validator selected the first owner/producer/creator token for a design
+   name, while attributing technology to creator/producer. For example, DRY's
+   forced request has `owner = DRY creator = "CUM"`. Resolution is explicitly
+   `producer`, then `creator`, then `owner`, then the OOB tag, independent of
+   token order. Both naming and bootstrap attribution use this rule; neither
+   source field is removed. Installed vanilla evidence: YUG_1939_nsb requests
+   France's `FT mod. 31` with owner YUG and creator FRA; France creates that design.
+2. Seven NSB requests used undefined `heavy_mechanized_equipment_1/3`. These are
+   treated as spelling errors for `mechanized_heavy_equipment_1/3` and migrate
+   to IFV tiers 0/2. This is a documented inference; mirrored non-NSB typos are
+   deliberately outside this migration.
+3. Country-specific localisation is the selected naming authority over the
+   consolidated file where TUR disagrees. This is a project naming policy,
+   not a claim about engine localisation precedence. ALB/MBZ duplicate IFV3 keys
+   select the first `BMP-1`, consistent with the surrounding tier progression.
+   Conflicting source entries remain in provenance; legacy localisation is not edited.
+4. New names trim surrounding whitespace and transliterate diacritics to ASCII.
+   Literal variant names need no new localisation keys. No translation files change.
+5. All APC loadouts use the existing unarmed baseline modules. IFVs use their
+   tier's autocannon plus the baseline fighting compartment, suspension, armor,
+   gasoline engine, AP and HE ammunition. All fifteen slots are explicit, with
+   zero engine/armor upgrades. These are functional authored baseline designs
+   carrying historical names, not exact historical configurations or calibrated
+   frozen-envelope matches. `allow_without_tech` follows existing bookmark setup.
+6. Scope is the two bookmarks' chassis union, not future tier authoring. Hull
+   years, tier counts, the Heavy Mech III 1955 exception and all 18 frozen
+   envelopes remain unchanged. Touched country-history scripts that had a BOM
+   have it removed; localisation BOMs are untouched.
+7. Mozambique's source localisation uses the undefined tag `MBZ`; the country's
+   registered tag is `MZB` (`common/country_tags/00_countries.txt`). The six
+   corresponding preset guards use MZB, with the MBZ source keys retained in
+   provenance. No legacy localisation or country-tag definitions change.
+
+### Runtime AI finding: recipes exist; production remains untested
+
+`common/ai_equipment/generic_tank.txt` defines eight `history = yes` recipes for
+each of `land_apc` and `land_ifv`. No `role_ratio` strategy in this repository
+names either role. The installed game's `common/ai_equipment/_documentation.md`
+describes roles as dynamically generated, says the AI attempts design and
+production to satisfy roles, and connects them to `role_ratio`; it does not
+specify the default demand when an explicit ratio is absent.
+
+Therefore the older sentence below saying the recipes "design a carrier at
+runtime" is superseded as an unverified claim. Static recipe availability does
+not demonstrate factory assignment, but absence of a ratio alone does not prove
+failure either. No AI strategy change is justified as necessary by this evidence
+alone, and none is included. Follow-up scope: observe fresh 1949 and 1980 NSB AI
+variant creation and factory assignment over time; if the new roles lack demand,
+author bounded `land_apc`/`land_ifv` ratios alongside existing mechanized/armor
+priorities and validate production balance and non-NSB behavior in a separate batch.
+
+### Acceptance boundary and deliberately remaining work
+
+This batch has no owner-run game QA. Fresh 1949/1980 NSB starts, named imports,
+stockpiles and factory lines, newest-only production visibility, save/reload,
+non-NSB regression and long-run AI production still need live acceptance.
+Static verification does not establish engine balance or runtime behavior.
+Legacy retirement/DLC gating is still sequenced after this commit, not included.
+Role dropdowns/duplicates, amphibious conversion, medium-hull Heavy APC/IFV,
+search filters, models and art remain outside this batch.
+
+## Previous batch record: APC and IFV families validated in game
+
+The sections below retain the previous batches' implementation and QA history.
+Their staged/commit-state wording and no-bookmark-work limitations are historical;
+the current Step 2 status above takes precedence.
 
 Date: 2026-09-07. Branch `tank-designer-and-doctrine-rework-test`. Gameplay HEAD at the
 start of this work: `80304e2030`. The APC batch is committed as `660f8984ae`; the IFV
