@@ -26,11 +26,347 @@ diagram's seven-tier decade cadence is a sketch. Do not "correct" the years to i
 year exception and is not permission to alter the stats or the workbook. `nsb_ifv_hulls2`
 carries `start_year = 1955` and the `@1955` tree row so tree, tooltip and hull agree.
 
-**The 15-position designer is final.** Five mandatory slots plus ten specialized
-special slots. No further layout expansion is approved or needed. The GUI defines
-exactly 15 positions, the validator asserts `pos_custom_module_slot_window_0..14`, and
-`equipment_modules` is 515 wide against a seventh column ending at exactly 515 - zero
-slack. Any slot frame wider than 76px re-clips.
+**The designer expands from 15 to 21 positions.** Ratified 2026-09-09, superseding
+"the 15-position designer is final". The target is drawio page 8
+`[REFERENCE] Tank Designer Composition`, which lays out nine named slots - Gun, Turret,
+AP Ammo, HE Ammo, Aiming, Optics, Suspension, Armour, Engine - plus `Slot 1..12`, i.e.
+21 positions. `archive/Balance_Sources.md:148-151` had ruled that page "a sketch, not a
+specification, and the shipped 15-slot layout in interface/tank_designer_view.gui is the
+thing that exists"; the owner reversed that on 2026-09-09. The sketch is now the
+contract and the shipped 15-slot layout is the **unfinished** state - see `STATUS.md`
+Finding 6.
+
+- Slot set: the five mandatory slots plus `tank_special_slot_1..16`. Names stay
+  `tank_special_slot_N`; `special_type_slot_N` is still prohibited in tank content
+  (the plane-airframe collision fixed by `368fa4815c`).
+- Specialized: slot 1 anti-tank ammunition, slot 2 HE ammunition, slot 3 aiming,
+  slot 4 optics. This splits today's "either ammunition in either slot" pair, and it
+  costs no preset edits because the shipped presets already follow it: of 586 national
+  blocks, slot 1 holds only `ap_*` (213 assignments, 373 `empty`) and slot 2 only
+  `tank_he_*` (213 assignments, 373 `empty`).
+- Free: slots 5-16 accept every remaining special category and every category authored
+  later. Their GUI labels are `Slot 1`..`Slot 12` per the sketch, so the label number is
+  deliberately offset from the slot id. Do not "fix" that by renumbering the slots.
+- The same 21-position layout applies to all five archetypes. `mechanized.txt:37-164`
+  and `mechanized_heavy.txt:28-42` already mirror the tank special-slot names and
+  category map and diverge only in mandatory armament/turret categories, so this is one
+  change applied five times, not two designs.
+
+**The 21 positions render 7 / 7 / 7 with the middle row over the blueprint.** Ratified
+2026-09-09. `equipment_modules` stays 515x350 and `equipment_preview` keeps its 508x248
+blueprint, so no art is rescaled or cropped: positions 0-6 on `@fixed_btn_mod_row_0 = 1`,
+7-13 on the existing `@fixed_btn_mod_row_middle = 180` promoted to a full row, and 14-20
+on `@fixed_btn_mod_row_1 = 300`. Frames stay 76x47
+(`interface/equipmentdesignerview.gui:1743-1751`) and the seven existing column macros at
+pitch 73 end at exactly 515. Two alternatives were rejected: the sketch's literal 6x3 +
+3 geometry, and a 3x7 grid above the blueprint. Both force the preview down to <=162px,
+which buys an art pass and no capacity. Overlaying frames on the blueprint is already
+this panel's layout language - slot 14 sits at (439,180) today, and
+`tag_icon_bg`/`niche_button` overlay the same rectangle (see "Retracted after
+measurement").
+
+**Gate: 21 positions is beyond anything vanilla ships and must be confirmed in game
+before any content depends on it.** The vanilla tank designer declares
+`pos_custom_module_slot_window_0..8` for 5 mandatory + 4 `special_type_slot_N` slots, and
+the highest index anywhere in the vanilla interface files is 8. No engine-side cap is
+documented and none was found; the mod's own 15 positions prove the count is not fixed at
+9. That makes 21 plausible, not verified.
+
+**Free slots keep today's tradeoffs through shared-budget exclusivity groups, pending an
+engine test.** Slot specialization is currently the only thing making computing compete
+with radar, allowing one loading system, and making active protection compete with an
+armour layer. Twelve free slots delete all of that unless one `module_count_limit` block
+can hold several `category` entries as a shared budget. **That form is unverified:**
+vanilla ships no multi-category limit block anywhere under
+`common/units/equipment/`, and all 18 blocks on the mod's own archetypes are
+single-category `count < 2`. Test it in the same pass as the 21-position render. If the
+engine rejects a shared budget, the fallback is per-category `count < 2` only, and the
+consequence - up to 12 specials mounted where the frozen envelopes assumed 10
+specialized picks - is an explicit balance-recalibration item, not a silent change.
+
+**Shipped 2026-09-09 with the per-category fallback, not the shared budgets.** The
+multi-category test was not runnable to a positive answer: a log diff can prove the
+engine *rejects* a multi-category `module_count_limit`, but engine silence cannot prove
+a shared budget is enforced rather than parsed and ignored, and that distinction needs
+a human in the designer. So the ratified fallback shipped - one single-category
+`count < 2` per special category, on all five archetypes, 18 each. APC and IFV were
+missing seven of those limits before this pass (four ammunition, three loader); the
+three loader limits are load-bearing, because twelve free slots would otherwise let a
+carrier mount three loading systems. The validator now rejects a multi-category limit
+block outright, so the unverified form cannot be reintroduced by accident. Authoring
+the shared budgets remains open and still requires a live enforcement test.
+
+**Positions above 8 are confirmed in game.** Ratified gate cleared 2026-09-09 by the
+owner's designer capture: the 7 / 7 / 7 layout renders with the middle row over the
+blueprint, and the top row reads turret, gun, suspension, armour, engine, AP
+ammunition, HE ammunition - so both the 21-position layout and the slot 1 / slot 2
+ammunition split are live. The gate is fully closed: after the blueprint fix below the
+owner re-checked in game and confirms all 21 slots load, and the live `error.log`
+carries zero `Could not find "tank_special_slot_*"`, zero `Requested GUI element not
+found` and zero `containerwindow.cpp` lines with the designer open, against 85
+slot-lookup failures on the pre-fix boot. **21 positions is now verified, not
+plausible** - do not reopen it as an engine risk.
+
+**The 106 per-hull blueprint files are a sixth surface, and they are hand-enumerated.**
+Discovered 2026-09-09. Every file under `interface/equipmentdesigner/tanks/` lists the
+slot names itself inside its `module_slots` window. A slot the archetype declares but a
+blueprint omits produces `containerwindow.cpp: Could not find "tank_special_slot_N" in
+window module_slots` and a `Requested GUI element not found` assertion, but **only once
+that specific hull's designer is opened** - so no static check and no ordinary load test
+sees it. All 106 now declare `tank_special_slot_1..16`; the validator pins the file
+count and the exact ordered slot list per file. The 147 unshadowed vanilla blueprint
+files were left alone: they all belong to chassis families this mod removed
+(`amphibious_tank`, `modern_tank`, `super_heavy_tank`, `land_cruiser`, and the deleted
+`*_amphibious` roles). Any future slot change must touch all 106 again.
+
+**Slots are to be locked per hull, not uniformly free.** Owner direction 2026-09-09,
+refining the free-slot rule above rather than replacing it. 21 positions on all five
+hulls is final; what is not final is that all five share one free-list. Specialized
+modules that only some hulls may carry - amphibious drive on APC and IFV, not on
+medium, MBT or heavy - need per-hull slot eligibility. The shipped identical free list
+is correct only while every free-list category applies to every hull, so the lock model
+must land in the same pass as the first hull-restricted module. Authoring such a module
+against the current uniform list would silently make it mountable everywhere.
+
+**The two owner mockups are the source for the unbuilt families.** Supplied 2026-09-09
+and now the authority for their ladders, superseding "invent the whole tree":
+
+- *Night and thermal vision* sits on the optics/aiming page as a four-step ladder off
+  the base optic sights: First Gen Night Vision (off Telescopic/Periscopic Sight,
+  alongside Sterioscopic Sight With Optical Rangefinder), Second Gen Night Vision,
+  Third Gen Night Vision, then Thermal Vision. The stat values are still invented and
+  still fall under the "recorded as authored" rule - the mockup fixes the shape and the
+  prerequisites, not the numbers.
+- *Special Capabilities* is its own dated column: Amphibious Drive 1940; OPVT,
+  Underwater Driving Capability and Dozer Plow 1945; Log (+2% reliability) 1950;
+  Anti-Mine Plow 1955 off Dozer Plow; Paradrop Capability 1960; Anti-Mine Roller 1965
+  (KMT-5); Integrated Trench-Digging Plow and a second Anti-Mine Plow 1970; Anti-Mine
+  Roller With Electro-Magnetic Coils 1980 (KMT-7 EMT). Amphibious Drive and Paradrop
+  Capability are hull-restricted by nature and are the reason the per-hull lock model
+  above is a prerequisite rather than a follow-up.
+
+**The per-hull lock is a module attribute, not a slot attribute.** Established
+2026-09-09 on engine evidence, and it supersedes any reading of the direction above
+that implies per-archetype free-slot lists. A category is global while a free-slot list
+is per archetype, so a category cannot restrict a module to some hulls: putting
+amphibious drive in `tank_mobility_auxiliary` makes it legal on every hull whose free
+slots take that category. The engine primitive is
+`allow_equipment_type` / `forbid_equipment_type` / `forbid_equipment_type_exact_match`,
+which key off the archetype's own `type = { ... }` set. Vanilla's `amphibious_drive`
+uses exactly that shape, and the mod's own module file already uses these keys 49
+times. The designer role roots supply the discriminators: `x_tank_chassis.txt:8-15`
+makes `light_tank_aa_chassis` `type = { armor anti_air }` and `:18-25` makes
+`light_tank_artillery_chassis` `type = { armor artillery }`, while the carrier
+archetypes carry `mechanized` beside `armor`. Consequence: hull-restricted modules
+need no GUI change, no new slot and no divergence between the five free lists. Do not
+implement per-hull locking by forking the category lists.
+
+**Thermal vision is already shipped; only night vision is missing.** Established
+2026-09-09. `Optics_4..7` are localised "Thermal Sight I/II/III" and "Advanced Thermal
+Sight" (`tank_modules_l_english.yml:951-957`) in category `tank_fcs_optics`, unlocked by
+`nsb_optics4..7` at 1970/1980/1990/2005. The owner's mockup shows a three-step thermal
+branch in a separate column; the shipped four steps in the optics column satisfy it. The
+default is to leave them where they are and treat the mockup's thermal boxes as done -
+splitting them into their own column would retarget four shipped modules, four
+technologies and every preset that names them, for presentation only. Night vision is
+the genuinely absent half: six technologies, column x18 free immediately right of the
+panoramic sights at x16, two new tree rows (1960 and 2000).
+
+**Paradrop capability cannot be a designer module.** Established 2026-09-09 by
+searching the vanilla module directory: no module anywhere carries
+`can_be_parachuted`, `parachut*`, `special_forces` or `marines`. The only
+capability-bearing vanilla module is `amphibious_drive`, and it works through equipment
+types. So the mockup's Paradrop Capability box has no module mechanism - it must be a
+sub-unit or technology property, or be dropped. Do not author it as a module.
+
+## Owner decisions, 2026-09-09 (module content)
+
+All four blocking decisions from the module content plan are answered. These are
+ratified; do not reopen them.
+
+1. **`Optics_4..7` are accepted as the thermal branch in place.** No new thermal
+   column, no retargeting of the four shipped modules or their `nsb_optics4..7`
+   unlocks. The mockup's thermal boxes are satisfied; its 1975/1990/2000 years yield to
+   the shipped 1970/1980/1990/2005. Descriptions 42-45 attach to the existing modules.
+2. **Amphibious follows the design documents, not an improvised role.** The proper
+   amphibious role is whatever the design documentation specifies; that specification is
+   the authority over any reconstruction from current script.
+3. **Paradrop is restricted to light hulls and light vehicles only.** It is therefore
+   hull-restricted in the Finding 9 sense. Since no module can carry a paradrop
+   capability key, the capability itself must come from a sub-unit or technology, and
+   the light-hull restriction is expressed with
+   `allow_equipment_type` / `forbid_equipment_type` on whatever module or role carries
+   it.
+4. **AA ammunition overturns the legacy self-supplying-AA-gun rule.** The ratified
+   position that AA guns supply their own attack and that SPAA variants carry no
+   ammunition is **superseded**. An AA ammunition ladder is authorized. Consequences to
+   settle in that batch: known inconsistency 10's "three SPAA variants deliberately
+   carry no ammunition" no longer holds, and the validator's `needs_ammunition` AA
+   exemption must be inverted rather than worked around.
+
+**Engine and suspension year authority: the icon assets win.** Ratified 2026-09-09.
+Where an icon year and its unlocking technology's `start_year` disagree, the icon year
+is correct and the technology moves. This is one systematic decision, not eleven: gas
+turbines `GT_0..3` icons 1960/1970/1980/2000 against techs
+`nsb_gt_engines0..3` 1965/1975/1985/2005, and `GT_APU_0..3` icons 1960/1970/1980/2000
+against the same four technologies. Also covers the combustion 1939-versus-1940 case.
+
+**Experimental 4-Track Suspension is authorized** as described in the mockup, including
+its "Opened by 1955 H Tank" prerequisite - a heavy-hull-gated unlock rather than a
+free-standing technology.
+
+**The module technology folder is visually clipped at x=16 and must be widened before
+any column is added there.** Established 2026-09-09: across all 102 technologies in
+`nsb_armor_modules_folder` the distinct x columns are
+-8, -6, -4, -2, -1, 0, 2, 4, 6, 8, 10, 12, 14, 16, so x=16 (`nsb_pano_sight0..2`) is the
+rightmost that has ever rendered, and the owner reports the tree is cut off there. The
+night-vision column at x=18 therefore depends on a GUI change in
+`interface/countrytechtreeview.gui` first. Per `GOTCHAS.md` the layout must be measured
+rather than inferred from element names before any value is changed.
+
+**Standing rule: a new NSB armour technology dated 1980 or earlier is incomplete until
+it is added to `cwic_major_tank_research_1980`.** That effect must grant every tank
+technology with `start_year <= 1980`, and the validator fails with "1980 tank research
+coverage differs" otherwise. It caught this twice on 2026-09-09 - once for
+`nsb_night_vision0..2` and once for `nsb_special_capabilities0..5`,
+`nsb_suspension_multi_track` and the migrated gas turbines. The effect lives in
+`common/scripted_effects/CWIC_tank_bookmark_research.txt`. Treat updating it as part of
+the definition of adding the technology, not as a follow-up.
+
+**A new category's cost depends on whether its slot is mandatory or free.** Established
+2026-09-09 by `tank_suspension_multi_track`. A **free-slot** category must be added to
+the free list of all five archetypes AND given a `module_count_limit { count < 2 }`, or
+it silently stacks. A **mandatory-slot** category - suspension, armour, engine, turret,
+main armament - is added only to that slot's `allowed_module_categories` on all five
+archetypes and must NOT get a count limit, because a mandatory slot holds exactly one
+module. Do not reflexively add a limit for every new category.
+
+**Brace balance and byte checks are not a syntax check, and a passing validator is not
+a passing parse.** Established 2026-09-09 the hard way: a single missing `=` in
+`tank_designer_view.gui` (`y@fixed_btn_mod_row_0`) aborted the parse of 125 children of
+`tank_designer_view` and crashed every tank, APC and IFV designer with SIGFPE, while
+brace balance was 0, all bytes were clean, and the validator reported
+`21 designer slots checked` - because its slot regex matched the broken line. Any pass
+that rewrites script or GUI assignment blocks MUST verify token shape. The validator now
+enforces this for `position`/`size`/`margin` blocks in the designer GUI and all 106
+blueprint files. Load-time parse errors appear with `no_game_date`, so a plain boot
+confirms them with no gameplay required - do that after any GUI edit.
+
+## Amphibious as a designer role, ratified 2026-09-09
+
+**Owner ruling, superseding every earlier amphibious statement** including
+`REFERENCE.md:129-131`'s "amphibious mobility module" and the "eligible mechanized
+designs" wording: the replacement for the legacy mechanized amphibious vehicle is an
+APC/IFV design that gains the **amphibious designer role**, in the same way a tank's main
+armament determines whether it is a gun tank, SP artillery, SPAA, tank destroyer or flame
+tank. Where earlier notes conflict, this wins.
+
+**The mechanism is real and already in use here - with the causality the other way
+round.** A module does not create a role; the role exists as an archetype and the module
+is *restricted to* it, which produces the same player experience. Measured:
+`tank_anti_air_cannon` carries `allow_equipment_type = anti_air` plus
+`forbid_equipment_type_exact_match = armor`, and `tank_low_p_cannon0` carries
+`allow_equipment_type = artillery`. The roles themselves are cheap `duplicate_archetypes`
+entries - `x_tank_chassis.txt:8-15` is six lines declaring `light_tank_aa_chassis` as
+`archetype = light_tank_chassis`, `type = { armor anti_air }` - and the engine derives
+every tier from the parent family, which is why `light_tank_aa_chassis_1` is legal though
+never declared.
+
+So the amphibious implementation is two small pieces plus rewiring:
+
+1. Carrier amphibious role roots in `x_tank_chassis.txt`, e.g. `apc_amphibious_chassis`
+   with `archetype = mechanized_equipment` and `type = { armor mechanized amphibious }`,
+   and the IFV equivalent.
+2. An amphibious drive module gated `allow_equipment_type = amphibious`, so it is
+   mountable only on those roles and nowhere else.
+3. `mechanized_marine`'s `need` / `transport` point at those **role chassis**, not at
+   `mechanized_equipment`. This is what makes the capability selective and it removes the
+   objection recorded in Finding 14: an ordinary APC is not a marine transport, only an
+   amphibious-role APC is.
+
+Finding 14 stands as the reason a module alone cannot do it - sub-units consume equipment
+ids and no land sub-unit can test for a fitted module - but its "expensive role rebuild"
+framing is downgraded: `duplicate_archetypes` makes the role itself nearly free. The real
+cost remains the six validator contracts and the `mechanized_marine` `active = no`
+assertion, all of which must change consciously.
+
+**Module-to-module compatibility does not exist in this engine, and the design must not
+assume it.** The complete tank-module vocabulary for restricting a module is three keys,
+confirmed by scanning the whole vanilla module directory: `allow_equipment_type` (23
+uses), `forbid_equipment_type` (4) and `forbid_equipment_type_exact_match` (6). There is
+**no** key expressing "this module requires that module" or "this module conflicts with
+that module" for land equipment; `need_equipment_modules` exists only on ship hulls
+(`battlecruiser.txt:8-12`). Consequences for any future module-limitation design:
+
+- Restriction by **hull or role** is expressible, via the archetype `type` set.
+- Restriction between **individual modules** is not. The only levers are which category a
+  module sits in, the per-category `count < 2` limits, and the still-unverified
+  multi-category shared budget.
+- Restriction by **hull size** is not expressible either - see Finding 13, light, medium
+  and heavy are all bare `type = armor`.
+
+**Attempted 2026-09-09, reverted: `duplicate_archetypes` cannot give the carrier
+families clean role tier ids.** The role-as-designer-role design above is right; this is
+a naming constraint on the mechanism, discovered by boot testing and not visible
+statically.
+
+`duplicate_archetypes` derives a role's tier ids by substituting the parent archetype's
+name inside each member's id:
+
+| Family | Archetype | Members | Derived role tier |
+| --- | --- | --- | --- |
+| tanks | `light_tank_chassis` | `light_tank_chassis_0..9` | `light_tank_aa_chassis_3` - clean |
+| carriers | `mechanized_equipment` | `apc_chassis_0..7` | `apc_amphibious_chassisapc_chassis_0` - concatenated |
+
+The tank case works because the member id **contains** the archetype id. The carrier
+members were deliberately renamed to `apc_chassis_N` / `ifv_chassis_N`, which do not
+contain `mechanized_equipment`, so the engine falls back to concatenating the role id and
+the member id. A live boot produced 24 error lines, eight of them
+`apc_amphibious_chassisapc_chassis_N is an equipment type ... not in script enum`, plus
+13 `Failed to change role to "Unknown"` before the `for_each variant_name
+find_and_replace` was removed. Renaming the role does not help - the mismatch is between
+the archetype id and the member ids, not in the role id.
+
+The whole attempt was reverted rather than shipped: the validator passed at
+`1318 technologies, 290 tank modules` with malformed equipment ids in play, which is
+Finding 11's lesson repeating in a new place. Post-revert boot is clean - zero
+`amphibious_chassis`, zero `Failed to change role`, zero `script_enum` complaints.
+
+**The route that remains open** is to declare the amphibious carrier role chassis
+**explicitly**, sixteen equipment blocks in the style of the existing `apc_chassis_0..7`
+and `ifv_chassis_0..7` members, each carrying `type = { armor mechanized amphibious }`,
+instead of deriving them. Verbose but fully controlled, and it sidesteps the derivation
+entirely. Renaming the carrier members to contain `mechanized_equipment` is the other
+theoretical fix and is **rejected**: those ids appear across 586 national presets, the
+generic bookmark variants and the OOB migration.
+
+Also established while attempting this, and it is why the module half is not enough on
+its own: a single sub-unit cannot accept either the legacy equipment or a designer role
+chassis. `transport` is one scalar id and `need` entries are conjunctive, so listing both
+`mechanized_marine_equipment` and an amphibious role chassis makes the sub-unit require
+**both** at once. Supplying marines from a designer carrier therefore needs a **second**
+sub-unit consuming the role chassis, leaving legacy `mechanized_marine` intact for
+non-NSB players - which touches division and AI templates and is its own decision.
+`CWIC-Special-Units.txt` was left byte-for-byte unchanged.
+
+Both columns are now partly built. Night vision shipped 2026-09-09 as
+`nsb_night_vision0..5` with six `tank_fcs_optics` modules; the thermal half was already
+shipped as `Optics_4..7`. The Special Capabilities column shipped the same day as
+`nsb_special_capabilities0..6` with ten modules, plus `nsb_suspension_multi_track` and
+`Four_Track_0`. Still unbuilt from that column: Amphibious Drive, Paradrop Capability,
+OPVT, Underwater Driving Capability and Modular Construction - the first four for want
+of an engine mechanism, the last for want of a category. All authored stats in both
+columns are invented and recorded as authored; `Log_0`'s +2% reliability is the sole
+documented value.
+
+**Free slots are not enumerated in presets.** Vanilla proves optional slots may be
+omitted: `history/countries/GER - Germany.txt:1097-1108` creates `light_tank_chassis_0`
+with the five mandatory slots and one special, nothing else. So the shipped 586 national,
+40 generic and 16 export creation blocks stay valid as written - their 8,790 + 160 + 80
+special-slot assignment lines need no rewrite - and the validator moves from "exactly 15
+assignments" to "five mandatory present, specials a subset of the declared set". Adding
+six slots is therefore a contract change in one archetype family plus the validator, not
+a mass content migration.
 
 **Legacy mechanized ladders retire by DLC-gating production, not by removing
 technologies from `nsb_armor_folder`.** Dropping the folder placement from
@@ -136,6 +472,58 @@ session must research and map each focus effect/equipment grant to its
 historical variant counterpart. The research cost is intentionally deferred;
 no historical mapping is part of this migration.
 
+## Stockpile grants
+
+**Ratified 2026-09-08.** `add_equipment_to_stockpile` takes `type`, `amount`,
+`variant_name` and `producer`. It does **not** take `creator`, even though
+`creator` is correct on `force_equipment_variants` and `add_equipment_production`
+and is what the producer-resolution rule above talks about. The engine rejects the
+token and drops the whole grant with no in-game symptom. Do not "restore" `creator`
+here for consistency with the resolution rule - the rule is about which tag owns a
+design, not about this effect's parameter names.
+
+Every stockpile `type` must resolve to a declared equipment id, or to a tier its
+parent family actually declares behind a `duplicate_archetypes` root. The engine
+derives those tiers at runtime, so `light_tank_aa_chassis_1` is legal despite never
+being declared, while `light_tank_aa_chassis_99` is not - the allowance is bounded
+rather than "any number after a known root".
+
+`validate_stockpile_grants()` pins both halves across **all 6220 grants in the mod**,
+not only the 2349 under `history/`. Two thirds live in `common/national_focus/` and
+`common/decisions/`; scanning only `history/` would leave the blind spot where this
+defect class returns. Six negative fixtures.
+
+Nine ids are carried as a named, commented exception set because each names
+something that is not equipment and each needs its content owner to say what was
+meant. None is tank-designer owned: `mp_uav_1` (ISR), `apc_equipment_1` (PHI),
+`manpads_3` (USA), `cv_nav_bomber_equipment_6` (JAP), and `armor_light`,
+`armor_medium`, `artillery_light`, `artillery_medium`, `support_artillery` (PRC,
+all technology categories used as equipment types). Recorded, not guessed at and
+not deleted. Shrinking this set is a content task with an owner, not a validator
+task.
+
+## Carrier art
+
+**Ratified 2026-09-08.** Carrier designs get **one static picture per hull tier**,
+not per-design art. Per-design art was measured and is not available: the designer
+icon compositor is an explicit tank-family graphics contract keyed on enumerated
+profile sprites in `interface/tank_profiles.gfx`, not a generic consequence of an
+equipment having module slots. Vanilla `super_heavy_artillery_equipment_1` inherits
+`module_slots` and still keeps a static archetype picture, and vanilla NSB gives
+mechanized no generated icons at all. Do not reopen this as "wire the carriers into
+the tank icon generator".
+
+Each hull declares `picture = cwic_apc_chassis_N` / `cwic_ifv_chassis_N`, resolved
+by the engine through `GFX_<picture>_medium`. Only the `_medium` sprite form is
+registered, matching vanilla. The sixteen sprites point at the already-shipped
+neutral `gfx/interface/technologies/apc_{N+3}.dds` and `ifv_{N+1}.dds` textures, so
+a hull's production icon is the same art as its technology icon. Neutral mod art was
+chosen over the equally complete USA and Soviet tech icon sets so no country's
+artwork is baked into a shared chassis definition. No new, copied or renamed assets.
+
+Consequence, accepted: every design on one hull tier shares one icon. `BTR-60P` and
+`BTR-60PB` are both `apc_chassis_2` art.
+
 ## Naming and localisation
 
 - Country-specific localisation is the naming authority over the consolidated file
@@ -182,6 +570,10 @@ All named `tank_special_slot_N`. Do not introduce the obsolete `special_type_slo
 names in tank content - that collision with plane airframes is what made Computer/Radar
 and Loading System both render as "Optics".
 
+**Retired 15-position map.** Superseded in script on 2026-09-09; kept because the
+shipped presets were authored against it and its tradeoffs are what the count limits
+now have to reproduce. The 21-position map below is what exists today.
+
 | Slot | Allowed categories | Tradeoff |
 | --- | --- | --- |
 | 1, 2 | Kinetic, chemical, missile or HE ammunition | Two ammunition choices |
@@ -197,6 +589,70 @@ and Loading System both render as "Optics".
 All 18 existing special-module categories remain reachable on all three hull
 archetypes. Existing category count limits remain in force. Player designs from before
 the slot specialization may use now-ineligible placements - use fresh campaigns.
+
+**Shipped 21-position map, ratified and implemented 2026-09-09.** Five mandatory slots
+plus `tank_special_slot_1..16`, on all five archetypes.
+
+| Slot | GUI label | Allowed categories |
+| --- | --- | --- |
+| mandatory x5 | Gun, Turret, Suspension, Armour, Engine | unchanged |
+| 1 | AP Ammunition | `tank_ammo_kinetic`, `tank_ammo_chemical`, `tank_ammo_missile` |
+| 2 | HE Ammunition | `tank_ammo_he` |
+| 3 | Aiming | `tank_fcs_aiming` |
+| 4 | Optics | `tank_fcs_optics` |
+| 5-16 | Slot 1 - Slot 12 | the twelve categories with no dedicated slot: `tank_fcs_computer`, `tank_fcs_radar`, `tank_loader_manual_assist`, `tank_loader_autoloader`, `tank_loader_artillery`, `tank_protection_passive`, `tank_protection_reactive`, `tank_protection_active`, `tank_survivability`, `tank_mobility_auxiliary`, `tank_smoke`, `tank_secondary_turret` |
+
+Free slots deliberately exclude the four dedicated categories, so one AP round, one HE
+round, one aiming device and one sight remain structurally enforced without a limit.
+A category authored later must be added to this list **and** to the count limits in the
+same edit, or it silently stacks - and, once the per-hull lock model exists, to the
+eligibility map as well.
+
+Exclusivity was to move from slot restriction to shared budgets, preserving the current
+tradeoffs. Every budget below is what the retired specialized layout enforced, so this
+would be a re-expression, not a rebalance:
+
+| Group | Budget |
+| --- | --- |
+| `tank_fcs_computer` + `tank_fcs_radar` | 1 |
+| `tank_loader_manual_assist` + `tank_loader_autoloader` + `tank_loader_artillery` | 1 |
+| `tank_protection_passive` + `tank_protection_reactive` + `tank_protection_active` | 2 |
+| `tank_survivability` + `tank_mobility_auxiliary` + `tank_smoke` | 2 |
+| `tank_secondary_turret` | 1 (already `count < 2`) |
+
+**Not shipped, and still contingent on the multi-category `module_count_limit` test.**
+The per-category `count < 2` fallback shipped instead. The consequence is exact and
+recorded: the four one-per-group tradeoffs above survive, because each of those groups'
+members reduces to one pick anyway, but the two budget-2 groups do not - a design may
+now mount all three protection categories and all three utility categories rather than
+two of each. That is the balance debt the expansion created.
+
+**The sketch's special-module list is 8 shipped families and 10 unbuilt ones.** Shipped
+today, all in `common/units/equipment/modules/00_tank_modules.txt`: Belt Autoloader
+(`Loader_4a/4b/4c_Belt`), Active Protection (`APS_0_H..3_H`, `APS_0_S..1_S`), ERA
+(`ERA_0`, `ERA_1`, `ERA_L`, `ERA_2`, `ERA_3`), External Additional Armour (`Addon_0_Comb`,
+`Addon_1..4_NERA`, `Addon_0/1_CE`), Auxiliary Power Unit (`APU_0..6`, `GT_APU_0..3`),
+ATGM (`tank_atgm_launcher_cannon`, `gl_atgm_0p..3p`, `h_atgm_0..4`), smoke launchers
+(`Smoke_0`, `Smoke_ESS`, `Smoke_1..4`) and thermal sights (`Optics_4..7`, category
+`tank_fcs_optics`). 145 special modules exist across the 18 special categories.
+
+Unbuilt - no module, no technology, no balance row: Blow-Out Panels, Anti-Mine Plow
+(and rollers), External Additional Fuel Tanks, Unmanned Turret / RWS, Underwater
+Driving, Integrated Trench Plow, Modular Construction, amphibious drive, dozer plough,
+and night vision I-III. Drawio page 11 `[STATUS]` states it verbatim: "`[TODO] Base &
+Other Tech Modules - RWS I-III, blow-out panels, unmanned turret, anti-mine ploughs and
+rollers, dozer plough, external fuel. None exist in script.`" The workbook carries rows
+only for the Belt/ERA/APS/APU/ATGM families, and its `Night & Thermal Vision Effects`
+tab has zero non-empty rows, so every unbuilt family's numbers are invented and fall
+under the existing "recorded as authored" rule. "Bulldozer" is the owner's word for the
+sketch's `Dozer Plow`; there is no separate module. `night_vision` exists only as an
+orphan tag at `common/technology_tags/00_technology.txt:42`.
+
+Each unbuilt family needs a category decision as well as numbers: some fit existing
+categories (external armour -> `tank_protection_passive`), others have none (external
+fuel, mine/trench ploughs, unmanned turret, amphibious drive). A new category is cheap
+in a free slot but must be added to an exclusivity group and to a count limit in the
+same edit, or it silently stacks.
 
 ## Module balance, ratified 2026-09-05
 
@@ -228,6 +684,27 @@ turret/weapon-size eligibility redesign.
 The CSV carries the revised row. The validator checks that row against the script, the
 workbook against the old values, and the revised turret against its numeric contract.
 These are the only cross-source exceptions.
+
+## Static QA dispositions, 2026-09-08
+
+The bounded owner-QA review is resolved at source level without a balance redesign:
+
+- USA and SOV 1980 dated history already call
+  `cwic_major_tank_research_1980`. Its two DLC branches and exact technology set
+  are validator contracts; no second country-history research convention is added.
+- The reported 1985 ahead-of-time cases already use matching `start_year` and
+  `@1985` rows. The source contains no missing-date defect, so no technology dates
+  are changed.
+- The Light/Conventional Turret difference is intentional: the former is the
+  1 IC option and the latter buys +0.05 breakthrough for 1.5 IC.
+- `Radar_1`'s script values match both balance sources. A displayed `-0` supply
+  value is a runtime tooltip-precision issue, not a balance correction.
+- Focus exports are internal obsolete designs: every helper is hidden and marked
+  obsolete, while startup national and generic designs use the existing
+  newest-only obsolescence marker. No focus effect names or creation order change.
+
+These are static dispositions only. Live tooltip, production-tab, bookmark and
+balance acceptance remain unverified.
 
 ## QA findings that are not transcription errors
 
@@ -271,6 +748,9 @@ These are the only cross-source exceptions.
    computed without it.
 3. Two parser families live in the validator - the doctrine work added a bounded parser
    while the tank half uses older near-duplicates. Do not add a third; reuse and delete.
+   Partially paid down 2026-09-08: the lenient brace scanner is now the single
+   `located_keyed_blocks`, with `keyed_blocks` and `stockpile_grants` as thin views
+   over it. The bounded/lenient split itself remains.
 4. Turret modules have no `xp_cost` while every other module family does.
 5. 14 abbreviation collisions across 60 modules, including all ten light gun tiers
    sharing `tanklightc`. Variant auto-naming cannot distinguish a 1939 gun from a 2015
@@ -289,8 +769,11 @@ These are the only cross-source exceptions.
    reference them.
 10. Bookmark variants use concrete module ids (`ap_0p`, `tank_he_0p`) while AI recipes
     use categories (`tank_ammo_kinetic`, `tank_ammo_he`). Both correct; the asymmetry
-    misleads. The three SPAA variants deliberately carry no ammunition, because AA guns
-    supply their own attack.
+    misleads. The claim that "the three SPAA variants deliberately carry no ammunition
+    because AA guns supply their own attack" is **superseded as of 2026-09-09**: the
+    owner reversed that rule, `tank_aa_ammo_1..3` exist in `tank_ammo_he` restricted to
+    `allow_equipment_type = anti_air`, all three SPAA variants now mount tier 1, and the
+    validator requires it. Flamethrowers remain self-supplying and exempt.
 11. `sp_tag_tank_speed_factor` is an invalid modifier in
     `common/dynamic_modifiers/wuw_dynamic_modifiers.txt` - one live log error,
     tank-adjacent, trivial, unowned.
@@ -300,3 +783,5 @@ These are the only cross-source exceptions.
     which is a localisation key rather than an equipment type. Predates the APC work.
     Most likely wants `mechanized_equipment_3`, or a designer APC. Flagged for whoever
     owns PHI.
+    Now also carried in `STOCKPILE_TYPE_EXCEPTIONS`, alongside eight sibling grants
+    the mod-wide stockpile contract found in ISR, USA, JAP and PRC content.
