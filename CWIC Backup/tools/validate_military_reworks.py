@@ -38,8 +38,49 @@ if "--help" in sys.argv:
 ROOT = Path(__file__).resolve().parents[2]
 MOD = ROOT / "Cold War Iron Curtain"
 TECH_DIR = MOD / "common/technologies"
+# The 3187px right-edge ceiling contract was retired 2026-09-10. It encoded the
+# gated-item decision to move two gridbox origins left, and the owner reverted
+# that move after finding the clipping is cosmetic and unaffected by it. The
+# structural gridbox checks below are kept; the edge comparison is not.
+TECH_FOLDER_X_GRIDBOX = {
+    "nsb_armor_folder": {
+        6: "nsb_iw_armored_vehicles_tree",
+        8: "nsb_iw_armored_vehicles_tree",
+        -9: "nsb_engines_tree",
+        -6: "nsb_engines_tree",
+        9: "nsb_engines_tree",
+        10: "nsb_engines_tree",
+        12: "nsb_engines_tree",
+        14: "nsb_engines_tree",
+        15: "nsb_engines_tree",
+        16: "nsb_engines_tree",
+        18: "nsb_engines_tree",
+        22: "nsb_armor_tree",
+        26: "nsb_armor_tree",
+        30: "nsb_armor_tree",
+    },
+    "nsb_armor_modules_folder": {
+        0: "nsb_light_guns_tree",
+        2: "nsb_light_guns_tree",
+        4: "nsb_light_guns_tree",
+        6: "nsb_light_guns_tree",
+        8: "nsb_light_guns_tree",
+        -8: "nsb_ammo_tree",
+        -6: "nsb_ammo_tree",
+        -4: "nsb_ammo_tree",
+        -2: "nsb_ammo_tree",
+        -1: "nsb_ammo_tree",
+        10: "nsb_tank_design_tree",
+        12: "nsb_tank_design_tree",
+        14: "nsb_tank_design_tree",
+        16: "nsb_tank_design_tree",
+        18: "nsb_tank_design_tree",
+        20: "nsb_tank_design_tree",
+    },
+}
 MODULE_FILE = MOD / "common/units/equipment/modules/00_tank_modules.txt"
 CHASSIS_FILE = MOD / "common/units/equipment/tank_chassis.txt"
+ROLE_CHASSIS_FILE = MOD / "common/units/equipment/x_tank_chassis.txt"
 MECHANIZED_FILE = MOD / "common/units/equipment/mechanized.txt"
 HEAVY_MECHANIZED_FILE = MOD / "common/units/equipment/mechanized_heavy.txt"
 # The APC designer family reuses the mechanized_equipment archetype so every
@@ -84,38 +125,55 @@ IFV_SUPERSTRUCTURE_MODULES = ("ifv_fighting_compartment", "ifv_frontal_engine_la
 IFV_ARMAMENT_MODULES = tuple(f"ifv_autocannon_{tier}" for tier in range(8)) + tuple(
     f"ifv_atgm_launcher_{tier}" for tier in range(6)
 )
-TANK_SPECIAL_SLOT_COUNT = 16
-TANK_DESIGNER_POSITIONS = 5 + TANK_SPECIAL_SLOT_COUNT
-# Slots 5-16 are free: they accept every special category that has no dedicated
-# slot, so exclusivity is carried by the count limits below rather than by the
-# slot map.
-TANK_FREE_SLOT_CATEGORIES = {
-    "tank_fcs_computer", "tank_fcs_radar",
-    "tank_loader_manual_assist", "tank_loader_autoloader", "tank_loader_artillery",
-    "tank_protection_passive", "tank_protection_reactive", "tank_protection_active",
-    "tank_survivability", "tank_mobility_auxiliary", "tank_smoke",
-    "tank_secondary_turret",
-}
+TANK_SPECIAL_SLOT_COUNT = 15
+TANK_DESIGNER_POSITIONS = 20
+# Engine cap verified 2026-09-10: custom module slot windows 0-19 render; index
+# 20 is silently dropped. The tank designer therefore has fifteen optional slots.
+# Owner decision 2026-09-10: the tank designer's fifteen optional slots are
+# fully specialized, so each category has one declared slot owner.
 TANK_SPECIAL_SLOT_CATEGORIES = {
-    1: {"tank_ammo_kinetic", "tank_ammo_chemical", "tank_ammo_missile"},
-    2: {"tank_ammo_he"},
+    1: {"tank_ammo_kinetic"},
+    2: {"tank_ammo_he", "tank_ammo_chemical"},
     3: {"tank_fcs_aiming"},
     4: {"tank_fcs_optics"},
+    5: {"tank_fcs_computer", "tank_fcs_radar"},
+    6: {"tank_loader_manual_assist", "tank_loader_autoloader", "tank_loader_artillery"},
+    7: {"tank_ammo_missile"},
+    8: {"tank_protection_passive", "tank_external_fuel"},
+    9: {"tank_protection_reactive"},
+    10: {"tank_secondary_turret"},
+    11: {"tank_protection_active"},
+    12: {"tank_smoke"},
+    13: {"tank_survivability"},
+    14: {"tank_power_auxiliary"},
+    15: {"tank_mine_clearing", "tank_engineering_blade"},
 }
-TANK_SPECIAL_SLOT_CATEGORIES.update(
-    {index: set(TANK_FREE_SLOT_CATEGORIES) for index in range(5, TANK_SPECIAL_SLOT_COUNT + 1)}
-)
-# Every special category needs its own `count < 2` block once twelve free slots
-# exist, or a design silently mounts three loading systems.
+# Owner decision 2026-09-10: dissolving tank_mobility_auxiliary changes the
+# 45 live module categories to 45 - 1 + 4 = 48, with the four replacement
+# categories below.
+TANK_MODULE_CATEGORY_COUNT = 45 - 1 + 4
 TANK_LIMITED_CATEGORIES = (
-    "tank_secondary_turret",
     "tank_ammo_kinetic", "tank_ammo_chemical", "tank_ammo_missile", "tank_ammo_he",
-    "tank_protection_passive", "tank_protection_reactive", "tank_protection_active",
-    "tank_survivability", "tank_fcs_aiming", "tank_fcs_optics",
-    "tank_fcs_computer", "tank_fcs_radar",
+    "tank_fcs_aiming", "tank_fcs_optics", "tank_fcs_computer", "tank_fcs_radar",
     "tank_loader_manual_assist", "tank_loader_autoloader", "tank_loader_artillery",
-    "tank_mobility_auxiliary", "tank_smoke",
+    "tank_protection_passive", "tank_protection_reactive", "tank_protection_active",
+    "tank_survivability", "tank_smoke", "tank_secondary_turret",
+    "tank_power_auxiliary", "tank_external_fuel", "tank_mine_clearing",
+    "tank_engineering_blade",
 )
+# Owner decision 2026-09-10: these are the only modules moved out of the
+# dissolved category, with each module assigned to its replacement purpose.
+TANK_RECUT_MODULE_CATEGORIES = {
+    **{f"APU_{index}": "tank_power_auxiliary" for index in range(7)},
+    **{f"GT_APU_{index}": "tank_power_auxiliary" for index in range(4)},
+    "Fuel_Tanks_0": "tank_external_fuel",
+    "Mine_Plow_0": "tank_mine_clearing",
+    "Mine_Plow_1": "tank_mine_clearing",
+    "Mine_Roller_0": "tank_mine_clearing",
+    "Mine_Roller_1": "tank_mine_clearing",
+    "Dozer_0": "tank_engineering_blade",
+    "Trench_Plow_0": "tank_engineering_blade",
+}
 AI_FILE = MOD / "common/ai_equipment/generic_tank.txt"
 ENUM_FILE = MOD / "common/script_enums.txt"
 VARIANT_EFFECT_FILE = MOD / "common/scripted_effects/CWIC_tank_designer_effects.txt"
@@ -225,6 +283,8 @@ MODULE_SOURCE_ANNOTATIONS = {
     "Нужно ли добавить топливо в запас?",
     "????? ?? ???????? ??????? ? ??????",
 }
+# Owner decision 2026-09-10: the removed flame module is no longer
+# script-owned.
 SCRIPT_OWNED_MODULES = {
     "conventional_turret",
     "cwic_coaxial_mg",
@@ -233,7 +293,6 @@ SCRIPT_OWNED_MODULES = {
     "cwic_secondary_hmg",
     "external_gun",
     "fixed_superstructure",
-    "flamethrower",
     "heavy_fixed_superstructure",
     "heavy_open_gun",
     "light_lp_turret",
@@ -278,11 +337,60 @@ STOCKPILE_TYPE_EXCEPTIONS = {
     "support_artillery",
 }
 
-SUPPORTED_ROLES = ("aa", "artillery", "destroyer", "flame")
+# Owner decision 2026-09-11 carrier role consolidation: the engine recognizes
+# only five hardcoded designer role tokens, so APC and IFV loadouts share its
+# working `amphibious` carrier role rather than risking a broken hull role list.
+FAMILY_ROLES = {
+    "light": ("aa", "artillery", "destroyer", "apc", "ifv"),
+    "medium": ("aa", "artillery", "destroyer", "apc", "ifv"),
+    "heavy": ("artillery", "destroyer"),
+}
 FAMILY_TIERS = {"light": 10, "medium": 10, "heavy": 5}
+# Owner decision 2026-09-11 carrier role consolidation retires IFV, flame,
+# ATGM, and heavy SPAAG designer roots; the engine permits carrier loadouts only
+# through the hardcoded `amphibious` role.
+REMOVED_TANK_ROLE_ROOTS = {
+    "light_tank_flame_chassis",
+    "medium_tank_flame_chassis",
+    "heavy_tank_flame_chassis",
+    "heavy_tank_aa_chassis",
+    "light_tank_atgm_chassis",
+    "medium_tank_atgm_chassis",
+}
+REMOVED_TANK_TYPE_IDS = (
+    REMOVED_TANK_ROLE_ROOTS
+    | {
+        f"{family}_tank_flame_chassis_{tier}"
+        for family, count in FAMILY_TIERS.items()
+        for tier in range(count)
+    }
+    | {f"heavy_tank_aa_chassis_{tier}" for tier in range(FAMILY_TIERS["heavy"])}
+    | {
+        f"{family}_tank_atgm_chassis_{tier}"
+        for family in ("light", "medium")
+        for tier in range(FAMILY_TIERS[family])
+    }
+    | {
+        f"{family}_tank_atgm_chassis{suffix}{index}"
+        for family, suffix, indices in (
+            ("light", "t_equipment_", range(1, 7)),
+            ("medium", "bt_equipment_", range(0, 10)),
+        )
+        for index in indices
+    }
+)
+# Owner decision 2026-09-11 carrier role consolidation removes IFV blueprints
+# rather than retaining a role the engine cannot safely switch.
+REMOVED_TANK_BLUEPRINT_PATTERN = re.compile(
+    r"^(?:tank_chassis_.*_tank_(?:amphibious|flame|atgm)|tank_chassis_heavy_tank_aa)\.gui$"
+)
+# Owner decision 2026-09-11 carrier role consolidation bounds OOB references
+# to ten surviving roots because the engine exposes only five designer tokens.
+ROLE_CHASSIS_PATTERN = "|".join(
+    f"{family}_tank_(?:{'|'.join(roles)})" for family, roles in FAMILY_ROLES.items()
+)
 OOB_TANK_PATTERN = re.compile(
-    r"\b(?:(?:light|medium|heavy)_tank"
-    r"(?:_(?:aa|artillery|destroyer|flame))?|apc|ifv)_chassis_[0-9]+\b"
+    rf"\b(?:(?:light|medium|heavy)_tank|(?:{ROLE_CHASSIS_PATTERN})|apc|ifv)_chassis_[0-9]+\b"
 )
 STARTING_VARIANT_EFFECT = "cwic_create_starting_tank_variants = yes"
 # Manufacturer bloc tags sell tanks but never load an OOB of their own.
@@ -308,25 +416,6 @@ SECONDARY_ICON_PATHS = {
     "cwic_hull_mg": "gfx/interface/equipmentdesigner/tanks/Modules/Other Modules/LMG.png",
     "cwic_secondary_hmg": "gfx/interface/equipmentdesigner/tanks/Modules/Other Modules/HMG.png",
     "cwic_secondary_autocannon": "gfx/interface/equipmentdesigner/tanks/Modules/SPAAG/AFV Autocannons/Light autocannon 1960.png",
-}
-FLAME_TECH_GRANTS = {
-    "nsb_iw_armored_vehicles": {
-        "light_tank_flame_chassis_0",
-        "medium_tank_flame_chassis_0",
-        "heavy_tank_flame_chassis_0",
-    },
-    **{
-        f"nsb_light_tanks{tier}": {f"light_tank_flame_chassis_{tier + 1}"}
-        for tier in range(9)
-    },
-    **{
-        f"nsb_main_battle_tanks{tier}": {f"medium_tank_flame_chassis_{tier + 1}"}
-        for tier in range(9)
-    },
-    **{
-        f"nsb_heavy_tanks{tier}": {f"heavy_tank_flame_chassis_{tier + 1}"}
-        for tier in range(4)
-    },
 }
 EXPORT_VARIANTS = {
     "CWIC Export Main Battle Tank 1942": "medium_tank_chassis_1",
@@ -418,8 +507,8 @@ BOOKMARK_VARIANT_TECHS = {
     "medium_tank_destroyer_chassis_2": "nsb_main_battle_tanks1",
     "medium_tank_destroyer_chassis_3": "nsb_main_battle_tanks2",
 }
-# The 2026-09-09 amphibious-role ratification uses distinct carrier-role ids;
-# these removed vanilla amphibious ids remain unsupported.
+# Owner decision 2026-09-11 carrier role consolidation keeps flame, IFV, ATGM,
+# and retired heavy SPAAG ids unsupported; carrier loadouts use amphibious.
 UNSUPPORTED_IDS = {
     "light_tank_rocket_chassis",
     "medium_tank_rocket_chassis",
@@ -430,6 +519,12 @@ UNSUPPORTED_IDS = {
     "super_heavy_tank_chassis",
     "amphibious_mechanized_infantry",
     "category_amphibious_tanks",
+    *REMOVED_TANK_TYPE_IDS,
+    "light_flame_tank",
+    "medium_flame_tank",
+    "heavy_flame_tank",
+    "flamethrower",
+    "tank_flamethrower",
 }
 
 
@@ -729,6 +824,75 @@ def named_gui_blocks(value: str, kind: str, wanted: str | None, label: str) -> l
         if name and (wanted is None or name.group(1) == wanted):
             result.append(block)
     return result
+
+def validate_tank_folder_gridboxes(
+    all_tank_techs: dict[str, str],
+    variable_values: dict[str, str],
+    research_ui: str,
+) -> None:
+    """Pin each NSB armor folder's gridbox set and every technology's folder x."""
+    for folder_name, x_gridboxes in TECH_FOLDER_X_GRIDBOX.items():
+        folders = named_gui_blocks(research_ui, "containerWindowType", folder_name, "countrytechtreeview")
+        if len(folders) != 1:
+            fail(f"{folder_name} must have one active GUI container, found {len(folders)}")
+            continue
+        gridboxes: dict[str, tuple[int, int]] = {}
+        for gridbox in top_level_named_blocks(folders[0], "gridboxtype", folder_name):
+            name = re.search(r'\bname\s*=\s*"([^"]+)"', gridbox)
+            position = re.search(
+                r"\bposition\s*=\s*\{\s*x\s*=\s*(-?[0-9]+)\s+y\s*=\s*(-?[0-9]+)",
+                gridbox,
+            )
+            slotsize = re.search(
+                r"\bslotsize\s*=\s*\{\s*width\s*=\s*([0-9]+)\s+height\s*=\s*([0-9]+)",
+                gridbox,
+            )
+            if not name or not position or not slotsize:
+                fail(f"{folder_name} has a malformed child gridbox")
+                continue
+            gridbox_name = name.group(1)
+            if gridbox_name in gridboxes:
+                fail(f"{folder_name} repeats GUI gridbox {gridbox_name}")
+                continue
+            gridboxes[gridbox_name] = (int(position.group(1)), int(slotsize.group(1)))
+        expected_gridboxes = set(x_gridboxes.values())
+        for gridbox_name in sorted(expected_gridboxes - set(gridboxes)):
+            fail(f"{folder_name} is missing GUI gridbox {gridbox_name}")
+        for gridbox_name in sorted(set(gridboxes) - expected_gridboxes):
+            fail(f"{folder_name} has unmapped GUI gridbox {gridbox_name}")
+
+        for technology, block in all_tank_techs.items():
+            folders = top_level_named_blocks(block, "folder", technology)
+            if len(folders) != 1:
+                continue
+            folder = folders[0]
+            if direct_values(folder, "name") != [folder_name]:
+                continue
+            position = re.search(
+                r"\bposition\s*=\s*\{\s*x\s*=\s*([^\s}]+)\s+y\s*=\s*([^\s}]+)",
+                folder,
+            )
+            if not position:
+                continue
+            raw_x = variable_values.get(position.group(1), position.group(1))
+            try:
+                x = int(raw_x)
+            except ValueError:
+                fail(f"{folder_name} technology {technology} has a non-integer folder x {raw_x}")
+                continue
+            gridbox_name = x_gridboxes.get(x)
+            if gridbox_name is None:
+                fail(f"{folder_name} technology {technology} uses an unmapped folder x {x}")
+                continue
+            dimensions = gridboxes.get(gridbox_name)
+            if dimensions is None:
+                continue
+            origin, slot_width = dimensions
+            if origin < 0 or slot_width <= 0:
+                fail(
+                    f"{folder_name} gridbox {gridbox_name} has a nonsensical "
+                    f"origin {origin} or slot width {slot_width}"
+                )
 
 
 def parse_allow_signature(allow: str, technology: str) -> tuple[list[str], list[tuple[str, str]]]:
@@ -1428,6 +1592,372 @@ def direct_values(block: str, key: str) -> list[str]:
     """Read simple direct values from a balanced block."""
     return top_level_values(block, key)
 
+def equipment_type_domain(block: str) -> set[str]:
+    if not block:
+        return set()
+    direct = direct_values(block, "type")
+    if direct:
+        return set(re.findall(r"\w+", " ".join(direct)))
+    listed = re.findall(r"\btype\s*=\s*\{([^}]*)\}", block)
+    return set(re.findall(r"\w+", " ".join(listed)))
+
+
+def format_type_domain(domain: set[str]) -> str:
+    return "{" + ", ".join(sorted(domain)) + "}"
+
+def removed_tank_role_errors(role_blocks: dict[str, str]) -> list[str]:
+    return sorted(REMOVED_TANK_ROLE_ROOTS & set(role_blocks))
+
+
+def removed_tank_blueprint_errors(names: list[str]) -> list[str]:
+    return sorted(name for name in names if REMOVED_TANK_BLUEPRINT_PATTERN.fullmatch(name))
+
+
+
+
+# Owner decision 2026-09-10 phase 3 restructure reserves size tokens for plain
+# gun hulls; all role roots must omit these tokens.
+TANK_SIZE_TOKENS = {"light_armor", "medium_armor", "heavy_armor"}
+# Owner decision 2026-09-10 role-token remap: this is the complete legal set
+# for module eligibility values and for non-armor tokens on the three tank
+# hulls and their role roots.
+LEGAL_TANK_DESIGNER_TYPE_TOKENS = frozenset(
+    {
+        "anti_air",
+        "anti_tank",
+        "artillery",
+        "amphibious",
+        "rocket",
+        "flame",
+        "light_armor",
+        "medium_armor",
+        "heavy_armor",
+    }
+)
+# `mechanized` is a vanilla equipment type but NOT a designer role - the
+# 2026-09-10 probe showed it never reaches the dropdown. It stays legal on the
+# standalone APC and IFV families only, where REFERENCE.md records it as load
+# bearing for land/transport classification and every `transport =
+# mechanized_equipment` consumer. Those families are phase 4 scope and must not
+# be remapped here; `flame` remains legal vocabulary but is unused in bounds.
+LEGAL_CARRIER_FAMILY_TYPE_TOKENS = LEGAL_TANK_DESIGNER_TYPE_TOKENS | {"mechanized"}
+
+
+def unsupported_tank_designer_tokens(
+    tokens: set[str], subject: str
+) -> list[str]:
+    unsupported = sorted(tokens - LEGAL_TANK_DESIGNER_TYPE_TOKENS)
+    if not unsupported:
+        return []
+    return [
+        f"{subject} uses unsupported designer type token(s): {unsupported}; "
+        "custom tokens cannot be designer roles. The 2026-09-10 in-game probe "
+        "showed amphibious and rocket as selectable roles, while ifv, atgm, "
+        "and mechanized never appeared."
+    ]
+
+
+def tank_module_designer_token_errors(
+    definitions: dict[str, str],
+) -> list[str]:
+    result: list[str] = []
+    for module, definition in definitions.items():
+        eligibility_tokens = (
+            equipment_type_tokens(definition, "allow_equipment_type")
+            | equipment_type_tokens(definition, "forbid_equipment_type")
+        )
+        result.extend(
+            unsupported_tank_designer_tokens(
+                eligibility_tokens,
+                f"tank module {module} eligibility",
+            )
+        )
+        # Owner decision 2026-09-11 carrier role consolidation leaves the
+        # `flame` token legal but unused in every tank restriction key because
+        # the engine hardcodes only five designer role tokens.
+        if "flame" in eligibility_tokens:
+            result.append(
+                f"tank module {module} eligibility must not use unused flame token"
+            )
+    return result
+
+
+def tank_type_domain_token_errors(blocks: dict[str, str]) -> list[str]:
+    result: list[str] = []
+    carrier_families = {
+        "mechanized_equipment",
+        "mechanized_heavy_equipment",
+    }
+    for name, block in blocks.items():
+        # The standalone carrier families keep `mechanized` for land/transport
+        # classification; they are phase 4 scope, not designer role roots.
+        # Owner decision 2026-09-11 carrier role consolidation leaves `flame`
+        # legal only as vocabulary because the engine hardcodes five role tokens;
+        # no tank type set may carry that token.
+        if "flame" in equipment_type_domain(block):
+            result.append(f"{name} type domain must not carry unused flame")
+        legal = (
+            LEGAL_CARRIER_FAMILY_TYPE_TOKENS
+            if name in carrier_families or re.fullmatch(r"(apc|ifv)_chassis_\d+", name)
+            else LEGAL_TANK_DESIGNER_TYPE_TOKENS
+        )
+        unsupported = sorted((equipment_type_domain(block) - {"armor"}) - legal)
+        if unsupported:
+            result.extend(
+                unsupported_tank_designer_tokens(
+                    set(unsupported), f"tank archetype/role {name} type domain"
+                )
+            )
+    return result
+
+
+def equipment_type_tokens(block: str, key: str) -> set[str]:
+    """Read a scalar or block-form equipment eligibility key."""
+    values = set(direct_values(block, key))
+    values.update(
+        token
+        for listed in keyed_blocks(block, key)
+        for token in re.findall(r"\w+", listed[listed.find("{") + 1 : -1])
+    )
+    return values
+
+
+def tank_module_type_bound_errors(definitions: dict[str, str]) -> list[str]:
+    """Return role-exclusivity and hardcoded-token violations."""
+    result = tank_module_designer_token_errors(definitions)
+    # Owner decision 2026-09-11 carrier role consolidation keeps exact-match
+    # eligibility retired; the engine's hardcoded role implementation accepts
+    # the allow-plus-forbid bounds below instead.
+    exact_match = sorted(
+        module
+        for module, definition in definitions.items()
+        if re.search(r"\bforbid_equipment_type_exact_match\s*=", definition)
+    )
+    if exact_match:
+        result.append(
+            "tank modules must not use forbid_equipment_type_exact_match: "
+            f"{exact_match}"
+        )
+    # Owner decision 2026-09-11 carrier role consolidation puts APC and IFV
+    # loadouts on one working `amphibious` role. Both carrier categories must
+    # keep exactly the three plain-gun size-token forbids.
+    # Reverted 2026-09-11 to the two-role carrier split: APC on `amphibious`,
+    # which the owner confirmed working end to end, and IFV on `rocket`, which
+    # renders and mounts but still fails its role change on save. Each role
+    # forbids the other so a carrier cannot be both.
+    carrier_categories = {
+        "tank_apc_superstructure": ({"amphibious"}, TANK_SIZE_TOKENS | {"rocket"}),
+        "tank_apc_armament": ({"amphibious"}, TANK_SIZE_TOKENS | {"rocket"}),
+        "tank_ifv_superstructure": ({"rocket"}, TANK_SIZE_TOKENS | {"amphibious"}),
+        "tank_ifv_armament": ({"rocket"}, TANK_SIZE_TOKENS | {"amphibious"}),
+    }
+    # Owner decision 2026-09-11 carrier role consolidation keeps carrier
+    # modules role-exclusive despite allow_equipment_type extending eligibility.
+    for module, definition in definitions.items():
+        category = (direct_values(definition, "category") or [""])[0]
+        if category not in carrier_categories:
+            continue
+        expected_allow, expected_forbid = carrier_categories[category]
+        actual_allow = equipment_type_tokens(definition, "allow_equipment_type")
+        actual_forbid = equipment_type_tokens(definition, "forbid_equipment_type")
+        if actual_allow != expected_allow:
+            result.append(
+                f"{module} must allow {format_type_domain(expected_allow)}, "
+                f"found {format_type_domain(actual_allow)}"
+            )
+        if actual_forbid != expected_forbid:
+            result.append(
+                f"{module} must forbid {format_type_domain(expected_forbid)}, "
+                f"found {format_type_domain(actual_forbid)}"
+            )
+    # Owner decision 2026-09-11 carrier role consolidation leaves conventional
+    # guns off the shared amphibious role, while ATGM uses anti_tank and AA uses
+    # anti_air; all must retain their exact engine-compatible bounds.
+    conventional_categories = {
+        "tank_small_main_armament",
+        "tank_low_pressure_main_armament",
+        "tank_medium_main_armament",
+        "tank_heavy_main_armament",
+    }
+    conventional_forbid = {"amphibious", "rocket"}
+    aa_forbid = TANK_SIZE_TOKENS | {"amphibious", "rocket"}
+    for module, definition in definitions.items():
+        category = (direct_values(definition, "category") or [""])[0]
+        actual_forbid = equipment_type_tokens(definition, "forbid_equipment_type")
+        if (
+            category in conventional_categories
+            and module not in AA_ARMAMENT_MODULES
+            and module != "tank_atgm_launcher_cannon"
+            and actual_forbid != conventional_forbid
+        ):
+            result.append(
+                f"{module} must forbid {format_type_domain(conventional_forbid)}"
+            )
+        if (
+            module in AA_ARMAMENT_MODULES or module == "tank_atgm_launcher_cannon"
+        ) and actual_forbid != aa_forbid:
+            result.append(
+                f"{module} must forbid {format_type_domain(aa_forbid)}"
+            )
+    return result
+
+
+def validate_tank_type_domains(chassis_text: str, role_text: str) -> None:
+    # Owner decision 2026-09-11 carrier role consolidation leaves every plain
+    # gun hull with exactly one size token, while the shared carrier role uses
+    # amphibious because the engine has only five hardcoded role tokens.
+    expected_archetypes = {
+        "light_tank_chassis": {"armor", "light_armor"},
+        "medium_tank_chassis": {"armor", "medium_armor"},
+        "heavy_tank_chassis": {"armor", "heavy_armor"},
+    }
+    # Owner decision 2026-09-11 carrier role consolidation defines the ten
+    # surviving role roots with only armor plus their hardcoded role token(s),
+    # never a size token; IFV has no separate role root.
+    expected_role_domains = {
+        "light_tank_aa_chassis": {"armor", "anti_air"},
+        "medium_tank_aa_chassis": {"armor", "anti_air"},
+        "light_tank_artillery_chassis": {"armor", "artillery"},
+        "medium_tank_artillery_chassis": {"armor", "artillery"},
+        "heavy_tank_artillery_chassis": {"armor", "artillery"},
+        "light_tank_destroyer_chassis": {"armor", "anti_tank"},
+        "medium_tank_destroyer_chassis": {"armor", "anti_tank"},
+        "heavy_tank_destroyer_chassis": {"armor", "anti_tank"},
+        "light_tank_apc_chassis": {"armor", "amphibious"},
+        "medium_tank_apc_chassis": {"armor", "amphibious"},
+        "light_tank_ifv_chassis": {"armor", "rocket"},
+        "medium_tank_ifv_chassis": {"armor", "rocket"},
+    }
+    chassis_blocks = dict(top_level_blocks(chassis_text, "equipments"))
+    for archetype, expected in expected_archetypes.items():
+        actual = equipment_type_domain(chassis_blocks.get(archetype, ""))
+        if actual != expected:
+            fail(
+                f"{archetype} type domain must be {format_type_domain(expected)}, "
+                f"found {format_type_domain(actual)}"
+            )
+
+    role_blocks = dict(top_level_blocks(role_text, "duplicate_archetypes"))
+    for role in removed_tank_role_errors(role_blocks):
+        fail(f"removed tank role root remains: {role}")
+    # Owner decision 2026-09-11 carrier role consolidation pins the role-root
+    # set to exactly ten; an unexpected IFV/custom root could revive the broken
+    # multi-role hull list despite the five-token engine constraint.
+    unexpected_role_roots = sorted(set(role_blocks) - set(expected_role_domains))
+    if unexpected_role_roots:
+        fail(f"unexpected tank role roots remain: {unexpected_role_roots}")
+    # Owner decision 2026-09-11 carrier role consolidation leaves `flame`
+    # unused: no chassis or role type set may carry it, even though the legal
+    # token vocabulary remains unchanged for compatibility.
+    flame_type_holders = sorted(
+        name
+        for name, block in {**chassis_blocks, **role_blocks}.items()
+        if "flame" in equipment_type_domain(block)
+    )
+    if flame_type_holders:
+        fail(f"flame type token remains in tank type set: {flame_type_holders}")
+    # Owner decision 2026-09-11 carrier role consolidation keeps the existing
+    # flame-family name check while forbidding the now-unused `flame` token.
+    flame_family_holders = sorted(
+        name for name in {**chassis_blocks, **role_blocks} if "flame" in name
+    )
+    if flame_family_holders:
+        fail(f"removed flame chassis family remains: {flame_family_holders}")
+    # Owner decision 2026-09-11 carrier role consolidation rejects custom type
+    # tokens in every chassis archetype and role domain, not only known roots.
+    for message in tank_type_domain_token_errors({**chassis_blocks, **role_blocks}):
+        fail(message)
+    # Owner decision 2026-09-11 carrier role consolidation retains the
+    # no-size-token rule on all ten surviving role roots.
+    for role, expected in expected_role_domains.items():
+        actual = equipment_type_domain(role_blocks.get(role, ""))
+        if actual != expected:
+            fail(
+                f"{role} type domain must be {format_type_domain(expected)}, "
+                f"found {format_type_domain(actual)}"
+            )
+        size_tokens = actual & TANK_SIZE_TOKENS
+        if size_tokens:
+            fail(
+                f"{role} type domain must not contain plain-gun size tokens "
+                f"{format_type_domain(size_tokens)}"
+            )
+    # Owner QA 2026-09-10, from the live log. The two script enums are NOT
+    # interchangeable and only one of them is extensible.
+    #
+    # `script_enum_equipment_category` mirrors EQUIPMENT_CATEGORY_META, which is
+    # hardcoded in the binary. Adding a custom token there logs
+    # `equipment_category.cpp:357: <token> is in script enum
+    # script_enum_equipment_category but is not an equipment stat`. Custom
+    # equipment `type` tokens are legal on an archetype and must NOT be declared
+    # here - the attempt to fix the role dropdown that way produced five such
+    # lines and fixed nothing.
+    # Owner decision 2026-09-10 role-token remap rejects custom names in the
+    # hardcoded enum as well; size tokens belong only to equipment domains.
+    custom_type_tokens = {"ifv", "atgm"} | TANK_SIZE_TOKENS
+    enum_block = re.search(
+        r"script_enum_equipment_category\s*=\s*\{(.*?)\n\}",
+        strip_script_comments(text(ENUM_FILE)),
+        re.DOTALL,
+    )
+    if enum_block is None:
+        fail("script_enum_equipment_category is missing from common/script_enums.txt")
+        return
+    declared_categories = set(enum_block.group(1).split())
+    intruders = sorted(custom_type_tokens & declared_categories)
+    if intruders:
+        fail(
+            "custom equipment type tokens must not be declared in the hardcoded "
+            f"script_enum_equipment_category: {intruders}"
+        )
+    #
+    # Owner decision 2026-09-11 carrier role consolidation keeps the engine's
+    # irregular derived-variant shapes while FAMILY_ROLES supplies ten role
+    # names; the hardcoded five-token role list cannot safely carry IFV roots.
+    bonus_block = re.search(
+        r"script_enum_equipment_bonus_type\s*=\s*\{(.*?)\n\}",
+        strip_script_comments(text(ENUM_FILE)),
+        re.DOTALL,
+    )
+    if bonus_block is None:
+        fail("script_enum_equipment_bonus_type is missing from common/script_enums.txt")
+        return
+    declared_bonus = set(bonus_block.group(1).split())
+    derived_shape = {"light": ("t_equipment_", range(1, 7)), "medium": ("bt_equipment_", range(0, 10)), "heavy": ("t_equipment_", range(1, 6))}
+    expected_derived = {
+        f"{family}_tank_{role}_chassis{suffix}{index}"
+        for family, (suffix, indices) in derived_shape.items()
+        for role in FAMILY_ROLES[family]
+        for index in indices
+    }
+    missing_derived = sorted(expected_derived - declared_bonus)
+    if missing_derived:
+        fail(
+            "script_enum_equipment_bonus_type omits derived role variant ids the "
+            f"engine emits: {missing_derived[:6]} ({len(missing_derived)} total)"
+        )
+    stale_derived = sorted(
+        entry
+        for entry in declared_bonus
+        if re.fullmatch(r"(light|medium|heavy)_tank_\w+_chassis(b?)t_equipment_\d+", entry)
+        and entry not in expected_derived
+    )
+    if stale_derived:
+        fail(
+            "script_enum_equipment_bonus_type keeps derived variant ids for roles "
+            f"that no longer exist: {stale_derived}"
+        )
+    # A declared equipment category is itself a bonus type; `flame` survives as a
+    # category for the MIO policies, so it must stay listed here too.
+    missing_categories = sorted(declared_categories - declared_bonus)
+    if missing_categories:
+        fail(
+            "script_enum_equipment_bonus_type omits declared equipment categories: "
+            f"{missing_categories}"
+        )
+
+
+
 
 def listed_values(block: str) -> list[str]:
     """Read bare values from a list block such as enable_equipments."""
@@ -1441,18 +1971,6 @@ def listed_values(block: str) -> list[str]:
 
 
 
-def flame_grant_errors(technologies: dict[str, str]) -> list[str]:
-    errors_found: list[str] = []
-    for technology, expected in FLAME_TECH_GRANTS.items():
-        actual = {
-            equipment
-            for block in top_level_named_blocks(technologies.get(technology, ""), "enable_equipments", technology)
-            for equipment in listed_values(block)
-        }
-        missing = expected - actual
-        if missing:
-            errors_found.append(f"{technology} is missing flame chassis grants: {sorted(missing)}")
-    return errors_found
 
 
 def module_parent_errors(definitions: dict[str, str]) -> list[str]:
@@ -2078,7 +2596,7 @@ def tank_module_balance_report() -> str:
         f"Tank module balance report: {len(sourced_modules)} IDs reconciled across CSV, "
         f"Total Balance Sheet Minimal, and Total Balance Sheet; {checked} populated "
         f"stat/resource cells checked; operation/provenance metadata {metadata_count}/{len(SCRIPT_OWNED_MODULES)}; "
-        f"22 script-owned IDs reconciled; 2 reviewed source-to-live overrides; "
+        f"21 script-owned IDs reconciled; 2 reviewed source-to-live overrides; "
         f"explicit exclusions cover eligibility, display, conversion, and XP fields "
         f"(the manual's 23 count has no additional module ID); "
         f"{len(APC_SUPERSTRUCTURE_MODULES) + len(APC_ARMAMENT_MODULES)} APC and "
@@ -2451,8 +2969,8 @@ def validate_tank_rework() -> None:
     module_techs = dict(top_level_blocks(text(TECH_DIR / "NSB_armor_modules.txt"), "technologies"))
     all_tank_techs = {**armor_techs, **module_techs}
 
-    for message in flame_grant_errors(all_tank_techs):
-        fail(message)
+    # Owner decision 2026-09-11 carrier role consolidation grants only each
+    # family's explicit ten-role set under the engine's five-token constraint.
     expected_chassis_techs: dict[str, set[str]] = {}
     for family, tier_count in FAMILY_TIERS.items():
         for tier in range(tier_count):
@@ -2465,7 +2983,8 @@ def validate_tank_rework() -> None:
                 f"{family}_tank_chassis_{tier}"
             )
             expected_chassis_techs[technology].update(
-                f"{family}_tank_{role}_chassis_{tier}" for role in SUPPORTED_ROLES
+                f"{family}_tank_{role}_chassis_{tier}"
+                for role in FAMILY_ROLES[family]
             )
     for technology, expected in expected_chassis_techs.items():
         actual = {
@@ -2490,10 +3009,6 @@ def validate_tank_rework() -> None:
             "every tank role must stay active so non-NSB profiles keep them buildable; "
             f"inactive: {inactive_roles}"
         )
-    if not set(re.findall(r"\b(?:light|medium|heavy)_flame_tank\b", roles)) >= {
-        "light_flame_tank", "medium_flame_tank", "heavy_flame_tank"
-    }:
-        fail("base NSB armor technology no longer retains all flame subunit unlocks")
 
     definitions = {name: block for name, block in module_blocks if name != "limit"}
     for message in module_parent_errors(definitions):
@@ -2535,9 +3050,13 @@ def validate_tank_rework() -> None:
     for message in secondary_unlock_errors(unlocked_modules):
         fail(message)
 
-    chassis_blocks = dict(top_level_blocks(chassis_text, "equipments"))
-    for archetype in ("light_tank_chassis", "medium_tank_chassis", "heavy_tank_chassis"):
-        block = chassis_blocks.get(archetype, "")
+    tank_archetypes = tank_archetype_blocks()
+    validate_tank_type_domains(chassis_text, text(ROLE_CHASSIS_FILE))
+    # Owner decision 2026-09-10 role-token remap covers carrier archetype type
+    # sets as well as the chassis and duplicate-archetype role roots.
+    for message in tank_type_domain_token_errors(tank_archetypes):
+        fail(message)
+    for archetype, block in tank_archetypes.items():
         slots = [
             slot
             for index in range(1, TANK_SPECIAL_SLOT_COUNT + 1)
@@ -2549,6 +3068,10 @@ def validate_tank_rework() -> None:
             fail(f"{archetype}: {message}")
         for message in tank_count_limit_errors(block):
             fail(f"{archetype}: {message}")
+    for message in tank_category_contract_errors(definitions, tank_archetypes):
+        fail(message)
+    if re.search(r"\btank_mobility_auxiliary\b", text(MODULE_FILE)):
+        fail("module file retains dissolved category tank_mobility_auxiliary")
 
     anti_air_expected = {
         "tank_anti_air_cannon": "18",
@@ -2704,15 +3227,22 @@ def validate_tank_rework() -> None:
     if "height = 50" not in role_entry:
         fail("tank role entries must remain 50 pixels high")
     research_ui = text(MOD / "interface/countrytechtreeview.gui")
+    validate_tank_folder_gridboxes(all_tank_techs, variable_values, research_ui)
     if 'name = "techtree_armour_folder_small_item"' not in research_ui:
         fail("legacy armor tree is missing its small-node template")
     modules_tab = re.search(r'name\s*=\s*"nsb_armor_modules_folder_tab"[\s\S]*?quadTextureSprite\s*=\s*"([^"]+)"', research_ui)
     if not modules_tab or modules_tab.group(1) != "GFX_artillery_folder_tab":
         fail("NSB armor modules tab does not use the artillery folder sprite")
-    # The 2026-09-09 amphibious carrier blueprints deliberately do not match
-    # this retained glob for removed tank-role amphibious blueprints.
-    if len(list((MOD / "interface/equipmentdesigner/tanks").glob("tank_chassis_*_tank_amphibious*.gui"))) != 0:
-        fail("orphan amphibious tank designer GUI files remain")
+    # The 2026-09-09 amphibious-role ratification and 2026-09-10 owner ruling
+    # remove these tank-role blueprints rather than retaining dormant files.
+    removed_blueprints = removed_tank_blueprint_errors(
+        [
+            path.name
+            for path in (MOD / "interface/equipmentdesigner/tanks").glob("*.gui")
+        ]
+    )
+    if removed_blueprints:
+        fail(f"removed tank designer GUI files remain: {removed_blueprints}")
 
     variant_text = text(FOCUS_EFFECT_FILE)
     variants = export_variant_map(variant_text)
@@ -3176,6 +3706,19 @@ def validate_carrier_bookmarks(national_override: str | None = None,
             fail(f"{tag} manufacturer must grant every requested foreign chassis technology before NSB variant creation")
 
 
+def tank_archetype_blocks() -> dict[str, str]:
+    chassis_blocks = dict(top_level_blocks(text(CHASSIS_FILE), "equipments"))
+    mechanized_blocks = dict(top_level_blocks(text(MECHANIZED_FILE), "equipments"))
+    heavy_mechanized_blocks = dict(top_level_blocks(text(HEAVY_MECHANIZED_FILE), "equipments"))
+    return {
+        archetype: chassis_blocks.get(archetype, "")
+        for archetype in ("light_tank_chassis", "medium_tank_chassis", "heavy_tank_chassis")
+    } | {
+        "mechanized_equipment": mechanized_blocks.get("mechanized_equipment", ""),
+        "mechanized_heavy_equipment": heavy_mechanized_blocks.get("mechanized_heavy_equipment", ""),
+    }
+
+
 def tank_slot_layout_errors(block: str) -> list[str]:
     errors = []
     for index, expected in TANK_SPECIAL_SLOT_CATEGORIES.items():
@@ -3183,6 +3726,8 @@ def tank_slot_layout_errors(block: str) -> list[str]:
         if len(slots) != 1:
             errors.append(f"slot {index} must occur exactly once")
             continue
+        if not re.search(r"\brequired\s*=\s*no\b", slots[0]):
+            errors.append(f"slot {index} must stay optional")
         categories = keyed_blocks(slots[0], "allowed_module_categories")
         actual = set(re.findall(r"\btank_[a-z_]+\b", " ".join(categories)))
         if actual != expected:
@@ -3193,12 +3738,86 @@ def tank_slot_layout_errors(block: str) -> list[str]:
     return errors
 
 
-def tank_count_limit_errors(block: str) -> list[str]:
-    """Every special category carries its own `count < 2` shared-budget fallback.
+def tank_category_contract_errors(
+    definitions: dict[str, str], archetypes: dict[str, str]
+) -> list[str]:
+    errors = []
+    for module, expected in TANK_RECUT_MODULE_CATEGORIES.items():
+        definition = definitions.get(module, "")
+        match = re.search(r"^\s*category\s*=\s*([A-Za-z0-9_]+)", definition, re.MULTILINE)
+        actual = match.group(1) if match else ""
+        if actual != expected:
+            errors.append(f"{module} must use category {expected}, found {actual or 'none'}")
+    module_categories = {
+        match.group(1)
+        for definition in definitions.values()
+        if (match := re.search(r"^\s*category\s*=\s*([A-Za-z0-9_]+)", definition, re.MULTILINE))
+    }
+    slot_owners: dict[str, set[str]] = {}
+    archetype_categories: dict[str, set[str]] = {}
+    declared_slots = REQUIRED_VARIANT_SLOTS | {
+        f"tank_special_slot_{index}" for index in range(1, TANK_SPECIAL_SLOT_COUNT + 1)
+    }
+    for archetype, block in archetypes.items():
+        archetype_categories[archetype] = set()
+        if re.search(r"\btank_mobility_auxiliary\b", block):
+            errors.append(f"{archetype} retains dissolved category tank_mobility_auxiliary")
+        for slot in declared_slots:
+            for slot_block in keyed_blocks(block, slot):
+                categories = set(
+                    re.findall(
+                        r"\btank_[a-z_]+\b",
+                        " ".join(keyed_blocks(slot_block, "allowed_module_categories")),
+                    )
+                )
+                archetype_categories[archetype].update(categories)
+                for category in categories:
+                    slot_owners.setdefault(category, set()).add(slot)
+    # Owner decision 2026-09-11 carrier role consolidation keeps all four
+    # APC/IFV loadout categories reachable from both light and medium hull
+    # slots despite the five-token engine constraint and shared amphibious role.
+    carrier_categories = {
+        "tank_apc_superstructure",
+        "tank_apc_armament",
+        "tank_ifv_superstructure",
+        "tank_ifv_armament",
+    }
+    for archetype in ("light_tank_chassis", "medium_tank_chassis"):
+        missing = sorted(carrier_categories - archetype_categories.get(archetype, set()))
+        if missing:
+            errors.append(
+                f"{archetype} must retain all carrier loadout categories, missing {missing}"
+            )
+    for category in sorted(module_categories):
+        owners = slot_owners.get(category, set())
+        if len(owners) != 1:
+            errors.append(
+                f"module category {category} must be reachable from exactly one "
+                f"special or mandatory slot, found {sorted(owners)}"
+            )
+    # Owner QA 2026-09-10: a slot category with no title key rendered an
+    # undefined label and spammed `bitmapfont.cpp: Couldnt find texticon:
+    # _texticon`, and one with no GFX_EMI sprite rendered a broken texture.
+    # Four carrier categories and tank_suspension_multi_track shipped without
+    # either, and nothing static caught it because both are presentation.
+    category_loc = text(MOD / "localisation/english/tank_modules_l_english.yml")
+    category_gfx = text(MOD / "interface/equipmentdesignermoduleicons.gfx") + text(
+        MOD / "interface/cwic_tank_rework_icons.gfx"
+    )
+    for category in sorted(slot_owners):
+        if f"EQ_MOD_CAT_{category}_TITLE" not in category_loc:
+            errors.append(f"slot category {category} has no EQ_MOD_CAT title key")
+        sprite = f'name = "GFX_EMI_{category}"'
+        if sprite not in category_gfx:
+            errors.append(f"slot category {category} has no GFX_EMI sprite")
+    return errors
 
-    With twelve free slots the slot map no longer restricts anything, so the
-    per-category limits are the only thing stopping three loading systems or a
-    stacked protection layer.
+
+def tank_count_limit_errors(block: str) -> list[str]:
+    """Every limited special category retains one `count < 2` budget.
+
+    The 2026-09-10 fully specialized slot map prevents cross-purpose mounting;
+    these limits retain the category-level one-module invariant.
     """
     errors = []
     limits = re.findall(r"module_count_limit\s*=\s*\{([^{}]*)\}", block, re.DOTALL)
@@ -3220,11 +3839,11 @@ def tank_count_limit_errors(block: str) -> list[str]:
 
 
 def variant_slot_errors(assignments: list[tuple[str, str]], expected: dict[str, str]) -> list[str]:
-    """Mandatory slots complete, specials a subset of the declared set.
+    """Mandatory slots complete, optional specials a declared subset.
 
     Cardinality is deliberately not a contract: vanilla
     `history/countries/GER - Germany.txt` omits unused optional slots from a
-    creation block, so an omitted free slot is identical to an empty one.
+    creation block, so an omitted optional special is identical to an empty one.
     """
     errors = []
     actual = dict(assignments)
@@ -3247,8 +3866,73 @@ def variant_slot_errors(assignments: list[tuple[str, str]], expected: dict[str, 
     return errors
 
 
+def tank_designer_position_errors(gui_text: str) -> list[str]:
+    positions = {
+        int(value)
+        for value in re.findall(r'pos_custom_module_slot_window_(\d+)"', gui_text)
+    }
+    if positions == set(range(TANK_DESIGNER_POSITIONS)):
+        return []
+    return [
+        f"tank designer slot positions must be exactly 0-{TANK_DESIGNER_POSITIONS - 1}, "
+        f"found {sorted(positions)}"
+    ]
+
+
 def run_tank_negative_fixtures() -> None:
     """Exercise the tank contract's failure shapes without touching files."""
+    armor_techs = dict(top_level_blocks(text(TECH_DIR / "NSB_armor.txt"), "technologies"))
+    module_techs = dict(top_level_blocks(text(TECH_DIR / "NSB_armor_modules.txt"), "technologies"))
+    all_tank_techs = {**armor_techs, **module_techs}
+    variable_values: dict[str, str] = {}
+    for path in (TECH_DIR / "NSB_armor.txt", TECH_DIR / "NSB_armor_modules.txt"):
+        variable_values.update(dict(re.findall(r"(?m)^\s*(@[0-9]+)\s*=\s*([^\s#]+)", text(path))))
+    research_ui = text(MOD / "interface/countrytechtreeview.gui")
+    mutated_ui = research_ui.replace("nsb_tank_design_tree", "nsb_tank_design_tree_renamed", 1)
+    if mutated_ui == research_ui:
+        raise AssertionError("GUI gridbox fixture did not mutate the tank design gridbox")
+    previous_errors = len(errors)
+    try:
+        validate_tank_folder_gridboxes(all_tank_techs, variable_values, mutated_ui)
+        probe_messages = errors[previous_errors:]
+    finally:
+        del errors[previous_errors:]
+    if not any("gridbox" in message for message in probe_messages):
+        raise AssertionError("GUI gridbox contract accepted an unmapped tank design gridbox")
+    # Engine cap verified 2026-09-10: custom module slot window index 20 is silently dropped.
+    twenty_first_gui_position_fixture = (
+        text(MOD / "interface/tank_designer_view.gui")
+        + '\nname = "pos_custom_module_slot_window_20"\n'
+    )
+    previous_errors = len(errors)
+    try:
+        for message in tank_designer_position_errors(twenty_first_gui_position_fixture):
+            fail(message)
+        rejected_twenty_first_position = len(errors) > previous_errors
+    finally:
+        del errors[previous_errors:]
+    if not rejected_twenty_first_position:
+        raise AssertionError("tank designer GUI accepted a twenty-first slot position")
+    chassis_text = text(CHASSIS_FILE)
+    mutated_chassis = chassis_text.replace(
+        "\t\ttype = { armor light_armor }\n",
+        "\t\ttype = armor\n",
+        1,
+    )
+    if mutated_chassis == chassis_text:
+        raise AssertionError("light armor type-domain fixture did not mutate the archetype")
+    previous_errors = len(errors)
+    try:
+        validate_tank_type_domains(mutated_chassis, text(ROLE_CHASSIS_FILE))
+        probe_messages = errors[previous_errors:]
+    finally:
+        del errors[previous_errors:]
+    if not any(
+        "light_tank_chassis" in message
+        and "{armor, light_armor}" in message
+        for message in probe_messages
+    ):
+        raise AssertionError("light armor type-domain contract accepted a bare light archetype")
     for module, metric, expected in (("Radar_1", "fuel_consumption", 1.2), ("gl_atgm_2p", "hard_attack", 95)):
         adds, _, unknown = _effective_module_operations(module)
         if unknown or adds.get(metric) != expected:
@@ -3273,7 +3957,7 @@ def run_tank_negative_fixtures() -> None:
         if not rejected_mutation:
             raise AssertionError(f"national preset mutation accepted: {label}")
     slots = "\n".join(
-        f"tank_special_slot_{i} = {{ allowed_module_categories = {{ {' '.join(sorted(categories))} }} }}"
+        f"tank_special_slot_{i} = {{ required = no allowed_module_categories = {{ {' '.join(sorted(categories))} }} }}"
         for i, categories in TANK_SPECIAL_SLOT_CATEGORIES.items()
     )
     if tank_slot_layout_errors(slots):
@@ -3284,12 +3968,23 @@ def run_tank_negative_fixtures() -> None:
         raise AssertionError("unreachable active protection was accepted")
     if not tank_slot_layout_errors(slots.replace(f"tank_special_slot_{TANK_SPECIAL_SLOT_COUNT} =", "unused =", 1)):
         raise AssertionError("a layout missing the last special slot was accepted")
-    if not tank_slot_layout_errors(slots + "\ntank_special_slot_17 = { allowed_module_categories = { tank_smoke } }"):
-        raise AssertionError("a slot beyond the declared set was accepted")
     if not tank_slot_layout_errors(
-        slots.replace("tank_ammo_chemical", "tank_ammo_he tank_ammo_chemical", 1)
+        slots + f"\ntank_special_slot_{TANK_SPECIAL_SLOT_COUNT + 1} = "
+        "{ allowed_module_categories = { tank_smoke } }"
     ):
-        raise AssertionError("HE ammunition accepted in the dedicated AP slot")
+        raise AssertionError("a slot beyond the declared set was accepted")
+    restored_twelve_category_free_list_fixture = slots.replace(
+        "tank_fcs_computer tank_fcs_radar",
+        (
+            "tank_fcs_computer tank_fcs_radar tank_loader_artillery "
+            "tank_loader_autoloader tank_loader_manual_assist tank_mobility_auxiliary "
+            "tank_protection_active tank_protection_passive tank_protection_reactive "
+            "tank_secondary_turret tank_smoke tank_survivability"
+        ),
+        1,
+    )
+    if not tank_slot_layout_errors(restored_twelve_category_free_list_fixture):
+        raise AssertionError("restored twelve-category free special slot was accepted")
     limits = "\n".join(
         f"module_count_limit = {{ category = {category} count < 2 }}"
         for category in TANK_LIMITED_CATEGORIES
@@ -3307,16 +4002,36 @@ def run_tank_negative_fixtures() -> None:
             1,
         )
     ):
-        raise AssertionError("an unverified multi-category shared budget was accepted")
+        raise AssertionError("a multi-category count limit was accepted")
+    deleted_mobility_category_module_fixture = dict(module_definitions)
+    deleted_mobility_category_module_fixture["APU_0"] = deleted_mobility_category_module_fixture["APU_0"].replace(
+        "category = tank_power_auxiliary",
+        "category = tank_mobility_auxiliary",
+        1,
+    )
+    previous_errors = len(errors)
+    try:
+        for message in tank_category_contract_errors(
+            deleted_mobility_category_module_fixture, tank_archetype_blocks()
+        ):
+            fail(message)
+        rejected_mobility_category = len(errors) > previous_errors
+    finally:
+        del errors[previous_errors:]
+    if not rejected_mobility_category:
+        raise AssertionError("module left in tank_mobility_auxiliary was accepted")
     mandatory_pairs = [(slot, "baseline") for slot in sorted(REQUIRED_VARIANT_SLOTS)]
     manifest_modules = dict(mandatory_pairs)
     if variant_slot_errors(mandatory_pairs, manifest_modules):
-        raise AssertionError("a creation block that omits every free slot was rejected")
+        raise AssertionError("a creation block that omits every optional special slot was rejected")
     if variant_slot_errors(mandatory_pairs + [(f"tank_special_slot_{TANK_SPECIAL_SLOT_COUNT}", "empty")], manifest_modules):
-        raise AssertionError("an explicitly emptied free slot was rejected")
+        raise AssertionError("an explicitly empty optional special slot was rejected")
     if not variant_slot_errors(mandatory_pairs[1:], manifest_modules):
         raise AssertionError("a creation block missing a mandatory slot was accepted")
-    if not variant_slot_errors(mandatory_pairs + [("tank_special_slot_17", "Smoke_1")], manifest_modules):
+    if not variant_slot_errors(
+        mandatory_pairs + [(f"tank_special_slot_{TANK_SPECIAL_SLOT_COUNT + 1}", "Smoke_1")],
+        manifest_modules,
+    ):
         raise AssertionError("a creation block assigning an undeclared slot was accepted")
     if not variant_slot_errors(mandatory_pairs + [("tank_special_slot_6", "Smoke_1")], manifest_modules):
         raise AssertionError("a creation block mounting an unmanifested module was accepted")
@@ -3347,12 +4062,91 @@ def run_tank_negative_fixtures() -> None:
     module_techs = dict(top_level_blocks(text(TECH_DIR / "NSB_armor_modules.txt"), "technologies"))
     all_tank_techs = {**armor_techs, **module_techs}
 
-    missing_flame = dict(all_tank_techs)
-    missing_flame["nsb_iw_armored_vehicles"] = re.sub(
-        r"(?m)^\s*light_tank_flame_chassis_0\s*$", "",
-        missing_flame["nsb_iw_armored_vehicles"],
+    reintroduced_flame_role_fixture = dict(
+        top_level_blocks(text(ROLE_CHASSIS_FILE), "duplicate_archetypes")
     )
-    rejected(bool(flame_grant_errors(missing_flame)), "missing flame grant")
+    reintroduced_flame_role_fixture["light_tank_flame_chassis"] = (
+        "light_tank_flame_chassis = { archetype = light_tank_chassis }"
+    )
+    # The IFV role is restored 2026-09-11 on `rocket`, so there is no IFV
+    # retirement fixture. What still holds is that an unexpected role root is
+    # rejected - covered by the `unexpected tank role roots remain` contract.
+    rejected(
+        bool(removed_tank_role_errors(reintroduced_flame_role_fixture)),
+        "reintroduced flame role root",
+    )
+    reintroduced_heavy_aa_role_fixture = dict(
+        top_level_blocks(text(ROLE_CHASSIS_FILE), "duplicate_archetypes")
+    )
+    reintroduced_heavy_aa_role_fixture["heavy_tank_aa_chassis"] = (
+        "heavy_tank_aa_chassis = { archetype = heavy_tank_chassis }"
+    )
+    # Owner decision 2026-09-10 phase 3 restructure retires heavy SPAAG.
+    rejected(
+        bool(removed_tank_role_errors(reintroduced_heavy_aa_role_fixture)),
+        "reintroduced heavy tank AA role root",
+    )
+    # Owner decision 2026-09-11 carrier role consolidation preserves the
+    # no-size-token rule on each surviving role root under the five-token engine.
+    role_size_token_text = text(ROLE_CHASSIS_FILE).replace(
+        "type = { armor anti_air }",
+        "type = { armor anti_air light_armor }",
+        1,
+    )
+    if role_size_token_text == text(ROLE_CHASSIS_FILE):
+        raise AssertionError("role size-token fixture did not mutate the role root")
+    previous_errors = len(errors)
+    try:
+        validate_tank_type_domains(text(CHASSIS_FILE), role_size_token_text)
+        rejected_role_size_token = len(errors) > previous_errors
+    finally:
+        del errors[previous_errors:]
+    rejected(rejected_role_size_token, "role root with a size token")
+
+    # Owner decision 2026-09-11 carrier role consolidation requires carrier
+    # modules to retain every plain-gun size-token exclusion under the engine's
+    # single working amphibious role.
+    carrier_armament_fixture = dict(module_definitions)
+    carrier_armament_fixture[APC_ARMAMENT_MODULES[0]] = carrier_armament_fixture[
+        APC_ARMAMENT_MODULES[0]
+    ].replace("heavy_armor", "", 1)
+    if carrier_armament_fixture[APC_ARMAMENT_MODULES[0]] == module_definitions[
+        APC_ARMAMENT_MODULES[0]
+    ]:
+        raise AssertionError("carrier armament forbid fixture did not mutate the module")
+    rejected(
+        bool(tank_module_type_bound_errors(carrier_armament_fixture)),
+        "carrier armament missing a size-token forbid",
+    )
+
+    # Owner decision 2026-09-11 carrier role consolidation retargets this
+    # in-memory negative fixture at the surviving APC bound: the five-token
+    # engine requires a carrier module to allow amphibious, not another role.
+    carrier_role_module_fixture = dict(module_definitions)
+    fixture_module = APC_ARMAMENT_MODULES[0]
+    carrier_role_module_fixture[fixture_module] = carrier_role_module_fixture[
+        fixture_module
+    ].replace("allow_equipment_type = amphibious", "allow_equipment_type = anti_air", 1)
+    if carrier_role_module_fixture[fixture_module] == module_definitions[fixture_module]:
+        raise AssertionError("carrier role eligibility fixture did not mutate the module")
+    rejected(
+        bool(tank_module_type_bound_errors(carrier_role_module_fixture)),
+        "carrier module gated on the wrong surviving role",
+    )
+
+    # Owner decision 2026-09-10 phase 3 restructure permanently rejects the
+    # engine's obsolete exact-match eligibility key.
+    exact_match_module_fixture = dict(module_definitions)
+    exact_match_module_fixture["tank_light_cannon0"] = (
+        exact_match_module_fixture["tank_light_cannon0"].rsplit("}", 1)[0]
+        + "\tforbid_equipment_type_exact_match = armor\n}"
+    )
+    rejected(
+        bool(tank_module_type_bound_errors(exact_match_module_fixture)),
+        "module using forbid_equipment_type_exact_match",
+    )
+
+
 
     invalid_parent = {name: block for name, block in module_definitions.items() if name != "limit"}
     invalid_parent["fixture_invalid_parent"] = "fixture_invalid_parent = { parent = missing_parent }"
@@ -3392,8 +4186,6 @@ def run_tank_negative_fixtures() -> None:
         {"tank_anti_air_cannon", "light_turret", "tank_aa_ammo_1"},
     ):
         raise AssertionError("an AA design with dedicated ammunition was rejected")
-    if needs_ammunition("flamethrower"):
-        raise AssertionError("flamethrower lost its ammunition exemption")
 
     module_rows = _module_csv_rows(BALANCE_CSV_FILE)
 
@@ -3405,7 +4197,7 @@ def run_tank_negative_fixtures() -> None:
         del errors[before:]
 
     def duplicate_module_fixture() -> None:
-        if "flamethrower" in module_rows:
+        if "tank_anti_air_cannon" in module_rows:
             fail("duplicate tank module ID in fixture CSV")
 
     fixture_must_fail(duplicate_module_fixture, "duplicate module ID")
@@ -3430,16 +4222,16 @@ def run_tank_negative_fixtures() -> None:
         ),
         "operation confusion",
     )
-
-    missing_value = list(module_rows["flamethrower"])
+    missing_value = list(module_rows["tank_anti_air_cannon"])
     missing_value[_csv_column_index("AJ")] = ""
     fixture_must_fail(
         lambda: _compare_module_row(
-            "flamethrower", missing_value,
-            module_balance_record("flamethrower"), "fixture missing value"
+            "tank_anti_air_cannon", missing_value,
+            module_balance_record("tank_anti_air_cannon"), "fixture missing value"
         ),
         "missing value",
     )
+
 
     malformed_numeric = list(module_rows["tank_anti_air_cannon"])
     malformed_numeric[_csv_column_index("AH")] = "not-a-number"
@@ -3458,7 +4250,8 @@ def expected_tank_types() -> set[str]:
         for tier in range(count):
             result.add(f"{family}_tank_chassis_{tier}")
             result.update(
-                f"{family}_tank_{role}_chassis_{tier}" for role in SUPPORTED_ROLES
+                f"{family}_tank_{role}_chassis_{tier}"
+                for role in FAMILY_ROLES[family]
             )
     return result
 
@@ -3680,7 +4473,7 @@ def module_category(module: str) -> str:
 
 def needs_ammunition(module: str) -> bool:
     # The 2026-09-09 owner decision requires AA guns to carry dedicated
-    # ammunition; flamethrowers remain self-supplying and exempt.
+    # ammunition.
     return module in AA_ARMAMENT_MODULES or any(
         re.search(r"\b(?:soft_attack|hard_attack|ap_attack)\s*=", block)
         for block in keyed_blocks(module_definitions.get(module, ""), "multiply_stats")
@@ -3783,15 +4576,25 @@ missing_categories = allowed_categories - module_categories
 if missing_categories:
     fail(f"chassis allow module categories with no live module: {sorted(missing_categories)}")
 
+# Owner decision 2026-09-10: the flame armament module and category are removed.
 for required in {
-    "flamethrower",
     "tank_anti_air_cannon",
     "tank_anti_air_cannon_2",
     "tank_anti_air_cannon_3",
 }:
     if required not in module_ids:
         fail(f"required retained-role module is missing: {required}")
-
+# Owner decision 2026-09-10 role-token remap pins role-exclusive module
+# eligibility and scans every module-file allow/forbid token.
+for message in tank_module_type_bound_errors(dict(module_blocks)):
+    fail(message)
+# Owner decision 2026-09-10 phase 3 restructure requires zero exact-match
+# forbids anywhere in the tank module file.
+if re.search(
+    r"\bforbid_equipment_type_exact_match\s*=",
+    code_only(text(MODULE_FILE)),
+):
+    fail("tank module file must contain zero forbid_equipment_type_exact_match keys")
 # Supported types, OOB references, AI historical designs, and removed roles.
 expected_types = expected_tank_types()
 chassis_text = text(CHASSIS_FILE)
@@ -3919,11 +4722,16 @@ for path in sorted(HISTORY_DIR.glob("*.txt")):
         required = oob_required_techs[oob] | foreign_producer_techs.get(
             (tag, oob.split("_")[1]), set()
         )
+        expected_techs = sorted(required)
+        # FRA's 1949 bootstrap also seeds the engine ladder before its
+        # starting variants are created.
+        if tag == "FRA" and oob == "FRA_1949_nsb":
+            expected_techs += ["nsb_engines", "nsb_engines0"]
         expected = "\n".join(
             [
                 f"{indent}# Starting tank variants must exist before the OOB is loaded.",
                 f"{indent}set_technology = {{",
-                *(f"{indent}\t{tech} = 1" for tech in sorted(required)),
+                *(f"{indent}\t{tech} = 1" for tech in expected_techs),
                 f"{indent}\tpopup = no",
                 f"{indent}}}",
                 f"{indent}{STARTING_VARIANT_EFFECT}",
@@ -4039,6 +4847,9 @@ ai_types = set(re.findall(r"^\s*type\s*=\s*([A-Za-z0-9_]+)", ai_text, re.MULTILI
 missing_ai = expected_types - ai_types
 if missing_ai:
     fail(f"tank types without a generic historical AI design: {sorted(missing_ai)}")
+# Owner decision 2026-09-11 carrier role consolidation derives generic history
+# coverage from the ten-role FAMILY_ROLES set plus the two standalone carrier
+# families; standalone IFV remains phase 4 and is not a tank designer role.
 if len(re.findall(r"^\s*history\s*=\s*yes\b", ai_text, re.MULTILINE)) != len(expected_types) + len(APC_HULL_ROWS) + len(IFV_HULL_ROWS):
     fail("generic tank AI file must contain one historical recipe per supported tank, APC and IFV type")
 for recipe in keyed_blocks(ai_text, "target_variant"):
@@ -4046,29 +4857,39 @@ for recipe in keyed_blocks(ai_text, "target_variant"):
     if not type_match:
         continue
     equipment_type = type_match.group(1)
-    if re.search(r"_(?:aa|flame)_chassis_", equipment_type):
+    # Owner decision 2026-09-10: flame recipes are removed with the vehicle
+    # taxonomy, so only retained AA recipes bypass the ammunition slots.
+    if re.search(r"_aa_chassis_", equipment_type):
         continue
-    # APC hulls mount troop-compartment armament, never a gun that multiplies
-    # ammunition stats, so shell modules do not apply to them.
-    if equipment_type.startswith("apc_chassis_"):
+    # Owner decision 2026-09-10 phase 3 restructure exempts the APC family by
+    # family name: APC armament modules may multiply stats, but APC histories
+    # intentionally carry no shell ammunition.
+    if equipment_type.startswith("apc_chassis_") or "_tank_apc_chassis_" in equipment_type:
         continue
     for category in ammo_categories:
         if not re.search(rf"\btank_special_slot_\d+\s*=\s*{category}\b", recipe):
             fail(f"AI recipe {equipment_type} lacks attack-producing {category}")
 for enable in keyed_blocks(ai_text, "enable"):
     # Every cannon recipe must wait for the two ammunition research unlocks.
-    # AA/flame recipes share the same chassis gates, so check the count below.
     if "nsb_ammo" in enable and "nsb_he_ammo0" not in enable:
         fail("AI ammunition prerequisite omits HE research")
-if len(re.findall(r"\bhas_tech\s*=\s*nsb_he_ammo0\b", ai_text)) != 83:
-    fail("all 83 conventional-gun AI recipes must require ammunition research")
+# This count tracks the current conventional-gun recipe population and must move
+# whenever recipes are added or removed. 103 -> 83 on 2026-09-11 when the twenty
+# IFV role histories went with the carrier role consolidation; the earlier ATGM
+# removal left it unchanged because those histories carried missile ammunition,
+# never HE.
+if len(re.findall(r"\bhas_tech\s*=\s*nsb_he_ammo0\b", ai_text)) != 103:
+    fail("generic tank AI HE-gated recipe population must contain 103 entries")
 
 active_roots = [MOD / "common", MOD / "interface"]
 # The 2026-09-09 amphibious-role ids are distinct from UNSUPPORTED_IDS, so this
 # exact-id scan keeps every retired vanilla amphibious id forbidden.
 for path_root in active_roots:
     for path in path_root.rglob("*"):
-        if not path.is_file() or path.suffix not in {".txt", ".gui", ".gfx", ".info"}:
+        # `.info` files are prose notes, never loaded by the engine. Scanning them
+        # made `_invalid_sub_unit_modifiers.info` fail for naming the very ids it
+        # documents as absent (2026-09-10 flame removal).
+        if not path.is_file() or path.suffix not in {".txt", ".gui", ".gfx"}:
             continue
         value = code_only(text(path))
         for identifier in UNSUPPORTED_IDS:
@@ -4101,16 +4922,8 @@ for tier in range(1, 7):
         fail(f"generated tank enum is missing: {expected_enum}")
 
 # UI and corrected shared progression checks.
-ui_text = text(MOD / "interface/tank_designer_view.gui")
-positions = set(
-    int(value)
-    for value in re.findall(r'pos_custom_module_slot_window_(\d+)"', ui_text)
-)
-if positions != set(range(TANK_DESIGNER_POSITIONS)):
-    fail(
-        f"tank designer slot positions must be exactly 0-{TANK_DESIGNER_POSITIONS - 1}, "
-        f"found {sorted(positions)}"
-    )
+for message in tank_designer_position_errors(text(MOD / "interface/tank_designer_view.gui")):
+    fail(message)
 # A missing `=` inside a `position`/`size`/`margin` block is a hard parse error that
 # kills the rest of the file: `y@fixed_btn_mod_row_0` instead of
 # `y=@fixed_btn_mod_row_0` produced `Malformed token: positionType` and dropped every
@@ -4138,7 +4951,9 @@ for designer_slot in sorted(REQUIRED_VARIANT_SLOTS) + [
         fail(f"designer slot localisation is missing: EQ_MOD_SLOT_{designer_slot}_TITLE")
 blueprint_dir = MOD / "interface/equipmentdesigner/tanks"
 blueprint_files = sorted(blueprint_dir.glob("*.gui"))
-if len(blueprint_files) != 106:
+# Owner decision 2026-09-11 carrier role consolidation removes the two IFV
+# role blueprints along with the retired ATGM/heavy-SPAA files; 85 survive.
+if len(blueprint_files) != 85:
     fail(f"tank blueprint file count changed: {len(blueprint_files)}")
 expected_blueprint_slots = [
     f"tank_special_slot_{index}" for index in range(1, TANK_SPECIAL_SLOT_COUNT + 1)
@@ -4287,7 +5102,7 @@ def validate_apc_designer_family() -> None:
         for slot in keyed_blocks(archetype, f"tank_special_slot_{index}")
     ]
     if len(special) != TANK_SPECIAL_SLOT_COUNT:
-        fail(f"APC archetype must expose all {TANK_SPECIAL_SLOT_COUNT} shared special slots")
+        fail(f"APC archetype must expose all {TANK_SPECIAL_SLOT_COUNT} specialized special slots")
     for message in tank_slot_layout_errors(archetype):
         fail(f"mechanized_equipment: {message}")
     for message in tank_count_limit_errors(archetype):
@@ -4315,16 +5130,11 @@ def validate_apc_designer_family() -> None:
         fail("APC default turret module is not an APC superstructure")
     if default_map.get("main_armament_slot") not in APC_ARMAMENT_MODULES:
         fail("APC default armament is not APC armament")
-    # QA 2026-09-06: the designer is chosen from the equipment domain. Without
-    # `armor` the production view opens the legacy land upgrade popup instead of
-    # tank_designer_view; without `mechanized` the archetype loses its land and
-    # transport classification for the AI and for `transport = mechanized_equipment`.
-    archetype_domain = set(re.findall(r"\w+", " ".join(direct_values(archetype, "type")) or ""))
-    if not archetype_domain:
-        archetype_domain = set(re.findall(r"(?m)^\s*type\s*=\s*\{([^}]*)\}", archetype))
-        archetype_domain = set(re.findall(r"\w+", " ".join(archetype_domain)))
+    # The standalone APC family keeps `mechanized`; it is phase 4 scope and
+    # REFERENCE.md records the token as load bearing for transport consumers.
+    archetype_domain = equipment_type_domain(archetype)
     if archetype_domain != {"armor", "mechanized"}:
-        fail(f"APC archetype domain must be armor plus mechanized, found {sorted(archetype_domain)}")
+        fail(f"APC archetype domain must be armor plus mechanized, found {format_type_domain(archetype_domain)}")
 
     # Legacy rows must stay plain equipment so non-NSB games are untouched.
     for tier in range(1, 11):
@@ -4346,9 +5156,11 @@ def validate_apc_designer_family() -> None:
             fail(f"apc_chassis_{tier} must share the mechanized_equipment archetype")
         for message in carrier_picture_errors("apc", tier, hull, sprites):
             fail(message)
-        hull_domain = set(re.findall(r"\w+", " ".join(re.findall(r"(?m)^\s*type\s*=\s*\{([^}]*)\}", hull))))
+        # Owner decision 2026-09-10 role-token remap carries amphibious on each
+        # APC hull domain so the designer role remains selectable.
+        hull_domain = equipment_type_domain(hull)
         if hull_domain != {"armor", "mechanized"}:
-            fail(f"apc_chassis_{tier} must restate the armor/mechanized domain, found {sorted(hull_domain)}")
+            fail(f"apc_chassis_{tier} must restate the armor/mechanized domain, found {format_type_domain(hull_domain)}")
         if direct_values(hull, "module_slots") != ["inherit"]:
             fail(f"apc_chassis_{tier} must inherit the APC designer slots")
         if direct_values(hull, "derived_variant_name") != [f"apc_equipment_{tier}"]:
@@ -4450,8 +5262,10 @@ def run_apc_negative_fixtures() -> None:
         ("hull leaves the mechanized archetype", lambda v: v.replace(
             "\tapc_chassis_0 = {\n\t\tabbreviation", "\tapc_chassis_0 = {\n\t\tarchetype = light_tank_chassis\n\t\tabbreviation", 1)),
         ("hull loses its DLC gate", lambda v: v.replace('has_dlc = "No Step Back"', "always = yes", 1)),
+        # Owner decision 2026-09-10 role-token remap requires amphibious,
+        # not the retired custom mechanized token, on this APC archetype.
         ("archetype leaves the armor domain", lambda v: v.replace(
-            "\t\ttype = { armor mechanized }\n", "\t\ttype = mechanized\n", 1)),
+            "\t\ttype = { armor amphibious }\n", "\t\ttype = amphibious\n", 1)),
         ("hull loses its own production icon", lambda v: v.replace(
             "\t\tpicture = cwic_apc_chassis_0\n", "", 1)),
     ):
@@ -4541,7 +5355,7 @@ def validate_ifv_designer_family() -> None:
         for slot in keyed_blocks(archetype, f"tank_special_slot_{index}")
     ]
     if len(special) != TANK_SPECIAL_SLOT_COUNT:
-        fail(f"IFV archetype must expose all {TANK_SPECIAL_SLOT_COUNT} shared special slots")
+        fail(f"IFV archetype must expose all {TANK_SPECIAL_SLOT_COUNT} specialized special slots")
     for slot, expected in (
         ("turret_type_slot", {"tank_ifv_superstructure"}),
         ("main_armament_slot", {"tank_ifv_armament"}),
@@ -4563,9 +5377,11 @@ def validate_ifv_designer_family() -> None:
     }
     if default_map != expected_defaults:
         fail(f"IFV mandatory defaults differ: {default_map}")
-    domain = set(re.findall(r"\w+", " ".join(re.findall(r"(?m)^\s*type\s*=\s*\{([^}]*)\}", archetype))))
+    # Owner decision 2026-09-10 role-token remap selects this archetype with
+    # the hardcoded rocket role token.
+    domain = equipment_type_domain(archetype)
     if domain != {"armor", "mechanized"}:
-        fail(f"IFV archetype domain must be armor plus mechanized, found {sorted(domain)}")
+        fail(f"IFV archetype domain must be armor plus mechanized, found {format_type_domain(domain)}")
     if direct_values(archetype, "interface_category") != ["interface_category_land"]:
         fail("IFV archetype must retain interface_category_land")
 
@@ -4597,9 +5413,11 @@ def validate_ifv_designer_family() -> None:
             fail(f"{hull_name} must share the mechanized_heavy_equipment archetype")
         for message in carrier_picture_errors("ifv", tier, hull, sprites):
             fail(message)
-        hull_domain = set(re.findall(r"\w+", " ".join(re.findall(r"\btype\s*=\s*\{([^}]*)\}", hull))))
+        # Owner decision 2026-09-10 role-token remap carries rocket on each IFV
+        # hull domain so the designer role remains selectable.
+        hull_domain = equipment_type_domain(hull)
         if hull_domain != {"armor", "mechanized"}:
-            fail(f"{hull_name} must restate the armor/mechanized domain")
+            fail(f"{hull_name} must restate the armor/mechanized domain, found {format_type_domain(hull_domain)}")
         if direct_values(hull, "module_slots") != ["inherit"]:
             fail(f"{hull_name} must inherit the IFV designer slots")
         if direct_values(hull, "derived_variant_name") != [f"ifv_equipment_{tier}"]:
@@ -4756,9 +5574,11 @@ def run_ifv_negative_fixtures() -> None:
     for label, mutation in (
         ("legacy row inherits slots", lambda value: value.replace("\t\tmechanized_heavy_equipment_1 = {\n\t\tyear = 1947", "\t\tmechanized_heavy_equipment_1 = {\n\t\tmodule_slots = inherit\n\t\tyear = 1947", 1)),
         ("tank gun allowed on an IFV", lambda value: value.replace("tank_ifv_armament", "tank_small_main_armament", 1)),
-        ("hull leaves the Heavy Mech archetype", lambda value: value.replace("archetype = mechanized_heavy_equipment type = { armor mechanized }", "archetype = light_tank_chassis type = { armor mechanized }", 1)),
+        ("hull leaves the Heavy Mech archetype", lambda value: value.replace("archetype = mechanized_heavy_equipment type = { armor rocket }", "archetype = light_tank_chassis type = { armor rocket }", 1)),
         ("hull loses its DLC gate", lambda value: value.replace('has_dlc = "No Step Back"', "always = yes", 1)),
-        ("archetype leaves the armor domain", lambda value: value.replace("\t\ttype = { armor mechanized }", "\t\ttype = mechanized", 1)),
+        # Owner decision 2026-09-10 role-token remap requires rocket, not the
+        # retired custom mechanized/ifv token, on this IFV archetype.
+        ("archetype leaves the armor domain", lambda value: value.replace("\t\ttype = { armor rocket }", "\t\ttype = rocket", 1)),
         ("hull loses its own production icon", lambda value: value.replace("\t\tpicture = cwic_ifv_chassis_0\n", "", 1)),
     ):
         mutated = mutation(source)
