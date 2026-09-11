@@ -1,18 +1,23 @@
 # Status
 
-Branch `tank-designer-and-doctrine-rework-test`. Last updated 2026-09-09.
+Branch `tank-designer-and-doctrine-rework-test`. Last updated 2026-09-10.
 
 ## Where the project stands
 
-Tier 1 and Tier 2 of the original completion plan are shipped and stable. The APC and
-IFV designer families are built, validated and accepted in live QA. Bookmark presets
-and the NSB OOB migration are committed.
+Tier 1 and Tier 2 of the original completion plan are shipped and stable. Bookmark
+presets and the NSB OOB migration are committed, and the 20-position designer is live
+and confirmed in game.
 
-**The designer itself is not finished, and that is the headline.** The module set and
-the designer GUI stop at 15 of the 21 designed positions, and ten of the sketch's
-special-module families have no script at all. Finding 6 records the gap; `DECISIONS.md`
-carries the ratified 21-position architecture. What remains is that expansion,
-historical coverage, three QA findings, and the deferred content batches.
+**The headline as of 2026-09-10 is that the architecture changed underneath the shipped
+work.** The owner has ratified a three-hull restructure: every armoured vehicle becomes
+a role on the light, medium or heavy tank hull, the two standalone carrier families
+retire, and all sixteen special slots become fully specialized. Finding 16 carries the
+measured blast radius and the implementation order; `DECISIONS.md` carries the
+architecture. The APC and IFV designer families remain built, validated and QA-accepted
+- they are now migration input rather than finished work.
+
+Finding 6's 15-to-21 expansion is closed and shipped. What remains is the restructure,
+the historical coverage sweep, three QA findings, and the deferred content batches.
 
 ### Committed checkpoints
 
@@ -177,18 +182,24 @@ one picture. That limit is now a recorded consequence of the engine's graphics
 contract rather than an open question. Static verification only; the rendered icon
 has not been confirmed in game.
 
-### Finding 4: major-country Petrol_1 bootstrap is deferred
+### Finding 4: major-country Petrol_1 bootstrap - resolved 2026-09-09
 
-`nsb_engines0` enables `Petrol_1`, starts in 1950, costs 2 research, and is not
-granted by any country history. USA, SOV, FRA, ENG and WGR grant `nsb_engines` in
-their NSB starting-tech blocks but do not grant `nsb_engines0`. Current historical
-medium-tank national presets exist only for USA and SOV; FRA/ENG/WGR/JAP appear in
-carrier paths, not this medium-tank ladder.
+`nsb_engines0` enables `Petrol_1`, starts in 1950 and costs 2 research. It is now
+granted in the NSB starting-technology blocks for USA, SOV, ENG and WGR, immediately
+after their existing `nsb_engines` grant. FRA's 1949 NSB bootstrap adds both
+`nsb_engines` and `nsb_engines0` before its starting variants are created.
 
-Recommendation: keep `Petrol_0` as the universal starting preset engine. Do not add
-major-country `nsb_engines0` grants or `Petrol_1` routing until a country/tier
-historical mapping and balance contract exists. This is an open design item, not
-implemented in this pass.
+The only national tank preset rerouted is USA's 1950 `M47 Patton`
+(`medium_tank_chassis_3`), from `Petrol_0` to `Petrol_1`. The 1950+ scripted-effect
+blocks are generic fallbacks shared by every tag, not major-country content, so they
+remain on `Petrol_0`; rerouting them would give minors an engine they cannot research.
+SOV's 1950 `T-55` already uses `Diesel_1`, and FRA, ENG and WGR have no national tank
+presets. Carrier presets remain on `Petrol_0`.
+
+The validator self-test, balance-target report and envelope report pass with the
+inventory line unchanged. The module-balance mirror remains incomplete; see the
+slot-budget debt note below. French and West German 1949 start behaviour remains
+unconfirmed in game. Static verification only; no balance acceptance is claimed.
 
 ### Finding 5: stockpile grants silently awarded nothing - resolved 2026-09-08
 
@@ -377,6 +388,23 @@ every free-list category exists on every hull. The per-hull lock model must land
 the same pass as the first hull-restricted module, or that module silently becomes
 mountable everywhere. See `DECISIONS.md`.
 
+### Slot budget debt - accepted by owner decision
+
+The owner accepts the per-category `count < 2` fallback and leaves the slot-budget debt
+recorded. The envelope path has no tolerance or pass/fail threshold; it prints deltas
+only. The estimator already consumes the modules a recipe actually installs, so
+nothing in it encodes the old slot-count assumption and no code change follows.
+
+Any future re-cut belongs in the frozen 40-row manifest. This remains a calibration
+item, not balance acceptance.
+
+The combined module-balance report remains blocked by pre-existing mirror coverage:
+the living CSV reports 246 rows against 266 expected, and the CSV plus Minimal and
+Master workbook tables omit 20 already-shipped IDs (`Blowout_Panels_0`, `Dozer_0`,
+`Four_Track_0`, `Fuel_Tanks_0`, `Log_0`, `Mine_Plow_0..1`, `Mine_Roller_0..1`,
+`Night_Vision_0..5`, `RWS_0`, `Trench_Plow_0` and `tank_aa_ammo_1..3`). The workbook
+stays byte-identical and no balance acceptance follows.
+
 ### Finding 7: the carrier bookmark validator was dead code and had never run - resolved 2026-09-09
 
 Found while migrating the slot-cardinality sites. `validate_carrier_bookmarks()` in
@@ -460,19 +488,25 @@ list. The one open question is what type token distinguishes an APC/IFV from a g
 for amphibious purposes - `mechanized` is the obvious candidate and must be confirmed
 against the archetype `type` sets before authoring.
 
-### Finding 10: `APU_6` is an orphan module with no unlock
+### Finding 10: `APU_6` is an orphan module with no unlock - false, closed 2026-09-09
 
-`APU_6` is declared at
-`common/units/equipment/modules/00_tank_modules.txt:4024-4038` with
-`category = tank_mobility_auxiliary` and the strongest stats in its family
-(`breakthrough = 4`, `defense = 4`, `build_cost_ic = 4`, `reliability` +0.06,
-`fuel_consumption` -0.3). No `enable_equipment_modules` block anywhere in
-`NSB_armor.txt` lists it: the ladder grants `APU_0` at 1940, `APU_1` 1950, `APU_2` 1960,
-`APU_3` and `APU_4` together at 1980, and `APU_5` at 2000, then stops. So the top APU
-tier is unreachable in play. Either it wants a 2020 grant beside `Diesel_5`'s
-`nsb_engines3` tier, or it is a leftover and should be deleted. Not tank-designer
-urgent, but it is a real dead end and the validator does not currently notice orphaned
-modules.
+**The claim does not hold against current source and should not be acted on.**
+`NSB_armor.txt:1309-1313` declares `nsb_hybrid_engines` with
+`enable_equipment_modules = { Diesel_6 APU_6 }`, `research_cost = 2`,
+`start_year = 2020` - which is exactly the "2020 grant" the finding proposed as its own
+fix. `APU_6` is reachable in play.
+
+The reachability question the finding raised was answered properly rather than spot
+checked. A full brace-structured audit parsed every module definition in
+`00_tank_modules.txt` and every `enable_equipment_modules` block under
+`common/technologies/`, `common/scripted_effects/` and `common/national_focus/`:
+**289 modules defined across 47 categories, 0 with no technology unlock.** There are no
+orphan tank modules at all, so the suggested validator orphan check would pin an
+invariant that already holds. The reverse scan's 163 "undefined" ids are all naval and
+submarine modules granted from ship technology files and defined in the ship module
+files; they are outside `00_tank_modules.txt` by design, not dead grants.
+
+No source change was made. The finding was stale documentation, not a defect.
 
 ### Finding 11: one missing `=` crashed every tank designer - resolved 2026-09-09
 
@@ -525,57 +559,50 @@ that the parse error which caused the crash is gone.
 script or GUI assignment blocks must verify token shape, not just braces and bytes. A
 boot is the cheap confirmation - load-time parse errors need no gameplay at all.
 
-### Finding 12: the armour tech folders clip their right edge - open
+### Finding 12: the armour tech folders clip their right edge - resolved 2026-09-09
 
-Owner-reported 2026-09-09, after the designer fix. Both the gun/loading tab and the
-armour/protection tab of the module tree lose their rightmost column to the window edge.
+Owner-reported 2026-09-09 after the designer fix. The mechanism is now measured:
+technology folder `x` is relative to its owning gridbox origin, and the rendered right
+edge is `origin + 70 * tech_x + 127`. The `70` is the gridbox slot width; `127` is the
+`techtree_nsb_armor_folder_item` offset and width (`x = -55`, `width = 182`).
 
-**This is not caused by the new columns, and widening the gridbox did not fix it.** Two
-pieces of evidence. First, the owner's second capture clips in a region containing no
-new content at all - the APS/softkill and add-on-armour area - so the clip predates this
-session's columns and they merely made it visible. Second, `nsb_tank_design_tree` was
-already widened from 2200 to 2500 (`countrytechtreeview.gui:4535-4541`), and at 70
-pixels per x unit the last used column x=20 sits ~1000 pixels inside that rectangle, so
-**the gridbox width is demonstrably not the limiting value.**
+The two dead-space origins moved, with no technology coordinate moved:
 
-What that leaves, none of it yet measured: the folder's own scroll extent
-(`:4496-4505`, `size = 100%%`, `clipping = yes`, `margin` right 25, horizontal
-scrollbar), the `armortech_bg` background sprite's dimensions, or a tech item's rendered
-width exceeding its 70-pixel slot so the last column's label overflows.
+| Gridbox | Origin before -> after | Widest x | Right edge before -> after |
+| --- | ---: | ---: | ---: |
+| `nsb_tank_design_tree` | 3600 -> 1650 | 20 | 5127 -> 3177 |
+| `nsb_armor_tree` | 2400 -> 950 | 30 | 4627 -> 3177 |
 
-**The one interactive measurement that would settle it:** with the tree scrolled fully
-right, does the horizontal scrollbar sit at its end while content is still cut off? If
-yes the scroll extent is short and the folder/background is the culprit; if the scrollbar
-has travel left the input handling is at fault. Deliberately not fixed by guesswork -
-Finding 11 is what unverified GUI geometry costs.
+The validator parses each child gridbox's origin and slot width, assigns each
+technology through an explicit folder-x partition, and rejects any computed edge over
+the **3187px** ceiling. That ceiling is empirical: `industry_folder` is the widest
+folder that does not clip. It is not a documented engine limit, so the underlying
+engine cause remains unisolated. The owner's scrollbar check is still the only
+measurement that can identify whether the remaining issue is scroll extent or input
+handling.
 
-### Finding 13: light / medium / heavy hulls are indistinguishable to `allow_equipment_type`
+Static verification only. The validator mutation fixture rejects the old module
+origin with the measured 5127px edge; the tech-tree render is unconfirmed in game.
+Do not treat this as render or balance acceptance.
 
-Recorded 2026-09-09, and it blocks the owner's ratified "paradrop for light hulls only"
-decision. Finding 9 established that per-hull module locking uses
-`allow_equipment_type` / `forbid_equipment_type`, which key off the archetype's own
-`type = { ... }` set. Measured, those sets are:
+### Finding 13: light / medium / heavy hull discrimination - resolved-as-infrastructure 2026-09-09
 
-| Archetype | `type` |
-| --- | --- |
-| `light_tank_chassis` | `armor` |
-| `medium_tank_chassis` | `armor` |
-| `heavy_tank_chassis` | `armor` |
-| `mechanized_equipment` (APC) | `armor mechanized` |
-| `mechanized_heavy_equipment` (IFV) | `armor mechanized` |
-| the twelve role roots | `armor` plus `anti_air` / `artillery` / `anti_tank` / `flame` |
+The light family now carries the discriminator `light_armor`. Exactly five declarations
+changed: `tank_chassis.txt:11` sets `light_tank_chassis` to
+`type = { armor light_armor }`, and `x_tank_chassis.txt:10,20,29,37` add
+`light_armor` to the four light role roots. The medium and heavy archetypes remain
+`type = armor`, and all eight medium/heavy role roots remain without the token.
 
-So the mechanism can separate carriers from gun tanks, and roles from base hulls, but it
-**cannot separate light from medium from heavy** - all three are the same bare `armor`.
-Amphibious-to-carriers works; paradrop-to-light-hulls does not.
+The validator pins the archetype domains and the light-role membership rule. The token
+is behaviour-neutral for the current module set: `tank_anti_air_cannon`,
+`tank_anti_air_cannon_2` and `tank_anti_air_cannon_3` still carry
+`allow_equipment_type = anti_air`, which independently excludes bare gun tanks from
+those modules even though their now-redundant exact-match clause no longer matches the
+light domain. No module consumes `light_armor` yet.
 
-Options, all needing an owner decision because each has a blast radius beyond the
-designer: add a discriminating token to the light archetype and its hulls (e.g.
-`type = { armor light_armor }`), which changes how the AI and any
-`type`-matching script classify every light design; or accept paradrop on all gun-tank
-hulls; or drop the box. Do not author a paradrop module before this is answered - it
-would silently be mountable on every hull, which is the exact failure mode the lock model
-exists to prevent.
+Static verification only. The type-set mutation fixture rejects a bare light
+archetype and names the expected `{armor, light_armor}` domain. The eventual paradrop
+consumer and its in-game filtering remain unconfirmed.
 
 ### Finding 14: the documented module-based amphibious design is engine-impossible
 
@@ -616,10 +643,66 @@ generic unsupported scan (`:3957-3960`), the forbidden module id `amphibious_dri
 `mechanized_marine` `active = no` assertion (`:4061-4062`). Note the validator currently
 rejects precisely the blueprint filenames a restored role would need.
 
-Nothing was implemented. This is a decision the owner must take before the amphibious
-batch can start: **module (impossible), role rebuild (expensive but correct), or APC-wide
-marine transport (cheap but unselective)**. OPVT and Underwater Driving Capability
-inherit the same blocker.
+Nothing was implemented. Finding 15 records the owner's deferral before the amphibious
+batch starts: a real sixth designer family, rejected carrier-member renaming, or
+APC-wide marine transport. OPVT and Underwater Driving Capability inherit the same
+blocker.
+
+### Finding 15: the ratified amphibious route cannot work - `need` cannot name a plain member - deferred by owner decision
+
+Established 2026-09-09 from vanilla evidence, and it invalidates the previously
+ratified route rather than refining it. The owner defers the whole amphibious batch;
+the three priced options remain open: a real sixth designer family, rejected carrier
+member renaming, or APC-wide marine transport.
+
+`DECISIONS.md` settled, after the `duplicate_archetypes` attempt was reverted, on
+declaring the amphibious carrier hulls **explicitly** - "sixteen equipment blocks in the
+style of the existing `apc_chassis_0..7` and `ifv_chassis_0..7` members" with
+`archetype = mechanized_equipment` and `type = { armor mechanized amphibious }`. That
+fixes the id-concatenation defect. It does **not** deliver the selectivity the same
+document promises when it says `mechanized_marine`'s `need`/`transport` should "point at
+those role chassis".
+
+**Measured rule: a land sub-unit's `need` and `transport` resolve an equipment
+*family*, never an individual member.** Every value used in those fields across the
+whole vanilla `common/units/` tree is either an archetype declared `is_archetype = yes`
+or a `duplicate_archetypes` role root. There is **no** vanilla case of a sub-unit naming
+a plain numbered member such as `mechanized_equipment_1`. Vanilla's own amphibious units
+prove the intended shape: `amphibious_mech.txt:103-107` consumes
+`amphibious_mechanized_equipment`, which is declared `is_archetype = yes` at
+`equipment/amphibious_mechanized.txt:8` with its own members `_1.._5`; and
+`amphibious_armor.txt:25` consumes `amphibious_tank_chassis`, itself
+`is_archetype = yes`. Paradox's own equipment documentation states the same rule from
+the other side - a need for an archetype is satisfied by any mix of that archetype's
+variants, and different archetypes are never interchangeable.
+
+Consequence, stated plainly: `apc_amphibious_chassis_N` declared as a member of
+`mechanized_equipment` **cannot be named in `need`**. The only thing a sub-unit could
+name is `mechanized_equipment` itself, which is the "APC-wide marine transport (cheap
+but unselective)" option Finding 14 lists - every ordinary APC would become a marine
+transport. The `type = { ... amphibious }` token still works for
+`allow_equipment_type` module gating, so the *module* half of the plan survives; the
+*supply* half does not, and the owner's Next-scope condition is "amphibious only
+together with marine sub-unit supply".
+
+**What is left, with the cost now honest:**
+
+1. **A real sixth designer family** - amphibious carrier hulls under their own
+   `is_archetype = yes` root, which is exactly vanilla's shape. This is the only route
+   that is both selective and proven. Cost is a full family: archetype block with the
+   21-slot layout, its own hull tiers, pictures, blueprint GUI, technology unlocks,
+   presets, and the six validator contracts Finding 14 already enumerates - not the
+   "nearly free" role `DECISIONS.md` assumed.
+2. **Rename the carrier members** so `duplicate_archetypes` derivation works. Already
+   rejected: the ids appear across 586 national presets, the generic bookmark variants
+   and the OOB migration.
+3. **Accept APC-wide marine transport.** Cheap, unselective, needs an explicit owner
+   ruling.
+
+**Owner decision: deferred.** Nothing was implemented and no amphibious content was
+authored. The batch stays blocked on the three priced options above, rather than on an
+assumption that would fail after the work was done.
+
 
 ### AA ammunition - IMPLEMENTED 2026-09-09
 
@@ -651,7 +734,18 @@ design without AA ammunition is now rejected.
 Consequence to carry forward: known inconsistency 10's claim that "the three SPAA
 variants deliberately carry no ammunition" is now **false and superseded**.
 
+### Artillery/AA restructure - deferred by owner decision
 
+The owner defers the artillery/AA batch entirely, including any provenance widening.
+Preserved facts: the provenance filter is the literal path set
+`{TECH_DIR / "NSB_armor.txt", TECH_DIR / "NSB_armor_modules.txt"}`, repeated at
+`validate_military_reworks.py:1969` and `:3937`; `artillery.txt` is already parsed
+into `technology_blocks` and excluded only by those two filters. No artillery family
+currently carries `enable_equipment_modules`, and no artillery-ammunition category
+exists. `Artillery_AA_Target_Manifest.md:117-119` requires fresh 1949/1980 NSB and
+non-NSB runtime QA before implementation.
+
+Static verification only. No artillery or AA restructure is authored in this batch.
 
 ## Module content plan, 2026-09-09
 
@@ -1076,8 +1170,11 @@ five-tier equipment ladders.
    see "Special Capabilities and 4-Track" below.
 4. ~~Experimental 4-Track and the icon-year authority migration~~ - **implemented
    2026-09-09**, same section.
-5. **Amphibious**, own batch - a module plus a sub-unit activation plus four validator
-   assertions that must consciously change.
+5. **Amphibious**, own batch - **blocked on an owner choice between three priced
+   options, not on authoring.** Finding 15 withdrew the ratified route: a sub-unit
+   `need`/`transport` cannot name a plain member, so explicitly declared carrier hulls
+   can never supply marines selectively. Pick a real sixth archetype family, rename the
+   carrier members (rejected), or accept APC-wide marine transport, then author.
 6. **Artillery/AA restructure**, last and largest, against the frozen manifest, and
    gated on the module-provenance decision in that plan.
 
@@ -1201,19 +1298,20 @@ design, so those three items leave the unverified list below.
 
 Non-NSB regression, long-run AI production behaviour with mechanized now also in the
 `armor` domain, the 1980 bookmark path end to end, the sixteen new carrier hull
-icons rendering in the production tab, and whether the AI ever assigns factories to
-`land_apc` or `land_ifv` without a `role_ratio`.
+icons rendering in the production tab, the moved tech-tree columns rendering, the
+light-family type filtering, the French and West German 1949 starts, and whether the
+AI ever assigns factories to `land_apc` or `land_ifv` without a `role_ratio`.
 
 Newest-only production visibility and save/reload of a saved NSB design were
 confirmed by the owner on 2026-09-08 and are no longer open.
 
-On that last point: `common/ai_equipment/generic_tank.txt` defines eight `history = yes`
-recipes for each of `land_apc` and `land_ifv`, and no `role_ratio` strategy in this
-repository names either role. The installed game's `_documentation.md` does not specify
-default demand when an explicit ratio is absent. Static recipe availability does not
-demonstrate factory assignment, but absence of a ratio does not prove failure either.
-No AI strategy change is justified by this evidence alone. Deferred to the final
-designer AI pass.
+On that last point: `common/ai_equipment/generic_tank.txt` defines eight
+`history = yes` recipes for each of `land_apc` and `land_ifv`, and no `role_ratio`
+strategy in this repository names either role. The installed game's
+`_documentation.md` does not specify default demand when an explicit ratio is absent.
+Static recipe availability does not demonstrate factory assignment, but absence of a
+ratio does not prove failure either. No AI strategy change is justified by this
+evidence alone. Deferred to the final designer AI pass.
 
 Also outstanding from Tier 3: a runtime render check of the legacy armour folder for
 non-NSB players, and a designer UI pass at 1920x1080 and 2560x1440 at 1.0x and 2.4x.
@@ -1241,44 +1339,760 @@ empty-variant failures were 3 on NSB versus 53 on non-NSB, and `light_tank_chass
 failures were **identical in both profiles**, so they are legacy 1980 content gaps
 in those countries' histories, not a designer regression.
 
-## Next scope
+## Finding 16: the three-hull restructure - measured blast radius, 2026-09-10
 
-1. **Fresh playtest capture** at 1949 and 1980 on both profiles, replacing the
-   stale 2026-09-06 corpus. This gates item 3. Confirm the Soviet 1980 stockpile now
-   actually arrives, and that the sixteen carrier hull icons render distinctly.
-2. **Module content authoring** - see "Module content plan, 2026-09-09" above for the
-   evidence, the per-lane ledger and the recommended order. The 21-position contract
-   and the render are shipped and confirmed; per-hull locking turns out to be a module
-   attribute rather than designer work (Finding 9), so the blocking items are the four
-   content decisions listed at the end of that plan, then night vision, then the
-   Special Capabilities modules. Amphibious and the artillery/AA restructure are their
-   own later batches.
-3. **Historical coverage sweep.** Explicitly required, not optional polish: named
-   designs for **all** armour vehicle families (light, medium, heavy, APC, IFV and
-   other armoured roles) across all countries, or at minimum every country with a
-   corresponding non-NSB vehicle already implemented. Sized 2026-09-08: the English
-   `TAG_<equipment>` inventory holds **2,189 distinct `(tag, family, tier)`
-   combinations across 86 tags**, of which 586 have a national preset today, leaving
-   **1,603 uncovered** - `lt` 399, `mbt` 616, `ht` 94, `mechanized` 341,
-   `mechanized_heavy` 153. Light and heavy have **no** national coverage at all, and
-   medium has only USA and SOV. At the current 20,549-line generated file for 586
-   presets this is a generator batch, not hand authoring, and it needs a demand
-   filter first: creating 2,189 startup designs for 86 tags is a production-tab and
-   load-time cost nobody has agreed to. Drive selection from the fresh capture's
-   actual variant demand plus the localisation inventory, not from the inventory
-   alone. The manifest's `future_inventory` already holds 354 selected tier 5-7
-   carrier pairs with provenance.
-4. **Finding 4** - decide whether any country/tier receives `nsb_engines0` and
-   `Petrol_1`; requires a historical mapping and balance contract before implementation.
-5. **`mp_uav_1`** - the two ISR grants need a content owner's decision; the validator
-   carries them as a named exception until then.
-6. **Deferred content batches**, in this order and each with an explicit slot-budget
-   statement: amphibious (only together with marine sub-unit supply), artillery/AA
-   against the frozen manifest, night/thermal vision, page-2 specials. This is
-   Finding 6 phase 3 for everything except artillery/AA, and it needs item 2's free
-   slots to exist first - ten of these families have no module at all today.
-7. **Envelope calibration** slots in before any batch that needs static estimates as
-   acceptance evidence, and before item 2's free slots widen what a design can mount.
+Owner direction 2026-09-10. `DECISIONS.md` carries the ratified architecture; this
+section carries only the counts, every one of them from a command run against current
+source. **Nothing is implemented.**
+
+### What changes shape
+
+| Surface | Now | After | Kind of change |
+| --- | --- | --- | --- |
+| Designer archetypes | 5 | 3 | delete two families |
+| `duplicate_archetypes` role roots | 12 | 17 (14 + 3 flame, pending) | +6 new, -1 heavy AA |
+| Special slots | 4 dedicated + 12 free | 15 dedicated | full re-specialization; 21 positions was above the engine cap |
+| Module categories | 45 | 49 | +5 new, -1 dissolved |
+| Blueprint GUI files | 106 | ~136 | +30 for six roles x hulls, -2 carrier |
+| `script_enum_equipment_bonus_type` | 872 entries | ~928 | +6 roots, +50 derived tiers |
+
+### What has to be migrated, counted
+
+| Item | Count | Derivation |
+| --- | ---: | --- |
+| `apc_chassis_*` / `ifv_chassis_*` references | **857 in 70 files** | regex `\b(apc\|ifv)_chassis_\d` over all `.txt/.yml/.gui/.gfx/.asset/.json` under `Cold War Iron Curtain/` |
+| - `common/scripted_effects/` | 588 | 572 in `CWIC_national_tank_presets.txt`, 10 in `CWIC_tank_designer_effects.txt`, 6 in `CWIC_tank_focus_effects.txt` |
+| - `history/units/` | 100 | NSB OOB forced variants and production requests |
+| - `localisation/english/` | 48 | hull, derived-variant and technology keys |
+| - `common/ai_equipment/generic_tank.txt` | 32 | 16 APC + 16 IFV recipes |
+| - `common/units/equipment/` | 30 | the two family files themselves |
+| - `common/national_focus/` | 27 | migrated legacy armour grants |
+| - `common/script_enums.txt` | 16 | 8 APC + 8 IFV hull ids |
+| - `common/technologies/NSB_armor.txt` | 16 | `nsb_apc_hulls0..7`, `nsb_ifv_hulls0..7` unlocks |
+| Special-slot assignments to re-sort | 9,030 | 8,790 national + 160 generic + 80 export |
+| Sub-units consuming a retired archetype | 7 | `mechanized_marine`, `mechanized_airborne`, `mechanized_infantry`, `armored_infantry`, `engineer_mechanized`, `recon_mechanized`, `field_hospital_mechanized` |
+| `module_count_limit` blocks to re-derive | 90 | 54 `tank_chassis.txt` + 18 `mechanized.txt` + 18 `mechanized_heavy.txt` |
+| Validator functions affected | 11 of 115 | family-identifier scan of `validate_military_reworks.py` |
+| Validator contract sites to edit | 27 | contiguous-block grouping of those 11 functions plus the constants |
+| Entity aliases affected | 0 | `gfx/entities/zz_CWIC_armor_entity_aliases.asset` contains zero apc/ifv/mechanized strings |
+
+**The cheap-migration guarantee is gone.** The 15-to-21 expansion cost no content edits
+because unused optional slots may be omitted and the already-explicit assignments stayed
+legal. Full specialization breaks that: a preset that put `Smoke_0` in slot 9 is illegal
+once slot 9 is ERA-only. All 9,030 assignments must be re-sorted into fixed positions.
+This is mechanical and scriptable, but it is a mass migration and it must not be
+described as a contract-only change.
+
+### The tier and year problem, and it is the one real balance consequence
+
+Carriers currently have their own eight-tier ladders. As hull roles they inherit the hull's
+tiers, and the ladders do not line up:
+
+| Family | Tiers | Years | Armour range |
+| --- | ---: | --- | --- |
+| `light_tank_chassis_0..9` | 10 | 1939-2010 | 5 - 27.5 |
+| `apc_chassis_0..7` | 8 | 1947-2005 | 15 - 40 |
+| `ifv_chassis_0..7` | 8 | 1947-2005 | 30 - 80 |
+| `medium_tank_chassis_0..9` | 10 | 1939-2010 | 30 - 75 |
+| `heavy_tank_chassis_0..4` | 5 | 1939-1955 | 45 - 65 |
+
+An APC on the light hull inherits armour 5-27.5 against its frozen 15-40; an IFV on the
+light hull inherits the same against its frozen 30-80. `for_each` can rewrite a stat per
+role - vanilla and this mod both use `hardness = { set = }` - but only uniformly across
+every tier, so a role-wide multiplier is the available shape, not a per-tier table.
+
+Consequence, stated plainly: **the frozen 18-envelope carrier mapping and the 40-row
+`Balance_Target_Manifest.md` are renegotiated by this restructure, not satisfied by it.**
+Eighteen of the forty frozen rows are the mechanized rows keyed to
+`mechanized_equipment_*` and `mechanized_heavy_equipment_*` armour values. Whether
+carriers keep their armour targets through a role multiplier or adopt the hull's is an
+owner balance decision that has to be taken before tier remapping, because the remap
+decides which named preset lands on which tier.
+
+Heavy hull ends at 1955, so Heavy Tank, Heavy Tank Destroyer and Heavy SP Artillery have
+no post-1955 generation. That is consistent with the period and is not a gap to fill.
+
+### Implementation order
+
+Derived from the dependency graph, not from convenience. Phases 1-3 are additive and
+leave the mod playable; phase 4 is the atomic cutover.
+
+1. ~~**Gate A and Gate B first.**~~ **CLOSED 2026-09-10.** Gate A closed positively by the
+   owner's live test: `light_armor`, a token this mod invented and vanilla does not
+   define, builds on a light tank chassis with zero errors, and custom equipment types are
+   documented as supported. Equipment `type` is an **open** enum; the `ifv` and `atgm`
+   tokens are legal. Gate B is resolved by planning rather than by test - the six new role
+   roots plus their 50 derived tier ids are authored into
+   `script_enum_equipment_bonus_type` as part of phase 3.
+2. ~~**Category re-cut.**~~ **IMPLEMENTED 2026-09-10**, see below.
+3. ~~**Role roots.**~~ **IMPLEMENTED 2026-09-10**, see below. Fourteen roots, module bounds
+   authored on the corrected engine model, blueprints at 87.
+4. **Carrier cutover, atomic.** Tier remap decision, then all 857 references in one pass:
+   presets, OOB requests, focus grants, AI recipes, enum, localisation, technology
+   unlocks, sub-unit `need`/`transport`, and the validator's carrier layer. Partial
+   landing leaves the mod unbuildable, so this phase does not split.
+5. **Battalion taxonomy.** Line and support sub-units rewired onto role roots, the eleven
+   `active = no` armour sub-units enabled, division and AI templates updated. This is
+   where the designer output finally reaches the battlefield.
+6. **Amphibious, unblocked.** Re-price off `DECISIONS.md`, not off Finding 15.
+7. **Artillery/AA restructure** and **envelope recalibration**, both against the
+   renegotiated manifest.
+
+### Phase 2 - IMPLEMENTED 2026-09-10
+
+Fifteen fully specialized special slots on all five archetypes, `tank_mobility_auxiliary`
+dissolved, and the designer corrected from 21 positions to 20. Ratified map, the engine
+cap and the merge rationale are in `DECISIONS.md`.
+
+It shipped twice in one pass. The first cut was sixteen special slots / 21 positions; the
+owner then established by live test that the engine renders at most twenty custom module
+slot windows, so Mine Clearing and Engineering Blade were merged into one Engineering
+Equipment slot and slot 16 was removed from every surface. Both categories survive with
+their own count limits; no module changed category twice and none became unreachable.
+
+| File | Change |
+| --- | --- |
+| `modules/00_tank_modules.txt` | 18 modules re-categorised; `tank_mobility_auxiliary` now appears 0 times. `tank_power_auxiliary` 11, `tank_external_fuel` 1, `tank_mine_clearing` 4, `tank_engineering_blade` 2. Line count unchanged at 7132, brace balance 0 before and after. |
+| `tank_chassis.txt` | Three archetypes specialized to slots 1-15; limits 54 -> 63. 1905 -> 1548 lines, entirely from collapsed category lists. |
+| `mechanized.txt` | APC archetype specialized; limits 18 -> 21. |
+| `mechanized_heavy.txt` | IFV archetype specialized; limits 18 -> 21. |
+| `interface/equipmentdesigner/tanks/*.gui` | All **106** blueprints lost their `tank_special_slot_16` block; every file now declares the identical ordered list `tank_special_slot_1..15`, verified as one distinct list across all 106. |
+| `interface/tank_designer_view.gui` | `pos_custom_module_slot_window_20` removed; positions are 0-19, laid out 7 / 7 / 6 on the unchanged row and column macros. No geometry value changed. |
+| `tank_modules_l_english.yml` | Slot labels rewritten; slot 15 is "Engineering Equipment" and slot 16's key is gone. The dissolved category's `EQ_MOD_CAT` key replaced by four new ones. BOM intact, non-ASCII byte count unchanged at 24 - the legal section-sign and pound-sign exceptions. |
+| `equipmentdesignermoduleicons.gfx` | `GFX_EMI_tank_mobility_auxiliary` replaced by four category sprites reusing already-shipped textures. Zero new art. |
+| `validate_military_reworks.py` | `TANK_FREE_SLOT_CATEGORIES` deleted; 15-entry specialized map; 21-category limit tuple; positions pinned to exactly 0-19; blueprint ordered list 1-15; five-archetype iteration; exact 18-module re-cut contract; every module category reachable from exactly one slot; three new negative fixtures. |
+
+**Structural invariants proved unchanged** by diffing each archetype file against HEAD:
+equipment definitions identical (28 / 19 / 10), mandatory slot blocks 15 / 5 / 5,
+`module_slots = inherit` 25 / 9 / 8, `default_modules` 3 / 1 / 1, `type` declarations
+3 / 9 / 1. Special-slot blocks are 45 / 15 / 15 after the merge. Brace balance 0 before
+and after on all three, and on every one of the 106 blueprints and the designer view. No
+BOM gained anywhere.
+
+**Zero content migration, as predicted.** No preset, OOB, focus or AI-recipe file was
+touched. All 567 non-empty special-slot assignments remain legal because the slot ids were
+chosen to preserve their meaning, and none of them used slots 15 or 16.
+
+**Verification.** Full validation passes with only the slot count moving:
+`1317 technologies, 289 tank modules, 125 historical tank designs, 40 generic bookmark
+variants, 586 national presets and 560 named OOB requests across 68 NSB OOBs, 76
+country-history bootstrap sites, 6220 stockpile grants, 8 APC designer hulls, 8 IFV
+designer hulls, and 20 designer slots checked.` Every other count is byte-identical to the
+pre-change baseline. The in-memory tank negative fixtures were run too, including
+`restored_twelve_category_free_list_fixture`, `deleted_mobility_category_module_fixture`
+and `twenty_first_gui_position_fixture`; all three mutations were rejected, so the new
+contract is not vacuous and the engine cap cannot be re-crossed silently.
+
+**Not run, and owed:** the APC, IFV and stockpile negative fixtures. Those three write to
+real mod files and the owner's `-debug` game was live for this whole session. Run
+`--tank-self-test` once the game is closed. Static verification only; no balance
+acceptance and no in-game check of the new slot labels is claimed.
+
+### Phase 3 - IMPLEMENTED 2026-09-10
+
+The fourteen designer role roots exist, and the module-side bounds that make each role's
+equipment role-exclusive are authored. Additive as planned: the standalone APC and IFV
+families are untouched and still shipping. Phase 4 retires them.
+
+**A measured correction to the engine model came first, and it changes how every
+restriction in this mod should be read.** `allow_equipment_type` **extends** eligibility;
+it does not restrict. Proof from shipped, QA-accepted content rather than from
+documentation: every tank gun carries `allow_equipment_type = anti_tank`, yet
+`medium_tank_chassis` was `type = { armor }` with no `anti_tank` token, and the national
+presets mount `tank_medium_cannon1` on `medium_tank_chassis_0` in live games. Only
+`forbid_equipment_type` and `forbid_equipment_type_exact_match` exclude anything. Both
+keys accept block form - vanilla ships `allow_equipment_type = { missile ballistic_missile }`
+(`00_ship_modules.txt:2722`) and a block `forbid_equipment_type` (`00_tank_modules.txt:1378`).
+
+**That exposed a live bug and dictated the token scheme.** `forbid_equipment_type_exact_match
+= armor` was the only thing keeping AA cannons off plain gun tanks, and Finding 13 broke it
+for the light family when `light_tank_chassis` became `{ armor light_armor }` - exact-match
+stopped matching, so light gun tanks could mount AA cannons. Rather than patch it, the
+scheme now makes "plain gun tank" a positive, checkable property:
+
+| Archetype / role | `type` |
+| --- | --- |
+| `light_tank_chassis` | `{ armor light_armor }` |
+| `medium_tank_chassis` | `{ armor medium_armor }` |
+| `heavy_tank_chassis` | `{ armor heavy_armor }` |
+| aa roles | `{ armor anti_air }` |
+| artillery roles | `{ armor artillery }` |
+| destroyer roles | `{ armor anti_tank }` |
+| apc roles | `{ armor mechanized }` |
+| ifv roles | `{ armor mechanized ifv }` |
+| atgm roles | `{ armor atgm }` |
+
+Size tokens live on base hulls only, so `forbid_equipment_type = { light_armor medium_armor
+heavy_armor }` is the exact expression of "not on a plain gun tank". `light_armor` was
+removed from the three light role roots; it was added by Finding 13 for a paradrop consumer
+that does not exist and cannot exist as a module, so nothing regressed.
+`forbid_equipment_type_exact_match` now appears **zero** times in the module file and the
+validator rejects its return.
+
+**Role roots: 9 -> 14.** Six new (`light`/`medium` x `apc`/`ifv`/`atgm`), one retired
+(`heavy_tank_aa_chassis` - the ratified Anti-Air taxonomy is Light and Medium SPAAG only).
+Authored hardness, recorded as authored: APC 0.3, IFV 0.5, ATGM 0.55.
+
+| File | Change |
+| --- | --- |
+| `x_tank_chassis.txt` | 9 -> 14 roots, new type scheme applied throughout. 92 -> 138 lines. |
+| `tank_chassis.txt` | medium and heavy gained their size tokens; light and medium turret and armament slots gained the four carrier categories. Heavy hull unchanged - it hosts no carrier role. |
+| `00_tank_modules.txt` | 65 modules bounded. 23 carrier modules gained `allow` + size-token forbid; 38 conventional guns gained `forbid_equipment_type = { mechanized ifv atgm }`; the 3 AA cannons swapped the broken exact-match for a full forbid list; `tank_atgm_launcher_cannon` now allows `{ anti_tank atgm }`. `forbid_equipment_type` 3 -> 68, exact-match 3 -> 0. 7111 -> 7201 lines. |
+| `script_enums.txt` | +6 roots +60 derived tiers, -1 root -5 tiers. 821 -> 881 entries. |
+| `NSB_armor.txt` | +60 chassis grants across `nsb_iw_armored_vehicles`, `nsb_light_tanks0..8` and `nsb_main_battle_tanks0..8`; -5 heavy AA grants; `heavy_sp_anti_air_brigade` dropped from `enable_subunits`. |
+| `generic_tank.txt` | 14 -> 19 AI recipe roots, 116 -> 171 histories: +60 for the new roles, -5 for heavy AA. |
+| Blueprints | 6 created, 1 deleted. **82 -> 87**, all declaring `tank_special_slot_1..15`. |
+| `need_for_tank_roles.txt` | `heavy_sp_anti_air_brigade` deleted; nothing else referenced it. |
+| Localisation | 132 role keys added, 11 heavy-AA keys removed, 2 heavy SPAA battalion keys removed; `tank_designer_ifv` and `tank_designer_atgm` plus their disallowed companions added. |
+| `validate_military_reworks.py` | `SUPPORTED_ROLES` replaced by an explicit `FAMILY_ROLES` map (light 6 / medium 6 / heavy 2) that both the grant formula and `expected_tank_types` now index; exact `type` domains pinned for all 14 roots and the 3 hulls; module bounds pinned per category; blueprint count 87; four new fixtures. |
+
+**Four things the gate caught that the batch contract had wrong**, all fixed:
+
+1. **The medium ATGM AI recipe named a category with no launcher in it.** The contract said
+   `tank_medium_main_armament`; `tank_atgm_launcher_cannon` is in `tank_small_main_armament`,
+   which the medium hull's armament slot already admits (`tank_chassis.txt:323-331`). Both
+   ATGM recipes now request the small category, and selection is unambiguous because every
+   conventional gun forbids `atgm`.
+2. **The ammunition contract did not fit the new roles.** It demanded kinetic and HE of every
+   recipe and failed all 20 ATGM recipes and the APC recipes. It is now role-aware: ATGM
+   requires `tank_ammo_missile` in slot 7 and rejects shell slots, APC is exempt by family
+   name the way the standalone APC family already was, and IFV keeps the full kinetic + HE
+   requirement. The stale "exempt because APC modules use `add_stats` only" comment was
+   corrected - the source shows they multiply, so the exemption has always been by family.
+3. **A retired sub-unit was still consuming the retired role.** `heavy_sp_anti_air_brigade`
+   needed `heavy_tank_aa_chassis = 40`. Removed, along with its technology unlock and
+   localisation. Nothing else referenced it.
+4. **Two new validator fixtures were pointed at the wrong file and one was structurally
+   broken.** They read `TANK_ROLE_FILE` (`need_for_tank_roles.txt`, the sub-units) instead of
+   `ROLE_CHASSIS_FILE` (`x_tank_chassis.txt`), and the size-token fixture indexed a parsed
+   dict by a role name that parse never produces, raising `KeyError`. This is Finding 7
+   repeating: a fixture that has never executed proves nothing. Both now mutate file text
+   and both reject.
+
+**Verification.** Full validation passes:
+`1317 technologies, 288 tank modules, 155 historical tank designs, 40 generic bookmark
+variants, 586 national presets and 560 named OOB requests across 68 NSB OOBs, 76
+country-history bootstrap sites, 6220 stockpile grants, 8 APC designer hulls, 8 IFV
+designer hulls, and 20 designer slots checked.` The in-memory tank negative fixtures pass,
+including all four new ones.
+
+Historical tank designs moved 100 -> 155, and the arithmetic closes exactly: +60 derived
+types for the six new roles across the 10 / 10 tier ladders, -5 for retired heavy AA.
+
+**Not verified:** nothing in phase 3 has been seen in game. The six new role blueprints, the
+role dropdown gaining ATGM and IFV entries, and the module eligibility filtering all need an
+owner check. The APC, IFV and stockpile negative fixtures remain unrun while a `-debug` game
+is live.
+
+### Finding 20: the two script enums are not interchangeable, and only one is extensible
+
+Established 2026-09-10 from the owner's second QA log, which is the most informative
+evidence this project has produced. It **corrects Finding 19's first fix**, which was
+wrong.
+
+**`script_enum_equipment_category` mirrors `EQUIPMENT_CATEGORY_META`, hardcoded in the
+binary.** Adding a custom token there is not how you register an equipment type. The
+engine says so directly, once per token:
+
+```
+equipment_category.cpp:357: ifv is in script enum script_enum_equipment_category
+but is not an equipment stat (cf. EQUIPMENT_CATEGORY_META in code)
+```
+
+All five tokens Finding 19 added - `ifv`, `atgm`, `light_armor`, `medium_armor`,
+`heavy_armor` - produced that line and fixed nothing. They are reverted. Custom `type`
+tokens on an archetype remain legal and functional; they are simply not categories.
+
+**`script_enum_equipment_bonus_type` is documentation the engine audits in both
+directions, and it wants the DERIVED VARIANT ids of every role, not the chassis ids.**
+This is the part no one had understood, and it explains the malformed-looking
+`chassist` / `chassisbt` entries that three separate passes recorded as "pre-existing
+typos, leave them alone". They are not typos. They are what the engine emits, and
+`equipment_database.cpp:656` names every missing one:
+
+```
+light_tank_apc_chassist_equipment_1 is an equipment type or equipment category
+but is not in script enum script_enum_equipment_bonus_type
+```
+
+The naming is irregular and was read out of the log rather than predicted, because no
+rule derivable from `derived_variant_name` produces it:
+
+| Family | Derived variant pattern | Indices | Hull tiers |
+| --- | --- | --- | ---: |
+| light | `<role>t_equipment_N` | 1-6 | 10 |
+| medium | `<role>bt_equipment_N` | 0-9 | 10 |
+| heavy | `<role>t_equipment_N` | 1-5 | 5 |
+
+The index ranges do not match the tier counts and are not consistent between families.
+**Do not "correct" them.** The log is the specification.
+
+48 derived ids were added for the six new roles, the 5 stale
+`heavy_tank_aa_chassist_equipment_*` entries were removed, and `flame` was restored to
+the bonus-type enum - a declared category is itself a bonus type, and `flame` survives
+as a category for the MIO policies, so removing it there while keeping the category
+produced its own `:656` line.
+
+**The validator now pins all three rules**, replacing Finding 19's incorrect check:
+custom type tokens must be absent from `script_enum_equipment_category`; every role's
+derived variant ids must be present in `script_enum_equipment_bonus_type` under the
+per-family pattern above; every stale derived id must be gone; and every declared
+category must also be a bonus type.
+
+### Finding 22: the tank designer role list is a closed, hardcoded set - custom tokens cannot be roles
+
+Established 2026-09-10 from the owner's third QA pass plus a full vanilla audit. **This is
+the constraint that decides the carrier half of the restructure, and it invalidates the
+phase 3 assumption that a custom `type` token can become a selectable designer role.**
+
+**What the owner observed.** After the Finding 20 enum repair the `equipment_category.cpp`
+and `equipment_database.cpp` errors are gone, but the role dropdown still lists exactly
+four entries - Tank, Tank Destroyer, Artillery, Anti-Air - with no APC, IFV or ATGM. A
+carrier module's tooltip does say it forbids the Tank role and unlocks a role, but that
+role renders as "Unknown" and never appears in the dropdown.
+
+**What vanilla says, measured across the whole install.** Every `allow_equipment_type` and
+every `duplicate_archetypes` role token in the base game is drawn from one set of five:
+
+| Token | Vanilla `allow_equipment_type` uses | Vanilla role root |
+| --- | ---: | --- |
+| `anti_tank` | 9 | yes |
+| `artillery` | 6 | yes |
+| `anti_air` | 3 | yes |
+| `flame` | 2 | yes |
+| `amphibious` | 1 | yes |
+
+And `localisation/english/designer_l_english.yml` in the base game carries
+`tank_designer_<token>` for exactly `amphibious`, `anti_air`, `artillery`, `anti_tank`,
+`rocket` and `flame` - plus the AAT support-vehicle roles and the per-archetype chassis
+names. There is no mechanism anywhere for declaring a new one.
+
+**So the engine's designer role vocabulary is hardcoded.** A custom token is still
+perfectly good for module eligibility - the owner confirmed `forbid_equipment_type` works,
+and Gate A's "custom types are legal" stands - but it can never be a **named, selectable
+role**. Being listed in `script_enum_equipment_category` does not help either: `mechanized`
+is a vanilla category and still produces no dropdown entry, which is the cleanest possible
+disproof of the Finding 19 theory.
+
+**This also explains Finding 21's texticon spam, which is now closed.** The spam fires only
+when hovering an APC or IFV module, which is precisely when the tooltip renders "unlocks the
+"unlocks the <role>" for a role the engine has no icon for. A pound-sign prefix plus an
+empty icon name is the
+`GFX__texticon` lookup in `bitmapfont.cpp:1844`. Vanilla role-gated modules never spam
+because their roles are all in the hardcoded set. The prediction is therefore exact: the
+spam disappears the moment the carrier modules gate on a legal role token, and it is not a
+separate defect to chase.
+
+**Three usable tokens remain free** - `amphibious`, `flame` and `rocket` - against three
+roles that need one: APC, IFV and ATGM. `rocket` is the only one of the three with no
+vanilla role root, so its usability is inferred from its `tank_designer_rocket`
+localisation key rather than observed, and must be tested before anything depends on it.
+
+The dropdown label is localisation and is ours to write, so a remapped token can read
+"Armored Personnel Carrier" regardless of its internal name. What is not cosmetic is
+whether `amphibious` or `rocket` carry hardcoded engine behaviour beyond naming - vanilla's
+amphibious role is consumed by amphibious sub-units, which is either a bonus or a trap
+depending on the design, and that needs the same kind of in-game check.
+
+No content was changed for this finding; it is a decision point, recorded for the owner.
+
+### Finding 23: the carrier consolidation was tried and REVERTED 2026-09-11
+
+Attempted, and it made things worse, so it is recorded as a dead end rather than as
+architecture. **Do not retry it without new evidence.**
+
+**The reasoning that led there.** APC on `amphibious` passed owner QA completely. IFV on
+`rocket` failed on save with `equipmentdesignerview.cpp:3657: Failed to change role` -
+`rocket` has a `tank_designer_rocket` key and a category entry but no vanilla role root,
+which renders it without making it switchable. IFV was moved to `flame`, the last token
+with a real role root, and then **both** carrier roles failed. The inference was that one
+unusable role entry takes down the hull's whole role list, so APC and IFV were collapsed
+into a single `amphibious` role with the loadout deciding the vehicle.
+
+**That inference was wrong.** With the two roles consolidated onto the one token that had
+been working, **both carriers were still broken in game.** So the failure is not "a second
+carrier role poisons the list" - a single carrier role on `amphibious` also fails once the
+hull has been through these edits. The real cause is still unidentified.
+
+**Reverted to the last state with a confirmed-working APC**, at the owner's direction and
+for the right reason: one working role plus one buggy role beats two broken ones. Restored
+exactly:
+
+| Surface | Restored to |
+| --- | --- |
+| `x_tank_chassis.txt` | 12 role roots; APC `{ armor amphibious }`, IFV `{ armor rocket }`, IFV hardness 0.5 |
+| `00_tank_modules.txt` | APC 7 allow `amphibious` forbid size + `rocket`; IFV 16 allow `rocket` forbid size + `amphibious`; 38 guns forbid `{ amphibious rocket }`; 3 AA and the ATGM launcher forbid size + both |
+| `script_enums.txt` | 38 IFV entries reinstated beside the APC ones |
+| `NSB_armor.txt` | 20 IFV chassis grants reinstated |
+| `generic_tank.txt` | 2 IFV recipe roots, 20 histories; 17 roots, 151 histories, 103 HE gates |
+| Blueprints | 2 IFV role files regenerated from the APC templates; **85** |
+| Localisation | 44 IFV role keys reinstated; `tank_designer_amphibious` "Armored Personnel Carrier", `tank_designer_rocket` "Infantry Fighting Vehicle" |
+| `validate_military_reworks.py` | `FAMILY_ROLES` 5/5/2, IFV ids un-retired, blueprint 85, HE gate 103, two-role carrier bounds |
+
+The IFV AI recipes and blueprints were **rebuilt from the surviving APC ones**, not
+rewritten from scratch, so their structure is identical by construction. The IFV histories
+gate on `nsb_ammo` and `nsb_he_ammo0` and carry kinetic plus HE ammunition, because IFV
+armament multiplies attack and the validator's ammunition contract applies to it; that is
+also why the HE-gate population returns to exactly 103.
+
+**Flame stays deleted.** The `flame` token is unused again and `tank_designer_flame` is
+gone; nothing from the flame family came back with this revert.
+
+### Finding 24: the "Failed to change role" error is benign - RESOLVED 2026-09-11
+
+**There was never a role bug.** Owner QA closes it: the APC and IFV roles work completely -
+role header correct in the designer, correct chassis names, separate production lines,
+separate equipment-tab entries, and both designs save and build. Confirmed by screenshots
+of the light-hull APC and IFV designs, the production tab and the equipment tab.
+
+**Why the error fires.** Carrier modules carry `allow_equipment_type`, which moves the
+design into the role the moment the superstructure and armament are fitted. By the time the
+player opens the dropdown and picks "Armored Personnel Carrier", the design is *already* in
+that role, so `equipmentdesignerview.cpp:3657` logs a failed change for what is a no-op.
+
+The tell was in the message text all along and was missed for three rounds: every failure
+named a design whose name is the target role's own chassis localisation -
+`Failed to change role to "Armored Personnel Carrier" on "Improved Light Armored Personnel
+Carrier"`. That is `light_tank_apc_chassis_2` being asked to become an APC.
+
+**Treat this line as ignorable engine noise**, alongside the other triaged families in
+`README.md`. It fires only on a redundant role selection and has no gameplay effect. Do not
+chase it, and do not "fix" it by removing `allow_equipment_type` from the carrier modules -
+that key is what makes the role assignment work in the first place.
+
+**Two wrong turns this cost, both recorded so they are not repeated.** The flame remap and
+the one-role consolidation were both attempts to fix a defect that did not exist. The
+consolidation was the more instructive failure: it disproved its own premise and still
+reported "broken", because the observation driving it was this benign log line rather than
+a real malfunction. The lesson is narrow and practical - **a log line is not a symptom until
+the described behaviour is checked in the UI.** The owner's decision to save the design
+despite the error is what settled it.
+
+### Phase 3 status: COMPLETE
+
+The three-hull restructure's role layer is done and owner-verified:
+
+- 12 role roots on 3 hulls; APC/Heavy APC on `amphibious`, IFV/Heavy IFV on `rocket`,
+  Tank Destroyer / SP Artillery / SPAA on their vanilla tokens, ATGM as a tank-destroyer
+  loadout.
+- 20 designer positions, 15 fully specialized special slots, 85 blueprints.
+- Module bounds keep every role's equipment exclusive, and plain gun tanks excluded via the
+  three size tokens.
+- Flame removed; heavy SPAA retired.
+
+Outstanding for later passes, unchanged: phase 4 carrier cutover, phase 5 battalion
+taxonomy, amphibious supply, artillery/AA, envelope recalibration.
+
+### Role-token probe - PASSED, and the remap is IMPLEMENTED 2026-09-10
+
+The two-line probe answered Finding 22's open question. Owner result:
+
+- **Both `amphibious` and `rocket` appeared as designer roles** on the light and medium
+  hulls. The hardcoded token set is usable and the remap is authorable.
+- **The texticon spam stopped for the IFV modules and persisted for the APC modules.** That
+  asymmetry is the diagnosis, not a loose end: at probe time the APC modules still carried
+  `forbid_equipment_type = { ... ifv }`, and `ifv` is a non-hardcoded token the tooltip
+  cannot draw an icon for. The IFV modules forbade only size tokens, which are never
+  rendered as roles. After the remap no module references `ifv`, `atgm` or `mechanized`, so
+  the spam is expected to be gone entirely - **owner re-check owed.**
+- **A design given the probe role produced base-hull equipment and reverted to the base
+  role.** Expected: no role root carried those tokens during the probe, so there was nothing
+  to switch to. The owner's own control observation - assigning the artillery role does
+  produce distinct equipment - confirms the mechanism is sound.
+
+**The remap as shipped.** `DECISIONS.md` carries the ratified mapping and the reasoning.
+Role roots go **14 -> 12**; the two `*_tank_atgm_chassis` roots are deleted and ATGM becomes
+a loadout on the tank destroyer role.
+
+| File | Change |
+| --- | --- |
+| `x_tank_chassis.txt` | APC roots to `{ armor amphibious }`, IFV roots to `{ armor rocket }`, both ATGM roots deleted. 12 roots. 138 -> 122 lines. |
+| `00_tank_modules.txt` | 65 modules retargeted. APC allows `amphibious` and forbids `{size rocket}`; IFV allows `rocket` and forbids `{size amphibious}`; 38 conventional guns forbid `{amphibious rocket}`; AA cannons and `tank_atgm_launcher_cannon` likewise. Key counts unchanged at 68/68/0 - this was a retarget, not an expansion. |
+| `script_enums.txt` | 38 ATGM entries removed (2 roots, 20 tiers, 16 derived variants); bonus entries 925 -> 887. The 13 legacy `atgm_equipment` / `atgm_carrier_equipment` ids are untouched - those are the pre-existing non-designer families. |
+| `NSB_armor.txt` | 20 ATGM chassis grants removed across `nsb_iw_armored_vehicles`, `nsb_light_tanks0..8` and `nsb_main_battle_tanks0..8`. |
+| `generic_tank.txt` | 2 ATGM recipe roots and 20 histories removed; roots 19 -> 17. Both destroyer recipes already request `tank_small_main_armament`, so they can select `tank_atgm_launcher_cannon` with no edit - verified, not assumed. |
+| Blueprints | 2 ATGM files deleted, **87 -> 85**, all still `tank_special_slot_1..15`. |
+| Localisation | 44 ATGM keys removed; `tank_designer_amphibious` now reads "Armored Personnel Carrier" and `tank_designer_rocket` reads "Infantry Fighting Vehicle", so the internal token name is invisible to players. |
+| `validate_military_reworks.py` | `FAMILY_ROLES` to 5/5/2; ATGM ids retired; blueprint count 85; **a new legal-token contract** rejecting any eligibility value or hull/role type token outside the hardcoded set, with a failure message citing the probe. |
+
+**Two parent corrections to subagent work**, both caught by the gate:
+
+1. **The standalone APC and IFV families were wrongly remapped too.** They are phase 4 scope
+   and keep `type = { armor mechanized }`; `REFERENCE.md` records that token as load bearing
+   for land/transport classification and every `transport = mechanized_equipment` consumer.
+   Restored.
+2. **The legal-token contract initially banned `mechanized` outright.** It is a real vanilla
+   equipment type - it is simply not a *designer role*. The check now distinguishes the two:
+   `LEGAL_TANK_DESIGNER_TYPE_TOKENS` governs module eligibility and the three hulls plus
+   their role roots, while `LEGAL_CARRIER_FAMILY_TYPE_TOKENS` adds `mechanized` for the two
+   carrier families and their hulls only.
+
+**Verification.** Gate passes: `1317 technologies, 288 tank modules, 135 historical tank
+designs, ... 20 designer slots checked`. In-memory fixtures pass, including the new
+`non_hardcoded_module_fixture`. Historical designs moved 155 -> 135, which is exactly the
+two deleted roles across the 10 + 10 tier ladders. A grep of every `allow_equipment_type`
+and `forbid_equipment_type` line in the module file returns zero `mechanized`, `ifv` or
+`atgm`.
+
+**Owner QA result.** APC passed completely: role assigns, APC production is separate, and
+the `_texticon` spam is gone - Findings 21 and 22 are both closed by the remap exactly as
+predicted. IFV failed on save with
+`equipmentdesignerview.cpp:3657: Failed to change role to "Infantry Fighting Vehicle"`.
+
+**Cause and fix, same day.** `rocket` is not a real designer role. It has a
+`tank_designer_rocket` key and a category entry, which is enough to render it in the
+dropdown, but **no vanilla `duplicate_archetypes` role root anywhere in the base game** -
+unlike `amphibious`, `anti_air`, `anti_tank`, `artillery` and `flame`, which all have one.
+The APC role worked because `amphibious` is in that group. IFV therefore moved to `flame`,
+the last token in it, free because flame tanks were deleted earlier the same day. The
+internal name is invisible: `tank_designer_flame` reads "Infantry Fighting Vehicle", and
+`tank_designer_rocket` was restored to "Rocket Artillery".
+
+Scope of the swap: 2 role roots, 65 module restriction lines, 4 localisation keys and the
+validator's IFV expectations. No other surface moved, because the remap had already put
+every carrier reference on a token boundary.
+
+One validator contract had to change with it. The flame-removal pass banned the `flame`
+*type token* outright; the IFV roles now legitimately carry it. The check is now on the
+family **name** - no chassis or role may contain `flame` - which is what was actually
+retired. The role roots themselves stay pinned by `removed_tank_role_errors` and
+`UNSUPPORTED_IDS`.
+
+**The usable designer role vocabulary is exactly five and all five are now spent:**
+`anti_air`, `anti_tank`, `artillery`, `amphibious`, `flame`. No further designer role can be
+added - any future vehicle class has to be a loadout on an existing role or its own
+archetype family. This is why ATGM is a tank-destroyer loadout and not a role.
+
+**Owner re-check owed:** that the IFV role now saves and produces distinct equipment.
+
+### Finding 21: the texticon spam - CAUSE IDENTIFIED, see Finding 22
+
+**Closed as a diagnosis, open as a fix.** The cause is a role with no icon, because the
+role token is not in the engine's hardcoded set. It resolves with the role remap, not on
+its own. The elimination work below is kept because it rules out four plausible-looking
+causes that would otherwise be re-investigated.
+
+Open. `bitmapfont.cpp:1844: Couldnt find texticon: _texticon` appears **1,682 times** in
+the current log, continuously at roughly 142 per second while the designer is open. The
+empty name means a pound-sign texticon prefix in a localisation string resolved to nothing.
+
+**It is new work, not pre-existing noise.** All three archived playtest logs -
+`error-1949NSB.log`, `error-1980NSB.log` and `error_9-8-26-2119.log` - contain **zero**
+occurrences. That is the one hard fact available.
+
+Four hypotheses were tested and eliminated:
+
+1. *Missing category title or sprite.* Fixed in Finding 19; the owner re-tested with the
+   icons loading correctly and the spam persisted.
+2. *Modules without `xp_cost`, making the `$EXPERIENCE_TYPE$` texticon empty.* Known inconsistency 4
+   claims turret modules lack `xp_cost`. Measured against current source: **all 288
+   modules have it.** That inconsistency is stale and should be closed.
+3. *A malformed texticon sequence in mod localisation.* A scan of every English `.yml` for a
+   pound-sign followed by a non-name character found 89 hits, all of them legal - the terminated
+   terminator form or literal pound-sterling prose in UK content.
+4. *A mod override diverging from vanilla.* The designer strings that use
+   `$EXPERIENCE_TYPE$` and `$XPICON$` texticon strings are byte-equivalent to vanilla's.
+
+That leaves the variable resolving empty at runtime, which points at equipment whose
+bonus-type resolution fails - exactly what Finding 20 repaired. **Re-test before
+investigating further**, because the enum was broken for all 48 derived role variants
+when that log was captured. If the spam survives the enum fix, the next step is an A/B
+with the designer opened on a pre-phase-3 chassis versus a new role chassis, diffing the
+log, rather than more static reading.
+
+### Finding 19: phase 3 QA - three defects, all of them presentation contracts nothing checked
+
+Owner in-game QA of phase 3, 2026-09-10. Three symptoms, three distinct causes, all static
+and all now pinned by the validator. Nothing about the role architecture was wrong.
+
+**Symptom 1: the role dropdown still showed only four roles** - Tank, Tank Destroyer,
+Artillery, Anti-Air - and selecting a carrier module unlocked a role labelled "Unknown".
+
+Cause: **an equipment `type` token only becomes a role the UI can offer once it is declared
+in `script_enum_equipment_category`.** `ifv` and `atgm` were never added there, so the
+archetypes loaded, the modules bound correctly, the forbid rules worked - and the dropdown
+had nothing to list. This refines the mechanism `REFERENCE.md` describes: the dropdown lists
+one entry per distinct `allow_equipment_type` value, but only for *declared* categories.
+
+The same check caught a third undeclared token nobody had noticed: **`light_armor` has been
+undeclared since Finding 13 shipped it.** That is why Finding 13 could describe it as
+"behaviour-neutral" - an undeclared token participates in nothing. All five tokens are now
+declared: `ifv`, `atgm`, `light_armor`, `medium_armor`, `heavy_armor`.
+
+This also explains Gate A's outcome more precisely than "equipment `type` is an open enum".
+The engine does accept an undeclared token without error - the owner's `light_armor` test
+was real - but the token is inert for anything that enumerates categories. Custom tokens are
+legal **and must be declared to do anything.**
+
+**Symptom 2: selecting Turret or Gun opened a category with an undefined label and a broken
+texture, and spammed the log.** 1,203 `bitmapfont.cpp:1844: Couldnt find texticon: _texticon`
+lines, with the empty name being the missing category title.
+
+Cause: a module category needs two presentation assets that nothing was checking - an
+`EQ_MOD_CAT_<category>_TITLE` localisation key and a `GFX_EMI_<category>` sprite. An audit of
+every category reachable from a `tank_chassis.txt` slot found **six** gaps, only four of them
+introduced by phase 3:
+
+| Category | Missing | Introduced by |
+| --- | --- | --- |
+| `tank_apc_superstructure`, `tank_apc_armament` | both | phase 3 put them on the tank hulls |
+| `tank_ifv_superstructure`, `tank_ifv_armament` | both | phase 3 put them on the tank hulls |
+| `tank_suspension_multi_track` | both | the 2026-09-09 4-Track batch |
+| `tank_secondary_turret` | sprite only | pre-existing |
+
+The four carrier categories had never carried either asset, including on the APC and IFV
+designers where they have shipped since `660f8984ae` - the gap was invisible because those
+slots hold exactly one category, so the selector never drew a category header. Putting them
+on a multi-category slot exposed it. All six are now authored, reusing already-shipped module
+textures; zero new art.
+
+**Symptom 3: the new role tooltips used the wrong wording.** `tank_designer_ifv` and
+`tank_designer_atgm` got "Remove the module that forbids..." - the phrasing for an
+archetype-swap role. A role reached by *allowing* a type takes "Add a module that allows..."
+like `tank_designer_anti_air`. Corrected, and the archetype-shaped keys were added alongside
+the type-token ones per `REFERENCE.md`'s standing advice to keep both shapes until one is
+observed resolving.
+
+**Two new validator contracts**, because the whole class of defect was invisible statically:
+
+1. Every category reachable from any archetype slot must have an `EQ_MOD_CAT` title key and a
+   `GFX_EMI` sprite. This is in `tank_category_contract_errors`.
+2. Every equipment `type` token used by any archetype or role root must be declared in
+   `script_enum_equipment_category`. This is in `validate_tank_type_domains`, and it failed on
+   first run against the three size tokens - which is how `light_armor` was found.
+
+**Verification.** The gate passes with the inventory line unchanged from phase 3. The fixes
+are static; whether the dropdown now lists Armored Personnel Carrier, Infantry Fighting
+Vehicle and ATGM Carrier needs an owner re-check, and so does the texticon spam. The log
+evidence for symptom 2 was read from the live `error.log` rather than inferred.
+
+### Flame removal - IMPLEMENTED 2026-09-10
+
+Owner ruling: flame tanks are axed completely. Ratified in `DECISIONS.md`, including the
+four surfaces deliberately left alone and why.
+
+**It was safe to take in full because nothing consumes it.** `history/`,
+`common/ai_templates/` and every OOB contain zero references to any flame sub-unit or
+flame chassis, so no division template, starting order of battle or AI template lost a
+battalion. The complete footprint was 33 files.
+
+| Surface | Change |
+| --- | --- |
+| `x_tank_chassis.txt` | 3 role roots removed; 9 remain, in order light/medium/heavy x aa/artillery/destroyer. 113 -> 92 lines. |
+| `need_for_tank_roles.txt` | `light_flame_tank`, `medium_flame_tank`, `heavy_flame_tank` deleted in full. 1106 -> 847 lines. The three armour battalions are untouched. |
+| `00_tank_modules.txt` | `flamethrower` deleted; confirmed by scoped grep to be the sole member of `tank_flamethrower` before deletion. 7132 -> 7111 lines. |
+| `tank_chassis.txt` | `tank_flamethrower` removed from all three `main_armament_slot` lists; nothing else touched. |
+| `NSB_armor.txt` | 29 grant lines removed across `nsb_iw_armored_vehicles` (7), `nsb_light_tanks0..8`, `nsb_main_battle_tanks0..8` and `nsb_heavy_tanks0..3` (1 each). No technology deleted, no block emptied. |
+| `generic_tank.txt` | 3 AI recipe blocks removed, 17 -> 14; surviving recipes byte-identical. |
+| `script_enums.txt` | 49 derived flame entries plus the bare `flame` bonus type removed from `script_enum_equipment_bonus_type`, 871 -> 821. |
+| Blueprint GUIs | 24 flame files deleted; **106 -> 82**, and all 82 still declare `tank_special_slot_1..15`. |
+| `.gfx` | `GFX_SMI_flamethrower`, `GFX_EMI_tank_flamethrower` and three flame MIO department sprites removed. |
+| English localisation | 67 keys from `tank_modules_l_english.yml` and `tank_designer_flame` / `tank_designer_flame_role_disallowed` from `designer_l_english.yml`. |
+| `zz_CWIC_armor_entity_aliases.asset` | 670 dead flame aliases removed, 3019 -> 2349 entries, 15246 -> 11897 lines. Load-order-critical `zz_` name untouched. |
+| Living balance CSV | the `flamethrower` row removed, 354 -> 353 lines. The frozen workbook is untouched and still hashes `dc2c9800b69b0f2f00568cdfe0f4bcac55c8bdd61476409b4a88b6d8e566b532`. |
+| `validate_military_reworks.py` | `SUPPORTED_ROLES` is now `("aa", "artillery", "destroyer")`; `FLAME_TECH_GRANTS` and `flame_grant_errors` deleted; the 25 derived flame chassis ids, 3 sub-units, the module and the category added to `UNSUPPORTED_IDS`; blueprint count pinned at 82 with `tank_chassis_*_tank_flame*.gui` rejected the way amphibious already was; the dead flamethrower ammunition exemption removed; one new fixture `reintroduced_flame_role_fixture`. |
+
+**Two corrections the parent made to subagent work, both caught by the gate:**
+
+1. **`script_enum_equipment_category` must keep `flame`.** An agent removed it along with
+   the bonus-type entries. Six `has_mio_equipment_type = flame` policy conditions under
+   `common/military_industrial_organization/` still name that token and are explicitly out
+   of scope, so deleting the enum value would have left them referencing an undeclared
+   entry. Restored. The bonus-type removals stand - those are designer ids, not the
+   equipment-domain vocabulary.
+2. **The unsupported-id scan was reading prose.** It globbed `.info` alongside `.txt`,
+   `.gui` and `.gfx`, so `common/unit_leader/_invalid_sub_unit_modifiers.info` failed for
+   naming the very ids it documents as absent. `.info` files are notes and the engine
+   never loads them; the suffix is dropped from that scan.
+
+**Verification.** Full validation passes:
+`1317 technologies, 288 tank modules, 100 historical tank designs, 40 generic bookmark
+variants, 586 national presets and 560 named OOB requests across 68 NSB OOBs, 76
+country-history bootstrap sites, 6220 stockpile grants, 8 APC designer hulls, 8 IFV
+designer hulls, and 20 designer slots checked.` The in-memory tank negative fixtures pass
+too, including the new flame-role fixture.
+
+Two counts moved and both are accounted for: tank modules 289 -> 288 is the deleted
+`flamethrower`, and historical tank designs **125 -> 100** is family x tier x role losing
+three roles across the 10 / 10 / 5 ladders - exactly 25 derived types. No design content
+was lost.
+
+**Consequence to expect in game:** the designer role dropdown drops from five entries to
+four on every chassis. `REFERENCE.md` explains why - the list is one entry per distinct
+`allow_equipment_type` value in the loaded module set, and `flamethrower` was the only
+module carrying `flame`. That is the intended outcome.
+
+Static verification only. The APC, IFV and stockpile negative fixtures remain unrun while
+a `-debug` game is live.
+
+### Finding 17: the 20-window cap, and what the 2026-09-09 verification actually proved
+
+Recorded 2026-09-10 because the failure mode is subtle and will recur. On 2026-09-09 this
+folder recorded "21 positions is now verified, not plausible - do not reopen it as an
+engine risk", on the strength of an owner designer capture plus a live `error.log` with
+zero `Could not find "tank_special_slot_*"`, zero `Requested GUI element not found` and
+zero `containerwindow.cpp` lines.
+
+**All of that was true and none of it was evidence of rendering.** The engine resolves and
+logs the 21st slot happily; it just never draws it. The one contrary observation was
+already written down and dismissed: Finding 6's "one cosmetic note, not a defect" describes
+six `+` affordances and a dark seventh cell in the bottom row, attributed to a `-debug`
+resolution overlay. That dark cell was the 21st position failing to render.
+
+The lesson generalises past this slot: **a clean log proves the engine parsed a
+declaration, not that it honoured it.** Where a count exceeds anything vanilla ships, the
+acceptance evidence has to be a positive visual count of the rendered elements, not the
+absence of errors.
+
+### Finding 18: the tech-folder right-edge ceiling contract is retired
+
+The gated-item decision to move `nsb_tank_design_tree` from x=3600 to x=1650 and
+`nsb_armor_tree` from x=2400 to x=950 was applied in an earlier session and **reverted by
+the owner on 2026-09-10**. The owner's finding: the clipping is not caused by the origins.
+Shifting the technologies left still leaves the right-most ones cut off even with the
+horizontal scrollbar present, so the cause is the folder's usable extent rather than where
+the content sits. It is cosmetic - no gameplay effect - and the owner logged it as a note,
+not a defect.
+
+The validator was enforcing the reverted position and failed with 55 right-edge errors
+against the owner's restored GUI. `TECH_FOLDER_RIGHT_EDGE_CEILING` and the 3187px
+comparison are removed; `validate_tank_folder_right_edges` is renamed
+`validate_tank_folder_gridboxes` and keeps every structural check that earned its place -
+one container per folder, no repeated or unmapped gridboxes, no missing gridbox, every
+technology's folder x mapped, and sane origin/slot-width values. Its negative fixture now
+probes an unmapped gridbox name instead of the retired pixel ceiling.
+
+Open, and genuinely unexplained: what actually bounds the drawable width of a technology
+folder. The 3187px figure was empirical (`industry_folder` is the widest that does not
+clip) and it is now known to be an incomplete model, because moving content inside it did
+not help. Anyone picking this up should measure the folder container and its scroll extent
+rather than the technology coordinates.
+
+
+### Carried forward from the previous next scope
+
+These remain owed and are not superseded by the restructure:
+
+1. **Fresh playtest capture** at 1949 and 1980 on both profiles, replacing the stale
+   2026-09-06 corpus. Confirm the moved tech-tree columns, the light-family filtering,
+   the French and West German 1949 starts and the Soviet 1980 stockpile.
+2. **Historical coverage sweep** - named designs for every armour family across all
+   countries. Its scope is now defined by the role table, so it must follow phase 4.
+3. **`mp_uav_1`** - the two ISR grants still need a content owner's decision.
+4. ~~**The flame decision.**~~ **Answered and implemented 2026-09-10** - flame is removed.
+   Phase 3 authors six role roots, not nine. No open decisions remain on the restructure.
+
+### A tooling note from this session
+
+The baseline self-test was run while the owner's `-debug` game was live (pid 50004).
+Per Finding 8 that is exactly the condition that produces the 2380 spurious
+`A limit for category X already exists` burst, because the APC and IFV negative fixtures
+write to the real `mechanized.txt` and `mechanized_heavy.txt` and a `-debug` game
+hot-reloads them. Any `error.log` line in that session's log after the run time is
+suspect and must not be treated as evidence. The check is `pgrep hoi4` before the
+validator, every time. Running the script **without** `--tank-self-test` performs every
+real contract check and writes nothing, so it is the safe form while a game is up.
+
 
 Estimator status: module parents no longer stack predecessor stats. Radar II fuel 1.2
 and GL ATGM III hard attack 95 are tested regression anchors. Full-design ordering,

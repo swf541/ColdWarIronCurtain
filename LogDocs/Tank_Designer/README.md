@@ -56,14 +56,33 @@ python3 "CWIC Backup/tools/loc_audit_1.py" --check
 git diff --check
 ```
 
-Current expected pass line:
+Current expected pass line, re-measured 2026-09-10:
 
 ```
-1303 technologies, 269 tank modules, 125 historical tank designs,
+1317 technologies, 288 tank modules, 135 historical tank designs,
 40 generic bookmark variants, 586 national presets and
 560 named OOB requests across 68 NSB OOBs, 76 country-history bootstrap sites,
-8 APC designer hulls, 8 IFV designer hulls, and 15 designer slots checked
+6220 stockpile grants, 8 APC designer hulls, 8 IFV designer hulls,
+and 20 designer slots checked
 ```
+
+**Twenty is an engine cap, not a design choice.** `pos_custom_module_slot_window_20`
+never renders. See `STATUS.md` Finding 17.
+
+**`equipmentdesignerview.cpp:3657: Failed to change role` is ignorable when the design is
+already in the named role.** Carrier modules carry `allow_equipment_type`, which assigns the
+role as soon as they are fitted, so selecting that role in the dropdown is a no-op the engine
+logs as a failure. It cost three debugging rounds. See `STATUS.md` Finding 24.
+
+The historical-design count is family x tier x role, so it moves whenever a role does:
+125 -> 100 when flame was removed (three roles across 10 / 10 / 5) and 100 -> 155 when
+phase 3 added six light/medium roles and retired heavy AA (+60 -5). No design content is
+lost when it falls.
+
+**Never run the validator while a `-debug` game is live.** Check `pgrep hoi4` first. The
+APC and IFV negative fixtures write to the real `mechanized.txt` and
+`mechanized_heavy.txt`; a `-debug` game hot-reloads them and logs 2380 spurious
+`A limit for category X already exists` lines. See `STATUS.md` Finding 8.
 
 `git diff --check` reporting trailing whitespace in `GRE - Greece.txt` is expected;
 that file is CRLF in the index.
