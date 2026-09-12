@@ -7890,6 +7890,12 @@ scripted_map_modes = {
 		# UI stuff: MAPMODE_EMBARGO_MAP_MODE, MAPMODE_EMBARGO_MAP_MODE_NAME,
 		# MAPMODE_EMBARGO_MAP_MODE_DESCRIPTION, embargo_map_mode_tooltip,
 		# GFX_mapmode_buttons_deselected_small_embargo_map_mode
+		# NOTE: a `targets` filter belongs here for performance, but it takes
+		# TARGETED-DECISION syntax (target_array / targets / target_trigger), not
+		# an every_country block. Writing one the wrong way broke the parse for
+		# this whole file and every map mode after it got named from whatever
+		# token the parser landed on - MAPMODE_CHECK_..., MAPMODE_ROOT_N... .
+		# Left out rather than guessed at a second time.
 		top = {
 			type = country
 			color = {
@@ -7958,5 +7964,140 @@ scripted_map_modes = {
 		far_text = country
 		near_text = none
 		update_daily = yes   # was no, so it never refreshed after you embargoed anyone
+	}
+
+	# ============================================================
+	# UN VOTE. Who is voting which way on the resolution on the floor.
+	# Reads the same vote flags cwic_un_recount reads, so it can never
+	# disagree with the tab.
+	# ============================================================
+	un_vote_map_mode = {
+		top = {
+			type = country
+			color = {
+				# not a member - almost invisible
+				set_temp_variable = { red = 70 }
+				set_temp_variable = { green = 70 }
+				set_temp_variable = { blue = 70 }
+				set_temp_variable = { alpha = 0.15 }
+
+				if = {   # veto - deep red, it kills the resolution outright
+					limit = { FROM = { has_country_flag = UN_VETO_ONGOING } }
+					set_temp_variable = { red = 140 }
+					set_temp_variable = { green = 0 }
+					set_temp_variable = { blue = 20 }
+					set_temp_variable = { alpha = 0.9 }
+				}
+				else_if = {   # no
+					limit = { FROM = { has_country_flag = UN_NO_ONGOING } }
+					set_temp_variable = { red = 220 }
+					set_temp_variable = { green = 60 }
+					set_temp_variable = { blue = 60 }
+					set_temp_variable = { alpha = 0.75 }
+				}
+				else_if = {   # yes
+					limit = { FROM = { has_country_flag = UN_YES_ONGOING } }
+					set_temp_variable = { red = 70 }
+					set_temp_variable = { green = 210 }
+					set_temp_variable = { blue = 100 }
+					set_temp_variable = { alpha = 0.75 }
+				}
+				else_if = {   # abstaining - present, not committed
+					limit = { FROM = { has_country_flag = UN_ABSTAIN_ONGOING } }
+					set_temp_variable = { red = 200 }
+					set_temp_variable = { green = 200 }
+					set_temp_variable = { blue = 120 }
+					set_temp_variable = { alpha = 0.55 }
+				}
+				else_if = {   # a member who has not voted yet
+					limit = {
+						FROM = {
+							OR = {
+								has_idea = un_member
+								has_idea = UN_Security_Council_Member_Perm
+							}
+						}
+					}
+					set_temp_variable = { red = 150 }
+					set_temp_variable = { green = 150 }
+					set_temp_variable = { blue = 150 }
+					set_temp_variable = { alpha = 0.35 }
+				}
+
+				divide_temp_variable = { red = 255 }
+				divide_temp_variable = { green = 255 }
+				divide_temp_variable = { blue = 255 }
+			}
+		}
+		bottom = { type = none }
+		far_text = country
+		near_text = none
+		update_daily = yes
+	}
+
+	# ============================================================
+	# UN BLOCS. Who speaks for whom.
+	#
+	# Bloc colours are DERIVED from the leader's country id rather than
+	# authored, so a content designer who creates a new bloc gets a usable
+	# colour for free and never has to pick one. Members of a bloc share their
+	# leader's colour at lower alpha; leaders are drawn solid.
+	#
+	# If a bloc ever needs a specific colour, the clean place to add it is a
+	# cwic_bloc_r/g/b variable on the leader read ahead of the hash below.
+	# ============================================================
+	un_bloc_map_mode = {
+		top = {
+			type = country
+			color = {
+				# unaligned - grey
+				set_temp_variable = { red = 120 }
+				set_temp_variable = { green = 120 }
+				set_temp_variable = { blue = 120 }
+				set_temp_variable = { alpha = 0.20 }
+
+				# whose colour are we wearing: our own if we lead, our
+				# leader's if we follow
+				set_temp_variable = { bloc_id = -1 }
+				if = {
+					limit = { FROM = { has_country_flag = cwic_bloc_leader } }
+					set_temp_variable = { bloc_id = FROM.id }
+					set_temp_variable = { alpha = 0.95 }
+				}
+				else_if = {
+					limit = { FROM = { has_variable = cwic_bloc_leader_of } }
+					set_temp_variable = { bloc_id = FROM.cwic_bloc_leader_of }
+					set_temp_variable = { alpha = 0.55 }
+				}
+
+				if = {
+					limit = { check_variable = { bloc_id > -1 } }
+					# three different multipliers off the same id so the
+					# channels do not move together and produce greys
+					set_temp_variable = { red = bloc_id }
+					multiply_temp_variable = { red = 53 }
+					modulo_temp_variable = { red = 200 }
+					add_to_temp_variable = { red = 55 }
+
+					set_temp_variable = { green = bloc_id }
+					multiply_temp_variable = { green = 97 }
+					modulo_temp_variable = { green = 200 }
+					add_to_temp_variable = { green = 55 }
+
+					set_temp_variable = { blue = bloc_id }
+					multiply_temp_variable = { blue = 149 }
+					modulo_temp_variable = { blue = 200 }
+					add_to_temp_variable = { blue = 55 }
+				}
+
+				divide_temp_variable = { red = 255 }
+				divide_temp_variable = { green = 255 }
+				divide_temp_variable = { blue = 255 }
+			}
+		}
+		bottom = { type = none }
+		far_text = country
+		near_text = none
+		update_daily = no
 	}
 }

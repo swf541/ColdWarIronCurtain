@@ -26,7 +26,17 @@ country_event = {
 	option = {
 		name = cwic_proxy.1.b
 		ai_chance = { factor = 20 }
-		set_variable = { Volunteer_Allowance^event_target:cwic_theatre = 1 }
+		# Licence the theatre's ENEMIES, not the theatre. Same fix as
+		# cwic_proxy.3 - this option was missed. Arming the country the rival
+		# is already propping up is the opposite of answering them.
+		every_country = {
+			limit = {
+				has_war_with = event_target:cwic_theatre
+				is_subject = no
+				NOT = { tag = ROOT }
+			}
+			set_variable = { ROOT.Volunteer_Allowance^THIS = 1 }
+		}
 		event_target:cwic_theatre = {
 			add_to_variable = { cwic_esc = 1 }
 			set_variable = { cwic_esc_cd = 18 }
@@ -58,7 +68,12 @@ country_event = {
 	option = {
 		name = cwic_proxy.2.a
 		ai_chance = { factor = 35 }
-		recall_volunteers_from = event_target:cwic_theatre
+		# recall_volunteers_from does not accept an event target - it was a
+		# silent no-op, so the whole de-escalation branch did nothing.
+		every_country = {
+			limit = { tag = ROOT }
+			recall_volunteers_from = PREV
+		}
 		event_target:cwic_theatre = {
 			set_variable = { cwic_esc_cd = 12 }
 			clr_country_flag = cwic_proxy_demanded

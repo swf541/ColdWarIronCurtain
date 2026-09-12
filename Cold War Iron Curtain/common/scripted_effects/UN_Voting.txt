@@ -65,25 +65,40 @@ un_ai_vote_weights ={
         }
         add_to_variable = { ai_un_voting_weight = 400 }
     }
-    if = {
+    # ---- BLOC COHESION ----
+    # These two blocks used to read influence_array^0 ("our largest foreign
+    # influencer") for 200 points each. The influence system is gone and that
+    # array is never written any more, so 400 points of bloc behaviour had
+    # silently stopped existing - countries were voting as individuals.
+    #
+    # Sphere_Leader replaces it. It is set by history and content, which is
+    # where alignment belongs, so this reads the game's own alignment rather
+    # than inventing a new one.
+    if = {                                  # the target is our patron's client
         limit = {
+            NOT = { check_variable = { Sphere_Leader = 0 } }
             var:UNS.un_nation_target = {
-                NOT = { check_variable = { influence_array^0 = 0 } }
-                var:influence_array^0 = {
-                    tag = PREV.PREV
-                }
+                check_variable = { Sphere_Leader = PREV.Sphere_Leader }
             }
         }
         add_to_variable = { ai_un_voting_weight = 200 }
     }
-    if = {
+    if = {                                  # the target IS our patron
         limit = {
-            NOT = { check_variable = { influence_array^0 = 0 } }
-            var:influence_array^0 = {
-                tag = var:UNS.un_nation_target
-            }
+            NOT = { check_variable = { Sphere_Leader = 0 } }
+            check_variable = { Sphere_Leader = UNS.un_nation_target }
         }
         add_to_variable = { ai_un_voting_weight = 200 }
+    }
+    if = {                                  # our patron's rival is the target
+        limit = {
+            NOT = { check_variable = { Sphere_Leader = 0 } }
+            var:UNS.un_nation_target = {
+                NOT = { check_variable = { Sphere_Leader = 0 } }
+                NOT = { check_variable = { Sphere_Leader = PREV.Sphere_Leader } }
+            }
+        }
+        subtract_from_variable = { ai_un_voting_weight = 120 }
     }
     if = {
         limit = {
@@ -198,6 +213,13 @@ un_ai_vote_weights ={
       #      is_subject = yes
      #   }
     #}   
+
+    # ---- PLEDGED VOTES ----
+    # Deliberately NOT handled here any more. This function runs when the
+    # resolution STARTS; the patron votes during the ten days that follow, so
+    # a term here could never see the patron's vote and every bought vote was
+    # silently ignored. Pledges are applied from the vote buttons instead -
+    # see cwic_un_apply_pledges in CWIC_un_pledges.txt.
 }
 monthly_infamy_calc = {
     if = {

@@ -1,0 +1,136 @@
+# ============================================================
+# THE UN IS ALWAYS IN SESSION
+#
+# The problem this solves: every resolution source in the mod was date-gated
+# before 1950 (four historical checks plus one French focus), so after January
+# 1950 the UN never convened again. Buying a bloc bought nothing.
+#
+# THE SHAPE, and it is deliberately both A and B rather than a choice between
+# them: authored content is the ceiling, this generator is the FLOOR. A
+# historical or scripted resolution always wins, because the generator only
+# fires when nothing else is running. So writing historical resolutions
+# improves the game without anyone having to disable this, and the tab is never
+# empty in the meantime.
+#
+# Content that wants a specific vote sets un_action_set + un_nation_target and
+# calls UN_START_SCRIPTED_RESOLUTION, exactly as before. Nothing here changes
+# that path.
+#
+# KILL SWITCH: set_global_flag = cwic_un_auto_off stops the generator entirely,
+# for a scenario that wants only authored votes.
+#
+# Runs weekly on UNS, from CWIC_division_limit_on_actions.txt.
+# ============================================================
+
+cwic_un_auto_resolution = {
+	if = {
+		limit = {
+			NOT = { has_country_flag = Current_UN_Vote }
+			NOT = { has_country_flag = cwic_un_auto_cooldown }
+			NOT = { has_global_flag = cwic_un_auto_off }
+		}
+		set_variable = { cwic_un_auto_pick = 0 }
+
+		# --- 1. A WAR. The most common thing the real Assembly argued about,
+		# and the one that ties the UN to the wargame. Subjects excluded: a
+		# puppet's war is its overlord's.
+		if = {
+			limit = {
+				any_country = {
+					has_war = yes
+					is_subject = no
+					NOT = { tag = UNS }
+					OR = { has_idea = un_member  has_idea = UN_Security_Council_Member_Perm }
+				}
+			}
+			random_country = {
+				limit = {
+					has_war = yes
+					is_subject = no
+					NOT = { tag = UNS }
+					OR = { has_idea = un_member  has_idea = UN_Security_Council_Member_Perm }
+				}
+				save_global_event_target_as = cwic_un_auto_target
+			}
+			set_variable = { un_action_set = 0 }
+			set_variable = { cwic_un_auto_pick = 1 }
+		}
+		# --- 2. A COLONIAL EMPIRE. Decolonisation was the other permanent item
+		# on the agenda, and it gives the Third World blocs something to be for.
+		else_if = {
+			limit = {
+				any_country = {
+					NOT = { tag = UNS }
+					any_subject_country = { exists = yes }
+					OR = { has_idea = un_member  has_idea = UN_Security_Council_Member_Perm }
+				}
+			}
+			random_country = {
+				limit = {
+					NOT = { tag = UNS }
+					any_subject_country = { exists = yes }
+					OR = { has_idea = un_member  has_idea = UN_Security_Council_Member_Perm }
+				}
+				save_global_event_target_as = cwic_un_auto_target
+			}
+			set_variable = { un_action_set = 1 }
+			set_variable = { cwic_un_auto_pick = 1 }
+		}
+		# --- 3. AN EMBARGO. Quietest of the three, and the one that most often
+		# puts a superpower itself in the dock.
+		else_if = {
+			limit = {
+				any_country = {
+					NOT = { tag = UNS }
+					any_country = { is_embargoed_by = PREV }
+					OR = { has_idea = un_member  has_idea = UN_Security_Council_Member_Perm }
+				}
+			}
+			random_country = {
+				limit = {
+					NOT = { tag = UNS }
+					any_country = { is_embargoed_by = PREV }
+					OR = { has_idea = un_member  has_idea = UN_Security_Council_Member_Perm }
+				}
+				save_global_event_target_as = cwic_un_auto_target
+			}
+			set_variable = { un_action_set = 5 }
+			set_variable = { cwic_un_auto_pick = 1 }
+		}
+
+		if = {
+			limit = { check_variable = { cwic_un_auto_pick = 1 } }
+			set_variable = { un_nation_target = event_target:cwic_un_auto_target.id }
+			set_variable = { un_state_target = 0 }
+			set_variable = { un_historical_resolution_id = 0 }
+			# 45 days between generated votes. The vote itself runs 10 days and
+			# cleanup 15, so this leaves a gap rather than a permanent session.
+			set_country_flag = { flag = cwic_un_auto_cooldown value = 1 days = 45 }
+			UN_START_SCRIPTED_RESOLUTION = yes
+		}
+	}
+}
+
+# ============================================================
+# COLD WAR POINTS
+#
+# Placeholder scoring so the votes mean something while they are being tested.
+# One point per country on the winning side of a resolution, banked in
+# cwic_cold_war_points. Nothing reads it yet - it is here so the data exists
+# when the victory screen does.
+# ============================================================
+cwic_un_award_points = {
+	if = {
+		limit = { check_variable = { UNS.un_yes_count > UNS.un_no_count } }
+		every_country = {
+			limit = { has_country_flag = UN_YES_ONGOING }
+			add_to_variable = { cwic_cold_war_points = 1 }
+		}
+	}
+	else = {
+		every_country = {
+			limit = { has_country_flag = UN_NO_ONGOING }
+			add_to_variable = { cwic_cold_war_points = 1 }
+		}
+	}
+}

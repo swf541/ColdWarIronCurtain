@@ -1,0 +1,155 @@
+# ============================================================
+# MISSILE AIRFRAME - BUILT THE WAY AMPHIBIOUS TANKS ARE BUILT
+#
+# THE PATTERN, copied from amphibious_tank_chassis in vanilla's
+# common/units/equipment/tank_chassis.txt:
+#   A new role is a NEW ARCHETYPE that keeps the family's `type`,
+#   `interface_category`, `group_by` and `priority`, and whose module_slots
+#   point at the SAME module categories the family already uses. It invents
+#   nothing. Its identity comes from `picture`, its stats, and WHICH of the
+#   existing categories it allows into which slot.
+#
+# That is what this now does against large_plane_airframe. Every category
+# below (strat_weapon, plane_rocket_engine_type, plane_special_module_*) is
+# vanilla and already has modules, techs and designer art behind it.
+#
+# MY EARLIER MISTAKE: I replaced the slots with invented categories
+# (cwic_missile_warhead and friends), which left the air designer with nothing
+# it recognised. The APC model is additive, not substitutive.
+#
+# The three CWIC modules in modules/CWIC_missile_modules.txt now declare
+# VANILLA categories, so they appear alongside vanilla's rather than instead
+# of them.
+#
+# Test wiring: common/on_actions/CWIC_missile_TEST_on_actions.txt gives SOV the
+# tech at startup. Delete that file once this is decided either way.
+# ============================================================
+
+equipments = {
+
+	cwic_missile_airframe = {
+		year = 1949
+
+		is_archetype = yes
+		is_buildable = no
+		is_convertable = no
+		can_license = no
+
+		picture = archetype_strat_bomber_equipment
+		# ============================================================
+		# DO NOT CHANGE `type` BACK TO `missile`. THIS IS SETTLED BY TEST.
+		#
+		# The air designer needs BOTH of these, and neither alone is enough:
+		#   1. a `type` the designer supports (the plane roles), AND
+		#   2. a blueprint registered in plane_blueprints_*.gui
+		#
+		# Proven by four runs:
+		#   type = missile   + no blueprint (CWIC ships all 8 files empty) -> Create Variant
+		#   type = strat_bmb + no blueprint                                -> Create Variant
+		#   type = strat_bmb + blueprint restored                          -> DESIGNER OPENS
+		#   type = missile   + blueprint restored                          -> Create Variant
+		#
+		# The fourth run is the one that isolates it: same blueprint, only the
+		# type changed, and the designer went away. `missile` is not a designer
+		# type - vanilla's own guided_missile_equipment has no module_slots and
+		# never opens a designer either.
+		#
+		# So the missile is a strategic bomber to the engine and a missile to the
+		# player: one_use_only, no crew, no air superiority, missile loc and art.
+		# ============================================================
+		type = strategic_bomber
+		allowed_types = {
+			strategic_bomber
+		}
+		allow_mission_type = training
+		group_by = archetype
+		sprite = heavy_plane
+		air_map_icon_frame = 21
+		interface_category = interface_category_air
+		interface_overview_category_index = 5
+
+		# The only real differences from a bomber: nobody is on board, and it
+		# does not come home.
+		manpower = 0
+		one_use_only = yes
+		air_superiority = 0
+
+		reliability = 0.7
+		naval_strike_attack = 1
+		naval_strike_targetting = 0.5
+		lend_lease_cost = 2
+		fuel_consumption = 0
+
+		build_cost_ic = 30
+		resources = {
+			aluminium = 2
+			tungsten = 1
+		}
+
+		module_slots = {
+			# Warhead. Vanilla's strategic and naval bomb categories - a
+			# warhead IS a bomb that arrives by itself.
+			fixed_main_weapon_slot = {
+				required = yes
+				allowed_module_categories = {
+					strat_weapon
+					nav_bomber_weapon
+				}
+			}
+
+			# Propulsion. Rocket first, but jets are allowed because a turbojet
+			# cruise missile is the other half of this era.
+			engine_type_slot = {
+				required = yes
+				allowed_module_categories = {
+					plane_rocket_engine_type
+					plane_jet_engine_type
+					medium_plane_jet_engine_type
+					plane_engine_type
+				}
+			}
+
+			# Guidance and airframe. Radio navigation and the two radar
+			# categories ARE guidance packages; no new category needed.
+			special_type_slot_1 = {
+				required = yes
+				allowed_module_categories = {
+					plane_special_module_radio_navigation
+					plane_special_module_air_ground_radar
+					plane_special_module_air_air_radar
+					plane_special_module_bomb_sights
+				}
+			}
+			special_type_slot_2 = {
+				required = no
+				allowed_module_categories = {
+					plane_special_module_small
+					plane_special_module_medium
+					plane_special_module_radio_navigation
+					plane_special_module_air_ground_radar
+				}
+			}
+			special_type_slot_3 = {
+				required = no
+				allowed_module_categories = {
+					plane_special_module_small
+					plane_special_module_medium
+				}
+			}
+		}
+	}
+
+	cwic_missile_airframe_0 = {
+		year = 1949
+		archetype = cwic_missile_airframe
+		is_buildable = yes
+		one_use_only = yes
+		sprite = heavy_plane
+		module_slots = inherit
+
+		air_range = 300
+		maximum_speed = 900
+		air_agility = 10
+		air_bombing = 200
+	}
+}

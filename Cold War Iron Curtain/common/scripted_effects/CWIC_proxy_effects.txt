@@ -21,7 +21,6 @@ cwic_proxy_register = {
 			NOT = { is_in_array = { global.cwic_theatres = THIS.id } }
 		}
 		add_to_array = { global.cwic_theatres = THIS.id }
-		set_variable = { cwic_esc = 0 }
 		set_variable = { cwic_esc_cd = 0 }
 	}
 }
@@ -85,21 +84,35 @@ cwic_proxy_close = {
 		remove_from_array = { array = global.cwic_theatres value = THIS.id }
 		# A licence held under a standing Defence Commitment survives the war —
 		# the player paid 100 PP for it and it is revoked by its own action.
+		# Guard on def_commit_check, NOT has_guaranteed. has_guaranteed was
+		# measured to gate nothing in this mod - that is why every action moved
+		# to variables - so this was wiping licences the player paid 100 PP for.
 		USA = {
 			if = {
-				limit = { NOT = { has_guaranteed = PREV } }
+				limit = { NOT = { check_variable = { def_commit_check^PREV = 1 } } }
 				set_variable = { Volunteer_Allowance^PREV = 0 }
 			}
 		}
 		SOV = {
 			if = {
-				limit = { NOT = { has_guaranteed = PREV } }
+				limit = { NOT = { check_variable = { def_commit_check^PREV = 1 } } }
 				set_variable = { Volunteer_Allowance^PREV = 0 }
 			}
 		}
 		clr_country_flag = cwic_proxy_demanded
-		clear_variable = cwic_esc
 		clear_variable = cwic_esc_cd
+		# The other side of the war never gets on_peace / on_capitulation, so it
+		# used to sit in the theatre array with a stale flag for the rest of the
+		# campaign. The array only ever grew.
+		every_country = {
+			limit = {
+				is_in_array = { global.cwic_theatres = THIS.id }
+				has_war = no
+			}
+			remove_from_array = { global.cwic_theatres = THIS.id }
+			clr_country_flag = cwic_proxy_demanded
+			clear_variable = cwic_esc_cd
+		}
 	}
 }
 

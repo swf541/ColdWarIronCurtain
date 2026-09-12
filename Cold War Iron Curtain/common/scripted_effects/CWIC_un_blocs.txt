@@ -1,0 +1,212 @@
+# ============================================================
+# UN VOTING BLOCS - AUTHORED, NOT EMERGENT
+#
+# Countries vote in blocs at the UN, so the player lobbies a BLOC LEADER, not
+# fifty individual countries. One purchase, one bloc.
+#
+# Everything here is content-designer territory. Nothing computes a bloc from
+# ideology or spheres; a bloc exists because a content file said so, and it
+# changes because an event, decision or focus said so.
+#
+# ---- THE API ----
+#
+#   EGY = { cwic_make_bloc_leader = yes }        # EGY now leads a bloc
+#   EGY = { cwic_clear_bloc_leader = yes }       # EGY stops leading one;
+#                                                # its members are released
+#
+#   set_temp_variable = { cwic_new_bloc = EGY.id }
+#   SYR = { cwic_join_bloc = yes }               # SYR follows EGY at the UN
+#
+#   SYR = { cwic_leave_bloc = yes }              # SYR votes for itself again
+#
+# ---- TRIGGERS ----
+#
+#   has_country_flag = cwic_bloc_leader          # this country leads a bloc
+#   check_variable = { cwic_bloc_leader_of = X } # this country follows X
+#
+# A bloc leader is not required to be aligned to anyone, is not required to be
+# a UN member, and blocs may overlap with factions and spheres freely - they
+# are a separate axis on purpose. Egypt can lead the Arab bloc while sitting in
+# nobody's sphere.
+# ============================================================
+
+cwic_make_bloc_leader = {
+	set_country_flag = cwic_bloc_leader
+}
+
+cwic_clear_bloc_leader = {
+	clr_country_flag = cwic_bloc_leader
+	# Release anyone who was following them, or they would follow a leader that
+	# no longer exists and the lobby action could never reach them again.
+	every_country = {
+		limit = { check_variable = { cwic_bloc_leader_of = PREV.id } }
+		clear_variable = cwic_bloc_leader_of
+	}
+	clear_variable = un_pledged_to
+	clr_country_flag = un_pledged
+}
+
+# temp cwic_new_bloc = the leader's id
+cwic_join_bloc = {
+	set_variable = { cwic_bloc_leader_of = cwic_new_bloc }
+}
+
+cwic_leave_bloc = {
+	clear_variable = cwic_bloc_leader_of
+}
+
+# ============================================================
+# STARTING BLOCS, 1949.
+#
+# Deliberately sparse. These are the groupings that actually voted together at
+# the outset; everything else is for content to add as it forms - the African
+# bloc barely exists in 1949 because most of Africa is still colonial, and the
+# Non-Aligned Movement is six years away from Bandung.
+#
+# Change these freely. They are a starting position, not a rule.
+# ============================================================
+cwic_un_blocs_startup = {
+	# NOTE ON SCOPE, TWO MISTAKES WORTH NOT REPEATING:
+	#   1. on_startup runs at NO scope, so this effect has to open its own with
+	#      a tag jump. Calling it bare produced "Invalid Scope ... provided: None".
+	#   2. set_temp_variable does NOT cross a scope change. Setting cwic_new_bloc
+	#      outside an every_country and reading it inside would read nothing,
+	#      so membership is assigned directly here. cwic_join_bloc stays as the
+	#      content API, where the designer sets the temp in the same scope.
+	#
+	# Colonies and other subjects are deliberately unassigned: they are not UN
+	# members in 1949 and they vote through nobody. They show grey on the bloc
+	# map mode, which is correct.
+
+	# The American bloc proper. Deliberately SMALL - the United States' power
+	# at the UN never came from its own caucus, it came from carrying Latin
+	# America and Western Europe. That is the game: a superpower with three
+	# votes of its own who has to buy the other blocs.
+	if = {
+		limit = { country_exists = USA }
+		USA = { cwic_make_bloc_leader = yes }
+		every_country = {
+			limit = {
+				OR = {
+					tag = PHI
+				}
+			}
+			set_variable = { cwic_bloc_leader_of = USA.id }
+		}
+	}
+
+	# The Eastern European Group. Voted as one with almost no exceptions -
+	# Yugoslavia is pointedly absent, Tito having split in 1948.
+	if = {
+		limit = { country_exists = SOV }
+		SOV = { cwic_make_bloc_leader = yes }
+		every_country = {
+			limit = {
+				OR = {
+					tag = POL  tag = CZE  tag = HUN  tag = ROM  tag = BUL
+					tag = ALB  tag = DDR  tag = MON
+				}
+			}
+			set_variable = { cwic_bloc_leader_of = SOV.id }
+		}
+	}
+
+	# Western Europe and Others - the real UN regional group, which is why
+	# Australia, New Zealand and Canada sit in it despite the name.
+	if = {
+		limit = { country_exists = ENG }
+		ENG = { cwic_make_bloc_leader = yes }
+		every_country = {
+			limit = {
+				OR = {
+					tag = FRA  tag = ITA  tag = HOL  tag = BEL  tag = LUX
+					tag = POR  tag = SPR  tag = SWI  tag = AUS  tag = GRE
+					tag = TUR  tag = IRE  tag = CAN  tag = AST  tag = NZL
+					tag = SAF
+				}
+			}
+			set_variable = { cwic_bloc_leader_of = ENG.id }
+		}
+	}
+
+	# The Arab League, founded 1945. Egypt chaired it and voted it.
+	if = {
+		limit = { country_exists = EGY }
+		EGY = { cwic_make_bloc_leader = yes }
+		every_country = {
+			limit = {
+				OR = {
+					tag = SYR  tag = IRQ  tag = SAU  tag = LEB  tag = YEM
+					tag = JOR  tag = LBA  tag = SUD  tag = MOR  tag = TUN
+					tag = ALG
+				}
+			}
+			set_variable = { cwic_bloc_leader_of = EGY.id }
+		}
+	}
+
+	# Twenty votes that moved together, and the reason the US could carry the
+	# General Assembly at will in these years.
+	if = {
+		limit = { country_exists = BRA }
+		BRA = { cwic_make_bloc_leader = yes }
+		every_country = {
+			limit = {
+				OR = {
+					tag = ARG  tag = CHL  tag = COL  tag = PER  tag = VEN
+					tag = MEX  tag = CUB  tag = URG  tag = BOL  tag = ECU
+					tag = PAR  tag = GUA  tag = HON  tag = NIC  tag = COS
+					tag = PAN  tag = DOM  tag = HAI  tag = ELS
+				}
+			}
+			set_variable = { cwic_bloc_leader_of = BRA.id }
+		}
+	}
+
+	# South and South-East Asia. India led the newly independent states and
+	# later the Non-Aligned Movement out of the same seat.
+	if = {
+		limit = { country_exists = RAJ }
+		RAJ = { cwic_make_bloc_leader = yes }
+		every_country = {
+			limit = {
+				OR = {
+					tag = PAK  tag = CEY  tag = BRM  tag = INS  tag = SIA
+					tag = AFG
+				}
+			}
+			set_variable = { cwic_bloc_leader_of = RAJ.id }
+		}
+	}
+
+	# The Nordics voted as a group on almost everything, and pointedly not
+	# with either superpower.
+	if = {
+		limit = { country_exists = SWE }
+		SWE = { cwic_make_bloc_leader = yes }
+		every_country = {
+			limit = {
+				OR = {
+					tag = NOR  tag = DEN  tag = FIN  tag = ICE
+				}
+			}
+			set_variable = { cwic_bloc_leader_of = SWE.id }
+		}
+	}
+
+	# Africa, such as it is in 1949 - two independent states on a continent of
+	# colonies. It is here so the bloc EXISTS and content can grow it as
+	# decolonisation happens, which is the whole reason blocs are authored.
+	if = {
+		limit = { country_exists = ETH }
+		ETH = { cwic_make_bloc_leader = yes }
+		every_country = {
+			limit = {
+				OR = {
+					tag = LBR
+				}
+			}
+			set_variable = { cwic_bloc_leader_of = ETH.id }
+		}
+	}
+}

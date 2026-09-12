@@ -1,3 +1,19 @@
+# ============================================================
+# UN TAB - PROPOSAL MACHINERY REMOVED
+#
+# The player can no longer table a resolution. The seventeen proposal buttons,
+# the resolution dropdown, the target and state pickers and the submit button
+# are gone, along with every write to un_action_set.
+#
+# Resolutions now only ARRIVE. The mechanism already existed and is untouched:
+# UN_HISTORICAL_RESOLUTION_WEEKLY_CHECK in UN_Scripted_Effects.txt runs weekly
+# on UNS and fires a resolution when its conditions are met. Content fires the
+# rest. What is left in this file is the part that was always the interesting
+# half - seeing the resolution, seeing who voted how, and voting.
+#
+# The player's lever on other countries is now a diplomatic action instead of a
+# menu: opt_un_lobby_action in scripted_diplomatic_actions.txt.
+# ============================================================
 scripted_gui = {
 
 
@@ -62,6 +78,9 @@ scripted_gui = {
 						add_to_array = { UNS.un_vote_abstain_list = THIS.id }
 					}
 				}
+							# Move everyone who pledged to us, then rebuild every count
+				# from the vote flags. See CWIC_un_pledges.txt.
+				cwic_un_apply_pledges = yes
 			}
 		}
 		triggers = {
@@ -704,6 +723,9 @@ scripted_gui = {
 						add_to_array = { UNS.un_vote_no_list = THIS.id }
 					}
 				}
+							# Move everyone who pledged to us, then rebuild every count
+				# from the vote flags. See CWIC_un_pledges.txt.
+				cwic_un_apply_pledges = yes
 			}
 		}
 		triggers = {
@@ -760,6 +782,9 @@ scripted_gui = {
 						add_to_array = { UNS.un_vote_abstain_list = THIS.id }
 					}
 				}
+							# Move everyone who pledged to us, then rebuild every count
+				# from the vote flags. See CWIC_un_pledges.txt.
+				cwic_un_apply_pledges = yes
 			}
 		}
 		triggers = {
@@ -816,17 +841,15 @@ scripted_gui = {
 						add_to_array = { UNS.un_vote_abstain_list = THIS.id }
 					}
 				}
+							# Move everyone who pledged to us, then rebuild every count
+				# from the vote flags. See CWIC_un_pledges.txt.
+				cwic_un_apply_pledges = yes
 			}
 		}
 		triggers = {
 			yes_vote_button_click_enabled = {
 				NOT = { has_country_flag = UN_YES_ONGOING }
 				UNS = { has_country_flag = Current_UN_Vote }
-			}
-			Resolution_Dropdown_Button_click_enabled = {
-				NOT = {
-					has_country_flag = Recent_UN_Proposal
-				}
 			}
 		}
 		effects = {
@@ -837,475 +860,8 @@ scripted_gui = {
 					set_variable = { show_un = show }
 				}			
 			}
-			Resolution_Dropdown_Button_click = {
-				ROOT = {
-					set_temp_variable = { show = 1 }
-					subtract_from_temp_variable = { show = show_resolution }
-					set_variable = { show_resolution = show }
-					set_variable = { root.show_target = 0 }
-				}			
-			}
-			Target_Dropdown_Button_click = {
-				ROOT = {
-					set_temp_variable = { show = 1 }
-					subtract_from_temp_variable = { show = show_target }
-					set_variable = { show_target = show }
-					set_variable = { root.show_resolution = 0 }
-				}			
-			}
-			submit_proposal_button_click = {
-				ROOT = {
-					set_country_flag = {
-						flag = Recent_UN_Proposal
-						days = 548
-						value = 1
-					}					
-				}
-				UN_START_SCRIPTED_RESOLUTION = yes
-			}
 		}
 		triggers = {
-			Target_Dropdown_Button_click_enabled = {
-				NOT = {
-					has_country_flag = Recent_UN_Proposal
-				}
-			}
-			submit_proposal_button_click_enabled = {
-				NOT = {
-					has_country_flag = Recent_UN_Proposal
-				}
-				UNS = {
-					NOT = { has_country_flag = Current_UN_Vote }
-				}
-				OR = {
-					check_variable = { root.un_nation_target > 0 }
-					check_variable = { root.un_state_target > 0 }
-				}
-				NOT = {
-					AND = {
-						check_variable = { UNS.un_action_set = 17 }
-						OR = {
-							has_idea = UN_Security_Council_Member_Perm
-							has_idea = un_member
-						}
-					}
-				}
-			}
-		}
-    }
-	country_un_action_list = {
-        context_type = player_context
-        window_name = "un_action_target_list_menu"
-		parent_scripted_gui = "UN_tab_menu"
-        dynamic_lists = {
-            un_action_listing_grid = {
-                array = UNS.un_option_list
-                change_scope = yes
-				entry_container = un_action_target_list_entry
-            }
-        }
-		visible = {
-			check_variable = {
-				show_resolution = 1 
-			}
-		}
-		effects = {
-			un_action_target_entry_button_click = { 
-				clear_array = ROOT.un_option_country_list
-				set_variable = { root.show_resolution = 0 }
-				set_variable = { root.show_target = 1 }
-				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 0 }
-					}
-					set_variable = { root.un_action_set = 0 }
-					clear_array = ROOT.un_option_country_list
-					custom_effect_tooltip = humanrightsaction_tt
-					hidden_effect = {
-						every_country = {
-							limit = {
-								check_variable = { badboy > 14 }
-								NOT = { tag = VTC }
-								NOT = { tag = UNS }
-								OR = {
-									has_idea = gulag_politic
-									has_idea = repression
-									has_idea = gulag_politic_expanded
-									has_idea = rightwing_deathsquads
-									has_idea = leftwing_deathsquads
-									has_idea = cocacolawing_deathsquads
-									has_idea = martial_law_perm
-									has_idea = opposition_banned
-									has_idea = policy_voting_temp_0
-									has_idea = policy_religion_temp_0
-									has_idea = policy_religion_temp_0a
-									has_idea = policy_media_temp_0
-									has_idea = policy_women_temp_0
-									has_idea = policy_minorities_temp_0
-									check_variable = { apartheidValue > 0 }
-									check_variable = { segregationValue < 0 }
-								}
-							}
-							add_to_array = { ROOT.un_option_country_list = THIS.id }
-						}
-					}
-				
-				}
-				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 1 }
-					}
-					set_variable = { root.un_action_set = 1 }
-					clear_array = ROOT.un_option_country_list
-					custom_effect_tooltip = condemncolonialism_tt
-					hidden_effect = {
-						every_country = {
-							limit = {
-								NOT = { original_tag = ROOT}
-								any_owned_state = {
-									OR = {
-										is_on_continent = asia		
-										is_on_continent = africa		
-									}		
-								}
-								any_country = {
-									OR = {
-										is_subject_of = THIS
-										is_puppet_of = THIS
-									}
-								}
-								capital_scope = {
-									is_on_continent = europe
-								}
-							}
-							add_to_array = { ROOT.un_option_country_list = THIS.id }
-						}
-					}
-				}
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 2 }
-					}
-					set_variable = { root.un_action_set = 2 }
-					clear_array = ROOT.un_option_country_list
-					custom_effect_tooltip = influencecontainment_tt
-					hidden_effect = {
-						every_country = {
-							limit = {
-								check_variable = { badboy > 24 }
-								NOT = { tag = ROOT }
-								NOT = { tag = VTC }
-								NOT = { tag = UNS }
-							}
-							add_to_array = { ROOT.un_option_country_list = THIS.id }
-						}
-					}
-				}
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 3 }
-					}
-					set_variable = { root.un_action_set = 3 }
-					clear_array = ROOT.un_option_country_list
-					custom_effect_tooltip = freezenationalassets_tt
-					hidden_effect = {
-						every_country = {
-							limit = {
-								check_variable = { badboy > 34 }
-								NOT = { tag = ROOT }
-								NOT = { tag = VTC }
-								NOT = { tag = UNS }
-							}
-							add_to_array = { ROOT.un_option_country_list = THIS.id }
-						}
-					}
-				}
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 4 }
-					}
-					set_variable = { root.un_action_set = 4 }
-					clear_array = ROOT.un_option_country_list
-					every_country = {
-						limit = {
-							check_variable = { badboy > 39 }
-							NOT = { tag = ROOT }
-							NOT = { tag = VTC }
-							NOT = { tag = UNS }
-						}
-						add_to_array = { ROOT.un_option_country_list = THIS.id }
-					}
-				}
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 5 }
-					}
-					set_variable = { root.un_action_set = 5 }
-					clear_array = ROOT.un_option_country_list
-					every_country = {
-						limit = {
-							check_variable = { badboy > 49 }
-							NOT = { tag = ROOT }
-							NOT = { tag = VTC }
-							NOT = { tag = UNS }
-						}
-						add_to_array = { ROOT.un_option_country_list = THIS.id }
-					}
-				}
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 6 }
-					}
-					set_variable = { root.un_action_set = 6 }
-					clear_array = ROOT.un_option_country_list
-					every_country = {
-						limit = {
-							check_variable = { badboy > 44 }
-							NOT = { tag = ROOT }
-							NOT = { tag = VTC }
-							NOT = { tag = UNS }
-						}
-						add_to_array = { ROOT.un_option_country_list = THIS.id }
-					}
-				}
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 7 }
-					}
-					set_variable = { root.un_action_set = 7 }
-					clear_array = ROOT.un_option_country_list
-					custom_effect_tooltip = haltnucleraization_tt
-					hidden_effect = {
-						every_country = {
-							limit = {
-								NOT = { tag = SOV }
-								NOT = { tag = FRA }
-								NOT = { tag = USA }
-								NOT = { tag = ENG }
-								NOT = { tag = ROOT }
-								has_tech = atomic_weapons
-
-							}
-							add_to_array = { ROOT.un_option_country_list = THIS.id }
-						}
-					}
-				}
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 8 }
-					}
-					set_variable = { root.un_action_set = 8 }
-					clear_array = ROOT.un_option_country_list
-					every_country = {
-						limit = {
-							NOT = { tag = SOV }
-							NOT = { tag = FRA }
-							NOT = { tag = USA }
-							NOT = { tag = ENG }
-							NOT = { tag = ROOT }
-							OR = {
-								is_researching_technology = NBC_research
-								has_tech = NBC_research
-							}
-
-						}
-						add_to_array = { ROOT.un_option_country_list = THIS.id }
-					}
-				}
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 9 }
-					}
-					set_variable = { root.un_action_set = 9 }
-					clear_array = ROOT.un_option_state_list
-					every_state = {
-						limit = {
-							is_core_of = ROOT
-							NOT = { owner = { tag = ROOT } }
-						}
-						add_to_array = { ROOT.un_option_state_list = THIS.id }
-						set_variable = { ROOT.un_nation_target = ROOT.id }
-					}
-				}	
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 10 }
-						has_war = no 
-						check_variable = { badboy < 10 }
-						any_owned_state = {
-							has_resistance = yes
-						}
-					}
-					set_variable = { root.un_action_set = 10 }
-					clear_array = ROOT.un_option_country_list
-				}		
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 11 }
-						has_war = yes 
-						OR = {
-							has_civil_war = yes
-							alliance_strength_ratio < 1
-						}
-						check_variable = { badboy < 20 }
-
-					}
-					set_variable = { root.un_action_set = 11 }
-					clear_array = ROOT.un_option_country_list
-				}	
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 12 }
-						has_defensive_war = yes 
-						OR = {
-							has_civil_war = yes
-							alliance_strength_ratio < 0.75
-						}
-						check_variable = { badboy < 15 }
-					}
-					set_variable = { UNS.coalition_tag = ROOT.id }
-					set_variable = { root.un_action_set = 12 }
-					clear_array = ROOT.un_option_country_list
-				}	
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 13 }
-					}
-					set_variable = { UNS.coalition_tag = ROOT.id }
-					set_variable = { root.un_action_set = 13 }
-					clear_array = ROOT.un_option_country_list
-					
-					every_country = {
-						limit = {
-							check_variable = { badboy > 20 }
-							NOT = { tag = ROOT }
-							has_offensive_war = yes
-							alliance_strength_ratio < 1
-						}
-						add_to_array = { ROOT.un_option_country_list = THIS.id }
-					}
-				}
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 14 }
-						check_variable = { badboy > 30 }
-						has_idea = UN_Trade_Sanctions
-					}
-					set_variable = { root.un_action_set = 14 }
-					clear_array = ROOT.un_option_country_list
-					set_variable = { ROOT.un_nation_target = ROOT.id }
-				}		
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 15 }
-						check_variable = { badboy > 30 }
-						has_idea = UN_Weapon_Trade_Ban
-					}
-					set_variable = { root.un_action_set = 15 }
-					clear_array = ROOT.un_option_country_list
-					set_variable = { ROOT.un_nation_target = ROOT.id }
-				}
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 17 }
-						NOT = { has_idea = un_member }
-						NOT = { has_idea = UN_Security_Council_Member_Perm }
-					}
-					set_variable = { root.un_action_set = 17 }
-					set_variable = { ROOT.un_nation_target = ROOT.id }
-					clear_array = ROOT.un_option_country_list
-				}
-
-
- 				if = {
-					limit = {
-						check_variable = { UNS.un_option_list^i = 16 }
-					}
-					set_variable = { root.un_action_set = 16 }
-					clear_array = ROOT.un_option_country_list
-					set_variable = { root.tag_list = 0 }
-					for_each_loop = {
-						array = global.countries
-						if = {
-							limit = {
-								NOT = { country_exists = v }
-								NOT = { check_variable = { v = COG.id } }
-								NOT = { check_variable = { v = FCB.id } }
-								NOT = { check_variable = { v = KMP.id } }
-								NOT = { check_variable = { v = GER.id } }
-								NOT = { check_variable = { v = CAP.id } }
-								NOT = { check_variable = { v = CUM.id } }
-								NOT = { check_variable = { v = MAO.id } }
-								NOT = { check_variable = { v = IND.id } }
-								NOT = { check_variable = { v = LAO.id } }
-								NOT = { check_variable = { v = UNT.id } }
-								NOT = { check_variable = { v = CSA.id } }
-								NOT = { check_variable = { v = YAN.id } }
-								NOT = { check_variable = { v = TAL.id } }
-								NOT = { check_variable = { v = SEE.id } }
-								NOT = { check_variable = { v = LOP.id } }
-								NOT = { check_variable = { v = AGN.id } }
-								NOT = { is_in_array = { ROOT.un_option_country_list = v } }
-								any_state = {
-									is_core_of = v
-								}
-							}
-							add_to_variable = { root.tag_list = 1 }
-							add_to_array = { ROOT.un_option_country_list = v }
-						}
-					}	
-				}		
-			}
-		}
-    }
-	country_un_country_list = {
-       context_type = player_context
-        window_name = "un_action_country_menu"
-		parent_scripted_gui = "UN_tab_menu"
-		visible = {
-			NOT = { check_variable = { root.un_action_set = 9 } }
-			check_variable = { show_target = 1 }
-			
-		}
-        dynamic_lists = {
-            un_action_country_listing_grid = {
-                array = ROOT.un_option_country_list
-                change_scope = yes
-				entry_container = un_action_country_target_entry
-            }
-        }
-		effects = {
-			un_action_country_target_entry_button_click = { 
-				set_variable = { root.show_target = 0 }
-				set_variable = { root.un_nation_target = THIS.id }
-			}
-		}
-    }
-	country_un_state_list = {
-       context_type = player_context
-        window_name = "un_action_state_menu"
-		parent_scripted_gui = "UN_tab_menu"
-		visible = {
-			check_variable = { root.un_action_set = 9 }
-			check_variable = { show_target = 1 }
-		}
-		triggers = {
-			un_action_state_listing_grid_visible = {
-				check_variable = { show_target = 1 }
-			}
-		}
-        dynamic_lists = {
-            un_action_state_listing_grid = {
-                array = ROOT.un_option_state_list
-                change_scope = yes
-				entry_container = un_action_state_target_entry
-            }
-        }
-		effects = {
-			un_action_state_target_entry_button_click = { 
-				set_variable = { root.show_target = 0 }
-				set_variable = { root.un_state_target = THIS.id }
-			}
 		}
     }
 	un_yes_vote_list_gui = {
@@ -1315,6 +871,9 @@ scripted_gui = {
 		visible = {
 			check_variable = {
 				show_yes = 1
+			}
+			UNS = {
+				has_country_flag = Current_UN_Vote
 			}
 		}
         dynamic_lists = {
@@ -1329,11 +888,6 @@ scripted_gui = {
 				set_temp_variable = { ROOT.show = 1 }
 				subtract_from_temp_variable = { ROOT.show = ROOT.show_yes }
 				set_variable = { ROOT.show_yes = ROOT.show }
-			}
-		}
-		visible = {
-			UNS = {
-				has_country_flag = Current_UN_Vote
 			}
 		}
 
@@ -1403,6 +957,11 @@ scripted_gui = {
         }
 
     }
+	# The veto window used to redeclare veto_vote_button_click and its
+	# _enabled trigger, which UN_tab_menu already defines - two scripted_guis
+	# owning the same callback is undefined behaviour, and this copy was dead
+	# anyway behind `visible = { always = no }`. Its grid also carried the YES
+	# list's name, colliding with the real one in United_Nations.gui.
 	un_veto_vote_list_gui = {
        context_type = player_context
         window_name = "un_veto_vote_list"
@@ -1411,74 +970,12 @@ scripted_gui = {
 			always = no
 		}
         dynamic_lists = {
-            un_yes_vote_list_grid = {
+            un_veto_vote_list_grid = {
                 array = UNS.un_vote_veto_list
                 change_scope = yes
 				entry_container = un_veto_vote_list_entry
             }
         }
-		effects = {
-			veto_vote_button_click = {
-				clear_array = UNS.un_vote_veto_list
-                set_country_flag = UN_VETO_ONGOING
-                add_to_variable = { UNS.un_veto_count = 1 }
-                add_political_power = -250
-                add_to_array = { UNS.un_vote_veto_list = THIS.id }
-                add_to_array = { UNS.un_vote_ = THIS.id }
-                 add_to_variable = { UNS.un_no_count = 1 }
-				every_country = {
-					limit = {
-						has_country_flag = UN_VETO_ONGOING
-					}
-					add_to_array = { UNS.un_vote_veto_list = THIS.id }
-				}
-				if = {
-					limit = { has_country_flag = UN_YES_ONGOING }
-					add_to_variable = { UNS.un_yes_count = -1 }
-					clr_country_flag = UN_YES_ONGOING
-					clear_array = UNS.un_vote_yes_list
-					every_country = {
-						limit = {
-							has_country_flag = UN_YES_ONGOING
-						}
-						add_to_array = { UNS.un_vote_yes_list = THIS.id }
-					}
-				}
-				if = {
-					limit = { has_country_flag = UN_NO_ONGOING }
-					add_to_variable = { UNS.un_no_count = -1 }
-					clr_country_flag = UN_NO_ONGOING
-					clear_array = UNS.un_vote_no_list
-					every_country = {
-						limit = {
-							has_country_flag = UN_NO_ONGOING
-						}
-						add_to_array = { UNS.un_vote_no_list = THIS.id }
-					}
-				}
-				if = {
-					limit = { has_country_flag = UN_ABSTAIN_ONGOING }
-					add_to_variable = { UNS.un_abstain_count = -1 }
-					clr_country_flag = UN_ABSTAIN_ONGOING
-					clear_array = UNS.un_vote_abstain_list
-					every_country = {
-						limit = {
-							has_country_flag = UN_ABSTAIN_ONGOING
-						}
-						add_to_array = { UNS.un_vote_abstain_list = THIS.id }
-					}
-				}
-			}
-		}
-		triggers = {
-			veto_vote_button_click_enabled = {
-				has_idea = UN_Security_Council_Member_Perm
-				has_political_power > 249
-				NOT = { has_country_flag = UN_VETO_ONGOING }
-				UNS = { has_country_flag = Current_UN_Vote }
-			}
-
-		}
     }
 
 	un_member_list_gui = {

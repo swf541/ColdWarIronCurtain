@@ -1,0 +1,90 @@
+# ============================================================
+# The one survivor of influence_scripted_diplomatic_actions.txt.
+#
+# That file held 11 actions; 10 were `visible = { always = no }` - dead since
+# the influence system was removed, still parsed and loaded every launch. They
+# are archived in _removed_influence_system/.
+#
+# This one is live and is not really an influence action at all: a sphere
+# leader clearing a client's debt. It reads Sphere_Leader (set by history and
+# content, which is where alignment belongs) and the money system. The
+# influence grant and the is_influencer gate that used to sit inside it are
+# gone; the debt payoff and the opinion reward are the whole action now.
+# ============================================================
+
+scripted_diplomatic_actions = {
+
+	opt_influence_pay_off_debt = {
+		allowed = {
+			ROOT = { is_ai = no }
+		}
+		visible = {
+			check_variable = { Sphere_Leader = ROOT } # only for our sphere members
+		}
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = Influence_action_cooldown
+				ROOT = { NOT = { has_country_flag = diplomatic_action_cooldown } }
+			}
+			NOT = { has_war_with = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = influence_Debt_Ratio_TT
+				check_variable = { ROOT.currentMoney > currentDebt }
+			}
+			custom_trigger_tooltip = {
+				tooltip = influence_Debt_TT
+				check_variable = { currentDebt > 0 }
+			}
+		}
+		requires_acceptance = no
+		cost = 0
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		on_sent_effect = {}
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			ROOT = { set_country_flag = { flag = diplomatic_action_cooldown value = 1 days = 1 } }
+			set_temp_variable = { tempDebt = currentDebt }
+			subtract_from_variable = { ROOT.currentMoney = currentDebt }
+			for_each_loop = {
+				array = debtPaymentArray
+				index = i
+				set_variable = { debtTotalsArray^i = 0 } 
+				set_variable = { debtPaymentArray^i = 0 } 	
+				set_variable = { debtOwnerArray^i = 0 }
+			}
+			set_variable = { currentDebtPayments = 0 }
+			set_variable = { currentDebt = 0 }
+			set_variable = { debtPayment = 0 }
+			# opinions
+			divide_temp_variable = { tempDebt = 10 }
+			round_temp_variable = tempDebt
+			if = { limit = { check_variable = { tempDebt > 40 } }
+				add_opinion_modifier = { target = ROOT modifier = paid_off_debt5 }
+			}
+			else_if = { limit = { check_variable = { tempDebt > 30 } }
+				add_opinion_modifier = { target = ROOT modifier = paid_off_debt4 }
+			}
+			else_if = { limit = { check_variable = { tempDebt > 20 } }
+				add_opinion_modifier = { target = ROOT modifier = paid_off_debt3 }
+			}
+			else_if = { limit = { check_variable = { tempDebt > 10 } }
+				add_opinion_modifier = { target = ROOT modifier = paid_off_debt2 }
+			}
+			else = {
+				add_opinion_modifier = { target = ROOT modifier = paid_off_debt1 }
+			}
+		}
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = pay_off_debt_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = pay_off_debt_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+}

@@ -104,13 +104,26 @@ NDefines.NCountry.MIN_COUP_SUCCESS_STABILITY = -2 -- NO COUPS ALLOWED!!!!
 NDefines.NCountry.BASE_FUEL_GAIN_PER_OIL = 4 -- VANILLA 2
 NDefines.NCountry.DAYS_OF_WAR_BEFORE_SURRENDER = 7 -- VANILLA 7
 
-NDefines.NCountry.AIR_VOLUNTEER_PLANES_LIMIT = 0.5	-- Ratio for volunteer planes available for sending in relation to sender air force
-NDefines.NCountry.AIR_VOLUNTEER_BASES_CAPACITY_LIMIT = 0.5	-- Ratio for volunteer planes available for sending in relation to receiver air base capacity
+-- AIR VOLUNTEERS.
+-- The name here used to be AIR_VOLUNTEER_PLANES_LIMIT, which is not a define
+-- that exists - vanilla calls it ..._RATIO. A misspelled define is silently
+-- ignored, so this line had never done anything and vanilla's 0.2 was in force
+-- the whole time. That is most of why the air volunteer tooltip offered so few
+-- planes.
+-- Raised well past vanilla: volunteers are how this war is fought, and an air
+-- contingent you cannot actually field is not a contingent.
+NDefines.NCountry.AIR_VOLUNTEER_PLANES_RATIO = 0.75	-- vanilla 0.2. Share of our air force we may commit.
+NDefines.NCountry.AIR_VOLUNTEER_BASES_CAPACITY_LIMIT = 1.0	-- vanilla 0.1. Share of the host's airbase capacity we may fill.
 
 
 NDefines.NDiplomacy.BASE_PEACE_TAKE_UNCONTROLLED_STATE_FACTOR = 10.0 -- Base factor for taking state you do not control in %
 NDefines.NDiplomacy.CIVIL_WAR_INVOLVEMENT_MIN_TENSION = 0.0 -- base value of world tension to involve other sides to the civil war
 NDefines.NDiplomacy.IDEOLOGY_JOIN_FACTION_MIN_LEVEL = 0 -- ideology limit required to join faction
+-- Declining a guarantee call costs nothing. Vanilla 0.2 war support. Our own
+-- guarantee never fires a call at all, but guarantees placed by history and
+-- content still do, and being dragged into a client's war by a popup is the
+-- behaviour we are removing.
+NDefines.NDiplomacy.BREAKING_GUARANTEE_PENALTY = 0
 NDefines.NDiplomacy.MAX_OPINION_VALUE = 200 -- Max opinion value cap.
 NDefines.NDiplomacy.MIN_OPINION_VALUE = -200
 NDefines.NDiplomacy.TENSION_STATE_VALUE = 0.005 -- Tension value gained by annexing one state (this value used to be divided by 20, this is no longer the case)

@@ -51,6 +51,18 @@ UN_RESET_VOTE_STATE = {
 
     clr_country_flag = Current_UN_Vote
     clr_country_flag = UN_Vote_Cleanup
+
+    # Drop pledges whose two years are up. The flag expires on its own; the
+    # variable does not, and un_ai_vote_weights only honours a pledge while
+    # both are present - so without this the variable would block the action
+    # from ever being offered to that country again.
+    every_country = {
+        limit = {
+            has_variable = un_pledged_to
+            NOT = { has_country_flag = un_pledged }
+        }
+        clear_variable = un_pledged_to
+    }
 }
 
 UN_START_SCRIPTED_RESOLUTION = {
@@ -139,6 +151,8 @@ UN_START_SCRIPTED_RESOLUTION = {
 }
 
 UN_RESOLVE_CURRENT_VOTE = {
+    # Bank the result before anything clears the vote flags.
+    cwic_un_award_points = yes
     if = {
         limit = {
             check_variable = { un_veto_count < 1 }
@@ -578,6 +592,11 @@ balkanise_country = {
             if = {
                 limit = {
                     NOT = { country_exists = var:country_temp }
+                    # One entry per tag, not one per (state x core country).
+                    # Without this a tag is added once for every state that
+                    # cores it, and the transfer loop below re-runs for each
+                    # duplicate.
+                    NOT = { is_in_array = { PREV.releasable_tags_array = country_temp } }
                 }
                 add_to_array = {
                     array = PREV.releasable_tags_array
