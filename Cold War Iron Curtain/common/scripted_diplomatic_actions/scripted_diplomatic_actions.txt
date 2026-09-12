@@ -1,7 +1,60 @@
+# ============================================================
+# CWIC SCRIPTED DIPLOMATIC ACTIONS
+#
+# Everything here is priced in POLITICAL POWER through the engine's own `cost`
+# field. No second currency. The engine greys the button out and writes the
+# price into the tooltip on its own, so none of these need a
+# custom_trigger_tooltip for the cost.
+#
+#     0   Recall Volunteers            - de-escalation is always free
+#     0   Revoke Military Cooperation  - so is walking away from a base
+#    25   Lift Embargo
+#    50   Military Cooperation Accord  - transit, ports and airfields
+#    50   Revoke Defence Commitment    - breaking your word costs something
+#    75   Embargo
+#   100   Defence Commitment           - the guarantee AND the volunteer licence
+#
+# ------------------------------------------------------------
+# THREE RULES LEARNED THE HARD WAY. BREAK ANY AND THE ACTION FAILS SILENTLY.
+#
+# 1. `ROOT = { ... }` DOES NOT EXECUTE inside complete_effect.
+#    Not "PREV misbehaves inside it" - the whole block is skipped. Everything
+#    ever put inside one here did nothing: send_embargo, give_guarantee, and
+#    the Volunteer_Allowance write. Everything at the TOP LEVEL fired.
+#    ROOT works fine as a TARGET (`country = ROOT`), just not as a scope.
+#    The escape hatch is `every_country = { limit = { tag = ROOT } ... }`,
+#    which is one country and costs nothing.
+#
+# 2. `diplomatic_relation` READS FROM THE SCOPE OUTWARDS.
+#    In scope S, `{ country = C relation = military_access }` means
+#    "S HAS ACCESS TO C" - not the reverse. Granting access to the sender
+#    therefore has to run in the SENDER's scope pointing at the receiver,
+#    which is the other reason everything goes through every_country now.
+#
+# 3. AN EFFECT CANNOT CREATE A DIPLOMATIC ACTION THAT IS HIDDEN.
+#    `give_military_access` did nothing while the two diplomatic_relation
+#    lines beside it worked, and `is_diplomatic_action_valid_military_access`
+#    is `always = no`. `diplomatic_relation` sets the raw relation and slips
+#    past the validity check; the dedicated effects do not. Same story for
+#    `send_embargo` vs the hidden embargo action.
+#
+# 4. TRACK STATE IN A VARIABLE, NOT A RELATION TRIGGER.
+#    `gives_military_access_to` and `has_guaranteed` gated nothing. The
+#    trade_embargo_check toggle is the one mechanism observed working, so
+#    every action here uses it: ROOT.<check>^THIS.
+#
+# Scope: in visible/selectable/complete_effect, ROOT is the SENDER and THIS is
+# the RECEIVER.
+# ------------------------------------------------------------
+
 scripted_diplomatic_actions = {
+
+	# ---------- ECONOMIC EMBARGO ----------
+	# "Embargo" and "Impose Naval Blockade" are the same engine mechanic under
+	# two names; `send_embargo` drives both. This is the only button for it.
 	opt_embargo_action  = {
 		allowed = {}
-		visible = { 
+		visible = {
 			check_variable = {
 				ROOT.trade_embargo_check^THIS = 0
 			}
@@ -16,31 +69,41 @@ scripted_diplomatic_actions = {
 			}
 		}
 		requires_acceptance = no
-		cost = 50
+		cost = 75
 		command_power = 0
 		show_acceptance_on_action_button = no
 		icon = 1
 		on_sent_effect = {}
-		# runs when the action is properly sent and accepted
 		complete_effect = {
+			save_event_target_as = cwic_dip_target
 			set_variable = {
 				ROOT.trade_embargo_check^THIS = 1
 			}
+			every_country = {
+				limit = { tag = ROOT }
+				# Both, deliberately. send_embargo is the documented effect but
+				# may be refused because the embargo action is hidden (rule 3);
+				# the raw relation slips past that. Setting an existing relation
+				# active twice is harmless. Delete the loser once one is proven.
+				send_embargo = event_target:cwic_dip_target
+				diplomatic_relation = { country = event_target:cwic_dip_target relation = embargo active = yes }
+			}
+			custom_effect_tooltip = EMBARGO_IMPOSED_TT
 		}
-		reject_effect = {} # runs when the action is properly sent and rejected
-		can_be_sent = {} # send button will be disabled if no
-		send_description = embargo_target_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reject_effect = {}
+		can_be_sent = {}
+		send_description = embargo_target_send
 		reset_receive_effect = {}
-		can_be_accepted = { always = no } # accept button will be disabled if no
-		receive_description = embargo_target_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
-		# ai_will_do to decide if AI should send this action or not
+		can_be_accepted = { always = no }
+		receive_description = embargo_target_receive
 		ai_desire = {
 			base = 0
 		}
 	}
+
 	opt_lift_embargo_action = {
 		allowed = {}
-		visible = { 
+		visible = {
 			check_variable = {
 				ROOT.trade_embargo_check^THIS = 1
 			}
@@ -55,30 +118,321 @@ scripted_diplomatic_actions = {
 			}
 		}
 		requires_acceptance = no
-		cost = 50
+		cost = 25
 		command_power = 0
 		show_acceptance_on_action_button = no
 		icon = 1
 		on_sent_effect = {}
-		# runs when the action is properly sent and accepted
 		complete_effect = {
+			save_event_target_as = cwic_dip_target
 			set_variable = {
 				ROOT.trade_embargo_check^THIS = 0
 			}
+			every_country = {
+				limit = { tag = ROOT }
+				break_embargo = event_target:cwic_dip_target
+				diplomatic_relation = { country = event_target:cwic_dip_target relation = embargo active = no }
+			}
+			custom_effect_tooltip = EMBARGO_LIFTED_TT
 		}
-		reject_effect = {} # runs when the action is properly sent and rejected
-		can_be_sent = {} # send button will be disabled if no
-		send_description = embargo_lifted_target_send # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reject_effect = {}
+		can_be_sent = {}
+		send_description = embargo_lifted_target_send
 		reset_receive_effect = {}
-		can_be_accepted = { always = no } # accept button will be disabled if no
-		receive_description = embargo_lifted_target_receive # if there is no scripted gui, this desc will be used in send yes/no pop up
-		# ai_will_do to decide if AI should send this action or not
+		can_be_accepted = { always = no }
+		receive_description = embargo_lifted_target_receive
 		ai_desire = {
 			base = 0
 		}
 	}
+
+	# ---------- MILITARY COOPERATION ACCORD ----------
+	# One action instead of three. The six vanilla access requests are hidden;
+	# this grants transit, ports and airfields together.
+	#
+	# All three go through `diplomatic_relation`. `give_military_access` was
+	# tried first and did nothing while the two diplomatic_relation lines beside
+	# it worked, so the whole accord uses the mechanism that was observed to fire.
+	opt_military_cooperation_action = {
+		allowed = {}
+		visible = {
+			NOT = { is_subject_of = ROOT }
+			check_variable = { ROOT.mil_coop_check^THIS = 0 }
+		}
+		selectable = {
+			NOT = { has_war_with = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = MIL_COOP_NO_ACCESS_TT
+				check_variable = { ROOT.mil_coop_check^THIS = 0 }
+			}
+		}
+		requires_acceptance = yes
+		cost = 50
+		command_power = 0
+		show_acceptance_on_action_button = yes
+		icon = 1
+		on_sent_effect = {}
+		complete_effect = {
+			# Runs in the SENDER's scope pointing at the receiver, so the sender
+			# is the one who gains access. Written the other way round first and
+			# it granted the exact opposite.
+			save_event_target_as = cwic_dip_target
+			set_variable = { ROOT.mil_coop_check^THIS = 1 }
+			every_country = {
+				limit = { tag = ROOT }
+				diplomatic_relation = { country = event_target:cwic_dip_target relation = military_access active = yes }
+				diplomatic_relation = { country = event_target:cwic_dip_target relation = docking_rights active = yes }
+				diplomatic_relation = { country = event_target:cwic_dip_target relation = air_base_access active = yes }
+			}
+			custom_effect_tooltip = MIL_COOP_GRANTED_TT
+		}
+		reject_effect = {}
+		can_be_sent = {}
+		send_description = mil_coop_send
+		reset_receive_effect = {}
+		can_be_accepted = { always = yes }
+		receive_description = mil_coop_receive
+		accept_title = mil_coop_accept
+		accept_description = mil_coop_accept_desc
+		reject_title = mil_coop_reject
+		reject_description = mil_coop_reject_desc
+		ai_acceptance = {
+			mil_coop_acceptance = {
+				base = -100
+				modifier = {                       # our patron is asking
+					sph_is_sphered = yes
+					check_variable = { Sphere_Leader = ROOT.id }
+					add = 300
+				}
+				modifier = {                       # same alliance
+					is_in_faction_with = ROOT
+					add = 250
+				}
+				modifier = {                       # same bloc, different patron
+					sph_is_sphered = yes
+					ROOT = { sph_is_sphered = yes }
+					check_variable = { Sphere_Leader = ROOT.Sphere_Leader }
+					add = 150
+				}
+				modifier = {                       # already fighting the same people
+					ROOT = { has_war = yes }
+					is_in_faction_with = ROOT
+					add = 100
+				}
+				modifier = {
+					has_opinion = { target = ROOT value > 100 }
+					add = 60
+				}
+				modifier = {                       # we are embargoing them
+					check_variable = { trade_embargo_check^ROOT = 1 }
+					add = -500
+				}
+				modifier = {                       # they are embargoing us
+					check_variable = { ROOT.trade_embargo_check^THIS = 1 }
+					add = -500
+				}
+			}
+		}
+		# AI NOTE. `ai_desire` is how the engine decides whether an AI country
+		# offers this at all; anything at or below 0 means never. Deliberately
+		# narrow - blocs should build a basing network, not spam every country.
+		ai_desire = {
+			base = -1
+			modifier = {
+				THIS = { sph_is_sphered = yes }
+				THIS = { check_variable = { Sphere_Leader = ROOT.id } }
+				add = 30
+			}
+			modifier = {
+				THIS = { sph_is_sphered = yes }
+				THIS = { check_variable = { Sphere_Leader = ROOT.id } }
+				ROOT = { has_war = yes }
+				add = 40
+			}
+			modifier = {
+				THIS = { is_in_faction_with = ROOT }
+				ROOT = { is_faction_leader = yes }
+				add = 25
+			}
+		}
+	}
+
+	opt_revoke_military_cooperation_action = {
+		allowed = {}
+		visible = {
+			check_variable = { ROOT.mil_coop_check^THIS = 1 }
+		}
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = MIL_COOP_HAS_ACCESS_TT
+				check_variable = { ROOT.mil_coop_check^THIS = 1 }
+			}
+		}
+		requires_acceptance = no
+		cost = 0
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		complete_effect = {
+			save_event_target_as = cwic_dip_target
+			set_variable = { ROOT.mil_coop_check^THIS = 0 }
+			every_country = {
+				limit = { tag = ROOT }
+				diplomatic_relation = { country = event_target:cwic_dip_target relation = military_access active = no }
+				diplomatic_relation = { country = event_target:cwic_dip_target relation = docking_rights active = no }
+				diplomatic_relation = { country = event_target:cwic_dip_target relation = air_base_access active = no }
+			}
+			custom_effect_tooltip = MIL_COOP_REVOKED_TT
+		}
+		can_be_sent = {}
+		send_description = mil_coop_revoke_send
+		can_be_accepted = { always = no }
+		receive_description = mil_coop_revoke_receive
+		ai_desire = {
+			base = 0
+		}
+	}
+
+	# ---------- DEFENCE COMMITMENT ----------
+	# Deliberately NOT a guarantee. It grants no engine relation at all - it
+	# writes ONE variable, the volunteer licence, and that licence also opens
+	# lend-lease. Guarantee stayed bundled in at first and behaved badly: it
+	# dragged the patron into wars the commitment was specifically meant to keep
+	# them out of. The vanilla Guarantee Independence button is still there for
+	# anyone who wants that promise; this is the other one.
+	opt_defence_commitment_action = {
+		allowed = {}
+		visible = {
+			NOT = { is_subject_of = ROOT }
+			check_variable = { ROOT.def_commit_check^THIS = 0 }
+		}
+		selectable = {
+			NOT = { has_war_with = ROOT }
+			custom_trigger_tooltip = {
+				tooltip = DEFENCE_COMMITMENT_NONE_TT
+				check_variable = { ROOT.def_commit_check^THIS = 0 }
+			}
+		}
+		requires_acceptance = yes
+		cost = 100
+		command_power = 0
+		show_acceptance_on_action_button = yes
+		icon = 1
+		complete_effect = {
+			save_event_target_as = cwic_dip_target
+			set_variable = { ROOT.def_commit_check^THIS = 1 }
+			every_country = {
+				limit = { tag = ROOT }
+				# THE VOLUNTEER LICENCE, read by
+				# DIPLOMACY_SEND_VOLUNTEERS_ENABLE_TRIGGER as
+				# ROOT.Volunteer_Allowance^FROM. This write is the whole point
+				# of the action and it silently did nothing inside ROOT = { }.
+				set_variable = { Volunteer_Allowance^event_target:cwic_dip_target = 1 }
+			}
+			custom_effect_tooltip = DEFENCE_COMMITMENT_LICENCE_TT
+		}
+		reject_effect = {}
+		can_be_sent = {}
+		send_description = defence_commitment_send
+		reset_receive_effect = {}
+		can_be_accepted = { always = yes }
+		receive_description = defence_commitment_receive
+		accept_title = defence_commitment_accept
+		accept_description = defence_commitment_accept_desc
+		reject_title = defence_commitment_reject
+		reject_description = defence_commitment_reject_desc
+		ai_acceptance = {
+			defence_commitment_acceptance = {
+				base = -50
+				modifier = {                       # our own patron
+					sph_is_sphered = yes
+					check_variable = { Sphere_Leader = ROOT.id }
+					add = 300
+				}
+				modifier = {
+					is_in_faction_with = ROOT
+					add = 200
+				}
+				modifier = {                       # same bloc
+					sph_is_sphered = yes
+					ROOT = { sph_is_sphered = yes }
+					check_variable = { Sphere_Leader = ROOT.Sphere_Leader }
+					add = 120
+				}
+				modifier = {                       # we are in trouble
+					has_war = yes
+					add = 100
+				}
+				modifier = {
+					has_opinion = { target = ROOT value < 0 }
+					add = -150
+				}
+			}
+		}
+		ai_desire = {
+			base = -1
+			modifier = {
+				THIS = { sph_is_sphered = yes }
+				THIS = { check_variable = { Sphere_Leader = ROOT.id } }
+				add = 20
+			}
+			modifier = {
+				THIS = { sph_is_sphered = yes }
+				THIS = { check_variable = { Sphere_Leader = ROOT.id } }
+				THIS = { has_war = yes }
+				add = 50
+			}
+			modifier = {
+				THIS = { is_in_faction_with = ROOT }
+				THIS = { has_war = yes }
+				add = 30
+			}
+			modifier = {                           # superpowers pick up the unaligned
+				ROOT = { OR = { tag = USA tag = SOV } }
+				THIS = { sph_is_free = yes  has_war = yes  is_subject = no }
+				add = 25
+			}
+		}
+	}
+
+	opt_revoke_defence_commitment_action = {
+		allowed = {}
+		visible = {
+			check_variable = { ROOT.def_commit_check^THIS = 1 }
+		}
+		selectable = {
+			custom_trigger_tooltip = {
+				tooltip = DEFENCE_COMMITMENT_HAS_TT
+				check_variable = { ROOT.def_commit_check^THIS = 1 }
+			}
+		}
+		requires_acceptance = no
+		cost = 50
+		command_power = 0
+		show_acceptance_on_action_button = no
+		icon = 1
+		complete_effect = {
+			save_event_target_as = cwic_dip_target
+			set_variable = { ROOT.def_commit_check^THIS = 0 }
+			every_country = {
+				limit = { tag = ROOT }
+				set_variable = { Volunteer_Allowance^event_target:cwic_dip_target = 0 }
+			}
+			custom_effect_tooltip = DEFENCE_COMMITMENT_REVOKE_TT
+		}
+		can_be_sent = {}
+		send_description = defence_commitment_revoke_send
+		can_be_accepted = { always = no }
+		receive_description = defence_commitment_revoke_receive
+		ai_desire = {
+			base = 0
+		}
+	}
+
+	# ---------- RECALL VOLUNTEERS ----------
+	# Free. De-escalation should never be gated behind a price.
 	recall_volunteers = {
-	
+
 		allowed = {
 			ROOT = { is_ai = no }
 		}
@@ -111,11 +465,15 @@ scripted_diplomatic_actions = {
 		icon = 1
 
 		complete_effect = {
-			ROOT = { recall_volunteers_from = PREV }
+			save_event_target_as = cwic_dip_target
+			every_country = {
+				limit = { tag = ROOT }
+				recall_volunteers_from = event_target:cwic_dip_target
+			}
 		}
 
 		ai_acceptance = {
-			condition = {
+			recall_volunteers_acceptance = {
 				base = 100
 			}
 		}

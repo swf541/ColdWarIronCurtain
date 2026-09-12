@@ -144,3 +144,67 @@ country able / unable to run spheres at all.
 
 Same index across `sph_gp_ids`/`sph_gp_score`/`sph_gp_stage`. To find a leader's row on
 a target, use `sph_get_pair_index` (temp `sph_from` = leader id) → temp `sph_idx` (or −1).
+
+---
+
+## 6. Ideological compatibility (2026-09-06)
+
+Accords are refused across the Iron Curtain. The policy is two lists in
+`common/scripted_triggers/CWIC_sphere_triggers.txt` — `sph_bloc_left`
+(communism, maoism, trotskyism, socialist) and `sph_bloc_west` (democratic,
+liberal, centrist, conservative). Everyone else — nationalists, monarchies,
+islamists, non-aligned — can deal with either side, because Washington armed
+the Shah and Moscow armed Nasser.
+
+| Trigger | Scope | Meaning |
+|---|---|---|
+| `sph_bloc_left` / `sph_bloc_west` | any | which side of the curtain |
+| `sph_curtain_blocked_root` | target, ROOT = power | accords barred (use in GUI/diplomatic actions) |
+| `sph_curtain_blocked_from` | target, temp `sph_from` | same test inside effects |
+| `sph_can_econ_accord_root` | target | economic accord legal |
+| `sph_can_mil_accord_root` | target | military accord legal (also requires they answer to no rival) |
+
+**Exception flag:** `sph_ignore_ideology` on *either* country lifts the bar.
+That is the Tito / Nasser / Ceausescu hatch — set it from your focus or event.
+
+```
+# Yugoslavia can deal with both sides
+YUG = { set_country_flag = sph_ignore_ideology }
+```
+
+## 7. Telling the great powers something is happening
+
+`sph_find_patrons` — **target scope**, temp `sph_min` = the influence a power
+needs to be told. Fills global event targets `sph_patron_1..3` (and
+`sph_patron_subject` = the country itself) plus temp `sph_patron_count`.
+
+Use it for elections, coups, regime change, succession — any moment the
+patrons would want a say. You write the event; this finds who has earned one.
+
+```
+# A colonel's coup is brewing in Iran — anyone holding 50+ influence gets a say
+IRN = {
+    set_temp_variable = { sph_min = 50 }
+    sph_find_patrons = yes
+    if = {
+        limit = { check_variable = { sph_patron_count > 0 } }
+        event_target:sph_patron_1 = { country_event = my_coup.1 }
+    }
+    if = {
+        limit = { check_variable = { sph_patron_count > 1 } }
+        event_target:sph_patron_2 = { country_event = my_coup.1 }
+    }
+}
+```
+
+`cwic_sphere.5` is a working template for the receiving event — copy it. Its
+first option spends 25 influence, so intervening costs the standing you built.
+
+**Automatic notifications** already fire on their own: `sph_notify_rivals`
+runs whenever an accord is signed or lost, a country is sphered, or one is
+torn out of a sphere. Every power holding more than 25 influence there is
+told (`cwic_sphere.2`), the country itself is told when it joins a sphere
+(`cwic_sphere.3`), and sphere members are told when their patron's embargo is
+forced on them (`cwic_sphere.4`). `global.sph_news_kind` carries what
+happened; `[GetSphNewsLine]` renders it.
+

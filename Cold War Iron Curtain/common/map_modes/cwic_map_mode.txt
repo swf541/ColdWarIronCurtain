@@ -5591,97 +5591,6 @@ scripted_map_modes = {
 
 		update_daily = no
 	}
-   influence_map_mode = {
-
-	   top = {
-		color = {
-
-			# Default: no influence -> grey
-			set_temp_variable = { red = 140 }
-			set_temp_variable = { green = 140 }
-			set_temp_variable = { blue = 140 }
-			set_temp_variable = { alpha = 0.20 }
-
-			# p = influence strength (0..100 or 0..1 depending on your data)
-			set_temp_variable = { p = 0 }
-
-			# 1) Own country: use domestic influence if it exists
-			if = {
-				limit = { tag = FROM }
-
-				# Try domestic_influence_amount if present, else just treat as full control
-				if = {
-					limit = { has_variable = domestic_influence_amount }
-					set_temp_variable = { p = domestic_influence_amount }
-				}
-				else = {
-					set_temp_variable = { p = 100 }
-				}
-			}
-
-			# 2) Foreign country: pull our influence percent from the slot that matches ROOT.id
-			else = {
-
-				if = { limit = { check_variable = { FROM.influence_array^0 = ROOT.id } } set_temp_variable = { p = FROM.influence_array_val^0 } }
-				else_if = { limit = { check_variable = { FROM.influence_array^1 = ROOT.id } } set_temp_variable = { p = FROM.influence_array_val^1 } }
-				else_if = { limit = { check_variable = { FROM.influence_array^2 = ROOT.id } } set_temp_variable = { p = FROM.influence_array_val^2 } }
-				else_if = { limit = { check_variable = { FROM.influence_array^3 = ROOT.id } } set_temp_variable = { p = FROM.influence_array_val^3 } }
-				else_if = { limit = { check_variable = { FROM.influence_array^4 = ROOT.id } } set_temp_variable = { p = FROM.influence_array_val^4 } }
-				else_if = { limit = { check_variable = { FROM.influence_array^5 = ROOT.id } } set_temp_variable = { p = FROM.influence_array_val^5 } }
-				else_if = { limit = { check_variable = { FROM.influence_array^6 = ROOT.id } } set_temp_variable = { p = FROM.influence_array_val^6 } }
-			}
-
-			# 3) If p > 0, color it by strength (red -> yellow -> green)
-			if = {
-				limit = { check_variable = { var = p value = 0.01 compare = greater_than } }
-
-				# convert 0..100 -> 0..1
-				divide_temp_variable = { p = 100 }
-
-				# clamp
-				if = { limit = { check_variable = { var = p value = 0 compare = less_than } } set_temp_variable = { p = 0 } }
-				if = { limit = { check_variable = { var = p value = 1 compare = greater_than } } set_temp_variable = { p = 1 } }
-
-				# alpha scales with strength (0.25..0.90)
-				set_temp_variable = { alpha = 0.25 }
-				set_temp_variable = { a_add = p }
-				multiply_temp_variable = { a_add = 0.65 }
-				add_to_temp_variable = { alpha = a_add }
-
-				# gradient
-				if = {
-					limit = { check_variable = { var = p value = 0.5 compare = less_than } }
-
-					set_temp_variable = { red = 255 }
-					set_temp_variable = { blue = 0 }
-
-					set_temp_variable = { green = p }
-					multiply_temp_variable = { green = 2 }
-					multiply_temp_variable = { green = 255 }
-				}
-				else = {
-					set_temp_variable = { green = 255 }
-					set_temp_variable = { blue = 0 }
-
-					set_temp_variable = { red = 1 }
-					subtract_from_temp_variable = { red = p }   # red = 1 - p
-					multiply_temp_variable = { red = 2 }
-					multiply_temp_variable = { red = 255 }
-				}
-			}
-
-			divide_temp_variable = { red = 255 }
-			divide_temp_variable = { green = 255 }
-			divide_temp_variable = { blue = 255 }
-		}
-
-
-		}
-		bottom = { type = none }
-		far_text = country
-		near_text = none
-		update_daily = no
-	}
     influence_sphere_map_mode = {
 
         top = {
@@ -7975,5 +7884,79 @@ scripted_map_modes = {
 		near_text = country
 
 		update_daily = no
+	}
+
+	embargo_map_mode = {
+		# UI stuff: MAPMODE_EMBARGO_MAP_MODE, MAPMODE_EMBARGO_MAP_MODE_NAME,
+		# MAPMODE_EMBARGO_MAP_MODE_DESCRIPTION, embargo_map_mode_tooltip,
+		# GFX_mapmode_buttons_deselected_small_embargo_map_mode
+		top = {
+			type = country
+			color = {
+				# grey: no trade quarrel with us
+				set_temp_variable = { red = 140 }
+				set_temp_variable = { green = 140 }
+				set_temp_variable = { blue = 140 }
+				set_temp_variable = { alpha = 0.20 }
+
+				# Read the ENGINE relation, not just our own bookkeeping variable.
+				# The variable only knows about embargoes placed with our own
+				# button; is_embargoing / is_embargoed_by also catch content,
+				# events and the AI, which is what you actually want on a map.
+				set_temp_variable = { emb_out = 0 }
+				set_temp_variable = { emb_in = 0 }
+				if = {
+					limit = {
+						OR = {
+							check_variable = { ROOT.trade_embargo_check^FROM = 1 }
+							ROOT = { is_embargoing = FROM }
+						}
+					}
+					set_temp_variable = { emb_out = 1 }
+				}
+				if = {
+					limit = {
+						OR = {
+							check_variable = { FROM.trade_embargo_check^ROOT = 1 }
+							ROOT = { is_embargoed_by = FROM }
+						}
+					}
+					set_temp_variable = { emb_in = 1 }
+				}
+
+				if = {   # mutual — deep red
+					limit = {
+						check_variable = { emb_out = 1 }
+						check_variable = { emb_in = 1 }
+					}
+					set_temp_variable = { red = 120 }
+					set_temp_variable = { green = 10 }
+					set_temp_variable = { blue = 10 }
+					set_temp_variable = { alpha = 0.85 }
+				}
+				else_if = {   # we embargo them — orange
+					limit = { check_variable = { emb_out = 1 } }
+					set_temp_variable = { red = 220 }
+					set_temp_variable = { green = 110 }
+					set_temp_variable = { blue = 30 }
+					set_temp_variable = { alpha = 0.75 }
+				}
+				else_if = {   # they embargo us — yellow
+					limit = { check_variable = { emb_in = 1 } }
+					set_temp_variable = { red = 230 }
+					set_temp_variable = { green = 200 }
+					set_temp_variable = { blue = 40 }
+					set_temp_variable = { alpha = 0.75 }
+				}
+
+				divide_temp_variable = { red = 255 }
+				divide_temp_variable = { green = 255 }
+				divide_temp_variable = { blue = 255 }
+			}
+		}
+		bottom = { type = none }
+		far_text = country
+		near_text = none
+		update_daily = yes   # was no, so it never refreshed after you embargoed anyone
 	}
 }

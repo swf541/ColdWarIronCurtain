@@ -82,6 +82,7 @@ sph_sign_econ_accord = {
 	sph_get_pair_index = yes
 	if = {
 		limit = {
+			NOT = { sph_curtain_blocked_from = yes }   # ideological compatibility
 			check_variable = { sph_idx > -1 }
 			check_variable = { sph_gp_score^sph_idx > 49 }
 			check_variable = { sph_gp_stage^sph_idx = 0 }
@@ -100,6 +101,8 @@ sph_sign_econ_accord = {
 		# ROOT is the accord leader when signed via the diplomatic action.
 		sign_trade_agreement = yes
 		sph_refresh_stage_opinion = yes
+		set_variable = { global.sph_news_kind = 1 }
+		sph_notify_rivals = yes
 	}
 }
 
@@ -111,6 +114,7 @@ sph_sign_mil_accord = {
 	sph_get_pair_index = yes
 	if = {
 		limit = {
+			NOT = { sph_curtain_blocked_from = yes }   # ideological compatibility
 			check_variable = { sph_idx > -1 }
 			check_variable = { sph_gp_score^sph_idx > 49 }
 			check_variable = { sph_gp_stage^sph_idx = 1 }
@@ -161,6 +165,8 @@ sph_sign_mil_accord = {
 			active = yes
 		}
 		sph_refresh_stage_opinion = yes
+		set_variable = { global.sph_news_kind = 2 }
+		sph_notify_rivals = yes
 	}
 }
 
@@ -186,6 +192,8 @@ sph_lower_accord = {
 		}
 		subtract_from_variable = { sph_gp_stage^sph_idx = 1 }
 		sph_refresh_stage_opinion = yes
+		set_variable = { global.sph_news_kind = 4 }
+		sph_notify_rivals = yes
 	}
 }
 
@@ -231,6 +239,9 @@ sph_add_to_sphere = {
 		set_country_flag = military_subsidized
 		set_variable = { mil_subsidy_id = sph_from }
 		add_opinion_modifier = { target = event_target:sph_gp_scope modifier = sph_sphere_member }
+		set_variable = { global.sph_news_kind = 3 }
+		sph_notify_rivals = yes
+		country_event = cwic_sphere.3
 	}
 }
 sph_remove_from_sphere = {
@@ -248,6 +259,15 @@ sph_remove_from_sphere = {
 			# end the bundled military subsidies
 			for_loop_effect = { end = military_subsidies^num value = v
 				if = { limit = { check_variable = { military_subsidies^v = sph_rmid } } remove_from_array = { array = military_subsidies index = v } } }
+		}
+		# lift every embargo the sphere imposed on us
+		every_country = {
+			limit = { check_variable = { PREV.sph_forced_emb^THIS = 1 } }
+			save_event_target_as = sph_emb_target
+			PREV = {
+				set_variable = { trade_embargo_check^event_target:sph_emb_target = 0 }
+				set_variable = { sph_forced_emb^event_target:sph_emb_target = 0 }
+			}
 		}
 		clr_country_flag = military_subsidized
 		clear_variable = mil_subsidy_id
@@ -294,6 +314,8 @@ sph_rip_from_sphere = {
 				LEADER = "[?var:sph_ripped_leader.GetTag]"
 			}
 			sph_refresh_stage_opinion = yes
+		set_variable = { global.sph_news_kind = 5 }
+		sph_notify_rivals = yes
 		}
 		# diplomatic fallout
 		if = {
@@ -607,11 +629,23 @@ sph_discredit = {
 # NOTE: dynamic-index set_variable crashes the game, so these use add/subtract.
 # ============================================================
 
+# Grant influence WITH a player-visible tooltip. TARGET scope;
+# temp sph_from = leader id, temp sph_amount = points (negative removes).
+# This is what focuses/decisions/events should call.
+sph_grant_influence = {
+	if = {
+		limit = { country_exists = var:sph_from }
+		var:sph_from = { save_event_target_as = sph_tt_gp }
+		custom_effect_tooltip = sph_influence_gain_tt
+		sph_add_influence = yes
+	}
+}
+
 # Give (or, with a negative value, remove) influence. temp sph_ce_amount.
 sph_ce_give_influence = {
 	set_temp_variable = { sph_from = ROOT.id }
 	set_temp_variable = { sph_amount = sph_ce_amount }
-	sph_add_influence = yes
+	sph_grant_influence = yes
 }
 
 # Set the leader's influence over this country to an exact value. temp sph_ce_amount.
@@ -628,6 +662,12 @@ sph_ce_set_influence = {
 # Instantly bring this country into ROOT's sphere (skips the influence/accord build).
 sph_ce_force_sphere = {
 	set_temp_variable = { sph_from = ROOT.id }
+	sph_force_sphere = yes
+}
+
+# Force this country into the sphere of temp sph_from (skips the influence cost).
+# TARGET scope. Used by sph_ce_force_sphere and the legacy add_to_sphere shim.
+sph_force_sphere = {
 	sph_ensure_pair = yes
 	# force stage -> 2 and score -> 100 (add/subtract only), then run the real effect
 	set_temp_variable = { sph_ce_st = sph_gp_stage^sph_idx }
@@ -720,4 +760,90 @@ sph_ce_store_influence = {
 		set_variable = { sph_query_influence = 0 }
 		set_variable = { sph_query_stage = 0 }
 	}
+}
+
+# =============================================================
+# CONTENT API — "something big is happening here, tell my patrons"
+# -------------------------------------------------------------
+# TARGET scope. temp sph_min = the influence a power needs to be told.
+# Fills global event targets sph_patron_1..3 and temp sph_patron_count.
+# Use it when a country has an election, a coup, a regime change, a
+# succession crisis — anything the great powers would want a say in.
+#
+#   IRN = {
+#       set_temp_variable = { sph_min = 50 }
+#       sph_find_patrons = yes
+#       if = {
+#           limit = { check_variable = { sph_patron_count > 0 } }
+#           event_target:sph_patron_1 = { country_event = my_coup.1 }
+#       }
+#   }
+# =============================================================
+sph_find_patrons = {
+	set_temp_variable = { sph_patron_count = 0 }
+	clear_global_event_target = sph_patron_1
+	clear_global_event_target = sph_patron_2
+	clear_global_event_target = sph_patron_3
+	save_global_event_target_as = sph_patron_subject
+	for_each_loop = {
+		array = sph_gp_ids
+		value = gpid
+		index = v
+		if = {
+			limit = {
+				country_exists = var:gpid
+				check_variable = { sph_gp_score^v > sph_min }
+				check_variable = { sph_patron_count < 3 }
+			}
+			if = {
+				limit = { check_variable = { sph_patron_count = 0 } }
+				var:gpid = { save_global_event_target_as = sph_patron_1 }
+			}
+			else_if = {
+				limit = { check_variable = { sph_patron_count = 1 } }
+				var:gpid = { save_global_event_target_as = sph_patron_2 }
+			}
+			else = {
+				var:gpid = { save_global_event_target_as = sph_patron_3 }
+			}
+			add_to_temp_variable = { sph_patron_count = 1 }
+		}
+	}
+}
+
+# Tell every OTHER power with a real stake here that something moved.
+# TARGET scope, temp sph_from = the power that just acted, temp sph_news_id = event.
+# Only powers above 25 influence are told, so this never turns into spam.
+sph_notify_rivals = {
+	save_global_event_target_as = sph_news_target
+	var:sph_from = { save_global_event_target_as = sph_news_actor }
+	for_each_loop = {
+		array = sph_gp_ids
+		value = gpid
+		index = v
+		if = {
+			limit = {
+				country_exists = var:gpid
+				NOT = { check_variable = { gpid = sph_from } }
+				check_variable = { sph_gp_score^v > 25 }
+			}
+			var:gpid = { country_event = cwic_sphere.2 }
+		}
+	}
+}
+
+# =============================================================
+# Panel display refresh. TARGET scope. Turns the raw 0-100 scores and
+# accord stages into sprite frame numbers for CWIC_sphere_list.
+# Called when the panel is opened and after every in-panel action, so the
+# bars never lag behind what the player just did.
+# =============================================================
+# Footer sits just under the last row instead of leaving a hole in the panel.
+# TARGET scope; called when the panel opens.
+sph_refresh_panel = {
+	set_variable = { sph_rows = sph_gp_ids^num }
+	clamp_variable = { var = sph_rows min = 1 max = 6 }
+	set_variable = { sph_foot_y = sph_rows }
+	multiply_variable = { sph_foot_y = 22 }
+	add_to_variable = { sph_foot_y = 78 }
 }

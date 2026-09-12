@@ -77,3 +77,64 @@ sph_ai_eligible_target = {
 	NOT = { has_war_with = event_target:sph_ai_me }
 	NOT = { is_in_array = { event_target:sph_ai_me.sph_active_ids = THIS.id } }
 }
+
+# =============================================================
+# IDEOLOGICAL COMPATIBILITY
+# -------------------------------------------------------------
+# THE POLICY LIVES HERE. Two buckets, and accords are refused across the
+# Iron Curtain between them. Everything else (nationalists, monarchies,
+# islamists, non-aligned) can deal with either side — Washington armed the
+# Shah and Moscow armed Nasser, so those pairings must stay legal.
+# To change the rules, edit these two lists and nothing else.
+# =============================================================
+sph_bloc_left = {
+	OR = {
+		has_government = communism
+		has_government = maoism
+		has_government = trotskyism
+		has_government = socialist
+	}
+}
+sph_bloc_west = {
+	OR = {
+		has_government = democratic
+		has_government = liberal
+		has_government = centrist
+		has_government = conservative
+	}
+}
+
+# Escape hatch for content: Tito, Nasser, Ceausescu, anyone playing both sides.
+# Set sph_ignore_ideology on EITHER country and the curtain stops applying.
+# TARGET scope, ROOT = the great power (use in diplomatic actions / GUI).
+sph_curtain_blocked_root = {
+	OR = {
+		AND = { sph_bloc_left = yes  ROOT = { sph_bloc_west = yes } }
+		AND = { sph_bloc_west = yes  ROOT = { sph_bloc_left = yes } }
+	}
+	NOT = { has_country_flag = sph_ignore_ideology }
+	NOT = { ROOT = { has_country_flag = sph_ignore_ideology } }
+}
+# Same test, TARGET scope with temp sph_from = leader id (use inside effects).
+sph_curtain_blocked_from = {
+	OR = {
+		AND = { sph_bloc_left = yes  var:sph_from = { sph_bloc_west = yes } }
+		AND = { sph_bloc_west = yes  var:sph_from = { sph_bloc_left = yes } }
+	}
+	NOT = { has_country_flag = sph_ignore_ideology }
+	NOT = { var:sph_from = { has_country_flag = sph_ignore_ideology } }
+}
+
+# Economic accord: blocked only across the curtain.
+sph_can_econ_accord_root = { NOT = { sph_curtain_blocked_root = yes } }
+
+# Military accord: stricter. Across the curtain is out, and you do not get
+# basing rights in a country that already answers to a rival power.
+sph_can_mil_accord_root = {
+	NOT = { sph_curtain_blocked_root = yes }
+	OR = {
+		sph_is_free = yes
+		check_variable = { Sphere_Leader = ROOT.id }
+	}
+}
+

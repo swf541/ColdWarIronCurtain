@@ -1,0 +1,116 @@
+# ============================================================
+# PROXY WARS — the escalation ladder.
+#
+# Anyone may send volunteers (VOLUNTEERS_DIVISIONS_REQUIRED = 1 mod-wide, and
+# DIPLOMACY_SEND_VOLUNTEERS_ENABLE_TRIGGER decides the pair). What this system
+# adds is the CONSEQUENCE: the other bloc notices, demands you leave, and if you
+# refuse it licenses itself to arm the other side.
+#
+# The licence it writes is Volunteer_Allowance^<theatre>, the same array 33
+# focus grants already use. No new currency, no new GUI.
+#
+# See docs/DIPLOMACY_GATING_EXPLAINED.md
+# ============================================================
+
+# Register a belligerent as a watchable theatre. Called on BOTH sides of a
+# declaration: either can host volunteers. Idempotent.
+cwic_proxy_register = {
+	if = {
+		limit = {
+			cwic_proxy_eligible = yes
+			NOT = { is_in_array = { global.cwic_theatres = THIS.id } }
+		}
+		add_to_array = { global.cwic_theatres = THIS.id }
+		set_variable = { cwic_esc = 0 }
+		set_variable = { cwic_esc_cd = 0 }
+	}
+}
+
+# Monthly sweep. Runs ONCE globally (guarded to one tag in the on_action), never
+# per country. Live theatres x 2 blocs = a dozen checks a month.
+#
+# At most ONE demand fires per month worldwide: the events pass the theatre via
+# global event targets, which a second demand in the same tick would clobber.
+# It also keeps escalation a drumbeat rather than a flood.
+cwic_proxy_pulse = {
+	set_temp_variable = { cwic_demand_fired = 0 }
+	for_each_loop = {
+		array = global.cwic_theatres
+		value = t
+		if = {
+			limit = { country_exists = var:t }
+			var:t = {
+				if = {
+					limit = { check_variable = { cwic_esc_cd > 0 } }
+					subtract_from_variable = { cwic_esc_cd = 1 }
+				}
+				else_if = {
+					limit = {
+						check_variable = { cwic_demand_fired = 0 }
+						NOT = { has_country_flag = cwic_proxy_demanded }
+						has_volunteers_amount_from = { tag = USA count > 0 }
+						NOT = { has_volunteers_amount_from = { tag = SOV count > 0 } }
+						SOV = { exists = yes  NOT = { has_war_with = USA } }
+					}
+					save_global_event_target_as = cwic_theatre
+					USA = { save_global_event_target_as = cwic_intervenor }
+					set_country_flag = cwic_proxy_demanded
+					set_temp_variable = { cwic_demand_fired = 1 }
+					SOV = { country_event = cwic_proxy.1 }
+				}
+				else_if = {
+					limit = {
+						check_variable = { cwic_demand_fired = 0 }
+						NOT = { has_country_flag = cwic_proxy_demanded }
+						has_volunteers_amount_from = { tag = SOV count > 0 }
+						NOT = { has_volunteers_amount_from = { tag = USA count > 0 } }
+						USA = { exists = yes  NOT = { has_war_with = SOV } }
+					}
+					save_global_event_target_as = cwic_theatre
+					SOV = { save_global_event_target_as = cwic_intervenor }
+					set_country_flag = cwic_proxy_demanded
+					set_temp_variable = { cwic_demand_fired = 1 }
+					USA = { country_event = cwic_proxy.1 }
+				}
+			}
+		}
+	}
+}
+
+# War over: drop the theatre and KILL THE LICENCES IT GRANTED.
+# Without this, a 1950 licence is still valid in 1989 — the existing bug.
+cwic_proxy_close = {
+	if = {
+		limit = { is_in_array = { global.cwic_theatres = THIS.id } }
+		remove_from_array = { array = global.cwic_theatres value = THIS.id }
+		# A licence held under a standing Defence Commitment survives the war —
+		# the player paid 100 PP for it and it is revoked by its own action.
+		USA = {
+			if = {
+				limit = { NOT = { has_guaranteed = PREV } }
+				set_variable = { Volunteer_Allowance^PREV = 0 }
+			}
+		}
+		SOV = {
+			if = {
+				limit = { NOT = { has_guaranteed = PREV } }
+				set_variable = { Volunteer_Allowance^PREV = 0 }
+			}
+		}
+		clr_country_flag = cwic_proxy_demanded
+		clear_variable = cwic_esc
+		clear_variable = cwic_esc_cd
+	}
+}
+
+# Called on the intervenor when it refuses to withdraw. Tells the other bloc.
+cwic_proxy_refused = {
+	if = {
+		limit = { tag = USA }
+		SOV = { country_event = cwic_proxy.3 }
+	}
+	else_if = {
+		limit = { tag = SOV }
+		USA = { country_event = cwic_proxy.3 }
+	}
+}

@@ -113,17 +113,11 @@ DIPLOMACY_CALL_ALLY_ENABLE_TRIGGER = {
 
 
 DIPLOMACY_GUARANTEE_ENABLE_TRIGGER = {
-	custom_trigger_tooltip = {
-		tooltip = RULE_GUARANTEE_BLOCKED_TT
-		always = no
-	}
+	# Unblocked. Guarantees are back - they are still useful somewhere, and the
+	# Defence Commitment is a different promise, not a replacement.
 }
 
 DIPLOMACY_REVOKE_GUARANTEE_ENABLE_TRIGGER = {
-	custom_trigger_tooltip = {
-		tooltip = RULE_GUARANTEE_BLOCKED_TT
-		always = yes
-	}
 }
 
 DIPLOMACY_RELEASE_NATION_ENABLE_TRIGGER = {
@@ -186,196 +180,33 @@ DIPLOMACY_OFFER_DOCKING_RIGHTS_ENABLE_TRIGGER = {
 }
 
 DIPLOMACY_LEND_LEASE_ENABLE_TRIGGER = {
-	# PERF: sphere check first so most country pairs short-circuit here.
-	# BUGFIX: NOT+faction checks wrapped in AND (was OR'd separately, so any
-	# country with a nonzero Sphere_Leader passed against anyone).
-	custom_trigger_tooltip = {
-		tooltip = Same_Sphere_Requirement_TT
-		OR = {
-			check_variable = {
-				ROOT.Sphere_Leader = FROM.Sphere_Leader
-			}
-			AND = {
-				NOT = { check_variable = { ROOT.Sphere_Leader = 0 } }
-				FROM = { is_in_faction_with = ROOT }
-			}
-		}
-	}
-	# PERF: else_if chain instead of 5 independent ifs - evaluates
-	# has_game_rule once for the common FREE/LIMITED cases instead of 5 times.
-	# LIMITED is the default and should be placed first
-	if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_lend_lease
-				option = LIMITED
-			}
-		}
-		always = yes		#handled by game logic, see above
-	}
-	else_if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_lend_lease
-				option = FREE
-			}
-		}
-		always = yes
-	}
-	else_if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_lend_lease
-				option = SAME_IDEOLOGY
-			}
-		}
-		custom_trigger_tooltip = {
-			tooltip = RULE_ALLOW_LEND_LEASE_SAME_IDEOLOGY_TT
-			has_government = FROM
-		}
-	}
-	else_if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_lend_lease
-				option = SAME_FACTION
-			}
-		}
-		custom_trigger_tooltip = {
-			tooltip = RULE_ALLOW_LEND_LEASE_SAME_FACTION_TT
-			is_in_faction_with = FROM
-		}
-	}
-	else_if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_lend_lease
-				option = BLOCKED
-			}
-		}
-		custom_trigger_tooltip = {
-			tooltip = RULE_ALLOW_LEND_LEASE_BLOCKED_TT
-			always = no
-		}
-	}
+	# FREE FOR EVERYONE. The old gate was "same Sphere_Leader", which since the
+	# influence system was removed meant 0 = 0 for every untouched country: it
+	# let every unsphered pair through and blocked every sphered one. Exactly
+	# backwards, which is why lend-lease read as broken.
+	#
+	# Rather than write a better gate, there is no gate. Lend-lease is how
+	# equipment moves in this war and the game rules already cover the cases a
+	# host wants to restrict.
+	#
+	# NOTE: the vanilla lend-lease action CANNOT be made to cost Political
+	# Power. There is no LEND_LEASE_COST define and no on_action fires when a
+	# contract is signed. The only way to price it is to replace it with a
+	# scripted diplomatic action that pays PP and calls send_equipment - a
+	# one-shot arms shipment, not a standing contract.
 }
 
 DIPLOMACY_INCOMING_LEND_LEASE_ENABLE_TRIGGER = {
-	# BUGFIX: was implicit AND of all three conditions (required same sphere
-	# AND nonzero sphere AND faction) - now matches outgoing trigger logic.
-	custom_trigger_tooltip = {
-		tooltip = Same_Sphere_Requirement_TT
-		OR = {
-			check_variable = {
-				ROOT.Sphere_Leader = FROM.Sphere_Leader
-			}
-			AND = {
-				NOT = { check_variable = { ROOT.Sphere_Leader = 0 } }
-				FROM = { is_in_faction_with = ROOT }
-			}
-		}
-	}
-	if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_lend_lease
-				option = LIMITED
-			}
-		}
-		always = yes		#handled by game logic, see above
-	}
-	else_if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_lend_lease
-				option = FREE
-			}
-		}
-		always = yes
-	}
-	else_if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_lend_lease
-				option = SAME_IDEOLOGY
-			}
-		}
-		custom_trigger_tooltip = {
-			tooltip = RULE_ALLOW_LEND_LEASE_SAME_IDEOLOGY_TT
-			has_government = FROM
-		}
-	}
-	else_if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_lend_lease
-				option = SAME_FACTION
-			}
-		}
-		custom_trigger_tooltip = {
-			tooltip = RULE_ALLOW_LEND_LEASE_SAME_FACTION_TT
-			is_in_faction_with = FROM
-		}
-	}
-	else_if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_lend_lease
-				option = BLOCKED
-			}
-		}
-		custom_trigger_tooltip = {
-			tooltip = RULE_ALLOW_LEND_LEASE_BLOCKED_TT
-			always = no
-		}
-	}
+	# Free, same as outgoing.
 }
 
 DIPLOMACY_REQUEST_LICENSED_PRODUCTION_ENABLE_TRIGGER = {
-	if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_licensing
-				option = FREE
-			}
-		}
-		always = yes
-	}
-	else_if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_licensing
-				option = SAME_IDEOLOGY
-			}
-		}
-		custom_trigger_tooltip = {
-			tooltip = RULE_ALLOW_LICENSING_SAME_IDEOLOGY_TT
-			has_government = FROM
-		}
-	}
-	else_if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_licensing
-				option = SAME_FACTION
-			}
-		}
-		custom_trigger_tooltip = {
-			tooltip = RULE_ALLOW_LICENSING_SAME_FACTION_TT
-			is_in_faction_with = FROM
-		}
-	}
-	else_if = {
-		limit = {
-			has_game_rule = {
-				rule = allow_licensing
-				option = BLOCKED
-			}
-		}
-		custom_trigger_tooltip = {
-			tooltip = RULE_ALLOW_LICENSING_BLOCKED_TT
-			always = no
-		}
+	# Licensed production is hidden outright in 00_diplo_action_valid_triggers.txt.
+	# This is the backstop: if that token turns out to be spelled wrong, the
+	# button is at least dead and says why instead of silently working.
+	custom_trigger_tooltip = {
+		tooltip = LICENSING_REMOVED_TT
+		always = no
 	}
 }
 
@@ -451,7 +282,7 @@ DIPLOMACY_SEND_VOLUNTEERS_ENABLE_TRIGGER = {
 		custom_trigger_tooltip = {
 			tooltip = Special_Exception_TT
 			check_variable = {
-				ROOT.Volunteer_Allowance^FROM = 1
+				ROOT.Volunteer_Allowance^FROM > 0
 			}
 		}
 	}
@@ -474,6 +305,66 @@ DIPLOMACY_OFFER_JOIN_FACTION_ENABLE_TRIGGER = {
 DIPLOMACY_CREATE_FACTION_ENABLE_TRIGGER = {
 	custom_trigger_tooltip = {
 		tooltip = RULE_ALLOW_CREATE_FACTION_BLOCKED_TOOLTIP
+		always = no
+	}
+}
+
+# ---- Restored from vanilla (same-path files fully replace, these were lost) ----
+DIPLOMACY_REVOKE_OFFER_DOCKING_RIGHTS_ENABLE_TRIGGER = {
+	if = {
+		limit = {
+			original_tag = PHI
+			FROM = { original_tag = USA }
+		}
+		NOT = { has_country_flag = PHI_permanent_usa_naval_bases }
+	}
+	if = {
+		limit = {
+			has_dlc = "Graveyard of Empires"
+			original_tag = IRQ
+			FROM = { original_tag = ENG }
+		}
+		NOT = { has_idea = IRQ_anglo_iraqi_treaty }
+	}
+}
+DIPLOMACY_REVOKE_OFFER_AIR_BASE_ACCESS_ENABLE_TRIGGER = {
+	if = {
+		limit = {
+			original_tag = PHI
+			FROM = { original_tag = USA }
+		}
+		NOT = { has_country_flag = PHI_permanent_usa_naval_bases }
+	}
+	if = {
+		limit = {
+			has_dlc = "Graveyard of Empires"
+			original_tag = IRQ
+			FROM = { original_tag = ENG }
+		}
+		NOT = { has_idea = IRQ_anglo_iraqi_treaty }
+	}
+}
+
+# ---- Expeditionary forces: dead ----
+# The AI already always joins your wars, so the problem expeditionary forces
+# exist to solve never comes up. is_diplomatic_action_valid_* did not hide the
+# buttons (see 00_diplo_action_valid_triggers.txt), so this is the kill: greyed
+# out with a tooltip that says why.
+DIPLOMACY_SEND_EXP_FORCE_ENABLE_TRIGGER = {
+	custom_trigger_tooltip = {
+		tooltip = EXP_FORCE_REMOVED_TT
+		always = no
+	}
+}
+DIPLOMACY_REQUEST_EXP_FORCE_ENABLE_TRIGGER = {
+	custom_trigger_tooltip = {
+		tooltip = EXP_FORCE_REMOVED_TT
+		always = no
+	}
+}
+DIPLOMACY_RETURN_EXP_FORCE_ENABLE_TRIGGER = {
+	custom_trigger_tooltip = {
+		tooltip = EXP_FORCE_REMOVED_TT
 		always = no
 	}
 }

@@ -1,0 +1,57 @@
+# ============================================================
+# DIPLOMATIC POWER (DP) — the currency for everything outside our borders.
+#
+# One national pool, like Political Power but for foreign affairs. Accrues
+# DAILY and is spent by CONTENT: decisions, diplomatic actions and events.
+# There is no system behind it — no scores per country, no slots, no ladder.
+# Spheres, pacts and alignments are whatever content says they are.
+#
+# See docs/DIPLOMATIC_POWER_API.md
+# ============================================================
+
+# Daily income. Each component is kept as its own variable so the topbar
+# tooltip can itemise it the way the Political Power tooltip does.
+cwic_dp_daily = {
+	set_variable = { dp_base = 0.5 }                           # every state has some reach
+
+	set_variable = { dp_ind = num_of_factories }               # industrial weight
+	divide_variable = { dp_ind = 600 }
+
+	set_variable = { dp_sub = num_subjects }                   # people who answer to us
+	multiply_variable = { dp_sub = 0.07 }
+
+	set_variable = { dp_nuke = num_of_nukes }                  # the ultimate argument
+	multiply_variable = { dp_nuke = 0.02 }
+
+	set_variable = { dp_per_day = dp_base }
+	add_to_variable = { dp_per_day = dp_ind }
+	add_to_variable = { dp_per_day = dp_sub }
+	add_to_variable = { dp_per_day = dp_nuke }
+
+	# Content hooks: both modifiers are already registered and already granted
+	# by existing acts, ideas and focuses (CIA Act, Peace Corps, Mutual Security).
+	set_variable = { dp_bonus = dp_per_day }
+	multiply_variable = { dp_bonus = modifier@foreign_influence_modifier }
+	set_variable = { dp_flat = modifier@influence_gain_flat }
+	divide_variable = { dp_flat = 30 }                         # those were written per month
+	add_to_variable = { dp_per_day = dp_bonus }
+	add_to_variable = { dp_per_day = dp_flat }
+
+	add_to_variable = { diplomatic_power = dp_per_day }
+	clamp_variable = { var = diplomatic_power min = 0 max = 500 }
+}
+
+# Spend. TARGET = whoever is paying (usually ROOT). temp dp_cost.
+# Pair it with a custom_cost_trigger on the decision so the price is visible.
+dp_spend = {
+	subtract_from_variable = { diplomatic_power = dp_cost }
+	clamp_variable = { var = diplomatic_power min = 0 max = 500 }
+	custom_effect_tooltip = dp_spend_tt
+}
+
+# Grant. temp dp_amount. Use for focus/event rewards.
+dp_gain = {
+	add_to_variable = { diplomatic_power = dp_amount }
+	clamp_variable = { var = diplomatic_power min = 0 max = 500 }
+	custom_effect_tooltip = dp_gain_tt
+}

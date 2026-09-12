@@ -5,6 +5,22 @@
 
 # in some cases this trigger is checked for only initatior country, in that case both from & this is same
 
+# ------------------------------------------------------------
+# WARNING, READ THIS BEFORE EDITING.
+#
+# A MISSPELLED TOKEN IS SILENTLY INERT. The engine simply never looks it up,
+# and the file still parses as an ordinary unused scripted trigger. No error,
+# no red text in the log, no clue in game. The only way to know a hide worked
+# is to open the diplomacy panel and watch the button disappear.
+#
+# The token namespace follows the engine's internal diplomatic_relations enum,
+# NOT the localisation key. That is why it is `military_access` and not
+# `milacc`, even though the loc key is DIPLOMACY_MILACC_ENABLE_TRIGGER.
+#
+# Where the spelling is not certain, BOTH candidates are written below. An
+# unused scripted trigger costs nothing, so the hedge is free.
+# ------------------------------------------------------------
+
 is_diplomatic_action_valid_stage_coup = {
 	NOT = { has_dlc = "La Resistance" } # we have operation for it
 }
@@ -12,29 +28,99 @@ is_diplomatic_action_valid_stage_coup = {
 is_diplomatic_action_valid_boost_party_popularity = {
 	NOT = { has_dlc = "La Resistance" } # we have operation for it
 }
+
+# ---- Trade denial: one button, ours ----
+# "Embargo" and "Impose Naval Blockade" are the SAME MECHANIC under two names.
+# The effect behind both is `send_embargo`, which opt_embargo_action already
+# calls, so there was never a merge to build - only leftover vanilla buttons to
+# take off the list. `break_embargo` is the other half (note: since 1.14.7 it
+# ignores scoping and always applies to ROOT, which is how we call it anyway).
 is_diplomatic_action_valid_embargo = {
 	always = no
 }
-#DIPLOMACY_EMBARGO
+is_diplomatic_action_valid_naval_blockade = {
+	always = no
+}
 
-# ---- Access requests folded into the CWIC sphere Military Accord ----
-# Sphere-capable powers get mutual Military Access + Docking Rights from the accord,
-# so the separate vanilla asks are hidden for them. Minors keep the vanilla actions.
+# ---- Vanilla access requests: disabled outright ----
+# Military access, docking rights and air base access are not asked for through
+# the diplomacy list in CWIC. One scripted action grants all three:
+# opt_military_cooperation_action.
 is_diplomatic_action_valid_military_access = {
-	FROM = { NOT = { is_sphere_capable = yes } }
+	always = no
 }
 is_diplomatic_action_valid_offer_military_access = {
-	FROM = { NOT = { is_sphere_capable = yes } }
+	always = no
 }
 is_diplomatic_action_valid_docking_rights = {
-	FROM = { NOT = { is_sphere_capable = yes } }
+	always = no
 }
 is_diplomatic_action_valid_offer_docking_rights = {
-	FROM = { NOT = { is_sphere_capable = yes } }
+	always = no
 }
 is_diplomatic_action_valid_air_base_access = {
-	FROM = { NOT = { is_sphere_capable = yes } }
+	always = no
 }
 is_diplomatic_action_valid_offer_air_base_access = {
-	FROM = { NOT = { is_sphere_capable = yes } }
+	always = no
 }
+
+# ---- Guarantee: KEPT ----
+# Vanilla guarantee stays available. It drags the guarantor into the war, which
+# is a real and sometimes useful commitment. The scripted Defence Commitment
+# sits BESIDE it, not instead of it: that one does not drag you into the war,
+# it writes the volunteer licence and opens lend-lease. Two different promises.
+
+# ---- Licensed production: removed ----
+# Nobody used it. DIPLOMACY_REQUEST_LICENSED_PRODUCTION_ENABLE_TRIGGER is the
+# backstop in case this token is spelled wrong.
+is_diplomatic_action_valid_request_access_to_licence_production = {
+	always = no
+}
+is_diplomatic_action_valid_request_licensed_production = {
+	always = no
+}
+is_diplomatic_action_valid_cancel_licensed_production = {
+	always = no
+}
+is_diplomatic_action_valid_cancel_access_to_licence_production = {
+	always = no
+}
+
+# ---- Market access: removed ----
+# Measured as a real framerate cost, and it buys the player nothing a trade
+# route does not already buy them. `give_market_access` still works for
+# content that wants to hand it out.
+# The error log proved `market_access` and `cancel_market_access` are not
+# tokens at all. The button's loc key is
+# DIPLOMACY_REQUEST_INTERNATIONAL_MARKET_ACCESS_RIGHTS_TITLE = "Negotiate Market
+# Access", so these are the names to try.
+is_diplomatic_action_valid_request_international_market_access_rights = {
+	always = no
+}
+is_diplomatic_action_valid_revoke_international_market_access_rights = {
+	always = no
+}
+is_diplomatic_action_valid_market_access_rights = {
+	always = no
+}
+
+# ---- Expeditionary forces: gone, all three ----
+# The AI already always joins your wars, so the problem expeditionary forces
+# exist to solve - getting an ally's divisions into your war - never comes up.
+# Volunteers cover "our troops fight in someone else's war". Three buttons for
+# a problem the mod does not have.
+is_diplomatic_action_valid_send_expeditionary_force = {
+	always = no
+}
+is_diplomatic_action_valid_request_expeditionary_forces = {
+	always = no
+}
+is_diplomatic_action_valid_return_expeditionary_forces = {
+	always = no
+}
+# `send_exp_force` / `request_exp_force` / `return_exp_force` were tried and the
+# error log says those tokens do not exist. The three names above DO exist, but
+# the buttons stayed on screen anyway - so this hook is probably not wired for
+# expeditionary forces at all. The real kill is the ENABLE_TRIGGER pair in
+# diplomacy_scripted_triggers.txt, which greys them out with a tooltip.

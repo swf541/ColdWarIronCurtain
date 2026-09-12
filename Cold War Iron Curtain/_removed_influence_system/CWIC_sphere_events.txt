@@ -1,0 +1,97 @@
+add_namespace = cwic_sphere
+
+# Fired to the OLD sphere leader when a rival tears a member from their sphere.
+country_event = {
+	id = cwic_sphere.1
+	title = cwic_sphere.1.t
+	desc = cwic_sphere.1.d
+	picture = GFX_report_event_generic_sign_treaty
+
+	is_triggered_only = yes
+
+	option = {
+		name = cwic_sphere.1.a
+		clear_global_event_target = sph_news_target
+		clear_global_event_target = sph_news_ripper
+	}
+}
+
+# Fired to every OTHER power holding >25 influence when the balance moves.
+# global.sph_news_kind says what happened; GetSphNewsLine turns it into a sentence.
+country_event = {
+	id = cwic_sphere.2
+	title = cwic_sphere.2.t
+	desc = cwic_sphere.2.d
+	picture = GFX_report_event_generic_sign_treaty
+
+	is_triggered_only = yes
+
+	option = {
+		name = cwic_sphere.2.a
+	}
+}
+
+# Fired to a country the moment it is brought into a sphere.
+country_event = {
+	id = cwic_sphere.3
+	title = cwic_sphere.3.t
+	desc = cwic_sphere.3.d
+	picture = GFX_report_event_generic_sign_treaty
+
+	is_triggered_only = yes
+
+	option = {
+		name = cwic_sphere.3.a
+	}
+}
+
+# Fired to a sphere member when its patron's embargo is imposed on it.
+country_event = {
+	id = cwic_sphere.4
+	title = cwic_sphere.4.t
+	desc = cwic_sphere.4.d
+	picture = GFX_report_event_generic_trade
+
+	is_triggered_only = yes
+
+	option = {
+		name = cwic_sphere.4.a
+	}
+}
+
+# ============================================================
+# TEMPLATE for content designers — copy this, do not fire it.
+# A regime change / election in event_target:sph_patron_subject, offered to a
+# patron who holds enough influence to have a say. The options spend influence,
+# so intervening costs you the standing you built.
+# Fire it with:
+#     set_temp_variable = { sph_min = 50 }
+#     sph_find_patrons = yes
+#     if = { limit = { check_variable = { sph_patron_count > 0 } }
+#         event_target:sph_patron_1 = { country_event = cwic_sphere.5 } }
+# ============================================================
+country_event = {
+	id = cwic_sphere.5
+	title = cwic_sphere.5.t
+	desc = cwic_sphere.5.d
+	picture = GFX_report_event_generic_rally
+
+	is_triggered_only = yes
+
+	# Put our thumb on the scale — costs 25 of the influence we built here.
+	option = {
+		name = cwic_sphere.5.a
+		event_target:sph_patron_subject = {
+			set_temp_variable = { sph_from = ROOT.id }
+			set_temp_variable = { sph_amount = -25 }
+			sph_grant_influence = yes
+		}
+		custom_effect_tooltip = cwic_sphere.5.a.tt
+	}
+
+	# Stay out of it.
+	option = {
+		name = cwic_sphere.5.b
+	}
+}
+

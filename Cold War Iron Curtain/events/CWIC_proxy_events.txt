@@ -1,0 +1,109 @@
+add_namespace = cwic_proxy
+
+# ============================================================
+# PROXY WARS. Fired by cwic_proxy_pulse, at most one chain a month.
+# event_target:cwic_theatre    = the country being fought over
+# event_target:cwic_intervenor = the bloc that sent volunteers
+# ============================================================
+
+# To the rival bloc: they have noticed foreign volunteers.
+country_event = {
+	id = cwic_proxy.1
+	title = cwic_proxy.1.t
+	desc = cwic_proxy.1.d
+	picture = GFX_report_event_generic_soldiers
+
+	is_triggered_only = yes
+
+	# Demand they leave.
+	option = {
+		name = cwic_proxy.1.a
+		ai_chance = { factor = 40 }
+		event_target:cwic_intervenor = { country_event = cwic_proxy.2 }
+	}
+
+	# Skip the diplomacy and arm the other side now.
+	option = {
+		name = cwic_proxy.1.b
+		ai_chance = { factor = 20 }
+		set_variable = { Volunteer_Allowance^event_target:cwic_theatre = 1 }
+		event_target:cwic_theatre = {
+			add_to_variable = { cwic_esc = 1 }
+			set_variable = { cwic_esc_cd = 18 }
+			clr_country_flag = cwic_proxy_demanded
+		}
+	}
+
+	# Not our fight.
+	option = {
+		name = cwic_proxy.1.c
+		ai_chance = { factor = 40 }
+		event_target:cwic_theatre = {
+			set_variable = { cwic_esc_cd = 24 }
+			clr_country_flag = cwic_proxy_demanded
+		}
+	}
+}
+
+# To the intervenor: withdraw, or refuse and let them in.
+country_event = {
+	id = cwic_proxy.2
+	title = cwic_proxy.2.t
+	desc = cwic_proxy.2.d
+	picture = GFX_report_event_generic_soldiers
+
+	is_triggered_only = yes
+
+	# Pull them out.
+	option = {
+		name = cwic_proxy.2.a
+		ai_chance = { factor = 35 }
+		recall_volunteers_from = event_target:cwic_theatre
+		event_target:cwic_theatre = {
+			set_variable = { cwic_esc_cd = 12 }
+			clr_country_flag = cwic_proxy_demanded
+		}
+	}
+
+	# Stay. They will arm the other side.
+	option = {
+		name = cwic_proxy.2.b
+		ai_chance = { factor = 65 }
+		event_target:cwic_theatre = { save_global_event_target_as = cwic_theatre }
+		cwic_proxy_refused = yes
+	}
+}
+
+# To the rival: the refusal licenses them.
+country_event = {
+	id = cwic_proxy.3
+	title = cwic_proxy.3.t
+	desc = cwic_proxy.3.d
+	picture = GFX_report_event_generic_soldiers
+
+	is_triggered_only = yes
+
+	option = {
+		name = cwic_proxy.3.a
+		# THE LICENCE. It must point at the theatre's ENEMIES, not at the
+		# theatre itself - this used to license us to send volunteers to the
+		# very country the other bloc was already propping up, which is the
+		# opposite of "you refused to leave, so we arm the other side".
+		#
+		# every_country once, only when this event fires (at most monthly), and
+		# written as ROOT.<array>^THIS so there is no scope jump to go wrong.
+		every_country = {
+			limit = {
+				has_war_with = event_target:cwic_theatre
+				is_subject = no
+				NOT = { tag = ROOT }
+			}
+			set_variable = { ROOT.Volunteer_Allowance^THIS = 1 }
+		}
+		event_target:cwic_theatre = {
+			add_to_variable = { cwic_esc = 1 }
+			set_variable = { cwic_esc_cd = 18 }
+			clr_country_flag = cwic_proxy_demanded
+		}
+	}
+}

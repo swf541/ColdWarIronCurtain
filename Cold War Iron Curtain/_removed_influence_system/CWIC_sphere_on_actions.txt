@@ -78,20 +78,49 @@ on_actions = {
 					multiply_temp_variable = { sph_income = 0.01 }
 					add_to_variable = { currentMoney = sph_income }
 				}
-				# embargo sync: members adopt the leader's embargoes
+				# Embargo sync, both directions: members adopt the leader's embargoes and
+				# drop them again when the leader lifts one. sph_forced_emb marks the ones the
+				# sphere imposed, so a member's own embargoes are never touched.
+				# ponytail: O(countries x members) once a month per leader, same cost as before;
+				# make it event-driven if the monthly tick ever shows up in a profile.
 				every_country = {
 					limit = {
-						check_variable = { PREV.trade_embargo_check^THIS = 1 }
-						NOT = { is_in_array = { PREV.sph_members = THIS.id } }
 						NOT = { tag = PREV }
+						NOT = { is_in_array = { PREV.sph_members = THIS.id } }
 					}
-					for_each_loop = {
-						array = PREV.sph_members
-						value = mid
-						if = {
-							limit = { country_exists = var:mid }
-							var:mid = {
-								set_variable = { trade_embargo_check^PREV = 1 }
+					save_event_target_as = sph_emb_target
+					set_temp_variable = { sph_emb_on = 0 }
+					if = {
+						limit = { check_variable = { PREV.trade_embargo_check^THIS = 1 } }
+						set_temp_variable = { sph_emb_on = 1 }
+					}
+					PREV = {
+						for_each_loop = {
+							array = sph_members
+							value = mid
+							if = {
+								limit = { country_exists = var:mid }
+								var:mid = {
+									if = {
+										limit = {
+											check_variable = { sph_emb_on = 1 }
+											NOT = { check_variable = { sph_forced_emb^event_target:sph_emb_target = 1 } }
+										}
+										set_variable = { trade_embargo_check^event_target:sph_emb_target = 1 }
+										set_variable = { sph_forced_emb^event_target:sph_emb_target = 1 }
+										PREV = { save_global_event_target_as = sph_news_actor }
+										event_target:sph_emb_target = { save_global_event_target_as = sph_news_target }
+										country_event = cwic_sphere.4
+									}
+									else_if = {
+										limit = {
+											check_variable = { sph_emb_on = 0 }
+											check_variable = { sph_forced_emb^event_target:sph_emb_target = 1 }
+										}
+										set_variable = { trade_embargo_check^event_target:sph_emb_target = 0 }
+										set_variable = { sph_forced_emb^event_target:sph_emb_target = 0 }
+									}
+								}
 							}
 						}
 					}

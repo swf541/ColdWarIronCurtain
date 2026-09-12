@@ -1,0 +1,42 @@
+on_actions = {
+	# Register both belligerents. ROOT declares, FROM is the target.
+	on_declare_war = {
+		effect = {
+			ROOT = { cwic_proxy_register = yes }
+			FROM = { cwic_proxy_register = yes }
+		}
+	}
+
+	# SEED EXISTING WARS. on_declare_war only catches wars declared after the
+	# game starts - every war already running at the bookmark (Greece, China,
+	# Indochina, Korea in the later starts) was invisible to the system, which
+	# is half of why the intervention event never fired. One pass, once, at
+	# startup.
+	on_startup = {
+		effect = {
+			every_country = {
+				limit = { has_war = yes }
+				cwic_proxy_register = yes
+			}
+		}
+	}
+
+	# The sweep. This was `on_monthly` with a `limit = { tag = USA }` guard -
+	# but the bare `on_monthly` on_action does not exist, only the per-country
+	# `on_monthly_<TAG>` form does, so the pulse never ran at all. That is the
+	# other half of why no intervention event ever fired.
+	#
+	# Scoped to USA so it runs once globally, not once per country.
+	on_monthly_USA = {
+		effect = {
+			cwic_proxy_pulse = yes
+		}
+	}
+
+	on_peace = {
+		effect = { cwic_proxy_close = yes }
+	}
+	on_capitulation = {
+		effect = { cwic_proxy_close = yes }
+	}
+}
